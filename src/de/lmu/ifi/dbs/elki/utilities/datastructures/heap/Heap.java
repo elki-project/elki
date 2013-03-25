@@ -25,9 +25,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * Basic in-memory heap structure. Closely related to a
@@ -43,7 +40,7 @@ import java.util.NoSuchElementException;
  * @param <E> Element type. Should be {@link java.lang.Comparable} or a
  *        {@link java.util.Comparator} needs to be given.
  */
-public class Heap<E> implements Iterable<E> {
+public class Heap<E> {
   /**
    * Heap storage.
    */
@@ -377,11 +374,6 @@ public class Heap<E> implements Iterable<E> {
     heapModified();
   }
 
-  @Override
-  public Iterator<E> iterator() {
-    return new Itr();
-  }
-
   /**
    * Called at the end of each heap modification.
    */
@@ -390,52 +382,12 @@ public class Heap<E> implements Iterable<E> {
   }
 
   /**
-   * Iterator over queue elements. No particular order (i.e. heap order!)
+   * Get an unordered heap iterator.
    * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
+   * @return Iterator.
    */
-  protected final class Itr implements Iterator<E> {
-    /**
-     * Cursor position.
-     */
-    private int cursor = 0;
-
-    /**
-     * Modification counter this iterator is valid for.
-     */
-    private int expectedModCount = modCount;
-
-    @Override
-    public boolean hasNext() {
-      return cursor < size;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public E next() {
-      if (expectedModCount != modCount) {
-        throw new ConcurrentModificationException();
-      }
-      if (cursor < size) {
-        return (E) queue[cursor++];
-      }
-      throw new NoSuchElementException();
-    }
-
-    @Override
-    public void remove() {
-      if (expectedModCount != modCount) {
-        throw new ConcurrentModificationException();
-      }
-      if (cursor > 0) {
-        cursor--;
-      } else {
-        throw new IllegalStateException();
-      }
-      expectedModCount = modCount;
-    }
+  public UnorderedIter unorderedIter() {
+    return new UnorderedIter();
   }
 
   /**
@@ -464,5 +416,44 @@ public class Heap<E> implements Iterable<E> {
       }
     }
     return null;
+  }
+
+  /**
+   * Heap iterator.
+   * 
+   * @author Erich Schubert
+   */
+  public class UnorderedIter implements de.lmu.ifi.dbs.elki.utilities.iterator.Iter {
+    /**
+     * Current iterator position.
+     */
+    int pos = 0;
+
+    /**
+     * Constructor.
+     */
+    protected UnorderedIter() {
+      super();
+    }
+
+    @Override
+    public boolean valid() {
+      return pos < size();
+    }
+
+    @Override
+    public void advance() {
+      pos++;
+    }
+
+    /**
+     * Get the current queue element.
+     * 
+     * @return Element
+     */
+    @SuppressWarnings("unchecked")
+    public E get() {
+      return (E) queue[pos];
+    }
   }
 }

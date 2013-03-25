@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 
 /**
  * A size-limited heap similar to {@link TopBoundedHeap}, discarding elements
@@ -74,12 +73,6 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
   public void clear() {
     super.clear();
     ties.clear();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Iterator<E> iterator() {
-    return new MergedIterator<>(ties.iterator(), super.iterator());
   }
 
   @Override

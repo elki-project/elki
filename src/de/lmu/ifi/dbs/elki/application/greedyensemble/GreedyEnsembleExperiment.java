@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -146,7 +147,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         if (heap.size() >= 2 * estimated_outliers) {
           LOG.warning("Too many ties. Expected: " + estimated_outliers + " got: " + heap.size());
         }
-        for (DoubleIntPair pair : heap) {
+        for (Heap<DoubleIntPair>.UnorderedIter it = heap.unorderedIter(); it.valid(); it.advance()) {
+          DoubleIntPair pair = it.get();
           if (outliers_seen[pair.second] == 0) {
             outliers_seen[pair.second] = 1;
             union_outliers += 1;
@@ -276,7 +278,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
             for (int i = 0; i < dim; i++) {
               oheap.add(new DoubleIntPair(vec.doubleValue(i), i));
             }
-            for (DoubleIntPair pair : oheap) {
+            for (Heap<DoubleIntPair>.UnorderedIter it = oheap.unorderedIter(); it.valid(); it.advance()) {
+              DoubleIntPair pair = it.get();
               assert (outliers_seen[pair.second] > 0);
               outliers_seen[pair.second] -= 1;
               if (outliers_seen[pair.second] == 0) {
