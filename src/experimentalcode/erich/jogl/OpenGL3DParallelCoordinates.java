@@ -33,7 +33,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.media.opengl.DebugGL2;
@@ -52,6 +51,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -79,7 +79,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import experimentalcode.erich.jogl.Simple1DOFCamera.CameraListener;
 import experimentalcode.shared.parallelcoord.layout.Layout;
 import experimentalcode.shared.parallelcoord.layout.Layouter3DPC;
@@ -114,12 +113,16 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     StyleResult style = getStyleResult(baseResult);
-    Iterator<Relation<? extends NumberVector<?>>> iter = VisualizerUtil.iterateVectorFieldRepresentations(newResult);
-    while (iter.hasNext()) {
-      Relation<? extends NumberVector<?>> rel = iter.next();
-      ScalesResult scales = ResultUtil.getScalesResult(rel);
+    List<Relation<?>> rels = ResultUtil.getRelations(newResult);
+    for (Relation<?> rel : rels) {
+      if (!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      @SuppressWarnings("unchecked")
+      Relation<? extends NumberVector<?>> vrel = (Relation<? extends NumberVector<?>>) rel;
+      ScalesResult scales = ResultUtil.getScalesResult(vrel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
-      new Instance(rel, proj, settings, style).run();
+      new Instance(vrel, proj, settings, style).run();
     }
   }
 

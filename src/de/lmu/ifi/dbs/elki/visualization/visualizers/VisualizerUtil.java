@@ -23,18 +23,9 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
@@ -48,40 +39,9 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 public final class VisualizerUtil {
   /**
    * Fake constructor: do not instantiate.
-   * 
    */
   private VisualizerUtil() {
     // Do not instantiate.
-  }
-
-  /**
-   * Find the visualizer context in a result tree.
-   * 
-   * @param baseResult base result to start searching at.
-   * @return Visualizer context
-   */
-  public static VisualizerContext getContext(HierarchicalResult baseResult) {
-    List<VisualizerContext> contexts = ResultUtil.filterResults(baseResult, VisualizerContext.class);
-    if (!contexts.isEmpty()) {
-      return contexts.get(0);
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Utility function to change Visualizer visibility.
-   * 
-   * @param task Visualization task
-   * @param visibility Visibility value
-   */
-  public static void setVisible(VisualizationTask task, boolean visibility) {
-    VisualizerContext context = task.getContext();
-    if (context != null) {
-      setVisible(context, task, visibility);
-    } else {
-      LoggingUtil.warning("setVisible called without context in task.", new Throwable());
-    }
   }
 
   /**
@@ -104,59 +64,5 @@ public final class VisualizerUtil {
     }
     task.visible = visibility;
     context.getHierarchy().resultChanged(task);
-  }
-
-  /**
-   * Filter for number vector field representations.
-   * 
-   * @param result Result to filter
-   * @return Iterator over suitable representations
-   */
-  // TODO: move to DatabaseUtil?
-  public static Iterator<Relation<? extends NumberVector<?>>> iterateVectorFieldRepresentations(final Result result) {
-    List<Relation<?>> parent = ResultUtil.filterResults(result, Relation.class);
-    return new VectorspaceIterator(parent.iterator());
-  }
-
-  /**
-   * Iterate over vectorspace.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private static class VectorspaceIterator extends AbstractFilteredIterator<Relation<?>, Relation<? extends NumberVector<?>>> {
-    /**
-     * Parent iterator.
-     */
-    private Iterator<Relation<?>> parent;
-
-    /**
-     * Constructor.
-     * 
-     * @param parent Parent iterator
-     */
-    public VectorspaceIterator(Iterator<Relation<?>> parent) {
-      super();
-      this.parent = parent;
-    }
-
-    @Override
-    protected Iterator<Relation<?>> getParentIterator() {
-      return parent;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected Relation<? extends NumberVector<?>> testFilter(Relation<?> nextobj) {
-      final SimpleTypeInformation<?> type = nextobj.getDataTypeInformation();
-      if (!NumberVector.class.isAssignableFrom(type.getRestrictionClass())) {
-        return null;
-      }
-      if (!(type instanceof VectorFieldTypeInformation)) {
-        return null;
-      }
-      return (Relation<? extends NumberVector<?>>) nextobj;
-    }
   };
 }
