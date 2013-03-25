@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -203,7 +202,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     // Refine cluster cores into projected clusters.
-    ArrayList<DBIDRef> dbids = new ArrayList<DBIDRef>(); // matrix row->DBID
+    ArrayModifiableDBIDs dbids = DBIDUtil.newArray(relation.size()); // matrix row->DBID
     Matrix M = computeFuzzyMembership(clusterCores, dbids);
     assignUnassigned(M, clusterCores, dbids);
     M = expectationMaximization(M, dbids);
@@ -272,7 +271,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   }
 
   /**
-   * ChiSquare quantiles, indexed by degrees of freedom.
+   * ChiSquare quantiles, indexed by degrees of freedom for alpha=0.001.
    * http://www.itl.nist.gov/div898/handbook/eda/section3/eda3674.htm
    */
   private static double[] chiSquaredQuantiles = new double[] { 10.828, 13.816, 16.266, 18.467, 20.515, 22.458, 24.322, 26.125, 27.877, 29.588, 31.264, 32.910, 34.528, 36.123, 37.697, 39.252, 40.790, 42.312, 43.820, 45.315, 46.797, 48.268, 49.728, 51.179, 52.620, 54.052, 55.476, 56.892, 58.301, 59.703, 61.098, 62.487, 63.870, 65.247, 66.619, 67.985, 69.347, 70.703, 72.055, 73.402, 74.745, 76.084, 77.419, 78.750, 80.077, 81.400, 82.720, 84.037, 85.351, 86.661, 87.968, 89.272, 90.573, 91.872, 93.168, 94.461, 95.751, 97.039, 98.324, 99.607, 100.888, 102.166, 103.442, 104.716, 105.988, 107.258, 108.526, 109.791, 111.055, 112.317, 113.577, 114.835, 116.092, 117.346, 118.599, 119.850, 121.100, 122.348, 123.594, 124.839, 126.083, 127.324, 128.565, 129.804, 131.041, 132.277, 133.512, 134.746, 135.978, 137.208, 138.438, 139.666, 140.893, 142.119, 143.344, 144.567, 145.789, 147.010, 148.230, 149.449 };
@@ -285,7 +284,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param dbids mapping of matrix row to DBID.
    * @return the fuzzy membership matrix.
    */
-  private Matrix computeFuzzyMembership(ArrayList<Signature> clusterCores, ArrayList<DBIDRef> dbids) {
+  private Matrix computeFuzzyMembership(ArrayList<Signature> clusterCores, ArrayModifiableDBIDs dbids) {
     final int n = relation.size();
     final int k = clusterCores.size();
 
@@ -325,7 +324,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param clusterCores the cluster cores.
    * @param dbids mapping of matrix row to DBID.
    */
-  private void assignUnassigned(Matrix M, ArrayList<Signature> clusterCores, ArrayList<DBIDRef> dbids) {
+  private void assignUnassigned(Matrix M, ArrayList<Signature> clusterCores, ArrayModifiableDBIDs dbids) {
     final int n = relation.size();
     final int k = clusterCores.size();
 
@@ -362,7 +361,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param M the initial membership matrix.
    * @param dbids mapping of matrix row to DBID.
    */
-  private Matrix expectationMaximization(Matrix M, ArrayList<DBIDRef> dbids) {
+  private Matrix expectationMaximization(Matrix M, ArrayModifiableDBIDs dbids) {
     final int n = M.getRowDimensionality();
     final int k = M.getColumnDimensionality();
 
@@ -373,8 +372,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Initialize variables based on original membership guess.
     for(int cluster = 0; cluster < k; ++cluster) {
       CovarianceMatrix cvm = new CovarianceMatrix(dimensionality);
-      for(int point = 0; point < n; ++cluster) {
-        cvm.put(relation.get(dbids.get(point)), M.get(point, cluster));
+      for(int point = 0; point < n; ++point) {
+        final double weight = M.get(point, cluster);
+        if (weight != 0) {
+          cvm.put(relation.get(dbids.get(point)), weight);
+        }
       }
       means[cluster] = cvm.getMeanVector();
       covariances[cluster] = cvm.destroyToNaiveMatrix();
@@ -383,7 +385,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Do EM as paper says...
     final int maxEmIterations = 5;
     for(int iteration = 0; iteration < maxEmIterations; ++iteration) {
-      // ... using mahalanobis to compute probabilities.
+      // ... using Mahalanobis to compute probabilities.
       for(int point = 0; point < n; ++point) {
         for(int cluster = 0; cluster < k; ++cluster) {
           // TODO does this need normalization?
@@ -395,8 +397,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       boolean allMeansEqual = true;
       for(int cluster = 0; cluster < k; ++cluster) {
         CovarianceMatrix cvm = new CovarianceMatrix(dimensionality);
-        for(int point = 0; point < n; ++cluster) {
-          cvm.put(relation.get(dbids.get(point)), M.get(point, cluster));
+        for(int point = 0; point < n; ++point) {
+          final double weight = M.get(point, cluster);
+          if (weight != 0) {
+            cvm.put(relation.get(dbids.get(point)), weight);
+          }
         }
         Vector mean = cvm.getMeanVector();
         for(int dim = 0; dim < dimensionality; ++dim) {
@@ -423,7 +428,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param dbids mapping matrix row to DBID.
    * @return a hard clustering based on the matrix.
    */
-  private ArrayModifiableDBIDs[] hardClustering(Matrix M, ArrayList<DBIDRef> dbids) {
+  private ArrayModifiableDBIDs[] hardClustering(Matrix M, ArrayModifiableDBIDs dbids) {
     final int n = M.getRowDimensionality();
     final int k = M.getColumnDimensionality();
 
@@ -470,8 +475,8 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       CovarianceMatrix cvm = CovarianceMatrix.make(relation, clusters[cluster]);
       Vector mean = cvm.getMeanVector();
       Matrix covariance = cvm.destroyToNaiveMatrix();
-      double cv = ChiSquaredDistribution.cdf(0.001f, signatures.get(cluster).dimensions.cardinality());
-      for(int point = clusters[cluster].size() - 1; point >= 0; ++point) {
+      final double cv = chiSquaredQuantiles[signatures.get(cluster).dimensions.cardinality() - 1];
+      for(int point = clusters[cluster].size() - 1; point >= 0; --point) {
         if(MathUtil.mahalanobisDistance(covariance, mean.minus(relation.get(clusters[cluster].get(point)).getColumnVector())) > cv) {
           // Outlier, remove it and add it to the outlier set.
           outliers.add(clusters[cluster].remove(point));
