@@ -27,7 +27,6 @@ import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
  * 
  * @author Erich Schubert
  */
-public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Object> {
+public class EvaluationTabPanel extends ParameterTabPanel {
   /**
    * Serial version.
    */
@@ -72,8 +71,8 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
     super();
     this.input = input;
     this.algs = algs;
-    input.addObserver(this);
-    algs.addObserver(this);
+    input.addPanelListener(this);
+    algs.addPanelListener(this);
   }
 
   @Override
@@ -136,7 +135,7 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
   }
 
   @Override
-  public void update(Object o) {
+  public void panelUpdated(ParameterTabPanel o) {
     if (o == input || o == algs) {
       checkDependencies();
       updateStatus();
@@ -151,7 +150,7 @@ public class EvaluationTabPanel extends ParameterTabPanel implements Observer<Ob
       if (!input.isComplete() || !algs.isComplete() || basedOnResult.get() != algs.getAlgorithmStep().getResult()) {
         // We've become invalidated, notify.
         basedOnResult = null;
-        observers.notifyObservers(this);
+        firePanelUpdated();
       }
     }
   }
