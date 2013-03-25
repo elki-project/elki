@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayListIter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -155,11 +156,11 @@ public class PolygonVisualization extends AbstractVisFactory {
             Vector first = ppoly.get(0);
             double[] f = proj.fastProjectDataToRenderSpace(first.getArrayRef());
             path.moveTo(f[0], f[1]);
-            for(Vector v : ppoly) {
-              if(v == first) {
+            for(ArrayListIter<Vector> it = ppoly.iter(); it.valid(); it.advance()) {
+              if(it.getOffset() == 0) {
                 continue;
               }
-              double[] p = proj.fastProjectDataToRenderSpace(v.getArrayRef());
+              double[] p = proj.fastProjectDataToRenderSpace(it.get().getArrayRef());
               path.drawTo(p[0], p[1]);
             }
             // close path.

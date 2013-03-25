@@ -23,76 +23,75 @@ package de.lmu.ifi.dbs.elki.utilities.iterator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ListIterator;
+import java.util.List;
 
 /**
- * Iterator proxy that does not allow modifications.
+ * ELKI style Iterator for array lists.
+ * 
+ * Note: this implementation is only efficient for lists with efficient random
+ * access and seeking (i.e. ArrayLists, but not Linked Lists!)
  * 
  * @author Erich Schubert
  * 
- * @apiviz.stereotype decorator
- * @apiviz.composedOf ListIterator oneway - - decorates
- * 
- * @param <T>
+ * @param <O> contained object type.
  */
-public final class UnmodifiableListIterator<T> implements ListIterator<T> {
+public class ArrayListIter<O> implements ArrayIter {
   /**
-   * Real iterator
+   * The array list to iterate over.
    */
-  private ListIterator<T> inner;
+  final List<O> data;
+
+  /**
+   * Current position.
+   */
+  int pos = 0;
 
   /**
    * Constructor.
    * 
-   * @param inner Real iterator to proxy.
+   * @param data Data array.
    */
-  public UnmodifiableListIterator(ListIterator<T> inner) {
+  public ArrayListIter(List<O> data) {
     super();
-    this.inner = inner;
+    this.data = data;
   }
 
   @Override
-  public boolean hasNext() {
-    return inner.hasNext();
+  public boolean valid() {
+    return pos < data.size();
   }
 
   @Override
-  public T next() {
-    return inner.next();
+  public void advance() {
+    pos++;
   }
 
   @Override
-  public boolean hasPrevious() {
-    return inner.hasPrevious();
+  public int getOffset() {
+    return pos;
   }
 
   @Override
-  public T previous() {
-    return inner.previous();
+  public void advance(int count) {
+    pos += count;
   }
 
   @Override
-  public int nextIndex() {
-    return inner.nextIndex();
+  public void retract() {
+    pos--;
   }
 
   @Override
-  public int previousIndex() {
-    return inner.previousIndex();
+  public void seek(int off) {
+    pos = off;
   }
 
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void add(T e) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void set(T e) {
-    throw new UnsupportedOperationException();
+  /**
+   * Get the current element.
+   * 
+   * @return current element
+   */
+  public O get() {
+    return data.get(pos);
   }
 }

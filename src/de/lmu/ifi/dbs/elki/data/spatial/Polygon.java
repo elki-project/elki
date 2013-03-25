@@ -25,12 +25,9 @@ package de.lmu.ifi.dbs.elki.data.spatial;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.iterator.ReverseListIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableListIterator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayListIter;
 
 /**
  * Class representing a simple polygon. While you can obviously store non-simple
@@ -41,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableListIterator;
  * 
  * @apiviz.composedOf Vector
  */
-public class Polygon implements Iterable<Vector>, SpatialComparable {
+public class Polygon implements SpatialComparable {
   /**
    * The actual points
    */
@@ -66,15 +63,15 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
     super();
     this.points = points;
     // Compute the bounds.
-    if(points.size() > 0) {
+    if (points.size() > 0) {
       final Iterator<Vector> iter = points.iterator();
       final Vector first = iter.next();
       final int dim = first.getDimensionality();
       min = first.getArrayCopy();
       max = first.getArrayCopy();
-      while(iter.hasNext()) {
+      while (iter.hasNext()) {
         Vector next = iter.next();
-        for(int i = 0; i < dim; i++) {
+        for (int i = 0; i < dim; i++) {
           final double cur = next.get(i);
           min[i] = Math.min(min[i], cur);
           max[i] = Math.max(max[i], cur);
@@ -90,27 +87,13 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
     this.max = new double[] { maxx, maxy };
   }
 
-  @Override
-  public Iterator<Vector> iterator() {
-    return new UnmodifiableIterator<>(points.iterator());
-  }
-
   /**
-   * Get a list iterator.
+   * Get an iterator to the vector contents.
    * 
-   * @return List iterator.
+   * @return Iterator
    */
-  public ListIterator<Vector> listIterator() {
-    return new UnmodifiableListIterator<>(points.listIterator());
-  }
-
-  /**
-   * Return an iterator that iterates the list backwards.
-   * 
-   * @return Reversed iterator
-   */
-  public ListIterator<Vector> descendingIterator() {
-    return new UnmodifiableListIterator<>(new ReverseListIterator<>(points));
+  public ArrayListIter<Vector> iter() {
+    return new ArrayListIter<>(points);
   }
 
   /**
@@ -120,15 +103,15 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
    */
   public void appendToBuffer(StringBuilder buf) {
     Iterator<Vector> iter = points.iterator();
-    while(iter.hasNext()) {
+    while (iter.hasNext()) {
       double[] data = iter.next().getArrayRef();
-      for(int i = 0; i < data.length; i++) {
-        if(i > 0) {
+      for (int i = 0; i < data.length; i++) {
+        if (i > 0) {
           buf.append(",");
         }
         buf.append(data[i]);
       }
-      if(iter.hasNext()) {
+      if (iter.hasNext()) {
         buf.append(" ");
       }
     }
@@ -181,7 +164,7 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
    * @return -1, 0, 1 for counterclockwise, undefined and clockwise.
    */
   public int testClockwise() {
-    if(points.size() < 3) {
+    if (points.size() < 3) {
       return 0;
     }
     final int size = points.size();
@@ -189,7 +172,7 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
     int c = 0;
 
     // TODO: faster when using an iterator?
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
       // Three consecutive points
       final int j = (i + 1) % size;
       final int k = (i + 2) % size;
@@ -198,20 +181,17 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
       final double dyji = points.get(j).get(1) - points.get(i).get(1);
       final double dxkj = points.get(k).get(0) - points.get(j).get(0);
       final double z = (dxji * dykj) - (dyji * dxkj);
-      if(z < 0) {
+      if (z < 0) {
         c--;
-      }
-      else if(z > 0) {
+      } else if (z > 0) {
         c++;
       }
     }
-    if(c > 0) {
+    if (c > 0) {
       return -1;
-    }
-    else if(c < 0) {
+    } else if (c < 0) {
       return +1;
-    }
-    else {
+    } else {
       return 0;
     }
   }
@@ -238,13 +218,13 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
   public boolean intersects2DIncomplete(Polygon other) {
     assert (this.getDimensionality() == 2);
     assert (other.getDimensionality() == 2);
-    for(Vector v : this.points) {
-      if(other.containsPoint2D(v)) {
+    for (Vector v : this.points) {
+      if (other.containsPoint2D(v)) {
         return true;
       }
     }
-    for(Vector v : other.points) {
-      if(this.containsPoint2D(v)) {
+    for (Vector v : other.points) {
+      if (this.containsPoint2D(v)) {
         return true;
       }
     }
@@ -269,14 +249,14 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
 
     Iterator<Vector> it = points.iterator();
     Vector pre = points.get(points.size() - 1);
-    while(it.hasNext()) {
+    while (it.hasNext()) {
       final Vector cur = it.next();
       final double curx = cur.get(0);
       final double cury = cur.get(1);
       final double prex = pre.get(0);
       final double prey = pre.get(1);
-      if(((cury > testy) != (prey > testy))) {
-        if((testx < (prex - curx) * (testy - cury) / (prey - cury) + curx)) {
+      if (((cury > testy) != (prey > testy))) {
+        if ((testx < (prex - curx) * (testy - cury) / (prey - cury) + curx)) {
           c = !c;
         }
       }
