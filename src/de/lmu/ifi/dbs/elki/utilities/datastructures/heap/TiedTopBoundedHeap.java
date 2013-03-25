@@ -25,10 +25,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-
-import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
 
 /**
  * A size-limited heap similar to {@link TopBoundedHeap}, discarding elements
@@ -73,12 +70,6 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
   public void clear() {
     super.clear();
     ties.clear();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Iterator<E> iterator() {
-    return new MergedIterator<>(ties.iterator(), super.iterator());
   }
 
   @Override
@@ -129,6 +120,46 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
     } else {
       // Also remove old ties.
       ties.clear();
+    }
+  }
+
+  /**
+   * Get an unordered heap iterator.
+   * 
+   * @return Iterator.
+   */
+  @Override
+  public UnorderedIter unorderedIter() {
+    return new UnorderedIter();
+  }
+
+  /**
+   * Unordered heap iterator class.
+   * 
+   * @author Erich Schubert
+   * 
+   */
+  public class UnorderedIter extends Heap<E>.UnorderedIter {
+    /**
+     * Constructor.
+     */
+    protected UnorderedIter() {
+      super();
+    }
+
+    @Override
+    public boolean valid() {
+      return pos < size();
+    }
+
+    @Override
+    public E get() {
+      final int ssize = TiedTopBoundedHeap.super.size();
+      if (pos < ssize) {
+        return super.get();
+      } else {
+        return ties.get(pos - ssize);
+      }
     }
   }
 }

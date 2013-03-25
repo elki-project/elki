@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -289,9 +290,9 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       // result now contains all d-dimensional sets of subspaces
 
       ArrayList<HiCSSubspace> candidateList = new ArrayList<>(dDimensionalList.size());
-      for (HiCSSubspace sub : dDimensionalList) {
-        subspaceList.add(sub);
-        candidateList.add(sub);
+      for (Heap<HiCSSubspace>.UnorderedIter it = dDimensionalList.unorderedIter(); it.valid(); it.advance()) {
+        subspaceList.add(it.get());
+        candidateList.add(it.get());
       }
       dDimensionalList.clear();
       // candidateList now contains the *m* best d-dimensional sets
@@ -319,8 +320,8 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       }
       // Prune
       for (HiCSSubspace cand : candidateList) {
-        for (HiCSSubspace nextSet : dDimensionalList) {
-          if (nextSet.contrast > cand.contrast) {
+        for (Heap<HiCSSubspace>.UnorderedIter it = dDimensionalList.unorderedIter(); it.valid(); it.advance()) {
+          if (it.get().contrast > cand.contrast) {
             subspaceList.remove(cand);
             break;
           }
