@@ -51,7 +51,11 @@ public class ELKILauncher {
         Class<?> cls = Class.forName(args[0]);
         Method m = cls.getMethod("main", String[].class);
         Object a = Arrays.copyOfRange(args, 1, args.length);
-        m.invoke(null, a);
+        try {
+          m.invoke(null, a);
+        } catch (Exception e) {
+          LoggingUtil.exception(e);
+        }
         return;
       } catch (Exception e) {
         // Ignore
@@ -60,7 +64,11 @@ public class ELKILauncher {
         Class<?> cls = Class.forName(AbstractApplication.class.getPackage().getName() + '.' + args[0]);
         Method m = cls.getMethod("main", String[].class);
         Object a = Arrays.copyOfRange(args, 1, args.length);
-        m.invoke(null, a);
+        try {
+          m.invoke(null, a);
+        } catch (Exception e) {
+          LoggingUtil.exception(e);
+        }
         return;
       } catch (Exception e) {
         // Ignore
