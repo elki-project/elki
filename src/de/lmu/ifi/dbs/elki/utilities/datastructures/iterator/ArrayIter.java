@@ -27,8 +27,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
  * Array iterators can also go backwards and seek.
  * 
  * @author Erich Schubert
- *
- * @apiviz.landmark
  */
 public interface ArrayIter extends Iter {
   /**
@@ -37,7 +35,7 @@ public interface ArrayIter extends Iter {
    * @return Iterator position
    */
   public int getOffset();
-  
+
   /**
    * Moves the iterator forward or backward by the given offset.
    * 

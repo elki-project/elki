@@ -82,6 +82,263 @@ public class QuickSelect {
    * QuickSelect is essentially quicksort, except that we only "sort" that half
    * of the array that we are interested in.
    * 
+   * @param data Data to process
+   * @param start Interval start
+   * @param end Interval end (exclusive)
+   * @param rank rank position we are interested in (starting at 0)
+   */
+  public static <T> void quickSelect(T data, Adapter<T> adapter, int start, int end, int rank) {
+    while (true) {
+      // Optimization for small arrays
+      // This also ensures a minimum size below
+      if (start + SMALL > end) {
+        insertionSort(data, adapter, start, end);
+        return;
+      }
+
+      // Best of 5 pivot picking:
+      // Choose pivots by looking at five candidates.
+      final int len = end - start;
+      final int seventh = (len >> 3) + (len >> 6) + 1;
+      final int m3 = (start + end) >> 1; // middle
+      final int m2 = m3 - seventh;
+      final int m1 = m2 - seventh;
+      final int m4 = m3 + seventh;
+      final int m5 = m4 + seventh;
+
+      // Explicit (and optimal) sorting network for 5 elements
+      // See Knuth for details.
+      if (adapter.compareGreater(data, m1, m2)) {
+        adapter.swap(data, m1, m2);
+      }
+      if (adapter.compareGreater(data, m1, m3)) {
+        adapter.swap(data, m1, m3);
+      }
+      if (adapter.compareGreater(data, m2, m3)) {
+        adapter.swap(data, m2, m3);
+      }
+      if (adapter.compareGreater(data, m4, m5)) {
+        adapter.swap(data, m4, m5);
+      }
+      if (adapter.compareGreater(data, m1, m4)) {
+        adapter.swap(data, m1, m4);
+      }
+      if (adapter.compareGreater(data, m3, m4)) {
+        adapter.swap(data, m3, m4);
+      }
+      if (adapter.compareGreater(data, m2, m5)) {
+        adapter.swap(data, m2, m5);
+      }
+      if (adapter.compareGreater(data, m2, m3)) {
+        adapter.swap(data, m2, m3);
+      }
+      if (adapter.compareGreater(data, m4, m5)) {
+        adapter.swap(data, m4, m5);
+      }
+
+      int best = bestPivot(rank, m1, m2, m3, m4, m5);
+      // final double pivot = data[best];
+      // Move middle element out of the way.
+      adapter.swap(data, best, end - 1);
+
+      // Begin partitioning
+      int i = start, j = end - 2;
+      // This is classic quicksort stuff
+      while (true) {
+        while (i <= j && adapter.compareGreater(data, end - 1, i)) {
+          i++;
+        }
+        while (j >= i && !adapter.compareGreater(data, end - 1, j)) {
+          j--;
+        }
+        if (i >= j) {
+          break;
+        }
+        adapter.swap(data, i, j);
+      }
+
+      // Move pivot (former middle element) back into the appropriate place
+      adapter.swap(data, i, end - 1);
+
+      // In contrast to quicksort, we only need to recurse into the half we are
+      // interested in. Instead of recursion we now use iteration.
+      if (rank < i) {
+        end = i;
+      } else if (rank > i) {
+        start = i + 1;
+      } else {
+        break;
+      }
+    } // Loop until rank==i
+  }
+
+  /**
+   * Sort a small array using repetitive insertion sort.
+   * 
+   * @param data Data to sort
+   * @param start Interval start
+   * @param end Interval end
+   */
+  private static <T> void insertionSort(T data, Adapter<T> adapter, int start, int end) {
+    for (int i = start + 1; i < end; i++) {
+      for (int j = i; j > start && adapter.compareGreater(data, j - 1, j); j--) {
+        adapter.swap(data, j, j - 1);
+      }
+    }
+  }
+
+  /**
+   * Adapter class to apply QuickSelect to arbitrary data structures.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <T> Data structure type
+   */
+  public static interface Adapter<T> {
+    /**
+     * Swap the two elements at positions i and j.
+     * 
+     * @param data Data structure
+     * @param i Position i
+     * @param j Position j
+     */
+    void swap(T data, int i, int j);
+
+    /**
+     * Compare two elements.
+     * 
+     * @param data Data structure
+     * @param i Position i
+     * @param j Position j
+     * @return {@code true} when the element at position i is greater than that
+     *         at position j.
+     */
+    boolean compareGreater(T data, int i, int j);
+  }
+
+  /**
+   * Adapter for double arrays.
+   */
+  public static Adapter<double[]> DOUBLE_ADAPTER = new Adapter<double[]>() {
+    @Override
+    public void swap(double[] data, int i, int j) {
+      double tmp = data[i];
+      data[i] = data[j];
+      data[j] = tmp;
+    }
+
+    @Override
+    public boolean compareGreater(double[] data, int i, int j) {
+      return data[i] > data[j];
+    }
+  };
+
+  /**
+   * Adapter for integer arrays.
+   */
+  public static Adapter<int[]> INTEGER_ADAPTER = new Adapter<int[]>() {
+    @Override
+    public void swap(int[] data, int i, int j) {
+      int tmp = data[i];
+      data[i] = data[j];
+      data[j] = tmp;
+    }
+
+    @Override
+    public boolean compareGreater(int[] data, int i, int j) {
+      return data[i] > data[j];
+    }
+  };
+
+  /**
+   * Adapter for float arrays.
+   */
+  public static Adapter<float[]> FLOAT_ADAPTER = new Adapter<float[]>() {
+    @Override
+    public void swap(float[] data, int i, int j) {
+      float tmp = data[i];
+      data[i] = data[j];
+      data[j] = tmp;
+    }
+
+    @Override
+    public boolean compareGreater(float[] data, int i, int j) {
+      return data[i] > data[j];
+    }
+  };
+
+  /**
+   * Adapter for short arrays.
+   */
+  public static Adapter<short[]> SHORT_ADAPTER = new Adapter<short[]>() {
+    @Override
+    public void swap(short[] data, int i, int j) {
+      short tmp = data[i];
+      data[i] = data[j];
+      data[j] = tmp;
+    }
+
+    @Override
+    public boolean compareGreater(short[] data, int i, int j) {
+      return data[i] > data[j];
+    }
+  };
+
+  /**
+   * Adapter for long arrays.
+   */
+  public static Adapter<long[]> LONG_ADAPTER = new Adapter<long[]>() {
+    @Override
+    public void swap(long[] data, int i, int j) {
+      long tmp = data[i];
+      data[i] = data[j];
+      data[j] = tmp;
+    }
+
+    @Override
+    public boolean compareGreater(long[] data, int i, int j) {
+      return data[i] > data[j];
+    }
+  };
+
+  /**
+   * Adapter for byte arrays.
+   */
+  public static Adapter<byte[]> BYTE_ADAPTER = new Adapter<byte[]>() {
+    @Override
+    public void swap(byte[] data, int i, int j) {
+      byte tmp = data[i];
+      data[i] = data[j];
+      data[j] = tmp;
+    }
+
+    @Override
+    public boolean compareGreater(byte[] data, int i, int j) {
+      return data[i] > data[j];
+    }
+  };
+
+  /**
+   * Adapter for char arrays.
+   */
+  public static Adapter<char[]> CHAR_ADAPTER = new Adapter<char[]>() {
+    @Override
+    public void swap(char[] data, int i, int j) {
+      char tmp = data[i];
+      data[i] = data[j];
+      data[j] = tmp;
+    }
+
+    @Override
+    public boolean compareGreater(char[] data, int i, int j) {
+      return data[i] > data[j];
+    }
+  };
+
+  /**
+   * QuickSelect is essentially quicksort, except that we only "sort" that half
+   * of the array that we are interested in.
+   * 
    * Note: the array is <b>modified</b> by this.
    * 
    * @param data Data to process
