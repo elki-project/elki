@@ -52,14 +52,12 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
  * </pre>
  * 
  * @author Erich Schubert
- * 
- * @apiviz.landmark
  */
 public interface Iter {
   /**
    * Returns true if the iterator currently points to a valid object.
    * 
-   * @return a <code>boolean</code> value
+   * @return a <code>boolean</code> value, whether the position is valid.
    */
   public boolean valid();
 
