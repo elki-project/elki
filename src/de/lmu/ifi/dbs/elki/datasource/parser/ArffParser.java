@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  */
 
 import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.map.hash.TIntFloatHashMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.BufferedReader;
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
-import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -60,7 +60,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * This parser is quite hackish, and contains lots of not yet configurable
  * magic.
  * 
- * TODO: Sparse vectors are not yet fully supported.
+ * TODO: Allow configuration of the vector types (double, float)
+ * 
+ * TODO: when encountering integer columns, produce integer vectors.
+ * 
+ * TODO: allow optional class labels.
  * 
  * @author Erich Schubert
  */
@@ -216,19 +220,21 @@ public class ArffParser implements Parser {
       }
       else {
         // sparse token
-        if(tokenizer.ttype != StreamTokenizer.TT_NUMBER) {
-          throw new AbortException("Unexpected token type encountered: " + tokenizer.toString());
+        if(tokenizer.ttype != StreamTokenizer.TT_WORD) {
+          throw new AbortException("Unexpected token type encountered: " + tokenizer.toString() + " type: " + tokenizer.ttype);
         }
-        int dim = (int) tokenizer.nval;
+        int dim = Integer.valueOf(tokenizer.sval);
         if(map.containsKey(dim)) {
           throw new AbortException("Duplicate key in sparse vector: " + tokenizer.toString());
         }
         nextToken(tokenizer);
-        if(tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
-          map.put(dim, Double.valueOf(tokenizer.nval));
-        }
-        else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
-          map.put(dim, tokenizer.sval);
+        if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
+          if(TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[targ[dim]])) {
+            map.put(dim, Double.parseDouble(tokenizer.sval));
+          }
+          else {
+            map.put(dim, tokenizer.sval);
+          }
         }
         else {
           throw new AbortException("Unexpected token type encountered: " + tokenizer.toString());
@@ -247,7 +253,7 @@ public class ArffParser implements Parser {
       }
       assert (s >= 0);
       if(TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[out])) {
-        TIntFloatHashMap f = new TIntFloatHashMap(dimsize[out]);
+        TIntDoubleHashMap f = new TIntDoubleHashMap(dimsize[out]);
         for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
           iter.advance();
           int i = iter.key();
@@ -258,9 +264,9 @@ public class ArffParser implements Parser {
             break;
           }
           double v = ((Double) iter.value()).doubleValue();
-          f.put(i - s + 1, (float) v);
+          f.put(i - s, v);
         }
-        data[out] = new SparseFloatVector(f, dimsize[out]);
+        data[out] = new SparseDoubleVector(f, dimsize[out]);
       }
       else if(TypeUtil.LABELLIST.equals(elkitypes[out])) {
         // Build a label list out of successive labels
@@ -292,10 +298,10 @@ public class ArffParser implements Parser {
         }
       }
       else if(TypeUtil.CLASSLABEL.equals(elkitypes[out])) {
-        String val = (String) map.get(s);
+        Object val = map.get(s);
         if(val != null) {
           // TODO: support other class label types.
-          ClassLabel lbl = new SimpleClassLabel(val);
+          ClassLabel lbl = new SimpleClassLabel(String.valueOf(val));
           data[out] = lbl;
         }
         else {
@@ -381,7 +387,7 @@ public class ArffParser implements Parser {
     {
       tokenizer.resetSyntax();
       tokenizer.whitespaceChars(0, ' ');
-      tokenizer.ordinaryChars('0', '9');
+      tokenizer.ordinaryChars('0', '9'); // Do not parse numbers
       tokenizer.ordinaryChar('-');
       tokenizer.ordinaryChar('.');
       tokenizer.wordChars(' ' + 1, '\u00FF');
@@ -425,8 +431,8 @@ public class ArffParser implements Parser {
           bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else {
-          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<>(SparseFloatVector.FACTORY, dimsize[out], labels);
-          bundle.appendColumn(type, new ArrayList<SparseFloatVector>());
+          VectorFieldTypeInformation<SparseDoubleVector> type = new VectorFieldTypeInformation<>(SparseDoubleVector.FACTORY, dimsize[out], labels);
+          bundle.appendColumn(type, new ArrayList<SparseDoubleVector>());
         }
       }
       else if(TypeUtil.LABELLIST.equals(etyp[out])) {
