@@ -593,15 +593,15 @@ public final class MathUtil {
    */
   public static double sinToCos(double angle, double sin) {
     // Numerics of the formula below aren't too good.
-    if((-1e-5 < sin && sin < 1e-5) || sin > 0.99999 || sin < -0.9999) {
+    if((-1e-5 < sin && sin < 1e-5) || sin > 0.99999 || sin < -0.99999) {
       return Math.cos(angle);
     }
     angle = normAngle(angle);
     if(angle < HALFPI || angle > ONEHALFPI) {
-      return Math.sqrt((1 + sin) * (1 - sin));
+      return Math.sqrt(1 - sin * sin);
     }
     else {
-      return -Math.sqrt((1 + sin) * (1 - sin));
+      return -Math.sqrt(1 - sin * sin);
     }
   }
 
@@ -614,15 +614,15 @@ public final class MathUtil {
    */
   public static double cosToSin(double angle, double cos) {
     // Numerics of the formula below aren't too good.
-    if((-1e-5 < cos && cos < 1e-5) || cos > 0.99999 || cos < -0.9999) {
+    if((-1e-5 < cos && cos < 1e-5) || cos > 0.99999 || cos < -0.99999) {
       return Math.sin(angle);
     }
     angle = normAngle(angle);
     if(angle < Math.PI) {
-      return Math.sqrt((1 + cos) * (1 - cos));
+      return Math.sqrt(1 - cos * cos);
     }
     else {
-      return -Math.sqrt((1 + cos) * (1 - cos));
+      return -Math.sqrt(1 - cos * cos);
     }
   }
 
