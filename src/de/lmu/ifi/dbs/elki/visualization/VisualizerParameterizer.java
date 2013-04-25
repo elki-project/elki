@@ -85,9 +85,22 @@ public class VisualizerParameterizer implements Parameterizable {
    * Key: -visualizer.stylesheet
    * 
    * Default: default properties file
+   * <br>
+   * included stylesheets:
+   * <ul>
+   * 	<li>classic</li>
+   * 	<li>default</li>
+   * 	<li>greyscale</li>
+   * 	<li>neon</li>
+   * 	<li>presentation</li>
+   * 	<li>print</li>
+   * </ul>
+   * These are {@code *.properties} files in the package {@link de.lmu.ifi.dbs.elki.visualization.style}.
    * </p>
+   * 
+   * 
    */
-  public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use");
+  public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use, included properties: classic, default, greyscale, neon, presentation, print");
 
   /**
    * Default pattern for visualizer enabling.
