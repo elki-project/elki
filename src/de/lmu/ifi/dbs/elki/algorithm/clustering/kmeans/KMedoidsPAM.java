@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -141,9 +142,13 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     // TODO: reuse this information, from the build phase, when possible?
     assignToNearestCluster(medoids, ids, second, clusters, distQ);
 
+    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
     // Swap phase
     boolean changed = true;
     while (changed) {
+      if (prog != null) {
+        prog.incrementProcessed(LOG);
+      }
       changed = false;
       // Try to swap the medoid with a better cluster member:
       double best = 0;
@@ -188,6 +193,9 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
             bestcluster = i;
           }
         }
+      }
+      if (prog != null) {
+        prog.setCompleted(LOG);
       }
       if (LOG.isDebugging()) {
         LOG.debug("Best cost: " + best);

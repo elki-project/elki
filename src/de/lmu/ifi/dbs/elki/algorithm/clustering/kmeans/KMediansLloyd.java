@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -102,9 +103,10 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
 
+    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medians iteration", LOG) : null;
     for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if (LOG.isVerbose()) {
-        LOG.verbose("K-Medians iteration " + (iteration + 1));
+      if (prog != null) {
+        prog.incrementProcessed(LOG);
       }
       boolean changed = assignToNearestCluster(relation, medians, clusters);
       // Stop if no cluster assignment changed.
@@ -113,6 +115,9 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
       }
       // Recompute medians.
       medians = medians(clusters, medians, relation);
+    }
+    if (prog != null) {
+      prog.setCompleted(LOG);
     }
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
