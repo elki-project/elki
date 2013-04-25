@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -135,9 +136,13 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
     // TODO: reuse this information, from the build phase, when possible?
     assignToNearestCluster(medoids, mdists, clusters, distQ);
 
+    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medoids iteration", LOG) : null;
     // Swap phase
     boolean changed = true;
     while (changed) {
+      if (prog != null) {
+        prog.incrementProcessed(LOG);
+      }
       changed = false;
       // Try to swap the medoid with a better cluster member:
       int i = 0;
@@ -167,6 +172,9 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
       if (changed) {
         assignToNearestCluster(medoids, mdists, clusters, distQ);
       }
+    }
+    if (prog != null) {
+      prog.setCompleted(LOG);
     }
 
     // Wrap result

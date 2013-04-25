@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -109,9 +110,10 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
 
+    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if (LOG.isVerbose()) {
-        LOG.verbose("K-Means iteration " + (iteration + 1));
+      if (prog != null) {
+        prog.incrementProcessed(LOG);
       }
       boolean changed = assignToNearestCluster(relation, means, clusters);
       // Stop if no cluster assignment changed.
@@ -121,6 +123,10 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
       // Recompute means.
       means = means(clusters, means, relation);
     }
+    if (prog != null) {
+      prog.setCompleted(LOG);
+    }
+
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
@@ -162,13 +168,13 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
     @Override
     protected void makeOptions(Parameterization config) {
       ObjectParameter<PrimitiveDistanceFunction<NumberVector<?>, D>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
-      if(config.grab(distanceFunctionP)) {
+      if (config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
         if (!(distanceFunction instanceof EuclideanDistanceFunction) && !(distanceFunction instanceof SquaredEuclideanDistanceFunction)) {
           LOG.warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }
-      
+
       IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(new GreaterConstraint(0));
       if (config.grab(kP)) {

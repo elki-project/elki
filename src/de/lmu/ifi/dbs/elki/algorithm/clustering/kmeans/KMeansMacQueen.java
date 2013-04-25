@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -114,16 +115,21 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
     // Initial recomputation of the means.
     means = means(clusters, means, relation);
 
+    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     // Refine result
     for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if (LOG.isVerbose()) {
-        LOG.verbose("K-Means iteration " + (iteration + 1));
+      if (prog != null) {
+        prog.incrementProcessed(LOG);
       }
       boolean changed = macQueenIterate(relation, means, clusters);
       if (!changed) {
         break;
       }
     }
+    if (prog != null) {
+      prog.setCompleted(LOG);
+    }
+
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for (int i = 0; i < clusters.size(); i++) {
