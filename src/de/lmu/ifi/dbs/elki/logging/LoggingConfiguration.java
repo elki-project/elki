@@ -56,6 +56,21 @@ public final class LoggingConfiguration {
   private static final String TOPLEVEL_PACKAGE = "de.lmu.ifi.dbs.elki";
 
   /**
+   * Top level logger.
+   */
+  private static final Logger LOGGER_GLOBAL_TOP = Logger.getLogger("");
+
+  /**
+   * Logger for ELKI top level package.
+   */
+  private static final Logger LOGGER_ELKI_TOP = Logger.getLogger(TOPLEVEL_PACKAGE);
+
+  /**
+   * Logger for ELKI timing.
+   */
+  private static final Logger LOGGER_TIME_TOP = Logger.getLogger(TOPLEVEL_PACKAGE + ".workflow.AlgorithmStep");
+
+  /**
    * Configuration base
    */
   private static final String confbase = LoggingConfiguration.class.getPackage().getName();
@@ -134,67 +149,47 @@ public final class LoggingConfiguration {
    * @param verbose verbose flag
    */
   public static void setVerbose(boolean verbose) {
-    Logger logger1 = Logger.getLogger("");
-    Logger logger2 = Logger.getLogger(TOPLEVEL_PACKAGE);
     if (verbose) {
       // decrease to VERBOSE if it was higher, otherwise further to VERYVERBOSE
-      if (logger1.getLevel() == null || logger1.getLevel().intValue() > Level.VERBOSE.intValue()) {
-        logger1.setLevel(Level.VERBOSE);
-      } else if (logger1.getLevel().intValue() > Level.VERYVERBOSE.intValue()) {
-        logger1.setLevel(Level.VERYVERBOSE);
+      if (LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > Level.VERBOSE.intValue()) {
+        LOGGER_GLOBAL_TOP.setLevel(Level.VERBOSE);
+      } else if (LOGGER_GLOBAL_TOP.getLevel().intValue() > Level.VERYVERBOSE.intValue()) {
+        LOGGER_GLOBAL_TOP.setLevel(Level.VERYVERBOSE);
       }
-      if (logger2.getLevel() == null || logger2.getLevel().intValue() > Level.VERBOSE.intValue()) {
-        logger2.setLevel(Level.VERBOSE);
-      } else if (logger2.getLevel().intValue() > Level.VERYVERBOSE.intValue()) {
-        logger2.setLevel(Level.VERYVERBOSE);
+      if (LOGGER_ELKI_TOP.getLevel() == null || LOGGER_ELKI_TOP.getLevel().intValue() > Level.VERBOSE.intValue()) {
+        LOGGER_ELKI_TOP.setLevel(Level.VERBOSE);
+      } else if (LOGGER_ELKI_TOP.getLevel().intValue() > Level.VERYVERBOSE.intValue()) {
+        LOGGER_ELKI_TOP.setLevel(Level.VERYVERBOSE);
       }
     } else {
       // increase to warning level if it was verbose, and to verbose if it was
       // "very verbose".
-      if (Level.VERYVERBOSE.equals(logger1.getLevel())) {
-        logger1.setLevel(Level.VERBOSE);
-      } else if (logger1.getLevel() == null || Level.VERBOSE.equals(logger1.getLevel())) {
-        logger1.setLevel(Level.WARNING);
+      if (Level.VERYVERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel())) {
+        LOGGER_GLOBAL_TOP.setLevel(Level.VERBOSE);
+      } else if (LOGGER_GLOBAL_TOP.getLevel() == null || Level.VERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel())) {
+        LOGGER_GLOBAL_TOP.setLevel(Level.WARNING);
       }
-      if (Level.VERYVERBOSE.equals(logger2.getLevel())) {
-        logger2.setLevel(Level.VERBOSE);
-      } else if (logger2.getLevel() == null || Level.VERBOSE.equals(logger2.getLevel())) {
-        logger2.setLevel(Level.WARNING);
+      if (Level.VERYVERBOSE.equals(LOGGER_ELKI_TOP.getLevel())) {
+        LOGGER_ELKI_TOP.setLevel(Level.VERBOSE);
+      } else if (LOGGER_ELKI_TOP.getLevel() == null || Level.VERBOSE.equals(LOGGER_ELKI_TOP.getLevel())) {
+        LOGGER_ELKI_TOP.setLevel(Level.WARNING);
       }
     }
   }
 
   /**
    * Enable runtime performance logging.
-   * 
-   * @param time Flag
    */
-  public static void setStatistics(boolean time) {
-    Logger logger1 = Logger.getLogger("");
-    Logger logger2 = Logger.getLogger(TOPLEVEL_PACKAGE);
-    Logger logger3 = Logger.getLogger(TOPLEVEL_PACKAGE + ".workflow.AlgorithmStep");
-    if (time) {
-      // decrease to INFO if it was higher
-      if (logger1.getLevel() == null || logger1.getLevel().intValue() > Level.STATISTICS.intValue()) {
-        logger1.setLevel(Level.STATISTICS);
-      }
-      if (logger2.getLevel() == null || logger2.getLevel().intValue() > Level.STATISTICS.intValue()) {
-        logger2.setLevel(Level.STATISTICS);
-      }
-      if (logger3.getLevel() == null || logger3.getLevel().intValue() > Level.STATISTICS.intValue()) {
-        logger3.setLevel(Level.STATISTICS);
-      }
-    } else {
-      // increase to warning level if it was INFO.
-      if (logger1.getLevel() != null || logger1.getLevel() == Level.STATISTICS) {
-        logger1.setLevel(Level.WARNING);
-      }
-      if (logger2.getLevel() != null || logger2.getLevel() == Level.STATISTICS) {
-        logger2.setLevel(Level.WARNING);
-      }
-      if (logger3.getLevel() != null || logger3.getLevel() == Level.STATISTICS) {
-        logger3.setLevel(Level.WARNING);
-      }
+  public static void setStatistics() {
+    // decrease to INFO if it was higher
+    if (LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
+      LOGGER_GLOBAL_TOP.setLevel(Level.STATISTICS);
+    }
+    if (LOGGER_ELKI_TOP.getLevel() == null || LOGGER_ELKI_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
+      LOGGER_ELKI_TOP.setLevel(Level.STATISTICS);
+    }
+    if (LOGGER_TIME_TOP.getLevel() == null || LOGGER_TIME_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
+      LOGGER_TIME_TOP.setLevel(Level.STATISTICS);
     }
   }
 
