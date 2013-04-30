@@ -78,7 +78,7 @@ public class Logging {
    */
   public static class Level extends java.util.logging.Level {
     /**
-     * Additional level for logging: statistics and timining information.
+     * Additional level for logging: statistics and timing information.
      * 
      * Inbetween of "verbose" and "warning".
      */
@@ -616,6 +616,6 @@ public class Logging {
 
   @Override
   public String toString() {
-    return logger.toString();
+    return "Logging(" + logger.getName() + ", " + logger.getLevel() + ")";
   }
 }

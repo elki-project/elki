@@ -173,7 +173,9 @@ public class AlgorithmStep implements WorkflowStep {
 
     @Override
     protected AlgorithmStep makeInstance() {
-      LoggingConfiguration.setStatistics(time);
+      if (time) {
+        LoggingConfiguration.setStatistics();
+      }
       return new AlgorithmStep(algorithms);
     }
   }
