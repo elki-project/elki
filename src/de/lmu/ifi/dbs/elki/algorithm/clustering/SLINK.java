@@ -115,17 +115,18 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * Performs the SLINK algorithm on the given database.
    */
   public Result run(Database database, Relation<O> relation) {
+    DBIDs ids = relation.getDBIDs();
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     @SuppressWarnings("unchecked")
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
-    WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDataStore<D> lambda = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, distCls);
+    WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    WritableDataStore<D> lambda = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, distCls);
     // Temporary storage for m.
-    WritableDataStore<D> m = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
+    WritableDataStore<D> m = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
 
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running SLINK", relation.size(), LOG) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running SLINK", ids.size(), LOG) : null;
     // has to be an array for monotonicity reasons!
-    ModifiableDBIDs processedIDs = DBIDUtil.newArray(relation.size());
+    ModifiableDBIDs processedIDs = DBIDUtil.newArray(ids.size());
 
     // Optimized code path for double distances
     if (getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction && lambda instanceof WritableDoubleDistanceDataStore && m instanceof WritableDoubleDistanceDataStore) {
@@ -134,7 +135,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       WritableDoubleDistanceDataStore lambdad = (WritableDoubleDistanceDataStore) lambda;
       WritableDoubleDistanceDataStore md = (WritableDoubleDistanceDataStore) m;
       // apply the algorithm
-      for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         step1double(id, pi, lambdad);
         step2double(id, processedIDs, distQuery.getRelation(), dist, md);
         step3double(id, pi, lambdad, processedIDs, md);
@@ -148,7 +149,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       }
     } else {
       // apply the algorithm
-      for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         step1(id, pi, lambda);
         step2(id, processedIDs, distQuery, m);
         step3(id, pi, lambda, processedIDs, m);
@@ -175,13 +176,13 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     }
     final BasicResult result;
     if (lambda instanceof DoubleDistanceDataStore) {
-      result = extractClustersDouble(relation.getDBIDs(), pi, (DoubleDistanceDataStore) lambda, minclusters);
+      result = extractClustersDouble(ids, pi, (DoubleDistanceDataStore) lambda, minclusters);
     } else {
-      result = extractClusters(relation.getDBIDs(), pi, lambda, minclusters);
+      result = extractClusters(ids, pi, lambda, minclusters);
     }
 
-    result.addChildResult(new MaterializedRelation<>("SLINK pi", "slink-order", TypeUtil.DBID, pi, processedIDs));
-    result.addChildResult(new MaterializedRelation<>("SLINK lambda", "slink-order", new SimpleTypeInformation<>(distCls), lambda, processedIDs));
+    result.addChildResult(new MaterializedRelation<>("SLINK pi", "slink-pi", TypeUtil.DBID, pi, processedIDs));
+    result.addChildResult(new MaterializedRelation<>("SLINK lambda", "slink-lambda", new SimpleTypeInformation<>(distCls), lambda, processedIDs));
     result.addChildResult(new OrderingFromDataStore<>("SLINK order", "slink-order", processedIDs, lambda));
     return result;
   }
