@@ -68,7 +68,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   }
 
   @Override
-  public void assign(int index, DBIDVar var) {
+  public void assignVar(int index, DBIDVar var) {
     throw new ArrayIndexOutOfBoundsException();
   }
 

@@ -118,7 +118,7 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
     @Override
     public String toString() {
-      return Integer.toString(internalGetIndex());
+      return Integer.toString(internalGetIndex()) + "@" + pos;
     }
   }
 
@@ -149,7 +149,7 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
   }
 
   @Override
-  public void assign(int i, DBIDVar var) {
+  public void assignVar(int i, DBIDVar var) {
     if (var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar)var).internalSetIndex(ids[i]);
     } else {

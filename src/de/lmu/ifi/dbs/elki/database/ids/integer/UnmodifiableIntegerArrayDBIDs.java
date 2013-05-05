@@ -87,8 +87,8 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
   }
 
   @Override
-  public void assign(int index, DBIDVar var) {
-    inner.assign(index, var);
+  public void assignVar(int index, DBIDVar var) {
+    inner.assignVar(index, var);
   }
 
   @Override

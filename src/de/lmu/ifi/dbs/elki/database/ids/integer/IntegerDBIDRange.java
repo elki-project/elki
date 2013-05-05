@@ -189,7 +189,7 @@ class IntegerDBIDRange implements DBIDRange {
   }
 
   @Override
-  public void assign(int index, DBIDVar var) {
+  public void assignVar(int index, DBIDVar var) {
     if (var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar)var).internalSetIndex(start + index);
     } else {
