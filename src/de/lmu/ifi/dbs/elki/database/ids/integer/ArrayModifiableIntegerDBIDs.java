@@ -98,8 +98,14 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   }
 
   @Override
-  public void assign(int index, DBIDVar var) {
-    store[index] = var.internalGetIndex();
+  public void assignVar(int index, DBIDVar var) {
+    if(var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar) var).internalSetIndex(store[index]);
+    }
+    else {
+      // less efficient, involves object creation.
+      var.set(get(index));
+    }
   }
 
   /**
@@ -109,10 +115,10 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
    */
   private void ensureSize(int minsize) {
     int asize = store.length;
-    while (asize < minsize) {
+    while(asize < minsize) {
       asize = (asize >> 1) + asize;
     }
-    if (asize > store.length) {
+    if(asize > store.length) {
       store = Arrays.copyOf(store, asize);
     }
   }
@@ -120,7 +126,7 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   @Override
   public boolean addDBIDs(DBIDs ids) {
     ensureSize(size + ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       store[size] = iter.internalGetIndex();
       ++size;
     }
@@ -130,11 +136,11 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
-    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       int rm = id.internalGetIndex();
       // TODO: when sorted, use binary search!
-      for (int i = 0; i < size; i++) {
-        if (store[i] == rm) {
+      for(int i = 0; i < size; i++) {
+        if(store[i] == rm) {
           --size;
           store[i] = store[size];
           success = true;
@@ -147,7 +153,7 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
 
   @Override
   public boolean add(DBIDRef e) {
-    if (size == store.length) {
+    if(size == store.length) {
       ensureSize(size + 1);
     }
     store[size] = e.internalGetIndex();
@@ -159,8 +165,8 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   public boolean remove(DBIDRef o) {
     int rm = o.internalGetIndex();
     // TODO: when sorted, use binary search!
-    for (int i = 0; i < size; i++) {
-      if (store[i] == rm) {
+    for(int i = 0; i < size; i++) {
+      if(store[i] == rm) {
         --size;
         store[i] = store[size];
         return true;
@@ -180,7 +186,7 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   public DBID remove(int index) {
     DBID ret = new IntegerDBID(store[index]);
     --size;
-    if (size > 0) {
+    if(size > 0) {
       store[index] = store[size];
     }
     return ret;
@@ -200,8 +206,8 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   public boolean contains(DBIDRef o) {
     // TODO: recognize sorted arrays, then use binary search?
     int oid = o.internalGetIndex();
-    for (int i = 0; i < size; i++) {
-      if (store[i] == oid) {
+    for(int i = 0; i < size; i++) {
+      if(store[i] == oid) {
         return true;
       }
     }
@@ -286,6 +292,11 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
     @Override
     public void remove() {
       ArrayModifiableIntegerDBIDs.this.remove(pos);
+    }
+
+    @Override
+    public String toString() {
+      return Integer.toString(internalGetIndex()) + "@" + pos;
     }
   }
 }

@@ -133,7 +133,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   }
 
   @Override
-  public void assign(int index, DBIDVar var) {
+  public void assignVar(int index, DBIDVar var) {
     if (index != 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
