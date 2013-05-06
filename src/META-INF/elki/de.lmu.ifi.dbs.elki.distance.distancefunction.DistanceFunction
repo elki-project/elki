@@ -39,6 +39,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDista
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedFloatDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.strings.LevenshteinDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.strings.NormalizedLevenshteinDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction

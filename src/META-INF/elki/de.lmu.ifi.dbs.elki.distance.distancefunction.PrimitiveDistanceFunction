@@ -25,6 +25,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.SquaredPearsonCorrelat
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.DimensionSelectingLatLngDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.strings.LevenshteinDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.strings.NormalizedLevenshteinDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
