@@ -63,11 +63,12 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
   /**
    * Constructor.
    * 
-   * @param colSep
-   * @param quoteChar
+   * @param colSep Column separator
+   * @param quoteChar Quotation character
+   * @param comment Comment pattern
    */
-  public BitVectorLabelParser(Pattern colSep, char quoteChar) {
-    super(colSep, quoteChar);
+  public BitVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment) {
+    super(colSep, quoteChar, comment);
   }
 
   @Override
@@ -78,38 +79,37 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
     List<BitVector> vectors = new ArrayList<>();
     List<LabelList> labels = new ArrayList<>();
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(!line.startsWith(COMMENT) && line.length() > 0) {
-          List<String> entries = tokenize(line);
-          // FIXME: use more efficient storage right away?
-          List<Bit> attributes = new ArrayList<>();
-          LabelList ll = null;
-          for(String entry : entries) {
-            try {
-              Bit attribute = Bit.valueOf(entry);
-              attributes.add(attribute);
-            }
-            catch(NumberFormatException e) {
-              if(ll == null) {
-                ll = new LabelList(1);
-              }
-              ll.add(entry);
-            }
-          }
-
-          if(dimensionality < 0) {
-            dimensionality = attributes.size();
-          }
-          else if(dimensionality != attributes.size()) {
-            throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
-          }
-
-          vectors.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
-          labels.add(ll);
+      for (String line; (line = reader.readLine()) != null; lineNumber++) {
+        // Skip empty lines and comments
+        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+          continue;
         }
+        List<String> entries = tokenize(line);
+        // FIXME: use more efficient storage right away?
+        List<Bit> attributes = new ArrayList<>();
+        LabelList ll = null;
+        for (String entry : entries) {
+          try {
+            Bit attribute = Bit.valueOf(entry);
+            attributes.add(attribute);
+          } catch (NumberFormatException e) {
+            if (ll == null) {
+              ll = new LabelList(1);
+            }
+            ll.add(entry);
+          }
+        }
+
+        if (dimensionality < 0) {
+          dimensionality = attributes.size();
+        } else if (dimensionality != attributes.size()) {
+          throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
+        }
+
+        vectors.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
+        labels.add(ll);
       }
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
     return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, labels);
@@ -134,7 +134,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
   public static class Parameterizer extends AbstractParser.Parameterizer {
     @Override
     protected BitVectorLabelParser makeInstance() {
-      return new BitVectorLabelParser(colSep, quoteChar);
+      return new BitVectorLabelParser(colSep, quoteChar, comment);
     }
   }
 }

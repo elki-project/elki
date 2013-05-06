@@ -77,11 +77,12 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
   /**
    * Constructor.
    * 
-   * @param colSep
-   * @param quoteChar
+   * @param colSep Column separator
+   * @param quoteChar Quotation character
+   * @param comment Comment pattern
    */
-  public SimplePolygonParser(Pattern colSep, char quoteChar) {
-    super(colSep, quoteChar);
+  public SimplePolygonParser(Pattern colSep, char quoteChar, Pattern comment) {
+    super(colSep, quoteChar, comment);
   }
 
   @Override
@@ -93,31 +94,31 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     List<LabelList> labels = null;
     List<ExternalID> eids = new ArrayList<>();
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(!line.startsWith(COMMENT) && line.length() > 0) {
-          Object[] objs = parseLine(line);
-          polys.add((PolygonsObject) objs[0]);
-          if(objs[1] != null) {
-            if(labels == null) {
-              labels = new ArrayList<>();
-              for(int i = 0; i < polys.size() - 1; i++) {
-                labels.add(null);
-              }
-            }
-            labels.add((LabelList) objs[1]);
-          }
-          eids.add((ExternalID) objs[2]);
+      for (String line; (line = reader.readLine()) != null; lineNumber++) {
+        // Skip empty lines and comments
+        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+          continue;
         }
+        Object[] objs = parseLine(line);
+        polys.add((PolygonsObject) objs[0]);
+        if (objs[1] != null) {
+          if (labels == null) {
+            labels = new ArrayList<>();
+            for (int i = 0; i < polys.size() - 1; i++) {
+              labels.add(null);
+            }
+          }
+          labels.add((LabelList) objs[1]);
+        }
+        eids.add((ExternalID) objs[2]);
       }
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    if(labels != null) {
+    if (labels != null) {
       return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.LABELLIST, labels, TypeUtil.EXTERNALID, eids);
-    }
-    else {
+    } else {
       return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.EXTERNALID, eids);
     }
   }
@@ -138,48 +139,45 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     List<Polygon> polys = new ArrayList<>(1);
 
     List<Vector> coords = new ArrayList<>();
-    while(iter.hasNext()) {
+    while (iter.hasNext()) {
       String cur = iter.next();
       Matcher m = COORD.matcher(cur);
-      if(m.find()) {
+      if (m.find()) {
         try {
           double c1 = Double.parseDouble(m.group(1));
           double c2 = Double.parseDouble(m.group(2));
-          if(m.group(3) != null) {
+          if (m.group(3) != null) {
             double c3 = Double.parseDouble(m.group(3));
             coords.add(new Vector(new double[] { c1, c2, c3 }));
-          }
-          else {
+          } else {
             coords.add(new Vector(new double[] { c1, c2 }));
           }
           continue;
-        }
-        catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
           LOG.warning("Looked like a coordinate pair but didn't parse: " + cur);
         }
       }
       // Polygon separator.
-      if(cur.equals(POLYGON_SEPARATOR)) {
-        if(coords.size() > 0) {
+      if (cur.equals(POLYGON_SEPARATOR)) {
+        if (coords.size() > 0) {
           polys.add(new Polygon(coords));
           coords = new ArrayList<>();
         }
         continue;
       }
       // First label will become the External ID
-      if(eid == null) {
+      if (eid == null) {
         eid = new ExternalID(cur);
-      }
-      else {
+      } else {
         // Label
-        if(labels == null) {
+        if (labels == null) {
           labels = new LabelList(1);
         }
         labels.add(cur);
       }
     }
     // Complete polygon
-    if(coords.size() > 0) {
+    if (coords.size() > 0) {
       polys.add(new Polygon(coords));
     }
     return new Object[] { new PolygonsObject(polys), labels, eid };
@@ -201,19 +199,24 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     @Override
     protected void makeOptions(Parameterization config) {
       PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, "\\s+");
-      if(config.grab(colParam)) {
+      if (config.grab(colParam)) {
         colSep = colParam.getValue();
       }
       StringParameter quoteParam = new StringParameter(QUOTE_ID, String.valueOf(QUOTE_CHAR));
       quoteParam.addConstraint(new StringLengthConstraint(1, 1));
-      if(config.grab(quoteParam)) {
+      if (config.grab(quoteParam)) {
         quoteChar = quoteParam.getValue().charAt(0);
+      }
+
+      PatternParameter commentP = new PatternParameter(COMMENT_ID, COMMENT_PATTERN);
+      if (config.grab(commentP)) {
+        comment = commentP.getValue();
       }
     }
 
     @Override
     protected SimplePolygonParser makeInstance() {
-      return new SimplePolygonParser(colSep, quoteChar);
+      return new SimplePolygonParser(colSep, quoteChar, comment);
     }
   }
 }

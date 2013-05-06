@@ -79,10 +79,11 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    * 
    * @param colSep Column separator pattern
    * @param quoteChar Quote character
+   * @param comment Comment pattern
    * @param distanceFactory Distance factory to use
    */
-  public NumberDistanceParser(Pattern colSep, char quoteChar, D distanceFactory) {
-    super(colSep, quoteChar);
+  public NumberDistanceParser(Pattern colSep, char quoteChar, Pattern comment, D distanceFactory) {
+    super(colSep, quoteChar, comment);
     this.distanceFactory = distanceFactory;
   }
 
@@ -99,33 +100,35 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
         if (prog != null) {
           prog.incrementProcessed(LOG);
         }
-        if (!line.startsWith(COMMENT) && line.length() > 0) {
-          List<String> entries = tokenize(line);
-          if (entries.size() != 3) {
-            throw new IllegalArgumentException("Line " + lineNumber + " does not have the " + "required input format: id1 id2 distanceValue! " + line);
-          }
+        // Skip empty lines and comments
+        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+          continue;
+        }
+        List<String> entries = tokenize(line);
+        if (entries.size() != 3) {
+          throw new IllegalArgumentException("Line " + lineNumber + " does not have the " + "required input format: id1 id2 distanceValue! " + line);
+        }
 
-          DBID id1, id2;
-          try {
-            id1 = DBIDUtil.importInteger(Integer.parseInt(entries.get(0)));
-          } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is no integer!");
-          }
+        DBID id1, id2;
+        try {
+          id1 = DBIDUtil.importInteger(Integer.parseInt(entries.get(0)));
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is no integer!");
+        }
 
-          try {
-            id2 = DBIDUtil.importInteger(Integer.parseInt(entries.get(1)));
-          } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is no integer!");
-          }
+        try {
+          id2 = DBIDUtil.importInteger(Integer.parseInt(entries.get(1)));
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is no integer!");
+        }
 
-          try {
-            D distance = distanceFactory.parseString(entries.get(2));
-            put(id1, id2, distance, distanceCache);
-            ids.add(id1);
-            ids.add(id2);
-          } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage(), e);
-          }
+        try {
+          D distance = distanceFactory.parseString(entries.get(2));
+          put(id1, id2, distance, distanceCache);
+          ids.add(id1);
+          ids.add(id2);
+        } catch (IllegalArgumentException e) {
+          throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage(), e);
         }
       }
     } catch (IOException e) {
@@ -219,7 +222,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
 
     @Override
     protected NumberDistanceParser<D> makeInstance() {
-      return new NumberDistanceParser<>(colSep, quoteChar, distanceFactory);
+      return new NumberDistanceParser<>(colSep, quoteChar, comment, distanceFactory);
     }
   }
 }
