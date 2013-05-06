@@ -1,0 +1,83 @@
+package de.lmu.ifi.dbs.elki.distance.distancefunction.strings;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
+/**
+ * Levenshtein distance on strings, normalized by string length.
+ * 
+ * TODO: add case insensitive flag.
+ * 
+ * @author Felix Stahlberg
+ * @author Erich Schubert
+ */
+public class NormalizedLevenshteinDistanceFunction extends AbstractPrimitiveDistanceFunction<String, DoubleDistance> {
+  /**
+   * Static instance, case sensitive.
+   */
+  public static final NormalizedLevenshteinDistanceFunction STATIC_SENSITIVE = new NormalizedLevenshteinDistanceFunction();
+
+  /**
+   * Constructor. Use static instance instead.
+   */
+  @Deprecated
+  public NormalizedLevenshteinDistanceFunction() {
+    super();
+  }
+
+  @Override
+  public DoubleDistance distance(String o1, String o2) {
+    int cost = LevenshteinDistanceFunction.levenshteinDistance(o1, o2);
+    return new DoubleDistance(cost * 2.0 / (o1.length() + o2.length()));
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
+  }
+
+  @Override
+  public SimpleTypeInformation<? super String> getInputTypeRestriction() {
+    return TypeUtil.STRING;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected NormalizedLevenshteinDistanceFunction makeInstance() {
+      return STATIC_SENSITIVE;
+    }
+  }
+}
