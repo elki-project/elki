@@ -81,6 +81,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.ByLabelOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialAllOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialNoOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialGeneratedOutlier
+de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialAverageCoordinateOutlier
 de.lmu.ifi.dbs.elki.algorithm.statistics.AddSingleScale
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
