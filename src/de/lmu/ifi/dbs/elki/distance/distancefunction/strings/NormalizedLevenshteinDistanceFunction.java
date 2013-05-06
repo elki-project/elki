@@ -27,16 +27,27 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Levenshtein distance on strings, normalized by string length.
+ * 
+ * Reference:
+ * <p>
+ * V. I. Levenshtein<br>
+ * Binary codes capable of correcting deletions, insertions and reversals.<br>
+ * Soviet physics doklady. Vol. 10. 1966.
+ * </p>
  * 
  * TODO: add case insensitive flag.
  * 
  * @author Felix Stahlberg
  * @author Erich Schubert
  */
+@Description("Levenshtein distance, normalized by average string length.")
+@Reference(authors = "V. I. Levenshtein", title = "Binary codes capable of correcting deletions, insertions and reversals.", booktitle = "Soviet physics doklady. Vol. 10. 1966.")
 public class NormalizedLevenshteinDistanceFunction extends AbstractPrimitiveDistanceFunction<String, DoubleDistance> {
   /**
    * Static instance, case sensitive.
