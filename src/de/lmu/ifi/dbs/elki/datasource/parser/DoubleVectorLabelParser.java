@@ -49,7 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @apiviz.has DoubleVector
  * 
- * @deprecated Use NumberVectorLabelParser instead, which defaults to DoubleVector.
+ * @deprecated Use NumberVectorLabelParser instead, which defaults to
+ *             DoubleVector.
  */
 @Deprecated
 public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
@@ -61,19 +62,20 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
   /**
    * Constructor.
    * 
-   * @param colSep
-   * @param quoteChar
-   * @param labelIndices
+   * @param colSep Column separator
+   * @param quoteChar Quotation character
+   * @param comment Comment pattern
+   * @param labelIndices Indices to use as labels
    */
-  public DoubleVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices, DoubleVector.FACTORY);
+  public DoubleVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices) {
+    super(colSep, quoteChar, comment, labelIndices, DoubleVector.FACTORY);
   }
 
   /**
    * Constructor with default values.
    */
   public DoubleVectorLabelParser() {
-    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR, new BitSet());
+    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR, Pattern.compile(COMMENT_PATTERN), new BitSet());
   }
 
   @Override
@@ -96,7 +98,7 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
 
     @Override
     protected DoubleVectorLabelParser makeInstance() {
-      return new DoubleVectorLabelParser(colSep, quoteChar, labelIndices);
+      return new DoubleVectorLabelParser(colSep, quoteChar, comment, labelIndices);
     }
   }
 }

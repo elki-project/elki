@@ -62,16 +62,14 @@ public abstract class AbstractParser {
   public static final String NUMBER_PATTERN = "[+-]?(?:\\d+\\.?|\\d*\\.\\d+)?(?:[eE][-]?\\d+)?";
 
   /**
-   * OptionID for the column separator parameter (defaults to whitespace as in
-   * {@link #DEFAULT_SEPARATOR}.
+   * Default pattern for comments.
    */
-  public static final OptionID COLUMN_SEPARATOR_ID = new OptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
+  public static final String COMMENT_PATTERN = "^\\s*(#|//|;).*$";
 
   /**
-   * OptionID for the quote character parameter (defaults to a double quotation
-   * mark as in {@link #QUOTE_CHAR}.
+   * A sign to separate attributes.
    */
-  public static final OptionID QUOTE_ID = new OptionID("parser.quote", "Quotation character. The default is to use a double quote.");
+  public static final String ATTRIBUTE_CONCATENATION = " ";
 
   /**
    * Stores the column separator pattern
@@ -82,27 +80,24 @@ public abstract class AbstractParser {
    * Stores the quotation character
    */
   protected char quoteChar = QUOTE_CHAR;
-
+  
   /**
-   * The comment character.
+   * Comment pattern.
    */
-  public static final String COMMENT = "#";
-
-  /**
-   * A sign to separate attributes.
-   */
-  public static final String ATTRIBUTE_CONCATENATION = " ";
+  protected Pattern comment = null;
 
   /**
    * Constructor.
    * 
    * @param colSep Column separator
    * @param quoteChar Quote character
+   * @param comment Comment pattern
    */
-  public AbstractParser(Pattern colSep, char quoteChar) {
+  public AbstractParser(Pattern colSep, char quoteChar, Pattern comment) {
     super();
     this.colSep = colSep;
     this.quoteChar = quoteChar;
+    this.comment = comment;
   }
 
   /**
@@ -198,6 +193,23 @@ public abstract class AbstractParser {
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**
+     * OptionID for the column separator parameter (defaults to whitespace as in
+     * {@link #DEFAULT_SEPARATOR}.
+     */
+    public static final OptionID COLUMN_SEPARATOR_ID = new OptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
+
+    /**
+     * OptionID for the quote character parameter (defaults to a double quotation
+     * mark as in {@link #QUOTE_CHAR}.
+     */
+    public static final OptionID QUOTE_ID = new OptionID("parser.quote", "Quotation character. The default is to use a double quote.");
+
+    /**
+     * Comment pattern.
+     */
+    public static final OptionID COMMENT_ID = new OptionID("string.comment", "Ignore lines in the input file that satisfy this pattern.");
+
+    /**
      * Stores the column separator pattern
      */
     protected Pattern colSep = null;
@@ -206,6 +218,11 @@ public abstract class AbstractParser {
      * Stores the quotation character
      */
     protected char quoteChar = QUOTE_CHAR;
+
+    /**
+     * Comment pattern.
+     */
+    protected Pattern comment = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -218,6 +235,10 @@ public abstract class AbstractParser {
       quoteParam.addConstraint(new StringLengthConstraint(1, 1));
       if(config.grab(quoteParam)) {
         quoteChar = quoteParam.getValue().charAt(0);
+      }
+      PatternParameter commentP = new PatternParameter(COMMENT_ID, COMMENT_PATTERN);
+      if (config.grab(commentP)) {
+        comment = commentP.getValue();
       }
     }
 

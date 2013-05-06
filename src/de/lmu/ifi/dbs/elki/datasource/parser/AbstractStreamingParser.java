@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
-import java.io.InputStream;
-import java.util.regex.Pattern;
-
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,6 +22,12 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.io.InputStream;
+import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+
 /**
  * Base class for streaming parsers.
  * 
@@ -38,9 +39,10 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
    * 
    * @param colSep Column separator pattern
    * @param quoteChar Quote character
+   * @param comment Comment pattern
    */
-  public AbstractStreamingParser(Pattern colSep, char quoteChar) {
-    super(colSep, quoteChar);
+  public AbstractStreamingParser(Pattern colSep, char quoteChar, Pattern comment) {
+    super(colSep, quoteChar, comment);
   }
 
   @Override

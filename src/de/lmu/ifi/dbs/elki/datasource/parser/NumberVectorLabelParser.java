@@ -167,7 +167,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @param factory Vector factory
    */
   public NumberVectorLabelParser(NumberVector.Factory<V, ?> factory) {
-    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR, null, factory);
+    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR, Pattern.compile(COMMENT_PATTERN), null, factory);
   }
 
   /**
@@ -175,11 +175,12 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * 
    * @param colSep Column separator
    * @param quoteChar Quote character
+   * @param comment Comment pattern
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices, NumberVector.Factory<V, ?> factory) {
-    super(colSep, quoteChar);
+  public NumberVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices, NumberVector.Factory<V, ?> factory) {
+    super(colSep, quoteChar, comment);
     this.labelIndices = labelIndices;
     this.factory = factory;
   }
@@ -210,31 +211,33 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     }
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
-        if (!line.startsWith(COMMENT) && line.length() > 0) {
-          parseLineInternal(line);
-          // Maybe a header column?
-          if (curvec == null) {
-            continue;
-          }
-          if (dimensionality == DIMENSIONALITY_UNKNOWN) {
-            dimensionality = curvec.getDimensionality();
-            buildMeta();
-            nextevent = Event.NEXT_OBJECT;
-            return Event.META_CHANGED;
-          } else if (dimensionality > 0) {
-            if (dimensionality != curvec.getDimensionality()) {
-              dimensionality = DIMENSIONALITY_VARIABLE;
-              buildMeta();
-              nextevent = Event.NEXT_OBJECT;
-              return Event.META_CHANGED;
-            }
-          } else if (curlbl != null && meta != null && meta.size() == 1) {
-            buildMeta();
-            nextevent = Event.NEXT_OBJECT;
-            return Event.META_CHANGED;
-          }
-          return Event.NEXT_OBJECT;
+        // Skip empty lines and comments
+        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+          continue;
         }
+        parseLineInternal(line);
+        // Maybe a header column?
+        if (curvec == null) {
+          continue;
+        }
+        if (dimensionality == DIMENSIONALITY_UNKNOWN) {
+          dimensionality = curvec.getDimensionality();
+          buildMeta();
+          nextevent = Event.NEXT_OBJECT;
+          return Event.META_CHANGED;
+        } else if (dimensionality > 0) {
+          if (dimensionality != curvec.getDimensionality()) {
+            dimensionality = DIMENSIONALITY_VARIABLE;
+            buildMeta();
+            nextevent = Event.NEXT_OBJECT;
+            return Event.META_CHANGED;
+          }
+        } else if (curlbl != null && meta != null && meta.size() == 1) {
+          buildMeta();
+          nextevent = Event.NEXT_OBJECT;
+          return Event.META_CHANGED;
+        }
+        return Event.NEXT_OBJECT;
       }
       reader.close();
       reader = null;
@@ -420,7 +423,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
 
     @Override
     protected NumberVectorLabelParser<V> makeInstance() {
-      return new NumberVectorLabelParser<>(colSep, quoteChar, labelIndices, factory);
+      return new NumberVectorLabelParser<>(colSep, quoteChar, comment, labelIndices, factory);
     }
   }
 }
