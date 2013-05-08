@@ -339,9 +339,9 @@ public final class DBIDUtil {
     // Both are the same type: both set or both non set.
     // Smaller goes first.
     if (first.size() <= second.size()) {
-      return intersectionSize(first, second);
+      return internalIntersectionSize(first, second);
     } else {
-      return intersectionSize(second, first);
+      return internalIntersectionSize(second, first);
     }
   }
 
