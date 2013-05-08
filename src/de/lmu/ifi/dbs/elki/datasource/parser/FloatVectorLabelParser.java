@@ -57,19 +57,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Deprecated
 public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector> {
   /**
-   * Class logger
+   * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(FloatVectorLabelParser.class);
 
   /**
    * Constructor.
    * 
-   * @param colSep
-   * @param quoteChar
-   * @param labelIndices
+   * @param colSep Column separator
+   * @param quoteChar Quotation character
+   * @param comment Comment pattern
+   * @param labelIndices Indices to use as labels
    */
-  public FloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices, FloatVector.FACTORY);
+  public FloatVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices) {
+    super(colSep, quoteChar, comment, labelIndices, FloatVector.FACTORY);
   }
 
   @Override
@@ -92,7 +93,7 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
 
     @Override
     protected FloatVectorLabelParser makeInstance() {
-      return new FloatVectorLabelParser(colSep, quoteChar, labelIndices);
+      return new FloatVectorLabelParser(colSep, quoteChar, comment, labelIndices);
     }
   }
 }

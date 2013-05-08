@@ -75,10 +75,11 @@ public class SparseFloatVectorLabelParser extends SparseNumberVectorLabelParser<
    * 
    * @param colSep Column separator
    * @param quoteChar Quotation character
-   * @param labelIndices Label indexes
+   * @param comment Comment pattern
+   * @param labelIndices Indices to use as labels
    */
-  public SparseFloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices, SparseFloatVector.FACTORY);
+  public SparseFloatVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices) {
+    super(colSep, quoteChar, comment, labelIndices, SparseFloatVector.FACTORY);
   }
 
   /**
@@ -91,7 +92,7 @@ public class SparseFloatVectorLabelParser extends SparseNumberVectorLabelParser<
   public static class Parameterizer extends SparseNumberVectorLabelParser.Parameterizer<SparseFloatVector> {
     @Override
     protected SparseFloatVectorLabelParser makeInstance() {
-      return new SparseFloatVectorLabelParser(colSep, quoteChar, labelIndices);
+      return new SparseFloatVectorLabelParser(colSep, quoteChar, comment, labelIndices);
     }
   }
 }
