@@ -86,12 +86,13 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
    * Constructor.
    * 
    * @param normalize Normalize
-   * @param colSep
-   * @param quoteChar
-   * @param labelIndices
+   * @param colSep Column separator
+   * @param quoteChar Quotation character
+   * @param comment Comment pattern
+   * @param labelIndices Indices to use as labels
    */
-  public TermFrequencyParser(boolean normalize, Pattern colSep, char quoteChar, BitSet labelIndices, SparseNumberVector.Factory<V, ?> factory) {
-    super(colSep, quoteChar, labelIndices, factory);
+  public TermFrequencyParser(boolean normalize, Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V, ?> factory) {
+    super(colSep, quoteChar, comment, labelIndices, factory);
     this.normalize = normalize;
     this.maxdim = 0;
     this.keymap = new TObjectIntHashMap<>();
@@ -205,7 +206,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
 
     @Override
     protected TermFrequencyParser<V> makeInstance() {
-      return new TermFrequencyParser<>(normalize, colSep, quoteChar, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
+      return new TermFrequencyParser<>(normalize, colSep, quoteChar, comment, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
     }
   }
 }

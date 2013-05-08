@@ -54,7 +54,8 @@ public abstract class AbstractParser {
   public static final char QUOTE_CHAR = '\"';
 
   /**
-   * A pattern catching most numbers that can be parsed using Double.parseDouble:
+   * A pattern catching most numbers that can be parsed using
+   * Double.parseDouble:
    * 
    * Some examples: <code>1</code> <code>1.</code> <code>1.2</code>
    * <code>.2</code> <code>-.2e-03</code>
@@ -80,7 +81,7 @@ public abstract class AbstractParser {
    * Stores the quotation character
    */
   protected char quoteChar = QUOTE_CHAR;
-  
+
   /**
    * Comment pattern.
    */
@@ -113,11 +114,11 @@ public abstract class AbstractParser {
 
     int index = 0;
     boolean inquote = (input.length() > 0) && (input.charAt(0) == quoteChar);
-    while(m.find()) {
+    while (m.find()) {
       // Quoted code path vs. regular code path
-      if(inquote && m.start() > 0) {
+      if (inquote && m.start() > 0) {
         // Closing quote found?
-        if(m.start() > index + 1 && input.charAt(m.start() - 1) == quoteChar) {
+        if (m.start() > index + 1 && input.charAt(m.start() - 1) == quoteChar) {
           // Strip quote characters
           if (index + 1 < m.start() - 1) {
             matchList.add(input.substring(index + 1, m.start() - 1));
@@ -127,8 +128,7 @@ public abstract class AbstractParser {
           // new quote?
           inquote = (index < input.length()) && (input.charAt(index) == quoteChar);
         }
-      }
-      else {
+      } else {
         // Add match before separator
         if (index < m.start()) {
           matchList.add(input.substring(index, m.start()));
@@ -140,25 +140,23 @@ public abstract class AbstractParser {
       }
     }
     // Nothing found - return original string.
-    if(index == 0) {
+    if (index == 0) {
       matchList.add(input);
       return matchList;
     }
     // Add tail after last separator.
-    if(inquote) {
-      if(input.charAt(input.length() - 1) == quoteChar) {
+    if (inquote) {
+      if (input.charAt(input.length() - 1) == quoteChar) {
         if (index + 1 < input.length() - 1) {
           matchList.add(input.substring(index + 1, input.length() - 1));
         }
-      }
-      else {
-        getLogger().warning("Invalid quoted line in input.");
+      } else {
+        getLogger().warning("Invalid quoted line in input: no closing quote found in: " + input);
         if (index < input.length()) {
           matchList.add(input.substring(index, input.length()));
         }
       }
-    }
-    else {
+    } else {
       if (index < input.length()) {
         matchList.add(input.substring(index, input.length()));
       }
@@ -199,8 +197,8 @@ public abstract class AbstractParser {
     public static final OptionID COLUMN_SEPARATOR_ID = new OptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
 
     /**
-     * OptionID for the quote character parameter (defaults to a double quotation
-     * mark as in {@link #QUOTE_CHAR}.
+     * OptionID for the quote character parameter (defaults to a double
+     * quotation mark as in {@link #QUOTE_CHAR}.
      */
     public static final OptionID QUOTE_ID = new OptionID("parser.quote", "Quotation character. The default is to use a double quote.");
 
@@ -228,12 +226,12 @@ public abstract class AbstractParser {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, DEFAULT_SEPARATOR);
-      if(config.grab(colParam)) {
+      if (config.grab(colParam)) {
         colSep = colParam.getValue();
       }
       StringParameter quoteParam = new StringParameter(QUOTE_ID, String.valueOf(QUOTE_CHAR));
       quoteParam.addConstraint(new StringLengthConstraint(1, 1));
-      if(config.grab(quoteParam)) {
+      if (config.grab(quoteParam)) {
         quoteChar = quoteParam.getValue().charAt(0);
       }
       PatternParameter commentP = new PatternParameter(COMMENT_ID, COMMENT_PATTERN);

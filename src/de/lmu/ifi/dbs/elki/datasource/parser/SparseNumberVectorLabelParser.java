@@ -101,11 +101,12 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
    * 
    * @param colSep Column separator
    * @param quoteChar Quotation character
-   * @param labelIndices Label indexes
+   * @param comment Comment pattern
+   * @param labelIndices Indices to use as labels
    * @param factory Vector factory
    */
-  public SparseNumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices, SparseNumberVector.Factory<V, ?> factory) {
-    super(colSep, quoteChar, labelIndices, factory);
+  public SparseNumberVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V, ?> factory) {
+    super(colSep, quoteChar, comment, labelIndices, factory);
     this.sparsefactory = factory;
   }
 
@@ -182,7 +183,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
 
     @Override
     protected SparseNumberVectorLabelParser<V> makeInstance() {
-      return new SparseNumberVectorLabelParser<>(colSep, quoteChar, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
+      return new SparseNumberVectorLabelParser<>(colSep, quoteChar, comment, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
     }
   }
 }
