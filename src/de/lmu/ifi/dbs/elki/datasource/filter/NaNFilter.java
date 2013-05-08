@@ -52,7 +52,7 @@ public class NaNFilter extends AbstractStreamFilter {
   /**
    * Columns to check.
    */
-  private BitSet densecols = new BitSet();
+  private BitSet densecols = null;
 
   /**
    * Constructor.
@@ -79,28 +79,12 @@ public class NaNFilter extends AbstractStreamFilter {
       case END_OF_STREAM:
         return ev;
       case META_CHANGED:
-        final BundleMeta meta = source.getMeta();
-        int cols = meta.size();
-        densecols.clear();
-        for (int i = 0; i < cols; i++) {
-          if (TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
-            throw new AbortException("Filtering sparse vectors is not yet supported by this filter. Please contribute.");
-          }
-          // TODO: only check for double and float?
-          if (TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
-            LOG.verbose("Filtering column " + i);
-            densecols.set(i);
-            continue;
-          }
-          if (TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
-            LOG.verbose("Filtering column " + i);
-            densecols.set(i);
-            continue;
-          }
-          LOG.verbose("Not filtering column: " + i + " " + meta.get(i));
-        }
+        updateMeta(source.getMeta());
         return ev;
       case NEXT_OBJECT:
+        if (densecols == null) {
+          updateMeta(source.getMeta());
+        }
         boolean good = true;
         for (int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
           NumberVector<?> v = (NumberVector<?>) source.data(j);
@@ -123,26 +107,63 @@ public class NaNFilter extends AbstractStreamFilter {
     }
   }
 
+  /**
+   * Process an updated meta record.
+   * 
+   * @param meta Meta record
+   */
+  private void updateMeta(BundleMeta meta) {
+    int cols = meta.size();
+    if (densecols == null) {
+      densecols = new BitSet();
+    } else {
+      densecols.clear();
+    }
+    for (int i = 0; i < cols; i++) {
+      if (TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
+        throw new AbortException("Filtering sparse vectors is not yet supported by this filter. Please contribute.");
+      }
+      // TODO: only check for double and float?
+      if (TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
+        densecols.set(i);
+        continue;
+      }
+      if (TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
+        densecols.set(i);
+        continue;
+      }
+    }
+  }
+
   @Override
   public MultipleObjectsBundle filter(final MultipleObjectsBundle objects) {
-    if (LOG.isDebugging()) {
-      LOG.debug("Filtering the data set");
+    if (LOG.isDebuggingFinest()) {
+      LOG.debugFinest("Removing records with NaN values.");
     }
 
+    updateMeta(objects.meta());
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     for (int j = 0; j < objects.metaLength(); j++) {
       bundle.appendColumn(objects.meta(j), new ArrayList<>());
     }
     for (int i = 0; i < objects.dataLength(); i++) {
+      final Object[] row = objects.getRow(i);
       boolean good = true;
-      for (int j = 0; j < objects.metaLength(); j++) {
-        if (objects.data(i, j) == null) {
+      for (int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
+        NumberVector<?> v = (NumberVector<?>) row[j];
+        if (v == null) {
           good = false;
           break;
         }
+        for (int d = 0; d < v.getDimensionality(); d++) {
+          if (Double.isNaN(v.doubleValue(d))) {
+            good = false;
+            break;
+          }
+        }
       }
       if (good) {
-        bundle.appendSimple(objects.getRow(i));
+        bundle.appendSimple(row);
       }
     }
     return bundle;
