@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.strings.LevenshteinDistanceFunction;
 
 /**
  * Unit test for Levenshtein distance.
@@ -40,7 +39,10 @@ public class LevenshteinDistanceFunctionTest implements JUnit4Test {
    */
   final String[][] TESTS = { //
   { "kitten", "sitting" }, //
-  { "Saturday", "Sunday" } //
+  { "Saturday", "Sunday" }, //
+  { "tier", "tor" }, //
+  { "abcz", "zabc" }, //
+  { "zabc", "abcz" }, //
   };
 
   /**
@@ -49,6 +51,9 @@ public class LevenshteinDistanceFunctionTest implements JUnit4Test {
   final int[] SCORES = { //
   3, // kitten <-> sitting
   3, // Saturday <-> Sunday
+  2, // Tier <-> Tor
+  2, // abcz <-> zabc
+  2, // zabc <-> abcz
   };
 
   @Test

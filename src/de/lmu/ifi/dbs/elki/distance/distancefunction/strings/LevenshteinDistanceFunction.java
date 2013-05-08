@@ -87,7 +87,7 @@ public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFuncti
     // Use two buffers:
     int[] curr = new int[l2 + 1], prev = new int[l2 + 1];
     // Initial row
-    for (int j = 1; j <= l2; j++) {
+    for (int j = 0; j <= l2; j++) {
       curr[j] = j;
     }
     for (int i = 0; i < l1; i++) {
@@ -96,7 +96,7 @@ public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFuncti
       curr = prev;
       prev = tmp;
       // Compute next row:
-      curr[0] = i;
+      curr[0] = i + 1;
       for (int j = 0; j < l2; j++) {
         // TODO: allow case insensitive comparisons?
         final int cost = (o1.charAt(i) == o2.charAt(j)) ? 0 : 1;

@@ -39,7 +39,10 @@ public class NormalizedLevenshteinDistanceFunctionTest implements JUnit4Test {
    */
   final String[][] TESTS = { //
   { "kitten", "sitting" }, //
-  { "Saturday", "Sunday" } //
+  { "Saturday", "Sunday" }, //
+  { "tier", "tor" }, //
+  { "abcz", "zabc" }, //
+  { "zabc", "abcz" }, //
   };
 
   /**
@@ -48,6 +51,9 @@ public class NormalizedLevenshteinDistanceFunctionTest implements JUnit4Test {
   final double[] SCORES = { //
   3. / 6.5, // kitten <-> sitting
   3. / 7., // Saturday <-> Sunday
+  2. / 3.5, // tier <-> tor
+  2. / 4., // abcz <-> zabc
+  2. / 4., // zabc <-> abcz
   };
 
   @Test
