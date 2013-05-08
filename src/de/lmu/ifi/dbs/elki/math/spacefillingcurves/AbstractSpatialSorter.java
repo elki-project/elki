@@ -125,18 +125,18 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
     // Compute min and max for each dimension:
     double[] mm = new double[dim << 1];
     {
-      for (int d = 0; d < dim; d++) {
-        mm[d << 1] = Double.POSITIVE_INFINITY;
-        mm[(d << 1) + 1] = Double.NEGATIVE_INFINITY;
+      for (int d = 0, d2 = 0; d < dim; d++, d2 += 2) {
+        mm[d2] = Double.POSITIVE_INFINITY;
+        mm[d2 + 1] = Double.NEGATIVE_INFINITY;
       }
       for (SpatialComparable obj : objs) {
-        for (int d = 0; d < dim; d++) {
-          mm[d << 1] = Math.min(mm[d << 1], obj.getMin(d));
-          mm[(d << 1) + 1] = Math.max(mm[(d << 1) + 1], obj.getMax(d));
+        for (int d = 0, d2 = 0; d < dim; d++, d2 += 2) {
+          mm[d2] = Math.min(mm[d2], obj.getMin(d));
+          mm[d2 + 1] = Math.max(mm[d2 + 1], obj.getMax(d));
         }
       }
-      for (int d = 0; d < dim; d++) {
-        assert (mm[d << 1] <= mm[(d << 1) + 1]);
+      for (int d = 0, d2 = 0; d < dim; d++, d2 += 2) {
+        assert (mm[d2] <= mm[d2 + 1]) : ("Min > Max in dim " + d + ": " + mm[d2] + " " + mm[d2 + 1]);
       }
     }
     return mm;
