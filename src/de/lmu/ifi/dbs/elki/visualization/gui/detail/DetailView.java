@@ -143,9 +143,9 @@ public class DetailView extends SVGPlot implements ResultListener {
 
     ArrayList<Visualization> layers = new ArrayList<>();
     // TODO: center/arrange visualizations?
-    for(Iterator<VisualizationTask> tit = visi.tasks.iterator(); tit.hasNext();) {
+    for (Iterator<VisualizationTask> tit = visi.tasks.iterator(); tit.hasNext();) {
       VisualizationTask task = tit.next();
-      if(task.visible) {
+      if (task.visible) {
         try {
           Visualization v = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
           if (task.noexport) {
@@ -153,23 +153,20 @@ public class DetailView extends SVGPlot implements ResultListener {
           }
           layers.add(v);
           layermap.put(task, v);
-        }
-        catch(Exception e) {
-          if(Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
+        } catch (Exception e) {
+          if (Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
             LoggingUtil.exception("Visualization failed.", e);
-          }
-          else {
+          } else {
             LoggingUtil.warning("Visualizer " + task.getFactory().getClass().getName() + " failed - enable debugging to see details: " + e.toString());
           }
         }
       }
     }
     // Arrange
-    for(Visualization layer : layers) {
-      if(layer.getLayer() != null) {
+    for (Visualization layer : layers) {
+      if (layer.getLayer() != null) {
         getRoot().appendChild(layer.getLayer());
-      }
-      else {
+      } else {
         LoggingUtil.warning("NULL layer seen.");
       }
     }
@@ -191,7 +188,7 @@ public class DetailView extends SVGPlot implements ResultListener {
   }
 
   private void destroyVisualizations() {
-    for(Entry<VisualizationTask, Visualization> v : layermap.entrySet()) {
+    for (Entry<VisualizationTask, Visualization> v : layermap.entrySet()) {
       v.getValue().destroy();
     }
     layermap.clear();
@@ -268,30 +265,28 @@ public class DetailView extends SVGPlot implements ResultListener {
   @Override
   public void resultChanged(Result current) {
     // Make sure we are affected:
-    if(!(current instanceof VisualizationTask)) {
+    if (!(current instanceof VisualizationTask)) {
       return;
     }
     // Get the layer
     final VisualizationTask task = (VisualizationTask) current;
     Visualization vis = layermap.get(task);
-    if(vis != null) {
+    if (vis != null) {
       // Ensure visibility is as expected
       boolean isHidden = SVGConstants.CSS_HIDDEN_VALUE.equals(vis.getLayer().getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
-      if(task.visible) {
-        if(isHidden) {
+      if (task.visible) {
+        if (isHidden) {
           this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
         }
-      }
-      else {
-        if(!isHidden) {
+      } else {
+        if (!isHidden) {
           this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE));
         }
       }
-    }
-    else {
+    } else {
       // Only materialize when becoming visible
-      if(task.visible) {
-        // LoggingUtil.warning("Need to recreate a missing layer for " + v);
+      if (task.visible) {
+        // LoggingUtil.warning("Need to recreate a missing layer for " + task);
         vis = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
         if (task.noexport) {
           vis.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);

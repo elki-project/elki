@@ -382,13 +382,6 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
                 if (pair.first.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
                   pair.first.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
                 }
-                // if not yet rendered, add a thumbnail
-                if (!pair.first.hasChildNodes()) {
-                  LOG.warning("This codepath should no longer be needed.");
-                  Visualization visualization = embedOrThumbnail(thumbsize, it, task, pair.first);
-                  vistoelem.put(it, task, pair.first, visualization);
-                  refreshcss = true;
-                }
               } else {
                 // hide if there is anything to hide.
                 if (pair.first != null && pair.first.hasChildNodes()) {
