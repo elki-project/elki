@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Visualizer, displaying the key for a clustering.
- *
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
@@ -68,17 +68,17 @@ public class KeyVisualization extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
-    for(Clustering<?> c : clusterings) {
+    for (Clustering<?> c : clusterings) {
       final int numc = c.getAllClusters().size();
-      if(numc > 0) {
+      if (numc > 0) {
         // FIXME: compute from labels?
         final double maxwidth = 10.;
         final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
         final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
         final int rows = (int) Math.ceil(numc / (double) cols);
-        final double div = Math.max(2. + rows, cols * maxwidth);
-        task.width = cols * maxwidth / div;
-        task.height = (2. + rows) / div;
+        final double ratio = cols * maxwidth / (2. + rows);
+        task.width = (ratio >= 1.) ? 1 : 1. / ratio;
+        task.height = (ratio >= 1.) ? 1. / ratio : 1;
         task.level = VisualizationTask.LEVEL_STATIC;
         task.nodetail = true;
         baseResult.getHierarchy().add(c, task);
@@ -147,7 +147,7 @@ public class KeyVisualization extends AbstractVisFactory {
     @Override
     public void resultChanged(Result current) {
       super.resultChanged(current);
-      if(current == context.getStyleResult()) {
+      if (current == context.getStyleResult()) {
         incrementalRedraw();
       }
     }
@@ -165,7 +165,8 @@ public class KeyVisualization extends AbstractVisFactory {
       final List<Cluster<Model>> allcs = clustering.getAllClusters();
       final int numc = allcs.size();
       final int cols = getPreferredColumns(task.getWidth(), task.getHeight(), numc, maxwidth);
-      final int rows = 2 + (int) Math.ceil(numc / (double) cols);
+      final int extrarows = 2;
+      final int rows = (int) Math.ceil(numc / (double) cols);
       // We use a coordinate system based on rows, so columns are at c*maxwidth
 
       layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
@@ -177,7 +178,7 @@ public class KeyVisualization extends AbstractVisFactory {
       }
 
       int i = 0;
-      for(Cluster<Model> c : allcs) {
+      for (Cluster<Model> c : allcs) {
         final int col = i / rows;
         final int row = i % rows;
         ml.useMarker(svgp, layer, 0.3 + maxwidth * col, row + 1.5, i, 0.3);
@@ -190,15 +191,14 @@ public class KeyVisualization extends AbstractVisFactory {
       // Add a button to set style policy
       {
         StylingPolicy sp = context.getStyleResult().getStylingPolicy();
-        if(sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
+        if (sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
           // Don't show the button when active. May confuse people more than the
           // disappearing button?
 
           // SVGButton button = new SVGButton(.1, rows + 1.1, 3.8, .7, .2);
           // button.setTitle("Active style", "darkgray");
           // layer.appendChild(button.render(svgp));
-        }
-        else {
+        } else {
           SVGButton button = new SVGButton(.1, rows + 1.1, 3.8, .7, .2);
           button.setTitle("Set style", "black");
           Element elem = button.render(svgp);
@@ -214,11 +214,8 @@ public class KeyVisualization extends AbstractVisFactory {
         }
       }
 
-      // int rows = i + 2;
-      // int cols = Math.max(6, (int) (rows * task.getHeight() /
-      // task.getWidth()));
       final double margin = style.getSize(StyleLibrary.MARGIN);
-      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols * maxwidth, rows, margin / StyleLibrary.SCALE);
+      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols * maxwidth, rows + extrarows, margin / StyleLibrary.SCALE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 
