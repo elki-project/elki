@@ -66,6 +66,9 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
    */
   private static final String NAME = "OPTICS Cut";
 
+  /**
+   * Constructor.
+   */
   public OPTICSPlotCutVisualization() {
     super();
   }
@@ -73,7 +76,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector<?> p : ops) {
+    for (OPTICSProjector<?> p : ops) {
       final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       baseResult.getHierarchy().add(p, task);
@@ -151,7 +154,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
     @Override
     protected void incrementalRedraw() {
-      if(layer == null) {
+      if (layer == null) {
         makeLayerElement();
         addCSSClasses();
       }
@@ -161,36 +164,33 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
       // compute absolute y-value of bar
       final double yAct = plotheight - getYFromEpsilon(epsilon);
 
-      if(elemText == null) {
+      if (elemText == null) {
         elemText = svgp.svgText(StyleLibrary.SCALE * 1.05, yAct, label);
         SVGUtil.setAtt(elemText, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_EPSILON);
         layer.appendChild(elemText);
-      }
-      else {
+      } else {
         elemText.setTextContent(label);
         SVGUtil.setAtt(elemText, SVGConstants.SVG_Y_ATTRIBUTE, yAct);
       }
 
       // line and handle
-      if(elementLine == null) {
+      if (elementLine == null) {
         elementLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE * 1.04, yAct);
         SVGUtil.addCSSClass(elementLine, CSS_LINE);
         layer.appendChild(elementLine);
-      }
-      else {
+      } else {
         SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y1_ATTRIBUTE, yAct);
         SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y2_ATTRIBUTE, yAct);
       }
-      if(elementPoint == null) {
+      if (elementPoint == null) {
         elementPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.04, yAct, StyleLibrary.SCALE * 0.004);
         SVGUtil.addCSSClass(elementPoint, CSS_LINE);
         layer.appendChild(elementPoint);
-      }
-      else {
+      } else {
         SVGUtil.setAtt(elementPoint, SVG12Constants.SVG_CY_ATTRIBUTE, yAct);
       }
 
-      if(eventarea == null) {
+      if (eventarea == null) {
         eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, StyleLibrary.SCALE * 0.1, plotheight, this);
         layer.appendChild(eventarea.getElement());
       }
@@ -209,10 +209,10 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      * @return epsilon
      */
     protected double getEpsilonFromY(double y) {
-      if(y < 0) {
+      if (y < 0) {
         y = 0;
       }
-      if(y > plotheight) {
+      if (y > plotheight) {
         y = plotheight;
       }
       return optics.getOPTICSPlot(context).getScale().getUnscaled(y / plotheight);
@@ -226,10 +226,10 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      */
     protected double getYFromEpsilon(double epsilon) {
       double y = optics.getOPTICSPlot(context).getScale().getScaled(epsilon) * plotheight;
-      if(y < 0) {
+      if (y < 0) {
         y = 0;
       }
-      if(y > plotheight) {
+      if (y > plotheight) {
         y = plotheight;
       }
       return y;
@@ -245,7 +245,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
     @Override
     public boolean duringDrag(SVGPoint start, SVGPoint end, Event evt, boolean inside) {
-      if(inside) {
+      if (inside) {
         epsilon = getEpsilonFromY(plotheight - end.getY());
       }
       // opvis.unsetEpsilonExcept(this);
@@ -255,7 +255,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
     @Override
     public boolean endDrag(SVGPoint start, SVGPoint end, Event evt, boolean inside) {
-      if(inside) {
+      if (inside) {
         epsilon = getEpsilonFromY(plotheight - end.getY());
         // opvis.unsetEpsilonExcept(this);
 
@@ -264,8 +264,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
         Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, optics.getOPTICSPlot(context).getDistanceAdapter(), epsilon);
         order.addChildResult(cl);
       }
-      context.getHierarchy().resultChanged(this.task);
-      // synchronizedRedraw();
+      synchronizedRedraw();
       return true;
     }
 
@@ -282,7 +281,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
     private void addCSSClasses() {
       // Class for the epsilon-value
       final StyleLibrary style = context.getStyleResult().getStyleLibrary();
-      if(!svgp.getCSSClassManager().contains(CSS_EPSILON)) {
+      if (!svgp.getCSSClassManager().contains(CSS_EPSILON)) {
         final CSSClass label = new CSSClass(svgp, CSS_EPSILON);
         label.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
         label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
@@ -290,7 +289,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
         svgp.addCSSClassOrLogError(label);
       }
       // Class for the epsilon cut line
-      if(!svgp.getCSSClassManager().contains(CSS_LINE)) {
+      if (!svgp.getCSSClassManager().contains(CSS_LINE)) {
         final CSSClass lcls = new CSSClass(svgp, CSS_LINE);
         lcls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.PLOT));
         lcls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.5 * style.getLineWidth(StyleLibrary.PLOT));
