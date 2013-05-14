@@ -27,14 +27,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -56,6 +54,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
 
 /**
  * Simple experiment to estimate the effects of approximating the kNN with space
@@ -77,7 +76,7 @@ public class SpacefillingKNNExperiment {
     List<SpatialRef> ps = new ArrayList<>(ids.size());
     List<SpatialRef> hs = new ArrayList<>(ids.size());
     {
-      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         final NumberVector<?> v = rel.get(id);
         SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
         zs.add(ref);
@@ -94,14 +93,14 @@ public class SpacefillingKNNExperiment {
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
     {
       Iterator<SpatialRef> it = zs.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         positions.put(r.id, new int[] { i, -1, -1 });
       }
     }
     {
       Iterator<SpatialRef> it = ps.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[1] = i;
@@ -110,7 +109,7 @@ public class SpacefillingKNNExperiment {
     }
     {
       Iterator<SpatialRef> it = hs.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[2] = i;
@@ -125,10 +124,10 @@ public class SpacefillingKNNExperiment {
     KNNQuery<NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
 
     ArrayList<MeanVariance[]> mvs = new ArrayList<>();
-    for(int i = 0; i < maxoff; i++) {
+    for (int i = 0; i < maxoff; i++) {
       mvs.add(new MeanVariance[] { new MeanVariance(), new MeanVariance(), new MeanVariance(), new MeanVariance() });
     }
-    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       final KNNList<DoubleDistance> trueNN = knnq.getKNNForDBID(id, k);
       DBIDs trueIds = DBIDUtil.ensureSet(trueNN);
       int[] posi = positions.get(id);
@@ -137,11 +136,11 @@ public class SpacefillingKNNExperiment {
         ModifiableDBIDs candz = DBIDUtil.newHashSet();
         candz.add(zs.get(posi[0]).id);
         assert (candz.size() == 1);
-        for(int off = 1; off < maxoff; off++) {
-          if(posi[0] - off >= 0) {
+        for (int off = 1; off < maxoff; off++) {
+          if (posi[0] - off >= 0) {
             candz.add(zs.get(posi[0] - off).id);
           }
-          if(posi[0] + off < ids.size()) {
+          if (posi[0] + off < ids.size()) {
             candz.add(zs.get(posi[0] + off).id);
           }
 
@@ -154,11 +153,11 @@ public class SpacefillingKNNExperiment {
         ModifiableDBIDs candp = DBIDUtil.newHashSet();
         candp.add(ps.get(posi[1]).id);
         assert (candp.size() == 1);
-        for(int off = 1; off < maxoff; off++) {
-          if(posi[1] - off >= 0) {
+        for (int off = 1; off < maxoff; off++) {
+          if (posi[1] - off >= 0) {
             candp.add(ps.get(posi[1] - off).id);
           }
-          if(posi[1] + off < ids.size()) {
+          if (posi[1] + off < ids.size()) {
             candp.add(ps.get(posi[1] + off).id);
           }
 
@@ -171,11 +170,11 @@ public class SpacefillingKNNExperiment {
         ModifiableDBIDs candh = DBIDUtil.newHashSet();
         candh.add(hs.get(posi[2]).id);
         assert (candh.size() == 1);
-        for(int off = 1; off < maxoff; off++) {
-          if(posi[2] - off >= 0) {
+        for (int off = 1; off < maxoff; off++) {
+          if (posi[2] - off >= 0) {
             candh.add(hs.get(posi[2] - off).id);
           }
-          if(posi[2] + off < ids.size()) {
+          if (posi[2] + off < ids.size()) {
             candh.add(hs.get(posi[2] + off).id);
           }
 
@@ -189,23 +188,23 @@ public class SpacefillingKNNExperiment {
         cands.add(zs.get(posi[0]).id);
         cands.add(ps.get(posi[1]).id);
         assert (cands.size() == 1);
-        for(int off = 1; off < maxoff; off++) {
-          if(posi[0] - off >= 0) {
+        for (int off = 1; off < maxoff; off++) {
+          if (posi[0] - off >= 0) {
             cands.add(zs.get(posi[0] - off).id);
           }
-          if(posi[0] + off < ids.size()) {
+          if (posi[0] + off < ids.size()) {
             cands.add(zs.get(posi[0] + off).id);
           }
-          if(posi[1] - off >= 0) {
+          if (posi[1] - off >= 0) {
             cands.add(ps.get(posi[1] - off).id);
           }
-          if(posi[1] + off < ids.size()) {
+          if (posi[1] + off < ids.size()) {
             cands.add(ps.get(posi[1] + off).id);
           }
-          if(posi[2] - off >= 0) {
+          if (posi[2] - off >= 0) {
             cands.add(hs.get(posi[2] - off).id);
           }
-          if(posi[2] + off < ids.size()) {
+          if (posi[2] + off < ids.size()) {
             cands.add(hs.get(posi[2] + off).id);
           }
 
@@ -215,7 +214,7 @@ public class SpacefillingKNNExperiment {
       }
     }
 
-    for(int i = 1; i < maxoff; i++) {
+    for (int i = 1; i < maxoff; i++) {
       MeanVariance[] mv = mvs.get(i);
       System.out.print(i);
       System.out.print(" " + mv[0].getMean() + " " + mv[0].getNaiveStddev());
@@ -226,7 +225,7 @@ public class SpacefillingKNNExperiment {
     }
   }
 
-  private Database loadDatabase() {
+  private static Database loadDatabase() {
     try {
       ListParameterization dbpar = new ListParameterization();
       // Input file
@@ -238,48 +237,8 @@ public class SpacefillingKNNExperiment {
       Database db = ClassGenericsUtil.tryInstantiate(Database.class, StaticArrayDatabase.class, dbpar);
       db.initialize();
       return db;
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException("Cannot load database." + e, e);
-    }
-  }
-
-  /**
-   * Object used in spatial sorting, combining the spatial object and the object
-   * ID.
-   * 
-   * @author Erich Schubert
-   */
-  static class SpatialRef implements SpatialComparable {
-    protected DBID id;
-
-    protected NumberVector<?> vec;
-
-    /**
-     * Constructor.
-     * 
-     * @param id
-     * @param vec
-     */
-    protected SpatialRef(DBID id, NumberVector<?> vec) {
-      super();
-      this.id = id;
-      this.vec = vec;
-    }
-
-    @Override
-    public int getDimensionality() {
-      return vec.getDimensionality();
-    }
-
-    @Override
-    public double getMin(int dimension) {
-      return vec.getMin(dimension);
-    }
-
-    @Override
-    public double getMax(int dimension) {
-      return vec.getMax(dimension);
     }
   }
 
@@ -288,8 +247,7 @@ public class SpacefillingKNNExperiment {
     // logger.getWrappedLogger().setLevel(Level.INFO);
     try {
       new SpacefillingKNNExperiment().run();
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       LOG.exception(e);
     }
   }

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
@@ -64,6 +63,7 @@ import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
 
 /**
  * Simple experiment to estimate the effects of approximating the kNN with space
@@ -92,7 +92,7 @@ public class SpacefillingKNNExperiment2 {
     List<SpatialRef> ps3 = new ArrayList<>(ids.size());
     List<SpatialRef> hs3 = new ArrayList<>(ids.size());
     {
-      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         final NumberVector<?> v = rel.get(id);
         SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
         zs.add(ref);
@@ -113,7 +113,7 @@ public class SpacefillingKNNExperiment2 {
       (new HilbertSpatialSorter()).sort(hs, 0, hs.size(), mms);
       double[] mms2 = new double[mms.length];
       double[] mms3 = new double[mms.length];
-      for(int i = 0; i < mms.length; i += 2) {
+      for (int i = 0; i < mms.length; i += 2) {
         double len = mms[i + 1] - mms[i];
         mms2[i] = mms[i] - len * .1234;
         mms2[i + 1] = mms[i + 1] + len * .3784123;
@@ -131,14 +131,14 @@ public class SpacefillingKNNExperiment2 {
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
     {
       Iterator<SpatialRef> it = zs.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         positions.put(r.id, new int[] { i, -1, -1, -1, -1, -1, -1, -1, -1 });
       }
     }
     {
       Iterator<SpatialRef> it = ps.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[1] = i;
@@ -146,7 +146,7 @@ public class SpacefillingKNNExperiment2 {
     }
     {
       Iterator<SpatialRef> it = hs.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[2] = i;
@@ -154,7 +154,7 @@ public class SpacefillingKNNExperiment2 {
     }
     {
       Iterator<SpatialRef> it = zs2.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[3] = i;
@@ -162,7 +162,7 @@ public class SpacefillingKNNExperiment2 {
     }
     {
       Iterator<SpatialRef> it = ps2.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[4] = i;
@@ -170,7 +170,7 @@ public class SpacefillingKNNExperiment2 {
     }
     {
       Iterator<SpatialRef> it = hs2.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[5] = i;
@@ -178,7 +178,7 @@ public class SpacefillingKNNExperiment2 {
     }
     {
       Iterator<SpatialRef> it = zs3.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[6] = i;
@@ -186,7 +186,7 @@ public class SpacefillingKNNExperiment2 {
     }
     {
       Iterator<SpatialRef> it = ps3.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[7] = i;
@@ -194,7 +194,7 @@ public class SpacefillingKNNExperiment2 {
     }
     {
       Iterator<SpatialRef> it = hs3.iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[8] = i;
@@ -212,43 +212,43 @@ public class SpacefillingKNNExperiment2 {
     ArrayList<MeanVariance[]> mrec = new ArrayList<>();
     ArrayList<MeanVariance[]> mdic = new ArrayList<>();
     ArrayList<MeanVariance[]> merr = new ArrayList<>();
-    for(int i = 0; i < maxoff; i++) {
+    for (int i = 0; i < maxoff; i++) {
       mrec.add(MeanVariance.newArray(numcurves));
       mdic.add(MeanVariance.newArray(numcurves));
       merr.add(MeanVariance.newArray(numcurves));
     }
 
     ArrayList<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> rec = new ArrayList<>();
-    for(int i = 0; i < numcurves; i++) {
+    for (int i = 0; i < numcurves; i++) {
       ModifiableDBIDs cand = DBIDUtil.newHashSet(maxoff * 2);
       DoubleDistanceKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(k);
       rec.add(new Pair<>(cand, heap));
     }
 
-    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       final NumberVector<?> vec = rel.get(id);
       final KNNList<DoubleDistance> trueNN = knnq.getKNNForObject(vec, k);
       final DBIDs trueIds = DBIDUtil.ensureSet(trueNN);
       final int[] posi = positions.get(id);
 
       // Reinit:
-      for(int i = 0; i < numcurves; i++) {
+      for (int i = 0; i < numcurves; i++) {
         initCandidates(rec.get(i).first, rec.get(i).second, id);
       }
 
       { // Random sample
         ArrayDBIDs rand = DBIDUtil.ensureArray(DBIDUtil.randomSample(ids, maxoff * 2, rnd.nextLong()));
-        for(int i = 0; i < maxoff; i++) {
-          if(2 * i + 1 >= rand.size()) {
+        for (int i = 0; i < maxoff; i++) {
+          if (2 * i + 1 >= rand.size()) {
             break;
           }
           DBID cid = rand.get(i * 2);
-          if(rec.get(0).first.add(cid)) {
+          if (rec.get(0).first.add(cid)) {
             final double d = distanceFunction.doubleDistance(vec, rel.get(cid));
             rec.get(0).second.add(DBIDFactory.FACTORY.newDistancePair(d, cid));
           }
           cid = rand.get(i * 2 + 1);
-          if(rec.get(0).first.add(cid)) {
+          if (rec.get(0).first.add(cid)) {
             final double d = distanceFunction.doubleDistance(vec, rel.get(cid));
             rec.get(0).second.add(DBIDFactory.FACTORY.newDistancePair(d, cid));
           }
@@ -263,7 +263,7 @@ public class SpacefillingKNNExperiment2 {
         }
       }
       // Spatial curves
-      for(int off = 1; off < maxoff; off++) {
+      for (int off = 1; off < maxoff; off++) {
         // Candidates from Z curve
         addCandidates(zs, posi[0], off, vec, rel, rec, 1, 10, 13, 19, 22, 25, 26, 28);
         // Candidates from Peano curve
@@ -283,7 +283,7 @@ public class SpacefillingKNNExperiment2 {
         // Candidates from third Hilbert curve
         addCandidates(hs3, posi[8], off, vec, rel, rec, 9, 15, 18, 21, 24, 26, 27, 28);
         // Evaluate curve performances
-        for(int i = 1; i < numcurves; i++) {
+        for (int i = 1; i < numcurves; i++) {
           // Candidate set size: distance computations
           mdic.get(off)[i].put(rec.get(i).first.size());
           // Intersection size = recall
@@ -310,32 +310,32 @@ public class SpacefillingKNNExperiment2 {
     assert (labels.length == numcurves);
     System.out.print("# i");
     // Recall of exact NN:
-    for(String s : labels) {
+    for (String s : labels) {
       System.out.print(" " + s + "-recall");
     }
     // Distance computations:
-    for(String s : labels) {
+    for (String s : labels) {
       System.out.print(" " + s + "-distc");
     }
     // Distance error:
-    for(String s : labels) {
+    for (String s : labels) {
       System.out.print(" " + s + "-distance-err");
     }
     System.out.println();
-    for(int i = 1; i < maxoff; i++) {
+    for (int i = 1; i < maxoff; i++) {
       System.out.print(i);
       MeanVariance[] mr = mrec.get(i);
-      for(int j = 0; j < mr.length; j++) {
+      for (int j = 0; j < mr.length; j++) {
         System.out.print(" " + (mr[j].getMean() / k));
         // + " " + mv[j].getNaiveStddev());
       }
       MeanVariance[] md = mdic.get(i);
-      for(int j = 0; j < mr.length; j++) {
+      for (int j = 0; j < mr.length; j++) {
         System.out.print(" " + (md[j].getMean() / ids.size()));
         // + " " + md[j].getNaiveStddev());
       }
       MeanVariance[] me = merr.get(i);
-      for(int j = 0; j < mr.length; j++) {
+      for (int j = 0; j < mr.length; j++) {
         System.out.print(" " + me[j].getMean());
         // + " " + me[j].getNaiveStddev());
       }
@@ -351,24 +351,24 @@ public class SpacefillingKNNExperiment2 {
   }
 
   protected void addCandidates(List<SpatialRef> zs, final int pos, int off, NumberVector<?> vec, Relation<NumberVector<?>> rel, List<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> pairs, int... runs) {
-    if(pos - off >= 0) {
+    if (pos - off >= 0) {
       final DBID cid = zs.get(pos - off).id;
       double d = Double.NaN;
-      for(int i = 0; i < runs.length; i++) {
-        if(pairs.get(runs[i]).first.add(cid)) {
-          if(Double.isNaN(d)) {
+      for (int i = 0; i < runs.length; i++) {
+        if (pairs.get(runs[i]).first.add(cid)) {
+          if (Double.isNaN(d)) {
             d = distanceFunction.doubleDistance(vec, rel.get(cid));
           }
           pairs.get(runs[i]).second.add(DBIDFactory.FACTORY.newDistancePair(d, cid));
         }
       }
     }
-    if(pos + off < zs.size()) {
+    if (pos + off < zs.size()) {
       final DBID cid = zs.get(pos + off).id;
       double d = Double.NaN;
-      for(int i = 0; i < runs.length; i++) {
-        if(pairs.get(runs[i]).first.add(cid)) {
-          if(Double.isNaN(d)) {
+      for (int i = 0; i < runs.length; i++) {
+        if (pairs.get(runs[i]).first.add(cid)) {
+          if (Double.isNaN(d)) {
             d = distanceFunction.doubleDistance(vec, rel.get(cid));
           }
           pairs.get(runs[i]).second.add(DBIDFactory.FACTORY.newDistancePair(d, cid));
@@ -389,48 +389,8 @@ public class SpacefillingKNNExperiment2 {
       Database db = ClassGenericsUtil.tryInstantiate(Database.class, StaticArrayDatabase.class, dbpar);
       db.initialize();
       return db;
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException("Cannot load database." + e, e);
-    }
-  }
-
-  /**
-   * Object used in spatial sorting, combining the spatial object and the object
-   * ID.
-   * 
-   * @author Erich Schubert
-   */
-  static class SpatialRef implements SpatialComparable {
-    protected DBID id;
-
-    protected NumberVector<?> vec;
-
-    /**
-     * Constructor.
-     * 
-     * @param id
-     * @param vec
-     */
-    protected SpatialRef(DBID id, NumberVector<?> vec) {
-      super();
-      this.id = id;
-      this.vec = vec;
-    }
-
-    @Override
-    public int getDimensionality() {
-      return vec.getDimensionality();
-    }
-
-    @Override
-    public double getMin(int dimension) {
-      return vec.getMin(dimension);
-    }
-
-    @Override
-    public double getMax(int dimension) {
-      return vec.getMax(dimension);
     }
   }
 
@@ -439,8 +399,7 @@ public class SpacefillingKNNExperiment2 {
     // logger.getWrappedLogger().setLevel(Level.INFO);
     try {
       new SpacefillingKNNExperiment2().run();
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       LOG.exception(e);
     }
   }

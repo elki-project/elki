@@ -114,16 +114,16 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
 
     final int numgen = curvegen.size();
     final int numcurves = numgen * variants;
-    List<List<SpatialRef>> curves = new ArrayList<>(numcurves);
+    List<List<SpatialRef<O>>> curves = new ArrayList<>(numcurves);
     for(int i = 0; i < numcurves; i++) {
-      curves.add(new ArrayList<SpatialRef>(size));
+      curves.add(new ArrayList<SpatialRef<O>>(size));
     }
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBID id  = DBIDUtil.deref(iditer);
       final O v = relation.get(id);
-      SpatialRef ref = new SpatialRef(id, v);
-      for(List<SpatialRef> curve : curves) {
+      SpatialRef<O> ref = new SpatialRef<>(id, v);
+      for(List<SpatialRef<O>> curve : curves) {
         curve.add(ref);
       }
     }
@@ -140,9 +140,9 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     // Build position index, DBID -> position in the three curves
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
     for(int cnum = 0; cnum < numcurves; cnum++) {
-      Iterator<SpatialRef> it = curves.get(cnum).iterator();
+      Iterator<SpatialRef<O>> it = curves.get(cnum).iterator();
       for(int i = 0; it.hasNext(); i++) {
-        SpatialRef r = it.next();
+        SpatialRef<O> r = it.next();
         final int[] data;
         if(cnum == 0) {
           data = new int[numcurves];
@@ -192,7 +192,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
    * @param tempstorage Temporary storage
    * @return number of distance computations
    */
-  private int scanCurve(List<SpatialRef> curve, final int wsize, int p, HashSetModifiableDBIDs cands, KNNHeap<D> heap) {
+  private int scanCurve(List<SpatialRef<O>> curve, final int wsize, int p, HashSetModifiableDBIDs cands, KNNHeap<D> heap) {
     int distcomp = 0;
     final int win2size = wsize * 2 + 1;
     final int start, end;
@@ -214,7 +214,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
       if(pos == p) {
         continue;
       }
-      SpatialRef ref2 = curve.get(pos);
+      SpatialRef<O> ref2 = curve.get(pos);
       if(cands.add(ref2.id)) {
         heap.add(distanceQuery.distance(q, ref2.vec), ref2.id);
         distcomp++;
@@ -279,10 +279,18 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
    * ID.
    * 
    * @author Erich Schubert
+   * 
+   * @param <O> Vector type
    */
-  class SpatialRef implements SpatialComparable {
+  protected static class SpatialRef<O extends NumberVector<?>> implements SpatialComparable {
+    /**
+     * Object reference.
+     */
     protected DBID id;
 
+    /**
+     * Vector.
+     */
     protected O vec;
 
     /**

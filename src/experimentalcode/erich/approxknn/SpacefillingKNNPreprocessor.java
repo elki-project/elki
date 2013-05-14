@@ -305,9 +305,15 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
    * 
    * @author Erich Schubert
    */
-  static class SpatialRef implements SpatialComparable {
+  protected static class SpatialRef implements SpatialComparable {
+    /**
+     * Object reference.
+     */
     protected DBID id;
 
+    /**
+     * Spatial vector.
+     */
     protected NumberVector<?> vec;
 
     /**
