@@ -578,6 +578,14 @@ public final class SphereUtil {
    * <li>Corner case: 10+3 trig, 2 sqrt</li>
    * </ul>
    * 
+   * Reference:
+   * <p>
+   * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
+   * Advances in Spatial and Temporal Databases - 13th International Symposium,
+   * SSTD 2013, Munich, Germany
+   * </p>
+   * 
    * @param plat Latitude of query point.
    * @param plng Longitude of query point.
    * @param rminlat Min latitude of rectangle.
@@ -586,6 +594,7 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance in radians.
    */
+  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
   public static double latlngMinDistDeg(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     return latlngMinDistRad(MathUtil.deg2rad(plat), MathUtil.deg2rad(plng),//
         MathUtil.deg2rad(rminlat), MathUtil.deg2rad(rminlng), //
@@ -602,6 +611,14 @@ public final class SphereUtil {
    * <li>Cross-track case: 4+3 trig</li>
    * </ul>
    * 
+   * Reference:
+   * <p>
+   * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
+   * Advances in Spatial and Temporal Databases - 13th International Symposium,
+   * SSTD 2013, Munich, Germany
+   * </p>
+   * 
    * @param plat Latitude of query point.
    * @param plng Longitude of query point.
    * @param rminlat Min latitude of rectangle.
@@ -610,6 +627,7 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance on unit sphere.
    */
+  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
   public static double latlngMinDistRad(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
 
@@ -703,6 +721,14 @@ public final class SphereUtil {
    * <li>Corner case: 10+3 trig, 2 sqrt</li>
    * </ul>
    * 
+   * Reference:
+   * <p>
+   * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+   * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
+   * Advances in Spatial and Temporal Databases - 13th International Symposium,
+   * SSTD 2013, Munich, Germany
+   * </p>
+   * 
    * @param plat Latitude of query point.
    * @param plng Longitude of query point.
    * @param rminlat Min latitude of rectangle.
@@ -711,6 +737,7 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance in radians
    */
+  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
   public static double latlngMinDistRadFull(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
 
