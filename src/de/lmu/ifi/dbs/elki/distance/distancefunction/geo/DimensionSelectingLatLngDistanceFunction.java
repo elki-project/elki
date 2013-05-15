@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDista
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -83,6 +84,7 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
   }
 
   @Override
+  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if (mbr1 instanceof NumberVector) {
       if (mbr2 instanceof NumberVector) {
