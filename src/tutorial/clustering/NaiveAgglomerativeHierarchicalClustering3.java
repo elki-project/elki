@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -93,7 +94,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
    * 
    * @author Erich Schubert
    */
-  public enum Linkage {//
+  public static enum Linkage {//
     SINGLE {
       @Override
       public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
@@ -125,8 +126,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
       public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
         final double wx = sizex / (double) (sizex + sizey);
         final double wy = sizey / (double) (sizex + sizey);
-        final double bias = (sizex * sizey) / (double) ((sizex + sizey) * (sizex + sizey));
-        return wx * dx + wy * dy - bias * dxy;
+        final double beta = (sizex * sizey) / (double) ((sizex + sizey) * (sizex + sizey));
+        return wx * dx + wy * dy - beta * dxy;
       }
     }, // Sokal and Michener (1958), Gower (1967)
     MEDIAN {
@@ -140,8 +141,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
       public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
         final double wx = (sizex + sizej) / (double) (sizex + sizey + sizej);
         final double wy = (sizey + sizej) / (double) (sizex + sizey + sizej);
-        final double bias = sizej / (double) (sizex + sizey + sizej);
-        return wx * dx + wy * dy - bias * dxy;
+        final double beta = sizej / (double) (sizex + sizey + sizej);
+        return wx * dx + wy * dy - beta * dxy;
       }
     }, // Minimum Variance, Wishart (1969), Anderson (1971)
     ;
@@ -157,7 +158,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
   /**
    * Current linkage in use.
    */
-  Linkage linkage = Linkage.SINGLE;
+  Linkage linkage = Linkage.WARD;
 
   /**
    * Constructor.
@@ -196,12 +197,13 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
+    boolean square = Linkage.WARD.equals(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
     for (int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
       for (int y = 0; y < x; y++, iy.advance()) {
         scratch[pos] = dq.distance(ix, iy).doubleValue();
         // Ward uses variances -- i.e. squared values
-        if (Linkage.WARD.equals(linkage)) {
+        if (square) {
           scratch[pos] *= scratch[pos];
         }
         pos++;

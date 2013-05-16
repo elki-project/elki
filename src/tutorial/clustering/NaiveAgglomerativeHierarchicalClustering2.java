@@ -175,27 +175,25 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
       }
       clusters.put(miny, cy);
       // Update distance matrix. Note: miny < minx
-      {
-        final int xbase = triangleSize(minx), ybase = triangleSize(miny);
-        // Write to (y, j), with j < y
-        for (int j = 0; j < miny; j++) {
-          if (height[j] < 0) {
-            scratch[ybase + j] = Math.min(scratch[xbase + j], scratch[ybase + j]);
-          }
+      final int xbase = triangleSize(minx), ybase = triangleSize(miny);
+      // Write to (y, j), with j < y
+      for (int j = 0; j < miny; j++) {
+        if (height[j] < 0) {
+          scratch[ybase + j] = Math.min(scratch[xbase + j], scratch[ybase + j]);
         }
-        // Write to (j, y), with y < j < x
-        for (int j = miny + 1; j < minx; j++) {
-          if (height[j] < 0) {
-            final int jbase = triangleSize(j);
-            scratch[jbase + miny] = Math.min(scratch[xbase + j], scratch[jbase + miny]);
-          }
+      }
+      // Write to (j, y), with y < j < x
+      for (int j = miny + 1; j < minx; j++) {
+        if (height[j] < 0) {
+          final int jbase = triangleSize(j);
+          scratch[jbase + miny] = Math.min(scratch[xbase + j], scratch[jbase + miny]);
         }
-        // Write to (j, y), with y < x < j
-        for (int j = minx + 1; j < size; j++) {
-          if (height[j] < 0) {
-            final int jbase = triangleSize(j);
-            scratch[jbase + miny] = Math.min(scratch[jbase + minx], scratch[jbase + miny]);
-          }
+      }
+      // Write to (j, y), with y < x < j
+      for (int j = minx + 1; j < size; j++) {
+        if (height[j] < 0) {
+          final int jbase = triangleSize(j);
+          scratch[jbase + miny] = Math.min(scratch[jbase + minx], scratch[jbase + miny]);
         }
       }
       if (prog != null) {
@@ -235,7 +233,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-	// The input relation must match our distance function:
+    // The input relation must match our distance function:
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
