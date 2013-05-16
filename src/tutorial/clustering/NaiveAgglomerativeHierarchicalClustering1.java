@@ -29,7 +29,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;

@@ -1,0 +1,7 @@
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WardLinkageMethod
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SingleLinkageMethod
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CompleteLinkageMethod
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.GroupAverageLinkageMethod
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WeightedAverageLinkageMethod
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CentroidLinkageMethod
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MedianLinkageMethod

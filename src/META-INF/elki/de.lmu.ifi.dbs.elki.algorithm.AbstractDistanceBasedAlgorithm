@@ -6,7 +6,8 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS
 de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
-de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPAM
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.HiCO
@@ -34,4 +35,7 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
+tutorial.clustering.NaiveAgglomerativeHierarchicalClustering1
+tutorial.clustering.NaiveAgglomerativeHierarchicalClustering2
+tutorial.clustering.NaiveAgglomerativeHierarchicalClustering3
 tutorial.outlier.DistanceStddevOutlier
