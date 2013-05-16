@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -99,12 +99,9 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
    */
   public Result run(Database db, Relation<O> relation) {
     DistanceQuery<O, D> dq = db.getDistanceQuery(relation, getDistanceFunction());
-    ArrayDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
-    if (size > 0x7FFF) {
-      throw new AbortException("This implementation does not scale to data sets larger than " + 0x7FFF + " instances (~8 GB RAM), which results in an integer overflow.");
-    }
     LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
 
     // Compute the initial distance matrix.
@@ -121,7 +118,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
 
     // Initialize space for result:
     double[] height = new double[size];
-    Arrays.fill(height, -1);
+    Arrays.fill(height, -1.);
     // Parent node, to track merges
     // have every object point to itself initially
     ArrayModifiableDBIDs parent = DBIDUtil.newArray(ids);
@@ -149,10 +146,13 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
           }
         }
       }
+      assert (minx >= 0 && miny >= 0);
+      // Avoid allocating memory, by reusing existing iterators:
+      ix.seek(minx);
+      iy.seek(miny);
       // Perform merge in data structure: x -> y
       // Since y < x, prefer keeping y, dropping x.
       height[minx] = min;
-      iy.seek(miny);
       parent.set(minx, iy);
       // Merge into cluster
       ModifiableDBIDs cx = clusters.get(minx);
@@ -162,7 +162,6 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
         cy.add(iy);
       }
       if (cx == null) {
-        ix.seek(minx);
         cy.add(ix);
       } else {
         cy.addDBIDs(cx);
@@ -195,7 +194,6 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
         dendrogram.addToplevelCluster(cluster);
       }
     }
-
     return dendrogram;
   }
 
@@ -228,6 +226,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter numclustersP = new IntParameter(SLINK.Parameterizer.SLINK_MINCLUSTERS_ID);
+      numclustersP.addConstraint(new GreaterEqualConstraint(1));
       if (config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
       }

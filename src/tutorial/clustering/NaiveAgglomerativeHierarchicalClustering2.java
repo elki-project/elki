@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -58,8 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * algorithm, agglomerative hierarchical clustering, in multiple steps.
  * 
  * This is the second step, where we increase the performance of the algorithm
- * by using an improved memory layout. It will allow us to use twice as big data
- * sets, but it will not cut down the runtime issues.
+ * by using an improved linear memory layout instead of ragged arrays.
  * 
  * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
@@ -99,7 +99,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
    */
   public Result run(Database db, Relation<O> relation) {
     DistanceQuery<O, D> dq = db.getDistanceQuery(relation, getDistanceFunction());
-    ArrayDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
     if (size > 0x10000) {
@@ -108,7 +108,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
     LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
 
     // Compute the initial (lower triangular) distance matrix.
-    double[] scratch = new double[(size * (size - 1)) >>> 1];
+    double[] scratch = new double[triangleSize(size)];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
@@ -122,14 +122,14 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
 
     // Initialize space for result:
     double[] height = new double[size];
-    Arrays.fill(height, -1);
+    Arrays.fill(height, -1.);
     // Parent node, to track merges
     // have every object point to itself initially
     ArrayModifiableDBIDs parent = DBIDUtil.newArray(ids);
     // Active clusters, when not trivial.
     TIntObjectMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
 
-    // Repeat until everything merged:
+    // Repeat until everything merged, except the desired number of clusters:
     final int stop = size - numclusters;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", stop, LOG) : null;
     for (int i = 0; i < stop; i++) {
@@ -139,7 +139,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
         if (height[x] > 0) {
           continue;
         }
-        final int xbase = (x * (x - 1)) >> 1;
+        final int xbase = triangleSize(x);
         for (int y = 0; y < x; y++) {
           if (height[y] > 0) {
             continue;
@@ -153,12 +153,14 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
         }
       }
       assert (minx >= 0 && miny >= 0);
+      // Avoid allocating memory, by reusing existing iterators:
+      ix.seek(minx);
+      iy.seek(miny);
       // Perform merge in data structure: x -> y
       // Since y < x, prefer keeping y, dropping x.
       height[minx] = min;
-      iy.seek(miny);
       parent.set(minx, iy);
-      // Merge into cluster (TODO: skip for single link etc.?)
+      // Merge into cluster
       ModifiableDBIDs cx = clusters.get(minx);
       ModifiableDBIDs cy = clusters.get(miny);
       if (cy == null) {
@@ -166,7 +168,6 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
         cy.add(iy);
       }
       if (cx == null) {
-        ix.seek(minx);
         cy.add(ix);
       } else {
         cy.addDBIDs(cx);
@@ -175,7 +176,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
       clusters.put(miny, cy);
       // Update distance matrix. Note: miny < minx
       {
-        final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
+        final int xbase = triangleSize(minx), ybase = triangleSize(miny);
         // Write to (y, j), with j < y
         for (int j = 0; j < miny; j++) {
           if (height[j] < 0) {
@@ -185,14 +186,14 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
         // Write to (j, y), with y < j < x
         for (int j = miny + 1; j < minx; j++) {
           if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
+            final int jbase = triangleSize(j);
             scratch[jbase + miny] = Math.min(scratch[xbase + j], scratch[jbase + miny]);
           }
         }
         // Write to (j, y), with y < x < j
         for (int j = minx + 1; j < size; j++) {
           if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
+            final int jbase = triangleSize(j);
             scratch[jbase + miny] = Math.min(scratch[jbase + minx], scratch[jbase + miny]);
           }
         }
@@ -222,8 +223,19 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
     return dendrogram;
   }
 
+  /**
+   * Compute the size of a complete x by x triangle (minus diagonal)
+   * 
+   * @param x Offset
+   * @return Size of complete triangle
+   */
+  protected static int triangleSize(int x) {
+    return (x * (x - 1)) >>> 1;
+  }
+
   @Override
   public TypeInformation[] getInputTypeRestriction() {
+	// The input relation must match our distance function:
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
@@ -250,6 +262,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter numclustersP = new IntParameter(SLINK.Parameterizer.SLINK_MINCLUSTERS_ID);
+      numclustersP.addConstraint(new GreaterEqualConstraint(1));
       if (config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
       }

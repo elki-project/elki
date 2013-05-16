@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -87,16 +88,65 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
   /**
    * Different linkage strategies.
    * 
+   * The update formulas here come from:<br />
+   * R. M. Cormack, A Review of Classification
+   * 
    * @author Erich Schubert
    */
   public enum Linkage {//
-    SINGLE, // single-linkage hiearchical clustering
-    COMPLETE, // complete-linkage hiearchical clustering
-    GROUP_AVERAGE, // average-linkage hiearchical clustering
-    WEIGHTED_AVERAGE, // a more naive variant, McQuitty (1966)
-    CENTROID, // Sokal and Michener (1958), Gower (1967)
-    MEDIAN, // Gower (1967)
-    WARD, // Minimum Variance, Wishart (1969), Anderson (1971)
+    SINGLE {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        return Math.min(dx, dy);
+      }
+    }, // single-linkage hierarchical clustering
+    COMPLETE {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        return Math.max(dx, dy);
+      }
+    }, // complete-linkage hierarchical clustering
+    GROUP_AVERAGE {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        final double wx = sizex / (double) (sizex + sizey);
+        final double wy = sizey / (double) (sizex + sizey);
+        return wx * dx + wy * dy;
+      }
+    }, // average-linkage hierarchical clustering
+    WEIGHTED_AVERAGE {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        return .5 * (dx + dy);
+      }
+    }, // a more naive variant, McQuitty (1966)
+    CENTROID {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        final double wx = sizex / (double) (sizex + sizey);
+        final double wy = sizey / (double) (sizex + sizey);
+        final double bias = (sizex * sizey) / (double) ((sizex + sizey) * (sizex + sizey));
+        return wx * dx + wy * dy - bias * dxy;
+      }
+    }, // Sokal and Michener (1958), Gower (1967)
+    MEDIAN {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        return .5 * (dx + dy) - .25 * dxy;
+      }
+    }, // Gower (1967)
+    WARD {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        final double wx = (sizex + sizej) / (double) (sizex + sizey + sizej);
+        final double wy = (sizey + sizej) / (double) (sizex + sizey + sizej);
+        final double bias = sizej / (double) (sizex + sizey + sizej);
+        return wx * dx + wy * dy - bias * dxy;
+      }
+    }, // Minimum Variance, Wishart (1969), Anderson (1971)
+    ;
+
+    abstract public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy);
   }
 
   /**
@@ -131,7 +181,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
    */
   public Result run(Database db, Relation<O> relation) {
     DistanceQuery<O, D> dq = db.getDistanceQuery(relation, getDistanceFunction());
-    ArrayDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
     if (size > 0x10000) {
@@ -142,7 +192,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
     }
 
     // Compute the initial (lower triangular) distance matrix.
-    double[] scratch = new double[(size * (size - 1)) >>> 1];
+    double[] scratch = new double[triangleSize(size)];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
@@ -160,14 +210,14 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
 
     // Initialize space for result:
     double[] height = new double[size];
-    Arrays.fill(height, -1);
+    Arrays.fill(height, -1.);
     // Parent node, to track merges
     // have every object point to itself initially
     ArrayModifiableDBIDs parent = DBIDUtil.newArray(ids);
     // Active clusters, when not trivial.
     TIntObjectMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
 
-    // Repeat until everything merged:
+    // Repeat until everything merged, except the desired number of clusters:
     final int stop = size - numclusters;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", stop, LOG) : null;
     for (int i = 0; i < stop; i++) {
@@ -177,7 +227,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
         if (height[x] > 0) {
           continue;
         }
-        final int xbase = (x * (x - 1)) >> 1;
+        final int xbase = triangleSize(x);
         for (int y = 0; y < x; y++) {
           if (height[y] > 0) {
             continue;
@@ -191,12 +241,14 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
         }
       }
       assert (minx >= 0 && miny >= 0);
+      // Avoid allocating memory, by reusing existing iterators:
+      ix.seek(minx);
+      iy.seek(miny);
       // Perform merge in data structure: x -> y
       // Since y < x, prefer keeping y, dropping x.
       height[minx] = min;
-      iy.seek(miny);
       parent.set(minx, iy);
-      // Merge into cluster (TODO: skip for single link etc.?)
+      // Merge into cluster
       ModifiableDBIDs cx = clusters.get(minx);
       ModifiableDBIDs cy = clusters.get(miny);
       int sizex = 1, sizey = 1; // cluster sizes, for averaging
@@ -207,7 +259,6 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
         sizey = cy.size();
       }
       if (cx == null) {
-        ix.seek(minx);
         cy.add(ix);
       } else {
         sizex = cx.size();
@@ -215,202 +266,37 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
         clusters.remove(minx);
       }
       clusters.put(miny, cy);
+
       // Update distance matrix. Note: miny < minx
 
-      // The update formulas here come from:
-      // R. M. Cormack, A Review of Classification
-      switch(linkage) {
-      case SINGLE: {
-        final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
-        // Write to (y, j), with j < y
-        for (int j = 0; j < miny; j++) {
-          if (height[j] < 0) {
-            scratch[ybase + j] = Math.min(scratch[xbase + j], scratch[ybase + j]);
-          }
+      // Implementation note: most will not need sizej, and could save the
+      // hashmap lookup.
+      final int xbase = triangleSize(minx), ybase = triangleSize(miny);
+      // Write to (y, j), with j < y
+      for (int j = 0; j < miny; j++) {
+        if (height[j] < 0) {
+          final DBIDs idsj = clusters.get(j);
+          final int sizej = (idsj == null) ? 1 : idsj.size();
+          scratch[ybase + j] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[ybase + j], sizej, min);
         }
-        // Write to (j, y), with y < j < x
-        for (int j = miny + 1; j < minx; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = Math.min(scratch[xbase + j], scratch[jbase + miny]);
-          }
-        }
-        // Write to (j, y), with y < x < j
-        for (int j = minx + 1; j < size; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = Math.min(scratch[jbase + minx], scratch[jbase + miny]);
-          }
-        }
-        break;
       }
-      case COMPLETE: {
-        final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
-        // Write to (y, j), with j < y
-        for (int j = 0; j < miny; j++) {
-          if (height[j] < 0) {
-            scratch[ybase + j] = Math.max(scratch[xbase + j], scratch[ybase + j]);
-          }
+      // Write to (j, y), with y < j < x
+      for (int j = miny + 1; j < minx; j++) {
+        if (height[j] < 0) {
+          final int jbase = triangleSize(j);
+          final DBIDs idsj = clusters.get(j);
+          final int sizej = (idsj == null) ? 1 : idsj.size();
+          scratch[jbase + miny] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jbase + miny], sizej, min);
         }
-        // Write to (j, y), with y < j < x
-        for (int j = miny + 1; j < minx; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = Math.max(scratch[xbase + j], scratch[jbase + miny]);
-          }
-        }
-        // Write to (j, y), with y < x < j
-        for (int j = minx + 1; j < size; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = Math.max(scratch[jbase + minx], scratch[jbase + miny]);
-          }
-        }
-        break;
       }
-      case GROUP_AVERAGE: {
-        final double wx = sizex / (double) (sizex + sizey);
-        final double wy = sizey / (double) (sizex + sizey);
-        final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
-        // Write to (y, j), with j < y
-        for (int j = 0; j < miny; j++) {
-          if (height[j] < 0) {
-            scratch[ybase + j] = wx * scratch[xbase + j] + wy * scratch[ybase + j];
-          }
+      // Write to (j, y), with y < x < j
+      for (int j = minx + 1; j < size; j++) {
+        if (height[j] < 0) {
+          final DBIDs idsj = clusters.get(j);
+          final int sizej = (idsj == null) ? 1 : idsj.size();
+          final int jbase = triangleSize(j);
+          scratch[jbase + miny] = linkage.combine(sizex, scratch[jbase + minx], sizey, scratch[jbase + miny], sizej, min);
         }
-        // Write to (j, y), with y < j < x
-        for (int j = miny + 1; j < minx; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = wx * scratch[xbase + j] + wy * scratch[jbase + miny];
-          }
-        }
-        // Write to (j, y), with y < x < j
-        for (int j = minx + 1; j < size; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = wx * scratch[jbase + minx] + wy * scratch[jbase + miny];
-          }
-        }
-        break;
-      }
-      case WEIGHTED_AVERAGE: {
-        final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
-        // Write to (y, j), with j < y
-        for (int j = 0; j < miny; j++) {
-          if (height[j] < 0) {
-            scratch[ybase + j] = .5 * (scratch[xbase + j] + scratch[ybase + j]);
-          }
-        }
-        // Write to (j, y), with y < j < x
-        for (int j = miny + 1; j < minx; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = .5 * (scratch[xbase + j] + scratch[jbase + miny]);
-          }
-        }
-        // Write to (j, y), with y < x < j
-        for (int j = minx + 1; j < size; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = .5 * (scratch[jbase + minx] + scratch[jbase + miny]);
-          }
-        }
-        break;
-      }
-      case CENTROID: {
-        final double wx = sizex / (double) (sizex + sizey);
-        final double wy = sizey / (double) (sizex + sizey);
-        final double bias = (min * sizex * sizey) / ((sizex + sizey) * (sizex + sizey));
-        final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
-        // Write to (y, j), with j < y
-        for (int j = 0; j < miny; j++) {
-          if (height[j] < 0) {
-            scratch[ybase + j] = wx * scratch[xbase + j] + wy * scratch[ybase + j] - bias;
-          }
-        }
-        // Write to (j, y), with y < j < x
-        for (int j = miny + 1; j < minx; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = wx * scratch[xbase + j] + wy * scratch[jbase + miny] - bias;
-          }
-        }
-        // Write to (j, y), with y < x < j
-        for (int j = minx + 1; j < size; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = wx * scratch[jbase + minx] + wy * scratch[jbase + miny] - bias;
-          }
-        }
-        break;
-      }
-      case MEDIAN: {
-        final double bias = .25 * min;
-        final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
-        // Write to (y, j), with j < y
-        for (int j = 0; j < miny; j++) {
-          if (height[j] < 0) {
-            scratch[ybase + j] = .5 * (scratch[xbase + j] + scratch[ybase + j]) - bias;
-          }
-        }
-        // Write to (j, y), with y < j < x
-        for (int j = miny + 1; j < minx; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = .5 * (scratch[xbase + j] + scratch[jbase + miny]) - bias;
-          }
-        }
-        // Write to (j, y), with y < x < j
-        for (int j = minx + 1; j < size; j++) {
-          if (height[j] < 0) {
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = .5 * (scratch[jbase + minx] + scratch[jbase + miny]) - bias;
-          }
-        }
-        break;
-      }
-      case WARD: {
-        final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
-        // Write to (y, j), with j < y
-        for (int j = 0; j < miny; j++) {
-          if (height[j] < 0) {
-            final DBIDs idsj = clusters.get(j);
-            final int sizej = (idsj == null) ? 1 : idsj.size();
-            final double wx = (sizex + sizej) / (double) (sizex + sizey + sizej);
-            final double wy = (sizey + sizej) / (double) (sizex + sizey + sizej);
-            final double bias = (min * sizej) / (sizex + sizey + sizej);
-            scratch[ybase + j] = wx * scratch[xbase + j] + wy * scratch[ybase + j] - bias;
-          }
-        }
-        // Write to (j, y), with y < j < x
-        for (int j = miny + 1; j < minx; j++) {
-          if (height[j] < 0) {
-            final DBIDs idsj = clusters.get(j);
-            final int sizej = (idsj == null) ? 1 : idsj.size();
-            final double wx = (sizex + sizej) / (double) (sizex + sizey + sizej);
-            final double wy = (sizey + sizej) / (double) (sizex + sizey + sizej);
-            final double bias = (min * sizej) / (sizex + sizey + sizej);
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = wx * scratch[xbase + j] + wy * scratch[jbase + miny] - bias;
-          }
-        }
-        // Write to (j, y), with y < x < j
-        for (int j = minx + 1; j < size; j++) {
-          if (height[j] < 0) {
-            final DBIDs idsj = clusters.get(j);
-            final int sizej = (idsj == null) ? 1 : idsj.size();
-            final double wx = (sizex + sizej) / (double) (sizex + sizey + sizej);
-            final double wy = (sizey + sizej) / (double) (sizex + sizey + sizej);
-            final double bias = (min * sizej) / (sizex + sizey + sizej);
-            final int jbase = (j * (j - 1)) >> 1;
-            scratch[jbase + miny] = wx * scratch[jbase + minx] + wy * scratch[jbase + miny] - bias;
-          }
-        }
-        break;
-      }
-      default:
-        throw new AbortException("Implementation incomplete.");
       }
       if (prog != null) {
         prog.incrementProcessed(LOG);
@@ -420,7 +306,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
       prog.ensureCompleted(LOG);
     }
 
-    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<>("Cluster-Dendrogram", "dendrogram");
+    // Build the clustering result
+    final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");
     for (int x = 0; x < size; x++) {
       if (height[x] < 0) {
         DBIDs cids = clusters.get(x);
@@ -428,7 +315,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
           ix.seek(x);
           cids = DBIDUtil.deref(ix);
         }
-        Cluster<DendrogramModel<D>> cluster = new Cluster<>("Cluster", cids);
+        Cluster<Model> cluster = new Cluster<>("Cluster", cids);
         dendrogram.addToplevelCluster(cluster);
       }
     }
@@ -436,8 +323,19 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
     return dendrogram;
   }
 
+  /**
+   * Compute the size of a complete x by x triangle (minus diagonal)
+   * 
+   * @param x Offset
+   * @return Size of complete triangle
+   */
+  protected static int triangleSize(int x) {
+    return (x * (x - 1)) >>> 1;
+  }
+
   @Override
   public TypeInformation[] getInputTypeRestriction() {
+    // The input relation must match our distance function:
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
@@ -474,11 +372,13 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter numclustersP = new IntParameter(SLINK.Parameterizer.SLINK_MINCLUSTERS_ID);
+      numclustersP.addConstraint(new GreaterEqualConstraint(1));
       if (config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
       }
 
       EnumParameter<Linkage> linkageP = new EnumParameter<>(LINKAGE_ID, Linkage.class);
+      linkageP.setDefaultValue(Linkage.WARD);
       if (config.grab(linkageP)) {
         linkage = linkageP.getValue();
       }
