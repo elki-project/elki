@@ -67,7 +67,7 @@ public class CheckELKIServices {
   /**
    * Package to skip matches in - unreleased code.
    */
-  private String[] skippackages = { "experimentalcode." };
+  private String[] skippackages = { "experimentalcode.", "project." };
 
   /**
    * Main method.
