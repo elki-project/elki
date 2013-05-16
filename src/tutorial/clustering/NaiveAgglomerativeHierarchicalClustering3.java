@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -65,10 +66,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
  * 
+ * Reference (for the update formulas):
+ * <p>
+ * A Review of Classification<br />
+ * R. M. Cormack<br />
+ * Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3
+ * </p>
+ * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  */
+@Reference(title = "A Review of Classification", authors = "R. M. Cormack", booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", url = "http://www.jstor.org/stable/2344237")
 public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, Result> {
   /**
    * Class logger
@@ -84,7 +93,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
     SINGLE, // single-linkage hiearchical clustering
     COMPLETE, // complete-linkage hiearchical clustering
     GROUP_AVERAGE, // average-linkage hiearchical clustering
-    WEIGHTED_AVERAGE, // a more naive variant, which ignores cluster sizes
+    WEIGHTED_AVERAGE, // a more naive variant, McQuitty (1966)
     CENTROID, // Sokal and Michener (1958), Gower (1967)
     MEDIAN, // Gower (1967)
     WARD, // Minimum Variance, Wishart (1969), Anderson (1971)
@@ -207,6 +216,9 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
       }
       clusters.put(miny, cy);
       // Update distance matrix. Note: miny < minx
+
+      // The update formulas here come from:
+      // R. M. Cormack, A Review of Classification
       switch(linkage) {
       case SINGLE: {
         final int xbase = (minx * (minx - 1)) >> 1, ybase = (miny * (miny - 1)) >> 1;
