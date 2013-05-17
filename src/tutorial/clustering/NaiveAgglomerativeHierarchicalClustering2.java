@@ -136,12 +136,12 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
       double min = Double.POSITIVE_INFINITY;
       int minx = -1, miny = -1;
       for (int x = 0; x < size; x++) {
-        if (height[x] > 0) {
+        if (height[x] >= 0) {
           continue;
         }
         final int xbase = triangleSize(x);
         for (int y = 0; y < x; y++) {
-          if (height[y] > 0) {
+          if (height[y] >= 0) {
             continue;
           }
           final int idx = xbase + y;
