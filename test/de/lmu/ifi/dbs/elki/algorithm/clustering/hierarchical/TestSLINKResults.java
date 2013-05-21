@@ -27,15 +27,14 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Performs a full SLINK run, and compares the result with a clustering derived
@@ -61,8 +60,9 @@ public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUn
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(SLINK.Parameterizer.SLINK_MINCLUSTERS_ID, 3);
-    SLINK<DoubleVector, DoubleDistance> slink = ClassGenericsUtil.parameterizeOrAbort(SLINK.class, params);
+    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, SLINK.class);
+    ExtractFlatClusteringFromHierarchy<DoubleDistance> slink = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
     // run SLINK on database
