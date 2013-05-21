@@ -36,11 +36,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.WeakHashMap;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -90,8 +87,8 @@ public class InspectionUtil {
   static {
     String[] classpath = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
     boolean hasnonstatic = false;
-    for(String path : classpath) {
-      if(!path.endsWith(".jar")) {
+    for (String path : classpath) {
+      if (!path.endsWith(".jar")) {
         hasnonstatic = true;
       }
     }
@@ -116,11 +113,11 @@ public class InspectionUtil {
    * @return Found implementations
    */
   public static List<Class<?>> cachedFindAllImplementations(Class<?> c) {
-    if(c == null) {
+    if (c == null) {
       return Collections.emptyList();
     }
     List<Class<?>> res = CLASS_CACHE.get(c);
-    if(res == null) {
+    if (res == null) {
       res = findAllImplementations(c, false);
       CLASS_CACHE.put(c, res);
     }
@@ -141,34 +138,29 @@ public class InspectionUtil {
     // Add all from service files (i.e. jars)
     {
       Iterator<Class<?>> iter = new ELKIServiceLoader(c);
-      while(iter.hasNext()) {
+      while (iter.hasNext()) {
         list.add(iter.next());
       }
     }
-    if(!InspectionUtil.NONSTATIC_CLASSPATH) {
-      if(list.size() == 0) {
+    if (!InspectionUtil.NONSTATIC_CLASSPATH) {
+      if (list.size() == 0) {
         LOG.warning("No implementations for " + c.getName() + " were found using index files.");
       }
-    }
-    else {
+    } else {
       // Duplicate checking
       THashSet<Class<?>> dupes = new THashSet<>(list);
-      // Scan for additional ones in class path
-      Iterator<Class<?>> iter;
-      // If possible, reuse an existing scan result
-      if(InspectionUtilFrequentlyScanned.class.isAssignableFrom(c)) {
-        iter = getFrequentScan();
+      // Build cache on first use:
+      if (MASTER_CACHE == null) {
+        MASTER_CACHE = slowScan();
       }
-      else {
-        iter = slowScan(c).iterator();
-      }
-      while(iter.hasNext()) {
+      Iterator<Class<?>> iter = MASTER_CACHE.iterator();
+      while (iter.hasNext()) {
         Class<?> cls = iter.next();
         // skip abstract / private classes.
-        if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+        if (!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
           continue;
         }
-        if(c.isAssignableFrom(cls) && !dupes.contains(cls)) {
+        if (c.isAssignableFrom(cls) && !dupes.contains(cls)) {
           list.add(cls);
           dupes.add(cls);
         }
@@ -178,148 +170,46 @@ public class InspectionUtil {
   }
 
   /**
-   * Get (or create) the result of a scan for any "frequent scanned" class.
-   * 
-   * @return Scan result
-   */
-  private static Iterator<Class<?>> getFrequentScan() {
-    if(MASTER_CACHE == null) {
-      MASTER_CACHE = slowScan(InspectionUtilFrequentlyScanned.class);
-    }
-    return MASTER_CACHE.iterator();
-  }
-
-  /**
    * Perform a full (slow) scan for classes.
    * 
-   * @param cond Class to include
    * @return List with the scan result
    */
-  private static List<Class<?>> slowScan(Class<?> cond) {
+  private static List<Class<?>> slowScan() {
     ArrayList<Class<?>> res = new ArrayList<>();
     try {
       ClassLoader cl = ClassLoader.getSystemClassLoader();
       Enumeration<URL> cps = cl.getResources("");
-      while(cps.hasMoreElements()) {
+      while (cps.hasMoreElements()) {
         URL u = cps.nextElement();
         // Scan file sources only.
-        if("file".equals(u.getProtocol())) {
+        if ("file".equals(u.getProtocol())) {
           Iterator<String> it = new DirClassIterator(new File(u.getFile()), DEFAULT_IGNORES);
-          while(it.hasNext()) {
+          while (it.hasNext()) {
             String classname = it.next();
             try {
               Class<?> cls = cl.loadClass(classname);
               // skip classes where we can't get a full name.
-              if(cls.getCanonicalName() == null) {
-                continue;
-              }
-              // Implements the right interface?
-              if(cond != null && !cond.isAssignableFrom(cls)) {
+              if (cls.getCanonicalName() == null) {
                 continue;
               }
               res.add(cls);
-            }
-            catch(ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
               continue;
-            }
-            catch(NoClassDefFoundError e) {
+            } catch (NoClassDefFoundError e) {
               continue;
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
               continue;
-            }
-            catch(Error e) {
+            } catch (Error e) {
               continue;
             }
           }
         }
       }
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       LOG.exception(e);
     }
     Collections.sort(res, new ClassSorter());
     return res;
-  }
-
-  /**
-   * Class to iterate over a Jar file.
-   * 
-   * Note: this is currently unused, as we now require all jar files to include
-   * an index in the form of service-style files in META-INF/elki/
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  static class JarClassIterator implements Iterator<String> {
-    private Enumeration<JarEntry> jarentries;
-
-    private String ne;
-
-    private String[] ignorepackages;
-
-    /**
-     * Constructor from Jar file.
-     * 
-     * @param path Jar file entries to iterate over.
-     */
-    public JarClassIterator(String path, String[] ignorepackages) {
-      this.ignorepackages = ignorepackages;
-      try {
-        JarFile jf = new JarFile(path);
-        this.jarentries = jf.entries();
-        this.ne = findNext();
-      }
-      catch(IOException e) {
-        LoggingUtil.exception("Error opening jar file: " + path, e);
-        this.jarentries = null;
-        this.ne = null;
-      }
-    }
-
-    @Override
-    public boolean hasNext() {
-      // Do we have a next entry?
-      return (ne != null);
-    }
-
-    /**
-     * Find the next entry, since we need to skip some jar file entries.
-     * 
-     * @return next entry or null
-     */
-    private String findNext() {
-      nextfile: while(jarentries.hasMoreElements()) {
-        JarEntry je = jarentries.nextElement();
-        String name = je.getName();
-        if(name.endsWith(".class")) {
-          String classname = name.substring(0, name.length() - ".class".length()).replace('/', '.');
-          for(String pkg : ignorepackages) {
-            if(classname.startsWith(pkg)) {
-              continue nextfile;
-            }
-          }
-          if(classname.endsWith(ClassParameter.FACTORY_POSTFIX) || !classname.contains("$")) {
-            return classname.replace('/', '.');
-          }
-        }
-      }
-      return null;
-    }
-
-    @Override
-    public String next() {
-      // Return the previously stored entry.
-      String ret = ne;
-      ne = findNext();
-      return ret;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
   }
 
   /**
@@ -352,7 +242,7 @@ public class InspectionUtil {
     public DirClassIterator(File path, String[] ignorepackages) {
       this.ignorepackages = ignorepackages;
       this.prefix = path.getAbsolutePath();
-      if(prefix.charAt(prefix.length() - 1) != File.separatorChar) {
+      if (prefix.charAt(prefix.length() - 1) != File.separatorChar) {
         prefix = prefix + File.separatorChar;
       }
 
@@ -361,7 +251,7 @@ public class InspectionUtil {
 
     @Override
     public boolean hasNext() {
-      if(files.size() == 0) {
+      if (files.size() == 0) {
         findNext();
       }
       return (files.size() > 0);
@@ -371,19 +261,19 @@ public class InspectionUtil {
      * Find the next entry, since we need to skip some directories.
      */
     private void findNext() {
-      while(folders.size() > 0) {
+      while (folders.size() > 0) {
         Pair<File, String> pair = folders.remove(folders.size() - 1);
         // recurse into directories
-        if(pair.first.isDirectory()) {
-          nextfile: for(String localname : pair.first.list()) {
+        if (pair.first.isDirectory()) {
+          nextfile: for (String localname : pair.first.list()) {
             // Ignore unix-hidden files/dirs
-            if(localname.charAt(0) == '.') {
+            if (localname.charAt(0) == '.') {
               continue;
             }
             // Classes
-            if(localname.endsWith(CLASS_EXT)) {
-              if(localname.indexOf('$') >= 0) {
-                if(!localname.endsWith(FACTORY_FILE_EXT)) {
+            if (localname.endsWith(CLASS_EXT)) {
+              if (localname.indexOf('$') >= 0) {
+                if (!localname.endsWith(FACTORY_FILE_EXT)) {
                   continue;
                 }
               }
@@ -392,10 +282,10 @@ public class InspectionUtil {
             }
             // Recurse into directories
             File newf = new File(pair.first, localname);
-            if(newf.isDirectory()) {
+            if (newf.isDirectory()) {
               String newpref = pair.second + localname + '.';
-              for(String ignore : ignorepackages) {
-                if(ignore.equals(newpref)) {
+              for (String ignore : ignorepackages) {
+                if (ignore.equals(newpref)) {
                   continue nextfile;
                 }
               }
@@ -408,10 +298,10 @@ public class InspectionUtil {
 
     @Override
     public String next() {
-      if(files.size() == 0) {
+      if (files.size() == 0) {
         findNext();
       }
-      if(files.size() > 0) {
+      if (files.size() > 0) {
         return files.remove(files.size() - 1);
       }
       return null;
@@ -434,7 +324,7 @@ public class InspectionUtil {
     @Override
     public int compare(Class<?> o1, Class<?> o2) {
       int pkgcmp = o1.getPackage().getName().compareTo(o2.getPackage().getName());
-      if(pkgcmp != 0) {
+      if (pkgcmp != 0) {
         return pkgcmp;
       }
       return o1.getCanonicalName().compareTo(o2.getCanonicalName());

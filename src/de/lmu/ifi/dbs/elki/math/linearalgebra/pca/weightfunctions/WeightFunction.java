@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
-
 /**
  * WeightFunction interface that allows the use of various distance-based weight
  * functions. In addition to the distance parameter, the maximum distance and
@@ -33,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * 
  * @author Erich Schubert
  */
-public interface WeightFunction extends InspectionUtilFrequentlyScanned {
+public interface WeightFunction {
   /**
    * Evaluate weight function with given parameters.
    * 

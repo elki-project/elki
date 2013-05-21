@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,8 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 /**
  * Interface for any class that can handle results
  * 
@@ -34,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * 
  * @apiviz.uses Result oneway - - processes
  */
-public interface ResultProcessor extends InspectionUtilFrequentlyScanned {
+public interface ResultProcessor {
   /**
    * Process a result.
    * 

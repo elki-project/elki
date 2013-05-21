@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 import java.io.InputStream;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.uses InputStream
  * @apiviz.has MultipleObjectsBundle oneway - - «create»
  */
-public interface Parser extends Parameterizable, InspectionUtilFrequentlyScanned {
+public interface Parser extends Parameterizable {
   /**
    * Returns a list of the objects parsed from the specified input stream.
    * 

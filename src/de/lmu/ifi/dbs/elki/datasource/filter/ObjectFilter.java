@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  */
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
 
 /**
  * Object filters as part of the input step.
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * 
  * @apiviz.uses MultipleObjectsBundle oneway - - «filters»
  */
-public interface ObjectFilter extends InspectionUtilFrequentlyScanned {
+public interface ObjectFilter {
   /**
    * Filter a set of object packages.
    * 

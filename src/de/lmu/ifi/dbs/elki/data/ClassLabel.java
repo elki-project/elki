@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
 
 /**
  * A ClassLabel to identify a certain class of objects that is to discern from
@@ -88,7 +87,7 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
    * @apiviz.has ClassLabel - - «creates»
    * @apiviz.stereotype factory
    */
-  public abstract static class Factory<L extends ClassLabel> implements InspectionUtilFrequentlyScanned {
+  public abstract static class Factory<L extends ClassLabel> {
     /**
      * Set for reusing the same objects.
      */
