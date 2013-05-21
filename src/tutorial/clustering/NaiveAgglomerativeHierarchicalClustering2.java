@@ -29,6 +29,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.ExtractFlatClusteringFromHierarchy;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -259,7 +260,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter numclustersP = new IntParameter(SLINK.Parameterizer.SLINK_MINCLUSTERS_ID);
+      IntParameter numclustersP = new IntParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID);
       numclustersP.addConstraint(new GreaterEqualConstraint(1));
       if (config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
