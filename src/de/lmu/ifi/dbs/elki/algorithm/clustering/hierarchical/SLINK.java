@@ -337,6 +337,11 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   }
 
   @Override
+  public D getDistanceFactory() {
+    return getDistanceFunction().getDistanceFactory();
+  }
+
+  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }

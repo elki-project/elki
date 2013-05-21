@@ -39,4 +39,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 public interface HierarchicalClusteringAlgorithm<D extends Distance<D>> extends Algorithm {
   @Override
   public PointerHierarchyRepresentationResult<D> run(Database db);
+
+  /**
+   * Return the distance type that will be used by the algorithm.
+   * 
+   * @return Distance factory.
+   */
+  public D getDistanceFactory();
 }

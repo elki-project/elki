@@ -53,6 +53,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
+    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
     params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
@@ -63,7 +64,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     Result result = c.run(db);
     Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.6829722);
-    testClusterSizes(clustering, new int[] { 0, 0, 9, 200, 429 });
+    testClusterSizes(clustering, new int[] { 9, 200, 429 });
   }
 
   /**
@@ -76,6 +77,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
+    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
     ExtractFlatClusteringFromHierarchy<DoubleDistance> c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
@@ -85,7 +87,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     Result result = c.run(db);
     Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.93866265);
-    testClusterSizes(clustering, new int[] { 0, 0, 200, 211, 227 });
+    testClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -98,6 +100,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
+    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
     params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
@@ -108,7 +111,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     Result result = c.run(db);
     Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.93866265);
-    testClusterSizes(clustering, new int[] { 0, 0, 200, 211, 227 });
+    testClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -121,6 +124,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
+    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
     params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);
@@ -131,6 +135,6 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     Result result = c.run(db);
     Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.938167802);
-    testClusterSizes(clustering, new int[] { 0, 0, 200, 217, 221 });
+    testClusterSizes(clustering, new int[] { 200, 217, 221 });
   }
 }
