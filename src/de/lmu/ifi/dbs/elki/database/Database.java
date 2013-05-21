@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
@@ -61,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @apiviz.has Index oneway - - manages
  * @apiviz.has DataStoreListener oneway - - invokes
  */
-public interface Database extends HierarchicalResult, InspectionUtilFrequentlyScanned {
+public interface Database extends HierarchicalResult {
   /**
    * Option to specify the data source for the database.
    * 

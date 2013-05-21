@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
-
 /**
  * Interface to define the required methods for command line interaction.
  * 
@@ -96,7 +94,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization
  *              .Parameterization oneway
  */
-public interface Parameterizable extends InspectionUtilFrequentlyScanned {
+public interface Parameterizable {
   // Empty marker interface - the \@Description / \@Title / \@Reference and
   // constructor requirements cannot be specified in Java!
 }
