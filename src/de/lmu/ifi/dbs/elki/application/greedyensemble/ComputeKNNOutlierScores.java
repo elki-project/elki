@@ -436,7 +436,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     }
 
     @Override
-    protected AbstractApplication makeInstance() {
+    protected ComputeKNNOutlierScores<O, D> makeInstance() {
       return new ComputeKNNOutlierScores<>(inputstep, distf, startk, stepk, maxk, bylabel, outfile);
     }
   }
