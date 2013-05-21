@@ -47,7 +47,7 @@ public class OneDimSortBulkSplit extends AbstractBulkSplit {
   /**
    * Static instance.
    */
-  public static final AbstractBulkSplit STATIC = new OneDimSortBulkSplit();
+  public static final OneDimSortBulkSplit STATIC = new OneDimSortBulkSplit();
 
   /**
    * Constructor.
@@ -79,7 +79,7 @@ public class OneDimSortBulkSplit extends AbstractBulkSplit {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected AbstractBulkSplit makeInstance() {
+    protected OneDimSortBulkSplit makeInstance() {
       return OneDimSortBulkSplit.STATIC;
     }
   }

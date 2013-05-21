@@ -418,7 +418,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
 
     @Override
-    protected AbstractApplication makeInstance() {
+    protected GreedyEnsembleExperiment makeInstance() {
       return new GreedyEnsembleExperiment(inputstep);
     }
   }

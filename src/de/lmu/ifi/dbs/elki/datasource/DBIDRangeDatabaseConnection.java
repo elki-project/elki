@@ -118,7 +118,7 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
     }
 
     @Override
-    protected Object makeInstance() {
+    protected DBIDRangeDatabaseConnection makeInstance() {
       return new DBIDRangeDatabaseConnection(start, count);
     }
   }

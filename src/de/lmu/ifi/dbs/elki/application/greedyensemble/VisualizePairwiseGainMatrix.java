@@ -282,7 +282,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     }
 
     @Override
-    protected AbstractApplication makeInstance() {
+    protected VisualizePairwiseGainMatrix makeInstance() {
       return new VisualizePairwiseGainMatrix(inputstep, vispar);
     }
   }
