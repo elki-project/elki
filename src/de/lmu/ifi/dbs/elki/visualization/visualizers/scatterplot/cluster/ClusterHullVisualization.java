@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -44,6 +43,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -102,9 +103,9 @@ public class ClusterHullVisualization extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-    for(Clustering<?> c : clusterings) {
+    for (Clustering<?> c : clusterings) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
+      for (ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.initDefaultVisibility(false);
@@ -155,28 +156,24 @@ public class ClusterHullVisualization extends AbstractVisFactory {
 
       double opacity = 0.25;
 
-      Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
+      List<Cluster<Model>> clusters = clustering.getAllClusters();
 
-      for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-        Cluster<?> clus = ci.next();
+      int cnum = 0;
+      for (Cluster<Model> clus : clusters) {
         final DBIDs ids = clus.getIDs();
 
-        if(settings.alpha >= Double.POSITIVE_INFINITY) {
+        if (settings.alpha >= Double.POSITIVE_INFINITY) {
           GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
-
-          for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-            double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
-            hull.add(new Vector(projP));
-          }
+          double weight = addToHull(hull, clustering.getClusterHierarchy(), clus);
           Polygon chres = hull.getHull();
 
           // Plot the convex hull:
-          if(chres != null && chres.size() > 1) {
+          if (chres != null && chres.size() > 1) {
             SVGPath path = new SVGPath(chres);
             // Approximate area (using bounding box)
             double hullarea = SpatialUtil.volume(chres);
-            final double relativeArea = (projarea - hullarea) / projarea;
-            final double relativeSize = (double) ids.size() / rel.size();
+            final double relativeArea = 1 - (hullarea / projarea);
+            final double relativeSize = weight / rel.size();
             opacity = Math.sqrt(relativeSize * relativeArea);
 
             Element hulls = path.makeElement(svgp);
@@ -184,15 +181,14 @@ public class ClusterHullVisualization extends AbstractVisFactory {
             SVGUtil.addCSSClass(hulls, CLUSTERHULL + cnum);
             layer.appendChild(hulls);
           }
-        }
-        else {
+        } else {
           ArrayList<Vector> ps = new ArrayList<>(ids.size());
-          for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
             double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
             ps.add(new Vector(projP));
           }
           List<Polygon> polys = (new AlphaShape(ps, settings.alpha * Projection.SCALE)).compute();
-          for(Polygon p : polys) {
+          for (Polygon p : polys) {
             SVGPath path = new SVGPath(p);
             Element hulls = path.makeElement(svgp);
             addCSSClasses(svgp, cnum, 0.5);
@@ -200,7 +196,29 @@ public class ClusterHullVisualization extends AbstractVisFactory {
             layer.appendChild(hulls);
           }
         }
+        cnum++;
       }
+    }
+
+    /**
+     * Recursively add a cluster and its children.
+     * 
+     * @param hull Hull to add to
+     * @param hier Cluster hierarchy
+     * @param clus Current cluster
+     * @return Weight for visualization
+     */
+    private double addToHull(GrahamScanConvexHull2D hull, Hierarchy<Cluster<Model>> hier, Cluster<Model> clus) {
+      final DBIDs ids = clus.getIDs();
+      double weight = ids.size();
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
+        hull.add(new Vector(projP));
+      }
+      for (Iter<Cluster<Model>> iter = hier.iterChildren(clus); iter.valid(); iter.advance()) {
+        weight += .5 * addToHull(hull, hier, iter.get());
+      }
+      return weight;
     }
 
     /**
@@ -216,10 +234,9 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
 
       final String color;
-      if(clustering.getAllClusters().size() == 1) {
+      if (clustering.getAllClusters().size() == 1) {
         color = "black";
-      }
-      else {
+      } else {
         color = colors.getColor(clusterID);
       }
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
@@ -256,7 +273,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY);
-      if(config.grab(alphaP)) {
+      if (config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
     }
