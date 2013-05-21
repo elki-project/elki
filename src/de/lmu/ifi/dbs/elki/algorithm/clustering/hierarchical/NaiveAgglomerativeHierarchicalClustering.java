@@ -246,6 +246,11 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
   }
 
   @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
+  }
+
+  @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());

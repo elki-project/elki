@@ -60,6 +60,7 @@ public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUn
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
+    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, SLINK.class);
     ExtractFlatClusteringFromHierarchy<DoubleDistance> slink = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
@@ -69,6 +70,6 @@ public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUn
     Result result = slink.run(db);
     Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.6829722);
-    testClusterSizes(clustering, new int[] { 0, 0, 9, 200, 429 });
+    testClusterSizes(clustering, new int[] { 9, 200, 429 });
   }
 }

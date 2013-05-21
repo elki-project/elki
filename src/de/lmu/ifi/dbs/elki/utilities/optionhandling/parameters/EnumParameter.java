@@ -111,14 +111,16 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<E> {
 
   @Override
   protected E parseValue(Object obj) throws ParameterException {
-    if(obj == null) {
+    if (obj == null) {
       throw new UnspecifiedParameterException(this);
     }
-    if(obj instanceof String) {
+    if (enumClass.isInstance(obj)) {
+      return enumClass.cast(obj);
+    }
+    if (obj instanceof String) {
       try {
         return Enum.valueOf(enumClass, (String) obj);
-      }
-      catch(IllegalArgumentException ex) {
+      } catch (IllegalArgumentException ex) {
         throw new WrongParameterValueException("Enum parameter " + getName() + " is invalid (must be one of [" + joinEnumNames(", ") + "].");
       }
     }
@@ -139,7 +141,7 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<E> {
     // Convert to string array
     final E[] enums = enumClass.getEnumConstants();
     ArrayList<String> values = new ArrayList<>(enums.length);
-    for(E t : enums) {
+    for (E t : enums) {
       values.add(t.name());
     }
     return values;
@@ -155,8 +157,8 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<E> {
   private String joinEnumNames(String separator) {
     E[] enumTypes = enumClass.getEnumConstants();
     StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < enumTypes.length; ++i) {
-      if(i > 0) {
+    for (int i = 0; i < enumTypes.length; ++i) {
+      if (i > 0) {
         sb.append(separator);
       }
       sb.append(enumTypes[i].name());
