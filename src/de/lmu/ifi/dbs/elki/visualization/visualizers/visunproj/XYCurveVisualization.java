@@ -133,7 +133,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
     // Add AUC value when found
     if(curve instanceof ROCResult) {
       double rocauc = ((ROCResult) curve).getAUC();
-      String lt = OutlierROCCurve.ROCAUC_LABEL + ": " + FormatUtil.NF8.format(rocauc);
+      String lt = OutlierROCCurve.ROCAUC_LABEL + ": " + FormatUtil.NF.format(rocauc);
       if(rocauc <= 0.5) {
         Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
@@ -147,7 +147,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
     }
     if(curve instanceof PRCurve) {
       double prauc = ((PRCurve) curve).getAUC();
-      String lt = PRCurve.PRAUC_LABEL + ": " + FormatUtil.NF8.format(prauc);
+      String lt = PRCurve.PRAUC_LABEL + ": " + FormatUtil.NF.format(prauc);
       if(prauc <= 0.5) {
         Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);

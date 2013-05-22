@@ -107,7 +107,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
   public SimpleCOP(DistanceFunction<? super V, D> distanceFunction, int k, PCAFilteredRunner<V> pca) {
     super(distanceFunction);
     this.k = k;
-    this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF8, pca, 0, false);
+    this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, 0, false);
   }
 
   public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {

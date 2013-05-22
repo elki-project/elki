@@ -198,7 +198,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
 
   @Override
   public String toString() {
-    return FormatUtil.NF8.format(value);
+    return FormatUtil.NF.format(value);
   }
 
   @Override
