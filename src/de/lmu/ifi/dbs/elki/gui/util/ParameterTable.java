@@ -27,6 +27,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -38,7 +40,6 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -94,6 +95,11 @@ public class ParameterTable extends JTable {
   static final Color COLOR_DEFAULT_VALUE = new Color(0xDFDFDF);
 
   /**
+   * Containing frame.
+   */
+  protected Frame frame;
+
+  /**
    * The parameters we edit.
    */
   protected DynamicParameters parameters;
@@ -101,11 +107,13 @@ public class ParameterTable extends JTable {
   /**
    * Constructor
    * 
+   * @param frame Containing frame
    * @param pm Parameter Model
    * @param parameters Parameter storage
    */
-  public ParameterTable(ParametersModel pm, DynamicParameters parameters) {
+  public ParameterTable(Frame frame, ParametersModel pm, DynamicParameters parameters) {
     super(pm);
+    this.frame = frame;
     this.parameters = parameters;
     this.setPreferredScrollableViewportSize(new Dimension(800, 400));
     this.setFillsViewportHeight(true);
@@ -141,16 +149,16 @@ public class ParameterTable extends JTable {
 
     @Override
     public void setValue(Object value) {
-      if(value instanceof String) {
+      if (value instanceof String) {
         setText((String) value);
         setToolTipText(null);
         return;
       }
-      if(value instanceof DynamicParameters.Node) {
+      if (value instanceof DynamicParameters.Node) {
         Parameter<?> o = ((DynamicParameters.Node) value).param;
         // Simulate a tree using indentation - there is no JTreeTable AFAICT
         StringBuilder buf = new StringBuilder();
-        for(int i = 1; i < ((DynamicParameters.Node) value).depth; i++) {
+        for (int i = 1; i < ((DynamicParameters.Node) value).depth; i++) {
           buf.append(' ');
         }
         buf.append(o.getOptionID().getName());
@@ -165,26 +173,21 @@ public class ParameterTable extends JTable {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-      if(row < parameters.size()) {
+      if (row < parameters.size()) {
         BitSet flags = parameters.getNode(row).flags;
         // TODO: don't hardcode black - maybe mix the other colors, too?
         c.setForeground(Color.BLACK);
-        if((flags.get(DynamicParameters.BIT_INVALID))) {
+        if ((flags.get(DynamicParameters.BIT_INVALID))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
-        }
-        else if((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
+        } else if ((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
-        }
-        else if((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
+        } else if ((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
           c.setBackground(COLOR_INCOMPLETE);
-        }
-        else if((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
+        } else if ((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
           c.setBackground(COLOR_DEFAULT_VALUE);
-        }
-        else if((flags.get(DynamicParameters.BIT_OPTIONAL))) {
+        } else if ((flags.get(DynamicParameters.BIT_OPTIONAL))) {
           c.setBackground(COLOR_OPTIONAL);
-        }
-        else {
+        } else {
           c.setBackground(null);
         }
       }
@@ -225,47 +228,45 @@ public class ParameterTable extends JTable {
       comboBox.removeAllItems();
       // Put the current value in first.
       Object val = table.getValueAt(row, column);
-      if(val != null && val instanceof String) {
-        comboBox.addItem((String)val);
+      if (val != null && val instanceof String) {
+        comboBox.addItem((String) val);
         comboBox.setSelectedIndex(0);
       }
-      if(row < parameters.size()) {
+      if (row < parameters.size()) {
         Parameter<?> option = parameters.getNode(row).param;
         // We can do dropdown choices for class parameters
-        if(option instanceof ClassParameter<?>) {
+        if (option instanceof ClassParameter<?>) {
           ClassParameter<?> cp = (ClassParameter<?>) option;
           // For parameters with a default value, offer using the default
           // For optional parameters, offer not specifying them.
-          if(cp.hasDefaultValue()) {
+          if (cp.hasDefaultValue()) {
             comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + cp.getDefaultValueAsString());
-          }
-          else if(cp.isOptional()) {
+          } else if (cp.isOptional()) {
             comboBox.addItem(DynamicParameters.STRING_OPTIONAL);
           }
           // Offer the shorthand version of class names.
-          for(Class<?> impl : cp.getKnownImplementations()) {
+          for (Class<?> impl : cp.getKnownImplementations()) {
             comboBox.addItem(ClassParameter.canonicalClassName(impl, cp.getRestrictionClass()));
           }
         }
         // and for Flag parameters.
-        else if(option instanceof Flag) {
-          if(!Flag.SET.equals(val)) {
+        else if (option instanceof Flag) {
+          if (!Flag.SET.equals(val)) {
             comboBox.addItem(Flag.SET);
           }
-          if(!Flag.NOT_SET.equals(val)) {
+          if (!Flag.NOT_SET.equals(val)) {
             comboBox.addItem(Flag.NOT_SET);
           }
         }
         // and for Enum parameters.
-        else if(option instanceof EnumParameter<?>) {
+        else if (option instanceof EnumParameter<?>) {
           EnumParameter<?> ep = (EnumParameter<?>) option;
-          for(String s : ep.getPossibleValues()) {
-            if(ep.hasDefaultValue() && ep.getDefaultValueAsString().equals(s)) {
-              if(!(DynamicParameters.STRING_USE_DEFAULT + ep.getDefaultValueAsString()).equals(val)) {
+          for (String s : ep.getPossibleValues()) {
+            if (ep.hasDefaultValue() && ep.getDefaultValueAsString().equals(s)) {
+              if (!(DynamicParameters.STRING_USE_DEFAULT + ep.getDefaultValueAsString()).equals(val)) {
                 comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + s);
               }
-            }
-            else if(!s.equals(val)) {
+            } else if (!s.equals(val)) {
               comboBox.addItem(s);
             }
           }
@@ -303,6 +304,11 @@ public class ParameterTable extends JTable {
     final JButton button = new JButton("...");
 
     /**
+     * File selector mode.
+     */
+    int mode = FileDialog.LOAD;
+
+    /**
      * Constructor.
      */
     public FileNameEditor() {
@@ -317,19 +323,34 @@ public class ParameterTable extends JTable {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-      final JFileChooser fc = new JFileChooser(new File("."));
+      final FileDialog fc = new FileDialog(frame);
+      fc.setDirectory((new File(".")).getAbsolutePath());
+      fc.setMode(mode);
       final String curr = textfield.getText();
       if (curr != null && curr.length() > 0) {
-        fc.setSelectedFile(new File(curr));
+        fc.setFile(curr);
       }
-      int returnVal = fc.showOpenDialog(button);
+      fc.setVisible(true);
+      String filename = fc.getFile();
+      if (filename != null) {
+        textfield.setText(new File(fc.getDirectory(), filename).getPath());
+      }
+      fc.dispose();
 
-      if(returnVal == JFileChooser.APPROVE_OPTION) {
-        textfield.setText(fc.getSelectedFile().getPath());
-      }
-      else {
-        // Do nothing on cancel.
-      }
+      // Swing file chooser. Currently much worse on Linux/GTK.
+      // final JFileChooser fc = new JFileChooser(new File("."));
+      // final String curr = textfield.getText();
+      // if (curr != null && curr.length() > 0) {
+      // fc.setSelectedFile(new File(curr));
+      // }
+      // int returnVal = fc.showOpenDialog(button);
+      //
+      // if(returnVal == JFileChooser.APPROVE_OPTION) {
+      // textfield.setText(fc.getSelectedFile().getPath());
+      // }
+      // else {
+      // // Do nothing on cancel.
+      // }
       fireEditingStopped();
     }
 
@@ -346,19 +367,19 @@ public class ParameterTable extends JTable {
      */
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-      if(row < parameters.size()) {
+      if (row < parameters.size()) {
         Parameter<?> option = parameters.getNode(row).param;
-        if(option instanceof FileParameter) {
+        if (option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
           File f = null;
-          if(fp.isDefined()) {
+          mode = FileParameter.FileType.INPUT_FILE.equals(fp.getFileType()) ? FileDialog.LOAD : FileDialog.SAVE;
+          if (fp.isDefined()) {
             f = fp.getValue();
           }
-          if(f != null) {
+          if (f != null) {
             String fn = f.getPath();
             textfield.setText(fn);
-          }
-          else {
+          } else {
             textfield.setText("");
           }
         }
@@ -423,31 +444,28 @@ public class ParameterTable extends JTable {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-      if(e.getSource() == button) {
+      if (e.getSource() == button) {
         popup.show(panel);
-      }
-      else if(e.getSource() == combo) {
+      } else if (e.getSource() == combo) {
         String newClass = (String) combo.getSelectedItem();
-        if(newClass != null && newClass.length() > 0) {
+        if (newClass != null && newClass.length() > 0) {
           String val = textfield.getText();
-          if(val.equals(DynamicParameters.STRING_OPTIONAL)) {
+          if (val.equals(DynamicParameters.STRING_OPTIONAL)) {
             val = "";
           }
-          if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+          if (val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
             val = "";
           }
-          if(val.length() > 0) {
+          if (val.length() > 0) {
             val = val + ClassListParameter.LIST_SEP + newClass;
-          }
-          else {
+          } else {
             val = newClass;
           }
           textfield.setText(val);
           popup.hide();
         }
         fireEditingStopped();
-      }
-      else {
+      } else {
         LoggingUtil.warning("Unrecognized action event in ClassListEditor: " + e);
       }
     }
@@ -516,30 +534,28 @@ public class ParameterTable extends JTable {
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       combo.removeAllItems();
-      if(row < parameters.size()) {
+      if (row < parameters.size()) {
         Parameter<?> option = parameters.getNode(row).param;
         // We can do dropdown choices for class parameters
-        if(option instanceof ClassListParameter<?>) {
+        if (option instanceof ClassListParameter<?>) {
           ClassListParameter<?> cp = (ClassListParameter<?>) option;
           // Offer the shorthand version of class names.
           String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
-          for(Class<?> impl : cp.getKnownImplementations()) {
+          for (Class<?> impl : cp.getKnownImplementations()) {
             String name = impl.getName();
-            if(name.startsWith(prefix)) {
+            if (name.startsWith(prefix)) {
               name = name.substring(prefix.length());
             }
             combo.addItem(name);
           }
         }
-        if(option.isDefined()) {
-          if(option.tookDefaultValue()) {
+        if (option.isDefined()) {
+          if (option.tookDefaultValue()) {
             textfield.setText(DynamicParameters.STRING_USE_DEFAULT + option.getDefaultValueAsString());
-          }
-          else {
+          } else {
             textfield.setText(option.getValueAsString());
           }
-        }
-        else {
+        } else {
           textfield.setText("");
         }
       }
@@ -603,7 +619,7 @@ public class ParameterTable extends JTable {
 
     @Override
     public Object getCellEditorValue() {
-      if(activeEditor == null) {
+      if (activeEditor == null) {
         return null;
       }
       return activeEditor.getCellEditorValue();
@@ -611,31 +627,31 @@ public class ParameterTable extends JTable {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-      if(value instanceof String) {
+      if (value instanceof String) {
         String s = (String) value;
-        if(s.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+        if (s.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
           value = s.substring(DynamicParameters.STRING_USE_DEFAULT.length());
         }
       }
-      if(row < parameters.size()) {
+      if (row < parameters.size()) {
         Parameter<?> option = parameters.getNode(row).param;
-        if(option instanceof Flag) {
+        if (option instanceof Flag) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if(option instanceof ClassListParameter<?>) {
+        if (option instanceof ClassListParameter<?>) {
           activeEditor = classListEditor;
           return classListEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if(option instanceof ClassParameter<?>) {
+        if (option instanceof ClassParameter<?>) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if(option instanceof FileParameter) {
+        if (option instanceof FileParameter) {
           activeEditor = fileNameEditor;
           return fileNameEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if(option instanceof EnumParameter<?>) {
+        if (option instanceof EnumParameter<?>) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }

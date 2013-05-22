@@ -113,6 +113,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
       store.add(new Pair<>(title, buf));
       buf = new ArrayList<>();
     }
+    is.close();
   }
 
   @Override

@@ -259,7 +259,7 @@ public class MiniGUI extends AbstractApplication {
       });
 
       // Create parameter table
-      parameterTable = new ParameterTable(parameterModel, parameters);
+      parameterTable = new ParameterTable(frame, parameterModel, parameters);
       // Create the scroll pane and add the table to it.
       JScrollPane scrollPane = new JScrollPane(parameterTable);
 
