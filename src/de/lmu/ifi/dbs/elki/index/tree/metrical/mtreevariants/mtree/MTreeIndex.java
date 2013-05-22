@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUti
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 
 /**
  * Class for using an m-tree as database index.
@@ -180,7 +181,7 @@ public class MTreeIndex<O, D extends NumberDistance<D, ?>> extends MTree<O, D> i
    */
   @Override
   public final boolean delete(DBIDRef id) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   /**
@@ -192,7 +193,7 @@ public class MTreeIndex<O, D extends NumberDistance<D, ?>> extends MTree<O, D> i
    */
   @Override
   public void deleteAll(DBIDs ids) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   @SuppressWarnings("unchecked")

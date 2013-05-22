@@ -127,7 +127,7 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
   public ClusterOrderResult<D> run(Database database, Relation<NV> relation) {
     Collection<DeLiCluTreeIndex<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTreeIndex.class);
     if(indexes.size() != 1) {
-      throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes, expected exactly one.");
+      throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes. DeLiClu needs a special index to operate, therefore you need to add this index to your database.");
     }
     DeLiCluTreeIndex<NV> index = indexes.iterator().next();
     // FIXME: check that the index matches the relation!

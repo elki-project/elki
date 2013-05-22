@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 
 /*
  This file is part of ELKI:
@@ -204,13 +204,13 @@ public class PoissonDistribution implements Distribution {
   // FIXME: implement!
   @Override
   public double cdf(double val) {
-    throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   // FIXME: implement!
   @Override
   public double quantile(double val) {
-    throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   /**
