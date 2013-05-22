@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowed
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Provides the APRIORI algorithm for Mining Association Rules.
@@ -340,11 +339,8 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       }
 
       // global parameter constraints
-      ArrayList<Parameter<?>> globalConstraints = new ArrayList<>();
-      globalConstraints.add(minfreqP);
-      globalConstraints.add(minsuppP);
-      config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));
-      config.checkConstraint(new OneMustBeSetGlobalConstraint(globalConstraints));
+      config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(minfreqP, minsuppP));
+      config.checkConstraint(new OneMustBeSetGlobalConstraint(minfreqP, minsuppP));
     }
 
     @Override

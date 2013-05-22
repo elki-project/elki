@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
@@ -55,17 +56,27 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
   }
 
   /**
+   * Constructs a global parameter constraint for testing if only one parameter
+   * of a list of parameters is set.
+   * 
+   * @param params list of parameters to be checked
+   */
+  public OnlyOneIsAllowedToBeSetGlobalConstraint(Parameter<?>... params) {
+    parameters = Arrays.asList(params);
+  }
+
+  /**
    * Checks if only one parameter of a list of parameters is set. If not, a
    * parameter exception is thrown.
    */
   @Override
   public void test() throws ParameterException {
     ArrayList<String> set = new ArrayList<>();
-    for(Parameter<?> p : parameters) {
-      if(p.isDefined()) {
+    for (Parameter<?> p : parameters) {
+      if (p.isDefined()) {
         // FIXME: Retire the use of this constraint for Flags!
-        if(p instanceof Flag) {
-          if (((Flag)p).getValue().booleanValue()) {
+        if (p instanceof Flag) {
+          if (((Flag) p).getValue().booleanValue()) {
             set.add(p.getName());
           }
         } else {
@@ -73,7 +84,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
         }
       }
     }
-    if(set.size() > 1) {
+    if (set.size() > 1) {
       throw new WrongParameterValueException("Global Parameter Constraint Error.\n" + "Only one of the parameters " + OptionUtil.optionsNamesToString(parameters) + " is allowed to be set. " + "Parameters currently set: " + set.toString());
     }
   }

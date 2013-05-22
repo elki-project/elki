@@ -175,6 +175,7 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
       if (prog != null) {
         prog.ensureCompleted(LOG);
       }
+      lock.release();
     } catch (IOException e) {
       LOG.exception(e);
     }

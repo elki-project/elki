@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
@@ -51,6 +52,16 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
    */
   public OneMustBeSetGlobalConstraint(List<Parameter<?>> params) {
     parameters = params;
+  }
+
+  /**
+   * Creates a One-Must-Be-Set global parameter constraint. That is, at least
+   * one parameter value of the given list of parameters has to be set.
+   * 
+   * @param params list of parameters
+   */
+  public OneMustBeSetGlobalConstraint(Parameter<?>... params) {
+    parameters = Arrays.asList(params);
   }
 
   /**

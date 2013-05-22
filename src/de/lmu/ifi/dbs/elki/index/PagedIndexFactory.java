@@ -68,7 +68,9 @@ public abstract class PagedIndexFactory<O, I extends Index> implements IndexFact
    * @return Page file
    */
   protected <N extends ExternalizablePage> PageFile<N> makePageFile(Class<N> cls) {
-    return ((PageFileFactory<N>) pageFileFactory).newPageFile(cls);
+    @SuppressWarnings("unchecked")
+    final PageFileFactory<N> castFactory = (PageFileFactory<N>) pageFileFactory;
+    return castFactory.newPageFile(cls);
   }
 
   /**

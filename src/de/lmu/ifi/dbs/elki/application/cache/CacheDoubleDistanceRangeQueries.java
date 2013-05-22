@@ -180,6 +180,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
       if (prog != null) {
         prog.ensureCompleted(LOG);
       }
+      lock.release();
     } catch (IOException e) {
       LOG.exception(e);
     }
