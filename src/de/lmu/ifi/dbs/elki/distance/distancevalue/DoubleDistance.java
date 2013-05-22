@@ -192,7 +192,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
 
   @Override
   public String toString() {
-    return FormatUtil.NF8.format(value);
+    return FormatUtil.NF.format(value);
   }
 
   @Override

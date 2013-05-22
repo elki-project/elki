@@ -72,7 +72,7 @@ public final class FormatUtil {
 
   static {
     NF.setMinimumFractionDigits(0);
-    NF.setMaximumFractionDigits(10);
+    NF.setMaximumFractionDigits(8);
     NF.setGroupingUsed(false);
     NF0.setMinimumFractionDigits(0);
     NF0.setMaximumFractionDigits(0);
@@ -721,7 +721,7 @@ public final class FormatUtil {
    * @return String representation of this Matrix
    */
   public static String format(Matrix m) {
-    return format(m, FormatUtil.NF8);
+    return format(m, FormatUtil.NF);
   }
 
   /**
@@ -741,7 +741,7 @@ public final class FormatUtil {
    * @return String representation of this Vector
    */
   public static String format(Vector m) {
-    return format(m, FormatUtil.NF8);
+    return format(m, FormatUtil.NF);
   }
 
   /**

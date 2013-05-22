@@ -314,7 +314,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     Relation<Double> scores = result.getScores();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double value = scaling.getScaled(scores.get(iter));
-      out.append(" ").append(FormatUtil.format(value, FormatUtil.NF8));
+      out.append(' ').append(FormatUtil.NF.format(value));
     }
     out.append(FormatUtil.NEWLINE);
   }
