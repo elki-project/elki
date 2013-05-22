@@ -137,4 +137,13 @@ public class FileParameter extends AbstractParameter<File> {
   public String getSyntax() {
     return "<file>";
   }
+
+  /**
+   * Get the file type (input / output)
+   * 
+   * @return file type
+   */
+  public FileType getFileType() {
+    return fileType;
+  }
 }
