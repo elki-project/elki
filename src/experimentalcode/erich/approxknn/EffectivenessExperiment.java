@@ -28,6 +28,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -66,10 +67,10 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
 
   @Override
   public void run() {
-    final int samplesize = 10000;
     Duration load = new MillisTimeDuration("approxknn.load");
     load.begin();
     Database database = LoadImageNet.loadDatabase("ImageNet-Haralick-1", true);
+    // Database database = LoadALOI.loadALOI("hsb-7x2x2", true);
     Relation<NumberVector<?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
     load.end();
@@ -83,42 +84,60 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
 
     // True kNN value
     final int k = 101;
-    final int[] halfwins = { 50, 100, 150, 200 }; // Half window widths
+    // Half window widths
+    // final int[] halfwins = { 2, 4, 10 };
+    final int[] halfwins = { 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 30, 40 };
     Random rnd = new Random(0);
-    final DBIDs subset = DBIDUtil.randomSample(ids, samplesize, rnd);
+    final int samplesize = ids.size(); // 10000;
+    final DBIDs subset = (samplesize == ids.size()) ? ids : DBIDUtil.randomSample(ids, samplesize, rnd);
 
-    // TODO: use a distance function that counts the number of distance
-    // computations.
-    DistanceQuery<NumberVector<?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
-    KNNQuery<NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
+    // Counting distance queries, for r-tree evaluation.
+    final CountingManhattanDistanceFunction cdist = new CountingManhattanDistanceFunction();
+    DistanceQuery<NumberVector<?>, DoubleDistance> cdistq = database.getDistanceQuery(rel, cdist);
+    KNNQuery<NumberVector<?>, DoubleDistance> cknnq = database.getKNNQuery(cdistq, k);
 
     // The curve combinations to test:
-    String[] sfc_names = { "z1", "p1", "h1",//
+    String[] sfc_names = {//
+    "z1", "p1", "h1",//
     "z2", "p2", "h2",//
     "z3", "p3", "h3", //
     "z123", "p123", "h123", //
-    "zph1", "all9", //
+    "zph1", "zph2", "zph3", //
+    "all9", //
     "random", //
     };
-    int[] sfc_masks = { 1, 2, 4, //
+    int[] sfc_masks = {//
+    1, 2, 4, //
     8, 16, 32,//
     64, 128, 256, //
     1 | 8 | 64, 2 | 16 | 128, 4 | 32 | 256, //
-    1 | 2 | 4, 0x1FF, //
+    1 | 2 | 4, 8 | 16 | 32, 64 | 128 | 256, //
+    0x1FF, //
     0, //
+    };
+    int[] sfc_halfscale = {//
+    25, 25, 25, //
+    25, 25, 25, //
+    25, 25, 25, //
+    10, 10, 10, //
+    10, 10, 10, //
+    4, //
+    25, //
     };
     assert (sfc_names.length == sfc_masks.length);
     final int numvars = sfc_masks.length * halfwins.length;
 
     Duration qtime = new MillisTimeDuration("approxnn.querytime");
     qtime.begin();
-    MeanVariance[] distcmv = MeanVariance.newArray(numvars);
+    MeanVariance[] distcmv = MeanVariance.newArray(numvars + 1);
     MeanVariance[] recallmv = MeanVariance.newArray(numvars);
     MeanVariance[] kdistmv = MeanVariance.newArray(numvars);
     for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
       NumberVector<?> vec = rel.get(id);
       // Get the exact nearest neighbors (use an index, luke!)
-      final KNNList<DoubleDistance> trueNN = knnq.getKNNForObject(vec, k);
+      long pre = cdist.counter;
+      final KNNList<DoubleDistance> trueNN = cknnq.getKNNForObject(vec, k);
+      distcmv[numvars].put((double) (cdist.counter - pre));
       SetDBIDs trueNNS = DBIDUtil.newHashSet(trueNN);
       double truedist = trueNN.getKNNDistance().doubleValue();
 
@@ -128,13 +147,13 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
         for (int w = 0; w < halfwins.length; w++) {
           final int varnum = w * sfc_masks.length + c;
           if (sfc_masks[c] > 0) {
-            DBIDs cands = mergeCandidates(ids, numcurves, sfc_masks[c], curves, halfwins[w], id, posi);
+            DBIDs cands = mergeCandidates(ids, numcurves, sfc_masks[c], curves, halfwins[w] * sfc_halfscale[c], id, posi);
             // Number of distance computations; exclude self.
             distcmv[varnum].put(cands.size() - 1);
             // Recall of true kNNs
             recallmv[varnum].put(Math.min(1., DBIDUtil.intersectionSize(trueNNS, cands) / (double) k));
             // Compute kdist in approximated kNNs:
-            if (truedist > 0) {
+            if (truedist > 0 && cands.size() >= k) {
               DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.ZERO_DISTANCE, k);
               for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
                 heap.add(distanceFunction.doubleDistance(vec, rel.get(iter)), id);
@@ -146,14 +165,14 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
             }
           } else {
             // Random sampling:
-            ModifiableDBIDs cands = DBIDUtil.randomSample(ids, halfwins[w] * 2, rnd);
+            ModifiableDBIDs cands = DBIDUtil.randomSample(ids, Math.min(k, halfwins[w] * 2 * sfc_halfscale[c]), rnd);
             cands.add(id);
             // Number of distance computations; exclude self.
             distcmv[varnum].put(cands.size() - 1);
             // Recall of true kNNs
             recallmv[varnum].put(Math.min(1., DBIDUtil.intersectionSize(trueNNS, cands) / (double) k));
             // Compute kdist in approximated kNNs:
-            if (truedist > 0) {
+            if (truedist > 0 && cands.size() >= k) {
               DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.ZERO_DISTANCE, k);
               for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
                 heap.add(distanceFunction.doubleDistance(vec, rel.get(iter)), id);
@@ -173,15 +192,17 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
     for (int c = 0; c < sfc_masks.length; c++) {
       for (int w = 0; w < halfwins.length; w++) {
         final int varnum = w * sfc_masks.length + c;
-        final String prefix = "approxnn." + sfc_names[c] + "-" + w;
+        final String prefix = "approxnn." + sfc_names[c] + "-" + (2 * halfwins[w] * sfc_halfscale[c] / (double) (k - 1));
         LOG.statistics(new DoubleStatistic(prefix + ".distc.mean", distcmv[varnum].getMean()));
-        LOG.statistics(new DoubleStatistic(prefix + ".distc.stddev", distcmv[varnum].getMean()));
+        LOG.statistics(new DoubleStatistic(prefix + ".distc.stddev", distcmv[varnum].getSampleStddev()));
         LOG.statistics(new DoubleStatistic(prefix + ".recall.mean", recallmv[varnum].getMean()));
-        LOG.statistics(new DoubleStatistic(prefix + ".recall.stddev", recallmv[varnum].getMean()));
+        LOG.statistics(new DoubleStatistic(prefix + ".recall.stddev", recallmv[varnum].getSampleStddev()));
         LOG.statistics(new DoubleStatistic(prefix + ".kdist.mean", kdistmv[varnum].getMean()));
-        LOG.statistics(new DoubleStatistic(prefix + ".kdist.stddev", kdistmv[varnum].getMean()));
+        LOG.statistics(new DoubleStatistic(prefix + ".kdist.stddev", kdistmv[varnum].getSampleStddev()));
       }
     }
+    LOG.statistics(new DoubleStatistic("approxnn.rtree.distc.mean", distcmv[numvars].getMean()));
+    LOG.statistics(new DoubleStatistic("approxnn.rtree.distc.stddev", distcmv[numvars].getSampleStddev()));
   }
 
   public ModifiableDBIDs mergeCandidates(DBIDs ids, final int numcurves, int mask, List<ArrayList<SpatialRef>> curves, final int halfwin, DBIDIter id, int[] posi) {
@@ -189,17 +210,23 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
     ModifiableDBIDs cands = DBIDUtil.newHashSet();
     cands.add(id);
     for (int c = 0; c < numcurves; c++) {
-      // Skip if not selected.
+      // Skip curve if not selected.
       if (((1 << c) & mask) == 0) {
         continue;
       }
       ArrayList<SpatialRef> curve = curves.get(c);
       assert (DBIDUtil.equal(curve.get(posi[c]).id, id));
-      for (int off = 1; off <= halfwin; off++) {
-        if (posi[c] - off >= 0) {
-          cands.add(curve.get(posi[c] - off).id);
+      if (posi[c] <= halfwin) {
+        for (int off = 0; off <= 2 * halfwin; off++) {
+          cands.add(curve.get(off).id);
         }
-        if (posi[c] + off < ids.size()) {
+      } else if (posi[c] + halfwin >= ids.size()) {
+        for (int off = ids.size() - 2 * halfwin - 1; off < ids.size(); off++) {
+          cands.add(curve.get(off).id);
+        }
+      } else {
+        for (int off = 1; off <= halfwin; off++) {
+          cands.add(curve.get(posi[c] - off).id);
           cands.add(curve.get(posi[c] + off).id);
         }
       }
@@ -214,5 +241,28 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
 
   public static void main(String[] args) {
     AbstractApplication.runCLIApplication(EffectivenessExperiment.class, args);
+  }
+
+  @SuppressWarnings("deprecation")
+  static class CountingManhattanDistanceFunction extends ManhattanDistanceFunction {
+    long counter = 0;
+
+    @Override
+    public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+      counter++;
+      return super.doubleDistance(v1, v2);
+    }
+
+    @Override
+    public double doubleNorm(NumberVector<?> v) {
+      counter++;
+      return super.doubleNorm(v);
+    }
+
+    @Override
+    public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+      counter++;
+      return super.doubleMinDist(mbr1, mbr2);
+    }
   }
 }
