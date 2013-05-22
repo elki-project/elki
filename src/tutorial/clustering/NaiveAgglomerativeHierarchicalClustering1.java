@@ -119,7 +119,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
 
     // Initialize space for result:
     double[] height = new double[size];
-    Arrays.fill(height, -1.);
+    Arrays.fill(height, Double.POSITIVE_INFINITY);
     // Parent node, to track merges
     // have every object point to itself initially
     ArrayModifiableDBIDs parent = DBIDUtil.newArray(ids);
@@ -133,11 +133,11 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
       double min = Double.POSITIVE_INFINITY;
       int minx = -1, miny = -1;
       for (int x = 0; x < size; x++) {
-        if (height[x] >= 0) {
+        if (height[x] < Double.POSITIVE_INFINITY) {
           continue;
         }
         for (int y = 0; y < x; y++) {
-          if (height[y] >= 0) {
+          if (height[y] < Double.POSITIVE_INFINITY) {
             continue;
           }
           if (matrix[x][y] < min) {
@@ -185,7 +185,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
     // Build the clustering result
     final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");
     for (int x = 0; x < size; x++) {
-      if (height[x] < 0) {
+      if (height[x] < Double.POSITIVE_INFINITY) {
         DBIDs cids = clusters.get(x);
         if (cids == null) {
           ix.seek(x);

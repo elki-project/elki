@@ -123,7 +123,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
 
     // Initialize space for result:
     double[] height = new double[size];
-    Arrays.fill(height, -1.);
+    Arrays.fill(height, Double.POSITIVE_INFINITY);
     // Parent node, to track merges
     // have every object point to itself initially
     ArrayModifiableDBIDs parent = DBIDUtil.newArray(ids);
@@ -137,12 +137,12 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
       double min = Double.POSITIVE_INFINITY;
       int minx = -1, miny = -1;
       for (int x = 0; x < size; x++) {
-        if (height[x] >= 0) {
+        if (height[x] < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int xbase = triangleSize(x);
         for (int y = 0; y < x; y++) {
-          if (height[y] >= 0) {
+          if (height[y] < Double.POSITIVE_INFINITY) {
             continue;
           }
           final int idx = xbase + y;
@@ -179,23 +179,26 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
       final int xbase = triangleSize(minx), ybase = triangleSize(miny);
       // Write to (y, j), with j < y
       for (int j = 0; j < miny; j++) {
-        if (height[j] < 0) {
-          scratch[ybase + j] = Math.min(scratch[xbase + j], scratch[ybase + j]);
+        if (height[j] < Double.POSITIVE_INFINITY) {
+          continue;
         }
+        scratch[ybase + j] = Math.min(scratch[xbase + j], scratch[ybase + j]);
       }
       // Write to (j, y), with y < j < x
       for (int j = miny + 1; j < minx; j++) {
-        if (height[j] < 0) {
-          final int jbase = triangleSize(j);
-          scratch[jbase + miny] = Math.min(scratch[xbase + j], scratch[jbase + miny]);
+        if (height[j] < Double.POSITIVE_INFINITY) {
+          continue;
         }
+        final int jbase = triangleSize(j);
+        scratch[jbase + miny] = Math.min(scratch[xbase + j], scratch[jbase + miny]);
       }
       // Write to (j, y), with y < x < j
       for (int j = minx + 1; j < size; j++) {
-        if (height[j] < 0) {
-          final int jbase = triangleSize(j);
-          scratch[jbase + miny] = Math.min(scratch[jbase + minx], scratch[jbase + miny]);
+        if (height[j] < Double.POSITIVE_INFINITY) {
+          continue;
         }
+        final int jbase = triangleSize(j);
+        scratch[jbase + miny] = Math.min(scratch[jbase + minx], scratch[jbase + miny]);
       }
       if (prog != null) {
         prog.incrementProcessed(LOG);
@@ -208,7 +211,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
     // Build the clustering result
     final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");
     for (int x = 0; x < size; x++) {
-      if (height[x] < 0) {
+      if (height[x] < Double.POSITIVE_INFINITY) {
         DBIDs cids = clusters.get(x);
         if (cids == null) {
           ix.seek(x);

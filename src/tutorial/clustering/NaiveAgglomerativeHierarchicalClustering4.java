@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package tutorial.clustering;
 
 /*
  This file is part of ELKI:
@@ -24,6 +24,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -48,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 
 /**
  * This tutorial will step you through implementing a well known clustering
@@ -60,15 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
  * 
- * Reference for the unified concept:
- * <p>
- * G. N. Lance and W. T. Williams<br />
- * A general theory of classificatory sorting strategies 1. Hierarchical systems
- * <br/>
- * The computer journal 9.4 (1967): 373-380.
- * </p>
- * 
- * See also:
+ * Reference (for the update formulas):
  * <p>
  * A Review of Classification<br />
  * R. M. Cormack<br />
@@ -79,25 +74,89 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-@Reference(authors = "G. N. Lance and W. T. Williams", title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", booktitle = "The computer journal 9.4", url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
-public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, PointerHierarchyRepresentationResult<DoubleDistance>> implements HierarchicalClusteringAlgorithm<DoubleDistance> {
+@Reference(title = "A Review of Classification", authors = "R. M. Cormack", booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", url = "http://www.jstor.org/stable/2344237")
+public class NaiveAgglomerativeHierarchicalClustering4<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, PointerHierarchyRepresentationResult<DoubleDistance>> implements HierarchicalClusteringAlgorithm<DoubleDistance> {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(NaiveAgglomerativeHierarchicalClustering.class);
+  private static final Logging LOG = Logging.getLogger(NaiveAgglomerativeHierarchicalClustering4.class);
 
   /**
-   * Current linkage method in use.
+   * Different linkage strategies.
+   * 
+   * The update formulas here come from:<br />
+   * R. M. Cormack, A Review of Classification
+   * 
+   * @author Erich Schubert
    */
-  LinkageMethod linkage = WardLinkageMethod.STATIC;
+  public static enum Linkage {//
+    SINGLE {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        return Math.min(dx, dy);
+      }
+    }, // single-linkage hierarchical clustering
+    COMPLETE {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        return Math.max(dx, dy);
+      }
+    }, // complete-linkage hierarchical clustering
+    GROUP_AVERAGE {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        final double wx = sizex / (double) (sizex + sizey);
+        final double wy = sizey / (double) (sizex + sizey);
+        return wx * dx + wy * dy;
+      }
+    }, // average-linkage hierarchical clustering
+    WEIGHTED_AVERAGE {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        return .5 * (dx + dy);
+      }
+    }, // a more naive variant, McQuitty (1966)
+    CENTROID {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        final double wx = sizex / (double) (sizex + sizey);
+        final double wy = sizey / (double) (sizex + sizey);
+        final double beta = (sizex * sizey) / (double) ((sizex + sizey) * (sizex + sizey));
+        return wx * dx + wy * dy - beta * dxy;
+      }
+    }, // Sokal and Michener (1958), Gower (1967)
+    MEDIAN {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        return .5 * (dx + dy) - .25 * dxy;
+      }
+    }, // Gower (1967)
+    WARD {
+      @Override
+      public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
+        final double wx = (sizex + sizej) / (double) (sizex + sizey + sizej);
+        final double wy = (sizey + sizej) / (double) (sizex + sizey + sizej);
+        final double beta = sizej / (double) (sizex + sizey + sizej);
+        return wx * dx + wy * dy - beta * dxy;
+      }
+    }, // Minimum Variance, Wishart (1969), Anderson (1971)
+    ;
+
+    abstract public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy);
+  }
+
+  /**
+   * Current linkage in use.
+   */
+  Linkage linkage = Linkage.WARD;
 
   /**
    * Constructor.
    * 
    * @param distanceFunction Distance function to use
-   * @param linkage Linkage method
+   * @param linkage Linkage strategy
    */
-  public NaiveAgglomerativeHierarchicalClustering(DistanceFunction<? super O, D> distanceFunction, LinkageMethod linkage) {
+  public NaiveAgglomerativeHierarchicalClustering4(DistanceFunction<? super O, D> distanceFunction, Linkage linkage) {
     super(distanceFunction);
     this.linkage = linkage;
   }
@@ -117,7 +176,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     if (size > 0x10000) {
       throw new AbortException("This implementation does not scale to data sets larger than " + 0x10000 + " instances (~17 GB RAM), which results in an integer overflow.");
     }
-    if (SingleLinkageMethod.class.isInstance(linkage)) {
+    if (Linkage.SINGLE.equals(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
 
@@ -126,9 +185,10 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     DBIDArrayIter ix = ids.iter(), iy = ids.iter(), ij = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
-    boolean square = WardLinkageMethod.class.isInstance(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
-    for (ix.seek(0); ix.valid(); ix.advance()) {
-      for (iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
+    boolean square = Linkage.WARD.equals(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
+    for (int x = 0; ix.valid(); x++, ix.advance()) {
+      iy.seek(0);
+      for (int y = 0; y < x; y++, iy.advance()) {
         scratch[pos] = dq.distance(ix, iy).doubleValue();
         // Ward uses variances -- i.e. squared values
         if (square) {
@@ -139,86 +199,75 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     }
 
     // Initialize space for result:
-    WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDoubleDistanceDataStore lambda = DataStoreUtil.makeDoubleDistanceStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    WritableDBIDDataStore parent = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    WritableDoubleDistanceDataStore height = DataStoreUtil.makeDoubleDistanceStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableIntegerDataStore csize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      pi.put(it, it);
-      lambda.put(it, Double.POSITIVE_INFINITY);
+      parent.put(it, it);
+      height.put(it, Double.POSITIVE_INFINITY);
       csize.put(it, 1);
     }
 
-    // Repeat until everything merged into 1 cluster
+    // Repeat until everything merged, except the desired number of clusters:
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
     for (int i = 1; i < size; i++) {
-      double mindist = Double.POSITIVE_INFINITY;
-      int x = -1, y = -1;
+      double min = Double.POSITIVE_INFINITY;
+      int minx = -1, miny = -1;
       for (ix.seek(0); ix.valid(); ix.advance()) {
-        if (lambda.doubleValue(ix) < Double.POSITIVE_INFINITY) {
+        if (height.doubleValue(ix) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int xbase = triangleSize(ix.getOffset());
         for (iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
-          if (lambda.doubleValue(iy) < Double.POSITIVE_INFINITY) {
+          if (height.doubleValue(iy) < Double.POSITIVE_INFINITY) {
             continue;
           }
           final int idx = xbase + iy.getOffset();
-          if (scratch[idx] <= mindist) {
-            mindist = scratch[idx];
-            x = ix.getOffset();
-            y = iy.getOffset();
+          if (scratch[idx] <= min) {
+            min = scratch[idx];
+            minx = ix.getOffset();
+            miny = iy.getOffset();
           }
         }
       }
-      assert (x >= 0 && y >= 0);
+      assert (minx >= 0 && miny >= 0);
       // Avoid allocating memory, by reusing existing iterators:
-      ix.seek(x);
-      iy.seek(y);
+      ix.seek(minx);
+      iy.seek(miny);
       // Perform merge in data structure: x -> y
       // Since y < x, prefer keeping y, dropping x.
-      lambda.put(ix, mindist);
-      pi.put(ix, iy);
-      // Merge into cluster
       int sizex = csize.intValue(ix), sizey = csize.intValue(iy);
+      height.put(ix, min);
+      parent.put(ix, iy);
       csize.put(iy, sizex + sizey);
 
       // Update distance matrix. Note: miny < minx
-
-      // Implementation note: most will not need sizej, and could save the
-      // hashmap lookup.
-      final int xbase = triangleSize(x), ybase = triangleSize(y);
-
-      ij.seek(0);
+      final int xbase = triangleSize(minx), ybase = triangleSize(miny);
       // Write to (y, j), with j < y
-      while (ij.getOffset() < y) {
-        if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+      for (ij.seek(0); ij.getOffset() < miny; ij.advance()) {
+        if (height.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int sizej = csize.intValue(ij);
-        scratch[ybase + ij.getOffset()] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[ybase + ij.getOffset()], sizej, mindist);
-        ij.advance();
+        scratch[ybase + ij.getOffset()] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[ybase + ij.getOffset()], sizej, min);
       }
-      ij.advance(); // Skip y
       // Write to (j, y), with y < j < x
-      while (ij.getOffset() < x) {
-        if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+      for (ij.seek(miny + 1); ij.getOffset() < minx; ij.advance()) {
+        if (height.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int jbase = triangleSize(ij.getOffset());
         final int sizej = csize.intValue(ij);
-        scratch[jbase + y] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[jbase + y], sizej, mindist);
-        ij.advance();
+        scratch[jbase + miny] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[jbase + miny], sizej, min);
       }
-      ij.advance(); // Skip x
       // Write to (j, y), with y < x < j
-      while (ij.valid()) {
-        if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+      for (ij.seek(minx + 1); ij.valid(); ij.advance()) {
+        if (height.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
-        final int sizej = csize.intValue(ij);
         final int jbase = triangleSize(ij.getOffset());
-        scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], sizej, mindist);
-        ij.advance();
+        final int sizej = csize.intValue(ij);
+        scratch[jbase + miny] = linkage.combine(sizex, scratch[jbase + minx], sizey, scratch[jbase + miny], sizej, min);
       }
       if (prog != null) {
         prog.incrementProcessed(LOG);
@@ -228,7 +277,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
       prog.ensureCompleted(LOG);
     }
 
-    return new PointerHierarchyRepresentationResult<>(ids, pi, lambda);
+    return new PointerHierarchyRepresentationResult<>(ids, parent, height);
   }
 
   /**
@@ -242,11 +291,6 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
   }
 
   @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
-
-  @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
@@ -255,6 +299,11 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 
   /**
@@ -269,31 +318,26 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     /**
      * Option ID for linkage parameter.
      */
-    public static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Linkage method to use (e.g. Ward, Single-Link)");
+    private static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Parameter to choose the linkage strategy.");
 
     /**
      * Current linkage in use.
      */
-    protected LinkageMethod linkage;
+    protected Linkage linkage = Linkage.SINGLE;
 
     @Override
     protected void makeOptions(Parameterization config) {
-      // We don't call super, because we want a different default distance.
-      ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, DistanceFunction.class);
-      if (config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
-
-      ObjectParameter<LinkageMethod> linkageP = new ObjectParameter<>(LINKAGE_ID, LinkageMethod.class);
-      linkageP.setDefaultValue(WardLinkageMethod.class);
+      super.makeOptions(config);
+      EnumParameter<Linkage> linkageP = new EnumParameter<>(LINKAGE_ID, Linkage.class);
+      linkageP.setDefaultValue(Linkage.WARD);
       if (config.grab(linkageP)) {
-        linkage = linkageP.instantiateClass(config);
+        linkage = linkageP.getValue();
       }
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering<O, D> makeInstance() {
-      return new NaiveAgglomerativeHierarchicalClustering<>(distanceFunction, linkage);
+    protected NaiveAgglomerativeHierarchicalClustering4<O, D> makeInstance() {
+      return new NaiveAgglomerativeHierarchicalClustering4<>(distanceFunction, linkage);
     }
   }
 }
