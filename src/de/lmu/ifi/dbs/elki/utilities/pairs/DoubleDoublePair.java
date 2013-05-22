@@ -59,6 +59,15 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair>, PairInter
   }
 
   /**
+   * Clone constructor.
+   *
+   * @param other Existing pair.
+   */
+  public DoubleDoublePair(DoubleDoublePair other) {
+    this(other.first, other.second);
+  }
+
+  /**
    * Trivial equals implementation
    * 
    * @param obj Object to compare to
