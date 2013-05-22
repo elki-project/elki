@@ -28,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.zip.GZIPOutputStream;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -50,25 +49,15 @@ public class MultipleFilesOutput implements StreamFactory {
   private static final String GZIP_EXTENSION = ".gz";
 
   /**
-   * Default stream to write to when no name is supplied.
-   */
-  private PrintStream defaultStream = null;
-
-  /**
    * Base file name.
    */
   private File basename;
 
   /**
-   * HashMap of open print streams.
-   */
-  private HashMap<String, PrintStream> map = new HashMap<>();
-
-  /**
    * Control gzip compression of output.
    */
   private boolean usegzip = false;
-  
+
   /**
    * Logger for debugging.
    */
@@ -95,20 +84,6 @@ public class MultipleFilesOutput implements StreamFactory {
   }
 
   /**
-   * Retrieve/open the default output stream.
-   * 
-   * @return default output stream
-   * @throws IOException
-   */
-  private PrintStream getDefaultStream() throws IOException {
-    if(defaultStream != null) {
-      return defaultStream;
-    }
-    defaultStream = newStream("default");
-    return defaultStream;
-  }
-
-  /**
    * Open a new stream of the given name
    * 
    * @param name file name (which will be appended to the base name)
@@ -117,14 +92,10 @@ public class MultipleFilesOutput implements StreamFactory {
    */
   private PrintStream newStream(String name) throws IOException {
     if (LOG.isDebuggingFiner()) {
-      LOG.debugFiner("Requested stream: "+name);
-    }
-    PrintStream res = map.get(name);
-    if(res != null) {
-      return res;
+      LOG.debugFiner("Requested stream: " + name);
     }
     // Ensure the directory exists:
-    if(!basename.exists()) {
+    if (!basename.exists()) {
       basename.mkdirs();
     }
     String fn = basename.getAbsolutePath() + File.separator + name + EXTENSION;
@@ -137,12 +108,11 @@ public class MultipleFilesOutput implements StreamFactory {
       // wrap into gzip stream.
       os = new GZIPOutputStream(os);
     }
-    res = new PrintStream(os);
+    PrintStream res = new PrintStream(os);
     if (LOG.isDebuggingFiner()) {
-      LOG.debugFiner("Opened new output stream:"+fn);
+      LOG.debugFiner("Opened new output stream:" + fn);
     }
     // cache.
-    map.put(name, res);
     return res;
   }
 
@@ -151,10 +121,12 @@ public class MultipleFilesOutput implements StreamFactory {
    */
   @Override
   public PrintStream openStream(String filename) throws IOException {
-    if(filename == null) {
-      return getDefaultStream();
-    }
     return newStream(filename);
+  }
+
+  @Override
+  public void closeStream(PrintStream stream) {
+    stream.close();
   }
 
   /**
@@ -173,16 +145,5 @@ public class MultipleFilesOutput implements StreamFactory {
    */
   protected void setGzipCompression(boolean usegzip) {
     this.usegzip = usegzip;
-  }
-
-  /**
-   * Close (and forget) all output streams.
-   */
-  @Override
-  public synchronized void closeAllStreams() {
-    for (PrintStream s : map.values()) {
-      s.close();
-    }
-    map.clear();
   }
 }

@@ -35,32 +35,32 @@ import java.util.zip.GZIPOutputStream;
  * Class to output all result data to a single stream (e.g. Stdout, single file)
  * 
  * @author Erich Schubert
- *
  */
 public class SingleStreamOutput implements StreamFactory {
   /**
    * Output stream
    */
   private PrintStream stream;
-  
+
   /**
    * Constructor using stdout.
+   * 
    * @throws IOException on IO error
    */
-  public SingleStreamOutput() throws IOException  {
+  public SingleStreamOutput() throws IOException {
     this(FileDescriptor.out);
   }
-  
+
   /**
    * Constructor using stdout
    * 
    * @param gzip Use gzip compression
    * @throws IOException on IO error
    */
-  public SingleStreamOutput(boolean gzip) throws IOException  {
+  public SingleStreamOutput(boolean gzip) throws IOException {
     this(FileDescriptor.out, gzip);
   }
-  
+
   /**
    * Constructor with given file name.
    * 
@@ -91,7 +91,7 @@ public class SingleStreamOutput implements StreamFactory {
   public SingleStreamOutput(FileDescriptor out) throws IOException {
     this(new FileOutputStream(out));
   }
-  
+
   /**
    * Constructor with given FileDescriptor
    * 
@@ -102,7 +102,7 @@ public class SingleStreamOutput implements StreamFactory {
   public SingleStreamOutput(FileDescriptor out, boolean gzip) throws IOException {
     this(new FileOutputStream(out), gzip);
   }
-  
+
   /**
    * Constructor with given FileOutputStream.
    * 
@@ -132,18 +132,16 @@ public class SingleStreamOutput implements StreamFactory {
   /**
    * Return the objects shared print stream.
    * 
-   * @param filename ignored filename for SingleStreamOutput, as the name suggests
+   * @param filename ignored filename for SingleStreamOutput, as the name
+   *        suggests
    */
   @Override
   public PrintStream openStream(String filename) {
     return stream;
   }
 
-  /**
-   * Close output stream.
-   */
   @Override
-  public void closeAllStreams() {
-    stream.close();
+  public void closeStream(PrintStream stream) {
+    // Do NOT close. We may still need it.
   }
 }
