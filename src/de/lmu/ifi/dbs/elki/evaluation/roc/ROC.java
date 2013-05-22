@@ -176,6 +176,18 @@ public class ROC {
     public int internalGetIndex() {
       return iter.internalGetIndex();
     }
+
+    @Deprecated
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Deprecated
+    @Override
+    public boolean equals(Object obj) {
+      return super.equals(obj);
+    }
   }
 
   /**
@@ -229,6 +241,18 @@ public class ROC {
     @Override
     public boolean tiedToPrevious() {
       return iter.getDistance().equals(prevDist);
+    }
+
+    @Deprecated
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Deprecated
+    @Override
+    public boolean equals(Object obj) {
+      return super.equals(obj);
     }
   }
 
@@ -288,6 +312,18 @@ public class ROC {
     @Override
     public int internalGetIndex() {
       return iter.internalGetIndex();
+    }
+
+    @Deprecated
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Deprecated
+    @Override
+    public boolean equals(Object obj) {
+      return super.equals(obj);
     }
   }
 
