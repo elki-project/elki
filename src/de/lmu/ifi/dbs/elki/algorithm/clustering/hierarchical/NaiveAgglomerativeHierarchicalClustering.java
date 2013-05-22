@@ -127,9 +127,8 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     // Position counter - must agree with computeOffset!
     int pos = 0;
     boolean square = WardLinkageMethod.class.isInstance(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
-    for (int x = 0; ix.valid(); x++, ix.advance()) {
-      iy.seek(0);
-      for (int y = 0; y < x; y++, iy.advance()) {
+    for (ix.seek(0); ix.valid(); ix.advance()) {
+      for (iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
         scratch[pos] = dq.distance(ix, iy).doubleValue();
         // Ward uses variances -- i.e. squared values
         if (square) {
@@ -152,34 +151,32 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
     for (int i = 1; i < size; i++) {
-      double min = Double.POSITIVE_INFINITY;
-      int minx = -1, miny = -1;
-      ix.seek(0);
-      for (int x = 0; x < size; x++, ix.advance()) {
+      double mindist = Double.POSITIVE_INFINITY;
+      int x = -1, y = -1;
+      for (ix.seek(0); ix.valid(); ix.advance()) {
         if (lambda.doubleValue(ix) < Double.POSITIVE_INFINITY) {
           continue;
         }
-        final int xbase = triangleSize(x);
-        iy.seek(0);
-        for (int y = 0; y < x; y++, iy.advance()) {
+        final int xbase = triangleSize(ix.getOffset());
+        for (iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
           if (lambda.doubleValue(iy) < Double.POSITIVE_INFINITY) {
             continue;
           }
-          final int idx = xbase + y;
-          if (scratch[idx] < min) {
-            min = scratch[idx];
-            minx = x;
-            miny = y;
+          final int idx = xbase + iy.getOffset();
+          if (scratch[idx] < mindist) {
+            mindist = scratch[idx];
+            x = ix.getOffset();
+            y = iy.getOffset();
           }
         }
       }
-      assert (minx >= 0 && miny >= 0);
+      assert (x >= 0 && y >= 0);
       // Avoid allocating memory, by reusing existing iterators:
-      ix.seek(minx);
-      iy.seek(miny);
+      ix.seek(x);
+      iy.seek(y);
       // Perform merge in data structure: x -> y
       // Since y < x, prefer keeping y, dropping x.
-      lambda.put(ix, min);
+      lambda.put(ix, mindist);
       pi.put(ix, iy);
       // Merge into cluster
       int sizex = csize.intValue(ix), sizey = csize.intValue(iy);
@@ -189,37 +186,39 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
 
       // Implementation note: most will not need sizej, and could save the
       // hashmap lookup.
-      final int xbase = triangleSize(minx), ybase = triangleSize(miny);
-      // Write to (y, j), with j < y
+      final int xbase = triangleSize(x), ybase = triangleSize(y);
+
       ij.seek(0);
-      for (int j = 0; j < miny; j++, ij.advance()) {
+      // Write to (y, j), with j < y
+      while (ij.getOffset() < y) {
         if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int sizej = csize.intValue(ij);
-        scratch[ybase + j] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[ybase + j], sizej, min);
+        scratch[ybase + ij.getOffset()] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[ybase + ij.getOffset()], sizej, mindist);
+        ij.advance();
       }
-      ij.advance(); // Always skip y
-      ij.seek(miny + 1);
+      ij.advance(); // Skip y
       // Write to (j, y), with y < j < x
-      for (int j = miny + 1; j < minx; j++, ij.advance()) {
+      while (ij.getOffset() < x) {
         if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
-        final int jbase = triangleSize(j);
+        final int jbase = triangleSize(ij.getOffset());
         final int sizej = csize.intValue(ij);
-        scratch[jbase + miny] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jbase + miny], sizej, min);
+        scratch[jbase + y] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[jbase + y], sizej, mindist);
+        ij.advance();
       }
       ij.advance(); // Skip x
-      ij.seek(minx + 1);
       // Write to (j, y), with y < x < j
-      for (int j = minx + 1; j < size; j++, ij.advance()) {
+      while (ij.valid()) {
         if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int sizej = csize.intValue(ij);
-        final int jbase = triangleSize(j);
-        scratch[jbase + miny] = linkage.combine(sizex, scratch[jbase + minx], sizey, scratch[jbase + miny], sizej, min);
+        final int jbase = triangleSize(ij.getOffset());
+        scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], sizej, mindist);
+        ij.advance();
       }
       if (prog != null) {
         prog.incrementProcessed(LOG);
@@ -229,10 +228,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
       prog.ensureCompleted(LOG);
     }
 
-    PointerHierarchyRepresentationResult<DoubleDistance> result = new PointerHierarchyRepresentationResult<>(ids, pi, lambda);
-    // TODO: also return an ordering, like slink, for visualization?
-
-    return result;
+    return new PointerHierarchyRepresentationResult<>(ids, pi, lambda);
   }
 
   /**

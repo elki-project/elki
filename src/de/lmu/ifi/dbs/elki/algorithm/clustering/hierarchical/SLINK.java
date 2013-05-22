@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunc
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -144,9 +143,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     m.destroy();
     m = null;
 
-    final PointerHierarchyRepresentationResult<D> result = new PointerHierarchyRepresentationResult<>(ids, pi, lambda);
-    result.addChildResult(new OrderingFromDataStore<>("SLINK order", "slink-order", processedIDs, lambda));
-    return result;
+    return new PointerHierarchyRepresentationResult<>(ids, pi, lambda);
   }
 
   /**
