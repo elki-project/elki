@@ -41,7 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
- * Result handler that feeds the data into a TextWriter
+ * Result handler that feeds the data into a TextWriter.
+ * 
+ * Note: these classes need to be rewritten. Contributions welcome!
  * 
  * @author Erich Schubert
  */
@@ -102,42 +104,35 @@ public class ResultWriter implements ResultHandler {
 
     StreamFactory output;
     try {
-      if(out == null) {
+      if (out == null) {
         output = new SingleStreamOutput(gzip);
-      }
-      else if(out.exists()) {
-        if(out.isDirectory()) {
-          if(warnoverwrite && out.listFiles().length > 0) {
+      } else if (out.exists()) {
+        if (out.isDirectory()) {
+          if (warnoverwrite && out.listFiles().length > 0) {
             LOG.warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
           }
           output = new MultipleFilesOutput(out, gzip);
-        }
-        else {
-          if(warnoverwrite) {
+        } else {
+          if (warnoverwrite) {
             LOG.warning("Output file exists and will be overwritten!");
           }
           output = new SingleStreamOutput(out, gzip);
         }
-      }
-      else {
+      } else {
         // If it doesn't exist yet, make a MultipleFilesOutput.
         output = new MultipleFilesOutput(out, gzip);
       }
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new IllegalStateException("Error opening output.", e);
     }
     try {
       Database db = ResultUtil.findDatabase(baseresult);
       writer.output(db, result, output);
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new IllegalStateException("Input/Output error while writing result.", e);
-    }
-    catch(UnableToComplyException e) {
+    } catch (UnableToComplyException e) {
       throw new IllegalStateException("Unable to comply while writing result.", e);
     }
-    output.closeAllStreams();
   }
 
   /**
@@ -167,17 +162,17 @@ public class ResultWriter implements ResultHandler {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       FileParameter outputP = new FileParameter(OutputStep.Parameterizer.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE, true);
-      if(config.grab(outputP)) {
+      if (config.grab(outputP)) {
         out = outputP.getValue();
       }
 
       Flag gzipF = new Flag(GZIP_OUTPUT_ID);
-      if(config.grab(gzipF)) {
+      if (config.grab(gzipF)) {
         gzip = gzipF.getValue();
       }
 
       Flag overwriteF = new Flag(OVERWRITE_OPTION_ID);
-      if(config.grab(overwriteF)) {
+      if (config.grab(overwriteF)) {
         // note: inversed meaning
         warnoverwrite = !overwriteF.getValue();
       }

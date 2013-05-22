@@ -25,14 +25,16 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 
 import java.io.PrintStream;
 
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 
 /**
  * Representation of an output stream to a text file.
  * 
  * @author Erich Schubert
- *
- * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory oneway - - wraps
+ * 
+ * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory oneway - -
+ *              wraps
  */
 public class TextWriterStream {
   /**
@@ -66,8 +68,8 @@ public class TextWriterStream {
   public static final String QUOTE = "# ";
 
   /**
-   * Comment separator line.
-   * Since this will be printed without {@link #QUOTE} infront, it should be quoted string itself. 
+   * Comment separator line. Since this will be printed without {@link #QUOTE}
+   * infront, it should be quoted string itself.
    */
   public static final String COMMENTSEP = "###############################################################";
 
@@ -80,12 +82,17 @@ public class TextWriterStream {
    * Marker used in text serialization (and re-parsing)
    */
   public static final String SER_MARKER = "Serialization class:";
-  
+
   /**
    * Force incomments flag
    */
   // TODO: solve this more gracefully
-  private boolean forceincomments = false; 
+  private boolean forceincomments = false;
+
+  /**
+   * Fallback writer, using toString.
+   */
+  private TextWriterObjectComment fallbackwriter = new TextWriterObjectComment();
 
   /**
    * Constructor.
@@ -99,7 +106,7 @@ public class TextWriterStream {
     inline = new StringBuilder();
     comment = new StringBuilder();
   }
-  
+
   /**
    * Print an object into the comments section
    * 
@@ -122,22 +129,21 @@ public class TextWriterStream {
   /**
    * Print a newline into the comments section.
    */
- public void commentPrintLn() {
+  public void commentPrintLn() {
     comment.append(NEWLINE);
   }
 
- /**
-  * Print a separator line in the comments section.
-  */
+  /**
+   * Print a separator line in the comments section.
+   */
   public void commentPrintSeparator() {
     comment.append(COMMENTSEP + NEWLINE);
   }
 
   /**
-   * Print data into the inline part of the file.
-   * Data is sanitized: newlines are replaced with spaces, and text
-   * containing separators is put in quotes. Quotes and escape characters
-   * are escaped.
+   * Print data into the inline part of the file. Data is sanitized: newlines
+   * are replaced with spaces, and text containing separators is put in quotes.
+   * Quotes and escape characters are escaped.
    * 
    * @param o object to print
    */
@@ -150,19 +156,19 @@ public class TextWriterStream {
       inline.append(SEPARATOR);
     }
     // remove newlines
-    String str = o.toString().replace(NEWLINE," ");
+    String str = o.toString().replace(NEWLINE, " ");
     // escaping
-    str = str.replace("\\","\\\\").replace("\"","\\\"");
+    str = str.replace("\\", "\\\\").replace("\"", "\\\"");
     // when needed, add quotes.
     if (str.contains(SEPARATOR)) {
-      str = "\""+str+"\"";
+      str = "\"" + str + "\"";
     }
     inline.append(str);
   }
 
   /**
-   * Print data into the inline part of the file WITHOUT checking for
-   * separators (and thus quoting).
+   * Print data into the inline part of the file WITHOUT checking for separators
+   * (and thus quoting).
    * 
    * @param o object to print.
    */
@@ -175,15 +181,14 @@ public class TextWriterStream {
       inline.append(SEPARATOR);
     }
     // remove newlines
-    String str = o.toString().replace(NEWLINE," ");
+    String str = o.toString().replace(NEWLINE, " ");
     // escaping
-    str = str.replace("\\","\\\\").replace("\"","\\\"");
+    str = str.replace("\\", "\\\\").replace("\"", "\\\"");
     inline.append(str);
   }
 
   /**
-   * Flush output:
-   * write inline data, then write comment section. Reset streams.
+   * Flush output: write inline data, then write comment section. Reset streams.
    */
   public void flush() {
     if (inline.length() > 0) {
@@ -220,13 +225,26 @@ public class TextWriterStream {
    * @return appropriate write, if available
    */
   public TextWriterWriterInterface<?> getWriterFor(Object o) {
-    return writers.getHandler(o);
+    if (o == null) {
+      return null;
+    }
+    TextWriterWriterInterface<?> writer = writers.getHandler(o);
+    if (writer == null) {
+      try {
+        if (o.getClass().getMethod("toString").getDeclaringClass() != Object.class) {
+          return fallbackwriter;
+        }
+      } catch (Exception e) {
+        return null;
+      }
+    }
+    return writer;
   }
 
   /**
-   * Restore a vector undoing any normalization that was applied.
-   * (This class does not support normalization, it is only provided
-   * by derived classes, which will then have to use generics.)
+   * Restore a vector undoing any normalization that was applied. (This class
+   * does not support normalization, it is only provided by derived classes,
+   * which will then have to use generics.)
    * 
    * @param <O> Object class
    * @param v vector to restore

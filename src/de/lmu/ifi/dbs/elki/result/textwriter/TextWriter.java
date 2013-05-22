@@ -62,7 +62,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleDoublePair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectArray;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
@@ -79,7 +78,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
- * Class to write a result to human-readable text output
+ * Class to write a result to human-readable text output.
+ * 
+ * Note: these classes need to be rewritten. Contributions welcome!
  * 
  * @author Erich Schubert
  * 
@@ -104,7 +105,6 @@ public class TextWriter {
    */
   static {
     TextWriterObjectInline trivialwriter = new TextWriterObjectInline();
-    writers.insertHandler(Object.class, new TextWriterObjectComment());
     writers.insertHandler(Pair.class, new TextWriterPair());
     writers.insertHandler(DoubleDoublePair.class, new TextWriterDoubleDoublePair());
     writers.insertHandler(Triple.class, new TextWriterTriple());
@@ -161,59 +161,6 @@ public class TextWriter {
   }
 
   /**
-   * Writes a header providing information concerning the underlying database
-   * and the specified parameter-settings.
-   * 
-   * @param out the print stream where to write
-   * @param sr the settings to be written into the header
-   */
-  protected void printSettings(TextWriterStream out, List<SettingsResult> sr) {
-    out.commentPrintSeparator();
-    out.commentPrintLn("Settings:");
-
-    if (sr != null) {
-      for (SettingsResult settings : sr) {
-        Object last = null;
-        for (Pair<Object, Parameter<?>> setting : settings.getSettings()) {
-          if (setting.first != last && setting.first != null) {
-            if (last != null) {
-              out.commentPrintLn("");
-            }
-            String name;
-            try {
-              if (setting.first instanceof Class) {
-                name = ((Class<?>) setting.first).getName();
-              } else {
-                name = setting.first.getClass().getName();
-              }
-              if (ClassParameter.class.isInstance(setting.first)) {
-                name = ((ClassParameter<?>) setting.first).getValue().getName();
-              }
-            } catch (NullPointerException e) {
-              name = "[null]";
-            }
-            out.commentPrintLn(name);
-            last = setting.first;
-          }
-          String name = setting.second.getOptionID().getName();
-          String value = "[unset]";
-          try {
-            if (setting.second.isDefined()) {
-              value = setting.second.getValueAsString();
-            }
-          } catch (NullPointerException e) {
-            value = "[null]";
-          }
-          out.commentPrintLn(SerializedParameterization.OPTION_PREFIX + name + " " + value);
-        }
-      }
-    }
-
-    out.commentPrintSeparator();
-    out.flush();
-  }
-
-  /**
    * Stream output.
    * 
    * @param db Database object
@@ -262,20 +209,22 @@ public class TextWriter {
       }
     }
 
+    writeSettingsResult(streamOpener, rs);
+
     for (IterableResult<?> rii : ri) {
-      writeIterableResult(streamOpener, rii, rs);
+      writeIterableResult(streamOpener, rii);
     }
     for (Clustering<?> c : rc) {
       NamingScheme naming = new SimpleEnumeratingScheme(c);
       for (Cluster<?> clus : c.getAllClusters()) {
-        writeClusterResult(db, streamOpener, (Clustering<Model>) c, (Cluster<Model>) clus, ra, naming, rs);
+        writeClusterResult(db, streamOpener, (Clustering<Model>) c, (Cluster<Model>) clus, ra, naming);
       }
     }
     for (OrderingResult ror : ro) {
-      writeOrderingResult(db, streamOpener, ror, ra, rs);
+      writeOrderingResult(db, streamOpener, ror, ra);
     }
     for (Result otherr : otherres) {
-      writeOtherResult(streamOpener, otherr, rs);
+      writeOtherResult(streamOpener, otherr);
     }
   }
 
@@ -320,24 +269,9 @@ public class TextWriter {
       }
     }
     out.flush();
-    out.flush();
   }
 
-  private void writeOtherResult(StreamFactory streamOpener, Result r, List<SettingsResult> rs) throws UnableToComplyException, IOException {
-    PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
-    TextWriterStream out = new TextWriterStream(outStream, writers);
-    TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
-    if (owriter == null) {
-      throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
-    }
-    // Write settings preamble
-    printSettings(out, rs);
-    // Write data
-    owriter.writeObject(out, null, r);
-    out.flush();
-  }
-
-  private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     if (naming != null) {
       filename = filenameFromLabel(naming.getNameFor(clus));
@@ -347,14 +281,15 @@ public class TextWriter {
 
     PrintStream outStream = streamOpener.openStream(getFilename(clus, filename));
     TextWriterStream out = new TextWriterStream(outStream, writers);
-    printSettings(out, sr);
 
     // Write cluster information
     out.commentPrintLn("Cluster: " + naming.getNameFor(clus));
     Model model = clus.getModel();
     if (model != ClusterModel.CLUSTER && model != null) {
-      TextWriterWriterInterface<?> mwri = writers.getHandler(model);
-      mwri.writeObject(out, null, model);
+      TextWriterWriterInterface<?> mwri = out.getWriterFor(model);
+      if (mwri != null) {
+        mwri.writeObject(out, null, model);
+      }
     }
     if (clustering.getClusterHierarchy().numParents(clus) > 0) {
       StringBuilder buf = new StringBuilder();
@@ -379,14 +314,13 @@ public class TextWriter {
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       printObject(out, db, iter, ra);
     }
-    out.commentPrintSeparator();
     out.flush();
+    streamOpener.closeStream(outStream);
   }
 
-  private void writeIterableResult(StreamFactory streamOpener, IterableResult<?> ri, List<SettingsResult> sr) throws UnableToComplyException, IOException {
+  private void writeIterableResult(StreamFactory streamOpener, IterableResult<?> ri) throws UnableToComplyException, IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(ri, ri.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
-    printSettings(out, sr);
 
     // hack to print collectionResult header information
     if (ri instanceof CollectionResult<?>) {
@@ -407,20 +341,85 @@ public class TextWriter {
       }
       out.flush();
     }
-    out.commentPrintSeparator();
     out.flush();
+    streamOpener.closeStream(outStream);
   }
 
-  private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<Relation<?>> ra, List<SettingsResult> sr) throws IOException, UnableToComplyException {
+  private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<Relation<?>> ra) throws IOException, UnableToComplyException {
     PrintStream outStream = streamOpener.openStream(getFilename(or, or.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
-    printSettings(out, sr);
 
     for (DBIDIter i = or.iter(or.getDBIDs()).iter(); i.valid(); i.advance()) {
       printObject(out, db, i, ra);
     }
-    out.commentPrintSeparator();
     out.flush();
+    streamOpener.closeStream(outStream);
+  }
+
+  private void writeSettingsResult(StreamFactory streamOpener, List<SettingsResult> rs) throws UnableToComplyException, IOException {
+    if (rs.size() < 1) {
+      return;
+    }
+    SettingsResult r = rs.get(0);
+    PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
+    TextWriterStream out = new TextWriterStream(outStream, writers);
+    // Write settings preamble
+    out.commentPrintLn("Settings:");
+    
+    if (rs != null) {
+      for (SettingsResult settings : rs) {
+        Object last = null;
+        for (Pair<Object, Parameter<?>> setting : settings.getSettings()) {
+          if (setting.first != last && setting.first != null) {
+            if (last != null) {
+              out.commentPrintLn("");
+            }
+            String name;
+            try {
+              if (setting.first instanceof Class) {
+                name = ((Class<?>) setting.first).getName();
+              } else {
+                name = setting.first.getClass().getName();
+              }
+              if (ClassParameter.class.isInstance(setting.first)) {
+                name = ((ClassParameter<?>) setting.first).getValue().getName();
+              }
+            } catch (NullPointerException e) {
+              name = "[null]";
+            }
+            out.commentPrintLn(name);
+            last = setting.first;
+          }
+          String name = setting.second.getOptionID().getName();
+          String value = "[unset]";
+          try {
+            if (setting.second.isDefined()) {
+              value = setting.second.getValueAsString();
+            }
+          } catch (NullPointerException e) {
+            value = "[null]";
+          }
+          out.commentPrintLn(SerializedParameterization.OPTION_PREFIX + name + " " + value);
+        }
+      }
+    }
+    out.flush();
+    streamOpener.closeStream(outStream);
+  }
+
+  private void writeOtherResult(StreamFactory streamOpener, Result r) throws UnableToComplyException, IOException {
+    if (writers.getHandler(r) != null) {
+      PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
+      TextWriterStream out = new TextWriterStream(outStream, writers);
+      TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
+      if (owriter == null) {
+        throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
+      }
+      // Write data
+      owriter.writeObject(out, null, r);
+      out.flush();
+      streamOpener.closeStream(outStream);
+    }
   }
 
   /**
