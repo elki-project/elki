@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 
 /**
  * Instance of a rKNN query for a particular spatial index.
@@ -72,6 +73,6 @@ public class MkTreeRKNNQuery<O, D extends NumberDistance<D, ?>> extends Abstract
   @Override
   public List<? extends DistanceDBIDList<D>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // TODO: implement
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 }

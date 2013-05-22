@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUti
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 
 /**
  * MkMax tree
@@ -117,7 +118,7 @@ public class MkMaxTreeIndex<O, D extends NumberDistance<D, ?>> extends MkMaxTree
    */
   @Override
   public final boolean delete(DBIDRef id) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   /**
@@ -129,7 +130,7 @@ public class MkMaxTreeIndex<O, D extends NumberDistance<D, ?>> extends MkMaxTree
    */
   @Override
   public void deleteAll(DBIDs ids) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   @SuppressWarnings("unchecked")

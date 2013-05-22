@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 
 /**
  * Kernel-based outlier detection.
@@ -154,7 +155,7 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
         }
         assert (k == kmax) : "K is " + k + " size: " + neighbors.size();
       } else {
-        throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+        throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
       }
     }
     // Compute scores:

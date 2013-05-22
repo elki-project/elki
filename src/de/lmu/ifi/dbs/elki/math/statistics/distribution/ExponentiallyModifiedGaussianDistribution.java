@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -190,7 +191,7 @@ public class ExponentiallyModifiedGaussianDistribution implements DistributionWi
   @Deprecated
   public static double quantile(double x, double mu, double sigma, double lambda) {
     // FIXME: implement!
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   /**
