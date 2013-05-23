@@ -127,6 +127,11 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
   private D threshold = null;
 
   /**
+   * Disallow singleton clusters, but add them to the parent cluster instead.
+   */
+  private boolean nosingletons = true;
+
+  /**
    * Constructor.
    * 
    * @param algorithm Algorithm to run
@@ -412,7 +417,6 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
     }
 
     // Extract the child clusters
-    int cnum = 0;
     int expcnum = ids.size() - split;
     WritableIntegerDataStore cluster_map = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
     ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<>(expcnum);
@@ -435,7 +439,7 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
         }
       } else {
         // Need to start a new cluster:
-        clusterid = cnum; // next cluster number.
+        clusterid = cluster_dbids.size(); // next cluster number.
         ModifiableDBIDs cids = DBIDUtil.newArray();
         // Add element and successor as initial members:
         cids.add(succ);
@@ -446,7 +450,6 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
         cluster_dbids.add(cids);
         cluster_leads.add(succ);
         cluster_dist.add(dist);
-        cnum++;
       }
 
       // Decrement counter
@@ -472,48 +475,108 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
         cluster_dist = null; // Invalidate
         cluster_dbids = null; // Invalidate
       }
-      // Process the upper part, bottom-up.
-      for (it.seek(split); it.valid(); it.advance()) {
-        int clusterid = cluster_map.intValue(it);
-        // The current cluster:
-        final Cluster<DendrogramModel<D>> clus;
-        if (clusterid >= 0) {
-          clus = clusters.get(clusterid);
-        } else {
-          clus = makeCluster(it, null, DBIDUtil.deref(it));
-        }
-        // The successor to join:
-        pi.assignVar(it, succ); // succ = pi(it)
-        if (DBIDUtil.equal(it, succ)) {
-          assert (root == null);
-          root = clus;
-        } else {
-          // Parent cluster:
-          int parentid = cluster_map.intValue(succ);
-          @SuppressWarnings("unchecked")
-          D depth = (D) new DoubleDistance(lambda.doubleValue(it));
-          // Parent cluster exists - merge as a new cluster:
-          if (parentid >= 0) {
-            final Cluster<DendrogramModel<D>> pclus = clusters.get(parentid);
-            if (pclus.size() <= 1 && pclus.getModel().getDistance().equals(depth)) {
-              dendrogram.addChildCluster(pclus, clus);
-            } else {
-              Cluster<DendrogramModel<D>> npclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
-              dendrogram.addChildCluster(npclus, pclus);
-              dendrogram.addChildCluster(npclus, clus);
-              clusters.set(parentid, npclus); // Replace existing parent cluster
-            }
+      if (nosingletons) {
+        // Process the upper part, bottom-up.
+        for (it.seek(split); it.valid(); it.advance()) {
+          int clusterid = cluster_map.intValue(it);
+          // The current cluster led by the current element:
+          final Cluster<DendrogramModel<D>> clus = (clusterid >= 0) ? clusters.get(clusterid) : null;
+          // The successor to join:
+          pi.assignVar(it, succ); // succ = pi(it)
+          if (DBIDUtil.equal(it, succ)) {
+            assert (root == null && clus != null);
+            root = clus;
           } else {
-            // Create a new, one-element cluster for parent, and a merged
-            // cluster on top.
-            parentid = cnum;
-            cnum++;
-            Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
-            dendrogram.addChildCluster(pclus, makeCluster(succ, null, DBIDUtil.deref(succ)));
-            dendrogram.addChildCluster(pclus, clus);
-            assert (clusters.size() == parentid);
-            clusters.add(pclus); // Remember parent cluster
-            cluster_map.putInt(succ, parentid); // Reference
+            // Parent cluster:
+            int parentid = cluster_map.intValue(succ);
+            @SuppressWarnings("unchecked")
+            D depth = (D) new DoubleDistance(lambda.doubleValue(it));
+            // Parent cluster exists - merge as a new cluster:
+            if (parentid >= 0) {
+              final Cluster<DendrogramModel<D>> pclus = clusters.get(parentid);
+              if (pclus.getModel().getDistance().equals(depth)) {
+                // If the current merging distance is the same, we shouldn't
+                // have created this cluster in the first place.
+                // The pointer representation requires every parent to be the
+                // last element at the given distance, i.e. uniquely defined.
+                assert (clus == null);
+                ((ModifiableDBIDs) pclus.getIDs()).add(it);
+              } else {
+                // Merge at new depth:
+                ModifiableDBIDs cids = DBIDUtil.newArray(clus == null ? 1 : 0);
+                if (clus == null) {
+                  cids.add(it);
+                }
+                Cluster<DendrogramModel<D>> npclus = makeCluster(succ, depth, cids);
+                if (clus != null) {
+                  dendrogram.addChildCluster(npclus, clus);
+                }
+                dendrogram.addChildCluster(npclus, pclus);
+                // Replace existing parent cluster: new depth
+                clusters.set(parentid, npclus);
+              }
+            } else {
+              // Merge with parent at this depth:
+              ModifiableDBIDs cids = DBIDUtil.newArray(clus == null ? 2 : 1);
+              cids.add(succ);
+              if (clus == null) {
+                cids.add(it);
+              }
+              // New cluster for parent:
+              Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, cids);
+              if (clus != null) {
+                dendrogram.addChildCluster(pclus, clus);
+              }
+              // Store cluster:
+              parentid = clusters.size();
+              clusters.add(pclus); // Remember parent cluster
+              cluster_map.putInt(succ, parentid); // Reference
+            }
+          }
+        }
+      } else {
+        // Process the upper part, bottom-up.
+        for (it.seek(split); it.valid(); it.advance()) {
+          int clusterid = cluster_map.intValue(it);
+          // The current cluster led by the current element:
+          final Cluster<DendrogramModel<D>> clus;
+          if (clusterid >= 0) {
+            clus = clusters.get(clusterid);
+          } else {
+            clus = makeCluster(it, null, DBIDUtil.deref(it));
+          }
+          // The successor to join:
+          pi.assignVar(it, succ); // succ = pi(it)
+          if (DBIDUtil.equal(it, succ)) {
+            assert (root == null);
+            root = clus;
+          } else {
+            // Parent cluster:
+            int parentid = cluster_map.intValue(succ);
+            @SuppressWarnings("unchecked")
+            D depth = (D) new DoubleDistance(lambda.doubleValue(it));
+            // Parent cluster exists - merge as a new cluster:
+            if (parentid >= 0) {
+              final Cluster<DendrogramModel<D>> pclus = clusters.get(parentid);
+              if (pclus.getModel().getDistance().equals(depth)) {
+                dendrogram.addChildCluster(pclus, clus);
+              } else {
+                Cluster<DendrogramModel<D>> npclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
+                dendrogram.addChildCluster(npclus, pclus);
+                dendrogram.addChildCluster(npclus, clus);
+                // Replace existing parent cluster: new depth
+                clusters.set(parentid, npclus);
+              }
+            } else {
+              // Create a new, one-element cluster for parent, and a merged
+              // cluster on top.
+              Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
+              dendrogram.addChildCluster(pclus, makeCluster(succ, null, DBIDUtil.deref(succ)));
+              dendrogram.addChildCluster(pclus, clus);
+              parentid = clusters.size();
+              clusters.add(pclus); // Remember parent cluster
+              cluster_map.putInt(succ, parentid); // Reference
+            }
           }
         }
 
@@ -576,15 +639,14 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
   private Cluster<DendrogramModel<D>> makeCluster(DBIDRef lead, D depth, DBIDs members) {
     final String name;
     if (members.size() == 0) {
-      name = "merge_" + DBIDUtil.toString(lead) + "_" + depth;
-    } else if (depth != null && depth.isInfiniteDistance() || members.size() == 1) {
-      assert (members.contains(lead));
-      name = "object_" + DBIDUtil.toString(lead);
+      name = "mrg_" + DBIDUtil.toString(lead) + "_" + depth;
+    } else if (depth != null && depth.isInfiniteDistance() || (members.size() == 1 && members.contains(lead))) {
+      name = "obj_" + DBIDUtil.toString(lead);
     } else if (depth != null) {
-      name = "cluster_" + DBIDUtil.toString(lead) + "_" + depth;
+      name = "clu_" + DBIDUtil.toString(lead) + "_" + depth;
     } else {
       // Complete data set only?
-      name = "cluster_" + DBIDUtil.toString(lead);
+      name = "clu_" + DBIDUtil.toString(lead);
     }
     Cluster<DendrogramModel<D>> cluster = new Cluster<>(name, members, new DendrogramModel<>(depth));
     return cluster;
