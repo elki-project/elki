@@ -38,11 +38,9 @@ import org.w3c.dom.events.EventTarget;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
@@ -102,7 +100,6 @@ public class KeyVisualization extends AbstractVisFactory {
           final double ratio = shape[0] * maxwidth / (2. + shape[1]);
           task.width = (ratio >= 1.) ? 1 : 1. / ratio;
           task.height = (ratio >= 1.) ? 1. / ratio : 1;
-          LoggingUtil.warning(FormatUtil.format(shape));
           if (shape[0] * maxwidth > 20 || shape[1] > 18) {
             task.width *= 2;
             task.height *= 2;
