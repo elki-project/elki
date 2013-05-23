@@ -481,8 +481,6 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
           clus = clusters.get(clusterid);
         } else {
           clus = makeCluster(it, null, DBIDUtil.deref(it));
-          // No need to store in clusters: cannot have another incoming pi
-          // pointer!
         }
         // The successor to join:
         pi.assignVar(it, succ); // succ = pi(it)
@@ -496,17 +494,22 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
           D depth = (D) new DoubleDistance(lambda.doubleValue(it));
           // Parent cluster exists - merge as a new cluster:
           if (parentid >= 0) {
-            Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
-            dendrogram.addChildCluster(pclus, clusters.get(parentid));
-            dendrogram.addChildCluster(pclus, clus);
-            clusters.set(parentid, pclus); // Replace existing parent cluster
+            final Cluster<DendrogramModel<D>> pclus = clusters.get(parentid);
+            if (pclus.size() <= 1 && pclus.getModel().getDistance().equals(depth)) {
+              dendrogram.addChildCluster(pclus, clus);
+            } else {
+              Cluster<DendrogramModel<D>> npclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
+              dendrogram.addChildCluster(npclus, pclus);
+              dendrogram.addChildCluster(npclus, clus);
+              clusters.set(parentid, npclus); // Replace existing parent cluster
+            }
           } else {
-            // Create a new, one-element, parent cluster.
+            // Create a new, one-element cluster for parent, and a merged
+            // cluster on top.
             parentid = cnum;
             cnum++;
-            ArrayModifiableDBIDs cids = DBIDUtil.newArray(1);
-            cids.add(succ);
-            Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, cids);
+            Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
+            dendrogram.addChildCluster(pclus, makeCluster(succ, null, DBIDUtil.deref(succ)));
             dendrogram.addChildCluster(pclus, clus);
             assert (clusters.size() == parentid);
             clusters.add(pclus); // Remember parent cluster
@@ -573,15 +576,15 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
   private Cluster<DendrogramModel<D>> makeCluster(DBIDRef lead, D depth, DBIDs members) {
     final String name;
     if (members.size() == 0) {
-      name = "merge_" + lead + "_" + depth;
-    } else if (depth != null && depth.isInfiniteDistance()) {
+      name = "merge_" + DBIDUtil.toString(lead) + "_" + depth;
+    } else if (depth != null && depth.isInfiniteDistance() || members.size() == 1) {
       assert (members.contains(lead));
-      name = "object_" + lead;
+      name = "object_" + DBIDUtil.toString(lead);
     } else if (depth != null) {
-      name = "cluster_" + lead + "_" + depth;
+      name = "cluster_" + DBIDUtil.toString(lead) + "_" + depth;
     } else {
       // Complete data set only?
-      name = "cluster_" + lead;
+      name = "cluster_" + DBIDUtil.toString(lead);
     }
     Cluster<DendrogramModel<D>> cluster = new Cluster<>(name, members, new DendrogramModel<>(depth));
     return cluster;
