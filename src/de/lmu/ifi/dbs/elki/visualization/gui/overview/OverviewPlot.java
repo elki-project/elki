@@ -210,6 +210,9 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     ResultHierarchy hier = context.getHierarchy();
     ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
     nextTask: for (VisualizationTask task : tasks) {
+      if (!task.visible) {
+        continue;
+      }
       for (Hierarchy.Iter<Result> iter = hier.iterParents(task); iter.valid(); iter.advance()) {
         if (iter.get() instanceof Projector) {
           continue nextTask;
@@ -556,6 +559,18 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   @Override
   public void resultChanged(Result current) {
     LOG.debug("result changed: " + current);
+    if (current instanceof VisualizationTask) {
+      boolean relayout = true;
+      for (Hierarchy.Iter<Result> iter = context.getHierarchy().iterParents(current); iter.valid(); iter.advance()) {
+        if (iter.get() instanceof Projector) {
+          relayout = false;
+          break;
+        }
+      }
+      if (relayout) {
+        reinitOnRefresh = true;
+      }
+    }
     lazyRefresh();
   }
 
