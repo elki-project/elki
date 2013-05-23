@@ -77,19 +77,60 @@ public class KeyVisualization extends AbstractVisFactory {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     for (Clustering<?> c : clusterings) {
       final int numc = c.getAllClusters().size();
+      final int topc = c.getToplevelClusters().size();
       if (numc > 0) {
-        // FIXME: compute from labels?
-        final double maxwidth = 10.;
         final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
-        final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
-        final int rows = (int) Math.ceil(numc / (double) cols);
-        final double ratio = cols * maxwidth / (2. + rows);
-        task.width = (ratio >= 1.) ? 1 : 1. / ratio;
-        task.height = (ratio >= 1.) ? 1. / ratio : 1;
+        if (numc == topc) {
+          // FIXME: compute from labels?
+          final double maxwidth = 10.;
+          // Flat clustering.
+          final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
+          final int rows = (int) Math.ceil(numc / (double) cols);
+          final double ratio = cols * maxwidth / (2. + rows);
+          task.width = (ratio >= 1.) ? 1 : 1. / ratio;
+          task.height = (ratio >= 1.) ? 1. / ratio : 1;
+          if (numc > 100) {
+            task.width *= 2;
+            task.height *= 2;
+          }
+        } else {
+          // Hierarchical clustering.
+          final int[] shape = findDepth(c);
+          final double maxwidth = 8.;
+          final double ratio = shape[0] * maxwidth / (2. + shape[1]);
+          task.width = (ratio >= 1.) ? 1 : 1. / ratio;
+          task.height = (ratio >= 1.) ? 1. / ratio : 1;
+          if (shape[0] > 10 || shape[1] > 10) {
+            task.width *= 2;
+            task.height *= 2;
+          }
+        }
         task.level = VisualizationTask.LEVEL_STATIC;
-        task.nodetail = true;
+        if (numc < 20) {
+          task.nodetail = true;
+        }
         baseResult.getHierarchy().add(c, task);
       }
+    }
+  }
+
+  private static <M extends Model> int[] findDepth(Clustering<M> c) {
+    final Hierarchy<Cluster<M>> hier = c.getClusterHierarchy();
+    int[] size = { 0, 0 };
+    for (Iter<Cluster<M>> iter = c.iterToplevelClusters(); iter.valid(); iter.advance()) {
+      findDepth(hier, iter.get(), size);
+    }
+    return size;
+  }
+
+  private static <M extends Model> void findDepth(Hierarchy<Cluster<M>> hier, Cluster<M> cluster, int[] size) {
+    if (hier.numChildren(cluster) > 0) {
+      for (Iter<Cluster<M>> iter = hier.iterChildren(cluster); iter.valid(); iter.advance()) {
+        findDepth(hier, iter.get(), size);
+      }
+      size[0] += 1; // Depth
+    } else {
+      size[1] += 1; // Leaves
     }
   }
 
