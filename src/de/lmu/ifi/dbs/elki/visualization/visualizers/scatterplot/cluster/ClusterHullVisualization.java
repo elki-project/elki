@@ -211,9 +211,19 @@ public class ClusterHullVisualization extends AbstractVisFactory {
         // For alpha shapes we can't use the shortcut of convex hulls,
         // but have to revisit all child clusters.
         for (Cluster<Model> clu : clusters) {
-          ArrayList<Vector> ps = new ArrayList<>(clu.size());
+          ArrayList<Vector> ps = new ArrayList<>();
           double weight = addRecursively(ps, hier, clu);
-          List<Polygon> polys = (new AlphaShape(ps, settings.alpha * Projection.SCALE)).compute();
+          List<Polygon> polys;
+          if (ps.size() < 1) {
+            continue;
+          }
+          if (ps.size() > 2) {
+            polys = (new AlphaShape(ps, settings.alpha * Projection.SCALE)).compute();
+          } else {
+            // Trivial polygon. Might still degenerate to a single point though.
+            polys = new ArrayList<>(1);
+            polys.add(new Polygon(ps));
+          }
           for (Polygon p : polys) {
             SVGPath path = new SVGPath(p);
             Element hulls = path.makeElement(svgp);
