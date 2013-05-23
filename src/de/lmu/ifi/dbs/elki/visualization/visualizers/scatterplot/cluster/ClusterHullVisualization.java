@@ -192,7 +192,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
         for (Cluster<Model> clu : clusters) {
           DoubleObjPair<Polygon> pair = hullmap.get(clu);
           // Plot the convex hull:
-          if (pair.second != null && pair.second.size() > 1) {
+          if (pair != null && pair.second != null && pair.second.size() > 1) {
             SVGPath path = new SVGPath(pair.second);
             // Approximate area (using bounding box)
             double hullarea = SpatialUtil.volume(pair.second);

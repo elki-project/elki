@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -169,6 +170,10 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
       Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
         Cluster<?> clus = ci.next();
+        final DBIDs ids = clus.getIDs();
+        if (ids.size() < 1) {
+          continue;
+        }
         for(int i = 0; i < dim; i++) {
           mms[i].reset();
           if(i < dim - 1) {
@@ -178,7 +183,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
         // Process points
         // TODO: do this just once, cache the result somewhere appropriately?
-        for(DBIDIter id = clus.getIDs().iter(); id.valid(); id.advance()) {
+        for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
           double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
           for(int i = 0; i < dim; i++) {
             mms[i].put(yPos[i]);
