@@ -39,7 +39,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Ecological monographs 27.4
  * </p>
  * 
- * Note: we modified the usual distance definition to return non-negative values.
+ * Note: we modified the usual definition of Bray-Curtis for use with negative
+ * values. In essence, this function is defined as:
+ * 
+ * ManhattanDistance(v1, v2) / (ManhattanNorm(v1) + ManhattanNorm(v2))
  * 
  * @author Erich Schubert
  */
@@ -71,9 +74,9 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDoubleDistanceFun
     for (int d = 0; d < dim1; d++) {
       double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       sumdiff += Math.abs(xd - yd);
-      sumsum += xd + yd;
+      sumsum += Math.abs(xd) + Math.abs(yd);
     }
-    return sumdiff / Math.abs(sumsum);
+    return sumdiff / sumsum;
   }
 
   @Override
@@ -96,9 +99,9 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDoubleDistanceFun
       } else {
         // Minimum difference is 0
       }
-      sumsum += max1 + max2;
+      sumsum += Math.max(-min1, max1) + Math.max(-min2, max2);
     }
-    return sumdiff / Math.abs(sumsum);
+    return sumdiff / sumsum;
   }
 
   /**
