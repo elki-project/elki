@@ -30,7 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Bray-Curtis distance function for vector spaces.
+ * Bray-Curtis distance function / Sørensen–Dice coefficient for continuous
+ * spaces.
  * 
  * Reference:
  * <p>
@@ -38,31 +39,68 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * An ordination of the upland forest communities of southern Wisconsin<br />
  * Ecological monographs 27.4
  * </p>
+ * Also:
+ * <p>
+ * T. Sørensen<br />
+ * A method of establishing groups of equal amplitude in plant sociology based
+ * on similarity of species and its application to analyses of the vegetation on
+ * Danish commons<br />
+ * Kongelige Danske Videnskabernes Selskab 5 (4)
+ * </p>
+ * and:
+ * <p>
+ * L. R. Dice<br />
+ * Measures of the Amount of Ecologic Association Between Species<br />
+ * Ecology 26 (3)
+ * </p>
+ * 
  * 
  * Note: we modified the usual definition of Bray-Curtis for use with negative
  * values. In essence, this function is defined as:
  * 
  * ManhattanDistance(v1, v2) / (ManhattanNorm(v1) + ManhattanNorm(v2))
  * 
+ * This obviously limits the usefulness of this distance function for cases
+ * where this kind of normalization is desired. In particular in low dimensional
+ * data it should be used with care.
+ * 
+ * TODO: add a version optimized for sparse vectors / binary data.
+ * 
  * @author Erich Schubert
  */
-@Alias({ "braycurtis", "sorensen" })
+@Alias({ "bray-curtis", "braycurtis", "sorensen", "dice", "sorensen-dice" })
 @Reference(authors = "J. R. Bray and J. T. Curtis", title = "An ordination of the upland forest communities of southern Wisconsin", booktitle = "Ecological monographs 27.4", url = "http://dx.doi.org/10.2307/1942268")
 public class BrayCurtisDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
   /**
    * Static instance.
    */
-  public static final BrayCurtisDistanceFunction STATIC = new BrayCurtisDistanceFunction();
+  public static final BrayCurtisDistanceFunction STATIC_CONTINUOUS = new BrayCurtisDistanceFunction();
 
   /**
    * Constructor.
    * 
-   * @deprecated Use {@link #STATIC} instance instead.
+   * @deprecated Use {@link #STATIC_CONTINUOUS} instance instead.
    */
   @Deprecated
   public BrayCurtisDistanceFunction() {
     super();
   }
+
+  /**
+   * Dummy method, just to attach a second reference.
+   */
+  @Reference(authors = "T. Sørensen", title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
+  static void secondReference() {
+    // Empty, just to attach a second reference
+  };
+
+  /**
+   * Dummy method, just to attach a third reference.
+   */
+  @Reference(authors = "L. R. Dice", title = "Measures of the Amount of Ecologic Association Between Species", booktitle = "Ecology 26 (3)")
+  static void thirdReference() {
+    // Empty, just to attach a second reference
+  };
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
@@ -114,7 +152,7 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDoubleDistanceFun
   public static class Parameterizer extends AbstractParameterizer {
     @Override
     protected BrayCurtisDistanceFunction makeInstance() {
-      return BrayCurtisDistanceFunction.STATIC;
+      return BrayCurtisDistanceFunction.STATIC_CONTINUOUS;
     }
   }
 }
