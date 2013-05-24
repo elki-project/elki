@@ -25,12 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -48,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Title("Color histogram intersection distance")
 @Description("Distance function for color histograms that emphasizes 'strong' bins.")
 @Reference(authors = "M. J. Swain, D. H. Ballard", title = "Color Indexing", booktitle = "International Journal of Computer Vision, 7(1), 32, 1991")
-public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
+public class HistogramIntersectionDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
   /**
    * Static instance
    */
@@ -65,20 +60,15 @@ public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleD
   }
 
   @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
-  }
-
-  @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim1 = v1.getDimensionality();
-    if(dim1 != v2.getDimensionality()) {
+    if (dim1 != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
     double dist = 0;
     double norm1 = 0;
     double norm2 = 0;
-    for(int i = 0; i < dim1; i++) {
+    for (int i = 0; i < dim1; i++) {
       final double val1 = v1.doubleValue(i);
       final double val2 = v2.doubleValue(i);
       dist += Math.min(val1, val2);
@@ -92,13 +82,13 @@ public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleD
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality();
-    if(dim1 != mbr2.getDimensionality()) {
+    if (dim1 != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n" + mbr1.getDimensionality() + "!=" + mbr2.getDimensionality());
     }
     double dist = 0;
     double norm1 = 0;
     double norm2 = 0;
-    for(int i = 0; i < dim1; i++) {
+    for (int i = 0; i < dim1; i++) {
       final double min1 = mbr1.getMin(i);
       final double max1 = mbr1.getMax(i);
       final double min2 = mbr2.getMin(i);
@@ -112,18 +102,13 @@ public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleD
   }
 
   @Override
-  public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<>(relation, this);
-  }
-
-  @Override
   public String toString() {
     return "HistogramIntersectionDistance";
   }
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
     return this.getClass().equals(obj.getClass());

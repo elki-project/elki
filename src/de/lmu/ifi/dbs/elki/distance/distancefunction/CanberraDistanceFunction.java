@@ -24,10 +24,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -47,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Reference(authors = "G. N. Lance, W. T. Williams", title = "Computer programs for hierarchical polythetic classification (similarity analysis).", booktitle = "Computer Journal, Volume 9, Issue 1", url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
 @Alias({ "canberra" })
-public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
+public class CanberraDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -102,20 +98,10 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   }
 
   @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
-  }
-
-  @Override
   public boolean isMetric() {
     // As this is also reffered to as "canberra metric", it is probably a metric
     // But *maybe* only for positive numbers only?
     return true;
-  }
-
-  @Override
-  public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
 
   /**

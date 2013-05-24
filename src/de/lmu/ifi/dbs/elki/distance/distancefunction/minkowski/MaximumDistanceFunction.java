@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Alias({ "maximum", "max", "chebyshev", "de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction" })
-public class MaximumDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
+public class MaximumDistanceFunction extends LPNormDistanceFunction {
   /**
    * Static instance.
    */
@@ -56,11 +55,11 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim1 = v1.getDimensionality();
-    if(dim1 != v2.getDimensionality()) {
+    if (dim1 != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
     double max = 0;
-    for(int i = 0; i < dim1; i++) {
+    for (int i = 0; i < dim1; i++) {
       final double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       max = Math.max(d, max);
     }
@@ -71,7 +70,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double max = 0;
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       max = Math.max(v.doubleValue(i), max);
     }
     return max;
@@ -80,19 +79,17 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality();
-    if(dim1 != mbr2.getDimensionality()) {
+    if (dim1 != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects.");
     }
     double max = 0;
-    for(int i = 0; i < dim1; i++) {
+    for (int i = 0; i < dim1; i++) {
       final double d;
-      if(mbr1.getMax(i) < mbr2.getMin(i)) {
+      if (mbr1.getMax(i) < mbr2.getMin(i)) {
         d = mbr2.getMin(i) - mbr1.getMin(i);
-      }
-      else if(mbr1.getMin(i) > mbr2.getMax(i)) {
+      } else if (mbr1.getMin(i) > mbr2.getMax(i)) {
         d = mbr1.getMin(i) - mbr2.getMax(i);
-      }
-      else {
+      } else {
         // The object overlap in this dimension.
         continue;
       }
@@ -113,13 +110,13 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(obj == this) {
+    if (obj == this) {
       return true;
     }
-    if(this.getClass().equals(obj.getClass())) {
+    if (this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);

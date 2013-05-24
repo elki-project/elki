@@ -25,10 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -44,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
-public class LorentzianDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
+public class LorentzianDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   /**
    * Static instance.
    */
@@ -86,11 +82,6 @@ public class LorentzianDistanceFunction extends AbstractVectorDoubleDistanceNorm
   }
 
   @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
-  }
-
-  @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if (mbr1 instanceof NumberVector && mbr2 instanceof NumberVector) {
       return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
@@ -115,11 +106,6 @@ public class LorentzianDistanceFunction extends AbstractVectorDoubleDistanceNorm
       sum += Math.log(1 + diff);
     }
     return sum;
-  }
-
-  @Override
-  public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
 
   /**
