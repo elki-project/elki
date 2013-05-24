@@ -38,4 +38,5 @@ de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering1
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering2
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering3
+tutorial.clustering.NaiveAgglomerativeHierarchicalClustering4
 tutorial.outlier.DistanceStddevOutlier

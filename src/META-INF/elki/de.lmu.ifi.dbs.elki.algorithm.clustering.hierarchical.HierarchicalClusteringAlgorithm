@@ -1,2 +1,3 @@
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
+tutorial.clustering.NaiveAgglomerativeHierarchicalClustering4
