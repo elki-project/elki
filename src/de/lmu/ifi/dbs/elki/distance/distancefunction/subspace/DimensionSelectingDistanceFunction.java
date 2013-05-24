@@ -27,10 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceNorm;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -44,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  */
-public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?>, DoubleDistance> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
+public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   /**
    * Parameter for dimensionality.
    */
@@ -76,7 +73,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
    */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    if(dim >= v1.getDimensionality() || dim >= v2.getDimensionality() || dim < 0) {
+    if (dim >= v1.getDimensionality() || dim >= v2.getDimensionality() || dim < 0) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
 
@@ -86,20 +83,18 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if(dim >= mbr1.getDimensionality() || dim >= mbr2.getDimensionality() || dim < 0) {
+    if (dim >= mbr1.getDimensionality() || dim >= mbr2.getDimensionality() || dim < 0) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
 
     double m1, m2;
-    if(mbr1.getMax(dim) < mbr2.getMin(dim)) {
+    if (mbr1.getMax(dim) < mbr2.getMin(dim)) {
       m1 = mbr1.getMax(dim);
       m2 = mbr2.getMin(dim);
-    }
-    else if(mbr1.getMin(dim) > mbr2.getMax(dim)) {
+    } else if (mbr1.getMin(dim) > mbr2.getMax(dim)) {
       m1 = mbr1.getMin(dim);
       m2 = mbr2.getMax(dim);
-    }
-    else { // The mbrs intersect!
+    } else { // The mbrs intersect!
       m1 = 0;
       m2 = 0;
     }
@@ -109,13 +104,8 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   }
 
   @Override
-  public DoubleDistance distance(NumberVector<?> o1, NumberVector<?> o2) {
-    return new DoubleDistance(doubleDistance(o1, o2));
-  }
-
-  @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
+  public double doubleNorm(NumberVector<?> obj) {
+    return Math.abs(obj.doubleValue(dim));
   }
 
   /**
@@ -138,21 +128,16 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   }
 
   @Override
-  public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new SpatialPrimitiveDistanceQuery<>(database, this);
-  }
-
-  @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(!this.getClass().equals(obj.getClass())) {
+    if (!this.getClass().equals(obj.getClass())) {
       return false;
     }
     return this.dim == ((DimensionSelectingDistanceFunction) obj).dim;
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -168,7 +153,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
       super.makeOptions(config);
       final IntParameter dimP = new IntParameter(DIM_ID);
       dimP.addConstraint(new GreaterEqualConstraint(0));
-      if(config.grab(dimP)) {
+      if (config.grab(dimP)) {
         dim = dimP.getValue();
       }
     }

@@ -25,10 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -43,11 +39,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Ecological monographs 27.4
  * </p>
  * 
+ * Note: we modified the usual distance definition to return non-negative values.
+ * 
  * @author Erich Schubert
  */
 @Alias({ "braycurtis", "sorensen" })
 @Reference(authors = "J. R. Bray and J. T. Curtis", title = "An ordination of the upland forest communities of southern Wisconsin", booktitle = "Ecological monographs 27.4", url = "http://dx.doi.org/10.2307/1942268")
-public class BrayCurtisDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
+public class BrayCurtisDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
   /**
    * Static instance.
    */
@@ -75,12 +73,7 @@ public class BrayCurtisDistanceFunction extends AbstractVectorDoubleDistanceFunc
       sumdiff += Math.abs(xd - yd);
       sumsum += xd + yd;
     }
-    return sumdiff / sumsum;
-  }
-
-  @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
+    return sumdiff / Math.abs(sumsum);
   }
 
   @Override
@@ -105,12 +98,7 @@ public class BrayCurtisDistanceFunction extends AbstractVectorDoubleDistanceFunc
       }
       sumsum += max1 + max2;
     }
-    return sumdiff / sumsum;
-  }
-
-  @Override
-  public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<>(relation, this);
+    return sumdiff / Math.abs(sumsum);
   }
 
   /**
