@@ -7,8 +7,12 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.RandomStableDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.BrayCurtisDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.ClarkDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.JeffreyDivergenceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.LorentzianDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.SharedNearestNeighborJaccardDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction

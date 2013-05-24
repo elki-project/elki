@@ -1,5 +1,7 @@
 de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski1SimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski2SimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.InvertedDistanceSimilarityFunction
 # de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.FooKernelFunction
 # de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction
