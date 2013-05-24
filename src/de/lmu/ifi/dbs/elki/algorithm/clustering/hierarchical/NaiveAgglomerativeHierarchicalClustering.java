@@ -174,6 +174,9 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
       // Avoid allocating memory, by reusing existing iterators:
       ix.seek(x);
       iy.seek(y);
+      if (LOG.isDebuggingFine()) {
+        LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy));
+      }
       // Perform merge in data structure: x -> y
       // Since y < x, prefer keeping y, dropping x.
       lambda.put(ix, mindist);
@@ -190,35 +193,32 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
 
       ij.seek(0);
       // Write to (y, j), with j < y
-      while (ij.getOffset() < y) {
+      for (; ij.getOffset() < y; ij.advance()) {
         if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int sizej = csize.intValue(ij);
         scratch[ybase + ij.getOffset()] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[ybase + ij.getOffset()], sizej, mindist);
-        ij.advance();
       }
       ij.advance(); // Skip y
       // Write to (j, y), with y < j < x
-      while (ij.getOffset() < x) {
+      for (; ij.getOffset() < x; ij.advance()) {
         if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int jbase = triangleSize(ij.getOffset());
         final int sizej = csize.intValue(ij);
         scratch[jbase + y] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[jbase + y], sizej, mindist);
-        ij.advance();
       }
       ij.advance(); // Skip x
       // Write to (j, y), with y < x < j
-      while (ij.valid()) {
+      for (; ij.valid(); ij.advance()) {
         if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int sizej = csize.intValue(ij);
         final int jbase = triangleSize(ij.getOffset());
         scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], sizej, mindist);
-        ij.advance();
       }
       if (prog != null) {
         prog.incrementProcessed(LOG);
