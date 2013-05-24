@@ -24,6 +24,12 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -39,8 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
+@Alias({ "braycurtis", "sorensen" })
 @Reference(authors = "J. R. Bray and J. T. Curtis", title = "An ordination of the upland forest communities of southern Wisconsin", booktitle = "Ecological monographs 27.4", url = "http://dx.doi.org/10.2307/1942268")
-public class BrayCurtisDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class BrayCurtisDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance.
    */
@@ -63,12 +70,47 @@ public class BrayCurtisDistanceFunction extends AbstractVectorDoubleDistanceFunc
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
     double sumdiff = 0., sumsum = 0.;
-    for (int i = 0; i < dim1; i++) {
-      double xi = v1.doubleValue(i), yi = v2.doubleValue(i);
-      sumdiff += Math.abs(xi - yi);
-      sumsum += xi + yi;
+    for (int d = 0; d < dim1; d++) {
+      double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      sumdiff += Math.abs(xd - yd);
+      sumsum += xd + yd;
     }
     return sumdiff / sumsum;
+  }
+
+  @Override
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
+  }
+
+  @Override
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    if (mbr1 instanceof NumberVector && mbr2 instanceof NumberVector) {
+      return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+    }
+    final int dim1 = mbr1.getDimensionality();
+    if (dim1 != mbr2.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n" + mbr1.getDimensionality() + "!=" + mbr2.getDimensionality());
+    }
+    double sumdiff = 0., sumsum = 0.;
+    for (int d = 0; d < dim1; d++) {
+      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
+      final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
+      if (max1 < min2) {
+        sumdiff += min2 - max1;
+      } else if (min1 > max2) {
+        sumdiff += min1 - max2;
+      } else {
+        // Minimum difference is 0
+      }
+      sumsum += max1 + max2;
+    }
+    return sumdiff / sumsum;
+  }
+
+  @Override
+  public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+    return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
 
   /**
