@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.SpatialComparator;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialSingleMinComparator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -46,7 +46,7 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
    * Logger.
    */
   private static final Logging LOG = Logging.getLogger(MaxExtensionBulkSplit.class);
-  
+
   /**
    * Static instance
    */
@@ -73,37 +73,37 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
     List<List<N>> partitions = new ArrayList<>();
     List<N> objects = new ArrayList<>(spatialObjects);
 
-    while(objects.size() > 0) {
+    while (objects.size() > 0) {
       StringBuilder msg = new StringBuilder();
 
       // get the split axis and split point
       int splitAxis = chooseMaximalExtendedSplitAxis(objects);
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
-      if(LOG.isDebugging()) {
+      if (LOG.isDebugging()) {
         msg.append("\nsplitAxis ").append(splitAxis);
         msg.append("\nsplitPoint ").append(splitPoint);
       }
 
       // sort in the right dimension
-      Collections.sort(objects, new SpatialComparator(splitAxis, SpatialComparator.MIN));
+      Collections.sort(objects, new SpatialSingleMinComparator(splitAxis));
 
       // insert into partition
       List<N> partition1 = new ArrayList<>();
-      for(int i = 0; i < splitPoint; i++) {
+      for (int i = 0; i < splitPoint; i++) {
         N o = objects.remove(0);
         partition1.add(o);
       }
       partitions.add(partition1);
 
       // copy array
-      if(LOG.isDebugging()) {
+      if (LOG.isDebugging()) {
         msg.append("\ncurrent partition ").append(partition1);
         msg.append("\nremaining objects # ").append(objects.size());
         LOG.debugFine(msg.toString());
       }
     }
 
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       LOG.debugFine("partitions " + partitions);
     }
     return partitions;
@@ -124,17 +124,17 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
     Arrays.fill(minExtension, Double.MAX_VALUE);
 
     // compute min and max value in each dimension
-    for(SpatialComparable object : objects) {
-      for(int d = 0; d < dimension; d++) {
+    for (SpatialComparable object : objects) {
+      for (int d = 0; d < dimension; d++) {
         double min, max;
         min = object.getMin(d);
         max = object.getMax(d);
 
-        if(maxExtension[d] < max) {
+        if (maxExtension[d] < max) {
           maxExtension[d] = max;
         }
 
-        if(minExtension[d] > min) {
+        if (minExtension[d] > min) {
           minExtension[d] = min;
         }
       }
@@ -143,9 +143,9 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
     // set split axis to dim with maximal extension
     int splitAxis = -1;
     double max = 0;
-    for(int d = 0; d < dimension; d++) {
+    for (int d = 0; d < dimension; d++) {
       double currentExtension = maxExtension[d] - minExtension[d];
-      if(max < currentExtension) {
+      if (max < currentExtension) {
         max = currentExtension;
         splitAxis = d;
       }

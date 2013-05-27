@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialSingleMeanComparator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -56,7 +56,7 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
     final int dims = spatialObjects.get(0).getDimensionality();
     final int p = (int) Math.ceil(spatialObjects.size() / (double) maxEntries);
     List<List<T>> ret = new ArrayList<>(p);
-    strPartition(spatialObjects, 0, spatialObjects.size(), 0, dims, maxEntries, new Compare<T>(), ret);
+    strPartition(spatialObjects, 0, spatialObjects.size(), 0, dims, maxEntries, new SpatialSingleMeanComparator(0), ret);
     return ret;
   }
 
@@ -73,7 +73,7 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
    * @param ret Output list
    * @param <T> data type
    */
-  protected <T extends SpatialComparable> void strPartition(List<T> objs, int start, int end, int depth, int dims, int maxEntries, Compare<T> c, List<List<T>> ret) {
+  protected <T extends SpatialComparable> void strPartition(List<T> objs, int start, int end, int depth, int dims, int maxEntries, SpatialSingleMeanComparator c, List<List<T>> ret) {
     final int p = (int) Math.ceil((end - start) / (double) maxEntries);
     final int s = (int) Math.ceil(Math.pow(p, 1.0 / (dims - depth)));
 
@@ -84,7 +84,7 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
       int e2 = start + (int) (((i + 1) * len) / s);
       // LoggingUtil.warning("STR " + dim + " s2:" + s2 + " e2:" + e2);
       if (e2 < end) {
-        c.dim = depth;
+        c.setDimension(depth);
         QuickSelect.quickSelect(objs, c, s2, end, e2);
       }
       if (depth + 1 == dims) {
@@ -93,29 +93,6 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
         // Descend
         strPartition(objs, s2, e2, depth + 1, dims, maxEntries, c, ret);
       }
-    }
-  }
-
-  /**
-   * Comparison helper.
-   * 
-   * @apiviz.exclude
-   * 
-   * @author Erich Schubert
-   * 
-   * @param <T> Type
-   */
-  private static class Compare<T extends SpatialComparable> implements Comparator<T> {
-    /**
-     * Current dimension.
-     */
-    int dim;
-
-    @Override
-    public int compare(T o1, T o2) {
-      final double v1 = o1.getMin(dim) + o1.getMax(dim);
-      final double v2 = o2.getMin(dim) + o2.getMax(dim);
-      return Double.compare(v1, v2);
     }
   }
 
@@ -131,6 +108,5 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
     protected SortTileRecursiveBulkSplit makeInstance() {
       return STATIC;
     }
-
   }
 }

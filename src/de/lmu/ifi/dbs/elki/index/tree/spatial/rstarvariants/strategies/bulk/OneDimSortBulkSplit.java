@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialSingleMeanComparator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -59,14 +59,7 @@ public class OneDimSortBulkSplit extends AbstractBulkSplit {
   @Override
   public <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries) {
     // Sort by first dimension
-    Collections.sort(spatialObjects, new Comparator<SpatialComparable>() {
-      @Override
-      public int compare(SpatialComparable o1, SpatialComparable o2) {
-        double min1 = (o1.getMax(0) + o1.getMin(0)) * .5;
-        double min2 = (o2.getMax(0) + o2.getMin(0)) * .5;
-        return Double.compare(min1, min2);
-      }
-    });
+    Collections.sort(spatialObjects, new SpatialSingleMeanComparator(0));
     return trivialPartition(spatialObjects, minEntries, maxEntries);
   }
 

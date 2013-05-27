@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
+package de.lmu.ifi.dbs.elki.data.spatial;
 
 /*
  This file is part of ELKI:
@@ -22,36 +22,41 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import java.util.Comparator;
 
 /**
- * Access the entries of a node as array-like.
+ * Comparator for sorting spatial objects by the maximum value in a single
+ * dimension.
  * 
  * @author Erich Schubert
  */
-public class NodeArrayAdapter implements ArrayAdapter<SpatialEntry, AbstractNode<? extends SpatialEntry>> {
+public class SpatialSingleMaxComparator implements Comparator<SpatialComparable> {
   /**
-   * Static adapter.
+   * Current dimension.
    */
-  public static NodeArrayAdapter STATIC = new NodeArrayAdapter();
+  int dim;
 
   /**
    * Constructor.
+   *
+   * @param dim Dimension to sort by.
    */
-  protected NodeArrayAdapter() {
+  public SpatialSingleMaxComparator(int dim) {
     super();
+    this.dim = dim;
+  }
+
+  /**
+   * Set the dimension to sort by.
+   * 
+   * @param dim Dimension
+   */
+  public void setDimension(int dim) {
+    this.dim = dim;
   }
 
   @Override
-  public int size(AbstractNode<? extends SpatialEntry> array) {
-    return array.getNumEntries();
-  }
-
-  @Override
-  public SpatialEntry get(AbstractNode<? extends SpatialEntry> array, int off) throws IndexOutOfBoundsException {
-    return array.getEntry(off);
+  public int compare(SpatialComparable o1, SpatialComparable o2) {
+    return Double.compare(o1.getMax(dim), o2.getMax(dim));
   }
 }
