@@ -1,5 +1,6 @@
 de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI
 de.lmu.ifi.dbs.elki.application.KDDCLIApplication
+de.lmu.ifi.dbs.elki.gui.multistep.MultiStepGUI
 de.lmu.ifi.dbs.elki.application.GeneratorXMLSpec
 de.lmu.ifi.dbs.elki.application.ConvertToBundleApplication
 de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceInOnDiskMatrix
