@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.BitSet;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -41,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  */
-public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
+public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDistanceNorm implements DimensionSelectingSubspaceDistanceFunction<NumberVector<?>, DoubleDistance> {
   /**
    * Parameter for dimensionality.
    */
@@ -115,6 +117,25 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
    */
   public int getSelectedDimension() {
     return dim;
+  }
+
+  @Override
+  @Deprecated
+  public BitSet getSelectedDimensions() {
+    BitSet bs = new BitSet(dim + 1);
+    bs.set(dim);
+    return bs;
+  }
+
+  @Override
+  public void setSelectedDimensions(BitSet dimensions) {
+    dim = dimensions.nextSetBit(0);
+    if (dim == -1) {
+      throw new IllegalStateException("No dimension was set.");
+    }
+    if (dimensions.nextSetBit(dim + 1) > 0) {
+      throw new IllegalStateException("More than one dimension was set.");
+    }
   }
 
   @Override
