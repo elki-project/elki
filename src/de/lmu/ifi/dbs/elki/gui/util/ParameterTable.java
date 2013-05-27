@@ -33,16 +33,23 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.BitSet;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
@@ -173,22 +180,24 @@ public class ParameterTable extends JTable {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-      if (row < parameters.size()) {
-        BitSet flags = parameters.getNode(row).flags;
-        // TODO: don't hardcode black - maybe mix the other colors, too?
-        c.setForeground(Color.BLACK);
-        if ((flags.get(DynamicParameters.BIT_INVALID))) {
-          c.setBackground(COLOR_SYNTAX_ERROR);
-        } else if ((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
-          c.setBackground(COLOR_SYNTAX_ERROR);
-        } else if ((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
-          c.setBackground(COLOR_INCOMPLETE);
-        } else if ((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
-          c.setBackground(COLOR_DEFAULT_VALUE);
-        } else if ((flags.get(DynamicParameters.BIT_OPTIONAL))) {
-          c.setBackground(COLOR_OPTIONAL);
-        } else {
-          c.setBackground(null);
+      if (!hasFocus) {
+        if (row < parameters.size()) {
+          BitSet flags = parameters.getNode(row).flags;
+          // TODO: don't hardcode black - maybe mix the other colors, too?
+          c.setForeground(Color.BLACK);
+          if ((flags.get(DynamicParameters.BIT_INVALID))) {
+            c.setBackground(COLOR_SYNTAX_ERROR);
+          } else if ((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
+            c.setBackground(COLOR_SYNTAX_ERROR);
+          } else if ((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
+            c.setBackground(COLOR_INCOMPLETE);
+          } else if ((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
+            c.setBackground(COLOR_DEFAULT_VALUE);
+          } else if ((flags.get(DynamicParameters.BIT_OPTIONAL))) {
+            c.setBackground(COLOR_OPTIONAL);
+          } else {
+            c.setBackground(null);
+          }
         }
       }
       return c;
@@ -207,6 +216,11 @@ public class ParameterTable extends JTable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * We need a panel to ensure focusing.
+     */
+    final JPanel panel;
+
+    /**
      * Combo box to use
      */
     private final JComboBox<String> comboBox;
@@ -219,11 +233,13 @@ public class ParameterTable extends JTable {
     public DropdownEditor(JComboBox<String> comboBox) {
       super(comboBox);
       this.comboBox = comboBox;
+      panel = new DispatchingPanel(comboBox);
+      panel.setLayout(new BorderLayout());
+      panel.add(comboBox, BorderLayout.CENTER);
     }
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-      Component c = super.getTableCellEditorComponent(table, value, isSelected, row, column);
       // remove old contents
       comboBox.removeAllItems();
       // Put the current value in first.
@@ -273,7 +289,7 @@ public class ParameterTable extends JTable {
         }
         // No completion for others
       }
-      return c;
+      return panel;
     }
   }
 
@@ -291,7 +307,7 @@ public class ParameterTable extends JTable {
     /**
      * We need a panel to put our components on.
      */
-    final JPanel panel = new JPanel();
+    final JPanel panel;
 
     /**
      * Text field to store the name
@@ -313,6 +329,7 @@ public class ParameterTable extends JTable {
      */
     public FileNameEditor() {
       button.addActionListener(this);
+      panel = new DispatchingPanel(textfield);
       panel.setLayout(new BorderLayout());
       panel.add(textfield, BorderLayout.CENTER);
       panel.add(button, BorderLayout.EAST);
@@ -336,6 +353,7 @@ public class ParameterTable extends JTable {
         textfield.setText(new File(fc.getDirectory(), filename).getPath());
       }
       fc.dispose();
+      textfield.requestFocus();
 
       // Swing file chooser. Currently much worse on Linux/GTK.
       // final JFileChooser fc = new JFileChooser(new File("."));
@@ -384,6 +402,7 @@ public class ParameterTable extends JTable {
           }
         }
       }
+      textfield.requestFocus();
       return panel;
     }
   }
@@ -402,7 +421,7 @@ public class ParameterTable extends JTable {
     /**
      * We need a panel to put our components on.
      */
-    final JPanel panel = new JPanel();
+    final JPanel panel;
 
     /**
      * Text field to store the name
@@ -433,6 +452,8 @@ public class ParameterTable extends JTable {
       combo.setEditable(true);
       combo.addActionListener(this);
       popup = new SuperPopup(combo);
+
+      panel = new DispatchingPanel(textfield);
 
       panel.setLayout(new BorderLayout());
       panel.add(textfield, BorderLayout.CENTER);
@@ -660,4 +681,55 @@ public class ParameterTable extends JTable {
       return plaintextEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
   }
+
+  /**
+   * This is a panel that will dispatch keystrokes to a particular component.
+   * 
+   * This makes the tabular GUI much more user friendly.
+   * 
+   * @author Erich Schubert
+   */
+  private class DispatchingPanel extends JPanel {
+    /**
+     * Serial version.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Component to dispatch to.
+     */
+    protected JComponent component;
+
+    /**
+     * Constructor.
+     * 
+     * @param component Component to dispatch to.
+     */
+    public DispatchingPanel(JComponent component) {
+      super();
+      this.component = component;
+      setRequestFocusEnabled(true);
+    }
+
+    @Override
+    public void addNotify() {
+      super.addNotify();
+      component.requestFocus();
+    }
+
+    @Override
+    protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+      InputMap map = component.getInputMap(condition);
+      ActionMap am = component.getActionMap();
+
+      if (map != null && am != null && isEnabled()) {
+        Object binding = map.get(ks);
+        Action action = (binding == null) ? null : am.get(binding);
+        if (action != null) {
+          return SwingUtilities.notifyAction(action, ks, e, component, e.getModifiers());
+        }
+      }
+      return false;
+    }
+  };
 }
