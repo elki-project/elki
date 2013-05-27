@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
 import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -78,6 +79,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @apiviz.owns ParameterTable
  * @apiviz.owns DynamicParameters
  */
+@Alias({"mini", "minigui"})
 public class MiniGUI extends AbstractApplication {
   /**
    * Filename for saved settings.
