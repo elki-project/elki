@@ -28,6 +28,8 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 
 /**
  * Class to launch ELKI.
@@ -48,20 +50,7 @@ public class ELKILauncher {
   public static void main(String[] args) {
     if (args.length > 0 && args[0].charAt(0) != '-') {
       try {
-        Class<?> cls = Class.forName(args[0]);
-        Method m = cls.getMethod("main", String[].class);
-        Object a = Arrays.copyOfRange(args, 1, args.length);
-        try {
-          m.invoke(null, a);
-        } catch (Exception e) {
-          LoggingUtil.exception(e);
-        }
-        return;
-      } catch (Exception e) {
-        // Ignore
-      }
-      try {
-        Class<?> cls = Class.forName(AbstractApplication.class.getPackage().getName() + '.' + args[0]);
+        Class<?> cls = findMainClass(args[0]);
         Method m = cls.getMethod("main", String[].class);
         Object a = Arrays.copyOfRange(args, 1, args.length);
         try {
@@ -80,5 +69,36 @@ public class ELKILauncher {
     } catch (Exception e) {
       LoggingUtil.exception(e);
     }
+  }
+
+  /**
+   * Find a class for the given name.
+   * 
+   * @param name Class name
+   * @return Class
+   * @throws ClassNotFoundException
+   */
+  private static Class<?> findMainClass(String name) throws ClassNotFoundException {
+    try {
+      return Class.forName(name);
+    } catch (ClassNotFoundException e) {
+      // pass
+    }
+    try {
+      return Class.forName(AbstractApplication.class.getPackage().getName() + '.' + name);
+    } catch (ClassNotFoundException e) {
+      // pass
+    }
+    for (Class<?> c : InspectionUtil.cachedFindAllImplementations(AbstractApplication.class)) {
+      if (c.isAnnotationPresent(Alias.class)) {
+        Alias aliases = c.getAnnotation(Alias.class);
+        for (String alias : aliases.value()) {
+          if (alias.equalsIgnoreCase(name)) {
+            return c;
+          }
+        }
+      }
+    }
+    throw new ClassNotFoundException(name);
   }
 }

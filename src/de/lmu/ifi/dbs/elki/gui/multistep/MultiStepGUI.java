@@ -32,12 +32,12 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.gui.GUIUtil;
 import de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.AlgorithmTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.EvaluationTabPanel;
@@ -48,8 +48,11 @@ import de.lmu.ifi.dbs.elki.gui.multistep.panels.SavedSettingsTabPanel;
 import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
@@ -65,32 +68,51 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @apiviz.composedOf OutputTabPanel
  * @apiviz.composedOf SavedSettingsTabPanel
  */
-public class MultiStepGUI extends JPanel {
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
+@Alias({ "multi", "multigui", "multistepgui" })
+public class MultiStepGUI extends AbstractApplication {
   /**
    * ELKI logger for the GUI
    */
   private static final Logging LOG = Logging.getLogger(MultiStepGUI.class);
 
   /**
+   * The frame
+   */
+  JFrame frame;
+
+  /**
    * Logging output area.
    */
   protected LogPanel outputArea;
 
+  /**
+   * Input panel.
+   */
   private InputTabPanel inputTab;
 
+  /**
+   * Algorithm panel.
+   */
   private AlgorithmTabPanel algTab;
 
+  /**
+   * Evaluation panel.
+   */
   private EvaluationTabPanel evalTab;
 
+  /**
+   * Output panel.
+   */
   private OutputTabPanel outTab;
 
+  /**
+   * Logging panel.
+   */
   private LoggingTabPanel logTab;
 
+  /**
+   * Saved settingspanel.
+   */
   private SavedSettingsTabPanel setTab;
 
   /**
@@ -98,7 +120,15 @@ public class MultiStepGUI extends JPanel {
    */
   public MultiStepGUI() {
     super();
-    this.setLayout(new GridBagLayout());
+    frame = new JFrame("ELKI ExpGUI");
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    try {
+      frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
+    } catch (Exception e) {
+      // Ignore - icon not found is not fatal.
+    }
+
+    frame.setLayout(new GridBagLayout());
     {
       // setup text output area
       outputArea = new LogPanel();
@@ -114,7 +144,7 @@ public class MultiStepGUI extends JPanel {
       constraints.gridy = 1;
       constraints.weightx = 1;
       constraints.weighty = 1;
-      add(outputPane, constraints);
+      frame.add(outputPane, constraints);
 
       // reconfigure logging
       outputArea.becomeDefaultLogger();
@@ -130,24 +160,23 @@ public class MultiStepGUI extends JPanel {
       constraints.gridy = 0;
       constraints.weightx = 1;
       constraints.weighty = 1;
-      add(panels, constraints);
+      frame.add(panels, constraints);
 
       addPanels(panels);
     }
+    frame.pack();
   }
 
   private void addPanels(JTabbedPane panels) {
     SavedSettingsFile settings = new SavedSettingsFile(MiniGUI.SAVED_SETTINGS_FILENAME);
     try {
       settings.load();
-    }
-    catch(FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       LOG.warning("Error loading saved settings.", e);
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       LOG.exception(e);
     }
-    
+
     inputTab = new InputTabPanel();
     algTab = new AlgorithmTabPanel(inputTab);
     evalTab = new EvaluationTabPanel(inputTab, algTab);
@@ -173,15 +202,15 @@ public class MultiStepGUI extends JPanel {
     // Clear errors after each step, so they don't consider themselves failed
     // because of earlier errors.
     logTab.setParameters(config);
-    //config.clearErrors();
+    // config.clearErrors();
     inputTab.setParameters(config);
-    //config.clearErrors();
+    // config.clearErrors();
     algTab.setParameters(config);
-    //config.clearErrors();
+    // config.clearErrors();
     evalTab.setParameters(config);
-    //config.clearErrors();
+    // config.clearErrors();
     outTab.setParameters(config);
-    //config.clearErrors();
+    // config.clearErrors();
   }
 
   /**
@@ -198,36 +227,11 @@ public class MultiStepGUI extends JPanel {
     outTab.appendParameters(params);
     return params.serialize();
   }
-  
-  /**
-   * Create the GUI and show it. For thread safety, this method should be
-   * invoked from the event-dispatching thread.
-   */
-  protected static void createAndShowGUI() {
-    // Create and set up the window.
-    JFrame frame = new JFrame("ELKI ExpGUI");
-    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    }
-    catch(Exception e) {
-      // ignore
-    }
-    try {
-      frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
-    }
-    catch(Exception e) {
-      // Ignore - icon not found is not fatal.
-    }
 
-    // Create and set up the content pane.
-    MultiStepGUI newContentPane = new MultiStepGUI();
-    newContentPane.setOpaque(true); // content panes must be opaque
-    frame.setContentPane(newContentPane);
-
-    // Display the window.
-    frame.pack();
+  @Override
+  public void run() throws UnableToComplyException {
     frame.setVisible(true);
+    outputArea.becomeDefaultLogger();
   }
 
   /**
@@ -235,12 +239,25 @@ public class MultiStepGUI extends JPanel {
    * 
    * @param args command line parameters
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
+    GUIUtil.logUncaughtExceptions(LOG);
+    GUIUtil.setLookAndFeel();
     OutputStep.setDefaultHandlerVisualizer();
+
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        createAndShowGUI();
+        try {
+          final MultiStepGUI gui = new MultiStepGUI();
+          gui.run();
+          if (args != null && args.length > 0) {
+            gui.setParameters(new SerializedParameterization(args));
+          } else {
+            gui.setParameters(new SerializedParameterization());
+          }
+        } catch (UnableToComplyException e) {
+          LOG.exception(e);
+        }
       }
     });
   }
