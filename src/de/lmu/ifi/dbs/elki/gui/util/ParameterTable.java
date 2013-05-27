@@ -233,7 +233,7 @@ public class ParameterTable extends JTable {
     public DropdownEditor(JComboBox<String> comboBox) {
       super(comboBox);
       this.comboBox = comboBox;
-      panel = new DispatchingPanel(comboBox);
+      panel = new DispatchingPanel((JComponent) comboBox.getEditor().getEditorComponent());
       panel.setLayout(new BorderLayout());
       panel.add(comboBox, BorderLayout.CENTER);
     }
@@ -245,8 +245,17 @@ public class ParameterTable extends JTable {
       // Put the current value in first.
       Object val = table.getValueAt(row, column);
       if (val != null && val instanceof String) {
-        comboBox.addItem((String) val);
-        comboBox.setSelectedIndex(0);
+        String sval = (String) val;
+        if (sval.equals(DynamicParameters.STRING_OPTIONAL)) {
+          sval = "";
+        }
+        if (sval.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+          sval = "";
+        }
+        if (sval != "") {
+          comboBox.addItem(sval);
+          comboBox.setSelectedIndex(0);
+        }
       }
       if (row < parameters.size()) {
         Parameter<?> option = parameters.getNode(row).param;
