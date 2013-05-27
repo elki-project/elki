@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.gui.multistep.panels;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -111,7 +112,7 @@ public class SavedSettingsTabPanel extends JPanel {
     {
       JPanel buttonPanel = new JPanel();
       buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-      
+
       // button to load settings
       JButton loadButton = new JButton("Load");
       loadButton.setMnemonic(KeyEvent.VK_L);
@@ -137,8 +138,7 @@ public class SavedSettingsTabPanel extends JPanel {
           store.put(key, gui.serializeParameters());
           try {
             store.save();
-          }
-          catch(IOException e1) {
+          } catch (IOException e1) {
             LOG.exception(e1);
           }
           savedSettingsModel.update();
@@ -155,8 +155,7 @@ public class SavedSettingsTabPanel extends JPanel {
           store.remove(key);
           try {
             store.save();
-          }
-          catch(IOException e1) {
+          } catch (IOException e1) {
             LOG.exception(e1);
           }
           savedCombo.setSelectedItem("[Saved Settings]");
@@ -164,7 +163,7 @@ public class SavedSettingsTabPanel extends JPanel {
         }
       });
       buttonPanel.add(removeButton);
-      
+
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.gridx = 0;
@@ -215,14 +214,14 @@ public class SavedSettingsTabPanel extends JPanel {
 
     @Override
     public void setSelectedItem(Object anItem) {
-      if(anItem instanceof String) {
+      if (anItem instanceof String) {
         selected = (String) anItem;
       }
     }
 
     @Override
     public String getElementAt(int index) {
-      return store.getElementAt(index).first;
+      return store.getElementAt(store.size() - 1 - index).first;
     }
 
     @Override
