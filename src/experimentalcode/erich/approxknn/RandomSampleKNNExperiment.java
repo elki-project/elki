@@ -127,7 +127,7 @@ public class RandomSampleKNNExperiment {
         for(int i = 1; i <= iters; i++) {
           final int k = i * step;
           LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction, distanceFunction);
-          OutlierResult res = lof.run(rel);
+          OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][3] = auc;
@@ -181,7 +181,7 @@ public class RandomSampleKNNExperiment {
         // Max k LOF run
         {
           LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(maxk, distanceFunction, distanceFunction);
-          OutlierResult res = lof.run(rel);
+          OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][4] = auc;
@@ -189,7 +189,7 @@ public class RandomSampleKNNExperiment {
         // Scaled k LOF run
         {
           LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction, distanceFunction);
-          OutlierResult res = lof.run(rel);
+          OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][5] = auc;
