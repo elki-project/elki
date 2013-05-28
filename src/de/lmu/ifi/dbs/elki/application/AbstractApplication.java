@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * 
  * @apiviz.uses LoggingConfiguration oneway
+ * @apiviz.excludeSubtypes
  */
 public abstract class AbstractApplication implements Parameterizable {
   /**

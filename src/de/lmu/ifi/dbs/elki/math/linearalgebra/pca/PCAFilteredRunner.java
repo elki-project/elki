@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses PCAFilteredResult oneway - - «create»
+ * @apiviz.has PCAFilteredResult oneway - - «create»
  * @apiviz.composedOf EigenPairFilter
  * 
  * @param <V> Vector class to use

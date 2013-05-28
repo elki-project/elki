@@ -28,6 +28,8 @@ package de.lmu.ifi.dbs.elki.persistent;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has Page
+ * 
  * @param <P> Page file
  */
 public interface PageFile<P extends Page> {

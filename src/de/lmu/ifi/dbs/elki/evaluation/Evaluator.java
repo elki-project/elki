@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.result.ResultProcessor;
  * evaluations, ...
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.excludeSubtypes
  */
 public interface Evaluator extends ResultProcessor {
   // Empty now - uses ResultProcessor API and serves merely UI purposes.

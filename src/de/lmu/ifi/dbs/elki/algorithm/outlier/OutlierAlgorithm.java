@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * @author Erich Schubert
  *
  * @apiviz.landmark
- * 
+ * @apiviz.excludeSubtypes
  * @apiviz.has OutlierResult
  */
 public interface OutlierAlgorithm extends Algorithm {

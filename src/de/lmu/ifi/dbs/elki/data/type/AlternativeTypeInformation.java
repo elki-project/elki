@@ -23,13 +23,13 @@ package de.lmu.ifi.dbs.elki.data.type;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 /**
  * Class that combines multiple type restrictions into one using the "or"
  * operator.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf TypeInformation
  */
 public class AlternativeTypeInformation implements TypeInformation {
   /**
@@ -49,8 +49,8 @@ public class AlternativeTypeInformation implements TypeInformation {
 
   @Override
   public boolean isAssignableFromType(TypeInformation type) {
-    for(int i = 0; i < restrictions.length; i++) {
-      if(restrictions[i].isAssignableFromType(type)) {
+    for (int i = 0; i < restrictions.length; i++) {
+      if (restrictions[i].isAssignableFromType(type)) {
         return true;
       }
     }
@@ -59,8 +59,8 @@ public class AlternativeTypeInformation implements TypeInformation {
 
   @Override
   public boolean isAssignableFrom(Object other) {
-    for(int i = 0; i < restrictions.length; i++) {
-      if(restrictions[i].isAssignableFrom(other)) {
+    for (int i = 0; i < restrictions.length; i++) {
+      if (restrictions[i].isAssignableFrom(other)) {
         return true;
       }
     }
@@ -70,8 +70,8 @@ public class AlternativeTypeInformation implements TypeInformation {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    for(int i = 0; i < restrictions.length; i++) {
-      if(i > 0) {
+    for (int i = 0; i < restrictions.length; i++) {
+      if (i > 0) {
         buf.append(" OR ");
       }
       buf.append(restrictions[i].toString());

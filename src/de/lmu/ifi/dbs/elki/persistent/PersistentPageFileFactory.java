@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has PersistentPageFile
+ * 
  * @param <P> Page type
  */
 public class PersistentPageFileFactory<P extends ExternalizablePage> extends AbstractPageFileFactory<P> {

@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf ByteBuffererSerializer
+ * 
  * @param <T> Java type we represent.
  */
 public class SimpleTypeInformation<T> implements TypeInformation {

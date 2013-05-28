@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has OnDiskArrayPageFile
+ * 
  * @param <P> Page type
  */
 public class OnDiskArrayPageFileFactory<P extends ExternalizablePage> extends AbstractPageFileFactory<P> {

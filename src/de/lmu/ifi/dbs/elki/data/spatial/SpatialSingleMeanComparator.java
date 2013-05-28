@@ -29,6 +29,8 @@ import java.util.Comparator;
  * dimension.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses SpatialComparable
  */
 public class SpatialSingleMeanComparator implements Comparator<SpatialComparable> {
   /**

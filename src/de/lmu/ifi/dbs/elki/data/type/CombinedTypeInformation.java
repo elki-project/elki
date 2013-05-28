@@ -23,11 +23,12 @@ package de.lmu.ifi.dbs.elki.data.type;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Class that combines multiple type restrictions into one using an "and" operator.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf TypeInformation
  */
 public class CombinedTypeInformation implements TypeInformation {
   /**
