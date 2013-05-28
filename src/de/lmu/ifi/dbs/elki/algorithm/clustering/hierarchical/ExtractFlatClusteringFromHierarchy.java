@@ -366,7 +366,7 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
           progress.incrementProcessed(LOG);
         }
       }
-      assert(root != null);
+      assert (root != null);
       // attach root
       dendrogram.addToplevelCluster(root);
       break;
@@ -590,7 +590,7 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
           progress.incrementProcessed(LOG);
         }
       }
-      assert(root != null);
+      assert (root != null);
       // attach root
       dendrogram.addToplevelCluster(root);
       break;
@@ -784,7 +784,7 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
      * Threshold mode.
      */
     ThresholdMode thresholdmode = null;
-    
+
     /**
      * Also create singleton clusters.
      */
@@ -812,7 +812,10 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
       }
 
       if (thresholdmode == null || ThresholdMode.BY_THRESHOLD.equals(thresholdmode)) {
-        DistanceParameter<D> distP = new DistanceParameter<>(THRESHOLD_ID, algorithm.getDistanceFactory());
+        // Fallback to double when no algorithm chosen yet:
+        @SuppressWarnings("unchecked")
+        final D factory = algorithm != null ? algorithm.getDistanceFactory() : (D) DoubleDistance.FACTORY;
+        DistanceParameter<D> distP = new DistanceParameter<>(THRESHOLD_ID, factory);
         if (config.grab(distP)) {
           threshold = distP.getValue();
         }
@@ -828,7 +831,7 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
         minclusters = -1;
         outputmode = OutputMode.PARTIAL_HIERARCHY;
       }
-      
+
       Flag singletonsF = new Flag(SINGLETONS_ID);
       if (config.grab(singletonsF)) {
         singletons = singletonsF.isTrue();
