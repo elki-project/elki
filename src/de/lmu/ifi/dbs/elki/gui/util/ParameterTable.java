@@ -697,6 +697,8 @@ public class ParameterTable extends JTable {
    * This makes the tabular GUI much more user friendly.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class DispatchingPanel extends JPanel {
     /**
