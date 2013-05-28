@@ -19,6 +19,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore
 de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut
 de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier
+de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN
 de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleCOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO
@@ -40,3 +41,4 @@ tutorial.clustering.NaiveAgglomerativeHierarchicalClustering2
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering3
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering4
 tutorial.outlier.DistanceStddevOutlier
+tutorial.outlier.ODIN

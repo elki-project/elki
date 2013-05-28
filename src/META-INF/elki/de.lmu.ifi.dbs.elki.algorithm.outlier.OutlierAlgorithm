@@ -17,6 +17,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP
+de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN
 de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.OnlineLOF
@@ -48,3 +49,4 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialNoOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialGeneratedOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialAverageCoordinateOutlier
 tutorial.outlier.DistanceStddevOutlier
+tutorial.outlier.ODIN
