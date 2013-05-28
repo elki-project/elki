@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
  * 
  * @author Elke Achtert
  * 
+ * @apiviz.composedOf MkAppTreeSettings
  * @apiviz.has MkAppTreeNode oneway - - contains
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index

@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.index.tree.Entry;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.composedOf Distance
  * @apiviz.uses Entry
  * 
  * @param <E> the type of Entry used in the index

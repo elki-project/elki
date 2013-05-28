@@ -27,6 +27,8 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
  * Array iterators can also go backwards and seek.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.excludeSubtypes
  */
 public interface ArrayIter extends Iter {
   /**

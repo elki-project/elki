@@ -87,6 +87,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf ProjectedKNNQuery
+ * @apiviz.composedOf ProjectedRangeQuery
+ * @apiviz.composedOf ProjectedRKNNQuery
+ * 
  * @param <O> Outer object type.
  * @param <I> Inner object type.
  */
@@ -463,6 +467,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.has ProjectedIndex
+   * 
    * @param <O> Outer object type.
    * @param <I> Inner object type.
    */
@@ -544,6 +550,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
      * Parameterization class.
      * 
      * @author Erich Schubert
+     * 
+     * @apiviz.exclude
      * 
      * @param <O> Outer object type.
      * @param <I> Inner object type.

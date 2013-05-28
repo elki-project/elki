@@ -89,7 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * @apiviz.landmark
  * 
  * @apiviz.composedOf DAFile
- * @apiviz.uses PartialVACandidate
+ * @apiviz.has PartialVACandidate
  * @apiviz.has PartialVAFileRangeQuery
  * @apiviz.has PartialVAFileKNNQuery
  * 

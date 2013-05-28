@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.UnsynchronizedLongCounter;
  * 
  * @apiviz.uses LoggingConfiguration
  * @apiviz.uses ELKILogRecord oneway - - «create»
+ * @apiviz.uses Level
  */
 public class Logging {
   /**

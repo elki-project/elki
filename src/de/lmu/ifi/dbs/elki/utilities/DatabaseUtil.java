@@ -58,6 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * 
+ * @apiviz.has RelationObjectIterator
+ * @apiviz.has CollectionFromRelation
  */
 public final class DatabaseUtil {
   /**

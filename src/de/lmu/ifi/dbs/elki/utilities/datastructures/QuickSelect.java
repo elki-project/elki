@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * 
  * @apiviz.uses ArrayModifiableDBIDs
  * @apiviz.uses List
- * @apiviz.uses Comparator
+ * @apiviz.uses Adapter
  */
 public class QuickSelect {
   /**

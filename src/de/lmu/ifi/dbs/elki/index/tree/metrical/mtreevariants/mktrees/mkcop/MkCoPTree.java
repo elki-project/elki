@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
  * @author Elke Achtert
  * 
  * @apiviz.has MkCoPTreeNode oneway - - contains
- * @apiviz.uses ConvexHull
+ * @apiviz.has ConvexHull
  * 
  * @param <O> Object type
  * @param <D> Distance type

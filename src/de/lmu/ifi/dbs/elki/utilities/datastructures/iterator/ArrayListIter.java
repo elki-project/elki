@@ -33,6 +33,8 @@ import java.util.List;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.excludeSubtypes
+ * 
  * @param <O> contained object type.
  */
 public class ArrayListIter<O> implements ArrayIter {

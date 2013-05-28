@@ -30,6 +30,8 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has Iter
+ * 
  * @param <O> Object type
  */
 public interface Hierarchy<O> {

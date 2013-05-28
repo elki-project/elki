@@ -106,23 +106,23 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if(!(inner instanceof KNNIndex)) {
+    if (!(inner instanceof KNNIndex)) {
       return null;
     }
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    if(!LatLngDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
+    if (!LatLngDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
       return null;
     }
-    for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_EXACT) {
+    for (Object o : hints) {
+      if (o == DatabaseQuery.HINT_EXACT) {
         return null;
       }
     }
     SpatialPrimitiveDistanceQuery<O, DoubleDistance> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
     KNNQuery<O, DoubleDistance> innerq = ((KNNIndex<O>) inner).getKNNQuery(innerQuery, hints);
-    if(innerq == null) {
+    if (innerq == null) {
       return null;
     }
     return (KNNQuery<O, D>) new ProjectedKNNQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
@@ -131,23 +131,23 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if(!(inner instanceof RangeIndex)) {
+    if (!(inner instanceof RangeIndex)) {
       return null;
     }
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    if(!LatLngDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
+    if (!LatLngDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
       return null;
     }
-    for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_EXACT) {
+    for (Object o : hints) {
+      if (o == DatabaseQuery.HINT_EXACT) {
         return null;
       }
     }
     SpatialPrimitiveDistanceQuery<O, DoubleDistance> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
     RangeQuery<O, DoubleDistance> innerq = ((RangeIndex<O>) inner).getRangeQuery(innerQuery, hints);
-    if(innerq == null) {
+    if (innerq == null) {
       return null;
     }
     return (RangeQuery<O, D>) new ProjectedRangeQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
@@ -156,23 +156,23 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if(!(inner instanceof RKNNIndex)) {
+    if (!(inner instanceof RKNNIndex)) {
       return null;
     }
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    if(!LatLngDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
+    if (!LatLngDistanceFunction.class.isInstance(distanceQuery.getDistanceFunction())) {
       return null;
     }
-    for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_EXACT) {
+    for (Object o : hints) {
+      if (o == DatabaseQuery.HINT_EXACT) {
         return null;
       }
     }
     SpatialPrimitiveDistanceQuery<O, DoubleDistance> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
     RKNNQuery<O, DoubleDistance> innerq = ((RKNNIndex<O>) inner).getRKNNQuery(innerQuery, hints);
-    if(innerq == null) {
+    if (innerq == null) {
       return null;
     }
     return (RKNNQuery<O, D>) new ProjectedRKNNQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
@@ -182,6 +182,8 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
    * Index factory.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has LatLngAsECEFIndex
    * 
    * @param <O> Data type.
    */
@@ -205,24 +207,23 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
 
     @Override
     public ProjectedIndex<O, O> instantiate(Relation<O> relation) {
-      if(!proj.getInputDataTypeInformation().isAssignableFromType(relation.getDataTypeInformation())) {
+      if (!proj.getInputDataTypeInformation().isAssignableFromType(relation.getDataTypeInformation())) {
         return null;
       }
       proj.initialize(relation.getDataTypeInformation());
       final Relation<O> view;
-      if(materialize) {
+      if (materialize) {
         DBIDs ids = relation.getDBIDs();
         WritableDataStore<O> content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, proj.getOutputDataTypeInformation().getRestrictionClass());
-        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           content.put(iter, proj.project(relation.get(iter)));
         }
         view = new MaterializedRelation<>("ECEF Projection", "ecef-projection", proj.getOutputDataTypeInformation(), content, ids);
-      }
-      else {
+      } else {
         view = new ProjectedView<>(relation, proj);
       }
       Index inneri = inner.instantiate(view);
-      if(inneri == null) {
+      if (inneri == null) {
         return null;
       }
       return new LatLngAsECEFIndex<>(relation, proj, view, inneri, norefine);
@@ -232,6 +233,8 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
      * Parameterization class.
      * 
      * @author Erich Schubert
+     * 
+     * @apiviz.exclude
      * 
      * @param <O> Outer object type.
      */
@@ -265,17 +268,17 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
         }
 
         ObjectParameter<IndexFactory<O, ?>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
-        if(config.grab(innerP)) {
+        if (config.grab(innerP)) {
           inner = innerP.instantiateClass(config);
         }
 
         Flag materializeF = new Flag(ProjectedIndex.Factory.Parameterizer.MATERIALIZE_FLAG);
-        if(config.grab(materializeF)) {
+        if (config.grab(materializeF)) {
           materialize = materializeF.isTrue();
         }
 
         Flag norefineF = new Flag(ProjectedIndex.Factory.Parameterizer.DISABLE_REFINE_FLAG);
-        if(config.grab(norefineF)) {
+        if (config.grab(norefineF)) {
           norefine = norefineF.isTrue();
         }
       }

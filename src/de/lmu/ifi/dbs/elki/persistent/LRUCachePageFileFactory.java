@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has LRUCache
+ * @apiviz.composedOf PageFileFactory
+ * 
  * @param <P> Page type
  */
 public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<P> {
@@ -75,6 +78,8 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
    * Parameterization class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
