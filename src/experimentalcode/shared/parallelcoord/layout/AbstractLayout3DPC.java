@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.CovarianceDimensionSimilarity;
@@ -62,10 +63,10 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
   }
 
   @Override
-  public Layout layout(Relation<? extends NumberVector<?>> rel) {
+  public Layout layout(Database database, Relation<? extends NumberVector<?>> rel) {
     int dim = RelationUtil.dimensionality(rel);
     DimensionSimilarityMatrix mat = DimensionSimilarityMatrix.make(dim);
-    sim.computeDimensionSimilarites(rel, rel.getDBIDs(), mat);
+    sim.computeDimensionSimilarites(database, rel, rel.getDBIDs(), mat);
     return process(dim, mat);
   }
 

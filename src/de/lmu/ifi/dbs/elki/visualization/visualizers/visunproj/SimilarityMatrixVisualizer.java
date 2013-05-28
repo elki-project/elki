@@ -29,6 +29,7 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
@@ -145,7 +146,8 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
       final double hlsize = StyleLibrary.SCALE * zoom * iratio / size;
       final double vlsize = StyleLibrary.SCALE * zoom / size;
       int i = 0;
-      final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(result.getRelation().getDatabase());
+      Database database = ResultUtil.findDatabase(context.getResult());
+      final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(database);
       for(DBIDIter id = result.getIDs().iter(); id.valid(); id.advance()) {
         String label = lrep.get(id);
         if(label != null) {

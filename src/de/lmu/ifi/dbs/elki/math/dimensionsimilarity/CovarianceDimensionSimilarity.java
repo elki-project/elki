@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
@@ -47,7 +48,7 @@ public class CovarianceDimensionSimilarity implements DimensionSimilarity<Number
   }
 
   @Override
-  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     // FIXME: Use only necessary dimensions!
     CovarianceMatrix covmat = CovarianceMatrix.make(relation, subset);

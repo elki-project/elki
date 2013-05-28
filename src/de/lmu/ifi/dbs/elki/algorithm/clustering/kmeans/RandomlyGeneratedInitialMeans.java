@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -54,7 +55,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
   }
 
   @Override
-  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     final int dim = RelationUtil.dimensionality(relation);
     NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);

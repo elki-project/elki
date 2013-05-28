@@ -241,7 +241,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
       @Override
       public void run(int k, String kstr) {
         LOF<O, D> lof = new LOF<>(k, distf, distf);
-        OutlierResult lofresult = lof.run(relation);
+        OutlierResult lofresult = lof.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
         scaling.prepare(lofresult);

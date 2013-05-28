@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -193,12 +194,13 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * Performs the Generalized LOF_SCORE algorithm on the given database by
    * calling {@link #doRunInTime}.
    * 
+   * @param database Database to query
    * @param relation Data to process
    * @return LOF outlier result
    */
-  public OutlierResult run(Relation<O> relation) {
+  public OutlierResult run(Database database, Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
-    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(relation, stepprog);
+    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, relation, stepprog);
     KNNQuery<O, D> kNNRefer = pair.getFirst();
     KNNQuery<O, D> kNNReach = pair.getSecond();
     return doRunInTime(relation.getDBIDs(), kNNRefer, kNNReach, stepprog).getResult();
@@ -211,7 +213,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * @param stepprog the progress logger
    * @return the kNN queries for the algorithm
    */
-  private Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Relation<O> relation, StepProgress stepprog) {
+  private Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
     // "HEAVY" flag for knnReach since it is used more than once
     KNNQuery<O, D> knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
@@ -224,8 +226,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         }
       }
       MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, reachabilityDistanceFunction, k);
-      relation.getDatabase().addIndex(preproc);
-      DistanceQuery<O, D> rdq = relation.getDatabase().getDistanceQuery(relation, reachabilityDistanceFunction);
+      database.addIndex(preproc);
+      DistanceQuery<O, D> rdq = database.getDistanceQuery(relation, reachabilityDistanceFunction);
       knnReach = preproc.getKNNQuery(rdq, k);
     }
 

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -51,7 +52,7 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
   }
 
   @Override
-  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     DBIDIter iter = relation.iterDBIDs();
     List<V> means = new ArrayList<>(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {

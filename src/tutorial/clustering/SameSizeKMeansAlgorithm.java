@@ -108,7 +108,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
     // Choose initial means
-    List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+    List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {

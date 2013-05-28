@@ -103,7 +103,7 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
     }
     // Choose initial means
     List<Vector> means = new ArrayList<>(k);
-    for (NumberVector<?> nv : initializer.chooseInitialMeans(relation, k, getDistanceFunction())) {
+    for (NumberVector<?> nv : initializer.chooseInitialMeans(database, relation, k, getDistanceFunction())) {
       means.add(nv.getColumnVector());
     }
     // Initialize cluster and assign objects

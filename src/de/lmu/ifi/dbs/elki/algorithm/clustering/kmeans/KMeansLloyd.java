@@ -103,7 +103,7 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+    List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {

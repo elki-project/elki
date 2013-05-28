@@ -180,7 +180,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       LOG.verbose("initializing " + k + " models");
     }
     List<Vector> means = new ArrayList<>();
-    for (NumberVector<?> nv : initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC)) {
+    for (NumberVector<?> nv : initializer.chooseInitialMeans(database, relation, k, EuclideanDistanceFunction.STATIC)) {
       means.add(nv.getColumnVector());
     }
     List<Matrix> covarianceMatrices = new ArrayList<>(k);

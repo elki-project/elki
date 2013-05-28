@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -134,10 +135,11 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   /**
    * Run the naive kernel density LOF algorithm.
    * 
+   * @param database Database to query
    * @param relation Data to process
    * @return LOF outlier result
    */
-  public OutlierResult run(Relation<O> relation) {
+  public OutlierResult run(Database database, Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LDF", 3) : null;
 
     final int dim = RelationUtil.dimensionality(relation);
@@ -152,8 +154,8 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
         stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
       }
       MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
-      relation.getDatabase().addIndex(preproc);
-      DistanceQuery<O, D> rdq = relation.getDatabase().getDistanceQuery(relation, getDistanceFunction());
+      database.addIndex(preproc);
+      DistanceQuery<O, D> rdq = database.getDistanceQuery(relation, getDistanceFunction());
       knnq = preproc.getKNNQuery(rdq, k);
     }
 

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -70,14 +71,14 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
   }
 
   @Override
-  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     // Get a distance query
     if(!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
       throw new AbortException("K-Means++ initialization can only be used with numerical distances.");
     }
     @SuppressWarnings("unchecked")
     final PrimitiveDistanceFunction<? super V, D> distF = (PrimitiveDistanceFunction<? super V, D>) distanceFunction;
-    DistanceQuery<V, D> distQ = relation.getDatabase().getDistanceQuery(relation, distF);
+    DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, distF);
 
     // Chose first mean
     List<V> means = new ArrayList<>(k);
