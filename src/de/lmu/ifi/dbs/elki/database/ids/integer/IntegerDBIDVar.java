@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @author Erich Schubert
  */
-class IntegerDBIDVar implements DBIDVar {
+class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   /**
    * The actual value.
    */
@@ -88,7 +87,7 @@ class IntegerDBIDVar implements DBIDVar {
   }
 
   @Override
-  public DBIDArrayIter iter() {
+  public IntegerDBIDArrayIter iter() {
     return new DBIDItr();
   }
 
@@ -115,7 +114,7 @@ class IntegerDBIDVar implements DBIDVar {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
+  protected class DBIDItr implements IntegerDBIDArrayIter, IntegerDBIDRef {
     /**
      * Iterator position: We use an integer so we can support retract().
      */
@@ -184,13 +183,13 @@ class IntegerDBIDVar implements DBIDVar {
   @Override
   public void assignVar(int i, DBIDVar var) {
     if (var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar)var).internalSetIndex(i);
+      ((IntegerDBIDVar) var).internalSetIndex(i);
     } else {
       // Much less efficient:
       var.set(get(i));
     }
   }
-  
+
   @Override
   public String toString() {
     return Integer.toString(id);
