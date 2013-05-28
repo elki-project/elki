@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -119,8 +120,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
     }
 
     @Override
-    public NeighborSetPredicate instantiate(Relation<?> database) {
-      DataStore<DBIDs> store = loadNeighbors(database);
+    public NeighborSetPredicate instantiate(Relation<?> relation) {
+      DataStore<DBIDs> store = loadNeighbors(relation.getDatabase(), relation);
       ExternalNeighborhood neighborhood = new ExternalNeighborhood(store);
       return neighborhood;
     }
@@ -133,8 +134,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
     /**
      * Method to load the external neighbors.
      */
-    private DataStore<DBIDs> loadNeighbors(Relation<?> database) {
-      final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
+    private DataStore<DBIDs> loadNeighbors(Database database, Relation<?> relation) {
+      final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
 
       if(LOG.isVerbose()) {
         LOG.verbose("Loading external neighborhoods.");
@@ -146,11 +147,11 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       // Build a map label/ExternalId -> DBID
       // (i.e. a reverse index!)
       // TODO: move this into the database layer to share?
-      Map<String, DBID> lblmap = new HashMap<>(database.size() << 1);
+      Map<String, DBID> lblmap = new HashMap<>(relation.size() << 1);
       {
-        Relation<LabelList> olq = database.getDatabase().getRelation(TypeUtil.LABELLIST);
-        Relation<ExternalID> eidq = database.getDatabase().getRelation(TypeUtil.EXTERNALID);
-        for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        Relation<LabelList> olq = database.getRelation(TypeUtil.LABELLIST);
+        Relation<ExternalID> eidq = database.getRelation(TypeUtil.EXTERNALID);
+        for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
           if(eidq != null) {
             ExternalID eid = eidq.get(iditer);
             if(eid != null) {

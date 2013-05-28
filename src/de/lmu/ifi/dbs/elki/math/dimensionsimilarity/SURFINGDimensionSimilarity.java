@@ -76,9 +76,8 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
   }
 
   @Override
-  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
-    final Database db = relation.getDatabase();
     Mean kdistmean = new Mean();
     final int k = Math.max(1, subset.size() / 10);
 
@@ -92,8 +91,8 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
         BitSet dims = new BitSet(dim);
         dims.set(i);
         dims.set(j);
-        DistanceQuery<? extends NumberVector<?>, DoubleDistance> dq = db.getDistanceQuery(relation, new SubspaceEuclideanDistanceFunction(dims));
-        KNNQuery<? extends NumberVector<?>, DoubleDistance> knnq = db.getKNNQuery(dq, k);
+        DistanceQuery<? extends NumberVector<?>, DoubleDistance> dq = database.getDistanceQuery(relation, new SubspaceEuclideanDistanceFunction(dims));
+        KNNQuery<? extends NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(dq, k);
 
         kdistmean.reset();
         int knn = 0;

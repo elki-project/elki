@@ -96,7 +96,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
       return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
-    List<? extends NumberVector<?>> medians = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+    List<? extends NumberVector<?>> medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {

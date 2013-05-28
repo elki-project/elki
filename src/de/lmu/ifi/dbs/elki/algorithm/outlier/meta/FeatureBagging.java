@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
@@ -127,10 +128,11 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
   /**
    * Run the algorithm on a data set.
    * 
+   * @param database Database context
    * @param relation Relation to use
    * @return Outlier detection result
    */
-  public OutlierResult run(Relation<NumberVector<?>> relation) {
+  public OutlierResult run(Database database, Relation<NumberVector<?>> relation) {
     final int dbdim = RelationUtil.dimensionality(relation);
     final int mindim = dbdim >> 1;
     final int maxdim = dbdim - 1;
@@ -145,7 +147,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, df);
 
         // run LOF and collect the result
-        OutlierResult result = lof.run(relation);
+        OutlierResult result = lof.run(database, relation);
         results.add(result);
         if (prog != null) {
           prog.incrementProcessed(LOG);

@@ -276,7 +276,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     }
 
     public void run() {
-      layout = settings.layout.layout(rel);
+      layout = settings.layout.layout(rel.getDatabase(), rel);
 
       assert (frame != null);
       frame.setVisible(true);

@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -116,18 +117,19 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
   /**
    * Run the algorithm
    * 
+   * @param database Database to process
    * @param relationx Spatial relation
    * @param relationy Attribute relation
    * @return Algorithm result
    */
-  public OutlierResult run(Relation<V> relationx, Relation<? extends NumberVector<?>> relationy) {
+  public OutlierResult run(Database database, Relation<V> relationx, Relation<? extends NumberVector<?>> relationy) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relationx.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax mm = new DoubleMinMax(0.0, 0.0);
 
     // Outlier detection loop
     {
       ModifiableDBIDs idview = DBIDUtil.newHashSet(relationx.getDBIDs());
-      ProxyView<V> proxy = new ProxyView<>(relationx.getDatabase(), idview, relationx);
+      ProxyView<V> proxy = new ProxyView<>(database, idview, relationx);
 
       double phialpha = NormalDistribution.standardNormalQuantile(1.0 - alpha *.5);
       // Detect outliers while significant.

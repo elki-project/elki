@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -78,7 +79,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
   }
 
   @Override
-  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     final int resolution = 500;
     byte[][][][] pics = new byte[dim][dim][][]; // [resolution][resolution];

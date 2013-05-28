@@ -24,6 +24,7 @@ package experimentalcode.shared.parallelcoord.layout;
  */
 
 
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -38,7 +39,10 @@ public interface Layouter3DPC<V> extends Parameterizable {
   /**
    * Run the layouting algorithm.
    * 
+   * @param database Database to use
+   * @param rel Relation to use
+   * 
    * @return Layout, nodes indexed by dimension.
    */
-  Layout layout(Relation<? extends V> rel);
+  Layout layout(Database database, Relation<? extends V> rel);
 }
