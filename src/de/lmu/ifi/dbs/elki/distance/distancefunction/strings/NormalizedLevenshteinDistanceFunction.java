@@ -45,6 +45,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Felix Stahlberg
  * @author Erich Schubert
+ * 
+ * @apiviz.uses String
  */
 @Description("Levenshtein distance, normalized by average string length.")
 @Reference(authors = "V. I. Levenshtein", title = "Binary codes capable of correcting deletions, insertions and reversals.", booktitle = "Soviet physics doklady. Vol. 10. 1966.")
