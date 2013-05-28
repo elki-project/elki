@@ -32,6 +32,9 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * Encapsulates the attributes of an assignment during a split.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.composedOf DistanceEntry
+ * 
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
 public class Assignments<E extends MTreeEntry> {

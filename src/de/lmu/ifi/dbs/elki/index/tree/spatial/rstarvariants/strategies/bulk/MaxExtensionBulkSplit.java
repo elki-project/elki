@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses SpatialComparator
+ * @apiviz.composedOf SpatialSingleMinComparator
  */
 public class MaxExtensionBulkSplit extends AbstractBulkSplit {
   /**

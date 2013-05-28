@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses DimensionSimilarityMatrix - - «writes»
+ * 
  * @param <V> Object type
  */
 public interface DimensionSimilarity<V> extends Parameterizable {

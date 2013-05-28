@@ -183,6 +183,8 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.has LngLatAsECEFIndex
+   * 
    * @param <O> Data type.
    */
   public static class Factory<O extends NumberVector<?>> extends ProjectedIndex.Factory<O, O> {
@@ -226,6 +228,8 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
      * Parameterization class.
      * 
      * @author Erich Schubert
+     * 
+     * @apiviz.exclude
      * 
      * @param <O> Outer object type.
      */

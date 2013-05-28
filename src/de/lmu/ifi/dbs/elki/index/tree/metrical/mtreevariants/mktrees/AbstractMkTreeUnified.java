@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Elke Achtert
  * 
  * @apiviz.has MkTreeHeader oneway
+ * @apiviz.composedOf MkTreeSettings
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of Distance used in the metrical index

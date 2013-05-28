@@ -28,6 +28,8 @@ package de.lmu.ifi.dbs.elki.persistent;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has MemoryPageFile
+ * 
  * @param <P> Page type
  */
 public class MemoryPageFileFactory<P extends Page> extends AbstractPageFileFactory<P> {
@@ -49,6 +51,8 @@ public class MemoryPageFileFactory<P extends Page> extends AbstractPageFileFacto
    * Parameterization class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<Page> {
     @Override

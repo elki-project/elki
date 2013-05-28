@@ -516,6 +516,8 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    * Iterator over all members of the hierarchy.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class ItrAll implements Iter<O> {
     /**

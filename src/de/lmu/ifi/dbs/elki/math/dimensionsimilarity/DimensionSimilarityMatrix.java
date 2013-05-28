@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Class representing a similarity matrix between dimensions.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses PrimsMinimumSpanningTree
  */
 public abstract class DimensionSimilarityMatrix {
   /**
@@ -225,6 +227,8 @@ public abstract class DimensionSimilarityMatrix {
    * Adapter class for running prim's algorithm.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class PrimAdapter implements PrimsMinimumSpanningTree.Adapter<DimensionSimilarityMatrix> {
     /**

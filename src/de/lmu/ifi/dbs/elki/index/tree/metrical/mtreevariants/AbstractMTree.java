@@ -48,6 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * 
  * @author Elke Achtert
  * 
+ * @apiviz.composedOf MTreeSettings
+ * @apiviz.composedOf Statistics
  * @apiviz.has SplitResult oneway - - computes
  * @apiviz.has AbstractMTreeNode oneway - - contains
  * 
@@ -55,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
+ * @param <S> the type to store settings in.
  */
 public abstract class AbstractMTree<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, D, N, E>> extends MetricalIndexTree<O, D, N, E> {
   /**
@@ -495,6 +498,8 @@ public abstract class AbstractMTree<O, D extends NumberDistance<D, ?>, N extends
    * Class for tracking some statistics.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf Counter
    */
   public class Statistics {
     /**

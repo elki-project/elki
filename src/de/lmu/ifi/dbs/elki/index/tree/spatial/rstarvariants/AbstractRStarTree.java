@@ -63,7 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @apiviz.landmark
  * @apiviz.has AbstractRStarTreeNode oneway - - contains
- * @apiviz.composedOf RTreeSettings
+ * @apiviz.composedOf AbstractRTreeSettings
+ * @apiviz.composedOf Statistics
  * 
  * @param <N> Node type
  * @param <E> Entry type
@@ -839,6 +840,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * Class for tracking some statistics.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf Counter
    */
   public class Statistics {
     /**

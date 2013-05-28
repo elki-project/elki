@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * 
  * @apiviz.has KDTreeKNNQuery
+ * @apiviz.has KDTreeRangeQuery
  * 
  * @param <O> Vector type
  */
