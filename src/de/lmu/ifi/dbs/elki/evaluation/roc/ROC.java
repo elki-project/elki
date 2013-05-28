@@ -59,12 +59,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses SimpleAdapter
- * @apiviz.uses DistanceResultAdapter
- * @apiviz.uses OutlierScoreAdapter
+ * @apiviz.composedOf ScoreIter
+ * @apiviz.composedOf Predicate
+ * @apiviz.has XYCurve
  */
-// TODO: add lazy Iterator<> based results that do not require full
-// materialization
 public class ROC {
   /**
    * Iterator for comparing scores.
