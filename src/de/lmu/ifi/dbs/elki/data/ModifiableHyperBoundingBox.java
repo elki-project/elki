@@ -82,7 +82,7 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    *        <code>dimension</code>
    */
   public void setMax(int dimension, double value) {
-    max[dimension - 1] = value;
+    max[dimension] = value;
   }
 
   /**
@@ -95,7 +95,7 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
    *        <code>dimension</code>
    */
   public void setMin(int dimension, double value) {
-    max[dimension - 1] = value;
+    max[dimension] = value;
   }
 
   /**
