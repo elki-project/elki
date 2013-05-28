@@ -8,13 +8,13 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SubspaceClusteringAlgor
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -26,12 +26,12 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * <p>
@@ -53,8 +54,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * <p>
  * Reference: <br/>
- * Cecilia M. Procopiuc, Michael Jones, Pankaj K. Agarwal, T. M. Murali: A Monte
- * Carlo algorithm for fast projective clustering. <br/>
+ * Cecilia M. Procopiuc, Michael Jones, Pankaj K. Agarwal, T. M. Murali<br />
+ * A Monte Carlo algorithm for fast projective clustering. <br/>
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02).
  * </p>
  * 
@@ -70,34 +71,20 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DOC.class);
-
-  // ---------------------------------------------------------------------- //
-  // Configuration
-  // ---------------------------------------------------------------------- //
-
-  public static final OptionID ALPHA_ID = new OptionID("doc.alpha", "Minimum relative density for a set of points to be considered a cluster (|C|>=doc.alpha*|S|).");
-
-  public static final OptionID BETA_ID = new OptionID("doc.beta", "Preference of cluster size versus number of relevant dimensions (higher value means higher priority on larger clusters).");
-
-  public static final OptionID W_ID = new OptionID("doc.w", "Maximum extent of scattering of points along a single attribute for the attribute to be considered relevant.");
-
-  public static final OptionID HEURISTICS_ID = new OptionID("doc.fastdoc", "Use heuristics as described, thus using the FastDOC algorithm (not yet implemented).");
-
-  public static final OptionID D_ZERO_ID = new OptionID("doc.d0", "Parameter for FastDOC, setting the number of relevant attributes which, when found for a cluster, are deemed enough to stop iterating.");
+  private static final Logging LOG = Logging.getLogger(DOC.class);
 
   /**
-   * Holds the value of {@link #ALPHA_ID}.
+   * Relative density threshold parameter alpha.
    */
   private double alpha;
 
   /**
-   * Holds the value of {@link #BETA_ID}.
+   * Balancing parameter for importance of points vs. dimensions
    */
   private double beta;
 
   /**
-   * Holds the value of {@link #W_ID}.
+   * Half width parameter.
    */
   private double w;
 
@@ -111,73 +98,28 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    */
   private int d_zero;
 
-  // ---------------------------------------------------------------------- //
-  // Relevant for a single run.
-  // Kind of ugly to keep those as instance variables, but reduces redundancy
-  // for DOC vs. FastDOC a lot, so it's justified.
-  // ---------------------------------------------------------------------- //
-
   /**
    * Randomizer used internally for sampling points.
    */
-  private Random random = new Random();
+  private RandomFactory rnd;
 
   /**
-   * The set of points we're working on.
-   */
-  private ArrayModifiableDBIDs S;
-
-  /**
-   * Dimensionality of the data set we're currently working on.
-   */
-  private int d;
-
-  /**
-   * Size of random samples.
-   */
-  private double r;
-
-  /**
-   * Number of inner iterations (per seed point).
-   */
-  private int m;
-
-  /**
-   * Number of outer iterations (seed points).
-   */
-  private int n;
-
-  /**
-   * Minimum size a cluster must have to be accepted.
-   */
-  private int minClusterSize;
-
-  /**
-   * Whether to use a query for getting objects in bounds or do a linear scan.
-   */
-  private boolean useQuery;
-
-  // ---------------------------------------------------------------------- //
-
-  /**
-   * Triggers execution of SkyNet and will eat your kittens.
+   * Constructor.
    * 
-   * @param alpha &alpha; input parameter.
-   * @param beta &beta; input parameter.
-   * @param w <em>w</em> input parameter.
+   * @param alpha &alpha; relative density threshold.
+   * @param beta &beta; balancing parameter for size vs. dimensionality.
+   * @param w <em>w</em> half width parameter.
    * @param heuristics whether to use heuristics (FastDOC) or not.
+   * @param random Random factory
    */
-  public DOC(double alpha, double beta, double w, boolean heuristics, int d_zero) {
+  public DOC(double alpha, double beta, double w, boolean heuristics, int d_zero, RandomFactory random) {
     this.alpha = alpha;
     this.beta = beta;
     this.w = w;
     this.heuristics = heuristics;
     this.d_zero = d_zero;
+    this.rnd = random;
   }
-
-  // ---------------------------------------------------------------------- //
-  // Run methods.
-  // ---------------------------------------------------------------------- //
 
   /**
    * Performs the DOC or FastDOC (as configured) algorithm on the given
@@ -191,52 +133,50 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    */
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     // Dimensionality of our set.
-    d = RelationUtil.dimensionality(relation);
+    final int d = RelationUtil.dimensionality(relation);
 
     // Get available DBIDs as a set we can remove items from.
-    S = DBIDUtil.newArray(relation.getDBIDs());
+    ArrayModifiableDBIDs S = DBIDUtil.newArray(relation.getDBIDs());
 
     // Precompute values as described in Figure 2.
-    r = Math.abs(Math.log10(d + d) / Math.log10(beta / 2));
+    double r = Math.abs(Math.log10(d + d) / Math.log10(beta * .5));
     // Outer loop count.
-    n = (int) (2 / alpha);
+    int n = (int) (2 / alpha);
     // Inner loop count.
-    m = (int) (Math.pow(2 / alpha, r) * Math.log(4));
-    if(heuristics) {
+    int m = (int) (Math.pow(2 / alpha, r) * Math.log(4));
+    if (heuristics) {
       m = Math.min(m, Math.min(1000000, d * d));
     }
 
     // Minimum size for a cluster for it to be accepted.
-    minClusterSize = (int) (alpha * S.size());
+    int minClusterSize = (int) (alpha * S.size());
 
     // List of all clusters we found.
-    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("DOC Clusters", "DOC");
+    Clustering<SubspaceModel<V>> result = new Clustering<>("DOC Clusters", "DOC");
 
     // Inform the user about the number of actual clusters found so far.
-    IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Number of clusters found so far", logger) : null;
+    IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
 
     // To not only find a single cluster, we continue running until our set
     // of points is empty.
-    while(S.size() > minClusterSize) {
+    while (S.size() > minClusterSize) {
       Cluster<SubspaceModel<V>> C;
-      if(heuristics) {
-        C = runFastDOC(relation);
-      }
-      else {
-        C = runDOC(relation);
+      if (heuristics) {
+        C = runFastDOC(relation, S, d, n, m, (int) r);
+      } else {
+        C = runDOC(relation, S, d, n, m, (int) r, minClusterSize);
       }
 
-      if(C == null) {
+      if (C == null) {
         // Stop trying if we couldn't find a cluster.
         // TODO not explicitly mentioned in the paper!
         break;
-      }
-      else {
+      } else {
         // Found a cluster, remember it, remove its points from the set.
         result.addToplevelCluster(C);
 
-        if(cprogress != null) {
-          cprogress.setProcessed(result.getAllClusters().size(), logger);
+        if (cprogress != null) {
+          cprogress.setProcessed(result.getAllClusters().size(), LOG);
         }
 
         // Remove all points of the cluster from the set and continue.
@@ -245,10 +185,14 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     // Add the remainder as noise.
-    result.addToplevelCluster(new Cluster<SubspaceModel<V>>(S, true, new SubspaceModel<V>(new Subspace(0), Centroid.make(relation, S).toVector(relation))));
+    if (S.size() > 0) {
+      BitSet alldims = new BitSet();
+      alldims.set(0, d);
+      result.addToplevelCluster(new Cluster<>(S, true, new SubspaceModel<>(new Subspace(alldims), Centroid.make(relation, S).toVector(relation))));
+    }
 
-    if(cprogress != null) {
-      cprogress.setCompleted(logger);
+    if (cprogress != null) {
+      cprogress.setCompleted(LOG);
     }
 
     return result;
@@ -258,9 +202,15 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * Performs a single run of DOC, finding a single cluster.
    * 
    * @param relation used to get actual values for DBIDs.
+   * @param S The set of points we're working on.
+   * @param d Dimensionality of the data set we're currently working on.
+   * @param r Size of random samples.
+   * @param m Number of inner iterations (per seed point).
+   * @param n Number of outer iterations (seed points).
+   * @param minClusterSize Minimum size a cluster must have to be accepted.
    * @return a cluster, if one is found, else <code>null</code>.
    */
-  private Cluster<SubspaceModel<V>> runDOC(Relation<V> relation) {
+  private Cluster<SubspaceModel<V>> runDOC(Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r, int minClusterSize) {
     // Best cluster for the current run.
     DBIDs C = null;
     // Relevant attributes for the best cluster.
@@ -268,115 +218,98 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Quality of the best cluster.
     double quality = Double.NEGATIVE_INFINITY;
 
-    // Inform the user about the progress in the current iteration.
-    FiniteProgress iprogress = logger.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, logger) : null;
+    // Bounds for our cluster.
+    ModifiableHyperBoundingBox bounds = new ModifiableHyperBoundingBox(new double[d], new double[d]);
 
-    for(int i = 0; i < n; ++i) {
+    // Inform the user about the progress in the current iteration.
+    FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
+
+    Random random = rnd.getRandom();
+
+    for (int i = 0; i < n; ++i) {
       // Pick a random seed point.
       DBID p = S.get(random.nextInt(S.size()));
       V pV = relation.get(p);
 
-      for(int j = 0; j < m; ++j) {
+      for (int j = 0; j < m; ++j) {
         // Choose a set of random points.
-        DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), (int) r), random.nextLong());
+        DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), r), random);
 
         // Initialize cluster info.
         BitSet nD = new BitSet(d);
-        DBIDs objects;
-        if(useQuery) {
-          // Get all points in the box.
-          for(int k = 0; k < d; ++k) {
-            if(dimensionIsRelevant(k, relation, randomSet)) {
-              nD.set(k);
-            }
+        final DBIDs objects;
+        // TODO: add a window query API to ELKI, or intersect one dimensional
+        // "indexes" similar to HiCS (ideally: make that a simple index to
+        // automatically add to the database)
+        ArrayModifiableDBIDs nC = DBIDUtil.newArray();
+        // Test each dimension and build bounding box
+        for (int k = 0; k < d; ++k) {
+          if (dimensionIsRelevant(k, relation, randomSet)) {
+            nD.set(k);
+            bounds.setMin(k, pV.doubleValue(k) - w);
+            bounds.setMax(k, pV.doubleValue(k) + w);
+          } else {
+            bounds.setMin(k, Double.NEGATIVE_INFINITY);
+            bounds.setMax(k, Double.POSITIVE_INFINITY);
           }
-          RangeQuery<V, DoubleDistance> rangeQuery = QueryUtil.getRangeQuery(relation, new SubspaceManhattanDistanceFunction(nD));
-          // TODO at least with smaller data sets this is slower than a linear
-          // scan; possible to query a sub-set?
-          objects = DBIDUtil.intersection(S, rangeQuery.getRangeForDBID(p, new DoubleDistance(w)));
-        }
-        else {
-          ArrayModifiableDBIDs nC = DBIDUtil.newArray();
-          // Test each dimension and build bounding box while we're at
-          // it.
-          double[] min = new double[d];
-          double[] max = new double[d];
-          for(int k = 0; k < d; ++k) {
-            if(dimensionIsRelevant(k, relation, randomSet)) {
-              nD.set(k);
-              min[k] = pV.doubleValue(k) - w;
-              max[k] = pV.doubleValue(k) + w;
-            }
-            else {
-              min[k] = Double.NEGATIVE_INFINITY;
-              max[k] = Double.POSITIVE_INFINITY;
-            }
-          }
-
-          // Bounds for our cluster.
-          HyperBoundingBox bounds = new HyperBoundingBox(min, max);
-
-          // Get all points in the box.
-          for(DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
-            if(isPointInBounds(relation.get(iter), bounds)) {
-              nC.add(iter);
-            }
-          }
-          objects = nC;
         }
 
-        if(logger.isDebuggingFiner()) {
-          logger.finer("Found a cluster, |C| = " + objects.size() + ", |D| = " + nD.cardinality());
+        // Get all points in the box.
+        for (DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
+          if (isPointInBounds(relation.get(iter), bounds)) {
+            nC.add(iter);
+          }
+        }
+        objects = nC;
+
+        if (LOG.isDebuggingFiner()) {
+          LOG.finer("Found a cluster, |C| = " + objects.size() + ", |D| = " + nD.cardinality());
         }
 
         // Is the cluster large enough?
-        if(objects.size() < minClusterSize) {
+        if (objects.size() < minClusterSize) {
           // Too small.
-          if(logger.isDebuggingFiner()) {
-            logger.finer("... but it's too small.");
+          if (LOG.isDebuggingFiner()) {
+            LOG.finer("... but it's too small.");
           }
-        }
-        else {
+        } else {
           // TODO not explicitly mentioned in the paper!
-          if(nD.cardinality() == 0) {
-            if(logger.isDebuggingFiner()) {
-              logger.finer("... but it has no relevant attributes.");
+          if (nD.cardinality() == 0) {
+            if (LOG.isDebuggingFiner()) {
+              LOG.finer("... but it has no relevant attributes.");
             }
-          }
-          else {
+          } else {
             // Better cluster than before?
             double nQuality = computeClusterQuality(objects.size(), nD.cardinality());
-            if(nQuality > quality) {
-              if(logger.isDebuggingFiner()) {
-                logger.finer("... and it's the best so far: " + nQuality + " vs. " + quality);
+            if (nQuality > quality) {
+              if (LOG.isDebuggingFiner()) {
+                LOG.finer("... and it's the best so far: " + nQuality + " vs. " + quality);
               }
 
               C = objects;
               D = nD;
               quality = nQuality;
-            }
-            else {
-              if(logger.isDebuggingFiner()) {
-                logger.finer("... but we already have a better one.");
+            } else {
+              if (LOG.isDebuggingFiner()) {
+                LOG.finer("... but we already have a better one.");
               }
             }
           }
         }
 
-        if(iprogress != null) {
-          iprogress.incrementProcessed(logger);
+        if (iprogress != null) {
+          iprogress.incrementProcessed(LOG);
         }
       }
     }
 
-    if(iprogress != null) {
-      iprogress.ensureCompleted(logger);
+    if (iprogress != null) {
+      iprogress.ensureCompleted(LOG);
     }
 
-    if(C != null) {
+    if (C != null) {
       return makeCluster(relation, C, D);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -385,10 +318,15 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * Performs a single run of FastDOC, finding a single cluster.
    * 
    * @param relation used to get actual values for DBIDs.
+   * @param S The set of points we're working on.
+   * @param d Dimensionality of the data set we're currently working on.
+   * @param r Size of random samples.
+   * @param m Number of inner iterations (per seed point).
+   * @param n Number of outer iterations (seed points).
    * @return a cluster, if one is found, else <code>null</code>.
    */
-  private Cluster<SubspaceModel<V>> runFastDOC(Relation<V> relation) {
-    logger.warning("FastDOC implementation is known to be faulty.");
+  private Cluster<SubspaceModel<V>> runFastDOC(Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r) {
+    LOG.warning("FastDOC implementation is known to be faulty.");
 
     // Relevant attributes of highest cardinality.
     BitSet D = null;
@@ -396,63 +334,64 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     V dV = null;
 
     // Inform the user about the progress in the current iteration.
-    FiniteProgress iprogress = logger.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, logger) : null;
+    FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
 
-    outer: for(int i = 0; i < n; ++i) {
+    Random random = rnd.getRandom();
+
+    outer: for (int i = 0; i < n; ++i) {
       // Pick a random seed point.
       DBID p = S.get(random.nextInt(S.size()));
       V pV = relation.get(p);
 
-      for(int j = 0; j < m; ++j) {
+      for (int j = 0; j < m; ++j) {
         // Choose a set of random points.
-        DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), (int) r), random.nextLong());
+        DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), r), random);
 
         // Initialize cluster info.
         BitSet nD = new BitSet(d);
 
         // Test each dimension and build bounding box while we're at it.
-        for(int k = 0; k < d; ++k) {
-          if(dimensionIsRelevant(k, relation, randomSet)) {
+        for (int k = 0; k < d; ++k) {
+          if (dimensionIsRelevant(k, relation, randomSet)) {
             nD.set(k);
           }
         }
 
-        if(D == null || nD.cardinality() > D.cardinality()) {
+        if (D == null || nD.cardinality() > D.cardinality()) {
           D = nD;
           dV = pV;
 
-          if(D.cardinality() >= d_zero) {
+          if (D.cardinality() >= d_zero) {
             if (iprogress != null) {
-              iprogress.setProcessed(iprogress.getTotal(), logger);
+              iprogress.setProcessed(iprogress.getTotal(), LOG);
             }
             break outer;
           }
         }
 
-        if(iprogress != null) {
-          iprogress.incrementProcessed(logger);
+        if (iprogress != null) {
+          iprogress.incrementProcessed(LOG);
         }
       }
     }
 
-    if(iprogress != null) {
-      iprogress.ensureCompleted(logger);
+    if (iprogress != null) {
+      iprogress.ensureCompleted(LOG);
     }
 
     // If no relevant dimensions were found, skip it.
-    if(D == null || D.cardinality() == 0) {
+    if (D == null || D.cardinality() == 0) {
       return null;
     }
 
     // Bounds for our cluster.
     double[] min = new double[d];
     double[] max = new double[d];
-    for(int k = 0; k < d; ++k) {
-      if(D.get(k)) {
+    for (int k = 0; k < d; ++k) {
+      if (D.get(k)) {
         min[k] = dV.doubleValue(k) - w;
         max[k] = dV.doubleValue(k) + w;
-      }
-      else {
+      } else {
         min[k] = Double.NEGATIVE_INFINITY;
         max[k] = Double.POSITIVE_INFINITY;
       }
@@ -464,7 +403,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // passed is one.
     Centroid centroid = Centroid.make(relation, S);
     double[] weights = new double[d];
-    for(int k = 0; k < d; ++k) {
+    for (int k = 0; k < d; ++k) {
       weights[k] = 1.0 / ((max[k] - min[k]) / 2.0);
     }
     DistanceQuery<V, DoubleDistance> distanceQuery = relation.getDatabase().getDistanceQuery(relation, new WeightedLPNormDistanceFunction(1.0, weights));
@@ -472,17 +411,12 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     DistanceDBIDList<DoubleDistance> objects = rangeQuery.getRangeForObject(centroid.toVector(relation), new DoubleDistance(1.0));
 
     // If we have a non-empty cluster, return it.
-    if(objects.size() > 0) {
+    if (objects.size() > 0) {
       return makeCluster(relation, objects, D);
-    }
-    else {
+    } else {
       return null;
     }
   }
-
-  // ---------------------------------------------------------------------- //
-  // Utility methods
-  // ---------------------------------------------------------------------- //
 
   /**
    * Utility method to test if a given dimension is relevant as determined via a
@@ -497,11 +431,11 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   private boolean dimensionIsRelevant(int dimension, Relation<V> relation, DBIDs points) {
     double min = Double.POSITIVE_INFINITY;
     double max = Double.NEGATIVE_INFINITY;
-    for(DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
       V xV = relation.get(iter);
       min = Math.min(min, xV.doubleValue(dimension));
       max = Math.max(max, xV.doubleValue(dimension));
-      if(max - min > w) {
+      if (max - min > w) {
         return false;
       }
     }
@@ -517,8 +451,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @return <code>true</code> if the point is inside the cube.
    */
   private boolean isPointInBounds(V v, HyperBoundingBox bounds) {
-    for(int i = 0; i < v.getDimensionality(); i++) {
-      if(v.doubleValue(i) < bounds.getMin(i) || v.doubleValue(i) > bounds.getMax(i)) {
+    for (int i = 0; i < v.getDimensionality(); i++) {
+      if (v.doubleValue(i) < bounds.getMin(i) || v.doubleValue(i) > bounds.getMax(i)) {
         return false;
       }
     }
@@ -535,10 +469,9 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @return an object representing the subspace cluster.
    */
   private Cluster<SubspaceModel<V>> makeCluster(Relation<V> relation, DBIDs C, BitSet D) {
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(C.size());
-    ids.addDBIDs(C);
-    Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(ids);
-    cluster.setModel(new SubspaceModel<V>(new Subspace(D), Centroid.make(relation, ids).toVector(relation)));
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(C);
+    Cluster<SubspaceModel<V>> cluster = new Cluster<>(ids);
+    cluster.setModel(new SubspaceModel<>(new Subspace(D), Centroid.make(relation, ids).toVector(relation)));
     return cluster;
   }
 
@@ -565,29 +498,76 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
-
-  // ---------------------------------------------------------------------- //
-  // Parameterization.
-  // ---------------------------------------------------------------------- //
 
   /**
    * Parameterization class.
    * 
+   * @author Florian Nuecke
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    /**
+     * Relative density threshold parameter Alpha.
+     */
+    public static final OptionID ALPHA_ID = new OptionID("doc.alpha", "Minimum relative density for a set of points to be considered a cluster (|C|>=doc.alpha*|S|).");
 
+    /**
+     * Balancing parameter for importance of points vs. dimensions
+     */
+    public static final OptionID BETA_ID = new OptionID("doc.beta", "Preference of cluster size versus number of relevant dimensions (higher value means higher priority on larger clusters).");
+
+    /**
+     * Half width parameter.
+     */
+    public static final OptionID W_ID = new OptionID("doc.w", "Maximum extent of scattering of points along a single attribute for the attribute to be considered relevant.");
+
+    /**
+     * Parameter to enable FastDOC heuristics.
+     */
+    public static final OptionID HEURISTICS_ID = new OptionID("doc.fastdoc", "Use heuristics as described, thus using the FastDOC algorithm (not yet implemented).");
+
+    /**
+     * Stopping threshold for FastDOC.
+     */
+    public static final OptionID D_ZERO_ID = new OptionID("doc.d0", "Parameter for FastDOC, setting the number of relevant attributes which, when found for a cluster, are deemed enough to stop iterating.");
+
+    /**
+     * Random seeding parameter.
+     */
+    public static final OptionID RANDOM_ID = new OptionID("doc.random-seed", "Random seed, for reproducible experiments.");
+
+    /**
+     * Relative density threshold parameter Alpha.
+     */
     protected double alpha;
 
+    /**
+     * Balancing parameter for importance of points vs. dimensions
+     */
     protected double beta;
 
+    /**
+     * Half width parameter.
+     */
     protected double w;
 
+    /**
+     * Parameter to enable FastDOC heuristics.
+     */
     protected boolean heuristics;
 
+    /**
+     * Stopping threshold for FastDOC.
+     */
     protected int d_zero;
+
+    /**
+     * Random seeding factory.
+     */
+    protected RandomFactory random = RandomFactory.DEFAULT;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -597,7 +577,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.2);
         param.addConstraint(new GreaterEqualConstraint(0));
         param.addConstraint(new LessEqualConstraint(1));
-        if(config.grab(param)) {
+        if (config.grab(param)) {
           alpha = param.getValue();
         }
       }
@@ -606,7 +586,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         DoubleParameter param = new DoubleParameter(BETA_ID, 0.8);
         param.addConstraint(new GreaterConstraint(0));
         param.addConstraint(new LessConstraint(1));
-        if(config.grab(param)) {
+        if (config.grab(param)) {
           beta = param.getValue();
         }
       }
@@ -614,31 +594,37 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       {
         DoubleParameter param = new DoubleParameter(W_ID, 0.05);
         param.addConstraint(new GreaterEqualConstraint(0));
-        if(config.grab(param)) {
+        if (config.grab(param)) {
           w = param.getValue();
         }
       }
 
       {
         Flag param = new Flag(HEURISTICS_ID);
-        if(config.grab(param)) {
+        if (config.grab(param)) {
           heuristics = param.getValue();
         }
       }
 
-      if(heuristics) {
+      if (heuristics) {
         IntParameter param = new IntParameter(D_ZERO_ID, 5);
         param.addConstraint(new GreaterConstraint(0));
-        if(config.grab(param)) {
+        if (config.grab(param)) {
           d_zero = param.getValue();
         }
       }
 
+      {
+        RandomParameter param = new RandomParameter(RANDOM_ID);
+        if (config.grab(param)) {
+          random = param.getValue();
+        }
+      }
     }
 
     @Override
     protected DOC<V> makeInstance() {
-      return new DOC<V>(alpha, beta, w, heuristics, d_zero);
+      return new DOC<>(alpha, beta, w, heuristics, d_zero, random);
     }
   }
 }
