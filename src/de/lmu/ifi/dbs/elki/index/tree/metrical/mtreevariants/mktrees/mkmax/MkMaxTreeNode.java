@@ -66,7 +66,6 @@ class MkMaxTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
    * Determines and returns the k-nearest neighbor distance of this node as the
    * maximum of the k-nearest neighbor distances of all entries.
    * 
-   * @param distanceFactory the distance function
    * @return the knn distance of this node
    */
   protected double kNNDistance() {

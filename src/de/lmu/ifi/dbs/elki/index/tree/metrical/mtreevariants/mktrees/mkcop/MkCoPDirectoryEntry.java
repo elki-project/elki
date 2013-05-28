@@ -38,6 +38,9 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry
  * @author Elke Achtert
  */
 class MkCoPDirectoryEntry extends MTreeDirectoryEntry implements MkCoPEntry {
+  /**
+   * Serialization version number.
+   */
   private static final long serialVersionUID = 2;
 
   /**
@@ -71,7 +74,6 @@ class MkCoPDirectoryEntry extends MTreeDirectoryEntry implements MkCoPEntry {
    * Returns the conservative approximated knn distance of the entry.
    * 
    * @param k the parameter k of the knn distance
-   * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
   @Override

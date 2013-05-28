@@ -63,7 +63,6 @@ class MkTabTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
    * Determines and returns the knn distance of this node as the maximum knn
    * distance of all entries.
    * 
-   * @param distanceFactory the distance function
    * @return the knn distance of this node
    */
   protected double[] kNNDistances() {

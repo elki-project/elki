@@ -38,6 +38,9 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * @author Elke Achtert
  */
 class MkCoPLeafEntry extends MTreeLeafEntry implements MkCoPEntry {
+  /**
+   * Serialization version ID.
+   */
   private static final long serialVersionUID = 2;
 
   /**
@@ -78,7 +81,6 @@ class MkCoPLeafEntry extends MTreeLeafEntry implements MkCoPEntry {
    * Returns the conservative approximated knn distance of the entry.
    * 
    * @param k the parameter k of the knn distance
-   * @param distanceFactory the distance function
    * @return the conservative approximated knn distance of the entry
    */
   @Override
@@ -89,9 +91,7 @@ class MkCoPLeafEntry extends MTreeLeafEntry implements MkCoPEntry {
   /**
    * Returns the progressive approximated knn distance of the entry.
    * 
-   * @param <O> Object type
    * @param k the parameter k of the knn distance
-   * @param distanceFactory the distance function
    * @return the progressive approximated knn distance of the entry
    */
   public double approximateProgressiveKnnDistance(int k) {

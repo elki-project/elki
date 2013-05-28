@@ -118,7 +118,6 @@ public class ApproximationLine implements Externalizable {
    * Returns the approximated knn-distance at the specified k.
    * 
    * @param k the value for which the knn-distance should be returned
-   * @param distanceFactory the distance function
    * @return the approximated knn-distance at the specified k
    */
   public double getApproximatedKnnDistance(int k) {
