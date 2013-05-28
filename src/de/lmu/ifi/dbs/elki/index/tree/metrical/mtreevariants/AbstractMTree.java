@@ -50,8 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * 
  * @apiviz.composedOf MTreeSettings
  * @apiviz.composedOf Statistics
- * @apiviz.has SplitResult oneway - - computes
  * @apiviz.has AbstractMTreeNode oneway - - contains
+ * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of Distance used in the metrical index

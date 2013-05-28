@@ -68,6 +68,8 @@ public class MedianLinkageMethod implements LinkageMethod {
    * Returns the static instance.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

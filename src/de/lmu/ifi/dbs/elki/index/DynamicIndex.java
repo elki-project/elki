@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Index that supports dynamic insertions and removals.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.excludeSubtypes
  */
 public interface DynamicIndex extends Index {
   /**

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * @author Elke Achtert
  * 
  * @apiviz.has MTreeEntry oneway - - contains
+ * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of DatabaseObject to be stored in the M-Tree
  * @param <D> the type of Distance used in the M-Tree

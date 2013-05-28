@@ -508,6 +508,13 @@ public class DocumentParameters {
     return htmldoc;
   }
 
+  /**
+   * Write to a Wiki format.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
   private static class WikiStream {
     PrintStream out;
 

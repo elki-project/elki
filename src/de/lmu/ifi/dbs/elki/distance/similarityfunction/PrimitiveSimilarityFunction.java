@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Elke Achtert
  * 
  * @apiviz.landmark
+ * @apiviz.excludeSubtypes
  * 
  * @param <O> object type
  * @param <D> distance type

@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Arthur Zimek
  * 
+ * @apiviz.excludeSubtypes
+ * 
  * @param <O> object type
  * @param <D> distance type
  */

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.excludeSubtypes
  * @apiviz.has KNNQuery oneway - - «provides»
  * 
  * @param <O> Object type

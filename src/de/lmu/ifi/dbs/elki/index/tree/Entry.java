@@ -30,6 +30,7 @@ import java.io.Externalizable;
  * represent a node or a data object.
  * 
  * @author Elke Achtert
+ * @apiviz.excludeSubtypes
  */
 public interface Entry extends Externalizable {
   /**

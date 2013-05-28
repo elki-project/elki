@@ -28,6 +28,8 @@ package de.lmu.ifi.dbs.elki.persistent;
  * persistently saved.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.excludeSubtypes
  */
 public interface Page {
   /**

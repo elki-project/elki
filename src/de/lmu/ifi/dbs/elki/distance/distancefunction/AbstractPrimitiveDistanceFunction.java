@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Arthur Zimek
  * 
+ * @apiviz.excludeSubtypes
+ * 
  * @param <O> the type of objects to compute the distances in between
  * @param <D> the type of Distance used
  */

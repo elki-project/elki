@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory,interface
+ * @apiviz.excludeSubtypes
  * @apiviz.has Index oneway - - «create»
  * @apiviz.composedOf PageFileFactory
  * 

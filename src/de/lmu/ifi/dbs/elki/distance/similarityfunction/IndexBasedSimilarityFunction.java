@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has Instance oneway - - «create»
  * @apiviz.landmark
  *
  * @param <O> Object type

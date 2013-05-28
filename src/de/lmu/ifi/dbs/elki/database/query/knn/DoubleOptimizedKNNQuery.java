@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 

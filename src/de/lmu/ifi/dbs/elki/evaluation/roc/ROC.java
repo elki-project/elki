@@ -138,6 +138,8 @@ public class ROC {
    * The ROC values would be incorrect then anyway!
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf DBIDIter
    */
   public static class SimpleAdapter implements ScoreIter, DBIDRef {
     /**
@@ -197,6 +199,9 @@ public class ROC {
    * The ROC values would be incorrect then anyway!
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf DistanceDBIDListIter
+   * 
    * @param <D> Distance type
    */
   public static class DistanceResultAdapter<D extends Distance<D>> implements ScoreIter, DBIDRef {
@@ -263,6 +268,8 @@ public class ROC {
    * The ROC values would be incorrect then anyway!
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf OutlierResult
    */
   public static class OutlierScoreAdapter implements ScoreIter, DBIDRef {
     /**
@@ -329,6 +336,8 @@ public class ROC {
    * Class to iterate over a number vector in decreasing order.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf NumberVector
    */
   public static class DecreasingVectorIter implements ScoreIter, IntegerComparator, ArrayIter {
     /**
@@ -410,6 +419,8 @@ public class ROC {
    * Class to iterate over a number vector in decreasing order.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf NumberVector
    */
   public static class IncreasingVectorIter implements ScoreIter, IntegerComparator, ArrayIter {
     /**
@@ -491,6 +502,8 @@ public class ROC {
    * Class that uses a NumberVector as reference, and considers all non-zero
    * values as positive entries.
    * 
+   * @apiviz.composedOf NumberVector
+   *
    * @author Erich Schubert
    */
   public static class VectorNonZero implements Predicate<DecreasingVectorIter> {
@@ -518,6 +531,8 @@ public class ROC {
    * Class that uses a NumberVector as reference, and considers all zero values
    * as positive entries.
    * 
+   * @apiviz.composedOf NumberVector
+   * 
    * @author Erich Schubert
    */
   public static class VectorZero implements Predicate<IncreasingVectorIter> {
@@ -543,6 +558,8 @@ public class ROC {
 
   /**
    * Test predicate using a DBID set as positive elements.
+   * 
+   * @apiviz.composedOf DBIDs
    * 
    * @author Erich Schubert
    */

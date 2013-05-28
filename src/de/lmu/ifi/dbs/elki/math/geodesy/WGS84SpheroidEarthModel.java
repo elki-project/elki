@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Flattening: 1 / 298.257223563
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 @Alias({ "wgs84", "WGS-84", "WGS84" })
 public class WGS84SpheroidEarthModel extends AbstractEarthModel {

@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Abstract base class for indexes with some implementation defaults.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.excludeSubtypes
  *
  * @param <O> Object type stored in the index
  */

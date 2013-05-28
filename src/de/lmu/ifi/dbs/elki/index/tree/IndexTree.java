@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @apiviz.composedOf PageFile
  * @apiviz.has Node oneway - - contains
  * @apiviz.has TreeIndexHeader oneway
+ * @apiviz.excludeSubtypes
  * 
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
