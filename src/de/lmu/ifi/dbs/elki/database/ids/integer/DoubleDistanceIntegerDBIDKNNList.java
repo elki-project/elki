@@ -35,8 +35,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * Class to store double distance, integer DBID results.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses DoubleIntegerArrayQuickSort
  */
-public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanceDBIDList, DoubleDistanceKNNList {
+public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanceDBIDList, DoubleDistanceKNNList, IntegerDBIDs {
   /**
    * Initial size allocation
    */
@@ -109,7 +111,7 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
   }
 
   @Override
-  public DoubleDistanceDBIDListIter iter() {
+  public DoubleDistanceIntegerDBIDListIter iter() {
     return new Itr();
   }
 
@@ -238,7 +240,7 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
    * 
    * @apiviz.exclude
    */
-  private class Itr implements DoubleDistanceDBIDListIter {
+  private class Itr implements DoubleDistanceIntegerDBIDListIter {
     int offset = 0;
 
     @Override
