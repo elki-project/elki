@@ -67,7 +67,6 @@ abstract public class MTree<O, D extends NumberDistance<D, ?>> extends AbstractM
   /**
    * Constructor.
    * 
-   * @param relation Relation to index
    * @param pagefile Page file
    * @param settings Tree settings
    */
