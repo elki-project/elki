@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * distance functions easier.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public abstract class AbstractSpatialDoubleDistanceNorm extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   @Override

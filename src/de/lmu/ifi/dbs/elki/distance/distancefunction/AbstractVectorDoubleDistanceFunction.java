@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.excludeSubtypes
  * @apiviz.uses NumberVector
  * @apiviz.has DoubleDistance
  */

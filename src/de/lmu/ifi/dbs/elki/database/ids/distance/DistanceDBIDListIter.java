@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.landmark
  * 
  * @apiviz.has DistanceDBIDPair - - iterator for
- * @apiviz.has DBID - - iterator for
  */
 public interface DistanceDBIDListIter<D extends Distance<D>> extends DBIDArrayIter {
   /**

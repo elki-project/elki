@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.persistent.Page;
  * @author Elke Achtert
  * 
  * @apiviz.composedOf Entry
+ * @apiviz.excludeSubtypes
  * 
  * @param <E> the type of Entry used in the index
  */

@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * Leaf entry
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.excludeSubtypes
  */
 public interface LeafEntry extends Entry {
   /**

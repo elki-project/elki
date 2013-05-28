@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses AbstractMTree oneway - - «create»
+ * @apiviz.excludeSubtypes
  * 
  * @param <O> Object type
  * @param <D> Distance type

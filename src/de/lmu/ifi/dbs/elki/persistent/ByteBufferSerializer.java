@@ -32,6 +32,7 @@ import java.nio.ByteBuffer;
  * @author Erich Schubert
  * 
  * @apiviz.uses ByteBuffer
+ * @apiviz.excludeSubtypes
  * 
  * @param <T> Object type processed
  */

@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.landmark
  * 
  * @apiviz.composedOf DistanceDBIDPair
- * @apiviz.has DistanceDBIDResultIter
  * 
  * @param <D> Distance type
  */

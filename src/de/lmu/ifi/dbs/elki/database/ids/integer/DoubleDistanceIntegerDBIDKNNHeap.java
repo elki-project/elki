@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
  * Class to efficiently manage a kNN heap.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has DoubleDistanceIntegerDBIDKNNList
+ * @apiviz.composedOf DoubleIntegerMaxHeap
  */
 public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
   /**

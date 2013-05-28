@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses DragListener
+ * @apiviz.has DragListener
  * @apiviz.has Element
  */
 public class DragableArea implements EventListener {
@@ -208,47 +208,43 @@ public class DragableArea implements EventListener {
 
   @Override
   public void handleEvent(Event evt) {
-    if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
+    if (evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEDOWN)) {
       SVGPoint dragPoint = getCoordinates(evt);
-      if(startDrag(dragPoint, evt)) {
+      if (startDrag(dragPoint, evt)) {
         // LoggingUtil.warning("Starting drag: "+dragPoint);
         startDragPoint = dragPoint;
         enableStop();
       }
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
-      if(startDragPoint != null) {
+    } else if (evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEMOVE)) {
+      if (startDragPoint != null) {
         SVGPoint dragPoint = getCoordinates(evt);
-        if(!duringDrag(startDragPoint, dragPoint, evt, evt.getTarget() == element)) {
+        if (!duringDrag(startDragPoint, dragPoint, evt, evt.getTarget() == element)) {
           // cancel the drag operation
           startDragPoint = null;
           disableStop();
         }
       }
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
-      if(startDragPoint != null) {
+    } else if (evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEUP)) {
+      if (startDragPoint != null) {
         SVGPoint dragPoint = getCoordinates(evt);
-        if(endDrag(startDragPoint, dragPoint, evt, evt.getTarget() == element)) {
+        if (endDrag(startDragPoint, dragPoint, evt, evt.getTarget() == element)) {
           // LoggingUtil.warning("Drag completed: "+dragPoint);
           startDragPoint = null;
           disableStop();
         }
       }
-    }
-    else if(evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEOUT)) {
+    } else if (evt.getType().equals(SVGConstants.SVG_EVENT_MOUSEOUT)) {
       // When leaving the document with the mouse!
-      if(startDragPoint != null && evt.getTarget() == evt.getCurrentTarget()) {
+      if (startDragPoint != null && evt.getTarget() == evt.getCurrentTarget()) {
         // LoggingUtil.warning("Mouseout: "+evt.getTarget().toString());
         SVGPoint dragPoint = getCoordinates(evt);
-        if(endDrag(startDragPoint, dragPoint, evt, false)) {
+        if (endDrag(startDragPoint, dragPoint, evt, false)) {
           // LoggingUtil.warning("Drag completed: "+dragPoint);
           startDragPoint = null;
           disableStop();
         }
       }
-    }
-    else {
+    } else {
       LoggingUtil.warning("Unrecognized event: " + evt);
     }
   }
@@ -271,7 +267,7 @@ public class DragableArea implements EventListener {
    * @return {@code true} to start the drag operation
    */
   protected boolean startDrag(SVGPoint startPoint, Event evt) {
-    if(listener != null) {
+    if (listener != null) {
       return listener.startDrag(startPoint, evt);
     }
     return true;
@@ -287,7 +283,7 @@ public class DragableArea implements EventListener {
    * @return {@code true} to continue the drag
    */
   protected boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-    if(listener != null) {
+    if (listener != null) {
       return listener.duringDrag(startPoint, dragPoint, evt, inside);
     }
     return true;
@@ -303,7 +299,7 @@ public class DragableArea implements EventListener {
    * @return {@code true} to complete the drag
    */
   protected boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-    if(listener != null) {
+    if (listener != null) {
       return listener.endDrag(startPoint, dragPoint, evt, inside);
     }
     return true;
@@ -334,6 +330,8 @@ public class DragableArea implements EventListener {
    * Listener interface for drag events.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.excludeSubtypes
    */
   public interface DragListener {
     /**

@@ -40,14 +40,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.has 
- *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
- *             .Factory
- * @apiviz.uses Instance oneway - - «create»
+ * @apiviz.has de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
+ * @apiviz.has Instance oneway - - «create»
  * 
  * @param <O> object type
  */
-// todo arthur comment class
 public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, ArrayDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
   /**
    * Constructor.
@@ -96,17 +93,15 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
       int intersection = 0;
       DBIDIter iter1 = neighbors1.iter();
       DBIDIter iter2 = neighbors2.iter();
-      while(iter1.valid() && iter2.valid()) {
+      while (iter1.valid() && iter2.valid()) {
         final int comp = DBIDUtil.compare(iter1, iter2);
-        if(comp == 0) {
+        if (comp == 0) {
           intersection++;
           iter1.advance();
           iter2.advance();
-        }
-        else if(comp < 0) {
+        } else if (comp < 0) {
           iter1.advance();
-        }
-        else // iter2 < iter1
+        } else // iter2 < iter1
         {
           iter2.advance();
         }

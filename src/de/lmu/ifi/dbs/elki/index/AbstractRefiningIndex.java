@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.excludeSubtypes
  * @apiviz.has AbstractRangeQuery
  * @apiviz.has AbstractKNNQuery
  * 

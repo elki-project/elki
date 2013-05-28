@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses TextWriteable
+ * @apiviz.has TextWriteable
  */
 public class TextWriterTextWriteable extends TextWriterWriterInterface<TextWriteable> {
   /**

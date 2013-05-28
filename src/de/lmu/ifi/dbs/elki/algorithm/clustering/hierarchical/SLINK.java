@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Elke Achtert
  * @author Erich Schubert
  * 
- * @apiviz.uses SingleLinkageMethod
+ * @apiviz.has SingleLinkageMethod
  * 
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used

@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf DoubleDistanceDBIDPair
- * @apiviz.has DoubleDistanceDBIDResultIter
+ * @apiviz.has DoubleDistanceDBIDListIter
  */
 public class DoubleDistanceDBIDPairList implements ModifiableDoubleDistanceDBIDList {
   /**

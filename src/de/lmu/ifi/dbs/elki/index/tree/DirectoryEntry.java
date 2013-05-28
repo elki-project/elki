@@ -27,6 +27,8 @@ package de.lmu.ifi.dbs.elki.index.tree;
  * Directory Entry
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.excludeSubtypes
  */
 public interface DirectoryEntry extends Entry {
   /**

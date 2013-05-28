@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @apiviz.stereotype factory,interface
  * @apiviz.has Index oneway - - «create»
+ * @apiviz.excludeSubtypes
  *
  * @param <V> Input object type
  * @param <I> Index type

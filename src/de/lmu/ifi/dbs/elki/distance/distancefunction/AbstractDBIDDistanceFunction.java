@@ -37,6 +37,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Arthur Zimek
  * 
+ * @apiviz.excludeSubtypes
+ * 
  * @param <D> the type of Distance used
  */
 public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implements DBIDDistanceFunction<D> {

@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf DoubleDistanceDBIDPair
- * @apiviz.has DoubleDistanceDBIDResultIter
+ * @apiviz.has DoubleDistanceDBIDListIter
  */
 public class DoubleDistanceDBIDPairKNNList implements DoubleDistanceKNNList {
   /**
