@@ -77,6 +77,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf LinkageMethod
+ * 
  * @param <O> Object type
  */
 @Reference(authors = "G. N. Lance and W. T. Williams", title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", booktitle = "The computer journal 9.4", url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
@@ -261,6 +263,8 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
    * Parameterization class
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    * 
    * @param <O> Object type
    * @param <D> Distance type

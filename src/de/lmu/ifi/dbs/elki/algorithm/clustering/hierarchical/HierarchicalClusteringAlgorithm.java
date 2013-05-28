@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has PointerHierarchyRepresentation
+ * 
  * @param <D> Distance type
  */
 public interface HierarchicalClusteringAlgorithm<D extends Distance<D>> extends Algorithm {

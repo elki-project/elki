@@ -70,6 +70,10 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * FIXME: re-check tie handling!
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses HierarchicalClusteringAlgorithm
+ * @apiviz.uses PointerHierarchyRepresentation
+ * @apiviz.has Clustering
  */
 public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implements ClusteringAlgorithm<Clustering<DendrogramModel<D>>> {
   /**
