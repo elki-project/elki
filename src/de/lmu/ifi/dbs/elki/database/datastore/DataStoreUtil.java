@@ -129,7 +129,6 @@ public final class DataStoreUtil {
    * Make a new storage, to associate the given ids with an double valued
    * distance.
    * 
-   * @param <T> stored data type
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @return new data store
@@ -138,5 +137,4 @@ public final class DataStoreUtil {
     // FIXME: this is an ugly work-around.
     return (WritableDoubleDistanceDataStore) DataStoreFactory.FACTORY.makeStorage(ids, hints, DoubleDistance.class);
   }
-
 }

@@ -86,9 +86,9 @@ public final class SphereUtil {
    * @param lon2 Longitude of second point in degree
    * @return Distance on unit sphere
    */
-  public static double cosineFormulaDeg(double lat1, double lng1, double lat2, double lng2) {
-    return cosineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lng1),//
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lng2));
+  public static double cosineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
+    return cosineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
+        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
@@ -111,10 +111,10 @@ public final class SphereUtil {
    * @param lon2 Longitude of second point in degree
    * @return Distance on unit sphere
    */
-  public static double cosineFormulaRad(double lat1, double lng1, double lat2, double lng2) {
+  public static double cosineFormulaRad(double lat1, double lon1, double lat2, double lon2) {
     final double slat1 = Math.sin(lat1), clat1 = MathUtil.sinToCos(lat1, slat1);
     final double slat2 = Math.sin(lat2), clat2 = MathUtil.sinToCos(lat2, slat2);
-    return Math.acos(Math.min(1.0, slat1 * slat2 + clat1 * clat2 * Math.cos(Math.abs(lng2 - lng1))));
+    return Math.acos(Math.min(1.0, slat1 * slat2 + clat1 * clat2 * Math.cos(Math.abs(lon2 - lon1))));
   }
 
   /**

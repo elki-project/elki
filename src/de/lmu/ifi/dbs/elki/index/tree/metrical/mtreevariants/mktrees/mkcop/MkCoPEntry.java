@@ -38,12 +38,10 @@ interface MkCoPEntry extends MTreeEntry {
   /**
    * Returns the conservative approximated knn distance of the entry.
    * 
-   * @param <O> Object type
    * @param k the parameter k of the knn distance
-   * @param distanceFactory the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public <O> double approximateConservativeKnnDistance(int k);
+  public double approximateConservativeKnnDistance(int k);
 
   /**
    * Returns the conservative approximation line.

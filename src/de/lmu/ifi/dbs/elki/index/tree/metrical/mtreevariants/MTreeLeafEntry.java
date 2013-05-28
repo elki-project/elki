@@ -37,9 +37,11 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
  * M-Tree.
  * 
  * @author Elke Achtert
- * @param <D> the type of Distance used in the M-Tree
  */
 public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
+  /**
+   * Serialization version ID.
+   */
   private static final long serialVersionUID = 2;
 
   /**

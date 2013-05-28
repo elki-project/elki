@@ -157,7 +157,7 @@ public class ExtractFlatClusteringFromHierarchy<D extends Distance<D>> implement
    * Constructor.
    * 
    * @param algorithm Algorithm to run
-   * @param minclusters Minimum number of clusters
+   * @param threshold Distance threshold
    * @param outputmode Output mode: truncated hierarchy or strict partitions.
    * @param singletons Allow producing singleton clusters.
    */

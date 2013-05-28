@@ -200,7 +200,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    * 
    * @apiviz.exclude
    * 
-   * @param<O> object type
+   * @param <O> object type
    */
   private static class Rec<O> {
     /**

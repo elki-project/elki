@@ -71,7 +71,7 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
    * 
    * @param relation Relation to index
    * @param pagefile Page file
-   * @param setting Tree settings
+   * @param settings Tree settings
    */
   public RStarTreeIndex(Relation<O> relation, PageFile<RStarTreeNode> pagefile, AbstractRTreeSettings settings) {
     super(pagefile, settings);

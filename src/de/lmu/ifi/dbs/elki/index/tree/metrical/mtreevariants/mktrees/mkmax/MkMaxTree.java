@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 /**
  * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
  * supporting efficient processing of reverse k nearest neighbor queries for
- * parameter k <= k_max. The k-nearest neigbor distance for k = k_max is stored
+ * parameter k <= k_max. The k-nearest neighbor distance for k = k_max is stored
  * in each entry of a node.
  * 
  * @author Elke Achtert
@@ -79,7 +79,7 @@ public class MkMaxTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. In the
    * first step the candidates are chosen by performing a reverse k-nearest
-   * neighbor query with k = {@link #k_max}. Then these candidates are refined
+   * neighbor query with k = {@link #getKmax()}. Then these candidates are refined
    * in a second step.
    */
   @Override
@@ -161,9 +161,9 @@ public class MkMaxTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
   /**
    * Performs a reverse k-nearest neighbor query in the specified subtree for
-   * the given query object with k = {@link #k_max}. It recursively traverses
+   * the given query object with k = {@link #getKmax()}. It recursively traverses
    * all paths from the specified node, which cannot be excluded from leading to
-   * qualififying objects.
+   * qualifying objects.
    * 
    * @param q the id of the query object
    * @param node the node of the subtree on which the query is performed
