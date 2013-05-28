@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has FeatureVector
+ * 
  * @param <V> Vector type
  */
 public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTypeInformation<V> {

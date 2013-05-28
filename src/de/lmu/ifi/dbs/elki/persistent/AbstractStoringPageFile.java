@@ -33,9 +33,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has Page
- * @apiviz.has PageFileStatistics
- * 
  * @param <P> Page type
  */
 public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPageFile<P> {

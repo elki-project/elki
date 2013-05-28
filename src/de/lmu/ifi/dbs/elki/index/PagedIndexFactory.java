@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @apiviz.stereotype factory,interface
  * @apiviz.excludeSubtypes
- * @apiviz.has Index oneway - - «create»
  * @apiviz.composedOf PageFileFactory
  * 
  * @param <O> Object type

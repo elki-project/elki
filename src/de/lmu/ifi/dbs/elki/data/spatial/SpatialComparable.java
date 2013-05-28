@@ -23,12 +23,13 @@ package de.lmu.ifi.dbs.elki.data.spatial;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 /**
  * Defines the required methods needed for comparison of spatial objects.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.landmark
+ * @apiviz.excludeSubtypes
  */
 public interface SpatialComparable {
   /**

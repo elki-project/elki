@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * 
  * @apiviz.has Clustering
  * @apiviz.has Model
+ * @apiviz.excludeSubtypes
  * 
  * @param <C> Clustering type
  */

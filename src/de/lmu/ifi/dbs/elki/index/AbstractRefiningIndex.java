@@ -80,7 +80,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
       refinements.increment(i);
     }
   }
-  
+
   @Override
   public void logStatistics() {
     if (refinements != null) {
@@ -103,6 +103,8 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    * Range query for this index.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.excludeSubtypes
    */
   public abstract class AbstractRangeQuery<D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
     /**
@@ -146,6 +148,8 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    * KNN query for this index.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.excludeSubtypes
    */
   public abstract class AbstractKNNQuery<D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
     /**
