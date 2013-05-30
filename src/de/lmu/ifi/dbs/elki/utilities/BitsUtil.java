@@ -969,19 +969,19 @@ public final class BitsUtil {
    * @return Position of first set bit, 64 if no set bit was found.
    */
   public static int numberOfLeadingZeros(long v) {
-    return Long.SIZE - magnitude(v);
+    return Long.numberOfLeadingZeros(v);
   }
 
   /**
-   * Find the number of leading zeros; 64 if all zero
+   * Find the number of leading zeros; 32 if all zero
    * 
-   * Note: this the same as {@link Long#numberOfLeadingZeros}.
+   * Note: this the same as {@link Integer#numberOfLeadingZeros}.
    * 
    * @param v Bitset
-   * @return Position of first set bit, 64 if no set bit was found.
+   * @return Position of first set bit, 32 if no set bit was found.
    */
   public static int numberOfLeadingZeros(int v) {
-    return Integer.SIZE - magnitude(v);
+    return Integer.numberOfLeadingZeros(v);
   }
 
   /**
@@ -1114,34 +1114,7 @@ public final class BitsUtil {
    * @return position of highest bit set, or 0.
    */
   public static int magnitude(long v) {
-    int log = 0, t;
-    if ((v & 0xffffffff00000000L) != 0) {
-      t = (int) (v >>>= 32);
-      log = 32;
-    } else {
-      t = (int) v;
-    }
-    if ((t & 0xffff0000) != 0) {
-      t >>>= 16;
-      log += 16;
-    }
-    if (t >= 256) {
-      t >>>= 8;
-      log += 8;
-    }
-    if (t >= 16) {
-      t >>>= 4;
-      log += 4;
-    }
-    if (t >= 4) {
-      t >>>= 2;
-      log += 2;
-    }
-    if (t >= 2) {
-      t >>>= 1;
-      log += 1;
-    }
-    return log + t;
+    return Long.SIZE - Long.numberOfLeadingZeros(v);
   }
 
   /**
@@ -1151,28 +1124,7 @@ public final class BitsUtil {
    * @return position of highest bit set, or 0.
    */
   public static int magnitude(int v) {
-    int log = 0;
-    if ((v & 0xffff0000) != 0) {
-      v >>>= 16;
-      log = 16;
-    }
-    if (v >= 256) {
-      v >>>= 8;
-      log += 8;
-    }
-    if (v >= 16) {
-      v >>>= 4;
-      log += 4;
-    }
-    if (v >= 4) {
-      v >>>= 2;
-      log += 2;
-    }
-    if (v >= 2) {
-      v >>>= 1;
-      log += 1;
-    }
-    return log + v;
+    return Integer.SIZE - Integer.numberOfLeadingZeros(v);
   }
 
   /**
