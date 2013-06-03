@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.data.projection;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -31,38 +29,32 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.AchlioptasRandomProjectionFamily;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Random projections as suggested by Dimitris Achlioptas.
+ * Randomized projections of the data.
  * 
- * Reference:
- * <p>
- * Database-friendly random projections: Johnson-Lindenstrauss with binary coins
- * <br />
- * Dimitris Achlioptas<br />
- * In: Proceedings of the twentieth ACM SIGMOD-SIGACT-SIGART symposium on
- * Principles of database systems
- * </p>
+ * This class allows projecting the data with different types of random
+ * projections, in particular database friendly projections (as suggested by
+ * Achlioptas, see {@link AchlioptasRandomProjectionFamily}), but also as
+ * suggested for locality sensitive hashing (LSH).
  * 
  * @author Erich Schubert
  * 
  * @param <V> Vector type
  */
-@Reference(title = "Database-friendly random projections: Johnson-Lindenstrauss with binary coins", authors = "Dimitris Achlioptas", booktitle = "Proceedings of the twentieth ACM SIGMOD-SIGACT-SIGART symposium on Principles of database systems", url = "http://dx.doi.org/10.1145/375551.375608")
-public class AchlioptasRandomProjection<V extends NumberVector<?>> implements Projection<V, V> {
+public class RandomProjection<V extends NumberVector<?>> implements Projection<V, V> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(AchlioptasRandomProjection.class);
+  private static final Logging LOG = Logging.getLogger(RandomProjection.class);
 
   /**
    * Vector factory.
@@ -75,31 +67,25 @@ public class AchlioptasRandomProjection<V extends NumberVector<?>> implements Pr
   private int dimensionality;
 
   /**
-   * Projection sparsity.
-   */
-  private double sparsity;
-
-  /**
    * Projection matrix.
    */
   private Matrix projectionMatrix = null;
 
   /**
-   * Random generator.
+   * Random projection family
    */
-  private RandomFactory random;
+  private RandomProjectionFamily family;
 
   /**
    * Constructor.
    * 
    * @param dimensionality Desired dimensionality
-   * @param sparsity Desired matrix sparsity
+   * @param family Random projection family
    */
-  public AchlioptasRandomProjection(int dimensionality, double sparsity, RandomFactory random) {
+  public RandomProjection(int dimensionality, RandomProjectionFamily family) {
     super();
     this.dimensionality = dimensionality;
-    this.sparsity = sparsity;
-    this.random = random;
+    this.family = family;
   }
 
   @Override
@@ -108,27 +94,7 @@ public class AchlioptasRandomProjection<V extends NumberVector<?>> implements Pr
     factory = (NumberVector.Factory<V, ?>) vin.getFactory();
     int inputdim = vin.getDimensionality();
 
-    final double pPos = .5 / sparsity;
-    final double pNeg = pPos + pPos; // Threshold
-    double baseValuePart = Math.sqrt(this.sparsity);
-
-    projectionMatrix = new Matrix(dimensionality, inputdim);
-    Random rnd = random.getRandom();
-    for (int i = 0; i < dimensionality; ++i) {
-      for (int j = 0; j < inputdim; ++j) {
-        final double r = rnd.nextDouble();
-        final double value;
-        if (r < pPos) {
-          value = baseValuePart;
-        } else if (r < pNeg) {
-          value = -baseValuePart;
-        } else {
-          value = 0.;
-        }
-
-        projectionMatrix.set(i, j, value);
-      }
-    }
+    projectionMatrix = family.generateProjectionMatrix(dimensionality, inputdim);
     if (LOG.isDebugging()) {
       LOG.debug(projectionMatrix.toString());
     }
@@ -159,9 +125,9 @@ public class AchlioptasRandomProjection<V extends NumberVector<?>> implements Pr
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Parameter for the projection sparsity.
+     * Parameter for the projection family.
      */
-    public static final OptionID SPARSITY_ID = new OptionID("randomproj.sparsity", "Frequency of zeros in the projection matrix.");
+    public static final OptionID FAMILY_ID = new OptionID("randomproj.family", "Projection family to use.");
 
     /**
      * Parameter for the desired output dimensionality.
@@ -169,33 +135,22 @@ public class AchlioptasRandomProjection<V extends NumberVector<?>> implements Pr
     public static final OptionID DIMENSIONALITY_ID = new OptionID("randomproj.dimensionality", "Amount of dimensions to project to.");
 
     /**
-     * Parameter for the random generator.
-     */
-    public static final OptionID RANDOM_ID = new OptionID("randomproj.random", "Random generator seed.");
-
-    /**
      * Output dimensionality.
      */
     private int dimensionality;
 
     /**
-     * Projection sparsity
-     */
-    private double sparsity;
-
-    /**
      * Random generator.
      */
-    private RandomFactory random;
+    private RandomProjectionFamily family;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter sparsP = new DoubleParameter(SPARSITY_ID);
-      sparsP.setDefaultValue(3.);
-      sparsP.addConstraint(new GreaterEqualConstraint(1.));
-      if (config.grab(sparsP)) {
-        sparsity = sparsP.doubleValue();
+      ObjectParameter<RandomProjectionFamily> familyP = new ObjectParameter<>(FAMILY_ID, RandomProjectionFamily.class);
+      familyP.setDefaultValue(AchlioptasRandomProjectionFamily.class);
+      if (config.grab(familyP)) {
+        family = familyP.instantiateClass(config);
       }
 
       IntParameter dimP = new IntParameter(DIMENSIONALITY_ID);
@@ -203,16 +158,11 @@ public class AchlioptasRandomProjection<V extends NumberVector<?>> implements Pr
       if (config.grab(dimP)) {
         dimensionality = dimP.intValue();
       }
-
-      RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if (config.grab(rndP)) {
-        random = rndP.getValue();
-      }
     }
 
     @Override
-    protected AchlioptasRandomProjection<NumberVector<?>> makeInstance() {
-      return new AchlioptasRandomProjection<>(dimensionality, sparsity, random);
+    protected RandomProjection<NumberVector<?>> makeInstance() {
+      return new RandomProjection<>(dimensionality, family);
     }
   }
 }

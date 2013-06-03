@@ -24,8 +24,9 @@ package de.lmu.ifi.dbs.elki.index.projected;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.projection.AchlioptasRandomProjection;
+import de.lmu.ifi.dbs.elki.data.projection.RandomProjection;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.AchlioptasRandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -67,7 +68,7 @@ public class PINN<O extends NumberVector<?>> extends ProjectedIndex.Factory<O, O
    * @param random Random generator factory
    */
   public PINN(IndexFactory<O, ?> inner, int t, double s, double h, RandomFactory random) {
-    super(new AchlioptasRandomProjection<O>(t, s, random), inner, true, false, h);
+    super(new RandomProjection<O>(t, new AchlioptasRandomProjectionFamily(s, random)), inner, true, false, h);
   }
 
   /**
