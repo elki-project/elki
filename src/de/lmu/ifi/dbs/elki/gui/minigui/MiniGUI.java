@@ -343,6 +343,7 @@ public class MiniGUI extends AbstractApplication {
     List<String> remainingParameters = config.getRemainingParameters();
 
     // update table:
+    parameterTable.removeEditor();
     parameterTable.setEnabled(false);
     parameters.updateFromTrackParameters(track);
     // Add remaining parameters
