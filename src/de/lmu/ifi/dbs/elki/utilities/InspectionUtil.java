@@ -323,7 +323,15 @@ public class InspectionUtil {
   public static class ClassSorter implements Comparator<Class<?>> {
     @Override
     public int compare(Class<?> o1, Class<?> o2) {
-      int pkgcmp = o1.getPackage().getName().compareTo(o2.getPackage().getName());
+      Package p1 = o1.getPackage();
+      Package p2 = o2.getPackage();
+      if (p1 == null) {
+        return -1;
+      }
+      if (p2 == null) {
+        return 1;
+      }
+      int pkgcmp = p1.getName().compareTo(p2.getName());
       if (pkgcmp != 0) {
         return pkgcmp;
       }
