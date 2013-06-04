@@ -94,7 +94,7 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
     factory = (NumberVector.Factory<V, ?>) vin.getFactory();
     int inputdim = vin.getDimensionality();
 
-    projectionMatrix = family.generateProjectionMatrix(dimensionality, inputdim);
+    projectionMatrix = family.generateProjectionMatrix(inputdim, dimensionality);
     if (LOG.isDebugging()) {
       LOG.debug(projectionMatrix.toString());
     }
