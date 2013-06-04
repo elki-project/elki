@@ -84,7 +84,6 @@ public class DoubleDistanceDBIDPairKNNList implements DoubleDistanceKNNList {
     super();
     this.data = new DoubleDistanceDBIDPair[heap.size()];
     this.k = heap.getK();
-    assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
     while (heap.size() > 0) {
@@ -127,11 +126,17 @@ public class DoubleDistanceDBIDPairKNNList implements DoubleDistanceKNNList {
   @Override
   @Deprecated
   public DoubleDistance getKNNDistance() {
+    if (size() < k) {
+      return DoubleDistance.INFINITE_DISTANCE;
+    }
     return get(k - 1).getDistance();
   }
 
   @Override
   public double doubleKNNDistance() {
+    if (size() < k) {
+      return Double.POSITIVE_INFINITY;
+    }
     return get(k - 1).doubleDistance();
   }
 
