@@ -40,6 +40,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -267,6 +270,16 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+  
+  @Override
+  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distQ, Object... hints) {
+    for(Object hint : hints) {
+      if (DatabaseQuery.HINT_EXACT.equals(hint)) {
+        return null;
+      }
+    }
+    return super.getKNNQuery(distQ, hints);
   }
 
   @Override

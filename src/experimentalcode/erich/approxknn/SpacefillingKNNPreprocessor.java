@@ -227,7 +227,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     for (Object hint : hints) {
-      if (DatabaseQuery.HINT_EXACT == hint) {
+      if (DatabaseQuery.HINT_EXACT.equals(hint)) {
         return null;
       }
     }
