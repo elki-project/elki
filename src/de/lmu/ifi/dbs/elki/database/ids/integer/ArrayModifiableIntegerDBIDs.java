@@ -115,6 +115,10 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
    */
   private void ensureSize(int minsize) {
     int asize = store.length;
+    // Ensure a minimum size, to not run into an infinite loop below!
+    if (asize < 2) {
+      asize = 2;
+    }
     while(asize < minsize) {
       asize = (asize >> 1) + asize;
     }
