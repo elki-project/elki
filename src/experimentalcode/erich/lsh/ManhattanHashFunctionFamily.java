@@ -22,7 +22,8 @@ package experimentalcode.erich.lsh;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.GaussianRandomProjectionFamily;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.CauchyRandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  */
 @Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", title = "Locality-sensitive hashing scheme based on p-stable distributions", booktitle = "Proc. 20th annual symposium on Computational geometry", url = "http://dx.doi.org/10.1145/997817.997857")
-public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
+public class ManhattanHashFunctionFamily extends AbstractHashFunctionFamily {
   /**
    * Constructor.
    * 
@@ -47,8 +48,8 @@ public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
    * @param width Bin width
    * @param l Number of projections to combine.
    */
-  public EuclideanHashFunctionFamily(RandomFactory random, double width, int l) {
-    super(random, new GaussianRandomProjectionFamily(random), width, l);
+  public ManhattanHashFunctionFamily(RandomFactory random, double width, int l) {
+    super(random, new CauchyRandomProjectionFamily(random), width, l);
   }
 
   /**
@@ -60,8 +61,8 @@ public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
    */
   public static class Parameterizer extends AbstractHashFunctionFamily.Parameterizer {
     @Override
-    protected EuclideanHashFunctionFamily makeInstance() {
-      return new EuclideanHashFunctionFamily(random, width, l);
+    protected ManhattanHashFunctionFamily makeInstance() {
+      return new ManhattanHashFunctionFamily(random, width, l);
     }
   }
 }
