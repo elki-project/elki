@@ -61,7 +61,6 @@ public class DistanceDBIDPairKNNList<D extends Distance<D>> implements KNNList<D
     super();
     this.data = new Object[heap.size()];
     this.k = heap.getK();
-    assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
     while (heap.size() > 0) {
