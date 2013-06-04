@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
@@ -158,7 +159,8 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         hashtables.add(new TIntObjectHashMap<DBIDs>(numberOfBuckets));
       }
 
-      int expect = relation.size() / numberOfBuckets;
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Building LSH index.", relation.size(), LOG) : null;
+      int expect = Math.max(2, (int)Math.ceil(relation.size() / (double) numberOfBuckets));
       for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         V obj = relation.get(iter);
         for (int i = 0; i < numhash; i++) {
@@ -180,6 +182,12 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
             table.put(bucket, newbuck);
           }
         }
+        if (progress != null) {
+          progress.incrementProcessed(LOG);
+        }
+      }
+      if (progress != null) {
+        progress.ensureCompleted(LOG);
       }
       if (LOG.isStatistics()) {
         Mean bmean = new Mean();
