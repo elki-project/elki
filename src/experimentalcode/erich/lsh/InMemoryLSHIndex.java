@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -199,6 +200,11 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
     @Override
     public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+      for (Object hint : hints) {
+        if (DatabaseQuery.HINT_EXACT.equals(hint)) {
+          return null;
+        }
+      }
       DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
       if (!family.isCompatible(df)) {
         return null;
