@@ -1,4 +1,4 @@
-package experimentalcode.erich.lsh;
+package de.lmu.ifi.dbs.elki.index.lsh;
 
 /*
  This file is part of ELKI:
@@ -48,6 +48,8 @@ import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
+import de.lmu.ifi.dbs.elki.index.lsh.hashfamilies.LocalitySensitiveHashFunctionFamily;
+import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;

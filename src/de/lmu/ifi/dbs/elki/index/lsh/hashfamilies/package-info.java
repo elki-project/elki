@@ -1,5 +1,6 @@
-package experimentalcode.erich.lsh;
-
+/**
+ * <p>Hash function families for LSH.</p>
+ */
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,20 +23,5 @@ package experimentalcode.erich.lsh;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.index.lsh.hashfamilies;
 
-/**
- * Hash functions as used by locality sensitive hashing.
- * 
- * @author Erich Schubert
- * 
- * @param <V> Data type to hash.
- */
-public interface LocalitySensitiveHashFunction<V> {
-  /**
-   * Compute the hash value of an object
-   * 
-   * @param obj Object to hash
-   * @return Hash value
-   */
-  int hashObject(V obj);
-}

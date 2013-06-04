@@ -1,4 +1,4 @@
-package experimentalcode.erich.lsh;
+package de.lmu.ifi.dbs.elki.index.lsh.hashfamilies;
 
 /*
  This file is part of ELKI:
@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
+import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.MultipleProjectionsLocalitySensitiveHashFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
