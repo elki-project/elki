@@ -78,10 +78,13 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
     // Generate random shifts:
     final int num = projection.getRowDimensionality();
     this.shift = new double[num];
+    this.randoms1 = new int[num];
     Random rnd = random.getRandom();
     for (int i = 0; i < num; i++) {
       shift[i] = rnd.nextDouble() * width;
-      randoms1[i] = rnd.nextInt(0xFFFFFFFA) + 1;
+      // Produce a large random number; although 7FFFFFFF would likely be large
+      // enough, we try to stick to the suggested approach (which assumes unsigned integers).
+      randoms1[i] = (rnd.nextInt(0x7FFFFFFD) << 1) + rnd.nextInt(1) + 1;
     }
   }
 

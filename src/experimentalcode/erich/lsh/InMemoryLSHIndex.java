@@ -40,6 +40,12 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Locality Sensitive Hashing.
@@ -64,9 +70,28 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
    */
   int k;
 
+  /**
+   * Number of buckets to use.
+   */
+  int numberOfBuckets;
+
+  /**
+   * Constructor.
+   * 
+   * @param family Projection family
+   * @param k Number of hash tables to use
+   * @param numberOfBuckets Number of buckets to use.
+   */
+  public InMemoryLSHIndex(LocalitySensitiveHashFunctionFamily<? super V> family, int k, int numberOfBuckets) {
+    super();
+    this.family = family;
+    this.k = k;
+    this.numberOfBuckets = numberOfBuckets;
+  }
+
   @Override
   public Instance<V> instantiate(Relation<V> relation) {
-    return new Instance<>(relation, family.generateHashFunctions(relation, k));
+    return new Instance<>(relation, family.generateHashFunctions(relation, k), numberOfBuckets);
   }
 
   @Override
@@ -86,11 +111,6 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
     ArrayList<? extends LocalitySensitiveHashFunction<? super V>> hashfunctions;
 
     /**
-     * Number of buckets for each hash function.
-     */
-    private int bucketsPerHash;
-
-    /**
      * The actual table
      */
     ArrayList<TIntObjectMap<DBIDs>> hashtables;
@@ -98,7 +118,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
     /**
      * Number of buckets to use.
      */
-    private int numberOfBuckets = 100;
+    private int numberOfBuckets;
 
     /**
      * Constructor.
@@ -106,9 +126,10 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
      * @param relation Relation to index.
      * @param hashfunctions Hash functions.
      */
-    public Instance(Relation<V> relation, ArrayList<? extends LocalitySensitiveHashFunction<? super V>> hashfunctions) {
+    public Instance(Relation<V> relation, ArrayList<? extends LocalitySensitiveHashFunction<? super V>> hashfunctions, int numberOfBuckets) {
       super(relation);
       this.hashfunctions = hashfunctions;
+      this.numberOfBuckets = numberOfBuckets;
     }
 
     @Override
@@ -123,15 +144,15 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
 
     @Override
     public void initialize() {
-      final int totalbuckets = bucketsPerHash * hashfunctions.size();
-      hashtables = new ArrayList<>(hashfunctions.size());
-      for (int i = 0; i < totalbuckets; i++) {
+      final int numhash = hashfunctions.size();
+      hashtables = new ArrayList<>(numhash);
+      for (int i = 0; i < numhash; i++) {
         hashtables.add(new TIntObjectHashMap<DBIDs>(numberOfBuckets));
       }
 
       for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         V obj = relation.get(iter);
-        for (int i = 0; i < hashfunctions.size(); i++) {
+        for (int i = 0; i < numhash; i++) {
           // Get the initial (unbounded) hash code:
           int hash = hashfunctions.get(i).hashObject(obj);
           // Reduce to hash table size
@@ -152,19 +173,86 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
       }
       if (LOG.isStatistics()) {
         Mean bmean = new Mean();
-        for (int i = 0; i < hashfunctions.size(); i++) {
+        for (int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
-          for (TIntObjectIterator<DBIDs> iter = table.iterator(); iter.hasNext(); iter.advance()) {
+          for (TIntObjectIterator<DBIDs> iter = table.iterator(); iter.hasNext();) {
+            iter.advance();
             bmean.put(iter.value().size());
           }
         }
-        LOG.statistics(new DoubleStatistic("lsh.mean-fill", bmean.getMean()));
+        LOG.statistics(new DoubleStatistic(this.getClass().getCanonicalName() + ".mean-fill", bmean.getMean()));
       }
     }
 
     @Override
     public void logStatistics() {
-      LOG.statistics(new LongStatistic("lsh.hashfunctions", hashfunctions.size()));
+      LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".hashfunctions", hashfunctions.size()));
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V> extends AbstractParameterizer {
+    /**
+     * Hash function family parameter.
+     */
+    public static final OptionID FAMILY_ID = new OptionID("lsh.family", "Hash function family to use for LSH.");
+
+    /**
+     * Number of hash tables to use for LSH.
+     */
+    public static final OptionID K_ID = new OptionID("lsh.k", "Number of hash tables to use.");
+
+    /**
+     * Number of hash tables to use for LSH.
+     */
+    public static final OptionID BUCKETS_ID = new OptionID("lsh.buckets", "Number of hash buckets to use.");
+
+    /**
+     * LSH hash function family to use.
+     */
+    LocalitySensitiveHashFunctionFamily<? super V> family;
+
+    /**
+     * Number of hash functions for each table.
+     */
+    int k;
+
+    /**
+     * Number of buckets to use.
+     */
+    int numberOfBuckets;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<LocalitySensitiveHashFunctionFamily<? super V>> familyP = new ObjectParameter<>(FAMILY_ID, LocalitySensitiveHashFunctionFamily.class);
+      if (config.grab(familyP)) {
+        family = familyP.instantiateClass(config);
+      }
+
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(kP)) {
+        k = kP.intValue();
+      }
+
+      IntParameter bucketsP = new IntParameter(BUCKETS_ID);
+      bucketsP.setDefaultValue(7919); // Primes work best, apparently.
+      bucketsP.addConstraint(new GreaterConstraint(1));
+      if (config.grab(bucketsP)) {
+        numberOfBuckets = bucketsP.intValue();
+      }
+    }
+
+    @Override
+    protected InMemoryLSHIndex<V> makeInstance() {
+      return new InMemoryLSHIndex<>(family, k, numberOfBuckets);
     }
   }
 }
