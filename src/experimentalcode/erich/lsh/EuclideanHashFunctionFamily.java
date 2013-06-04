@@ -45,10 +45,10 @@ public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
    * 
    * @param random Random generator
    * @param width Bin width
-   * @param l Number of projections to combine.
+   * @param k Number of projections to combine.
    */
-  public EuclideanHashFunctionFamily(RandomFactory random, double width, int l) {
-    super(random, new GaussianRandomProjectionFamily(random), width, l);
+  public EuclideanHashFunctionFamily(RandomFactory random, double width, int k) {
+    super(random, new GaussianRandomProjectionFamily(random), width, k);
   }
 
   /**
@@ -61,7 +61,7 @@ public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
   public static class Parameterizer extends AbstractHashFunctionFamily.Parameterizer {
     @Override
     protected EuclideanHashFunctionFamily makeInstance() {
-      return new EuclideanHashFunctionFamily(random, width, l);
+      return new EuclideanHashFunctionFamily(random, width, k);
     }
   }
 }

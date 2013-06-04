@@ -68,7 +68,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
   /**
    * Number of hash functions for each table.
    */
-  int k;
+  int l;
 
   /**
    * Number of buckets to use.
@@ -79,19 +79,19 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
    * Constructor.
    * 
    * @param family Projection family
-   * @param k Number of hash tables to use
+   * @param l Number of hash tables to use
    * @param numberOfBuckets Number of buckets to use.
    */
-  public InMemoryLSHIndex(LocalitySensitiveHashFunctionFamily<? super V> family, int k, int numberOfBuckets) {
+  public InMemoryLSHIndex(LocalitySensitiveHashFunctionFamily<? super V> family, int l, int numberOfBuckets) {
     super();
     this.family = family;
-    this.k = k;
+    this.l = l;
     this.numberOfBuckets = numberOfBuckets;
   }
 
   @Override
   public Instance<V> instantiate(Relation<V> relation) {
-    return new Instance<>(relation, family.generateHashFunctions(relation, k), numberOfBuckets);
+    return new Instance<>(relation, family.generateHashFunctions(relation, l), numberOfBuckets);
   }
 
   @Override
@@ -206,7 +206,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
     /**
      * Number of hash tables to use for LSH.
      */
-    public static final OptionID K_ID = new OptionID("lsh.k", "Number of hash tables to use.");
+    public static final OptionID L_ID = new OptionID("lsh.l", "Number of hash tables to use.");
 
     /**
      * Number of hash tables to use for LSH.
@@ -221,7 +221,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
     /**
      * Number of hash functions for each table.
      */
-    int k;
+    int l;
 
     /**
      * Number of buckets to use.
@@ -236,10 +236,10 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
         family = familyP.instantiateClass(config);
       }
 
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(kP)) {
-        k = kP.intValue();
+      IntParameter lP = new IntParameter(L_ID);
+      lP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(lP)) {
+        l = lP.intValue();
       }
 
       IntParameter bucketsP = new IntParameter(BUCKETS_ID);
@@ -252,7 +252,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
 
     @Override
     protected InMemoryLSHIndex<V> makeInstance() {
-      return new InMemoryLSHIndex<>(family, k, numberOfBuckets);
+      return new InMemoryLSHIndex<>(family, l, numberOfBuckets);
     }
   }
 }
