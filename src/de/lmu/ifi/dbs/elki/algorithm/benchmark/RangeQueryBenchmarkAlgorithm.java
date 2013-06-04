@@ -179,7 +179,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
     if (prog != null) {
       prog.ensureCompleted(LOG);
     }
-    if (LOG.isVerbose()) {
+    if (LOG.isStatistics()) {
       LOG.verbose("Result hashcode: " + hash);
       LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
     }
@@ -268,7 +268,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
     if (prog != null) {
       prog.ensureCompleted(LOG);
     }
-    if (LOG.isVerbose()) {
+    if (LOG.isStatistics()) {
       LOG.verbose("Result hashcode: " + hash);
       LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
     }

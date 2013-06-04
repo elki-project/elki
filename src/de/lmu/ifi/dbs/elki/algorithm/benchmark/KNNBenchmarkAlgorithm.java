@@ -154,7 +154,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
       if (prog != null) {
         prog.ensureCompleted(LOG);
       }
-      if (LOG.isVerbose()) {
+      if (LOG.isStatistics()) {
         LOG.verbose("Result hashcode: " + hash);
         LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         if (mvdist.getCount() > 0) {
@@ -215,7 +215,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
       if (prog != null) {
         prog.ensureCompleted(LOG);
       }
-      if (LOG.isVerbose()) {
+      if (LOG.isStatistics()) {
         LOG.verbose("Result hashcode: " + hash);
         LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         if (mvdist.getCount() > 0) {

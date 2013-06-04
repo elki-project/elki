@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -191,7 +190,7 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
       if (prog != null) {
         prog.ensureCompleted(LOG);
       }
-      if (LOG.isVerbose()) {
+      if (LOG.isStatistics()) {
         LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         LOG.verbose("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
         if (mvdist.getCount() > 0) {
@@ -231,23 +230,36 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         sample = DBIDUtil.randomSample(sids, size, random);
       }
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-      int hash = 0;
-      MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
+      MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance(), mvdist = new MeanVariance(), mvderr = new MeanVariance();
+      int misses = 0;
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         int off = sids.binarySearch(iditer);
         assert (off >= 0);
         @SuppressWarnings("unchecked")
         O o = (O) bundle.data(off, col);
+
+        // Query index:
         KNNList<D> knns = knnQuery.getKNNForObject(o, k);
-        int ichecksum = 0;
-        for (DBIDIter it = knns.iter(); it.valid(); it.advance()) {
-          ichecksum += it.internalGetIndex();
-        }
-        hash = Util.mixHashCodes(hash, ichecksum);
-        mv.put(knns.size());
-        D kdist = knns.getKNNDistance();
-        if (kdist instanceof NumberDistance) {
-          mvdist.put(((NumberDistance<?, ?>) kdist).doubleValue());
+        // Query reference:
+        KNNList<D> trueknns = truekNNQuery.getKNNForObject(o, k);
+
+        // Put adjusted knn size:
+        mv.put(knns.size() * k / (double) trueknns.size());
+
+        // Put recall:
+        mvrec.put(DBIDUtil.intersectionSize(knns, DBIDUtil.newHashSet(trueknns)) / trueknns.size());
+
+        if (knns.size() >= k) {
+          D kdist = knns.getKNNDistance();
+          if (kdist instanceof NumberDistance) {
+            final double dist = ((NumberDistance<?, ?>) kdist).doubleValue();
+            final double tdist = ((NumberDistance<?, ?>) trueknns.getKNNDistance()).doubleValue();
+            mvdist.put(dist);
+            mvderr.put(dist / tdist);
+          }
+        } else {
+          // Less than k objects.
+          misses++;
         }
         if (prog != null) {
           prog.incrementProcessed(LOG);
@@ -256,11 +268,15 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
       if (prog != null) {
         prog.ensureCompleted(LOG);
       }
-      if (LOG.isVerbose()) {
-        LOG.verbose("Result hashcode: " + hash);
+      if (LOG.isStatistics()) {
         LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+        LOG.verbose("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
         if (mvdist.getCount() > 0) {
           LOG.verbose("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
+          LOG.verbose("Mean relative k-distance: " + mvderr.getMean() + " +- " + mvderr.getNaiveStddev());
+        }
+        if (misses > 0) {
+          LOG.verbose(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / sample.size()));
         }
       }
     }
