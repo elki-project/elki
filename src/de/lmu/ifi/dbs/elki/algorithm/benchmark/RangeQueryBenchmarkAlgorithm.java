@@ -180,8 +180,8 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
       prog.ensureCompleted(LOG);
     }
     if (LOG.isStatistics()) {
-      LOG.verbose("Result hashcode: " + hash);
-      LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+      LOG.statistics("Result hashcode: " + hash);
+      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
     }
     return null;
   }
@@ -269,8 +269,8 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
       prog.ensureCompleted(LOG);
     }
     if (LOG.isStatistics()) {
-      LOG.verbose("Result hashcode: " + hash);
-      LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+      LOG.statistics("Result hashcode: " + hash);
+      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
     }
     return null;
   }
