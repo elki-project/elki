@@ -73,21 +73,21 @@ public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHas
    * @param random Random generator
    * @param proj Projection family
    * @param width Bin width
-   * @param l Number of projections for each hash function.
+   * @param k Number of projections for each hash function.
    */
-  public AbstractHashFunctionFamily(RandomFactory random, RandomProjectionFamily proj, double width, int l) {
+  public AbstractHashFunctionFamily(RandomFactory random, RandomProjectionFamily proj, double width, int k) {
     super();
     this.random = random;
     this.proj = proj;
     this.width = width;
-    this.k = l;
+    this.k = k;
   }
 
   @Override
-  public ArrayList<? extends LocalitySensitiveHashFunction<? super NumberVector<?>>> generateHashFunctions(Relation<? extends NumberVector<?>> relation, int k) {
+  public ArrayList<? extends LocalitySensitiveHashFunction<? super NumberVector<?>>> generateHashFunctions(Relation<? extends NumberVector<?>> relation, int l) {
     int dim = RelationUtil.dimensionality(relation);
-    ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(k);
-    for (int i = 0; i < k; i++) {
+    ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(l);
+    for (int i = 0; i < l; i++) {
       Matrix mat = proj.generateProjectionMatrix(dim, k);
       ps.add(new MultipleProjectionsLocalitySensitiveHashFunction(mat, width, random));
     }
