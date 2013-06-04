@@ -118,7 +118,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
   public Result run(Database database, Relation<O> relation) {
     // Get a distance and kNN query instance.
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, 10);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, k);
 
     // No query set - use original database.
     if (queries == null) {
