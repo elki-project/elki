@@ -176,8 +176,10 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
           if (kdist instanceof NumberDistance) {
             final double dist = ((NumberDistance<?, ?>) kdist).doubleValue();
             final double tdist = ((NumberDistance<?, ?>) trueknns.getKNNDistance()).doubleValue();
-            mvdist.put(dist);
-            mvderr.put(dist / tdist);
+            if (tdist > 0.0) {
+              mvdist.put(dist);
+              mvderr.put(dist / tdist);
+            }
           }
         } else {
           // Less than k objects.
@@ -254,8 +256,10 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
           if (kdist instanceof NumberDistance) {
             final double dist = ((NumberDistance<?, ?>) kdist).doubleValue();
             final double tdist = ((NumberDistance<?, ?>) trueknns.getKNNDistance()).doubleValue();
-            mvdist.put(dist);
-            mvderr.put(dist / tdist);
+            if (tdist > 0.0) {
+              mvdist.put(dist);
+              mvderr.put(dist / tdist);
+            }
           }
         } else {
           // Less than k objects.
