@@ -108,18 +108,12 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    */
   public abstract class AbstractRangeQuery<D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
     /**
-     * Hold the distance function to be used.
-     */
-    private DistanceQuery<O, D> distanceQuery;
-
-    /**
      * Constructor.
      * 
      * @param distanceQuery Distance query object
      */
     public AbstractRangeQuery(DistanceQuery<O, D> distanceQuery) {
       super(distanceQuery);
-      this.distanceQuery = distanceQuery;
     }
 
     /**
