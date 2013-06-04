@@ -1,4 +1,4 @@
-package experimentalcode.erich.lsh;
+package de.lmu.ifi.dbs.elki.index.lsh.hashfamilies;
 
 /*
  This file is part of ELKI:
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 
 /**
  * LSH family of hash functions.

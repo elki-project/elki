@@ -1,4 +1,4 @@
-package experimentalcode.erich.lsh;
+package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
 
 /*
  This file is part of ELKI:
