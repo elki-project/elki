@@ -169,7 +169,7 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         mv.put(knns.size() * k / (double) trueknns.size());
 
         // Put recall:
-        mvrec.put(DBIDUtil.intersectionSize(knns, DBIDUtil.newHashSet(trueknns)) / trueknns.size());
+        mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / trueknns.size());
 
         if (knns.size() >= k) {
           D kdist = knns.getKNNDistance();
@@ -193,14 +193,14 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         prog.ensureCompleted(LOG);
       }
       if (LOG.isStatistics()) {
-        LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
-        LOG.verbose("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
+        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+        LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
         if (mvdist.getCount() > 0) {
-          LOG.verbose("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
-          LOG.verbose("Mean relative k-distance: " + mvderr.getMean() + " +- " + mvderr.getNaiveStddev());
+          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
+          LOG.statistics("Mean relative k-distance: " + mvderr.getMean() + " +- " + mvderr.getNaiveStddev());
         }
         if (misses > 0) {
-          LOG.verbose(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / sample.size()));
+          LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / sample.size()));
         }
       }
     } else {
@@ -249,7 +249,7 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         mv.put(knns.size() * k / (double) trueknns.size());
 
         // Put recall:
-        mvrec.put(DBIDUtil.intersectionSize(knns, DBIDUtil.newHashSet(trueknns)) / trueknns.size());
+        mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / trueknns.size());
 
         if (knns.size() >= k) {
           D kdist = knns.getKNNDistance();
@@ -273,14 +273,14 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         prog.ensureCompleted(LOG);
       }
       if (LOG.isStatistics()) {
-        LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
-        LOG.verbose("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
+        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+        LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
         if (mvdist.getCount() > 0) {
-          LOG.verbose("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
-          LOG.verbose("Mean relative k-distance: " + mvderr.getMean() + " +- " + mvderr.getNaiveStddev());
+          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
+          LOG.statistics("Mean relative k-distance: " + mvderr.getMean() + " +- " + mvderr.getNaiveStddev());
         }
         if (misses > 0) {
-          LOG.verbose(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / sample.size()));
+          LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / sample.size()));
         }
       }
     }

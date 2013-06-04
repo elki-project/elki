@@ -155,10 +155,10 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         prog.ensureCompleted(LOG);
       }
       if (LOG.isStatistics()) {
-        LOG.verbose("Result hashcode: " + hash);
-        LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+        LOG.statistics("Result hashcode: " + hash);
+        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         if (mvdist.getCount() > 0) {
-          LOG.verbose("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
+          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
         }
       }
     } else {
@@ -216,10 +216,10 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         prog.ensureCompleted(LOG);
       }
       if (LOG.isStatistics()) {
-        LOG.verbose("Result hashcode: " + hash);
-        LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+        LOG.statistics("Result hashcode: " + hash);
+        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         if (mvdist.getCount() > 0) {
-          LOG.verbose("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
+          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
         }
       }
     }
