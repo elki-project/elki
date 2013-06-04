@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 
 /**
  * LSH family of hash functions.
@@ -51,4 +52,13 @@ public interface LocalitySensitiveHashFunctionFamily<V> {
    * @return Family of hash functions
    */
   ArrayList<? extends LocalitySensitiveHashFunction<? super V>> generateHashFunctions(Relation<? extends V> relation, int k);
+
+  /**
+   * Check whether the given distance function can be accelerated using this
+   * hash family.
+   * 
+   * @param df Distance function.
+   * @return {@code true} when appropriate.
+   */
+  boolean isCompatible(DistanceFunction<?, ?> df);
 }

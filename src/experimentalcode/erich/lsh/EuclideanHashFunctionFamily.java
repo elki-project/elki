@@ -22,6 +22,8 @@ package experimentalcode.erich.lsh;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.GaussianRandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -49,6 +51,11 @@ public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
    */
   public EuclideanHashFunctionFamily(RandomFactory random, double width, int k) {
     super(random, new GaussianRandomProjectionFamily(random), width, k);
+  }
+
+  @Override
+  public boolean isCompatible(DistanceFunction<?, ?> df) {
+    return EuclideanDistanceFunction.class.isInstance(df);
   }
 
   /**

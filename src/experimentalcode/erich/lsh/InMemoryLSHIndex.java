@@ -33,9 +33,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.index.AbstractIndex;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
@@ -54,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Object type to index
  */
-public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Instance<V>> {
+public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.Instance> {
   /**
    * Class logger
    */
@@ -90,8 +97,8 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
   }
 
   @Override
-  public Instance<V> instantiate(Relation<V> relation) {
-    return new Instance<>(relation, family.generateHashFunctions(relation, l), numberOfBuckets);
+  public Instance instantiate(Relation<V> relation) {
+    return new Instance(relation, family.generateHashFunctions(relation, l), numberOfBuckets);
   }
 
   @Override
@@ -104,7 +111,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V> extends AbstractIndex<V> {
+  public class Instance extends AbstractRefiningIndex<V> implements KNNIndex<V> {
     /**
      * Hash functions to use.
      */
@@ -180,13 +187,80 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
             bmean.put(iter.value().size());
           }
         }
-        LOG.statistics(new DoubleStatistic(this.getClass().getCanonicalName() + ".mean-fill", bmean.getMean()));
+        LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".mean-fill", bmean.getMean()));
       }
     }
 
     @Override
     public void logStatistics() {
-      LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".hashfunctions", hashfunctions.size()));
+      super.logStatistics();
+      LOG.statistics(new LongStatistic(this.getClass().getName() + ".hashfunctions", hashfunctions.size()));
+    }
+
+    @Override
+    public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+      DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
+      if (!family.isCompatible(df)) {
+        return null;
+      }
+      return (KNNQuery<V, D>) new LSHKNNQuery<>(distanceQuery);
+    }
+
+    /**
+     * Class for handling kNN queries against the LSH index.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     * 
+     * @param <D> Distance type
+     */
+    protected class LSHKNNQuery<D extends Distance<D>> extends AbstractKNNQuery<D> {
+      /**
+       * Constructor.
+       * 
+       * @param distanceQuery
+       */
+      public LSHKNNQuery(DistanceQuery<V, D> distanceQuery) {
+        super(distanceQuery);
+      }
+
+      @Override
+      public KNNList<D> getKNNForObject(V obj, int k) {
+        ModifiableDBIDs candidates = DBIDUtil.newHashSet();
+        int numhash = hashfunctions.size();
+        for (int i = 0; i < numhash; i++) {
+          // Get the initial (unbounded) hash code:
+          int hash = hashfunctions.get(i).hashObject(obj);
+          // Reduce to hash table size
+          int bucket = hash % numberOfBuckets;
+          final TIntObjectMap<DBIDs> table = hashtables.get(i);
+          DBIDs cur = table.get(bucket);
+          if (cur != null) {
+            candidates.addDBIDs(cur);
+          }
+        }
+
+        // Refine.
+        KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
+        D max = distanceQuery.getDistanceFactory().infiniteDistance();
+        for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
+          final D dist = distanceQuery.distance(obj, iter);
+          super.incRefinements(1);
+          if (max.compareTo(dist) > 0) {
+            heap.add(dist, iter);
+            if (heap.size() >= k) {
+              max = heap.getKNNDistance();
+            }
+          }
+        }
+        return heap.toKNNList();
+      }
+    }
+
+    @Override
+    public Logging getLogger() {
+      return LOG;
     }
   }
 
@@ -206,7 +280,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex.Ins
     /**
      * Number of hash tables to use for LSH.
      */
-    public static final OptionID L_ID = new OptionID("lsh.l", "Number of hash tables to use.");
+    public static final OptionID L_ID = new OptionID("lsh.tables", "Number of hash tables to use.");
 
     /**
      * Number of hash tables to use for LSH.

@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
-public class AbstractHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector<?>> {
+public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector<?>> {
   /**
    * Random generator to use.
    */
@@ -120,7 +120,7 @@ public class AbstractHashFunctionFamily implements LocalitySensitiveHashFunction
     /**
      * Number of projections to use in each hash function.
      */
-    public static final OptionID NUMPROJ_ID = new OptionID("lsh.projection.k", "Number of projections to use for each hash function.");
+    public static final OptionID NUMPROJ_ID = new OptionID("lsh.projection.projections", "Number of projections to use for each hash function.");
 
     /**
      * Random generator to use.
