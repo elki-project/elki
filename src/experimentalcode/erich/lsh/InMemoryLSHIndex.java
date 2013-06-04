@@ -158,21 +158,23 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         hashtables.add(new TIntObjectHashMap<DBIDs>(numberOfBuckets));
       }
 
+      int expect = relation.size() / numberOfBuckets;
       for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         V obj = relation.get(iter);
         for (int i = 0; i < numhash; i++) {
+          final TIntObjectMap<DBIDs> table = hashtables.get(i);
+          final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
-          int hash = hashfunctions.get(i).hashObject(obj);
+          int hash = hashfunc.hashObject(obj);
           // Reduce to hash table size
           int bucket = hash % numberOfBuckets;
-          final TIntObjectMap<DBIDs> table = hashtables.get(i);
           DBIDs cur = table.get(bucket);
           if (cur == null) {
             table.put(bucket, DBIDUtil.deref(iter));
           } else if (cur.size() > 1) {
             ((ModifiableDBIDs) cur).add(iter);
           } else {
-            ModifiableDBIDs newbuck = DBIDUtil.newArray();
+            ModifiableDBIDs newbuck = DBIDUtil.newArray(expect);
             newbuck.addDBIDs(cur);
             newbuck.add(iter);
             table.put(bucket, newbuck);
@@ -189,13 +191,8 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
           }
         }
         LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".mean-fill", bmean.getMean()));
+        LOG.statistics(new LongStatistic(this.getClass().getName() + ".hashtables", hashtables.size()));
       }
-    }
-
-    @Override
-    public void logStatistics() {
-      super.logStatistics();
-      LOG.statistics(new LongStatistic(this.getClass().getName() + ".hashfunctions", hashfunctions.size()));
     }
 
     @Override
@@ -234,13 +231,14 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       @Override
       public KNNList<D> getKNNForObject(V obj, int k) {
         ModifiableDBIDs candidates = DBIDUtil.newHashSet();
-        int numhash = hashfunctions.size();
+        final int numhash = hashtables.size();
         for (int i = 0; i < numhash; i++) {
+          final TIntObjectMap<DBIDs> table = hashtables.get(i);
+          final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
-          int hash = hashfunctions.get(i).hashObject(obj);
+          int hash = hashfunc.hashObject(obj);
           // Reduce to hash table size
           int bucket = hash % numberOfBuckets;
-          final TIntObjectMap<DBIDs> table = hashtables.get(i);
           DBIDs cur = table.get(bucket);
           if (cur != null) {
             candidates.addDBIDs(cur);
@@ -249,16 +247,10 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
         // Refine.
         KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
-        D max = distanceQuery.getDistanceFactory().infiniteDistance();
         for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
           final D dist = distanceQuery.distance(obj, iter);
           super.incRefinements(1);
-          if (max.compareTo(dist) > 0) {
-            heap.add(dist, iter);
-            if (heap.size() >= k) {
-              max = heap.getKNNDistance();
-            }
-          }
+          heap.add(dist, iter);
         }
         return heap.toKNNList();
       }
