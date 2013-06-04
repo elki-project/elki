@@ -23,6 +23,8 @@ package experimentalcode.erich.lsh;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.CauchyRandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -50,6 +52,12 @@ public class ManhattanHashFunctionFamily extends AbstractHashFunctionFamily {
    */
   public ManhattanHashFunctionFamily(RandomFactory random, double width, int k) {
     super(random, new CauchyRandomProjectionFamily(random), width, k);
+  }
+
+  @Override
+  public boolean isCompatible(DistanceFunction<?, ?> df) {
+    // TODO: also allow HistogramIntersectionDistance?
+    return ManhattanDistanceFunction.class.isInstance(df);
   }
 
   /**
