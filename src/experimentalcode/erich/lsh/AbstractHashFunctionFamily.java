@@ -65,7 +65,7 @@ public class AbstractHashFunctionFamily implements LocalitySensitiveHashFunction
   /**
    * The number of projections to use for each hash function.
    */
-  protected int l;
+  protected int k;
 
   /**
    * Constructor.
@@ -80,7 +80,7 @@ public class AbstractHashFunctionFamily implements LocalitySensitiveHashFunction
     this.random = random;
     this.proj = proj;
     this.width = width;
-    this.l = l;
+    this.k = l;
   }
 
   @Override
@@ -88,7 +88,7 @@ public class AbstractHashFunctionFamily implements LocalitySensitiveHashFunction
     int dim = RelationUtil.dimensionality(relation);
     ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(k);
     for (int i = 0; i < k; i++) {
-      Matrix mat = proj.generateProjectionMatrix(dim, l);
+      Matrix mat = proj.generateProjectionMatrix(dim, k);
       ps.add(new MultipleProjectionsLocalitySensitiveHashFunction(mat, width, random));
     }
     return ps;
@@ -120,7 +120,7 @@ public class AbstractHashFunctionFamily implements LocalitySensitiveHashFunction
     /**
      * Number of projections to use in each hash function.
      */
-    public static final OptionID NUMPROJ_ID = new OptionID("lsh.projection.l", "Number of projections to use for each hash function.");
+    public static final OptionID NUMPROJ_ID = new OptionID("lsh.projection.k", "Number of projections to use for each hash function.");
 
     /**
      * Random generator to use.
@@ -135,7 +135,7 @@ public class AbstractHashFunctionFamily implements LocalitySensitiveHashFunction
     /**
      * The number of projections to use for each hash function.
      */
-    int l;
+    int k;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -154,7 +154,7 @@ public class AbstractHashFunctionFamily implements LocalitySensitiveHashFunction
       IntParameter lP = new IntParameter(NUMPROJ_ID);
       lP.addConstraint(new GreaterConstraint(0));
       if (config.grab(lP)) {
-        l = lP.intValue();
+        k = lP.intValue();
       }
     }
   }
