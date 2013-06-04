@@ -33,17 +33,21 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
@@ -113,7 +117,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
    * 
    * @author Erich Schubert
    */
-  public class Instance extends AbstractRefiningIndex<V> implements KNNIndex<V> {
+  public class Instance extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
     /**
      * Hash functions to use.
      */
@@ -160,7 +164,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       }
 
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Building LSH index.", relation.size(), LOG) : null;
-      int expect = Math.max(2, (int)Math.ceil(relation.size() / (double) numberOfBuckets));
+      int expect = Math.max(2, (int) Math.ceil(relation.size() / (double) numberOfBuckets));
       for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         V obj = relation.get(iter);
         for (int i = 0; i < numhash; i++) {
@@ -204,6 +208,11 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
     }
 
     @Override
+    public Logging getLogger() {
+      return LOG;
+    }
+
+    @Override
     public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
       for (Object hint : hints) {
         if (DatabaseQuery.HINT_EXACT.equals(hint)) {
@@ -215,6 +224,20 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         return null;
       }
       return (KNNQuery<V, D>) new LSHKNNQuery<>(distanceQuery);
+    }
+
+    @Override
+    public <D extends Distance<D>> RangeQuery<V, D> getRangeQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+      for (Object hint : hints) {
+        if (DatabaseQuery.HINT_EXACT.equals(hint)) {
+          return null;
+        }
+      }
+      DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
+      if (!family.isCompatible(df)) {
+        return null;
+      }
+      return (RangeQuery<V, D>) new LSHRangeQuery<>(distanceQuery);
     }
 
     /**
@@ -264,9 +287,53 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       }
     }
 
-    @Override
-    public Logging getLogger() {
-      return LOG;
+    /**
+     * Class for handling kNN queries against the LSH index.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     * 
+     * @param <D> Distance type
+     */
+    protected class LSHRangeQuery<D extends Distance<D>> extends AbstractRangeQuery<D> {
+      /**
+       * Constructor.
+       * 
+       * @param distanceQuery
+       */
+      public LSHRangeQuery(DistanceQuery<V, D> distanceQuery) {
+        super(distanceQuery);
+      }
+
+      @Override
+      public DistanceDBIDList<D> getRangeForObject(V obj, D range) {
+        ModifiableDBIDs candidates = DBIDUtil.newHashSet();
+        final int numhash = hashtables.size();
+        for (int i = 0; i < numhash; i++) {
+          final TIntObjectMap<DBIDs> table = hashtables.get(i);
+          final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
+          // Get the initial (unbounded) hash code:
+          int hash = hashfunc.hashObject(obj);
+          // Reduce to hash table size
+          int bucket = hash % numberOfBuckets;
+          DBIDs cur = table.get(bucket);
+          if (cur != null) {
+            candidates.addDBIDs(cur);
+          }
+        }
+
+        // Refine.
+        GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+        for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
+          final D dist = distanceQuery.distance(obj, iter);
+          super.incRefinements(1);
+          if (range.compareTo(dist) >= 0) {
+            result.add(dist, iter);
+          }
+        }
+        return result;
+      }
     }
   }
 
