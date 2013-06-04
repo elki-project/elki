@@ -98,6 +98,7 @@ de.lmu.ifi.dbs.elki.algorithm.KNNJoin
 de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
+de.lmu.ifi.dbs.elki.algorithm.benchmark.ValidateApproximativeKNNIndex
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering1
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering2
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering3
