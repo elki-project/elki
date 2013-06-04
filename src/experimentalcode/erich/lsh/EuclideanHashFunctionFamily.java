@@ -33,6 +33,13 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.GaussianRandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * 2-stable hash function family for Euclidean distances.
@@ -64,16 +71,22 @@ public class EuclideanHashFunctionFamily implements LocalitySensitiveHashFunctio
   double width;
 
   /**
+   * The number of projections to use for each hash function.
+   */
+  int l;
+
+  /**
    * Constructor.
    * 
    * @param random Random generator
    * @param width Bin width
    */
-  public EuclideanHashFunctionFamily(RandomFactory random, double width) {
+  public EuclideanHashFunctionFamily(RandomFactory random, double width, int l) {
     super();
     this.random = random;
     this.proj = new GaussianRandomProjectionFamily(random);
     this.width = width;
+    this.l = l;
   }
 
   @Override
@@ -81,7 +94,7 @@ public class EuclideanHashFunctionFamily implements LocalitySensitiveHashFunctio
     int dim = RelationUtil.dimensionality(relation);
     ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(k);
     for (int i = 0; i < k; i++) {
-      Matrix mat = proj.generateProjectionMatrix(dim, k);
+      Matrix mat = proj.generateProjectionMatrix(dim, l);
       ps.add(new MultipleProjectionsLocalitySensitiveHashFunction(mat, width, random));
     }
     return ps;
@@ -90,5 +103,70 @@ public class EuclideanHashFunctionFamily implements LocalitySensitiveHashFunctio
   @Override
   public TypeInformation getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter for fixing the random seed.
+     */
+    public static final OptionID RANDOM_ID = new OptionID("lsh.projection.random", "Random seed for generating the projections.");
+
+    /**
+     * Parameter for choosing the bin width.
+     */
+    public static final OptionID WIDTH_ID = new OptionID("lsh.projection.width", "Bin width for random projections.");
+
+    /**
+     * Number of projections to use in each hash function.
+     */
+    public static final OptionID NUMPROJ_ID = new OptionID("lsh.projection.l", "Number of projections to use for each hash function.");
+
+    /**
+     * Random generator to use.
+     */
+    private RandomFactory random;
+
+    /**
+     * Width of each bin.
+     */
+    double width;
+
+    /**
+     * The number of projections to use for each hash function.
+     */
+    int l;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      RandomParameter randP = new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT);
+      if (config.grab(randP)) {
+        random = randP.getValue();
+      }
+      
+      DoubleParameter widthP = new DoubleParameter(WIDTH_ID);
+      widthP.addConstraint(new GreaterConstraint(0.0));
+      if (config.grab(widthP)) {
+        width = widthP.doubleValue();
+      }
+
+      IntParameter lP = new IntParameter(NUMPROJ_ID);
+      lP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(lP)) {
+        l = lP.intValue();
+      }
+}
+
+    @Override
+    protected EuclideanHashFunctionFamily makeInstance() {
+      return new EuclideanHashFunctionFamily(random, width, l);
+    }
   }
 }
