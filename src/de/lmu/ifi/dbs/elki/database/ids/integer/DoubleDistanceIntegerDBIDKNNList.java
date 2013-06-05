@@ -174,7 +174,7 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
    */
   protected void add(double dist, int id) {
     if (size == dists.length) {
-      final int newlength = (dists.length << 2) + dists.length;
+      final int newlength = (dists.length << 1) + 1;
       dists = Arrays.copyOf(dists, newlength);
       ids = Arrays.copyOf(ids, newlength);
     }
