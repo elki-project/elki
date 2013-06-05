@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
-import de.lmu.ifi.dbs.elki.data.model.CoreModel;
+import de.lmu.ifi.dbs.elki.data.model.CoreObjectsModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -262,7 +262,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         boolean isNoise = (cid == NOISE);
         Cluster<Model> c;
         if (corelists != null) {
-          c = new Cluster<Model>(clusterlists.get(cid), isNoise, new CoreModel(corelists.get(cid)));
+          c = new Cluster<Model>(clusterlists.get(cid), isNoise, new CoreObjectsModel(corelists.get(cid)));
         } else {
           c = new Cluster<Model>(clusterlists.get(cid), isNoise, ClusterModel.CLUSTER);
         }
