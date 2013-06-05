@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.CoreModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -53,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -67,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * @author Arthur Zimek
- *
+ * 
  * @apiviz.landmark
  * 
  * @apiviz.has Instance
@@ -92,22 +94,29 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
   CorePredicate corepred;
 
   /**
+   * Track which objects are "core" objects.
+   */
+  boolean coremodel = false;
+
+  /**
    * Constructor for parameterized algorithm.
    * 
-   * @param npred Neighbor predicate
-   * @param corepred Core point predicate
+   * @param npred Neighbor predicate.
+   * @param corepred Core point predicate.
+   * @param coremodel Keep track of core points.
    */
-  public GeneralizedDBSCAN(NeighborPredicate npred, CorePredicate corepred) {
+  public GeneralizedDBSCAN(NeighborPredicate npred, CorePredicate corepred, boolean coremodel) {
     super();
     this.npred = npred;
     this.corepred = corepred;
+    this.coremodel = coremodel;
   }
 
   @Override
   public Clustering<Model> run(Database database) {
     for (SimpleTypeInformation<?> t : npred.getOutputType()) {
       if (corepred.acceptsType(t)) {
-        return new Instance<>(npred.instantiate(database, t), corepred.instantiate(database, t)).run();
+        return new Instance<>(npred.instantiate(database, t), corepred.instantiate(database, t), coremodel).run();
       }
     }
     throw new AbortException("No compatible types found.");
@@ -127,7 +136,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    * Instance for a particular data set.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.composedOf CorePredicate.Instance
    * @apiviz.composedOf NeighborPredicate.Instance
    */
@@ -135,17 +144,12 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     /**
      * Unprocessed IDs
      */
-    private static final int UNPROCESSED = -2;
+    private static final int UNPROCESSED = 0;
 
     /**
      * Noise IDs
      */
-    private static final int NOISE = -1;
-
-    /**
-     * Noise IDs
-     */
-    private static final int FIRST_CLUSTER = 0;
+    private static final int NOISE = 1;
 
     /**
      * The neighborhood predicate
@@ -158,15 +162,22 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     final CorePredicate.Instance<T> corepred;
 
     /**
+     * Track which objects are "core" objects.
+     */
+    boolean coremodel = false;
+
+    /**
      * Full Constructor
      * 
      * @param npred Neighborhood predicate
      * @param corepred Core object predicate
+     * @param coremodel Keep track of core points.
      */
-    public Instance(NeighborPredicate.Instance<T> npred, CorePredicate.Instance<T> corepred) {
+    public Instance(NeighborPredicate.Instance<T> npred, CorePredicate.Instance<T> corepred, boolean coremodel) {
       super();
       this.npred = npred;
       this.corepred = corepred;
+      this.coremodel = coremodel;
     }
 
     /**
@@ -181,74 +192,81 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       final IndefiniteProgress clusprogress = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters found", LOG) : null;
       // (Temporary) store the cluster ID assigned.
       final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, UNPROCESSED);
-      // Note: these are not exact!
+      // Note: these are not exact, as objects may be stolen from noise.
       final TIntArrayList clustersizes = new TIntArrayList();
+      clustersizes.add(0); // Unprocessed dummy value.
+      clustersizes.add(0); // Noise counter.
 
       // Implementation Note: using Integer objects should result in
       // reduced memory use in the HashMap!
-      int clusterid = FIRST_CLUSTER;
-      int clustersize = 0;
-      int noisesize = 0;
+      int clusterid = NOISE + 1;
       // Iterate over all objects in the database.
-      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         // Skip already processed ids.
-        if(clusterids.intValue(id) != UNPROCESSED) {
+        if (clusterids.intValue(id) != UNPROCESSED) {
           continue;
         }
         // Evaluate Neighborhood predicate
         final T neighbors = npred.getNeighbors(id);
         // Evaluate Core-Point predicate:
-        if(corepred.isCorePoint(id, neighbors)) {
+        if (corepred.isCorePoint(id, neighbors)) {
           clusterids.putInt(id, clusterid);
-          clustersize = 1 + setbasedExpandCluster(clusterid, clusterids, neighbors, progress);
+          clustersizes.add(expandCluster(clusterid, clusterids, neighbors, progress));
           // start next cluster on next iteration.
-          clustersizes.add(clustersize);
-          clustersize = 0;
-          clusterid += 1;
-          if(clusprogress != null) {
+          ++clusterid;
+          if (clusprogress != null) {
             clusprogress.setProcessed(clusterid, LOG);
           }
-        }
-        else {
+        } else {
           // otherwise, it's a noise point
           clusterids.putInt(id, NOISE);
-          noisesize += 1;
+          clustersizes.set(NOISE, clustersizes.get(NOISE) + 1);
         }
         // We've completed this element
-        if(progress != null) {
+        if (progress != null) {
           progress.incrementProcessed(LOG);
         }
       }
       // Finish progress logging.
-      if(progress != null) {
+      if (progress != null) {
         progress.ensureCompleted(LOG);
       }
-      if(clusprogress != null) {
+      if (clusprogress != null) {
         clusprogress.setCompleted(LOG);
       }
 
       // Transform cluster ID mapping into a clustering result:
-      ArrayList<ArrayModifiableDBIDs> clusterlists = new ArrayList<>(clusterid + 1);
-      // add noise cluster storage
-      clusterlists.add(DBIDUtil.newArray(noisesize));
+      ArrayList<ArrayModifiableDBIDs> clusterlists = new ArrayList<>(clusterid);
+      ArrayList<ArrayModifiableDBIDs> corelists = coremodel ? new ArrayList<ArrayModifiableDBIDs>(clusterid) : null;
       // add storage containers for clusters
-      for(int i = 0; i < clustersizes.size(); i++) {
+      for (int i = 0; i < clustersizes.size(); i++) {
         clusterlists.add(DBIDUtil.newArray(clustersizes.get(i)));
+        if (corelists != null) {
+          corelists.add(DBIDUtil.newArray(clustersizes.get(i)));
+        }
       }
       // do the actual inversion
-      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        int cluster = clusterids.intValue(id);
-        clusterlists.get(cluster + 1).add(id);
+      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+        // Negative values are non-core points:
+        int cid = clusterids.intValue(id);
+        int cluster = Math.abs(cid);
+        clusterlists.get(cluster).add(id);
+        if (corelists != null && cid > NOISE) {
+          corelists.get(cluster).add(id);
+        }
       }
       clusterids.destroy();
 
       Clustering<Model> result = new Clustering<>("GDBSCAN", "gdbscan-clustering");
-      int cid = 0;
-      for(ArrayModifiableDBIDs res : clusterlists) {
-        boolean isNoise = (cid == FIRST_CLUSTER);
-        Cluster<Model> c = new Cluster<Model>(res, isNoise, ClusterModel.CLUSTER);
+      for (int cid = NOISE; cid < clusterlists.size(); cid++) {
+        boolean isNoise = (cid == NOISE);
+        Cluster<Model> c;
+        if (corelists != null) {
+          c = new Cluster<Model>(clusterlists.get(cid), isNoise, new CoreModel(corelists.get(cid)));
+        } else {
+          c = new Cluster<Model>(clusterlists.get(cid), isNoise, ClusterModel.CLUSTER);
+        }
         result.addToplevelCluster(c);
-        cid++;
       }
       return result;
     }
@@ -263,28 +281,36 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * 
      * @return cluster size
      */
-    protected int setbasedExpandCluster(final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, final FiniteProgress progress) {
-      int clustersize = 0;
+    protected int expandCluster(final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, final FiniteProgress progress) {
+      int clustersize = 1; // initial seed!
       final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray();
       npred.addDBIDs(activeSet, neighbors);
       // run expandCluster as long as this set is non-empty (non-recursive
       // implementation)
-      while(!activeSet.isEmpty()) {
+      while (!activeSet.isEmpty()) {
         final DBID id = activeSet.remove(activeSet.size() - 1);
-        clustersize += 1;
         // Assign object to cluster
-        final int oldclus = clusterids.putInt(id, clusterid);
-        if(oldclus == UNPROCESSED) {
+        final int oldclus = clusterids.intValue(id);
+        if (oldclus == NOISE) {
+          clustersize += 1;
+          // Non core point cluster member:
+          clusterids.putInt(id, -clusterid);
+        } else if (oldclus == UNPROCESSED) {
+          clustersize += 1;
           // expandCluster again:
           // Evaluate Neighborhood predicate
           final T newneighbors = npred.getNeighbors(id);
           // Evaluate Core-Point predicate
-          if(corepred.isCorePoint(id, newneighbors)) {
+          if (corepred.isCorePoint(id, newneighbors)) {
             // Note: the recursion is unrolled into iteration over the active
             // set.
             npred.addDBIDs(activeSet, newneighbors);
+            clusterids.putInt(id, clusterid);
+          } else {
+            // Non core point cluster member:
+            clusterids.putInt(id, -clusterid);
           }
-          if(progress != null) {
+          if (progress != null) {
             progress.incrementProcessed(LOG);
           }
         }
@@ -302,43 +328,58 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Neighborhood predicate
+     * Neighborhood predicate.
      */
     NeighborPredicate npred = null;
 
     /**
-     * Core point predicate
+     * Core point predicate.
      */
     CorePredicate corepred = null;
 
     /**
-     * Parameter for neighborhood predicate
+     * Track which objects are "core" objects.
+     */
+    boolean coremodel = false;
+
+    /**
+     * Parameter for neighborhood predicate.
      */
     public static final OptionID NEIGHBORHOODPRED_ID = new OptionID("gdbscan.neighborhood", "Neighborhood predicate for GDBSCAN");
 
     /**
-     * Parameter for core predicate
+     * Parameter for core predicate.
      */
     public static final OptionID COREPRED_ID = new OptionID("gdbscan.core", "Core point predicate for GDBSCAN");
+
+    /**
+     * Flag to keep track of core points.
+     */
+    public static final OptionID COREMODEL_ID = new OptionID("gdbscan.core-model", "Use a model that keeps track of core points. Needs more memory.");
 
     @Override
     protected void makeOptions(Parameterization config) {
       // Neighborhood predicate
       ObjectParameter<NeighborPredicate> npredOpt = new ObjectParameter<>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class);
-      if(config.grab(npredOpt)) {
+      if (config.grab(npredOpt)) {
         npred = npredOpt.instantiateClass(config);
       }
 
       // Core point predicate
       ObjectParameter<CorePredicate> corepredOpt = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
-      if(config.grab(corepredOpt)) {
+      if (config.grab(corepredOpt)) {
         corepred = corepredOpt.instantiateClass(config);
+      }
+
+      Flag coremodelOpt = new Flag(COREMODEL_ID);
+      if (config.grab(coremodelOpt)) {
+        coremodel = coremodelOpt.isTrue();
       }
     }
 
     @Override
     protected GeneralizedDBSCAN makeInstance() {
-      return new GeneralizedDBSCAN(npred, corepred);
+      return new GeneralizedDBSCAN(npred, corepred, coremodel);
     }
   }
 }
