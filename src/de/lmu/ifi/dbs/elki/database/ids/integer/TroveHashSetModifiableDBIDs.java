@@ -83,6 +83,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
 
   @Override
   public boolean addDBIDs(DBIDs ids) {
+    store.ensureCapacity(ids.size());
     boolean success = false;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       success |= store.add(DBIDUtil.asInteger(iter));

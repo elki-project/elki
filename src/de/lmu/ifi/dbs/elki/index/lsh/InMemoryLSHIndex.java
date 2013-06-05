@@ -263,7 +263,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
       @Override
       public KNNList<D> getKNNForObject(V obj, int k) {
-        ModifiableDBIDs candidates = DBIDUtil.newHashSet();
+        ModifiableDBIDs candidates = null;
         final int numhash = hashtables.size();
         for (int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
@@ -274,8 +274,14 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
           int bucket = hash % numberOfBuckets;
           DBIDs cur = table.get(bucket);
           if (cur != null) {
+            if (candidates == null) {
+              candidates = DBIDUtil.newHashSet(cur.size() * numhash + k);
+            }
             candidates.addDBIDs(cur);
           }
+        }
+        if (candidates == null) {
+          candidates = DBIDUtil.newArray();
         }
 
         // Refine.

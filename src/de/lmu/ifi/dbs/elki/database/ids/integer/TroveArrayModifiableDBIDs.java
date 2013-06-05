@@ -81,6 +81,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   @Override
   public boolean addDBIDs(DBIDs ids) {
     boolean success = false;
+    store.ensureCapacity(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       success |= store.add(DBIDUtil.asInteger(iter));
     }
