@@ -177,8 +177,8 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     public Clustering<Model> run() {
       final DBIDs ids = npred.getIDs();
       // Setup progress logging
-      final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size(), LOG) : null;
-      final IndefiniteProgress clusprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters", LOG) : null;
+      final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Generalized DBSCAN Clustering", ids.size(), LOG) : null;
+      final IndefiniteProgress clusprogress = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters found", LOG) : null;
       // (Temporary) store the cluster ID assigned.
       final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, UNPROCESSED);
       // Note: these are not exact!
@@ -245,7 +245,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       Clustering<Model> result = new Clustering<>("GDBSCAN", "gdbscan-clustering");
       int cid = 0;
       for(ArrayModifiableDBIDs res : clusterlists) {
-        boolean isNoise = (cid == 0);
+        boolean isNoise = (cid == FIRST_CLUSTER);
         Cluster<Model> c = new Cluster<Model>(res, isNoise, ClusterModel.CLUSTER);
         result.addToplevelCluster(c);
         cid++;
@@ -274,7 +274,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         clustersize += 1;
         // Assign object to cluster
         final int oldclus = clusterids.putInt(id, clusterid);
-        if(oldclus == -2) {
+        if(oldclus == UNPROCESSED) {
           // expandCluster again:
           // Evaluate Neighborhood predicate
           final T newneighbors = npred.getNeighbors(id);
