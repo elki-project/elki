@@ -66,7 +66,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Cluster Outline";
+  public static final String NAME = "Parallel Cluster Outline";
 
   /**
    * Currently unused option to enable/disable rounding

@@ -69,7 +69,7 @@ public class MarkerVisualization extends AbstractVisFactory {
    */
   public MarkerVisualization() {
     super();
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
+    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override

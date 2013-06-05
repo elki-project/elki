@@ -91,8 +91,8 @@ public class ClusterEvaluationVisualization extends AbstractVisFactory {
     final ArrayList<EvaluateClustering.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluateClustering.ScoreResult.class);
     for (EvaluateClustering.ScoreResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
-      task.width = .5;
-      task.height = 2.0;
+      task.width = .4;
+      task.height = 1.5;
       task.level = VisualizationTask.LEVEL_STATIC;
       baseResult.getHierarchy().add(sr, task);
     }

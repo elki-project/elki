@@ -24,6 +24,8 @@ package de.lmu.ifi.dbs.elki.visualization.style;
  */
 
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -54,6 +56,11 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   ArrayList<DBIDs> ids;
 
   /**
+   * Map from cluster objects to color offsets.
+   */
+  TObjectIntMap<Cluster<?>> cmap;
+
+  /**
    * Colors
    */
   TIntArrayList colors;
@@ -75,19 +82,20 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
     List<? extends Cluster<?>> clusters = clustering.getAllClusters();
     ids = new ArrayList<>(clusters.size());
     colors = new TIntArrayList(clusters.size());
+    cmap = new TObjectIntHashMap<>(clusters.size(), .5f, -1);
 
     Iterator<? extends Cluster<?>> ci = clusters.iterator();
-    for(int i = 0; ci.hasNext(); i++) {
+    for (int i = 0; ci.hasNext(); i++) {
       Cluster<?> c = ci.next();
       ids.add(DBIDUtil.ensureSet(c.getIDs()));
+      cmap.put(c, i);
       Color col = SVGUtil.stringToColor(colorset.getColor(i));
-      if(col != null) {
+      if (col != null) {
         colors.add(col.getRGB());
-      }
-      else {
+      } else {
         LoggingUtil.warning("Unrecognized color name: " + colorset.getColor(i));
       }
-      if(!ci.hasNext()) {
+      if (!ci.hasNext()) {
         break;
       }
     }
@@ -95,8 +103,8 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public int getStyleForDBID(DBIDRef id) {
-    for(int i = 0; i < ids.size(); i++) {
-      if(ids.get(i).contains(id)) {
+    for (int i = 0; i < ids.size(); i++) {
+      if (ids.get(i).contains(id)) {
         return i;
       }
     }
@@ -105,8 +113,8 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public int getColorForDBID(DBIDRef id) {
-    for(int i = 0; i < ids.size(); i++) {
-      if(ids.get(i).contains(id)) {
+    for (int i = 0; i < ids.size(); i++) {
+      if (ids.get(i).contains(id)) {
         return colors.get(i);
       }
     }
@@ -135,5 +143,15 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
    */
   public Clustering<?> getClustering() {
     return clustering;
+  }
+
+  /**
+   * Get the style number for a cluster.
+   * 
+   * @param c Cluster
+   * @return Style number
+   */
+  public int getStyleForCluster(Cluster<?> c) {
+    return cmap.get(c);
   }
 }
