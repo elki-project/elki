@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -38,14 +40,14 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
   /**
    * Random generator.
    */
-  protected RandomFactory random;
+  protected Random random;
 
   /**
    * Constructor.
    */
   public AbstractRandomProjectionFamily(RandomFactory random) {
     super();
-    this.random = random;
+    this.random = random.getRandom();
   }
 
   /**

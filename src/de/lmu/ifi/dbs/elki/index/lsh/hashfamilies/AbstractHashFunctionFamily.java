@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfamilies;
  */
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -89,9 +90,10 @@ public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHas
   public ArrayList<? extends LocalitySensitiveHashFunction<? super NumberVector<?>>> generateHashFunctions(Relation<? extends NumberVector<?>> relation, int l) {
     int dim = RelationUtil.dimensionality(relation);
     ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(l);
+    final Random rnd = random.getRandom();
     for (int i = 0; i < l; i++) {
       Matrix mat = proj.generateProjectionMatrix(dim, k);
-      ps.add(new MultipleProjectionsLocalitySensitiveHashFunction(mat, width, random));
+      ps.add(new MultipleProjectionsLocalitySensitiveHashFunction(mat, width, rnd));
     }
     return ps;
   }

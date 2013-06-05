@@ -27,7 +27,6 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -70,8 +69,9 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
    * 
    * @param projection Projection vectors
    * @param width Width of bins
+   * @param rnd Random number generator
    */
-  public MultipleProjectionsLocalitySensitiveHashFunction(Matrix projection, double width, RandomFactory random) {
+  public MultipleProjectionsLocalitySensitiveHashFunction(Matrix projection, double width, Random rnd) {
     super();
     this.projection = projection;
     this.width = width;
@@ -79,11 +79,11 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
     final int num = projection.getRowDimensionality();
     this.shift = new double[num];
     this.randoms1 = new int[num];
-    Random rnd = random.getRandom();
     for (int i = 0; i < num; i++) {
       shift[i] = rnd.nextDouble() * width;
       // Produce a large random number; although 7FFFFFFF would likely be large
-      // enough, we try to stick to the suggested approach (which assumes unsigned integers).
+      // enough, we try to stick to the suggested approach (which assumes
+      // unsigned integers).
       randoms1[i] = (rnd.nextInt(0x7FFFFFFD) << 1) + rnd.nextInt(1) + 1;
     }
   }
