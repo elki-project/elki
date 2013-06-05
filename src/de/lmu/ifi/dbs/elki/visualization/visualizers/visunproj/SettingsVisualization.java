@@ -143,8 +143,7 @@ public class SettingsVisualization extends AbstractVisFactory {
       task.width = 1.0;
       task.height = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
-      task.visible = false;
-      task.default_visibility = false;
+      task.initDefaultVisibility(false);
       baseResult.getHierarchy().add(sr, task);
     }
   }
