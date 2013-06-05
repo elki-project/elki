@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
@@ -72,10 +70,9 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     double baseValuePart = Math.sqrt(this.sparsity);
 
     Matrix projectionMatrix = new Matrix(odim, idim);
-    Random rnd = random.getRandom();
     for (int i = 0; i < odim; ++i) {
       for (int j = 0; j < idim; ++j) {
-        final double r = rnd.nextDouble();
+        final double r = random.nextDouble();
         final double value;
         if (r < pPos) {
           value = baseValuePart;
@@ -97,10 +94,9 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     final double pNeg = pPos + pPos; // Threshold
     double baseValuePart = Math.sqrt(this.sparsity);
 
-    Random rnd = random.getRandom();
     double[] vec = new double[odim];
     for (int j = 0; j < odim; ++j) {
-      final double r = rnd.nextDouble();
+      final double r = random.nextDouble();
       final double value;
       if (r < pPos) {
         value = baseValuePart;
