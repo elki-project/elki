@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.data.projection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -103,7 +104,7 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
   @Override
   public V project(V data) {
     // TODO: remove getColumnVector overhead?
-    return factory.newNumberVector(projectionMatrix.times(data.getColumnVector()).getArrayRef());
+    return factory.newNumberVector(VectorUtil.fastTimes(projectionMatrix, data.getColumnVector()));
   }
 
   @Override

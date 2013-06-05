@@ -102,54 +102,53 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
   protected boolean assignToNearestCluster(Relation<V> relation, List<? extends NumberVector<?>> means, List<? extends ModifiableDBIDs> clusters) {
     boolean changed = false;
 
-    if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
+    if (getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
       @SuppressWarnings("unchecked")
       final PrimitiveDoubleDistanceFunction<? super NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?>>) getDistanceFunction();
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double mindist = Double.POSITIVE_INFINITY;
         V fv = relation.get(iditer);
         int minIndex = 0;
-        for(int i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
           double dist = df.doubleDistance(fv, means.get(i));
-          if(dist < mindist) {
+          if (dist < mindist) {
             minIndex = i;
             mindist = dist;
           }
         }
-        if(clusters.get(minIndex).add(iditer)) {
+        if (clusters.get(minIndex).add(iditer)) {
           changed = true;
           // Remove from previous cluster
           // TODO: keep a list of cluster assignments to save this search?
-          for(int i = 0; i < k; i++) {
-            if(i != minIndex) {
-              if(clusters.get(i).remove(iditer)) {
+          for (int i = 0; i < k; i++) {
+            if (i != minIndex) {
+              if (clusters.get(i).remove(iditer)) {
                 break;
               }
             }
           }
         }
       }
-    }
-    else {
+    } else {
       final PrimitiveDistanceFunction<? super NumberVector<?>, D> df = getDistanceFunction();
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         D mindist = df.getDistanceFactory().infiniteDistance();
         V fv = relation.get(iditer);
         int minIndex = 0;
-        for(int i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
           D dist = df.distance(fv, means.get(i));
-          if(dist.compareTo(mindist) < 0) {
+          if (dist.compareTo(mindist) < 0) {
             minIndex = i;
             mindist = dist;
           }
         }
-        if(clusters.get(minIndex).add(iditer)) {
+        if (clusters.get(minIndex).add(iditer)) {
           changed = true;
           // Remove from previous cluster
           // TODO: keep a list of cluster assignments to save this search?
-          for(int i = 0; i < k; i++) {
-            if(i != minIndex) {
-              if(clusters.get(i).remove(iditer)) {
+          for (int i = 0; i < k; i++) {
+            if (i != minIndex) {
+              if (clusters.get(i).remove(iditer)) {
                 break;
               }
             }
@@ -175,20 +174,23 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
    */
   protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?>> means, Relation<V> database) {
     List<Vector> newMeans = new ArrayList<>(k);
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       ModifiableDBIDs list = clusters.get(i);
       Vector mean = null;
-      if(list.size() > 0) {
+      if (list.size() > 0) {
         double s = 1.0 / list.size();
         DBIDIter iter = list.iter();
         assert (iter.valid());
         mean = database.get(iter).getColumnVector().timesEquals(s);
+        double[] raw = mean.getArrayRef();
         iter.advance();
-        for(; iter.valid(); iter.advance()) {
-          mean.plusTimesEquals(database.get(iter).getColumnVector(), s);
+        for (; iter.valid(); iter.advance()) {
+          NumberVector<?> vec = database.get(iter);
+          for (int j = 0; j < mean.getDimensionality(); j++) {
+            raw[j] += s * vec.doubleValue(j);
+          }
         }
-      }
-      else {
+      } else {
         mean = means.get(i).getColumnVector();
       }
       newMeans.add(mean);
@@ -208,18 +210,17 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
     final int dim = medians.get(0).getDimensionality();
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
     List<NumberVector<?>> newMedians = new ArrayList<>(k);
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       ArrayModifiableDBIDs list = DBIDUtil.newArray(clusters.get(i));
-      if(list.size() > 0) {
+      if (list.size() > 0) {
         Vector mean = new Vector(dim);
-        for(int d = 0; d < dim; d++) {
+        for (int d = 0; d < dim; d++) {
           sorter.setDimension(d);
           DBID id = QuickSelect.median(list, sorter);
           mean.set(d, database.get(id).doubleValue(d));
         }
         newMedians.add(mean);
-      }
-      else {
+      } else {
         newMedians.add((NumberVector<?>) medians.get(i));
       }
     }
@@ -235,7 +236,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
    * @param op Cluster size change / Weight change
    */
   protected void incrementalUpdateMean(Vector mean, V vec, int newsize, double op) {
-    if(newsize == 0) {
+    if (newsize == 0) {
       return; // Keep old mean
     }
     Vector delta = vec.getColumnVector();
@@ -256,65 +257,62 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
   protected boolean macQueenIterate(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters) {
     boolean changed = false;
 
-    if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
+    if (getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
       // Raw distance function
       @SuppressWarnings("unchecked")
       final PrimitiveDoubleDistanceFunction<? super NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?>>) getDistanceFunction();
 
       // Incremental update
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double mindist = Double.POSITIVE_INFINITY;
         V fv = relation.get(iditer);
         int minIndex = 0;
-        for(int i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
           double dist = df.doubleDistance(fv, means.get(i));
-          if(dist < mindist) {
+          if (dist < mindist) {
             minIndex = i;
             mindist = dist;
           }
         }
         // Update the cluster mean incrementally:
-        for(int i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
           ModifiableDBIDs ci = clusters.get(i);
-          if(i == minIndex) {
-            if(ci.add(iditer)) {
+          if (i == minIndex) {
+            if (ci.add(iditer)) {
               incrementalUpdateMean(means.get(i), fv, ci.size(), +1);
               changed = true;
             }
-          }
-          else if(ci.remove(iditer)) {
+          } else if (ci.remove(iditer)) {
             incrementalUpdateMean(means.get(i), fv, ci.size() + 1, -1);
             changed = true;
           }
         }
       }
-    }
-    else {
+    } else {
       // Raw distance function
       final PrimitiveDistanceFunction<? super NumberVector<?>, D> df = getDistanceFunction();
 
       // Incremental update
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         D mindist = df.getDistanceFactory().infiniteDistance();
         V fv = relation.get(iditer);
         int minIndex = 0;
-        for(int i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
           D dist = df.distance(fv, means.get(i));
-          if(dist.compareTo(mindist) < 0) {
+          if (dist.compareTo(mindist) < 0) {
             minIndex = i;
             mindist = dist;
           }
         }
         // Update the cluster mean incrementally:
-        for(int i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
           ModifiableDBIDs ci = clusters.get(i);
-          if(i == minIndex) {
-            if(ci.add(iditer)) {
+          if (i == minIndex) {
+            if (ci.add(iditer)) {
               incrementalUpdateMean(means.get(i), fv, ci.size(), +1);
               changed = true;
             }
-          }
-          else if(ci.remove(iditer)) {
+          } else if (ci.remove(iditer)) {
             incrementalUpdateMean(means.get(i), fv, ci.size() + 1, -1);
             changed = true;
           }

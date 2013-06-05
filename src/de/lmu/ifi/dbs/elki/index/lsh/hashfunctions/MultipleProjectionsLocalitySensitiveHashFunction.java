@@ -25,8 +25,8 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -92,9 +92,9 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
   public int hashObject(NumberVector<?> vec) {
     long t1sum = 0L;
     // Project the vector:
-    final Vector proj = projection.times(vec.getColumnVector());
+    final double[] proj = VectorUtil.fastTimes(projection, vec);
     for (int i = 0; i < shift.length; i++) {
-      int ai = (int) Math.floor((proj.doubleValue(i) + shift[i]) / width);
+      int ai = (int) Math.floor((proj[i] + shift[i]) / width);
       t1sum += randoms1[i] * (long) ai;
     }
     return fastModPrime(t1sum);
