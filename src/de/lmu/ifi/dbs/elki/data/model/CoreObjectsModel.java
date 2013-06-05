@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @author Erich Schubert
  */
-public class CoreModel extends BaseModel {
+public class CoreObjectsModel extends BaseModel {
   /**
    * Objects that are part of the cluster core.
    */
@@ -42,9 +42,18 @@ public class CoreModel extends BaseModel {
    * 
    * @param core Core objects
    */
-  public CoreModel(DBIDs core) {
+  public CoreObjectsModel(DBIDs core) {
     super();
     this.core = core;
+  }
+
+  /**
+   * Get the core object IDs.
+   * 
+   * @return Core object IDs
+   */
+  public DBIDs getCoreObjects() {
+    return core;
   }
 
   @Override
