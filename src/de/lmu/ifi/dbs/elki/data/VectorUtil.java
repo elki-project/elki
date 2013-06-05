@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
@@ -68,7 +69,7 @@ public final class VectorUtil {
   public static DoubleMinMax getRangeDouble(NumberVector<?> vec) {
     DoubleMinMax minmax = new DoubleMinMax();
 
-    for(int i = 0; i < vec.getDimensionality(); i++) {
+    for (int i = 0; i < vec.getDimensionality(); i++) {
       minmax.put(vec.doubleValue(i));
     }
 
@@ -77,7 +78,7 @@ public final class VectorUtil {
 
   /**
    * Produce a new vector based on random numbers in [0:1].
-   *
+   * 
    * @param factory Vector factory
    * @param dim desired dimensionality
    * @param r Random generator
@@ -115,7 +116,7 @@ public final class VectorUtil {
 
     // Length of first vector
     double l1 = 0.0;
-    for(int i = b1.nextSetBit(0); i >= 0; i = b1.nextSetBit(i + 1)) {
+    for (int i = b1.nextSetBit(0); i >= 0; i = b1.nextSetBit(i + 1)) {
       final double val = v1.doubleValue(i);
       l1 += val * val;
     }
@@ -123,7 +124,7 @@ public final class VectorUtil {
 
     // Length of second vector
     double l2 = 0.0;
-    for(int i = b2.nextSetBit(0); i >= 0; i = b2.nextSetBit(i + 1)) {
+    for (int i = b2.nextSetBit(0); i >= 0; i = b2.nextSetBit(i + 1)) {
       final double val = v2.doubleValue(i);
       l2 += val * val;
     }
@@ -131,7 +132,7 @@ public final class VectorUtil {
 
     // Cross product
     double cross = 0.0;
-    for(int i = both.nextSetBit(0); i >= 0; i = both.nextSetBit(i + 1)) {
+    for (int i = both.nextSetBit(0); i >= 0; i = both.nextSetBit(i + 1)) {
       cross += v1.doubleValue(i) * v2.doubleValue(i);
     }
     return cross / (l1 * l2);
@@ -153,7 +154,7 @@ public final class VectorUtil {
     double[] oe = o.getArrayRef();
     final int dim = v1.getDimensionality();
     double s = 0, e1 = 0, e2 = 0;
-    for(int k = 0; k < dim; k++) {
+    for (int k = 0; k < dim; k++) {
       final double r1 = v1.doubleValue(k) - oe[k];
       final double r2 = v2.doubleValue(k) - oe[k];
       s += r1 * r2;
@@ -178,7 +179,7 @@ public final class VectorUtil {
     // We can just compute all three in parallel.
     final int dim = v1.getDimensionality();
     double s = 0, e1 = 0, e2 = 0;
-    for(int k = 0; k < dim; k++) {
+    for (int k = 0; k < dim; k++) {
       final double r1 = v1.doubleValue(k) - o.doubleValue(k);
       final double r2 = v2.doubleValue(k) - o.doubleValue(k);
       s += r1 * r2;
@@ -198,7 +199,7 @@ public final class VectorUtil {
    * @return Angle
    */
   public static double cosAngle(NumberVector<?> v1, NumberVector<?> v2) {
-    if(v1 instanceof SparseNumberVector<?> && v2 instanceof SparseNumberVector<?>) {
+    if (v1 instanceof SparseNumberVector<?> && v2 instanceof SparseNumberVector<?>) {
       return angleSparse((SparseNumberVector<?>) v1, (SparseNumberVector<?>) v2);
     }
     // Essentially, we want to compute this:
@@ -208,18 +209,18 @@ public final class VectorUtil {
     final int d2 = v2.getDimensionality();
     final int dim = Math.min(d1, d2);
     double s = 0, e1 = 0, e2 = 0;
-    for(int k = 0; k < dim; k++) {
+    for (int k = 0; k < dim; k++) {
       final double r1 = v1.doubleValue(k);
       final double r2 = v2.doubleValue(k);
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
     }
-    for(int k = dim; k < d1; k++) {
+    for (int k = dim; k < d1; k++) {
       final double r1 = v1.doubleValue(k);
       e1 += r1 * r1;
     }
-    for(int k = dim; k < d2; k++) {
+    for (int k = dim; k < d2; k++) {
       final double r2 = v2.doubleValue(k);
       e2 += r2 * r2;
     }
@@ -238,7 +239,7 @@ public final class VectorUtil {
    * @return Angle
    */
   public static double minCosAngle(SpatialComparable v1, SpatialComparable v2) {
-    if(v1 instanceof NumberVector<?> && v2 instanceof NumberVector<?>) {
+    if (v1 instanceof NumberVector<?> && v2 instanceof NumberVector<?>) {
       return cosAngle((NumberVector<?>) v1, (NumberVector<?>) v2);
     }
     // Essentially, we want to compute this:
@@ -246,23 +247,21 @@ public final class VectorUtil {
     // We can just compute all three in parallel.
     final int dim = v1.getDimensionality();
     double s1 = 0, s2 = 0, e1 = 0, e2 = 0;
-    for(int k = 0; k < dim; k++) {
+    for (int k = 0; k < dim; k++) {
       final double min1 = v1.getMin(k), max1 = v1.getMax(k);
       final double min2 = v2.getMin(k), max2 = v2.getMax(k);
       final double p1 = min1 * min2, p2 = min1 * max2;
       final double p3 = max1 * min2, p4 = max1 * max2;
       s1 += Math.max(Math.max(p1, p2), Math.max(p3, p4));
       s2 += Math.min(Math.min(p1, p2), Math.min(p3, p4));
-      if(max1 < 0) {
+      if (max1 < 0) {
         e1 += max1 * max1;
-      }
-      else if(min1 > 0) {
+      } else if (min1 > 0) {
         e1 += min1 * min1;
       } // else: 0
-      if(max2 < 0) {
+      if (max2 < 0) {
         e2 += max2 * max2;
-      }
-      else if(min2 > 0) {
+      } else if (min2 > 0) {
         e2 += min2 * min2;
       } // else: 0
     }
@@ -282,7 +281,7 @@ public final class VectorUtil {
   public static double scalarProduct(NumberVector<?> d1, NumberVector<?> d2) {
     final int dim = d1.getDimensionality();
     double result = 0.0;
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       result += d1.doubleValue(i) * d2.doubleValue(i);
     }
     return result;
@@ -308,10 +307,35 @@ public final class VectorUtil {
   }
 
   /**
+   * This is an ugly hack, but we don't want to have the {@link Matrix} class
+   * depend on {@link NumberVector}. Maybe a future version will no longer need
+   * this.
+   * 
+   * @param mat Matrix
+   * @param v Vector
+   * @return {@code mat * v}, as double array.
+   */
+  public static double[] fastTimes(Matrix mat, NumberVector<?> v) {
+    final double[][] elements = mat.getArrayRef();
+    final int cdim = mat.getColumnDimensionality();
+    final double[] X = new double[elements.length];
+    // multiply it with each row from A
+    for (int i = 0; i < elements.length; i++) {
+      final double[] Arowi = elements[i];
+      double s = 0;
+      for (int k = 0; k < cdim; k++) {
+        s += Arowi[k] * v.doubleValue(k);
+      }
+      X[i] = s;
+    }
+    return X;
+  }
+
+  /**
    * Compare number vectors by a single dimension.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class SortDBIDsBySingleDimension implements Comparator<DBIDRef> {
@@ -363,7 +387,7 @@ public final class VectorUtil {
    * Compare number vectors by a single dimension.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class SortVectorsBySingleDimension implements Comparator<NumberVector<?>> {
@@ -421,7 +445,8 @@ public final class VectorUtil {
           values.put(d, v.doubleValue(d));
         }
       }
-      // We can't avoid this cast, because Java doesn't know that V is a SparseNumberVector:
+      // We can't avoid this cast, because Java doesn't know that V is a
+      // SparseNumberVector:
       @SuppressWarnings("unchecked")
       V projectedVector = (V) sfactory.newNumberVector(values, selectedAttributes.cardinality());
       return projectedVector;
