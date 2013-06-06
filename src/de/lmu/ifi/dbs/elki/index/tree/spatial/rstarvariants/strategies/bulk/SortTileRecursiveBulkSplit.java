@@ -27,6 +27,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialSingleMeanComparator;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -45,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "Leutenegger, S.T. and Lopez, M.A. and Edgington, J.", title = "STR: A simple and efficient algorithm for R-tree packing", booktitle = "Proc. 13th International Conference on Data Engineering, 1997", url = "http://dx.doi.org/10.1109/ICDE.1997.582015")
+@Alias({"str", "STR"})
 public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
   /**
    * Static instance.

@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -72,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <O> Vector type
  */
 @Reference(authors = "J. L. Bentley", title = "Multidimensional binary search trees used for associative searching", booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", url = "http://dx.doi.org/10.1145/361002.361007")
+@Alias({"minikd", "kd"})
 public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends AbstractIndex<O> implements KNNIndex<O>, RangeIndex<O> {
   /**
    * Class logger
