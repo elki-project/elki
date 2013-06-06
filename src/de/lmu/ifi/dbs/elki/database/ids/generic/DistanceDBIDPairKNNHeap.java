@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 /**
  * Heap for collecting kNN candidates with arbitrary distance types.
  * 
- * For double distances, see {@link DoubleDistanceDBIDPairKNNHeap}
+ * For double distances, see {@link DoubleDistanceKNNHeap}
  * 
  * <b>To instantiate, use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap} instead!</b>
  * 

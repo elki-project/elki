@@ -25,10 +25,10 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -38,12 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @apiviz.uses DoubleIntegerArrayQuickSort
  */
-public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanceDBIDList, DoubleDistanceKNNList, IntegerDBIDs {
-  /**
-   * Initial size allocation.
-   */
-  private static final int INITIAL_SIZE = 21;
-
+public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHeap, DoubleDistanceKNNList, IntegerDBIDs {
   /**
    * The k value this list was generated for.
    */
@@ -66,48 +61,15 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
 
   /**
    * Constructor.
-   */
-  public DoubleDistanceIntegerDBIDKNNList() {
-    super();
-    this.k = -1;
-    this.dists = new double[INITIAL_SIZE];
-    this.ids = new int[INITIAL_SIZE];
-  }
-
-  /**
-   * Constructor.
    * 
    * @param k K parameter
-   * @param size Actual size
    */
-  public DoubleDistanceIntegerDBIDKNNList(int k, int size) {
+  public DoubleDistanceIntegerDBIDKNNListHeap(int k) {
     super();
     this.k = k;
-    if (size > 0) {
-      this.dists = new double[size];
-      this.ids = new int[size];
-    } else {
-      this.dists = new double[INITIAL_SIZE];
-      this.ids = new int[INITIAL_SIZE];
-    }
-  }
-
-  /**
-   * Constructor from heap.
-   * 
-   * @param heap KNN heap.
-   */
-  public DoubleDistanceIntegerDBIDKNNList(DoubleDistanceIntegerDBIDKNNHeap heap) {
-    super();
-    this.k = heap.getK();
-    this.size = heap.size();
-    this.dists = new double[size];
-    this.ids = new int[size];
-    for (int i = size - 1; i >= 0; i--) {
-      dists[i] = heap.peekDistance();
-      ids[i] = heap.peekInternalDBID();
-      heap.pop();
-    }
+    this.size = 0;
+    this.dists = new double[k + 1];
+    this.ids = new int[k + 1];
   }
 
   @Override
@@ -118,8 +80,8 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
   @Override
   public boolean contains(DBIDRef o) {
     final int q = o.internalGetIndex();
-    for (int i = 0; i < size; i++) {
-      if (q == ids[i]) {
+    for(int i = 0; i < size; i++) {
+      if(q == ids[i]) {
         return true;
       }
     }
@@ -138,9 +100,6 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
 
   @Override
   public int getK() {
-    if (k <= 0) {
-      return size - 1;
-    }
     return k;
   }
 
@@ -157,10 +116,7 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
 
   @Override
   public double doubleKNNDistance() {
-    if (k <= 0) {
-      return dists[size - 1];
-    }
-    if (size < k) {
+    if(size < k) {
       return Double.POSITIVE_INFINITY;
     }
     return dists[k - 1];
@@ -172,8 +128,8 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
    * @param dist Distance
    * @param id Internal index
    */
-  protected void add(double dist, int id) {
-    if (size == dists.length) {
+  protected void append(double dist, int id) {
+    if(size == dists.length) {
       final int newlength = (dists.length << 1) + 1;
       dists = Arrays.copyOf(dists, newlength);
       ids = Arrays.copyOf(ids, newlength);
@@ -183,9 +139,62 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
     ++size;
   }
 
+  /**
+   * Add a new element to the heap/list.
+   * 
+   * @param dist Distance
+   * @param id Object ID
+   */
+  protected void add(double dist, int id) {
+    if(size < k) {
+      append(dist, id);
+      if(size == k) {
+        sort();
+      }
+      return;
+    }
+    // Check the threshold.
+    if(dist > dists[k - 1]) {
+      return;
+    }
+    // Insert the node by binary search.
+    int left = 0, right = k;
+    while(left < right) {
+      int mid = left + ((right - left) >> 1);
+      if(dists[mid] > dist) {
+        right = mid;
+      }
+      else {
+        left = mid + 1;
+      }
+    }
+    // Ensure we have enough space.
+    if(size == dists.length) {
+      final int newlength = (dists.length << 1) + 1;
+      dists = Arrays.copyOf(dists, newlength);
+      ids = Arrays.copyOf(ids, newlength);
+    }
+    System.arraycopy(dists, left, dists, left + 1, size - left);
+    System.arraycopy(ids, left, ids, left + 1, size - left);
+    // Insert
+    dists[left] = dist;
+    ids[left] = id;
+    ++size;
+    // Truncate?
+    if(dists[k - 1] < dists[k]) {
+      size = k;
+    }
+  }
+
   @Override
   @Deprecated
   public void add(DoubleDistance dist, DBIDRef id) {
+    add(dist.doubleValue(), id);
+  }
+
+  @Override
+  @Deprecated
+  public void add(Double dist, DBIDRef id) {
     add(dist.doubleValue(), id);
   }
 
@@ -199,33 +208,43 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
     add(pair.doubleDistance(), pair.internalGetIndex());
   }
 
-  @Override
-  public void sort() {
+  /**
+   * Sort the current contents of the list.
+   */
+  protected void sort() {
     DoubleIntegerArrayQuickSort.sort(dists, ids, 0, size);
   }
 
-  /**
-   * Reverse the list.
-   */
-  protected void reverse() {
-    for (int i = 0, j = size - 1; i < j; i++, j--) {
-      double tmpd = dists[j];
-      dists[j] = dists[i];
-      dists[i] = tmpd;
-      int tmpi = ids[j];
-      ids[j] = ids[i];
-      ids[i] = tmpi;
-    }
+  @Override
+  public void clear() {
+    size = 0;
+    Arrays.fill(dists, Double.NaN);
+    Arrays.fill(ids, -1);
+  }
+
+  @Override
+  public DoubleDistanceIntegerDBIDPair poll() {
+    return new DoubleDistanceIntegerDBIDPair(dists[k], ids[k]);
+  }
+
+  @Override
+  public DoubleDistanceIntegerDBIDPair peek() {
+    return new DoubleDistanceIntegerDBIDPair(dists[k], ids[k]);
+  }
+
+  @Override
+  public DoubleDistanceKNNList toKNNList() {
+    return this;
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append("kNNList[");
-    for (DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
+    buf.append("kNNListHeap[");
+    for(DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleDistance()).append(':').append(iter.internalGetIndex());
       iter.advance();
-      if (iter.valid()) {
+      if(iter.valid()) {
         buf.append(',');
       }
     }
@@ -293,6 +312,5 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
     public DoubleDistance getDistance() {
       return new DoubleDistance(dists[offset]);
     }
-
   }
 }

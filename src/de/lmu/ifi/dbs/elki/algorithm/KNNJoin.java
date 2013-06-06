@@ -38,9 +38,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -285,7 +285,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
     if (DistanceUtil.isDoubleDistanceFunction(distFunction)) {
       List<?> khp = (List<?>) pr_heaps;
       List<?> khs = (List<?>) ps_heaps;
-      processDataPagesDouble((SpatialPrimitiveDoubleDistanceFunction<? super V>) distFunction, pr, ps, (List<DoubleDistanceDBIDPairKNNHeap>) khp, (List<DoubleDistanceDBIDPairKNNHeap>) khs);
+      processDataPagesDouble((SpatialPrimitiveDoubleDistanceFunction<? super V>) distFunction, pr, ps, (List<DoubleDistanceKNNHeap>) khp, (List<DoubleDistanceKNNHeap>) khs);
     } else {
       for (int j = 0; j < ps.getNumEntries(); j++) {
         final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);
@@ -312,7 +312,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
    * @param pr_heaps the knn lists for each data object
    * @param ps_heaps the knn lists for each data object in ps
    */
-  private void processDataPagesDouble(SpatialPrimitiveDoubleDistanceFunction<? super V> df, N pr, N ps, List<DoubleDistanceDBIDPairKNNHeap> pr_heaps, List<DoubleDistanceDBIDPairKNNHeap> ps_heaps) {
+  private void processDataPagesDouble(SpatialPrimitiveDoubleDistanceFunction<? super V> df, N pr, N ps, List<DoubleDistanceKNNHeap> pr_heaps, List<DoubleDistanceKNNHeap> ps_heaps) {
     // Compare pairwise
     for (int j = 0; j < ps.getNumEntries(); j++) {
       final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);

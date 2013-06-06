@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -360,7 +360,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
     }
 
     @Override
-    public DoubleDistanceDBIDPairKNNList getKNNForObject(V query, int k) {
+    public DoubleDistanceKNNList getKNNForObject(V query, int k) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 
@@ -398,7 +398,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       Collections.sort(candidates);
 
       // refinement step
-      DoubleDistanceDBIDPairKNNHeap result = new DoubleDistanceDBIDPairKNNHeap(k);
+      DoubleDistanceKNNHeap result = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k);
 
       // log.fine("candidates size " + candidates.size());
       // retrieve accurate distances

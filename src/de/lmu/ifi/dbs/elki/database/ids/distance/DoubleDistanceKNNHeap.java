@@ -32,9 +32,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @author Erich Schubert
  */
 public interface DoubleDistanceKNNHeap extends KNNHeap<DoubleDistance> {
-  @Override
-  DoubleDistanceKNNList toKNNList();
-
   /**
    * Add a distance-id pair to the heap unless the distance is too large.
    * 
@@ -91,4 +88,13 @@ public interface DoubleDistanceKNNHeap extends KNNHeap<DoubleDistance> {
   @Override
   @Deprecated
   DoubleDistance getKNNDistance();
+  
+  @Override
+  DoubleDistanceDBIDPair poll();
+  
+  @Override
+  DoubleDistanceDBIDPair peek();
+
+  @Override
+  DoubleDistanceKNNList toKNNList();
 }
