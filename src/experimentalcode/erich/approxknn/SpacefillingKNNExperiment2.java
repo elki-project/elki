@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -221,7 +220,7 @@ public class SpacefillingKNNExperiment2 {
     ArrayList<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> rec = new ArrayList<>();
     for (int i = 0; i < numcurves; i++) {
       ModifiableDBIDs cand = DBIDUtil.newHashSet(maxoff * 2);
-      DoubleDistanceKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(k);
+      DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k);
       rec.add(new Pair<>(cand, heap));
     }
 
