@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -166,11 +167,12 @@ public class TextWriter {
    * @param db Database object
    * @param r Result class
    * @param streamOpener output stream manager
+   * @param filter Filter pattern
    * @throws UnableToComplyException when no usable results were found
    * @throws IOException on IO error
    */
   @SuppressWarnings("unchecked")
-  public void output(Database db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
+  public void output(Database db, Result r, StreamFactory streamOpener, Pattern filter) throws UnableToComplyException, IOException {
     List<Relation<?>> ra = new LinkedList<>();
     List<OrderingResult> ro = new LinkedList<>();
     List<Clustering<?>> rc = new LinkedList<>();
@@ -178,10 +180,16 @@ public class TextWriter {
     List<SettingsResult> rs = new LinkedList<>();
     List<Result> otherres = new LinkedList<>();
 
-    // collect other results
+    // Split result objects in different known types:
     {
       List<Result> results = ResultUtil.filterResults(r, Result.class);
       for (Result res : results) {
+        if (filter != null) {
+          final String nam = res.getShortName();
+          if (nam == null || !filter.matcher(nam).find()) {
+            continue;
+          }
+        }
         if (res instanceof Database) {
           continue;
         }
