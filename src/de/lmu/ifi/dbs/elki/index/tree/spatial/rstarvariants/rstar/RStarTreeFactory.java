@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFac
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Factory for regular R*-Trees.
@@ -41,6 +42,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * 
  * @param <O> Object type
  */
+@Alias({"rstar", "r*"})
 public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>, AbstractRTreeSettings> {
   /**
    * Constructor.

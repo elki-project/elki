@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -43,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <O> Object type
  * @param <D> Distance type
  */
+@Alias({ "mtree", "m" })
 public class MTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MTreeNode<O, D>, MTreeEntry, MTreeIndex<O, D>, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry>> {
   /**
    * Constructor.
