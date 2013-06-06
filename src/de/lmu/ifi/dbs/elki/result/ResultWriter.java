@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -38,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
@@ -52,22 +54,6 @@ public class ResultWriter implements ResultHandler {
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(ResultWriter.class);
-
-  /**
-   * Flag to control GZIP compression.
-   * <p>
-   * Key: {@code -out.gzip}
-   * </p>
-   */
-  public static final OptionID GZIP_OUTPUT_ID = new OptionID("out.gzip", "Enable gzip compression of output files.");
-
-  /**
-   * Flag to suppress overwrite warning.
-   * <p>
-   * Key: {@code -out.silentoverwrite}
-   * </p>
-   */
-  public static final OptionID OVERWRITE_OPTION_ID = new OptionID("out.silentoverwrite", "Silently overwrite output files.");
 
   /**
    * Holds the file to print results to.
@@ -85,17 +71,24 @@ public class ResultWriter implements ResultHandler {
   private boolean warnoverwrite = true;
 
   /**
+   * Result filter pattern. Optional!
+   */
+  private Pattern filter = null;
+
+  /**
    * Constructor.
    * 
-   * @param out
-   * @param gzip
-   * @param warnoverwrite
+   * @param out Output file
+   * @param gzip Gzip compression
+   * @param warnoverwrite Warn before overwriting files
+   * @param filter Filter pattern
    */
-  public ResultWriter(File out, boolean gzip, boolean warnoverwrite) {
+  public ResultWriter(File out, boolean gzip, boolean warnoverwrite, Pattern filter) {
     super();
     this.out = out;
     this.gzip = gzip;
     this.warnoverwrite = warnoverwrite;
+    this.filter = filter;
   }
 
   @Override
@@ -127,7 +120,7 @@ public class ResultWriter implements ResultHandler {
     }
     try {
       Database db = ResultUtil.findDatabase(baseresult);
-      writer.output(db, result, output);
+      writer.output(db, result, output, filter);
     } catch (IOException e) {
       throw new IllegalStateException("Input/Output error while writing result.", e);
     } catch (UnableToComplyException e) {
@@ -144,6 +137,30 @@ public class ResultWriter implements ResultHandler {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
+     * Flag to control GZIP compression.
+     * <p>
+     * Key: {@code -out.gzip}
+     * </p>
+     */
+    public static final OptionID GZIP_OUTPUT_ID = new OptionID("out.gzip", "Enable gzip compression of output files.");
+
+    /**
+     * Flag to suppress overwrite warning.
+     * <p>
+     * Key: {@code -out.silentoverwrite}
+     * </p>
+     */
+    public static final OptionID OVERWRITE_OPTION_ID = new OptionID("out.silentoverwrite", "Silently overwrite output files.");
+
+    /**
+     * Pattern to filter the output
+     * <p>
+     * Key: {@code -out.filter}
+     * </p>
+     */
+    public static final OptionID FILTER_PATTERN_ID = new OptionID("out.filter", "Filter pattern for output selection. Only output streams that match the given pattern will be written.");
+
+    /**
      * Holds the file to print results to.
      */
     private File out = null;
@@ -157,6 +174,11 @@ public class ResultWriter implements ResultHandler {
      * Whether or not to warn on overwrite
      */
     private boolean warnoverwrite = true;
+
+    /**
+     * Result filter pattern. Optional!
+     */
+    private Pattern filter = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -176,11 +198,17 @@ public class ResultWriter implements ResultHandler {
         // note: inversed meaning
         warnoverwrite = !overwriteF.getValue();
       }
+
+      PatternParameter filterP = new PatternParameter(FILTER_PATTERN_ID);
+      filterP.setOptional(true);
+      if (config.grab(filterP)) {
+        filter = filterP.getValue();
+      }
     }
 
     @Override
     protected ResultWriter makeInstance() {
-      return new ResultWriter(out, gzip, warnoverwrite);
+      return new ResultWriter(out, gzip, warnoverwrite, filter);
     }
   }
 }
