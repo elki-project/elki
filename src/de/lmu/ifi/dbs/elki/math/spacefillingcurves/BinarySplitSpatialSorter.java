@@ -22,10 +22,10 @@ package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialSingleMeanComparator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -58,9 +58,9 @@ public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
   }
 
   @Override
-  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
-    final int dims = objs.get(0).getDimensionality();
-    binarySplitSort(objs, start, end, 1, dims, new DimC());
+  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims) {
+    final int numdim = (dims != null) ? dims.length : (minmax.length >>> 1);
+    binarySplitSort(objs, start, end, 0, numdim, dims, new SpatialSingleMeanComparator(0));
   }
 
   /**
@@ -70,47 +70,24 @@ public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
    * @param objs List of objects
    * @param start Interval start
    * @param end Interval end (exclusive)
-   * @param curdim Current dimension
-   * @param dims Number of dimensions
+   * @param depth Recursion depth
+   * @param numdims Number of dimensions
+   * @param dims Dimension indexes to sort by.
    * @param comp Comparator to use
    * @param <T> Object type
    */
-  private <T extends SpatialComparable> void binarySplitSort(List<T> objs, final int start, final int end, int curdim, final int dims, DimC comp) {
+  private <T extends SpatialComparable> void binarySplitSort(List<T> objs, final int start, final int end, int depth, final int numdim, int[] dims, SpatialSingleMeanComparator comp) {
     final int mid = start + ((end - start) >>> 1);
     // Make invariant
-    comp.dim = curdim;
+    comp.setDimension(dims != null ? dims[depth] : depth);
     QuickSelect.quickSelect(objs, comp, start, end, mid);
     // Recurse
-    final int nextdim = (curdim + 1) % dims;
-    if(start < mid - 1) {
-      binarySplitSort(objs, start, mid, nextdim, dims, comp);
+    final int nextdim = (depth + 1) % numdim;
+    if (start < mid - 1) {
+      binarySplitSort(objs, start, mid, nextdim, numdim, dims, comp);
     }
-    if(mid + 2 < end) {
-      binarySplitSort(objs, mid + 1, end, nextdim, dims, comp);
-    }
-  }
-
-  /**
-   * Comparator that uses only a particular dimension.
-   * 
-   * This comparator is meant to be reused, and the dimension to be changed, to
-   * reduce the number of objects allocated.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private static class DimC implements Comparator<SpatialComparable> {
-    /**
-     * Dimension.
-     */
-    public int dim = -1;
-
-    @Override
-    public int compare(SpatialComparable o1, SpatialComparable o2) {
-      double m1 = o1.getMax(dim) + o1.getMin(dim);
-      double m2 = o2.getMax(dim) + o2.getMin(dim);
-      return Double.compare(m1, m2);
+    if (mid + 2 < end) {
+      binarySplitSort(objs, mid + 1, end, nextdim, numdim, dims, comp);
     }
   }
 }

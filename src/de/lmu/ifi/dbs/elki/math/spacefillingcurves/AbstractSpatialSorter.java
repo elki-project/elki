@@ -43,7 +43,7 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs) {
     double[] mms = computeMinMax(objs);
-    sort(objs, 0, objs.size(), mms);
+    sort(objs, 0, objs.size(), mms, null);
   }
 
   /**

@@ -79,8 +79,8 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
   }
 
   @Override
-  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
-    peanoSort(objs, start, end, minmax, 0, new BitSet(), false);
+  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims) {
+    peanoSort(objs, start, end, minmax, dims, 0, new BitSet(), false);
   }
 
   /**
@@ -90,14 +90,16 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
    * @param start Start index
    * @param end End
    * @param mms Minmax values
-   * @param dim Dimension
+   * @param dims Dimensions index
+   * @param depth Dimension
    * @param bits Bit set for inversions
    * @param desc Current ordering
    */
-  protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int dim, BitSet bits, boolean desc) {
-    final int dims = mms.length >> 1;
+  protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int[] dims, int depth, BitSet bits, boolean desc) {
+    final int numdim = (dims != null) ? dims.length : (mms.length >> 1);
+    final int edim = (dims != null) ? dims[depth] : depth;
     // Find the splitting points.
-    final double min = mms[2 * dim], max = mms[2 * dim + 1];
+    final double min = mms[2 * edim], max = mms[2 * edim + 1];
     final double tfirst = (min + min + max) / 3.;
     final double tsecond = (min + max + max) / 3.;
     // Safeguard against duplicate points:
@@ -113,38 +115,38 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
         return;
       }
     }
-    final boolean inv = bits.get(dim) ^ desc;
+    final boolean inv = bits.get(edim) ^ desc;
     // Split the data set into three parts
     int fsplit, ssplit;
     if(!inv) {
-      fsplit = pivotizeList1D(objs, start, end, dim, tfirst, false);
-      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim, tsecond, false) : fsplit;
+      fsplit = pivotizeList1D(objs, start, end, edim, tfirst, false);
+      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, edim, tsecond, false) : fsplit;
     }
     else {
-      fsplit = pivotizeList1D(objs, start, end, dim, tsecond, true);
-      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim, tfirst, true) : fsplit;
+      fsplit = pivotizeList1D(objs, start, end, edim, tsecond, true);
+      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, edim, tfirst, true) : fsplit;
     }
-    int nextdim = (dim + 1) % dims;
+    int nextdim = (depth + 1) % numdim;
     // Do we need to update the min/max values?
     if(start < fsplit - 1) {
-      mms[2 * dim] = !inv ? min : tsecond;
-      mms[2 * dim + 1] = !inv ? tfirst : max;
-      peanoSort(objs, start, fsplit, mms, nextdim, bits, desc);
+      mms[2 * edim] = !inv ? min : tsecond;
+      mms[2 * edim + 1] = !inv ? tfirst : max;
+      peanoSort(objs, start, fsplit, mms, dims, nextdim, bits, desc);
     }
     if(fsplit < ssplit - 1) {
-      bits.flip(dim); // set (all but dim: we also flip "desc")
-      mms[2 * dim] = tfirst;
-      mms[2 * dim + 1] = tsecond;
-      peanoSort(objs, fsplit, ssplit, mms, nextdim, bits, !desc);
-      bits.flip(dim);
+      bits.flip(edim); // set (all but dim: we also flip "desc")
+      mms[2 * edim] = tfirst;
+      mms[2 * edim + 1] = tsecond;
+      peanoSort(objs, fsplit, ssplit, mms, dims, nextdim, bits, !desc);
+      bits.flip(edim);
     }
     if(ssplit < end - 1) {
-      mms[2 * dim] = !inv ? tsecond : min;
-      mms[2 * dim + 1] = !inv ? max : tfirst;
-      peanoSort(objs, ssplit, end, mms, nextdim, bits, desc);
+      mms[2 * edim] = !inv ? tsecond : min;
+      mms[2 * edim + 1] = !inv ? max : tfirst;
+      peanoSort(objs, ssplit, end, mms, dims, nextdim, bits, desc);
     }
     // Restore ranges
-    mms[2 * dim] = min;
-    mms[2 * dim + 1] = max;
+    mms[2 * edim] = min;
+    mms[2 * edim + 1] = max;
   }
 }

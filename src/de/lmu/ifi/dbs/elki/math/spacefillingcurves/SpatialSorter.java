@@ -49,6 +49,7 @@ public interface SpatialSorter {
    * @param start First index to sort (e.g. 0)
    * @param end End of range (e.g. <code>site()</code>)
    * @param minmax Array with dim pairs of (min, max) of value ranges
+   * @param dims Dimensions to sort by, for indexing vectors <em>and</em> {@code minmax}.
    */
-  <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax);
+  <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims);
 }
