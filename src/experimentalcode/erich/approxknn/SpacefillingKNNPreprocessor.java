@@ -25,6 +25,7 @@ package experimentalcode.erich.approxknn;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -56,15 +57,16 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Compute the nearest neighbors approximatively using space filling curves.
@@ -113,18 +115,25 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
   Mean mean = new Mean();
 
   /**
+   * Random number generator.
+   */
+  Random random;
+
+  /**
    * Constructor.
    * 
    * @param relation Relation to index.
    * @param curvegen Curve generators
    * @param window Window multiplicator
    * @param variants Number of curve variants to generate
+   * @param random Random number generator
    */
-  public SpacefillingKNNPreprocessor(Relation<O> relation, List<SpatialSorter> curvegen, double window, int variants) {
+  public SpacefillingKNNPreprocessor(Relation<O> relation, List<SpatialSorter> curvegen, double window, int variants, Random random) {
     super(relation);
     this.curvegen = curvegen;
     this.window = window;
     this.variants = variants;
+    this.random = random;
   }
 
   @Override
@@ -158,32 +167,30 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     }
 
     // Sort spatially
-    double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+    final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+    final double[] mmscratch = new double[mms.length];
+    final int numdim = mms.length >>> 1;
+    final int[] permutation = new int[numdim];
     for (int j = 0; j < variants; j++) {
-      final double[] mm;
-      if (j == 0) {
-        mm = mms;
-      } else if (j == 1) {
-        // Hardcoded for publication CIKM12
-        mm = new double[mms.length];
-        for (int i = 0; i < mms.length; i += 2) {
-          double len = mms[i + 1] - mms[i];
-          mm[i] = mms[i] - len * .1234;
-          mm[i + 1] = mms[i + 1] + len * .3784123;
-        }
-      } else if (j == 2) {
-        // Hardcoded for publication CIKM12
-        mm = new double[mms.length];
-        for (int i = 0; i < mms.length; i += 2) {
-          double len = mms[i + 1] - mms[i];
-          mm[i] = mms[i] - len * .321078;
-          mm[i + 1] = mms[i + 1] + len * .51824172;
-        }
-      } else {
-        throw new AbortException("Currently, only 1-3 variants may be used!");
+      for (int i = 0; i < mms.length; i += 2) {
+        double len = mms[i + 1] - mms[i];
+        mmscratch[i] = mms[i] - len * random.nextDouble();
+        mmscratch[i + 1] = mms[i + 1] + len * random.nextDouble();
+      }
+      // Generate permutation:
+      for (int i = 0; i < numdim; i++) {
+        permutation[i] = i;
+      }
+      // Knuth / Fisher-Yates style shuffle
+      for (int i = numdim - 1; i > 0; i--) {
+        // Swap with random preceeding element.
+        int ri = random.nextInt(i + 1);
+        int tmp = permutation[ri];
+        permutation[ri] = permutation[i];
+        permutation[i] = tmp;
       }
       for (int i = 0; i < numgen; i++) {
-        curvegen.get(i).sort(curves.get(i + numgen * j), 0, size, mm);
+        curvegen.get(i).sort(curves.get(i + numgen * j), 0, size, mmscratch, permutation);
       }
     }
 
@@ -368,22 +375,29 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     int variants;
 
     /**
+     * Random number generator.
+     */
+    RandomFactory random;
+
+    /**
      * Constructor.
      * 
      * @param curvegen Curve generators
      * @param window Window multiplicator
      * @param variants Number of curve variants to generate
+     * @param random Random number generator
      */
-    public Factory(List<SpatialSorter> curvegen, double window, int variants) {
+    public Factory(List<SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
       super();
       this.curvegen = curvegen;
       this.window = window;
       this.variants = variants;
+      this.random = random;
     }
 
     @Override
     public SpacefillingKNNPreprocessor<V> instantiate(Relation<V> relation) {
-      return new SpacefillingKNNPreprocessor<>(relation, curvegen, window, variants);
+      return new SpacefillingKNNPreprocessor<>(relation, curvegen, window, variants, random.getRandom());
     }
 
     @Override
@@ -415,6 +429,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       public static final OptionID VARIANTS_ID = new OptionID("sfcknn.variants", "Number of curve variants to generate.");
 
       /**
+       * Parameter for choosing the number of variants to use.
+       */
+      public static final OptionID RANDOM_ID = new OptionID("sfcknn.seed", "Random generator.");
+
+      /**
        * Spatial curve generators
        */
       List<SpatialSorter> curvegen;
@@ -429,6 +448,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
        */
       int variants;
 
+      /**
+       * Random number generator.
+       */
+      RandomFactory random;
+
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
@@ -442,15 +466,18 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
         }
         IntParameter variantsP = new IntParameter(VARIANTS_ID, 1);
         variantsP.addConstraint(new GreaterEqualConstraint(1));
-        variantsP.addConstraint(new LessEqualConstraint(3));
         if (config.grab(variantsP)) {
           variants = variantsP.getValue();
+        }
+        RandomParameter randomP = new RandomParameter(RANDOM_ID);
+        if (config.grab(randomP)) {
+          random = randomP.getValue();
         }
       }
 
       @Override
       protected Factory<?> makeInstance() {
-        return new Factory<DoubleVector>(curvegen, window, variants);
+        return new Factory<DoubleVector>(curvegen, window, variants, random);
       }
     }
   }
