@@ -195,7 +195,7 @@ public class TestKNNJoin implements JUnit4Test {
         KNNList<DoubleDistance> knnlist = result.get(id);
         meansize.put(knnlist.size());
       }
-      org.junit.Assert.assertEquals("Euclidean mean 2NN", mean2nnEuclid, meansize.getMean(), 0.00001);
+      org.junit.Assert.assertEquals("Euclidean mean 2NN set size", mean2nnEuclid, meansize.getMean(), 0.00001);
       org.junit.Assert.assertEquals("Euclidean variance 2NN", var2nnEuclid, meansize.getSampleVariance(), 0.00001);
     }
     // Manhattan

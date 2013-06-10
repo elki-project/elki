@@ -166,17 +166,17 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
    */
   private final void addToTies(int id) {
     if (ties.length == numties) {
-      ties = Arrays.copyOf(ties, ties.length << 1); // grow.
+      ties = Arrays.copyOf(ties, (ties.length << 1) + 1); // grow.
     }
-    ties[numties++] = id;
+    ties[numties] = id;
+    ++numties;
   }
 
   @Override
   public DoubleDistanceIntegerDBIDPair poll() {
-    final int last = numties - 1;
     final DoubleDistanceIntegerDBIDPair ret;
-    if (last >= 0) {
-      ret = new DoubleDistanceIntegerDBIDPair(kdist, ties[last]);
+    if (numties > 0) {
+      ret = new DoubleDistanceIntegerDBIDPair(kdist, ties[numties - 1]);
       --numties;
     } else {
       ret = new DoubleDistanceIntegerDBIDPair(heap.peekKey(), heap.peekValue());
@@ -198,9 +198,8 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
 
   @Override
   public DoubleDistanceIntegerDBIDPair peek() {
-    final int last = numties - 1;
-    if (last >= 0) {
-      return new DoubleDistanceIntegerDBIDPair(kdist, ties[last]);
+    if (numties > 0) {
+      return new DoubleDistanceIntegerDBIDPair(kdist, ties[numties - 1]);
     }
     return new DoubleDistanceIntegerDBIDPair(heap.peekKey(), heap.peekValue());
   }
@@ -219,7 +218,6 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
   public void clear() {
     heap.clear();
     numties = 0;
-    // ties = null;
   }
 
   @Override
