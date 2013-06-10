@@ -331,7 +331,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         }
       }
       // Avoid division by 0
-      final double lrd = (sum > 0) ? (count / sum) : 0;
+      final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
       lrds.putDouble(iter, lrd);
       if (lrdsProgress != null) {
         lrdsProgress.incrementProcessed(LOG);
@@ -361,7 +361,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lrdp = lrds.doubleValue(iter);
       final double lof;
-      if (lrdp > 0) {
+      if (lrdp > 0 && !Double.isInfinite(lrdp)) {
         final KNNList<D> neighbors = knnRefer.getKNNForDBID(iter, k);
         double sum = 0.0;
         int count = 0;
