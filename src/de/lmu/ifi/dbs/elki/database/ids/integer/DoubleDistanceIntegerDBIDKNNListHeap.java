@@ -129,11 +129,7 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
    * @param id Internal index
    */
   protected void append(double dist, int id) {
-    if(size == dists.length) {
-      final int newlength = (dists.length << 1) + 1;
-      dists = Arrays.copyOf(dists, newlength);
-      ids = Arrays.copyOf(ids, newlength);
-    }
+    ensureSize(size + 1);
     dists[size] = dist;
     ids[size] = id;
     ++size;
@@ -146,43 +142,46 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
    * @param id Object ID
    */
   protected void add(double dist, int id) {
+    // Ensure we have enough space.
+    ensureSize(size + 1);
     if(size < k) {
-      append(dist, id);
+      dists[size] = dist;
+      ids[size] = id;
+      ++size;
       if(size == k) {
         sort();
       }
       return;
     }
-    // Check the threshold.
-    if(dist > dists[k - 1]) {
+    if (dist > dists[size - 1]) {
       return;
     }
-    // Insert the node by binary search.
-    int left = 0, right = k;
-    while(left < right) {
-      int mid = left + ((right - left) >> 1);
-      if(dists[mid] > dist) {
-        right = mid;
-      }
-      else {
-        left = mid + 1;
-      }
+    // Insertion sort:
+    int pos = size;
+    while(pos > 0 && dists[pos - 1] > dist) {
+      dists[pos] = dists[pos - 1];
+      ids[pos] = ids[pos - 1];
+      --pos;
     }
-    // Ensure we have enough space.
-    if(size == dists.length) {
-      final int newlength = (dists.length << 1) + 1;
+    dists[pos] = dist;
+    ids[pos] = id;
+    ++size;
+    // Truncate.
+    if(size > k && dists[k] > dists[k - 1]) {
+      size = k;
+    }
+  }
+
+  /**
+   * Ensure we have enough space.
+   * 
+   * @param size Desired size
+   */
+  private void ensureSize(int size) {
+    if(size > dists.length) {
+      final int newlength = Math.max(size, (dists.length << 1) + 1);
       dists = Arrays.copyOf(dists, newlength);
       ids = Arrays.copyOf(ids, newlength);
-    }
-    System.arraycopy(dists, left, dists, left + 1, size - left);
-    System.arraycopy(ids, left, ids, left + 1, size - left);
-    // Insert
-    dists[left] = dist;
-    ids[left] = id;
-    ++size;
-    // Truncate?
-    if(dists[k - 1] < dists[k]) {
-      size = k;
     }
   }
 
