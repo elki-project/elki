@@ -165,7 +165,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
       for (int i = 0; i < values.length; i++) {
         double value = values[i];
         if (value != 0.0f) {
-          this.indexes[pos] = i + 1;
+          this.indexes[pos] = i;
           this.values[pos] = value;
           pos++;
         }
