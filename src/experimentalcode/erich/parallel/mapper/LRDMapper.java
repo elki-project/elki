@@ -36,11 +36,9 @@ import experimentalcode.erich.parallel.SharedDouble;
 /**
  * Mapper for the "local reachability density" of LOF.
  * 
- * Note: we compute 1/lrd, the local reachability distance.
- * 
  * @author Erich Schubert
  */
-public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
+public class LRDMapper<D extends NumberDistance<D, ?>> extends AbstractDoubleMapper {
   /**
    * KNN store
    */
@@ -50,11 +48,6 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
    * k-distance store
    */
   private DoubleDataStore kdists;
-
-  /**
-   * Output variable
-   */
-  private SharedDouble output;
 
   /**
    * Constructor.
@@ -68,15 +61,6 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
     this.kdists = kdists;
   }
 
-  /**
-   * Connect the output variable.
-   * 
-   * @param output Output variable
-   */
-  public void connectOutput(SharedDouble output) {
-    this.output = output;
-  }
-
   @Override
   public Instance instantiate(MapExecutor mapper) {
     return new Instance(output.instantiate(mapper));
@@ -87,20 +71,14 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
    * 
    * @author Erich Schubert
    */
-  private class Instance implements Mapper.Instance {
-    /**
-     * Output variable
-     */
-    private SharedDouble.Instance output;
-
+  private class Instance extends AbstractDoubleMapper.Instance {
     /**
      * Constructor.
      * 
      * @param output Output variable
      */
-    public Instance(SharedDouble.Instance output) {
-      super();
-      this.output = output;
+    protected Instance(SharedDouble.Instance output) {
+      super(output);
     }
 
     @Override
@@ -117,12 +95,7 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
         size += 1;
       }
       // Avoid division by 0:
-      output.set(lrd > 0 ? size / lrd : 0);
-    }
-
-    @Override
-    public void cleanup() {
-      // Nothing to do.
+      output.set(lrd > 0 ? size / lrd : Double.POSITIVE_INFINITY);
     }
   }
 }

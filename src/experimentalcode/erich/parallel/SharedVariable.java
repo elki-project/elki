@@ -23,7 +23,6 @@ package experimentalcode.erich.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Shared variables storing a particular type.
  * 
@@ -38,7 +37,7 @@ public interface SharedVariable<T> {
    * @param mapper Mapper to instantiate for
    * @return Instance
    */
-  public Instance<T> instantiate(MapExecutor mapper);
+  Instance<T> instantiate(MapExecutor mapper);
 
   /**
    * Instance for a single execution thread.
@@ -47,19 +46,19 @@ public interface SharedVariable<T> {
    * 
    * @param <T> Payload type
    */
-  public interface Instance<T> {
+  interface Instance<T> {
     /**
      * Get the current value
      * 
      * @return Value
      */
-    public T get();
+    T get();
 
     /**
      * Set a new value
      * 
      * @param data Setter
      */
-    public void set(T data);
+    void set(T data);
   }
 }

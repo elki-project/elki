@@ -35,11 +35,9 @@ import experimentalcode.erich.parallel.SharedDouble;
 /**
  * Mapper for computing the LOF.
  * 
- * Note: we use 1/lrd, as this avoids a division by 0 earlier.
- * 
  * @author Erich Schubert
  */
-public class LOFMapper implements Mapper {
+public class LOFMapper extends AbstractDoubleMapper {
   /**
    * KNN store
    */
@@ -49,11 +47,6 @@ public class LOFMapper implements Mapper {
    * LRD store
    */
   private DoubleDataStore lrds;
-
-  /**
-   * Output variable
-   */
-  private SharedDouble output;
 
   /**
    * Exclude object itself from computation.
@@ -74,15 +67,6 @@ public class LOFMapper implements Mapper {
     this.noself = noself;
   }
 
-  /**
-   * Connect the output variable.
-   * 
-   * @param output Output variable
-   */
-  public void connectOutput(SharedDouble output) {
-    this.output = output;
-  }
-
   @Override
   public Instance instantiate(MapExecutor mapper) {
     return new Instance(output.instantiate(mapper));
@@ -93,27 +77,21 @@ public class LOFMapper implements Mapper {
    * 
    * @author Erich Schubert
    */
-  private class Instance implements Mapper.Instance {
-    /**
-     * Output variable
-     */
-    private SharedDouble.Instance output;
-
+  private class Instance extends AbstractDoubleMapper.Instance {
     /**
      * Constructor.
      * 
      * @param output Output variable
      */
-    public Instance(SharedDouble.Instance output) {
-      super();
-      this.output = output;
+    protected Instance(SharedDouble.Instance output) {
+      super(output);
     }
 
     @Override
     public void map(DBIDRef id) {
       // Own density
       final double lrdp = lrds.doubleValue(id);
-      if (!(lrdp > 0)) {
+      if (Double.isInfinite(lrdp)) {
         output.set(1.0);
         return;
       }
@@ -127,14 +105,12 @@ public class LOFMapper implements Mapper {
         }
         avlrd += lrds.doubleValue(n);
         cnt++;
+        if (Double.isInfinite(avlrd)) {
+          break;
+        }
       }
       avlrd = (cnt > 0) ? (avlrd / cnt) : 0;
       output.set(avlrd / lrdp);
-    }
-
-    @Override
-    public void cleanup() {
-      // Nothing to do.
     }
   }
 }
