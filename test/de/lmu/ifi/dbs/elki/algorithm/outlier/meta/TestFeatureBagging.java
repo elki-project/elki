@@ -45,7 +45,7 @@ public class TestFeatureBagging extends AbstractSimpleAlgorithmTest implements J
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, 10);
+    params.addParameter(LOF.Parameterizer.K_ID, 10);
     params.addParameter(FeatureBagging.Parameterizer.NUM_ID, 10);
     params.addParameter(FeatureBagging.Parameterizer.SEED_ID, 1);
 
@@ -66,7 +66,7 @@ public class TestFeatureBagging extends AbstractSimpleAlgorithmTest implements J
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, 10);
+    params.addParameter(LOF.Parameterizer.K_ID, 10);
     params.addParameter(FeatureBagging.Parameterizer.NUM_ID, 10);
     params.addParameter(FeatureBagging.Parameterizer.SEED_ID, 5);
     params.addFlag(FeatureBagging.Parameterizer.BREADTH_ID);

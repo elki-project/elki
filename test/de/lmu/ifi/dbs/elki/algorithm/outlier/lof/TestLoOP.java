@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 /*
  This file is part of ELKI:
@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOCI;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -36,27 +36,27 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the LOCI algorithm.
+ * Tests the LoOP algorithm.
  * 
  * @author Lucia Cichella
  */
-public class TestLOCI extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestLoOP extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testLOCI() {
-    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+  public void testLoOP() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOCI.RMAX_ID, 0.5);
+    params.addParameter(LoOP.KCOMP_ID, 15);
 
     // setup Algorithm
-    LOCI<DoubleVector, DoubleDistance> loci = ClassGenericsUtil.parameterizeOrAbort(LOCI.class, params);
+    LoOP<DoubleVector, DoubleDistance> loop = ClassGenericsUtil.parameterizeOrAbort(LoOP.class, params);
     testParameterizationOk(params);
 
-    // run LOCI on database
-    OutlierResult result = loci.run(db);
+    // run LoOP on database
+    OutlierResult result = loop.run(db);
 
-    testAUC(db, "Noise", result, 0.96222222);
-    testSingleScore(result, 146, 3.8054382);
+    testAUC(db, "Noise", result, 0.9443796296296296);
+    testSingleScore(result, 945, 0.39805457858293325);
   }
 }

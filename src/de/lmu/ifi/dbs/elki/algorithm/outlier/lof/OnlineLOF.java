@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
@@ -55,11 +54,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -68,10 +63,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has LOF.LOFResult oneway - - updates
+ * @apiviz.has FlexibleLOF.LOFResult oneway - - updates
  */
 // TODO: related to publication?
-public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
+public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends FlexibleLOF<O, D> {
   /**
    * The logger for this class.
    */
@@ -80,12 +75,13 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
    * Constructor.
    * 
-   * @param k the value of k
+   * @param krefer The number of neighbors for reference
+   * @param kreach The number of neighbors for reachability distance
    * @param neighborhoodDistanceFunction the neighborhood distance function
    * @param reachabilityDistanceFunction the reachability distance function
    */
-  public OnlineLOF(int k, DistanceFunction<? super O, D> neighborhoodDistanceFunction, DistanceFunction<? super O, D> reachabilityDistanceFunction) {
-    super(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
+  public OnlineLOF(int krefer, int kreach, DistanceFunction<? super O, D> neighborhoodDistanceFunction, DistanceFunction<? super O, D> reachabilityDistanceFunction) {
+    super(krefer, kreach, neighborhoodDistanceFunction, reachabilityDistanceFunction);
   }
 
   /**
@@ -124,18 +120,18 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
    */
   private Pair<Pair<KNNQuery<O, D>, KNNQuery<O, D>>, Pair<RKNNQuery<O, D>, RKNNQuery<O, D>>> getKNNAndRkNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
     // Use "HEAVY" flag, since this is an online algorithm
-    KNNQuery<O, D> kNNRefer = QueryUtil.getKNNQuery(relation, neighborhoodDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    RKNNQuery<O, D> rkNNRefer = QueryUtil.getRKNNQuery(relation, neighborhoodDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O, D> kNNRefer = QueryUtil.getKNNQuery(relation, referenceDistanceFunction, krefer, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    RKNNQuery<O, D> rkNNRefer = QueryUtil.getRKNNQuery(relation, referenceDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
 
     // No optimized kNN query or RkNN query - use a preprocessor!
     if (kNNRefer == null || rkNNRefer == null) {
       if (stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", LOG);
       }
-      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, neighborhoodDistanceFunction, k);
-      DistanceQuery<O, D> ndq = database.getDistanceQuery(relation, neighborhoodDistanceFunction);
-      kNNRefer = preproc.getKNNQuery(ndq, k, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNRefer = preproc.getRKNNQuery(ndq, k, DatabaseQuery.HINT_HEAVY_USE);
+      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, referenceDistanceFunction, krefer);
+      DistanceQuery<O, D> ndq = database.getDistanceQuery(relation, referenceDistanceFunction);
+      kNNRefer = preproc.getKNNQuery(ndq, krefer, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNRefer = preproc.getRKNNQuery(ndq, krefer, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
       relation.getDatabase().addIndex(preproc);
     } else {
@@ -144,7 +140,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       }
     }
 
-    KNNQuery<O, D> kNNReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O, D> kNNReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     RKNNQuery<O, D> rkNNReach = QueryUtil.getRKNNQuery(relation, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     if (kNNReach == null || rkNNReach == null) {
       if (stepprog != null) {
@@ -152,11 +148,11 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       }
       ListParameterization config = new ListParameterization();
       config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
-      config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.K_ID, k);
-      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, reachabilityDistanceFunction, k);
+      config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.K_ID, kreach);
+      MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, reachabilityDistanceFunction, kreach);
       DistanceQuery<O, D> rdq = database.getDistanceQuery(relation, reachabilityDistanceFunction);
-      kNNReach = preproc.getKNNQuery(rdq, k, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNReach = preproc.getRKNNQuery(rdq, k, DatabaseQuery.HINT_HEAVY_USE);
+      kNNReach = preproc.getKNNQuery(rdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNReach = preproc.getRKNNQuery(rdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
       relation.getDatabase().addIndex(preproc);
     }
@@ -263,7 +259,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
         stepprog.beginStep(1, "Recompute LRDs.", LOG);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
-      List<? extends DistanceDBIDList<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
+      List<? extends DistanceDBIDList<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, kreach);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
       WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
@@ -280,7 +276,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       if (stepprog != null) {
         stepprog.beginStep(2, "Recompute LOFS.", LOG);
       }
-      List<? extends DistanceDBIDList<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      List<? extends DistanceDBIDList<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, krefer);
       ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
       recomputeLOFs(affected_lof_ids, lofResult);
 
@@ -322,7 +318,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
         stepprog.beginStep(2, "Recompute LRDs.", LOG);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(updates2);
-      List<? extends DistanceDBIDList<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
+      List<? extends DistanceDBIDList<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, kreach);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
       WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
@@ -339,7 +335,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       if (stepprog != null) {
         stepprog.beginStep(3, "Recompute LOFS.", LOG);
       }
-      List<? extends DistanceDBIDList<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      List<? extends DistanceDBIDList<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, krefer);
       ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, updates1);
       recomputeLOFs(affected_lof_ids, lofResult);
 
@@ -413,43 +409,10 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
-    /**
-     * The neighborhood size to use
-     */
-    protected int k = 2;
-
-    /**
-     * Neighborhood distance function.
-     */
-    protected DistanceFunction<O, D> neighborhoodDistanceFunction = null;
-
-    /**
-     * Reachability distance function.
-     */
-    protected DistanceFunction<O, D> reachabilityDistanceFunction = null;
-
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-
-      final IntParameter pK = new IntParameter(K_ID);
-      pK.addConstraint(new GreaterConstraint(1));
-      if (config.grab(pK)) {
-        k = pK.getValue();
-      }
-
-      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
-      if (config.grab(reachDistP)) {
-        reachabilityDistanceFunction = reachDistP.instantiateClass(config);
-      }
-    }
-
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends FlexibleLOF.Parameterizer<O, D> {
     @Override
     protected OnlineLOF<O, D> makeInstance() {
-      // Default is to re-use the same distance
-      DistanceFunction<O, D> rdist = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : distanceFunction;
-      return new OnlineLOF<>(k, distanceFunction, rdist);
+      return new OnlineLOF<>(kreach, krefer, distanceFunction, reachabilityDistanceFunction);
     }
   }
 }

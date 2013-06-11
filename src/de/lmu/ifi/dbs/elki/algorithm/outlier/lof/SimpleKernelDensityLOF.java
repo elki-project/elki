@@ -267,7 +267,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      final IntParameter pK = new IntParameter(LOF.K_ID);
+      final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID);
       pK.addConstraint(new GreaterConstraint(1));
       if (config.grab(pK)) {
         k = pK.getValue();
