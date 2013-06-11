@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
@@ -48,11 +49,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 /**
  * Class that computed the kNN only on a random sample.
  * 
+ * Used in:
+ * <p>
+ * Subsampling for Efficient and Effective Unsupervised Outlier Detection
+ * Ensembles<br />
+ * A. Zimek and M. Gaudet and R. J. G. B. Campello and J. Sander<br />
+ * In: Proc. 19th ACM SIGKDD International Conference on Knowledge Discovery and
+ * Data Mining, KDD '13
+ * </p>
+ * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  * @param <D> Distance type
  */
+@Reference(title = "Subsampling for Efficient and Effective Unsupervised Outlier Detection Ensembles", authors = "A. Zimek and M. Gaudet and R. J. G. B. Campello and J. Sander", booktitle = "Proc. 19th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, KDD '13")
 public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNList<D>> {
   /**
    * Logger
