@@ -167,7 +167,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
       for (int i = 0; i < values.length; i++) {
         float value = values[i];
         if (value != 0.0f) {
-          this.indexes[pos] = i + 1;
+          this.indexes[pos] = i;
           this.values[pos] = value;
           pos++;
         }
