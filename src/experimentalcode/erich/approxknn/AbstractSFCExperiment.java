@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -86,9 +87,12 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
     Duration proj = new MillisTimeDuration("approxnn.project");
     proj.begin();
     List<ArrayList<SpatialRef>> curves = allocateCurves(rel, ids, numcurves);
+    Random random = new Random(0);
 
     // Sort spatially
-    double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+    final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+    final int numdim = mms.length >>> 1;
+    final int[] dims = new int[numdim];
     // Actually use the maximal extends across axes, to avoid distortion!
     {
       DoubleMinMax mm = new DoubleMinMax();
@@ -97,14 +101,27 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
         mms[i] = mm.getMin();
         mms[i + 1] = mm.getMax();
       }
+      // Generate permutation:
+      for (int i = 0; i < numdim; i++) {
+        dims[i] = i;
+      }
+      // Knuth / Fisher-Yates style shuffle
+      for (int i = numdim - 1; i > 0; i--) {
+        // Swap with random preceeding element.
+        int ri = random.nextInt(i + 1);
+        int tmp = dims[ri];
+        dims[ri] = dims[i];
+        dims[i] = tmp;
+      }
     }
 
-    sortSpatially("z1", new ZCurveSpatialSorter(), curves.get(0), mms);
-    sortSpatially("p1", new PeanoSpatialSorter(), curves.get(1), mms);
-    sortSpatially("h1", new HilbertSpatialSorter(), curves.get(2), mms);
+    sortSpatially("z1", new ZCurveSpatialSorter(), curves.get(0), mms, dims);
+    sortSpatially("p1", new PeanoSpatialSorter(), curves.get(1), mms, dims);
+    sortSpatially("h1", new HilbertSpatialSorter(), curves.get(2), mms, dims);
 
     if (numcurves > 3) {
       double[] mms2 = new double[mms.length], mms3 = new double[mms.length];
+      final int[] dims2 = new int[numdim], dims3 = new int[numdim];
       for (int i = 0; i < mms.length; i += 2) {
         double len = mms[i + 1] - mms[i];
         // Grow each axis by the same factor, to avoid distortion!
@@ -113,13 +130,34 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
         mms3[i] = mms[i] - len * .321078;
         mms3[i + 1] = mms[i + 1] + len * .51824172;
       }
-      sortSpatially("z2", new ZCurveSpatialSorter(), curves.get(3), mms2);
-      sortSpatially("p2", new PeanoSpatialSorter(), curves.get(4), mms2);
-      sortSpatially("h2", new HilbertSpatialSorter(), curves.get(5), mms2);
+      // Generate permutations:
+      for (int i = 0; i < numdim; i++) {
+        dims2[i] = i;
+        dims3[i] = i;
+      }
+      // Knuth / Fisher-Yates style shuffle
+      for (int i = numdim - 1; i > 0; i--) {
+        // Swap with random preceeding element.
+        int ri = random.nextInt(i + 1);
+        int tmp = dims2[ri];
+        dims2[ri] = dims2[i];
+        dims2[i] = tmp;
+      }
+      // Knuth / Fisher-Yates style shuffle
+      for (int i = numdim - 1; i > 0; i--) {
+        // Swap with random preceeding element.
+        int ri = random.nextInt(i + 1);
+        int tmp = dims3[ri];
+        dims3[ri] = dims3[i];
+        dims3[i] = tmp;
+      }
+      sortSpatially("z2", new ZCurveSpatialSorter(), curves.get(3), mms2, dims2);
+      sortSpatially("p2", new PeanoSpatialSorter(), curves.get(4), mms2, dims2);
+      sortSpatially("h2", new HilbertSpatialSorter(), curves.get(5), mms2, dims2);
       if (numcurves > 6) {
-        sortSpatially("z3", new ZCurveSpatialSorter(), curves.get(6), mms3);
-        sortSpatially("p3", new PeanoSpatialSorter(), curves.get(7), mms3);
-        sortSpatially("h3", new HilbertSpatialSorter(), curves.get(8), mms3);
+        sortSpatially("z3", new ZCurveSpatialSorter(), curves.get(6), mms3, dims3);
+        sortSpatially("p3", new PeanoSpatialSorter(), curves.get(7), mms3, dims3);
+        sortSpatially("h3", new HilbertSpatialSorter(), curves.get(8), mms3, dims3);
       }
     }
     // End all projections:
@@ -145,10 +183,10 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
     return curves;
   }
 
-  protected void sortSpatially(String name, SpatialSorter spatialSorter, ArrayList<SpatialRef> c, double[] mms) {
+  protected void sortSpatially(String name, SpatialSorter spatialSorter, ArrayList<SpatialRef> c, double[] mms, int[] dims) {
     Duration dur = new MillisTimeDuration("approxnn.sort-" + name);
     dur.begin();
-    spatialSorter.sort(c, 0, c.size(), mms);
+    spatialSorter.sort(c, 0, c.size(), mms, dims);
     dur.end();
     getLogger().statistics(dur);
   }

@@ -25,7 +25,7 @@ package experimentalcode.erich.approxknn;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
@@ -48,18 +48,18 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Compute the nearest neighbors approximatively using space filling curves.
@@ -71,10 +71,6 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(SpacefillingMaterializeKNNPreprocessor.class);
-
-  static {
-    LoggingConfiguration.setLevelFor(SpacefillingMaterializeKNNPreprocessor.class.getName(), Level.INFO.getName());
-  }
 
   /**
    * Spatial curve generators
@@ -92,6 +88,16 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
   final int variants;
 
   /**
+   * Mean number of distance computations
+   */
+  Mean mean = new Mean();
+
+  /**
+   * Random number generator.
+   */
+  Random random;
+
+  /**
    * Constructor.
    * 
    * @param relation Relation to index.
@@ -100,161 +106,115 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
    * @param curvegen Curve generators
    * @param window Window multiplicator
    * @param variants Number of curve variants to generate
+   * @param random Random number generator
    */
-  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, List<SpatialSorter> curvegen, double window, int variants) {
+  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, List<SpatialSorter> curvegen, double window, int variants, Random random) {
     super(relation, distanceFunction, k);
     this.curvegen = curvegen;
     this.window = window;
     this.variants = variants;
+    this.random = random;
   }
 
   @Override
   protected void preprocess() {
     // Prepare space filling curve:
-    final long start = System.nanoTime();
+    final long starttime = System.nanoTime();
     final int size = relation.size();
-    final int wsize = (int) (window * (k - 1));
 
     final int numgen = curvegen.size();
     final int numcurves = numgen * variants;
-    List<List<SpatialRef<O>>> curves = new ArrayList<>(numcurves);
-    for(int i = 0; i < numcurves; i++) {
-      curves.add(new ArrayList<SpatialRef<O>>(size));
+    List<List<SpatialRef>> curves = new ArrayList<>(numcurves);
+    for (int i = 0; i < numcurves; i++) {
+      curves.add(new ArrayList<SpatialRef>(size));
     }
 
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = DBIDUtil.deref(iditer);
-      final O v = relation.get(id);
-      SpatialRef<O> ref = new SpatialRef<>(id, v);
-      for(List<SpatialRef<O>> curve : curves) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      final NumberVector<?> v = relation.get(iditer);
+      SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
+      for (List<SpatialRef> curve : curves) {
         curve.add(ref);
       }
     }
 
     // Sort spatially
-    double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
-    for(int j = 0; j < variants; j++) {
-      final double[] mm = setupMinMax(mms, j);
-      for(int i = 0; i < numgen; i++) {
-        curvegen.get(i).sort(curves.get(i + numgen * j), 0, size, mm);
+    final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+    final double[] mmscratch = new double[mms.length];
+    final int numdim = mms.length >>> 1;
+    final int[] permutation = new int[numdim];
+    for (int j = 0; j < variants; j++) {
+      for (int i = 0; i < mms.length; i += 2) {
+        double len = mms[i + 1] - mms[i];
+        mmscratch[i] = mms[i] - len * random.nextDouble();
+        mmscratch[i + 1] = mms[i + 1] + len * random.nextDouble();
+      }
+      // Generate permutation:
+      for (int i = 0; i < numdim; i++) {
+        permutation[i] = i;
+      }
+      // Knuth / Fisher-Yates style shuffle
+      for (int i = numdim - 1; i > 0; i--) {
+        // Swap with random preceeding element.
+        int ri = random.nextInt(i + 1);
+        int tmp = permutation[ri];
+        permutation[ri] = permutation[i];
+        permutation[i] = tmp;
+      }
+      for (int i = 0; i < numgen; i++) {
+        curvegen.get(i).sort(curves.get(i + numgen * j), 0, size, mmscratch, permutation);
       }
     }
 
     // Build position index, DBID -> position in the three curves
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
-    for(int cnum = 0; cnum < numcurves; cnum++) {
-      Iterator<SpatialRef<O>> it = curves.get(cnum).iterator();
-      for(int i = 0; it.hasNext(); i++) {
-        SpatialRef<O> r = it.next();
+    for (int cnum = 0; cnum < numcurves; cnum++) {
+      Iterator<SpatialRef> it = curves.get(cnum).iterator();
+      for (int i = 0; it.hasNext(); i++) {
+        SpatialRef r = it.next();
         final int[] data;
-        if(cnum == 0) {
+        if (cnum == 0) {
           data = new int[numcurves];
           positions.put(r.id, data);
-        }
-        else {
+        } else {
           data = positions.get(r.id);
         }
         data[cnum] = i;
       }
     }
 
-    Mean mean = new Mean();
-
     // Convert to final storage
+    final int wsize = (int) (window * k);
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
-    KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
-    HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * numcurves * 2);
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final D n = distanceQuery.getDistanceFactory().nullDistance();
-      heap.add(n, iditer);
-
+    HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(2 * wsize * numcurves);
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       // Get candidates.
       cands.clear();
-      int[] ps = positions.get(iditer);
-      int distcomp = 0;
-      for(int i = 0; i < numcurves; i++) {
-        distcomp += scanCurve(curves.get(i), wsize, ps[i], cands, heap);
+      int[] posi = positions.get(iditer);
+      for (int i = 0; i < posi.length; i++) {
+        List<SpatialRef> curve = curves.get(i);
+        final int start = Math.max(0, posi[i] - wsize);
+        final int end = Math.min(posi[i] + wsize + 1, curve.size());
+        for (int pos = start; pos < end; pos++) {
+          cands.add(curve.get(pos).id);
+        }
+      }
+
+      int distc = 0;
+      KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
+      O vec = relation.get(iditer);
+      for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
+        heap.add(distanceQuery.distance(vec, iter), iter);
+        distc++;
       }
 
       storage.put(iditer, heap.toKNNList());
-      mean.put(distcomp);
+      mean.put(distc / (double) k);
     }
 
     final long end = System.nanoTime();
-    if(LOG.isVerbose()) {
-      LOG.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds and " + mean.getMean() + " distance computations on average.");
+    if (LOG.isVerbose()) {
+      LOG.verbose("SFC preprocessor took " + ((end - starttime) / 1.E6) + " milliseconds and " + mean.getMean() + " * k distance computations on average.");
     }
-  }
-
-  /**
-   * Perform a window scan on the curve.
-   * 
-   * @param curve Curve to process
-   * @param wsize Window size
-   * @param heap Heap
-   * @param tempstorage Temporary storage
-   * @return number of distance computations
-   */
-  private int scanCurve(List<SpatialRef<O>> curve, final int wsize, int p, HashSetModifiableDBIDs cands, KNNHeap<D> heap) {
-    int distcomp = 0;
-    final int win2size = wsize * 2 + 1;
-    final int start, end;
-    if(p < wsize) {
-      start = 0;
-      end = win2size;
-    }
-    else if(p + win2size > curve.size()) {
-      start = curve.size() - win2size;
-      end = curve.size();
-    }
-    else {
-      start = p - wsize;
-      end = p + wsize + 1;
-    }
-
-    O q = curve.get(p).vec;
-    for(int pos = start; pos < end; pos++) {
-      if(pos == p) {
-        continue;
-      }
-      SpatialRef<O> ref2 = curve.get(pos);
-      if(cands.add(ref2.id)) {
-        heap.add(distanceQuery.distance(q, ref2.vec), ref2.id);
-        distcomp++;
-      }
-    }
-    return distcomp;
-  }
-
-  protected double[] setupMinMax(final double[] mms, int variant) {
-    final double[] mm;
-    {
-      if(variant == 0) {
-        mm = mms;
-      }
-      else if(variant == 1) {
-        // Hardcoded for publication CIKM12
-        mm = new double[mms.length];
-        for(int i = 0; i < mms.length; i += 2) {
-          double len = mms[i + 1] - mms[i];
-          mm[i] = mms[i] - len * .1234;
-          mm[i + 1] = mms[i + 1] + len * .3784123;
-        }
-      }
-      else if(variant == 2) {
-        // Hardcoded for publication CIKM12
-        mm = new double[mms.length];
-        for(int i = 0; i < mms.length; i += 2) {
-          double len = mms[i + 1] - mms[i];
-          mm[i] = mms[i] - len * .321078;
-          mm[i + 1] = mms[i + 1] + len * .51824172;
-        }
-      }
-      else {
-        throw new AbortException("Currently, only 1-3 variants may be used!");
-      }
-    }
-    return mm;
   }
 
   @Override
@@ -268,13 +228,18 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
   }
 
   @Override
+  public void logStatistics() {
+    LOG.statistics(new DoubleStatistic(this.getClass().getCanonicalName() + ".distance-computations-per-k", mean.getMean()));
+  }
+
+  @Override
   protected Logging getLogger() {
     return LOG;
   }
-  
+
   @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distQ, Object... hints) {
-    for(Object hint : hints) {
+    for (Object hint : hints) {
       if (DatabaseQuery.HINT_EXACT.equals(hint)) {
         return null;
       }
@@ -282,20 +247,13 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     return super.getKNNQuery(distQ, hints);
   }
 
-  @Override
-  public void logStatistics() {
-    // Nothing to do, yet.
-  }
-
   /**
    * Object used in spatial sorting, combining the spatial object and the object
    * ID.
    * 
    * @author Erich Schubert
-   * 
-   * @param <O> Vector type
    */
-  protected static class SpatialRef<O extends NumberVector<?>> implements SpatialComparable {
+  protected static class SpatialRef implements SpatialComparable {
     /**
      * Object reference.
      */
@@ -304,7 +262,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     /**
      * Vector.
      */
-    protected O vec;
+    protected NumberVector<?> vec;
 
     /**
      * Constructor.
@@ -312,7 +270,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
      * @param id
      * @param vec
      */
-    protected SpatialRef(DBID id, O vec) {
+    protected SpatialRef(DBID id, NumberVector<?> vec) {
       super();
       this.id = id;
       this.vec = vec;
@@ -359,22 +317,29 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     int variants;
 
     /**
+     * Random number generator.
+     */
+    RandomFactory random;
+
+    /**
      * Constructor.
      * 
      * @param curvegen Curve generators
      * @param window Window multiplicator
      * @param variants Number of curve variants to generate
+     * @param random Random number generator
      */
-    public Factory(int k, DistanceFunction<? super V, D> distanceFunction, List<SpatialSorter> curvegen, double window, int variants) {
+    public Factory(int k, DistanceFunction<? super V, D> distanceFunction, List<SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
       super(k, distanceFunction);
       this.curvegen = curvegen;
       this.window = window;
       this.variants = variants;
+      this.random = random;
     }
 
     @Override
     public SpacefillingMaterializeKNNPreprocessor<V, D> instantiate(Relation<V> relation) {
-      return new SpacefillingMaterializeKNNPreprocessor<>(relation, distanceFunction, k, curvegen, window, variants);
+      return new SpacefillingMaterializeKNNPreprocessor<>(relation, distanceFunction, k, curvegen, window, variants, random.getRandom());
     }
 
     @Override
@@ -409,6 +374,11 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
       public static final OptionID VARIANTS_ID = new OptionID("sfcknn.variants", "Number of curve variants to generate.");
 
       /**
+       * Parameter for choosing the number of variants to use.
+       */
+      public static final OptionID RANDOM_ID = new OptionID("sfcknn.seed", "Random generator.");
+
+      /**
        * Spatial curve generators
        */
       List<SpatialSorter> curvegen;
@@ -423,28 +393,36 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
        */
       int variants;
 
+      /**
+       * Random number generator.
+       */
+      RandomFactory random;
+
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<>(CURVES_ID, SpatialSorter.class);
-        if(config.grab(curveP)) {
+        if (config.grab(curveP)) {
           curvegen = curveP.instantiateClasses(config);
         }
         DoubleParameter windowP = new DoubleParameter(WINDOW_ID, 10.0);
-        if(config.grab(windowP)) {
+        if (config.grab(windowP)) {
           window = windowP.getValue();
         }
         IntParameter variantsP = new IntParameter(VARIANTS_ID, 1);
         variantsP.addConstraint(new GreaterEqualConstraint(1));
-        variantsP.addConstraint(new LessEqualConstraint(3));
-        if(config.grab(variantsP)) {
+        if (config.grab(variantsP)) {
           variants = variantsP.getValue();
+        }
+        RandomParameter randomP = new RandomParameter(RANDOM_ID);
+        if (config.grab(randomP)) {
+          random = randomP.getValue();
         }
       }
 
       @Override
       protected Factory<V, D> makeInstance() {
-        return new Factory<>(k, distanceFunction, curvegen, window, variants);
+        return new Factory<>(k, distanceFunction, curvegen, window, variants, random);
       }
     }
   }

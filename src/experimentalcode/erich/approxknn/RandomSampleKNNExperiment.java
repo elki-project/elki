@@ -126,7 +126,7 @@ public class RandomSampleKNNExperiment {
         FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", iters, LOG) : null;
         for(int i = 1; i <= iters; i++) {
           final int k = i * step;
-          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction, distanceFunction);
+          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction);
           OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
@@ -180,7 +180,7 @@ public class RandomSampleKNNExperiment {
         }
         // Max k LOF run
         {
-          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(maxk, distanceFunction, distanceFunction);
+          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(maxk, distanceFunction);
           OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
@@ -188,7 +188,7 @@ public class RandomSampleKNNExperiment {
         }
         // Scaled k LOF run
         {
-          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction, distanceFunction);
+          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction);
           OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
