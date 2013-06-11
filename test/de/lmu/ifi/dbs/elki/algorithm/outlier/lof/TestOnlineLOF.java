@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 /*
  This file is part of ELKI:
@@ -32,6 +32,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.FlexibleLOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.OnlineLOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -99,7 +100,7 @@ public class TestOnlineLOF implements JUnit4Test {
     UpdatableDatabase db = getDatabase();
 
     // 1. Run LOF
-    LOF<DoubleVector, DoubleDistance> lof = new LOF<>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
+    FlexibleLOF<DoubleVector, DoubleDistance> lof = new FlexibleLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
     OutlierResult result1 = lof.run(db);
 
     // 2. Run OnlineLOF (with insertions and removals) on database
@@ -124,7 +125,7 @@ public class TestOnlineLOF implements JUnit4Test {
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
     // setup algorithm
-    OnlineLOF<DoubleVector, DoubleDistance> lof = new OnlineLOF<>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
+    OnlineLOF<DoubleVector, DoubleDistance> lof = new OnlineLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
 
     // run OnlineLOF on database
     OutlierResult result = lof.run(db);

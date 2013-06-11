@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 /*
  This file is part of ELKI:
@@ -47,7 +47,7 @@ public class TestLOF extends AbstractSimpleAlgorithmTest implements JUnit4Test {
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, 10);
+    params.addParameter(LOF.Parameterizer.K_ID, 10);
 
     // setup Algorithm
     LOF<DoubleVector, DoubleDistance> lof = ClassGenericsUtil.parameterizeOrAbort(LOF.class, params);

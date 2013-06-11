@@ -48,7 +48,7 @@ public class TestHiCS extends AbstractSimpleAlgorithmTest implements JUnit4Test 
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, 10);
+    params.addParameter(LOF.Parameterizer.K_ID, 10);
     params.addParameter(HiCS.Parameterizer.LIMIT_ID, 10);
     params.addParameter(HiCS.Parameterizer.SEED_ID, 0);
     params.addParameter(HiCS.Parameterizer.TEST_ID, KolmogorovSmirnovTest.STATIC);
@@ -70,7 +70,7 @@ public class TestHiCS extends AbstractSimpleAlgorithmTest implements JUnit4Test 
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOF.K_ID, 10);
+    params.addParameter(LOF.Parameterizer.K_ID, 10);
     params.addParameter(HiCS.Parameterizer.LIMIT_ID, 10);
     params.addParameter(HiCS.Parameterizer.SEED_ID, 0);
     params.addParameter(HiCS.Parameterizer.TEST_ID, WelchTTest.STATIC);

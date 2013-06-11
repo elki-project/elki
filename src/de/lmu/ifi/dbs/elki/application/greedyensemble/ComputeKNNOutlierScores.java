@@ -240,7 +240,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LOF<O, D> lof = new LOF<>(k, distf, distf);
+        LOF<O, D> lof = new LOF<>(k, distf);
         OutlierResult lofresult = lof.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
