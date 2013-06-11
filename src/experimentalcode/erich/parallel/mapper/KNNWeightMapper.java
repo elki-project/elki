@@ -38,7 +38,7 @@ import experimentalcode.erich.parallel.SharedObject;
  * 
  * @author Erich Schubert
  */
-public class KNNWeightMapper implements Mapper {
+public class KNNWeightMapper extends AbstractDoubleMapper {
   /**
    * K parameter
    */
@@ -60,11 +60,6 @@ public class KNNWeightMapper implements Mapper {
   SharedObject<? extends KNNList<? extends NumberDistance<?, ?>>> input;
 
   /**
-   * Output channel to write to
-   */
-  SharedDouble out;
-
-  /**
    * Connect the input channel.
    * 
    * @param input Input channel
@@ -73,18 +68,9 @@ public class KNNWeightMapper implements Mapper {
     this.input = input;
   }
 
-  /**
-   * Connect the output channel.
-   * 
-   * @param output Output channel
-   */
-  public void connectDistanceOutput(SharedDouble output) {
-    this.out = output;
-  }
-
   @Override
   public Instance instantiate(MapExecutor mapper) {
-    return new Instance(k, input.instantiate(mapper), out.instantiate(mapper));
+    return new Instance(k, input.instantiate(mapper), output.instantiate(mapper));
   }
 
   /**
@@ -92,7 +78,7 @@ public class KNNWeightMapper implements Mapper {
    * 
    * @author Erich Schubert
    */
-  public static class Instance implements Mapper.Instance {
+  private static class Instance extends AbstractDoubleMapper.Instance {
     /**
      * k Parameter
      */
@@ -104,11 +90,6 @@ public class KNNWeightMapper implements Mapper {
     SharedObject.Instance<? extends KNNList<? extends NumberDistance<?, ?>>> input;
 
     /**
-     * Output data store
-     */
-    SharedDouble.Instance store;
-
-    /**
      * Constructor.
      * 
      * @param k K parameter
@@ -116,10 +97,9 @@ public class KNNWeightMapper implements Mapper {
      * @param store Datastore to write to
      */
     protected Instance(int k, SharedObject.Instance<? extends KNNList<? extends NumberDistance<?, ?>>> input, SharedDouble.Instance store) {
-      super();
+      super(store);
       this.k = k;
       this.input = input;
-      this.store = store;
     }
 
     @Override
@@ -138,12 +118,7 @@ public class KNNWeightMapper implements Mapper {
           sum += iter.getDistance().doubleValue();
         }
       }
-      store.set(sum);
-    }
-
-    @Override
-    public void cleanup() {
-      // Nothing to do.
+      output.set(sum);
     }
   }
 }

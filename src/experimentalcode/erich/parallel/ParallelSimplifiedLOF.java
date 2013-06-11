@@ -166,7 +166,7 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter kP = new IntParameter(LOF.K_ID);
+      IntParameter kP = new IntParameter(LOF.Parameterizer.K_ID);
       if(config.grab(kP)) {
         k = kP.getValue();
       }

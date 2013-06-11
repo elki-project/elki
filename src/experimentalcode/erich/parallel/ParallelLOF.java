@@ -111,7 +111,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
       SharedDouble kdistv = new SharedDouble();
       WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(kdists);
       kdistm.connectKNNInput(knnv);
-      kdistm.connectDistanceOutput(kdistv);
+      kdistm.connectOutput(kdistv);
       storem.connectInput(kdistv);
 
       new ParallelMapExecutor().run(ids, knnm, storek, kdistm, storem);
@@ -178,7 +178,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter kP = new IntParameter(LOF.K_ID);
+      IntParameter kP = new IntParameter(LOF.Parameterizer.K_ID);
       if (config.grab(kP)) {
         k = kP.intValue();
       }

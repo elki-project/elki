@@ -48,24 +48,40 @@ public class SharedDouble implements SharedVariable<Double> {
     /**
      * Cache for last data consumed/produced
      */
-    protected double data = Double.NaN;
+    private double data = Double.NaN;
 
+    /**
+     * @deprecated use {@link #doubleValue}!
+     */
     @Deprecated
     @Override
     public Double get() {
       return data;
     }
 
+    /**
+     * @deprecated use {@link #set(double)}!
+     */
     @Deprecated
     @Override
     public void set(Double data) {
       this.data = data;
     }
 
+    /**
+     * Get the variables value.
+     * 
+     * @return Double value
+     */
     public double doubleValue() {
       return data;
     }
 
+    /**
+     * Set the variables value.
+     * 
+     * @param data New value
+     */
     public void set(double data) {
       this.data = data;
     }

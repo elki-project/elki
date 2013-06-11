@@ -101,7 +101,7 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
 
     knnm.connectKNNOutput(knnv);
     kdistm.connectKNNInput(knnv);
-    kdistm.connectDistanceOutput(kdistv);
+    kdistm.connectOutput(kdistv);
     storem.connectInput(kdistv);
     mmm.connectInput(kdistv);
 

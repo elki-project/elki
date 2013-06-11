@@ -54,7 +54,7 @@ public class SharedObject<T> implements SharedVariable<T> {
     /**
      * Cache for last data consumed/produced
      */
-    protected T data = null;
+    private T data = null;
 
     @Override
     public T get() {

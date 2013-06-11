@@ -37,7 +37,7 @@ public interface MapExecutor {
    * @param cls Channel instance class
    * @return Instance or {@code null}
    */
-  public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls);
+  <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls);
 
   /**
    * Add a channel instance to this executor.
@@ -45,5 +45,5 @@ public interface MapExecutor {
    * @param parent Channel parent
    * @param inst Channel instance
    */
-  public void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst);
+  void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst);
 }

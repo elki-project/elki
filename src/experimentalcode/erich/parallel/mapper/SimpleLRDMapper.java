@@ -39,16 +39,11 @@ import experimentalcode.erich.parallel.SharedDouble;
  * 
  * @author Erich Schubert
  */
-public class SimpleLRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
+public class SimpleLRDMapper<D extends NumberDistance<D, ?>> extends AbstractDoubleMapper {
   /**
    * KNN store
    */
   private DataStore<? extends KNNList<D>> knns;
-
-  /**
-   * Output variable
-   */
-  private SharedDouble output;
 
   /**
    * Constructor.
@@ -58,15 +53,6 @@ public class SimpleLRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
   public SimpleLRDMapper(DataStore<? extends KNNList<D>> knns) {
     super();
     this.knns = knns;
-  }
-
-  /**
-   * Connect the output variable.
-   * 
-   * @param output Output variable
-   */
-  public void connectOutput(SharedDouble output) {
-    this.output = output;
   }
 
   @Override
@@ -79,20 +65,14 @@ public class SimpleLRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
    * 
    * @author Erich Schubert
    */
-  private class Instance implements Mapper.Instance {
-    /**
-     * Output variable
-     */
-    private SharedDouble.Instance output;
-
+  private class Instance extends AbstractDoubleMapper.Instance {
     /**
      * Constructor.
      * 
      * @param output Output variable
      */
     public Instance(SharedDouble.Instance output) {
-      super();
-      this.output = output;
+      super(output);
     }
 
     @Override
@@ -110,11 +90,6 @@ public class SimpleLRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
       }
       // Avoid division by zero.
       output.set(lrd > 0 ? size / lrd : 0);
-    }
-
-    @Override
-    public void cleanup() {
-      // Nothing to do.
     }
   }
 }
