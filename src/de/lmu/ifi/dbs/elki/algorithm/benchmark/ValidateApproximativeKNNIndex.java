@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.benchmark;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -47,6 +49,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -55,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
@@ -100,6 +104,11 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
   protected RandomFactory random;
 
   /**
+   * Filter pattern
+   */
+  protected Pattern pattern;
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction Distance function to use
@@ -108,14 +117,16 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
    * @param sampling Sampling rate
    * @param random Random factory
    * @param forcelinear Force the use of linear scanning.
+   * @param pattern
    */
-  public ValidateApproximativeKNNIndex(DistanceFunction<? super O, D> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random) {
+  public ValidateApproximativeKNNIndex(DistanceFunction<? super O, D> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
     super(distanceFunction);
     this.k = k;
     this.queries = queries;
     this.sampling = sampling;
     this.forcelinear = forcelinear;
     this.random = random;
+    this.pattern = pattern;
   }
 
   /**
@@ -145,7 +156,10 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
     }
 
     // No query set - use original database.
-    if (queries == null) {
+    if (queries == null || pattern != null) {
+      // Relation to filter on
+      Relation<String> lrel = (pattern != null) ? DatabaseUtil.guessLabelRepresentation(database) : null;
+
       final DBIDs sample;
       if (sampling <= 0) {
         sample = relation.getDBIDs();
@@ -157,33 +171,37 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
       }
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-      MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance(), mvdist = new MeanVariance(), mvderr = new MeanVariance();
+      MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance();
+      MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(), mvdrerr = new MeanVariance();
       int misses = 0;
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-        // Query index:
-        KNNList<D> knns = knnQuery.getKNNForDBID(iditer, k);
-        // Query reference:
-        KNNList<D> trueknns = truekNNQuery.getKNNForDBID(iditer, k);
+        if (pattern == null || pattern.matcher(lrel.get(iditer)).find()) {
+          // Query index:
+          KNNList<D> knns = knnQuery.getKNNForDBID(iditer, k);
+          // Query reference:
+          KNNList<D> trueknns = truekNNQuery.getKNNForDBID(iditer, k);
 
-        // Put adjusted knn size:
-        mv.put(knns.size() * k / (double) trueknns.size());
+          // Put adjusted knn size:
+          mv.put(knns.size() * k / (double) trueknns.size());
 
-        // Put recall:
-        mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / trueknns.size());
+          // Put recall:
+          mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / trueknns.size());
 
-        if (knns.size() >= k) {
-          D kdist = knns.getKNNDistance();
-          if (kdist instanceof NumberDistance) {
-            final double dist = ((NumberDistance<?, ?>) kdist).doubleValue();
-            final double tdist = ((NumberDistance<?, ?>) trueknns.getKNNDistance()).doubleValue();
-            if (tdist > 0.0) {
-              mvdist.put(dist);
-              mvderr.put(dist / tdist);
+          if (knns.size() >= k) {
+            D kdist = knns.getKNNDistance();
+            if (kdist instanceof NumberDistance) {
+              final double dist = ((NumberDistance<?, ?>) kdist).doubleValue();
+              final double tdist = ((NumberDistance<?, ?>) trueknns.getKNNDistance()).doubleValue();
+              if (tdist > 0.0) {
+                mvdist.put(dist);
+                mvdaerr.put(dist - tdist);
+                mvdrerr.put(dist / tdist);
+              }
             }
+          } else {
+            // Less than k objects.
+            misses++;
           }
-        } else {
-          // Less than k objects.
-          misses++;
         }
         if (prog != null) {
           prog.incrementProcessed(LOG);
@@ -197,10 +215,11 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
         if (mvdist.getCount() > 0) {
           LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
-          LOG.statistics("Mean relative k-distance: " + mvderr.getMean() + " +- " + mvderr.getNaiveStddev());
+          LOG.statistics("Mean absolute k-error: " + mvdaerr.getMean() + " +- " + mvdaerr.getNaiveStddev());
+          LOG.statistics("Mean relative k-error: " + mvdrerr.getMean() + " +- " + mvdrerr.getNaiveStddev());
         }
         if (misses > 0) {
-          LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / sample.size()));
+          LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / mv.getCount()));
         }
       }
     } else {
@@ -232,7 +251,8 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         sample = DBIDUtil.randomSample(sids, size, random);
       }
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-      MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance(), mvdist = new MeanVariance(), mvderr = new MeanVariance();
+      MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance();
+      MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(), mvdrerr = new MeanVariance();
       int misses = 0;
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         int off = sids.binarySearch(iditer);
@@ -258,7 +278,8 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
             final double tdist = ((NumberDistance<?, ?>) trueknns.getKNNDistance()).doubleValue();
             if (tdist > 0.0) {
               mvdist.put(dist);
-              mvderr.put(dist / tdist);
+              mvdaerr.put(dist - tdist);
+              mvdrerr.put(dist / tdist);
             }
           }
         } else {
@@ -276,11 +297,11 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
         if (mvdist.getCount() > 0) {
-          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
-          LOG.statistics("Mean relative k-distance: " + mvderr.getMean() + " +- " + mvderr.getNaiveStddev());
+          LOG.statistics("Mean absolute k-error: " + mvdaerr.getMean() + " +- " + mvdaerr.getNaiveStddev());
+          LOG.statistics("Mean relative k-error: " + mvdrerr.getMean() + " +- " + mvdrerr.getNaiveStddev());
         }
         if (misses > 0) {
-          LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / sample.size()));
+          LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / mv.getCount()));
         }
       }
     }
@@ -334,6 +355,11 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
     public static final OptionID RANDOM_ID = new OptionID("validateknn.random", "Random generator for sampling.");
 
     /**
+     * Parameter to select query points.
+     */
+    public static final OptionID PATTERN_ID = new OptionID("validateknn.pattern", "Pattern to select query points.");
+
+    /**
      * K parameter
      */
     protected int k = 10;
@@ -358,6 +384,11 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
      */
     protected RandomFactory random;
 
+    /**
+     * Filter pattern for query points.
+     */
+    protected Pattern pattern;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -365,10 +396,16 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
       if (config.grab(kP)) {
         k = kP.intValue();
       }
-      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<>(QUERY_ID, DatabaseConnection.class);
-      queryP.setOptional(true);
-      if (config.grab(queryP)) {
-        queries = queryP.instantiateClass(config);
+      PatternParameter patternP = new PatternParameter(PATTERN_ID);
+      patternP.setOptional(true);
+      if (config.grab(patternP)) {
+        pattern = patternP.getValue();
+      } else {
+        ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<>(QUERY_ID, DatabaseConnection.class);
+        queryP.setOptional(true);
+        if (config.grab(queryP)) {
+          queries = queryP.instantiateClass(config);
+        }
       }
       DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID);
       samplingP.setOptional(true);
@@ -387,7 +424,7 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
 
     @Override
     protected ValidateApproximativeKNNIndex<O, D> makeInstance() {
-      return new ValidateApproximativeKNNIndex<>(distanceFunction, k, queries, sampling, forcelinear, random);
+      return new ValidateApproximativeKNNIndex<>(distanceFunction, k, queries, sampling, forcelinear, random, pattern);
     }
   }
 }
