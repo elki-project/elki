@@ -129,16 +129,16 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
     // Get a distance and kNN query instance.
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     // Approximate query:
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, k);
+    KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    if (knnQuery == null || knnQuery instanceof LinearScanKNNQuery) {
+      throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
+    }
     // Exact query:
     KNNQuery<O, D> truekNNQuery;
     if (forcelinear) {
       truekNNQuery = QueryUtil.getLinearScanKNNQuery(distQuery);
     } else {
       truekNNQuery = database.getKNNQuery(distQuery, k, DatabaseQuery.HINT_EXACT);
-    }
-    if (knnQuery instanceof LinearScanKNNQuery) {
-      throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
     }
     if (knnQuery.getClass().equals(truekNNQuery.getClass())) {
       LOG.warning("Query classes are the same. This experiment may be invalid!");
