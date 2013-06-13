@@ -187,7 +187,7 @@ public interface ProjectionParallel extends Projection {
   public double fastProjectRenderToDataSpace(double value, int axis);
 
   /**
-   * Find the axis assinged to the given dimension.
+   * Find the axis assigned to the given dimension.
    * 
    * @param truedim Dimension
    * @return Axis number
