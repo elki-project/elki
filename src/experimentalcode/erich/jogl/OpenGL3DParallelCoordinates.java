@@ -167,7 +167,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
      * strong limitation on alpha: computation is not in floats, but has 1/256
      * steps for blending. This in particular affects sloped lines!
      */
-    double alpha = .5;
+    double alpha = .1;
 
     /**
      * Line width
@@ -266,6 +266,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
       GLProfile glp = GLProfile.getDefault();
       GLCapabilities caps = new GLCapabilities(glp);
+      // Increase color depth.
+      caps.setBlueBits(16);
+      caps.setRedBits(16);
+      caps.setGreenBits(16);
       caps.setDoubleBuffered(true);
       canvas = new GLCanvas(caps);
       canvas.addGLEventListener(this);
