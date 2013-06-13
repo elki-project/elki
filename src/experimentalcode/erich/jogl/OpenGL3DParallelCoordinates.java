@@ -28,9 +28,6 @@ import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +54,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -81,10 +77,9 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.erich.jogl.Simple1DOFCamera.CameraListener;
 import experimentalcode.shared.parallelcoord.layout.Layout;
+import experimentalcode.shared.parallelcoord.layout.Layout.Node;
 import experimentalcode.shared.parallelcoord.layout.Layouter3DPC;
 import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Simple JOGL2 based parallel coordinates visualization.
@@ -167,12 +162,22 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
      * strong limitation on alpha: computation is not in floats, but has 1/256
      * steps for blending. This in particular affects sloped lines!
      */
-    double alpha = .1;
+    double alpha = 1f;
 
     /**
-     * Line width
+     * Line width.
      */
     public float linewidth = 2f;
+
+    /**
+     * Texture width.
+     */
+    public int texwidth = 256;
+
+    /**
+     * Texture height.
+     */
+    public int texheight = 1024;
   }
 
   /**
@@ -325,7 +330,8 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       canvas.addMouseMotionListener(arcball);
       canvas.addMouseWheelListener(arcball);
 
-      prenderer.setupVertexBuffer(gl);
+      prenderer.initLabels();
+      prenderer.renderTextures(gl);
       textrenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
     }
 
@@ -374,95 +380,13 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
      * @author Erich Schubert
      */
     class Parallel3DRenderer {
-
       /**
-       * Vertex buffer IDs
+       * Prerendered textures.
        */
-      int[] vbi = null;
+      private int[] textures;
 
-      /**
-       * Number of quads in buffer
-       */
-      int lines = -1;
-
-      /**
-       * Sizes of the individual clusters
-       */
-      int[] sizes;
-
-      /**
-       * Colors
-       */
-      float[] colors;
-
-      private int size;
-
-      private void setupVertexBuffer(GL2 gl) {
-        final int dim = RelationUtil.dimensionality(rel);
-        size = rel.size();
-        final float sz = (float) (1 / StyleLibrary.SCALE);
-
-        int lines = layout.edges.size() * size;
-
-        // Setup buffer IDs:
-        int[] vbi = new int[1];
-        gl.glGenBuffers(1, vbi, 0);
-        // Vertexes
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, lines * 2 * 3 * ByteArrayUtil.SIZE_FLOAT, null, GL2.GL_DYNAMIC_DRAW);
-        ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
-        FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
-
-        StylingPolicy sp = style.getStylingPolicy();
-        ColorLibrary cols = style.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-        if (sp instanceof ClassStylingPolicy) {
-          ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-          final int maxStyle = csp.getMaxStyle();
-          TIntArrayList sizes = new TIntArrayList();
-          TFloatArrayList colors = new TFloatArrayList();
-
-          int csum = 0; //
-          for (int s = csp.getMinStyle(); s < maxStyle; s++) {
-            // Count the number of instances in the style
-            int c = 0;
-            for (DBIDIter it = csp.iterateClass(s); it.valid(); it.advance(), c++, csum++) {
-              int coff = (csum << 2) + (csum << 1); // * 6
-              double[] vec = proj.fastProjectDataToRenderSpace(rel.get(it));
-              for (Layout.Edge e : layout.edges) {
-                // Seek to appropriate position.
-                // See buffer layout discussed above.
-                vertices.position(coff);
-                final int d0 = e.dim1, d1 = e.dim2;
-                vertices.put((float) layout.getNode(d0).getX());
-                vertices.put((float) layout.getNode(d0).getY());
-                vertices.put(1.f - sz * (float) vec[d0]);
-                vertices.put((float) layout.getNode(d1).getX());
-                vertices.put((float) layout.getNode(d1).getY());
-                vertices.put(1.f - sz * (float) vec[d1]);
-                coff += (size << 2) + (size << 1);
-              }
-            }
-            // Skip empty classes
-            if (c == 0) {
-              continue;
-            }
-            sizes.add(c);
-            Color col = SVGUtil.stringToColor(cols.getColor(s));
-            colors.add(col.getRed() / 255.f);
-            colors.add(col.getGreen() / 255.f);
-            colors.add(col.getBlue() / 255.f);
-          }
-          this.sizes = sizes.toArray();
-          this.colors = colors.toArray();
-        } else {
-          // TODO: single color.
-        }
-
-        vertices.flip();
-        gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
-        this.lines = lines;
-        this.vbi = vbi; // Store
-
+      void initLabels() {
+        int dim = RelationUtil.dimensionality(rel);
         // Labels:
         labels = new String[dim];
         for (int i = 0; i < dim; i++) {
@@ -470,68 +394,161 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         }
       }
 
+      void renderTextures(GL2 gl) {
+        final StylingPolicy sp = style.getStylingPolicy();
+        final ColorLibrary cols = style.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+
+        // Setup color table:
+        float[] colors;
+        if (sp instanceof ClassStylingPolicy) {
+          ClassStylingPolicy csp = (ClassStylingPolicy) sp;
+          final int maxStyle = csp.getMaxStyle();
+          colors = new float[maxStyle * 3];
+          for (int c = 0, s = csp.getMinStyle(); s < maxStyle; c += 3, s++) {
+            Color col = SVGUtil.stringToColor(cols.getColor(s));
+            colors[c + 0] = col.getRed() / 255.f;
+            colors[c + 1] = col.getGreen() / 255.f;
+            colors[c + 2] = col.getBlue() / 255.f;
+          }
+        } else {
+          // Render in black.
+          colors = new float[] { 0f, 0f, 0f };
+        }
+
+        // Generate textures:
+        textures = new int[layout.edges.size()];
+        gl.glGenTextures(textures.length, textures, 0);
+
+        // Get a framebuffer:
+        int[] frameBufferID = new int[1];
+        gl.glGenFramebuffers(1, frameBufferID, 0);
+
+        gl.glPushAttrib(GL2.GL_TEXTURE_BIT | GL2.GL_VIEWPORT_BIT);
+        gl.glPushMatrix();
+        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, frameBufferID[0]);
+
+        for (int edge = 0; edge < textures.length; edge++) {
+          Layout.Edge e = layout.edges.get(edge);
+
+          gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[edge]);
+          gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+          gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+          gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_DECAL);
+
+          // Reserve texture image data:
+          gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA16, //
+              settings.texwidth, settings.texheight, 0, // Size
+              GL2.GL_RGBA, GL2.GL_FLOAT, null);
+          gl.glViewport(0, 0, settings.texwidth, settings.texheight);
+
+          // Attach 2D texture to this FBO
+          gl.glFramebufferTexture2D(GL2.GL_FRAMEBUFFER, GL2.GL_COLOR_ATTACHMENT0, //
+              GL2.GL_TEXTURE_2D, textures[edge], 0);
+
+          if (gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER) != GL2.GL_FRAMEBUFFER_COMPLETE) {
+            LOG.warning("glCheckFramebufferStatus: " + gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER));
+          }
+
+          gl.glDisable(GL2.GL_LIGHTING);
+          gl.glDisable(GL.GL_CULL_FACE);
+          gl.glDisable(GL.GL_DEPTH_TEST);
+          gl.glMatrixMode(GL2.GL_PROJECTION);
+          gl.glLoadIdentity();
+          gl.glOrtho(0f, 1f, 0f, StyleLibrary.SCALE, -1, 1);
+          gl.glMatrixMode(GL2.GL_MODELVIEW);
+          gl.glLoadIdentity();
+
+          gl.glClearColor(1f, 1f, 1f, .0f);
+          gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+
+          gl.glShadeModel(GL2.GL_SMOOTH);
+          gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+          gl.glEnable(GL.GL_BLEND);
+          gl.glEnable(GL.GL_LINE_SMOOTH);
+
+          gl.glLineWidth(settings.linewidth);
+
+          final float alpha = (float) settings.alpha;
+          if (sp instanceof ClassStylingPolicy) {
+            ClassStylingPolicy csp = (ClassStylingPolicy) sp;
+            final int maxStyle = csp.getMaxStyle();
+            gl.glBegin(GL.GL_LINES);
+            for (int c = 0, s = csp.getMinStyle(); s < maxStyle; c += 3, s++) {
+              gl.glColor4f(colors[c], colors[c + 1], colors[c + 2], alpha);
+              for (DBIDIter it = csp.iterateClass(s); it.valid(); it.advance()) {
+                gl.glVertex2d(0., proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim1), e.dim1));
+                gl.glVertex2d(1., proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim2), e.dim2));
+              }
+            }
+            gl.glEnd();
+          } else {
+            LOG.warning("Rendering without styling policy is not yet implemented.");
+          }
+          gl.glColor4f(1f, 1f, 1f, 1f);
+
+          if (!gl.glIsTexture(textures[0])) {
+            LOG.warning("Generating texture failed!");
+          }
+        }
+        // Switch back to the default framebuffer.
+        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
+        gl.glPopMatrix();
+        gl.glPopAttrib();
+
+        // Reset background color.
+        gl.glClearColor(1f, 1f, 1f, 1f);
+      }
+
       public void dispose(GL gl) {
-        // Free vertex buffers
-        if (vbi != null) {
-          gl.glDeleteBuffers(vbi.length, vbi, 0);
+        if (textures != null) {
+          gl.glDeleteTextures(textures.length, textures, 0);
+          textures = null;
         }
       }
 
       protected void drawParallelPlot(GLAutoDrawable drawable, final int dim, GL2 gl) {
-        gl.glPushMatrix();
-        // gl.glRotatef((float) MathUtil.rad2deg(rotation), 0.f, 0.f, 1.f);
-        // Enable shading
-        gl.glShadeModel(GL2.GL_SMOOTH);
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glEnable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_LINE_SMOOTH);
-        gl.glLineWidth(settings.linewidth);
-
-        // Bind vertex buffer.
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
-        // Use 2D coordinates
-        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glVertexPointer(3, GL.GL_FLOAT, 3 * ByteArrayUtil.SIZE_FLOAT, 0);
-
-        // See buffer layout above!
-
-        // Simple Z sorting for edge groups
-        DoubleIntPair[] depth = new DoubleIntPair[layout.edges.size()];
         {
-          double[] buf = new double[3];
-          double[] z = new double[dim];
-          for (int d = 0; d < dim; d++) {
-            camera.project(layout.getNode(d).getX(), layout.getNode(d).getY(), 0, buf);
-            z[d] = buf[2];
+          gl.glPushMatrix();
+          // Simple Z sorting for edge groups
+          DoubleIntPair[] depth = new DoubleIntPair[layout.edges.size()];
+          {
+            double[] buf = new double[3];
+            double[] z = new double[dim];
+            for (int d = 0; d < dim; d++) {
+              camera.project(layout.getNode(d).getX(), layout.getNode(d).getY(), 0, buf);
+              z[d] = buf[2];
+            }
+            int e = 0;
+            for (Layout.Edge edge : layout.edges) {
+              depth[e] = new DoubleIntPair(-(z[edge.dim1] + z[edge.dim2]), e);
+              e++;
+            }
+            Arrays.sort(depth);
           }
-          int e = 0;
-          for (Layout.Edge edge : layout.edges) {
-            depth[e] = new DoubleIntPair(-(z[edge.dim1] + z[edge.dim2]), e);
-            e++;
+          gl.glShadeModel(GL2.GL_FLAT);
+          gl.glEnable(GL.GL_TEXTURE_2D);
+          gl.glColor4f(1f, 1f, 1f, 1f);
+          for (DoubleIntPair pair : depth) {
+            Layout.Edge edge = layout.edges.get(pair.second);
+            final Node node1 = layout.getNode(edge.dim1);
+            final Node node2 = layout.getNode(edge.dim2);
+
+            gl.glBindTexture(GL.GL_TEXTURE_2D, textures[pair.second]);
+            gl.glBegin(GL2.GL_QUADS);
+            gl.glTexCoord2d(0f, 0f);
+            gl.glVertex3d(node1.getX(), node1.getY(), 0f);
+            gl.glTexCoord2d(0f, 1f);
+            gl.glVertex3d(node1.getX(), node1.getY(), 1f);
+            gl.glTexCoord2d(1f, 1f);
+            gl.glVertex3d(node2.getX(), node2.getY(), 1f);
+            gl.glTexCoord2d(1f, 0f);
+            gl.glVertex3d(node2.getX(), node2.getY(), 0f);
+            gl.glEnd();
           }
-          Arrays.sort(depth);
+          gl.glDisable(GL.GL_TEXTURE_2D);
+          gl.glPopMatrix();
         }
-
-        for (int e = 0; e < depth.length; e++) {
-          final int eoff = depth[e].second * (size << 1);
-
-          // Within each block, we go by colors:
-          for (int i = 0, off = 0; i < sizes.length; i++) {
-            // Setup color
-            final float alpha = (float) (settings.alpha + (1 - settings.alpha) / Math.sqrt(rel.size()));
-            gl.glColor4f(colors[i * 3], colors[i * 3 + 1], colors[i * 3 + 2], alpha);
-
-            // Execute
-            final int size2 = sizes[i] << 1;
-            gl.glDrawArrays(GL2.GL_LINES, eoff + off, size2);
-            off += size2;
-          }
-        }
-        // Unbind buffer
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glPopMatrix();
-
         // Render labels
         {
           gl.glPushMatrix();
