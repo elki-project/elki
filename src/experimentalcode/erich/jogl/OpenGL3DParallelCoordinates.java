@@ -585,6 +585,16 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
             Arrays.sort(depth);
           }
           gl.glShadeModel(GL2.GL_FLAT);
+          // Render spider web:
+          gl.glBegin(GL.GL_LINES);
+          gl.glLineWidth(settings.linewidth);
+          gl.glColor4f(0f, 0f, 0f, 1f);
+          for (Layout.Edge edge : layout.edges) {
+            Node n1 = layout.getNode(edge.dim1), n2 = layout.getNode(edge.dim2);
+            gl.glVertex3d(n1.getX(), n1.getY(), 0f);
+            gl.glVertex3d(n2.getX(), n2.getY(), 0f);
+          }
+          gl.glEnd();
           gl.glEnable(GL.GL_TEXTURE_2D);
           gl.glColor4f(1f, 1f, 1f, 1f);
           for (DoubleIntPair pair : depth) {
