@@ -39,7 +39,7 @@ import java.util.zip.GZIPInputStream;
 public final class FileUtil {
   /**
    * Fake Constructor. Use static methods.
-   *
+   * 
    */
   private FileUtil() {
     // Do not instantiate.
@@ -68,19 +68,19 @@ public final class FileUtil {
    *         <code>null</code>
    */
   public static String getFilenameExtension(String name) {
-    if(name == null) {
+    if (name == null) {
       return null;
     }
     int index = name.lastIndexOf('.');
-    if(index >= name.length() - 1) {
+    if (index >= name.length() - 1) {
       return null;
     }
     return name.substring(name.lastIndexOf('.') + 1).toLowerCase();
   }
 
   /**
-   * Try to open a file, first trying the file system,
-   * then falling back to the classpath.
+   * Try to open a file, first trying the file system, then falling back to the
+   * classpath.
    * 
    * @param filename File name in system notation
    * @return Input stream
@@ -89,8 +89,7 @@ public final class FileUtil {
   public static InputStream openSystemFile(String filename) throws FileNotFoundException {
     try {
       return new FileInputStream(filename);
-    }
-    catch(FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       // try with classloader
       String resname = filename.replace(File.separatorChar, '/');
       InputStream result = ClassLoader.getSystemResourceAsStream(resname);
@@ -116,7 +115,7 @@ public final class FileUtil {
       PushbackInputStream pb = new PushbackInputStream(in, 16);
       in = pb;
       // read a magic from the file header
-      byte[] magic = {0, 0};
+      byte[] magic = { 0, 0 };
       pb.read(magic);
       pb.unread(magic);
       if (magic[0] == 31 && magic[1] == -117) {
@@ -145,55 +144,73 @@ public final class FileUtil {
   public static File locateFile(String name, String basedir) {
     // Try exact match first.
     File f = new File(name);
-    if(f.exists()) {
+    if (f.exists()) {
       return f;
     }
     // Try with base directory
-    if(basedir != null) {
+    if (basedir != null) {
       f = new File(basedir, name);
       // logger.warning("Trying: "+f.getAbsolutePath());
-      if(f.exists()) {
+      if (f.exists()) {
         return f;
       }
     }
     // try stripping whitespace
     {
       String name2 = name.trim();
-      if(!name.equals(name2)) {
+      if (!name.equals(name2)) {
         // logger.warning("Trying without whitespace.");
         f = locateFile(name2, basedir);
-        if(f != null) {
+        if (f != null) {
           return f;
         }
       }
     }
     // try substituting path separators
     {
-      String name2 = name.replace('/',File.separatorChar);
+      String name2 = name.replace('/', File.separatorChar);
       if (!name.equals(name2)) {
         // logger.warning("Trying with replaced separators.");
         f = locateFile(name2, basedir);
-        if(f != null) {
+        if (f != null) {
           return f;
         }
       }
-      name2 = name.replace('\\',File.separatorChar);
+      name2 = name.replace('\\', File.separatorChar);
       if (!name.equals(name2)) {
         // logger.warning("Trying with replaced separators.");
         f = locateFile(name2, basedir);
-        if(f != null) {
+        if (f != null) {
           return f;
         }
       }
     }
     // try stripping extra characters, such as quotes.
-    if(name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"') {
+    if (name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"') {
       // logger.warning("Trying without quotes.");
       f = locateFile(name.substring(1, name.length() - 1), basedir);
-      if(f != null) {
+      if (f != null) {
         return f;
       }
     }
     return null;
+  }
+
+  /**
+   * Load an input stream (e.g. a Java resource) into a String buffer. The
+   * stream is closed afterwards.
+   * 
+   * @param is Input stream
+   * @return String with file/resource contents.
+   * @throws IOException on IO errors
+   */
+  public static String slurp(InputStream is) throws IOException {
+    StringBuilder buf = new StringBuilder();
+    final byte[] b = new byte[4096];
+    for (int n; (n = is.read(b)) != -1;) {
+      buf.append(new String(b, 0, n));
+    }
+    is.close();
+    return buf.toString();
   }
 }

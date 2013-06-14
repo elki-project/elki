@@ -28,6 +28,9 @@ import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,6 +57,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -154,15 +158,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
      * Layouting method.
      */
     public Layouter3DPC<? super NumberVector<?>> layout;
-
-    /**
-     * Alpha effect: 1=solid, 0=full alpha effect
-     * 
-     * Note: since OpenGL usually works with 8 bit color depth, this puts a
-     * strong limitation on alpha: computation is not in floats, but has 1/256
-     * steps for blending. This in particular affects sloped lines!
-     */
-    double alpha = 1f;
 
     /**
      * Line width.
@@ -272,9 +267,9 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       GLProfile glp = GLProfile.getDefault();
       GLCapabilities caps = new GLCapabilities(glp);
       // Increase color depth.
-      caps.setBlueBits(16);
-      caps.setRedBits(16);
-      caps.setGreenBits(16);
+      // caps.setBlueBits(16);
+      // caps.setRedBits(16);
+      // caps.setGreenBits(16);
       caps.setDoubleBuffered(true);
       canvas = new GLCanvas(caps);
       canvas.addGLEventListener(this);
@@ -331,7 +326,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       canvas.addMouseWheelListener(arcball);
 
       prenderer.initLabels();
+      long start = System.nanoTime();
       prenderer.renderTextures(gl);
+      long end = System.nanoTime();
+      LOG.warning("Time to render textures: " + (end - start) / 1e6 + " ms.");
       textrenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
     }
 
@@ -400,6 +398,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
         // Setup color table:
         float[] colors;
+        int lines = 0;
         if (sp instanceof ClassStylingPolicy) {
           ClassStylingPolicy csp = (ClassStylingPolicy) sp;
           final int maxStyle = csp.getMaxStyle();
@@ -409,11 +408,20 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
             colors[c + 0] = col.getRed() / 255.f;
             colors[c + 1] = col.getGreen() / 255.f;
             colors[c + 2] = col.getBlue() / 255.f;
+            lines = Math.max(lines, csp.classSize(s));
           }
         } else {
           // Render in black.
           colors = new float[] { 0f, 0f, 0f };
+          lines = rel.size();
         }
+
+        // Setup buffer IDs:
+        int[] vbi = new int[1];
+        gl.glGenBuffers(1, vbi, 0);
+        // Buffer for coordinates.
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, lines * 2 * 2 * ByteArrayUtil.SIZE_FLOAT, null, GL2.GL_DYNAMIC_DRAW);
 
         // Generate textures:
         textures = new int[layout.edges.size()];
@@ -430,20 +438,21 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         for (int edge = 0; edge < textures.length; edge++) {
           Layout.Edge e = layout.edges.get(edge);
 
-          gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[edge]);
-          gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-          gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-          gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_DECAL);
+          gl.glBindTexture(GL.GL_TEXTURE_2D, textures[edge]);
+          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+          gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
 
           // Reserve texture image data:
-          gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA16, //
+          gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL2.GL_RGBA16, //
               settings.texwidth, settings.texheight, 0, // Size
               GL2.GL_RGBA, GL2.GL_FLOAT, null);
+          gl.glGenerateMipmap(GL.GL_TEXTURE_2D); // Allocate mipmaps!
           gl.glViewport(0, 0, settings.texwidth, settings.texheight);
 
           // Attach 2D texture to this FBO
           gl.glFramebufferTexture2D(GL2.GL_FRAMEBUFFER, GL2.GL_COLOR_ATTACHMENT0, //
-              GL2.GL_TEXTURE_2D, textures[edge], 0);
+              GL.GL_TEXTURE_2D, textures[edge], 0);
 
           if (gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER) != GL2.GL_FRAMEBUFFER_COMPLETE) {
             LOG.warning("glCheckFramebufferStatus: " + gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER));
@@ -468,23 +477,68 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
           gl.glLineWidth(settings.linewidth);
 
-          final float alpha = (float) settings.alpha;
           if (sp instanceof ClassStylingPolicy) {
             ClassStylingPolicy csp = (ClassStylingPolicy) sp;
             final int maxStyle = csp.getMaxStyle();
-            gl.glBegin(GL.GL_LINES);
             for (int c = 0, s = csp.getMinStyle(); s < maxStyle; c += 3, s++) {
-              gl.glColor4f(colors[c], colors[c + 1], colors[c + 2], alpha);
-              for (DBIDIter it = csp.iterateClass(s); it.valid(); it.advance()) {
-                gl.glVertex2d(0., proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim1), e.dim1));
-                gl.glVertex2d(1., proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim2), e.dim2));
+              ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
+              FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
+              int p = 0;
+              for (DBIDIter it = csp.iterateClass(s); it.valid(); it.advance(), p++) {
+                final NumberVector<?> vec = rel.get(it);
+                final float v1 = (float) proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
+                final float v2 = (float) proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim2), e.dim2);
+                vertices.put(0.f);
+                vertices.put(v1);
+                vertices.put(1.f);
+                vertices.put(v2);
               }
+              assert (p == csp.classSize(s));
+              vertices.flip();
+              gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
+
+              gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
+              gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+              gl.glVertexPointer(2, GL.GL_FLOAT, 0, 0);
+
+              gl.glColor3f(colors[c], colors[c + 1], colors[c + 2]);
+              gl.glDrawArrays(GL.GL_LINES, 0, p);
+
+              gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
             }
-            gl.glEnd();
           } else {
-            LOG.warning("Rendering without styling policy is not yet implemented.");
+            ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
+            FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
+            int p = 0;
+            for (DBIDIter it = rel.iterDBIDs(); it.valid(); it.advance(), p++) {
+              final NumberVector<?> vec = rel.get(it);
+              final float v1 = (float) proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
+              final float v2 = (float) proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim2), e.dim2);
+              vertices.put(0.f);
+              vertices.put(v1);
+              vertices.put(1.f);
+              vertices.put(v2);
+            }
+            vertices.flip();
+            gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
+
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
+            gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+            gl.glVertexPointer(2, GL.GL_FLOAT, 0, 0);
+
+            gl.glColor3f(colors[0], colors[1], colors[2]);
+            gl.glDrawArrays(GL.GL_LINES, 0, p);
+
+            gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
           }
-          gl.glColor4f(1f, 1f, 1f, 1f);
+
+          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
+          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 2);
+          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
+          gl.glHint(GL.GL_GENERATE_MIPMAP_HINT, GL.GL_NICEST);
+          gl.glGenerateMipmap(GL.GL_TEXTURE_2D);
+          gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
           if (!gl.glIsTexture(textures[0])) {
             LOG.warning("Generating texture failed!");
@@ -492,9 +546,11 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         }
         // Switch back to the default framebuffer.
         gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
-        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
         gl.glPopMatrix();
         gl.glPopAttrib();
+
+        // Free vertex buffer
+        gl.glDeleteBuffers(vbi.length, vbi, 0);
 
         // Reset background color.
         gl.glClearColor(1f, 1f, 1f, 1f);
@@ -508,7 +564,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       }
 
       protected void drawParallelPlot(GLAutoDrawable drawable, final int dim, GL2 gl) {
-        {
+        if (textures != null) {
           gl.glPushMatrix();
           // Simple Z sorting for edge groups
           DoubleIntPair[] depth = new DoubleIntPair[layout.edges.size()];
@@ -536,13 +592,13 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
             gl.glBindTexture(GL.GL_TEXTURE_2D, textures[pair.second]);
             gl.glBegin(GL2.GL_QUADS);
-            gl.glTexCoord2d(0f, 0f);
+            gl.glTexCoord2d(.5f / settings.texwidth, 0f);
             gl.glVertex3d(node1.getX(), node1.getY(), 0f);
-            gl.glTexCoord2d(0f, 1f);
+            gl.glTexCoord2d(.5f / settings.texwidth, 1f);
             gl.glVertex3d(node1.getX(), node1.getY(), 1f);
-            gl.glTexCoord2d(1f, 1f);
+            gl.glTexCoord2d((settings.texwidth - .5f) / settings.texwidth, 1f);
             gl.glVertex3d(node2.getX(), node2.getY(), 1f);
-            gl.glTexCoord2d(1f, 0f);
+            gl.glTexCoord2d((settings.texwidth - .5f) / settings.texwidth, 0f);
             gl.glVertex3d(node2.getX(), node2.getY(), 0f);
             gl.glEnd();
           }

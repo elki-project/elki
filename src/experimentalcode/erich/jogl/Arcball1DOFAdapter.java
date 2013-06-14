@@ -120,7 +120,7 @@ public class Arcball1DOFAdapter extends MouseInputAdapter {
    */
   private void mapMouseToPlane(Simple1DOFCamera camera, Point point2d, double[] vec) {
     // Far plane
-    camera.unproject(point2d.x, point2d.y, 0., far);
+    camera.unproject(point2d.x, point2d.y, -100., far);
     // Near plane
     camera.unproject(point2d.x, point2d.y, 1., near);
     // Delta vector: far -= near.
@@ -143,12 +143,12 @@ public class Arcball1DOFAdapter extends MouseInputAdapter {
     // TODO: add full arcball support?
   }
 
-  @SuppressWarnings("unused")
   /**
    * Render a debugging hint for the arcball tool.
    * 
    * @param gl GL class for rendering-
    */
+  @SuppressWarnings("unused")
   public void debugRender(GL2 gl) {
     if (!DEBUG || (startcamera == null)) {
       return;
@@ -157,10 +157,10 @@ public class Arcball1DOFAdapter extends MouseInputAdapter {
     gl.glColor4f(1.f, 0.f, 0.f, .66f);
     gl.glBegin(GL.GL_LINES);
     gl.glVertex3f(0.f, 0.f, 0.f);
-    double initialrot = startcamera.getRotationZ();
-    gl.glVertex3f((float) Math.cos(-initialrot + startangle) * 4.f, (float) -Math.sin(-initialrot + startangle) * 4.f, 0.f);
-    gl.glVertex3f((float) Math.cos(-initialrot + startangle) * 1.f, (float) -Math.sin(-initialrot + startangle) * 1.f, 0.f);
-    gl.glVertex3f((float) Math.cos(-initialrot + startangle) * 1.f, (float) -Math.sin(-initialrot + startangle) * 1.f, 1.f);
+    double rot = startangle - startcamera.getRotationZ();
+    gl.glVertex3f((float) Math.cos(rot) * 4.f, (float) -Math.sin(rot) * 4.f, 0.f);
+    gl.glVertex3f((float) Math.cos(rot) * 1.f, (float) -Math.sin(rot) * 1.f, 0.f);
+    gl.glVertex3f((float) Math.cos(rot) * 1.f, (float) -Math.sin(rot) * 1.f, 1.f);
     gl.glEnd();
   }
 }
