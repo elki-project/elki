@@ -89,9 +89,11 @@ import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
 /**
  * Simple JOGL2 based parallel coordinates visualization.
  * 
- * @author Erich Schubert
+ * TODO: Improve generics of Layout3DPC.
  * 
- *         TODO: Improve generics of Layout3DPC.
+ * FIXME: proper depth-sorting of edges. It's not that simple, unfortunately.
+ * 
+ * @author Erich Schubert
  */
 public class OpenGL3DParallelCoordinates implements ResultHandler {
   /**
@@ -411,7 +413,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
         // Setup color table:
         float[] colors;
-        int lines = 0;
         if (sp instanceof ClassStylingPolicy) {
           ClassStylingPolicy csp = (ClassStylingPolicy) sp;
           final int maxStyle = csp.getMaxStyle();
@@ -421,12 +422,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
             colors[c + 0] = col.getRed() / 255.f;
             colors[c + 1] = col.getGreen() / 255.f;
             colors[c + 2] = col.getBlue() / 255.f;
-            lines = Math.max(lines, csp.classSize(s));
           }
         } else {
           // Render in black.
           colors = new float[] { 0f, 0f, 0f };
-          lines = rel.size();
         }
 
         // Setup buffer IDs:
@@ -434,7 +433,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         gl.glGenBuffers(1, vbi, 0);
         // Buffer for coordinates.
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, lines * 2 * 2 * ByteArrayUtil.SIZE_FLOAT, null, GL2.GL_DYNAMIC_DRAW);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, rel.size() // Number of lines *
+            * 2 // 2 Points *
+            * 5 // 2 coordinates + 3 color
+            * ByteArrayUtil.SIZE_FLOAT, null, GL2.GL_DYNAMIC_DRAW);
 
         // Generate textures:
         textures = new int[layout.edges.size()];
@@ -494,33 +496,39 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
           if (sp instanceof ClassStylingPolicy) {
             ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-            final int maxStyle = csp.getMaxStyle();
-            for (int c = 0, s = csp.getMinStyle(); s < maxStyle; c += 3, s++) {
-              ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
-              FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
-              int p = 0;
-              for (DBIDIter it = csp.iterateClass(s); it.valid(); it.advance(), p++) {
-                final NumberVector<?> vec = rel.get(it);
-                final float v1 = (float) proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
-                final float v2 = (float) proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim2), e.dim2);
-                vertices.put(0.f);
-                vertices.put(v1);
-                vertices.put(1.f);
-                vertices.put(v2);
-              }
-              assert (p == csp.classSize(s));
-              vertices.flip();
-              gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
-
-              gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
-              gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-              gl.glVertexPointer(2, GL.GL_FLOAT, 0, 0);
-
-              gl.glColor3f(colors[c], colors[c + 1], colors[c + 2]);
-              gl.glDrawArrays(GL.GL_LINES, 0, p);
-
-              gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+            final int mincolor = csp.getMinStyle();
+            ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
+            FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
+            int p = 0;
+            for (DBIDIter it = rel.iterDBIDs(); it.valid(); it.advance(), p++) {
+              final NumberVector<?> vec = rel.get(it);
+              final int c = (csp.getStyleForDBID(it) - mincolor) * 3;
+              final float v1 = (float) proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
+              final float v2 = (float) proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim2), e.dim2);
+              vertices.put(0.f);
+              vertices.put(v1);
+              vertices.put(colors[c]);
+              vertices.put(colors[c + 1]);
+              vertices.put(colors[c + 2]);
+              vertices.put(1.f);
+              vertices.put(v2);
+              vertices.put(colors[c]);
+              vertices.put(colors[c + 1]);
+              vertices.put(colors[c + 2]);
             }
+            vertices.flip();
+            gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
+
+            gl.glColor4f(1f, 1f, 1f, 1f);
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
+            gl.glVertexPointer(2, GL.GL_FLOAT, 5 * ByteArrayUtil.SIZE_FLOAT, 0);
+            gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+            gl.glColorPointer(3, GL.GL_FLOAT, 5 * ByteArrayUtil.SIZE_FLOAT, 2 * ByteArrayUtil.SIZE_FLOAT);
+            gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
+            gl.glDrawArrays(GL.GL_LINES, 0, p);
+
+            gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
+            gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
           } else {
             ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
             FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
