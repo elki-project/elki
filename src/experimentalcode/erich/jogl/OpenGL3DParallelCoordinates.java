@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -628,6 +629,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
           for (int i = 0; i < dim; i++) {
             final int d = axes[i].second;
             final Node node1 = layout.getNode(d);
+            // Draw edge textures
             for (IntIntPair pair : edgesort) {
               // Other axis must have a smaller index.
               if (pair.first >= i) {
@@ -657,11 +659,20 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
               gl.glEnd();
               gl.glDisable(GL.GL_TEXTURE_2D);
             }
+            // Draw axis
             gl.glLineWidth(settings.linewidth); // outside glBegin!
             gl.glBegin(GL.GL_LINES);
             gl.glColor4f(0f, 0f, 0f, 1f);
             gl.glVertex3d(node1.getX(), node1.getY(), 0f);
             gl.glVertex3d(node1.getX(), node1.getY(), 1f);
+            gl.glEnd();
+            // Draw ticks.
+            LinearScale scale = proj.getAxisScale(d);
+            gl.glPointSize(settings.linewidth * 2f);
+            gl.glBegin(GL.GL_POINTS);
+            for (double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += scale.getRes()) {
+              gl.glVertex3d(node1.getX(), node1.getY(), scale.getScaled(tick));
+            }
             gl.glEnd();
           }
         }
