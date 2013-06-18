@@ -25,6 +25,7 @@ package experimentalcode.erich.jogl;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
@@ -45,6 +46,7 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
+import javax.swing.event.MouseInputListener;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
@@ -57,6 +59,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -64,9 +67,12 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
@@ -82,6 +88,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.erich.jogl.Simple1DOFCamera.CameraListener;
+import experimentalcode.shared.parallelcoord.layout.AbstractLayout3DPC;
 import experimentalcode.shared.parallelcoord.layout.Layout;
 import experimentalcode.shared.parallelcoord.layout.Layout.Node;
 import experimentalcode.shared.parallelcoord.layout.Layouter3DPC;
@@ -256,6 +263,11 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     SimpleMenuOverlay menuoverlay;
 
     /**
+     * Toogle for menu.
+     */
+    boolean menuVisible = false;
+
+    /**
      * Constructor.
      * 
      * @param rel Relation
@@ -270,7 +282,22 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       this.settings = settings;
       this.style = style;
       this.prenderer = new Parallel3DRenderer();
-      this.menuoverlay = new SimpleMenuOverlay();
+      this.menuoverlay = new SimpleMenuOverlay() {
+        @Override
+        void menuItemClicked(int item) {
+          if (item >= 0) {
+            LOG.warning("Relayout chosen: " + menuoverlay.options.get(item));
+            relayout(menuoverlay.options.get(item));
+          }
+          menuVisible = false;
+          canvas.repaint();
+        }
+      };
+
+      // Init menu for SIGMOD demo. TODO: cleanup.
+      for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(DimensionSimilarity.class)) {
+        menuoverlay.options.add(clz.getSimpleName());
+      }
 
       GLProfile glp = GLProfile.getDefault();
       GLCapabilities caps = new GLCapabilities(glp);
@@ -285,6 +312,21 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       frame = new JFrame("EKLI OpenGL Visualization");
       frame.setSize(600, 600);
       frame.add(canvas);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void relayout(String simname) {
+      try {
+        ListParameterization params = new ListParameterization();
+        params.addParameter(AbstractLayout3DPC.Parameterizer.SIM_ID, simname);
+        settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout.class, params);
+        layout = settings.layout.layout(rel.getDatabase(), rel);
+        GL gl = canvas.getGL();
+        prenderer.forgetTextures(gl);
+      } catch (Exception e) {
+        LOG.exception(e);
+        return;
+      }
     }
 
     public void run() {
@@ -329,16 +371,13 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
       // Setup arcball:
       arcball = new Arcball1DOFAdapter(camera);
-      canvas.addMouseListener(arcball);
       canvas.addMouseMotionListener(arcball);
       canvas.addMouseWheelListener(arcball);
 
+      canvas.addMouseListener(new MouseProxy());
+
       prenderer.initLabels();
-      long start = System.nanoTime();
-      prenderer.renderTextures(gl);
-      long end = System.nanoTime();
-      LOG.warning("Time to render textures: " + (end - start) / 1e6 + " ms.");
-      textrenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
+      textrenderer = new TextRenderer(new Font(Font.SANS_SERIF, Font.BOLD, 36));
     }
 
     @Override
@@ -361,13 +400,100 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         arcball.debugRender(gl);
       }
 
-      // menuoverlay.render(gl);
+      if (menuVisible) {
+        menuoverlay.render(gl);
+      }
     }
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
       GL gl = drawable.getGL();
-      prenderer.dispose(gl);
+      prenderer.forgetTextures(gl);
+    }
+
+    /**
+     * Simple proxy for mouse events.
+     * 
+     * @author Erich Schubert
+     */
+    class MouseProxy implements MouseInputListener {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+          if (menuVisible) {
+            menuoverlay.mouseClicked(e);
+            return;
+          }
+          arcball.mouseClicked(e);
+          return;
+        }
+        if (e.getButton() == MouseEvent.BUTTON3) {
+          menuVisible = !menuVisible;
+          if (menuVisible) {
+            canvas.removeMouseMotionListener(arcball);
+            canvas.removeMouseWheelListener(arcball);
+          } else {
+            canvas.addMouseMotionListener(arcball);
+            canvas.addMouseWheelListener(arcball);
+          }
+          Instance.this.canvas.repaint();
+          return;
+        }
+      }
+
+      @Override
+      public void mousePressed(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+          if (!menuVisible) {
+            arcball.mousePressed(e);
+          }
+        }
+      }
+
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+          if (!menuVisible) {
+            arcball.mouseReleased(e);
+          }
+        }
+      }
+
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+          if (!menuVisible) {
+            arcball.mouseEntered(e);
+          }
+        }
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+          if (!menuVisible) {
+            arcball.mouseExited(e);
+          }
+        }
+      }
+
+      @Override
+      public void mouseDragged(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+          if (!menuVisible) {
+            arcball.mouseDragged(e);
+          }
+        }
+      }
+
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+          if (!menuVisible) {
+            arcball.mouseMoved(e);
+          }
+        }
+      }
     }
 
     /**
@@ -580,7 +706,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         gl.glClearColor(1f, 1f, 1f, 1f);
       }
 
-      public void dispose(GL gl) {
+      public void forgetTextures(GL gl) {
         if (textures != null) {
           gl.glDeleteTextures(textures.length, textures, 0);
           textures = null;
@@ -588,6 +714,12 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       }
 
       protected void drawParallelPlot(GLAutoDrawable drawable, final int dim, GL2 gl) {
+        if (textures == null) {
+          long start = System.nanoTime();
+          prenderer.renderTextures(gl);
+          long end = System.nanoTime();
+          LOG.warning("Time to render textures: " + (end - start) / 1e6 + " ms.");
+        }
         // Sort axes by sq. distance from camera, front-to-back:
         int[] dindex = new int[dim];
         DoubleIntPair[] axes = new DoubleIntPair[dim];
