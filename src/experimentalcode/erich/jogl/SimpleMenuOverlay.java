@@ -1,6 +1,7 @@
 package experimentalcode.erich.jogl;
 
 import java.awt.Font;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
@@ -37,7 +38,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
  * 
  * @author Erich Schubert
  */
-public class SimpleMenuOverlay extends MouseInputAdapter {
+public abstract class SimpleMenuOverlay extends MouseInputAdapter {
   /**
    * Screen ratio.
    */
@@ -63,11 +64,8 @@ public class SimpleMenuOverlay extends MouseInputAdapter {
    */
   public SimpleMenuOverlay() {
     super();
-    fontsize = 28;
-    renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, fontsize));
-    options.add("Example");
-    options.add("acenop");
-    options.add("qjFWXM");
+    fontsize = 18;
+    renderer = new TextRenderer(new Font(Font.SANS_SERIF, Font.PLAIN, fontsize));
   }
 
   public void render(GL2 gl) {
@@ -75,6 +73,8 @@ public class SimpleMenuOverlay extends MouseInputAdapter {
     gl.glPushMatrix();
     gl.glLoadIdentity();
     gl.glMatrixMode(GL2.GL_MODELVIEW);
+    gl.glPushMatrix();
+    gl.glLoadIdentity();
 
     gl.glOrtho(0, width, 0, height, -1, +1);
     gl.glColor4f(0f, 0f, 0f, .5f);
@@ -95,23 +95,23 @@ public class SimpleMenuOverlay extends MouseInputAdapter {
       bounds[i] = renderer.getBounds(options.get(i));
       maxwidth = Math.max(bounds[i].getWidth(), maxwidth);
     }
-    final double padding = .3 * fontsize;
+    final double padding = .5 * fontsize;
     final double margin = padding * .3;
-    final float bx1 = (float)(.5 * (width - maxwidth - margin));
-    final float bx2 = (float)(.5 * (width + maxwidth + margin));
+    final float bx1 = (float) (.5 * (width - maxwidth - padding));
+    final float bx2 = (float) (.5 * (width + maxwidth + padding));
     double totalheight = numopt * fontsize + (numopt - 1) * padding;
 
     // Render background buttons:
     gl.glBegin(GL2.GL_QUADS);
-    gl.glColor4f(0f, 0f, 0f, .5f);
+    gl.glColor4f(0f, 0f, 0f, .75f);
     for (int i = 0; i < numopt; i++) {
       final double pos = (height - totalheight) * .5 + fontsize * i + padding * i;
 
       // Render a background button:
-      gl.glVertex2f(bx1, (float)(pos - margin));
-      gl.glVertex2f(bx1, (float)(pos + fontsize + margin));
-      gl.glVertex2f(bx2, (float)(pos + fontsize + margin));
-      gl.glVertex2f(bx2, (float)(pos - margin));
+      gl.glVertex2f(bx1, (float) (pos - margin));
+      gl.glVertex2f(bx1, (float) (pos + fontsize + margin));
+      gl.glVertex2f(bx2, (float) (pos + fontsize + margin));
+      gl.glVertex2f(bx2, (float) (pos - margin));
     }
     gl.glEnd();
 
@@ -144,4 +144,41 @@ public class SimpleMenuOverlay extends MouseInputAdapter {
     this.width = width;
     this.height = height;
   }
+
+  @Override
+  public void mouseClicked(MouseEvent e) {
+    if (e.getButton() != MouseEvent.BUTTON1) {
+      return;
+    }
+    final int mx = e.getX(), my = e.getY();
+    
+    final int numopt = options.size();
+    double maxwidth = 0.;
+    Rectangle2D[] bounds = new Rectangle2D[numopt];
+    for (int i = 0; i < numopt; i++) {
+      bounds[i] = renderer.getBounds(options.get(i));
+      maxwidth = Math.max(bounds[i].getWidth(), maxwidth);
+    }
+    final double padding = .5 * fontsize;
+    final double margin = padding * .3;
+    final float bx1 = (float) (.5 * (width - maxwidth - padding));
+    final float bx2 = (float) (.5 * (width + maxwidth + padding));
+    if (mx < bx1 || mx > bx2) {
+      return;
+    }
+    
+    double totalheight = numopt * fontsize + (numopt - 1) * padding;
+    for (int i = 0; i < numopt; i++) {
+      final double pos = (height - totalheight) * .5 + fontsize * i + padding * i;
+      if (my < pos - margin) {
+        return;
+      }
+      if (my < pos + fontsize + margin) {
+        menuItemClicked(i);
+        return;
+      }
+    }
+  }
+  
+  abstract void menuItemClicked(int item);
 }

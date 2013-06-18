@@ -61,7 +61,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
     super();
     this.sim = sim;
   }
-
+  
   @Override
   public Layout layout(Database database, Relation<? extends NumberVector<?>> rel) {
     int dim = RelationUtil.dimensionality(rel);
