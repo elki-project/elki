@@ -278,6 +278,34 @@ public class Simple1DOFCamera {
   }
 
   /**
+   * Distance from camera
+   * 
+   * @param x X position
+   * @param y Y position
+   * @return Squared distance
+   */
+  public double squaredDistanceFromCamera(double x, double y) {
+    double dx = (distance * sinZ) - x;
+    double dy = (distance * -cosZ) - y;
+    return dx * dx + dy * dy;
+  }
+
+  /**
+   * Distance from camera
+   * 
+   * @param x X position
+   * @param y Y position
+   * @param z Z position
+   * @return Squared distance
+   */
+  public double squaredDistanceFromCamera(double x, double y, double z) {
+    double dx = (distance * sinZ) - x;
+    double dy = (distance * -cosZ) - y;
+    double dz = height - z;
+    return dx * dx + dy * dy + dz * dz;
+  }
+
+  /**
    * Add a camera listener.
    * 
    * @param lis Listener

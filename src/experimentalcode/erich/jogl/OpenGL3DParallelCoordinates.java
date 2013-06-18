@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
@@ -217,15 +218,13 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     StyleResult style;
 
     /**
-     * Axis labels
-     */
-    String[] labels;
-
-    /**
      * Layout
      */
     private Layout layout;
 
+    /**
+     * 3D parallel coordinates renderer.
+     */
     private Parallel3DRenderer prenderer;
 
     /**
@@ -249,6 +248,11 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     Arcball1DOFAdapter arcball;
 
     /**
+     * Menu overlay.
+     */
+    SimpleMenuOverlay menuoverlay;
+
+    /**
      * Constructor.
      * 
      * @param rel Relation
@@ -263,6 +267,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       this.settings = settings;
       this.style = style;
       this.prenderer = new Parallel3DRenderer();
+      this.menuoverlay = new SimpleMenuOverlay();
 
       GLProfile glp = GLProfile.getDefault();
       GLCapabilities caps = new GLCapabilities(glp);
@@ -336,6 +341,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
       camera.setRatio(width / (double) height);
+      menuoverlay.setSize(width, height);
     }
 
     @Override
@@ -351,6 +357,8 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       if (DEBUG) {
         arcball.debugRender(gl);
       }
+
+      // menuoverlay.render(gl);
     }
 
     @Override
@@ -382,6 +390,11 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
        * Prerendered textures.
        */
       private int[] textures;
+
+      /**
+       * Axis labels
+       */
+      String[] labels;
 
       void initLabels() {
         int dim = RelationUtil.dimensionality(rel);
@@ -566,28 +579,36 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       }
 
       protected void drawParallelPlot(GLAutoDrawable drawable, final int dim, GL2 gl) {
-        if (textures != null) {
-          gl.glPushMatrix();
-          // Simple Z sorting for edge groups
-          DoubleIntPair[] depth = new DoubleIntPair[layout.edges.size()];
-          {
-            double[] buf = new double[3];
-            double[] z = new double[dim];
-            for (int d = 0; d < dim; d++) {
-              camera.project(layout.getNode(d).getX(), layout.getNode(d).getY(), 0, buf);
-              z[d] = buf[2];
-            }
-            int e = 0;
-            for (Layout.Edge edge : layout.edges) {
-              depth[e] = new DoubleIntPair(-(z[edge.dim1] + z[edge.dim2]), e);
-              e++;
-            }
-            Arrays.sort(depth);
+        // Sort axes by sq. distance from camera, front-to-back:
+        int[] dindex = new int[dim];
+        DoubleIntPair[] axes = new DoubleIntPair[dim];
+        {
+          for (int d = 0; d < dim; d++) {
+            double dist = camera.squaredDistanceFromCamera(layout.getNode(d).getX(), layout.getNode(d).getY());
+            axes[d] = new DoubleIntPair(-dist, d);
           }
+          Arrays.sort(axes);
+          for (int i = 0; i < dim; i++) {
+            dindex[axes[i].second] = i;
+          }
+        }
+        // Sort edges by the maximum (foreground) index.
+        IntIntPair[] edgesort = new IntIntPair[layout.edges.size()];
+        {
+          int e = 0;
+          for (Layout.Edge edge : layout.edges) {
+            int i1 = dindex[edge.dim1], i2 = dindex[edge.dim2];
+            edgesort[e] = new IntIntPair(Math.min(i1, i2), e);
+            e++;
+          }
+          Arrays.sort(edgesort);
+        }
+
+        if (textures != null) {
           gl.glShadeModel(GL2.GL_FLAT);
           // Render spider web:
+          gl.glLineWidth(settings.linewidth); // outside glBegin!
           gl.glBegin(GL.GL_LINES);
-          gl.glLineWidth(settings.linewidth);
           gl.glColor4f(0f, 0f, 0f, 1f);
           for (Layout.Edge edge : layout.edges) {
             Node n1 = layout.getNode(edge.dim1), n2 = layout.getNode(edge.dim2);
@@ -595,32 +616,50 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
             gl.glVertex3d(n2.getX(), n2.getY(), 0f);
           }
           gl.glEnd();
-          gl.glEnable(GL.GL_TEXTURE_2D);
-          gl.glColor4f(1f, 1f, 1f, 1f);
-          for (DoubleIntPair pair : depth) {
-            Layout.Edge edge = layout.edges.get(pair.second);
-            final Node node1 = layout.getNode(edge.dim1);
-            final Node node2 = layout.getNode(edge.dim2);
+          // Draw axes and 3DPC:
+          for (int i = 0; i < dim; i++) {
+            final int d = axes[i].second;
+            final Node node1 = layout.getNode(d);
+            for (IntIntPair pair : edgesort) {
+              // Other axis must have a smaller index.
+              if (pair.first >= i) {
+                continue;
+              }
+              Layout.Edge edge = layout.edges.get(pair.second);
+              // Must involve the current axis.
+              if (edge.dim1 != d && edge.dim2 != d) {
+                continue;
+              }
+              int od = axes[pair.first].second;
 
-            gl.glBindTexture(GL.GL_TEXTURE_2D, textures[pair.second]);
-            gl.glBegin(GL2.GL_QUADS);
-            gl.glTexCoord2d(0f, 0f);
+              gl.glEnable(GL.GL_TEXTURE_2D);
+              gl.glColor4f(1f, 1f, 1f, 1f);
+              final Node node2 = layout.getNode(od);
+
+              gl.glBindTexture(GL.GL_TEXTURE_2D, textures[pair.second]);
+              gl.glBegin(GL2.GL_QUADS);
+              gl.glTexCoord2d((edge.dim1 == d) ? 0f : 1f, 0f);
+              gl.glVertex3d(node1.getX(), node1.getY(), 0f);
+              gl.glTexCoord2d((edge.dim1 == d) ? 0f : 1f, 1f);
+              gl.glVertex3d(node1.getX(), node1.getY(), 1f);
+              gl.glTexCoord2d((edge.dim1 != d) ? 0f : 1f, 1f);
+              gl.glVertex3d(node2.getX(), node2.getY(), 1f);
+              gl.glTexCoord2d((edge.dim1 != d) ? 0f : 1f, 0f);
+              gl.glVertex3d(node2.getX(), node2.getY(), 0f);
+              gl.glEnd();
+              gl.glDisable(GL.GL_TEXTURE_2D);
+            }
+            gl.glLineWidth(settings.linewidth); // outside glBegin!
+            gl.glBegin(GL.GL_LINES);
+            gl.glColor4f(0f, 0f, 0f, 1f);
             gl.glVertex3d(node1.getX(), node1.getY(), 0f);
-            gl.glTexCoord2d(0f, 1f);
             gl.glVertex3d(node1.getX(), node1.getY(), 1f);
-            gl.glTexCoord2d(1f, 1f);
-            gl.glVertex3d(node2.getX(), node2.getY(), 1f);
-            gl.glTexCoord2d(1f, 0f);
-            gl.glVertex3d(node2.getX(), node2.getY(), 0f);
             gl.glEnd();
           }
-          gl.glDisable(GL.GL_TEXTURE_2D);
-          gl.glPopMatrix();
         }
         // Render labels
         {
-          gl.glPushMatrix();
-          // TODO: use 2d rendering, and {@link SimpleCamera.project}?
+          // gl.glPushMatrix();
           textrenderer.begin3DRendering();
           // UNDO the camera rotation. This will mess up text orientation!
           gl.glRotatef((float) MathUtil.rad2deg(camera.getRotationZ()), 0.f, 0.f, 1.f);
@@ -645,8 +684,25 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
             float y = (float) (-sin * layout.getNode(i).getX() + cos * layout.getNode(i).getY());
             textrenderer.draw3D(labels[i], (x - w * .5f), 1.01f, -y, scale);
           }
+
+          // Show depth indexes on debug:
+          if (DEBUG) {
+            textrenderer.setColor(1f, 0f, 0f, 1f);
+            for (IntIntPair pair : edgesort) {
+              Layout.Edge edge = layout.edges.get(pair.second);
+              final Node node1 = layout.getNode(edge.dim1);
+              final Node node2 = layout.getNode(edge.dim2);
+              final double mx = 0.5 * (node1.getX() + node2.getX());
+              final double my = 0.5 * (node1.getY() + node2.getY());
+              // Rotate manually, in x-z plane
+              float x = (float) (cos * mx + sin * my);
+              float y = (float) (-sin * mx + cos * my);
+              textrenderer.draw3D(Integer.toString(pair.first), (x - defaultscale * .5f), 1.01f, -y, defaultscale);
+            }
+          }
+
           textrenderer.end3DRendering();
-          gl.glPopMatrix();
+          // gl.glPopMatrix();
         }
       }
     }
