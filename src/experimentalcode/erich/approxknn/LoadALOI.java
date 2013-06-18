@@ -23,9 +23,13 @@ package experimentalcode.erich.approxknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.SortTileRecursiveBulkSplit;
@@ -45,6 +49,30 @@ public class LoadALOI {
       if (index) {
         dbpar.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
         dbpar.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, "10000");
+        dbpar.addParameter(AbstractRStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
+      }
+      // Instantiate
+      Database db = ClassGenericsUtil.tryInstantiate(Database.class, StaticArrayDatabase.class, dbpar);
+      db.initialize();
+      return db;
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot load database." + e, e);
+    }
+  }
+
+  protected static Database loadALOIOutlier(String variant, boolean index) {
+    try {
+      ListParameterization dbpar = new ListParameterization();
+      // Input file
+      dbpar.addParameter(FileBasedDatabaseConnection.INPUT_ID, folder + "outlier/aloi-" + variant + ".csv.gz");
+      ArrayList<Object> filters = new ArrayList<>();
+      filters.add(ClassLabelFilter.class);
+      dbpar.addParameter(AbstractDatabaseConnection.FILTERS_ID, filters);
+      dbpar.addParameter(ClassLabelFilter.CLASS_LABEL_INDEX_ID, "2");
+      // Index
+      if (index) {
+        dbpar.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+        dbpar.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, "16384");
         dbpar.addParameter(AbstractRStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
       }
       // Instantiate

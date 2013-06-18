@@ -183,7 +183,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     }
 
     // Convert to final storage
-    final int wsize = (int) (window * k);
+    final int wsize = (int)  Math.ceil(window * k);
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(2 * wsize * numcurves);
     for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

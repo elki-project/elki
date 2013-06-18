@@ -146,7 +146,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     final int size = relation.size();
 
     final int numgen = curvegen.size();
-    final int numcurves = numgen * variants;
+    final int numcurves = variants; // numgen * variants;
     curves = new ArrayList<>(numcurves);
     for (int i = 0; i < numcurves; i++) {
       curves.add(new ArrayList<SpatialRef>(size));
@@ -162,14 +162,22 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
     // Sort spatially
     final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+    // Find maximum extend.
+    double extend = 0;
+    for (int i = 0; i < mms.length; i += 2) {
+      extend = Math.max(extend, mms[i + 1] - mms[i]);
+    }
     final double[] mmscratch = new double[mms.length];
     final int numdim = mms.length >>> 1;
     final int[] permutation = new int[numdim];
-    for (int j = 0; j < variants; j++) {
+    for (int j = 0; j < numcurves; j++) {
+      int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
+      // Scale all axes by the same factor:
+      final double scale = 1. + random.nextDouble();
       for (int i = 0; i < mms.length; i += 2) {
-        double len = mms[i + 1] - mms[i];
-        mmscratch[i] = mms[i] - len * random.nextDouble();
-        mmscratch[i + 1] = mms[i + 1] + len * random.nextDouble();
+        // Note: use global extend, to be unbiased against different scales.
+        mmscratch[i] = mms[i] - extend * random.nextDouble();
+        mmscratch[i + 1] = mms[i] + extend * scale;
       }
       // Generate permutation:
       for (int i = 0; i < numdim; i++) {
@@ -183,9 +191,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
         permutation[ri] = permutation[i];
         permutation[i] = tmp;
       }
-      for (int i = 0; i < numgen; i++) {
-        curvegen.get(i).sort(curves.get(i + numgen * j), 0, size, mmscratch, permutation);
-      }
+      // for (int ctype = 0; ctype < numgen; ctype++) {
+      // curvegen.get(ctype).sort(curves.get(ctype + numgen * j), 0, size,
+      // mmscratch, permutation);
+      // }
+      curvegen.get(ctype).sort(curves.get(j), 0, size, mmscratch, permutation);
     }
 
     // Build position index, DBID -> position in the three curves
@@ -260,7 +270,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
     @Override
     public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
-      final int wsize = (int) (window * k);
+      final int wsize = (int) Math.ceil(window * k);
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(2 * wsize * curves.size());
       final int[] posi = positions.get(id);
