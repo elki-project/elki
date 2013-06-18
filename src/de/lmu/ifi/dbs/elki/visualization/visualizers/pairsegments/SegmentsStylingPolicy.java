@@ -165,6 +165,20 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
     return (ids != null) ? ids.iter() : DBIDUtil.EMPTYDBIDS.iter();
   }
 
+  @Override
+  public int classSize(int cnum) {
+    // unselected
+    if(cnum == -2) {
+      return unselectedObjects.size();
+    }
+    else if(cnum == -1) {
+      return 0;
+    }
+    // colors
+    DBIDs ids = selectedSegments.get(cnum).getDBIDs();
+    return (ids != null) ? ids.size() : 0;
+  }
+
   /**
    * Adds or removes the given segment to the selection. Depending on the
    * clustering and cluster selected and the addToSelection option given, the

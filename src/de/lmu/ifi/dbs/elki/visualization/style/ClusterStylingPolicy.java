@@ -136,6 +136,11 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
     return ids.get(cnum).iter();
   }
 
+  @Override
+  public int classSize(int cnum) {
+    return ids.get(cnum).size();
+  }
+
   /**
    * Get the clustering used by this styling policy
    * 
