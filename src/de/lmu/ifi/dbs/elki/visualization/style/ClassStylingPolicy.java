@@ -63,4 +63,12 @@ public interface ClassStylingPolicy extends StylingPolicy {
    * @return Iterator over object IDs
    */
   public DBIDIter iterateClass(int cnum);
+
+  /**
+   * Get the number of elements in the styling class.
+   * 
+   * @param cnum Class number
+   * @return Size of class.
+   */
+  public int classSize(int cnum);
 }
