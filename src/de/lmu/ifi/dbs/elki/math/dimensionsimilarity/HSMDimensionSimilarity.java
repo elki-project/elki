@@ -35,9 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * FIXME: This needs serious TESTING before release. Large parts have been
- * rewritten, but could not be tested at the time of rewriting.
- * 
  * Compute the similarity of dimensions by using a hough transformation.
  * 
  * Reference: <br>
@@ -48,6 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Dimensional Data. <br/>
  * IEEEVisualization and Computer Graphics, 2011.
  * </p>
+ * 
+ * FIXME: This needs serious TESTING before release. Large parts have been
+ * rewritten, but could not be tested at the time of rewriting.
  * 
  * @author Erich Schubert
  * @author Robert Rödler
