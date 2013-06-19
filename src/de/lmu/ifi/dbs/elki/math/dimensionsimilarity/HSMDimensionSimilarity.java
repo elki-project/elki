@@ -64,7 +64,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
    * 
    * The original publication used 50.
    */
-  private final static int STEPS = 64;
+  private final static int STEPS = 48; // 64;
 
   /**
    * Precompute sinus and cosinus
@@ -81,13 +81,13 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
   @Override
   public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
-    final int resolution = 500;
-    byte[][][][] pics = new byte[dim][dim][][]; // [resolution][resolution];
+    final int resolution = 512;
+    boolean[][][][] pics = new boolean[dim][dim][][]; // [resolution][resolution];
 
     // Initialize / allocate "pictures":
     for (int i = 0; i < dim - 1; i++) {
       for (int j = i + 1; j < dim; j++) {
-        pics[i][j] = new byte[resolution][resolution];
+        pics[i][j] = new boolean[resolution][resolution];
       }
     }
     // FIXME: Get/keep these statistics in the relation, or compute for the
@@ -107,8 +107,8 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
     for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
       NumberVector<?> pvec = relation.get(id);
       for (int i = 0; i < dim - 1; i++) {
+        double xi = (pvec.doubleValue(matrix.dim(i)) - off[i]) * scale[i];
         for (int j = i + 1; j < dim; j++) {
-          double xi = (pvec.doubleValue(matrix.dim(i)) - off[i]) * scale[i];
           double xj = (pvec.doubleValue(matrix.dim(j)) - off[j]) * scale[j];
           drawLine(0, (int) (resolution * xi), resolution - 1, (int) (resolution * xj), pics[i][j]);
         }
@@ -117,11 +117,9 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
 
     final double stepsq = (double) STEPS * (double) STEPS;
     for (int x = 0; x < dim; x++) {
-      final int i = matrix.dim(x);
       for (int y = x + 1; y < dim; y++) {
-        final int j = matrix.dim(y);
-        int[][] hough = houghTransformation(pics[i][j]);
-        pics[i][j] = null; // Release picture
+        int[][] hough = houghTransformation(pics[x][y]);
+        pics[x][y] = null; // Release picture
         // The original publication said "median", but judging from the text,
         // meant "mean". Otherwise, always half of the cells are above the
         // threshold, which doesn't match the explanation there.
@@ -134,16 +132,17 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
   }
 
   /**
-   * Compute the sum of a matix.
+   * Compute the sum of a matrix.
    * 
    * @param mat Matrix
    * @return Sum of all elements
    */
   private long sumMatrix(int[][] mat) {
     long ret = 0;
-    for (int i = 0; i < mat[0].length; i++) {
-      for (int j = 0; j < mat.length; j++) {
-        ret += mat[i][j];
+    for (int i = 0; i < mat.length; i++) {
+      final int[] row = mat[i];
+      for (int j = 0; j < row.length; j++) {
+        ret += row[j];
       }
     }
     return ret;
@@ -175,18 +174,18 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
    * @param mat Binary image
    * @return Hough transformation of image.
    */
-  private int[][] houghTransformation(byte[][] mat) {
+  private int[][] houghTransformation(boolean[][] mat) {
     final int xres = mat.length, yres = mat[0].length;
-    final double tscale = STEPS / Math.sqrt(xres * xres + yres * yres);
+    final double tscale = STEPS * .5 / (xres + yres);
     final int[][] ret = new int[STEPS][STEPS];
 
     for (int x = 0; x < mat.length; x++) {
       for (int y = 0; y < mat[0].length; y++) {
-        if (mat[x][y] > 0) {
+        if (mat[x][y]) {
           for (int i = 0; i < STEPS; i++) {
-            final int d = (int) (tscale * (x * table.cos(i) + y * table.sin(i)));
+            final int d = (STEPS >> 1) + (int) (tscale * (x * table.cos(i) + y * table.sin(i)));
             if (d > 0 && d < STEPS) {
-              ret[d][i] += mat[x][y];
+              ret[d][i]++;
             }
           }
         }
@@ -205,7 +204,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
    * @param y1 End Y
    * @param pic Picture array
    */
-  private static void drawLine(int x0, int y0, int x1, int y1, byte[][] pic) {
+  private static void drawLine(int x0, int y0, int x1, int y1, boolean[][] pic) {
     final int xres = pic.length, yres = pic[0].length;
     // Ensure bounds
     y0 = (y0 < 0) ? 0 : (y0 >= yres) ? (yres - 1) : y0;
@@ -219,7 +218,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
     int err = dx + dy;
 
     for (;;) {
-      pic[x0][y0] = 1;
+      pic[x0][y0] = true;
       if (x0 == x1 && y0 == y1) {
         break;
       }
