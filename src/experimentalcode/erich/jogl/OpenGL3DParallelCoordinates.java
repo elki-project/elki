@@ -23,17 +23,12 @@ package experimentalcode.erich.jogl;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.Rectangle2D;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.media.opengl.DebugGL2;
@@ -46,7 +41,7 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
-import javax.swing.event.MouseInputListener;
+import javax.swing.SwingUtilities;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
@@ -54,14 +49,11 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -75,22 +67,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
-import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
-import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
-import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.erich.jogl.Simple1DOFCamera.CameraListener;
 import experimentalcode.shared.parallelcoord.layout.AbstractLayout3DPC;
 import experimentalcode.shared.parallelcoord.layout.Layout;
-import experimentalcode.shared.parallelcoord.layout.Layout.Node;
 import experimentalcode.shared.parallelcoord.layout.Layouter3DPC;
 import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
 
@@ -107,8 +91,11 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
   /**
    * Logging class.
    */
-  private static final Logging LOG = Logging.getLogger(ResultHandler.class);
+  private static final Logging LOG = Logging.getLogger(OpenGL3DParallelCoordinates.class);
 
+  /**
+   * Settings
+   */
   Settings settings = new Settings();
 
   /**
@@ -173,7 +160,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     /**
      * Line width.
      */
-    public float linewidth = 1.5f;
+    public float linewidth = 2f;
 
     /**
      * Texture width.
@@ -200,17 +187,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     /**
      * Flag to enable debug rendering.
      */
-    private static final boolean DEBUG = false;
-
-    /**
-     * Relation to viualize
-     */
-    Relation<? extends NumberVector<?>> rel;
-
-    /**
-     * Projection
-     */
-    ProjectionParallel proj;
+    static final boolean DEBUG = false;
 
     /**
      * Frame
@@ -223,39 +200,14 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     GLU glu;
 
     /**
-     * Settings
-     */
-    Settings settings;
-
-    /**
-     * Style result
-     */
-    StyleResult style;
-
-    /**
-     * Layout
-     */
-    private Layout layout;
-
-    /**
      * 3D parallel coordinates renderer.
      */
     private Parallel3DRenderer prenderer;
 
     /**
-     * Text renderer
-     */
-    TextRenderer textrenderer;
-
-    /**
      * The OpenGL canvas
      */
     GLCanvas canvas;
-
-    /**
-     * Camera handling class
-     */
-    Simple1DOFCamera camera;
 
     /**
      * Arcball controller.
@@ -265,12 +217,85 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     /**
      * Menu overlay.
      */
-    SimpleMenuOverlay menuoverlay;
+    SimpleMenuOverlay menuOverlay;
 
     /**
-     * Toogle for menu.
+     * Message overlay.
      */
-    boolean menuVisible = false;
+    SimpleMessageOverlay messageOverlay;
+
+    /**
+     * Handler to open the menu.
+     */
+    MouseAdapter menuStarter;
+
+    /**
+     * Current state.
+     */
+    State state = State.PREPARATION;
+
+    /**
+     * States of the UI.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    protected static enum State { //
+      PREPARATION, // Preparation phase
+      EXPLORE, // Exploration phase (rotate etc.)
+      MENU, // Menu open
+    }
+
+    protected static class Shared {
+      /**
+       * Dimensionality.
+       */
+      int dim;
+
+      /**
+       * Relation to viualize
+       */
+      Relation<? extends NumberVector<?>> rel;
+
+      /**
+       * Axis labels
+       */
+      String[] labels;
+
+      /**
+       * Projection
+       */
+      ProjectionParallel proj;
+
+      /**
+       * Style result
+       */
+      StyleResult style;
+
+      /**
+       * Layout
+       */
+      Layout layout;
+
+      /**
+       * Settings
+       */
+      Settings settings;
+
+      /**
+       * Camera handling class
+       */
+      Simple1DOFCamera camera;
+
+      /**
+       * Text renderer
+       */
+      TextRenderer textrenderer;
+
+    };
+
+    Shared shared = new Shared();
 
     /**
      * Constructor.
@@ -282,41 +307,68 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
      */
     public Instance(Relation<? extends NumberVector<?>> rel, ProjectionParallel proj, Settings settings, StyleResult style) {
       super();
-      this.rel = rel;
-      this.proj = proj;
-      this.settings = settings;
-      this.style = style;
-      this.prenderer = new Parallel3DRenderer();
-      this.menuoverlay = new SimpleMenuOverlay() {
+
+      this.shared.dim = RelationUtil.dimensionality(rel);
+      this.shared.rel = rel;
+      this.shared.proj = proj;
+      this.shared.style = style;
+      this.shared.settings = settings;
+      // Labels:
+      this.shared.labels = new String[this.shared.dim];
+      {
+        VectorFieldTypeInformation<? extends NumberVector<?>> vrel = RelationUtil.assumeVectorField(rel);
+        for (int i = 0; i < this.shared.dim; i++) {
+          this.shared.labels[i] = vrel.getLabel(i);
+        }
+      }
+
+      this.prenderer = new Parallel3DRenderer(shared);
+      this.menuOverlay = new SimpleMenuOverlay() {
         @Override
         void menuItemClicked(int item) {
           if (item >= 0) {
-            LOG.warning("Relayout chosen: " + menuoverlay.options.get(item));
-            relayout(menuoverlay.options.get(item));
+            LOG.debug("Relayout chosen: " + menuOverlay.options.get(item));
+            relayout(menuOverlay.options.get(item));
+          } else {
+            closeMenu();
           }
-          menuVisible = false;
-          canvas.repaint();
         }
       };
+      this.menuStarter = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+          if (State.EXPLORE.equals(state)) {
+            if (e.getButton() == MouseEvent.BUTTON3) {
+              switchState(State.MENU);
+              // e.consume();
+            }
+          }
+        }
+      };
+      this.messageOverlay = new SimpleMessageOverlay();
 
-      // Init menu for SIGMOD demo. TODO: cleanup.
+      // Init menu for SIGMOD demo. TODO: make more flexible.
       for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(DimensionSimilarity.class)) {
-        menuoverlay.options.add(clz.getSimpleName());
+        menuOverlay.options.add(clz.getSimpleName());
       }
 
       GLProfile glp = GLProfile.getDefault();
       GLCapabilities caps = new GLCapabilities(glp);
-      // Increase color depth.
-      // caps.setBlueBits(16);
-      // caps.setRedBits(16);
-      // caps.setGreenBits(16);
       caps.setDoubleBuffered(true);
       canvas = new GLCanvas(caps);
       canvas.addGLEventListener(this);
 
-      frame = new JFrame("EKLI OpenGL Visualization");
+      frame = new JFrame("ELKI 3D Parallel Coordinate Visualization");
       frame.setSize(600, 600);
       frame.add(canvas);
+    }
+
+    void initLabels() {
+      // Labels:
+      shared.labels = new String[shared.dim];
+      for (int i = 0; i < shared.dim; i++) {
+        shared.labels[i] = RelationUtil.getColumnLabel(shared.rel, i);
+      }
     }
 
     @SuppressWarnings("unchecked")
@@ -324,19 +376,31 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       try {
         ListParameterization params = new ListParameterization();
         params.addParameter(AbstractLayout3DPC.Parameterizer.SIM_ID, simname);
-        settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout.class, params);
-        layout = settings.layout.layout(rel.getDatabase(), rel);
-        GL gl = canvas.getGL();
-        prenderer.forgetTextures(gl);
+        shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout.class, params);
+        switchState(State.PREPARATION);
+        startLayoutThread();
       } catch (Exception e) {
         LOG.exception(e);
         return;
       }
     }
 
-    public void run() {
-      layout = settings.layout.layout(rel.getDatabase(), rel);
+    private void startLayoutThread() {
+      new Thread() {
+        @Override
+        public void run() {
+          final Layout newlayout = shared.settings.layout.layout(shared.rel.getDatabase(), shared.rel);
+          setLayout(newlayout);
+        }
+      }.start();
+    }
 
+    protected void closeMenu() {
+      // TODO: which state to return to?
+      state = State.EXPLORE;
+    }
+
+    public void run() {
       assert (frame != null);
       frame.setVisible(true);
       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -346,6 +410,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
           stop();
         }
       });
+      startLayoutThread();
     }
 
     public void stop() {
@@ -366,8 +431,8 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       gl.glDisable(GL.GL_CULL_FACE);
 
       glu = new GLU();
-      camera = new Simple1DOFCamera(glu);
-      camera.addCameraListener(new CameraListener() {
+      shared.camera = new Simple1DOFCamera(glu);
+      shared.camera.addCameraListener(new CameraListener() {
         @Override
         public void cameraChanged() {
           canvas.display();
@@ -375,20 +440,52 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       });
 
       // Setup arcball:
-      arcball = new Arcball1DOFAdapter(camera);
-      canvas.addMouseMotionListener(arcball);
-      canvas.addMouseWheelListener(arcball);
+      arcball = new Arcball1DOFAdapter(shared.camera);
+      shared.textrenderer = new TextRenderer(new Font(Font.SANS_SERIF, Font.BOLD, 36));
+      // Ensure listeners.
+      switchState(state);
+    }
 
-      canvas.addMouseListener(new MouseProxy());
-
-      prenderer.initLabels();
-      textrenderer = new TextRenderer(new Font(Font.SANS_SERIF, Font.BOLD, 36));
+    /**
+     * Switch the current state.
+     * 
+     * @param newstate State to switch to.
+     */
+    void switchState(State newstate) {
+      // Reset mouse listeners
+      canvas.removeMouseListener(menuStarter);
+      canvas.removeMouseListener(menuOverlay);
+      canvas.removeMouseListener(arcball);
+      canvas.removeMouseMotionListener(arcball);
+      canvas.removeMouseWheelListener(arcball);
+      switch(newstate) {
+      case EXPLORE: {
+        canvas.addMouseListener(menuStarter);
+        canvas.addMouseListener(arcball);
+        canvas.addMouseMotionListener(arcball);
+        canvas.addMouseWheelListener(arcball);
+        break;
+      }
+      case MENU: {
+        canvas.addMouseListener(menuOverlay);
+        break;
+      }
+      case PREPARATION: {
+        // No listeners.
+        break;
+      }
+      }
+      if (state != newstate) {
+        this.state = newstate;
+        canvas.repaint();
+      }
     }
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-      camera.setRatio(width / (double) height);
-      menuoverlay.setSize(width, height);
+      shared.camera.setRatio(width / (double) height);
+      messageOverlay.setSize(width, height);
+      menuOverlay.setSize(width, height);
     }
 
     @Override
@@ -396,472 +493,55 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       GL2 gl = drawable.getGL().getGL2();
       gl.glClear(GL.GL_COLOR_BUFFER_BIT /* | GL.GL_DEPTH_BUFFER_BIT */);
 
-      camera.apply(gl);
+      if (shared.layout != null) {
+        int res = prenderer.prepare(gl);
+        if (res == 1) {
+          // Request a repaint, to generate the next texture.
+          canvas.repaint();
+        }
+        if (res == 2) {
+          switchState(State.EXPLORE);
+        }
+      }
 
-      final int dim = RelationUtil.dimensionality(rel);
-      prenderer.drawParallelPlot(drawable, dim, gl);
+      shared.camera.apply(gl);
+      if (shared.layout != null) {
+        prenderer.drawParallelPlot(drawable, gl);
+      }
 
       if (DEBUG) {
         arcball.debugRender(gl);
       }
 
-      if (menuVisible) {
-        menuoverlay.render(gl);
+      if (State.MENU.equals(state)) {
+        menuOverlay.render(gl);
       }
+      if (State.PREPARATION.equals(state)) {
+        messageOverlay.message = "Preparing ...";
+        messageOverlay.render(gl);
+      }
+    }
+
+    /**
+     * Callback from layouting thread.
+     * 
+     * @param newlayout New layout.
+     */
+    protected void setLayout(final Layout newlayout) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          shared.layout = newlayout;
+          prenderer.forgetTextures(canvas.getGL());
+          canvas.repaint();
+        }
+      });
     }
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
       GL gl = drawable.getGL();
       prenderer.forgetTextures(gl);
-    }
-
-    /**
-     * Simple proxy for mouse events.
-     * 
-     * @author Erich Schubert
-     */
-    class MouseProxy implements MouseInputListener {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-          if (menuVisible) {
-            menuoverlay.mouseClicked(e);
-            return;
-          }
-          arcball.mouseClicked(e);
-          return;
-        }
-        if (e.getButton() == MouseEvent.BUTTON3) {
-          menuVisible = !menuVisible;
-          if (menuVisible) {
-            canvas.removeMouseMotionListener(arcball);
-            canvas.removeMouseWheelListener(arcball);
-          } else {
-            canvas.addMouseMotionListener(arcball);
-            canvas.addMouseWheelListener(arcball);
-          }
-          Instance.this.canvas.repaint();
-          return;
-        }
-      }
-
-      @Override
-      public void mousePressed(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-          if (!menuVisible) {
-            arcball.mousePressed(e);
-          }
-        }
-      }
-
-      @Override
-      public void mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-          if (!menuVisible) {
-            arcball.mouseReleased(e);
-          }
-        }
-      }
-
-      @Override
-      public void mouseEntered(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-          if (!menuVisible) {
-            arcball.mouseEntered(e);
-          }
-        }
-      }
-
-      @Override
-      public void mouseExited(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-          if (!menuVisible) {
-            arcball.mouseExited(e);
-          }
-        }
-      }
-
-      @Override
-      public void mouseDragged(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-          if (!menuVisible) {
-            arcball.mouseDragged(e);
-          }
-        }
-      }
-
-      @Override
-      public void mouseMoved(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-          if (!menuVisible) {
-            arcball.mouseMoved(e);
-          }
-        }
-      }
-    }
-
-    /**
-     * Renderer for 3D parallel plots.
-     * 
-     * The tricky part here is the vertex buffer layout. We are drawing lines,
-     * so we need two vertices for each macro edge (edge between axes in the
-     * plot). We furthermore need the following properties: we need to draw
-     * edges sorted by depth to allow alpha and smoothing to work, and we need
-     * to be able to have different colors for clusters. An efficient batch
-     * therefore will consist of one edge-color combination. The input data
-     * comes in color-object ordering, so we need to seek through the edges when
-     * writing the buffer.
-     * 
-     * In total, we have 2 * obj.size * edges.size vertices.
-     * 
-     * Where obj.size = sum(col.sizes)
-     * 
-     * @author Erich Schubert
-     */
-    class Parallel3DRenderer {
-      /**
-       * Prerendered textures.
-       */
-      private int[] textures;
-
-      /**
-       * Axis labels
-       */
-      String[] labels;
-
-      void initLabels() {
-        int dim = RelationUtil.dimensionality(rel);
-        // Labels:
-        labels = new String[dim];
-        for (int i = 0; i < dim; i++) {
-          labels[i] = RelationUtil.getColumnLabel(rel, i);
-        }
-      }
-
-      void renderTextures(GL2 gl) {
-        final StylingPolicy sp = style.getStylingPolicy();
-        final ColorLibrary cols = style.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-
-        // Setup color table:
-        float[] colors;
-        if (sp instanceof ClassStylingPolicy) {
-          ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-          final int maxStyle = csp.getMaxStyle();
-          colors = new float[maxStyle * 3];
-          for (int c = 0, s = csp.getMinStyle(); s < maxStyle; c += 3, s++) {
-            Color col = SVGUtil.stringToColor(cols.getColor(s));
-            colors[c + 0] = col.getRed() / 255.f;
-            colors[c + 1] = col.getGreen() / 255.f;
-            colors[c + 2] = col.getBlue() / 255.f;
-          }
-        } else {
-          // Render in black.
-          colors = new float[] { 0f, 0f, 0f };
-        }
-
-        // Setup buffer IDs:
-        int[] vbi = new int[1];
-        gl.glGenBuffers(1, vbi, 0);
-        // Buffer for coordinates.
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, rel.size() // Number of lines *
-            * 2 // 2 Points *
-            * 5 // 2 coordinates + 3 color
-            * ByteArrayUtil.SIZE_FLOAT, null, GL2.GL_DYNAMIC_DRAW);
-
-        // Generate textures:
-        textures = new int[layout.edges.size()];
-        gl.glGenTextures(textures.length, textures, 0);
-
-        // Get a framebuffer:
-        int[] frameBufferID = new int[1];
-        gl.glGenFramebuffers(1, frameBufferID, 0);
-
-        gl.glPushAttrib(GL2.GL_TEXTURE_BIT | GL2.GL_VIEWPORT_BIT);
-        gl.glPushMatrix();
-        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, frameBufferID[0]);
-
-        for (int edge = 0; edge < textures.length; edge++) {
-          Layout.Edge e = layout.edges.get(edge);
-
-          gl.glBindTexture(GL.GL_TEXTURE_2D, textures[edge]);
-          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
-          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
-          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-          gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
-
-          // Reserve texture image data:
-          gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL2.GL_RGBA16, //
-              settings.texwidth, settings.texheight, 0, // Size
-              GL2.GL_RGBA, GL2.GL_FLOAT, null);
-          gl.glViewport(0, 0, settings.texwidth, settings.texheight);
-
-          // Attach 2D texture to this FBO
-          gl.glFramebufferTexture2D(GL2.GL_FRAMEBUFFER, GL2.GL_COLOR_ATTACHMENT0, //
-              GL.GL_TEXTURE_2D, textures[edge], 0);
-
-          if (gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER) != GL2.GL_FRAMEBUFFER_COMPLETE) {
-            LOG.warning("glCheckFramebufferStatus: " + gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER));
-          }
-
-          gl.glDisable(GL2.GL_LIGHTING);
-          gl.glDisable(GL.GL_CULL_FACE);
-          gl.glDisable(GL.GL_DEPTH_TEST);
-          gl.glMatrixMode(GL2.GL_PROJECTION);
-          gl.glLoadIdentity();
-          gl.glOrtho(0f, 1f, 0f, StyleLibrary.SCALE, -1, 1);
-          gl.glMatrixMode(GL2.GL_MODELVIEW);
-          gl.glLoadIdentity();
-
-          gl.glClearColor(1f, 1f, 1f, .0f);
-          gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-
-          gl.glShadeModel(GL2.GL_SMOOTH);
-          gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-          gl.glEnable(GL.GL_BLEND);
-          gl.glEnable(GL.GL_LINE_SMOOTH);
-
-          gl.glLineWidth(settings.linewidth);
-
-          if (sp instanceof ClassStylingPolicy) {
-            ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-            final int mincolor = csp.getMinStyle();
-            ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
-            FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
-            int p = 0;
-            for (DBIDIter it = rel.iterDBIDs(); it.valid(); it.advance(), p++) {
-              final NumberVector<?> vec = rel.get(it);
-              final int c = (csp.getStyleForDBID(it) - mincolor) * 3;
-              final float v1 = (float) proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
-              final float v2 = (float) proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim2), e.dim2);
-              vertices.put(0.f);
-              vertices.put(v1);
-              vertices.put(colors[c]);
-              vertices.put(colors[c + 1]);
-              vertices.put(colors[c + 2]);
-              vertices.put(1.f);
-              vertices.put(v2);
-              vertices.put(colors[c]);
-              vertices.put(colors[c + 1]);
-              vertices.put(colors[c + 2]);
-            }
-            vertices.flip();
-            gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
-
-            gl.glColor4f(1f, 1f, 1f, 1f);
-            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
-            gl.glVertexPointer(2, GL.GL_FLOAT, 5 * ByteArrayUtil.SIZE_FLOAT, 0);
-            gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-            gl.glColorPointer(3, GL.GL_FLOAT, 5 * ByteArrayUtil.SIZE_FLOAT, 2 * ByteArrayUtil.SIZE_FLOAT);
-            gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
-            gl.glDrawArrays(GL.GL_LINES, 0, p);
-
-            gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-            gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-          } else {
-            ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
-            FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
-            int p = 0;
-            for (DBIDIter it = rel.iterDBIDs(); it.valid(); it.advance(), p++) {
-              final NumberVector<?> vec = rel.get(it);
-              final float v1 = (float) proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
-              final float v2 = (float) proj.fastProjectDataToRenderSpace(rel.get(it).doubleValue(e.dim2), e.dim2);
-              vertices.put(0.f);
-              vertices.put(v1);
-              vertices.put(1.f);
-              vertices.put(v2);
-            }
-            vertices.flip();
-            gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
-
-            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
-            gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-            gl.glVertexPointer(2, GL.GL_FLOAT, 0, 0);
-
-            gl.glColor3f(colors[0], colors[1], colors[2]);
-            gl.glDrawArrays(GL.GL_LINES, 0, p);
-
-            gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-          }
-
-          if (settings.mipmaps > 0) {
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, settings.mipmaps);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
-            gl.glHint(GL.GL_GENERATE_MIPMAP_HINT, GL.GL_NICEST);
-            gl.glGenerateMipmap(GL.GL_TEXTURE_2D);
-          }
-          gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
-
-          if (!gl.glIsTexture(textures[0])) {
-            LOG.warning("Generating texture failed!");
-          }
-        }
-        // Switch back to the default framebuffer.
-        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
-        gl.glPopMatrix();
-        gl.glPopAttrib();
-
-        // Free vertex buffer
-        gl.glDeleteBuffers(vbi.length, vbi, 0);
-
-        // Reset background color.
-        gl.glClearColor(1f, 1f, 1f, 1f);
-      }
-
-      public void forgetTextures(GL gl) {
-        if (textures != null) {
-          gl.glDeleteTextures(textures.length, textures, 0);
-          textures = null;
-        }
-      }
-
-      protected void drawParallelPlot(GLAutoDrawable drawable, final int dim, GL2 gl) {
-        if (textures == null) {
-          long start = System.nanoTime();
-          prenderer.renderTextures(gl);
-          long end = System.nanoTime();
-          LOG.warning("Time to render textures: " + (end - start) / 1e6 + " ms.");
-        }
-        // Sort axes by sq. distance from camera, front-to-back:
-        int[] dindex = new int[dim];
-        DoubleIntPair[] axes = new DoubleIntPair[dim];
-        {
-          for (int d = 0; d < dim; d++) {
-            double dist = camera.squaredDistanceFromCamera(layout.getNode(d).getX(), layout.getNode(d).getY());
-            axes[d] = new DoubleIntPair(-dist, d);
-          }
-          Arrays.sort(axes);
-          for (int i = 0; i < dim; i++) {
-            dindex[axes[i].second] = i;
-          }
-        }
-        // Sort edges by the maximum (foreground) index.
-        IntIntPair[] edgesort = new IntIntPair[layout.edges.size()];
-        {
-          int e = 0;
-          for (Layout.Edge edge : layout.edges) {
-            int i1 = dindex[edge.dim1], i2 = dindex[edge.dim2];
-            edgesort[e] = new IntIntPair(Math.min(i1, i2), e);
-            e++;
-          }
-          Arrays.sort(edgesort);
-        }
-
-        if (textures != null) {
-          gl.glShadeModel(GL2.GL_FLAT);
-          // Render spider web:
-          gl.glLineWidth(settings.linewidth); // outside glBegin!
-          gl.glBegin(GL.GL_LINES);
-          gl.glColor4f(0f, 0f, 0f, 1f);
-          for (Layout.Edge edge : layout.edges) {
-            Node n1 = layout.getNode(edge.dim1), n2 = layout.getNode(edge.dim2);
-            gl.glVertex3d(n1.getX(), n1.getY(), 0f);
-            gl.glVertex3d(n2.getX(), n2.getY(), 0f);
-          }
-          gl.glEnd();
-          // Draw axes and 3DPC:
-          for (int i = 0; i < dim; i++) {
-            final int d = axes[i].second;
-            final Node node1 = layout.getNode(d);
-            // Draw edge textures
-            for (IntIntPair pair : edgesort) {
-              // Other axis must have a smaller index.
-              if (pair.first >= i) {
-                continue;
-              }
-              Layout.Edge edge = layout.edges.get(pair.second);
-              // Must involve the current axis.
-              if (edge.dim1 != d && edge.dim2 != d) {
-                continue;
-              }
-              int od = axes[pair.first].second;
-
-              gl.glEnable(GL.GL_TEXTURE_2D);
-              gl.glColor4f(1f, 1f, 1f, 1f);
-              final Node node2 = layout.getNode(od);
-
-              gl.glBindTexture(GL.GL_TEXTURE_2D, textures[pair.second]);
-              gl.glBegin(GL2.GL_QUADS);
-              gl.glTexCoord2d((edge.dim1 == d) ? 0f : 1f, 0f);
-              gl.glVertex3d(node1.getX(), node1.getY(), 0f);
-              gl.glTexCoord2d((edge.dim1 == d) ? 0f : 1f, 1f);
-              gl.glVertex3d(node1.getX(), node1.getY(), 1f);
-              gl.glTexCoord2d((edge.dim1 != d) ? 0f : 1f, 1f);
-              gl.glVertex3d(node2.getX(), node2.getY(), 1f);
-              gl.glTexCoord2d((edge.dim1 != d) ? 0f : 1f, 0f);
-              gl.glVertex3d(node2.getX(), node2.getY(), 0f);
-              gl.glEnd();
-              gl.glDisable(GL.GL_TEXTURE_2D);
-            }
-            // Draw axis
-            gl.glLineWidth(settings.linewidth); // outside glBegin!
-            gl.glBegin(GL.GL_LINES);
-            gl.glColor4f(0f, 0f, 0f, 1f);
-            gl.glVertex3d(node1.getX(), node1.getY(), 0f);
-            gl.glVertex3d(node1.getX(), node1.getY(), 1f);
-            gl.glEnd();
-            // Draw ticks.
-            LinearScale scale = proj.getAxisScale(d);
-            gl.glPointSize(settings.linewidth * 2f);
-            gl.glBegin(GL.GL_POINTS);
-            for (double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += scale.getRes()) {
-              gl.glVertex3d(node1.getX(), node1.getY(), scale.getScaled(tick));
-            }
-            gl.glEnd();
-          }
-        }
-        // Render labels
-        {
-          // gl.glPushMatrix();
-          textrenderer.begin3DRendering();
-          // UNDO the camera rotation. This will mess up text orientation!
-          gl.glRotatef((float) MathUtil.rad2deg(camera.getRotationZ()), 0.f, 0.f, 1.f);
-          // Rotate to have the text face the camera direction, which looks +Y
-          // While the text will be visible from +Z and +Y is baseline.
-          gl.glRotatef(90.f, 1.f, 0.f, 0.f);
-          // HalfPI: 180 degree extra rotation, for text orientation.
-          double cos = Math.cos(camera.getRotationZ()), sin = Math.sin(camera.getRotationZ());
-
-          textrenderer.setColor(0.0f, 0.0f, 0.0f, 1.0f);
-          float defaultscale = .01f / dim;
-          float targetwidth = 0.2f; // TODO: div depth?
-          for (int i = 0; i < dim; i++) {
-            Rectangle2D b = textrenderer.getBounds(labels[i]);
-            float scale = defaultscale;
-            if (b.getWidth() * scale > targetwidth) {
-              scale = targetwidth / (float) b.getWidth();
-            }
-            float w = (float) b.getWidth() * scale;
-            // Rotate manually, in x-z plane
-            float x = (float) (cos * layout.getNode(i).getX() + sin * layout.getNode(i).getY());
-            float y = (float) (-sin * layout.getNode(i).getX() + cos * layout.getNode(i).getY());
-            textrenderer.draw3D(labels[i], (x - w * .5f), 1.01f, -y, scale);
-          }
-
-          // Show depth indexes on debug:
-          if (DEBUG) {
-            textrenderer.setColor(1f, 0f, 0f, 1f);
-            for (IntIntPair pair : edgesort) {
-              Layout.Edge edge = layout.edges.get(pair.second);
-              final Node node1 = layout.getNode(edge.dim1);
-              final Node node2 = layout.getNode(edge.dim2);
-              final double mx = 0.5 * (node1.getX() + node2.getX());
-              final double my = 0.5 * (node1.getY() + node2.getY());
-              // Rotate manually, in x-z plane
-              float x = (float) (cos * mx + sin * my);
-              float y = (float) (-sin * mx + cos * my);
-              textrenderer.draw3D(Integer.toString(pair.first), (x - defaultscale * .5f), 1.01f, -y, defaultscale);
-            }
-          }
-
-          textrenderer.end3DRendering();
-          // gl.glPopMatrix();
-        }
-      }
     }
   }
 
