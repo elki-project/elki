@@ -173,17 +173,22 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     /**
      * Line width.
      */
-    public float linewidth = 2f;
+    public float linewidth = 1.5f;
 
     /**
      * Texture width.
      */
-    public int texwidth = 256;
+    public int texwidth = 1 << 8;
 
     /**
      * Texture height.
      */
-    public int texheight = 1024;
+    public int texheight = 1 << 10;
+
+    /**
+     * Number of additional mipmaps to generate.
+     */
+    public int mipmaps = 1;
   }
 
   /**
@@ -591,7 +596,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
           gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL2.GL_RGBA16, //
               settings.texwidth, settings.texheight, 0, // Size
               GL2.GL_RGBA, GL2.GL_FLOAT, null);
-          gl.glGenerateMipmap(GL.GL_TEXTURE_2D); // Allocate mipmaps!
           gl.glViewport(0, 0, settings.texwidth, settings.texheight);
 
           // Attach 2D texture to this FBO
@@ -682,12 +686,14 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
             gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
           }
 
-          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
-          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 2);
-          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-          gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
-          gl.glHint(GL.GL_GENERATE_MIPMAP_HINT, GL.GL_NICEST);
-          gl.glGenerateMipmap(GL.GL_TEXTURE_2D);
+          if (settings.mipmaps > 0) {
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, settings.mipmaps);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
+            gl.glHint(GL.GL_GENERATE_MIPMAP_HINT, GL.GL_NICEST);
+            gl.glGenerateMipmap(GL.GL_TEXTURE_2D);
+          }
           gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
           if (!gl.glIsTexture(textures[0])) {
