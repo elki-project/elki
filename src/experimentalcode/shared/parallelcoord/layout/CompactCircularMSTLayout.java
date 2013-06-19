@@ -104,21 +104,22 @@ public class CompactCircularMSTLayout extends AbstractLayout3DPC<CompactCircular
     node.x = Math.sin(aoff) * radius;
     node.y = Math.cos(aoff) * radius;
 
-    // Avoid overly wide angles - shrink radius if necessary.
-    double cpos = aoff - awid * .5;
+    // Angular width per weight
     double cwid = awid / node.weight;
-    double cwid2 = cwid;
+    // Avoid overly wide angles - shrink radius if necessary.
+    double div = 1;
     if (node.weight > 1) {
       double s = Math.sin(awid * .5), c = Math.cos(awid * .5);
       double dx = s * (depth + 1), dy = c * (depth + 1) - depth;
       double d = Math.sqrt(dx * dx + dy * dy) / MathUtil.SQRT2;
-      if (d > 1) {
-        cwid2 /= d;
-      }
+      div = Math.max(div, d);
     }
+    // Angular position of current child:
+    double cang = aoff - awid * .5 / div;
+    final double adjwid = cwid / div;
     for (Node c : node.children) {
-      computePositions(c, depth + 1, cpos, cwid2 * c.weight, radius + radiusinc, radiusinc);
-      cpos += cwid * c.weight;
+      computePositions(c, depth + 1, cang + adjwid * c.weight * .5, adjwid * c.weight, radius + radiusinc, radiusinc);
+      cang += adjwid * c.weight;
     }
   }
 
