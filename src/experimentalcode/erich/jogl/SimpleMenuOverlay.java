@@ -1,15 +1,5 @@
 package experimentalcode.erich.jogl;
 
-import java.awt.Font;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-
-import javax.media.opengl.GL2;
-import javax.swing.event.MouseInputAdapter;
-
-import com.jogamp.opengl.util.awt.TextRenderer;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -33,17 +23,24 @@ import com.jogamp.opengl.util.awt.TextRenderer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.awt.Font;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+
+import javax.media.opengl.GL2;
+
+import com.jogamp.opengl.util.awt.TextRenderer;
+
 /**
  * Simple menu overlay.
  * 
+ * TODO: Hover effects?
+ * 
  * @author Erich Schubert
  */
-public abstract class SimpleMenuOverlay extends MouseInputAdapter {
-  /**
-   * Screen ratio.
-   */
-  int width = 100, height = 100;
-
+public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements MouseListener {
   /**
    * Text renderer
    */
@@ -68,25 +65,8 @@ public abstract class SimpleMenuOverlay extends MouseInputAdapter {
     renderer = new TextRenderer(new Font(Font.SANS_SERIF, Font.PLAIN, fontsize));
   }
 
-  public void render(GL2 gl) {
-    gl.glMatrixMode(GL2.GL_PROJECTION);
-    gl.glPushMatrix();
-    gl.glLoadIdentity();
-    gl.glMatrixMode(GL2.GL_MODELVIEW);
-    gl.glPushMatrix();
-    gl.glLoadIdentity();
-
-    gl.glOrtho(0, width, 0, height, -1, +1);
-    gl.glColor4f(0f, 0f, 0f, .5f);
-
-    // Fade background:
-    gl.glBegin(GL2.GL_QUADS);
-    gl.glVertex2f(0f, 0f);
-    gl.glVertex2f(width, 0f);
-    gl.glVertex2f(width, height);
-    gl.glVertex2f(0f, height);
-    gl.glEnd();
-
+  @Override
+  void renderContents(GL2 gl) {
     final int numopt = options.size();
 
     double maxwidth = 0.;
@@ -127,22 +107,6 @@ public abstract class SimpleMenuOverlay extends MouseInputAdapter {
       renderer.draw(options.get(j), (width - (int) bounds[j].getWidth()) >> 1, (int) pos);
     }
     renderer.endRendering();
-
-    gl.glMatrixMode(GL2.GL_PROJECTION);
-    gl.glPopMatrix();
-    gl.glMatrixMode(GL2.GL_MODELVIEW);
-    gl.glPopMatrix();
-  }
-
-  /**
-   * Set screen ratio.
-   * 
-   * @param width Screen width
-   * @param height Screen height
-   */
-  public void setSize(int width, int height) {
-    this.width = width;
-    this.height = height;
   }
 
   @Override
@@ -151,7 +115,7 @@ public abstract class SimpleMenuOverlay extends MouseInputAdapter {
       return;
     }
     final int mx = e.getX(), my = e.getY();
-    
+
     final int numopt = options.size();
     double maxwidth = 0.;
     Rectangle2D[] bounds = new Rectangle2D[numopt];
@@ -166,7 +130,7 @@ public abstract class SimpleMenuOverlay extends MouseInputAdapter {
     if (mx < bx1 || mx > bx2) {
       return;
     }
-    
+
     double totalheight = numopt * fontsize + (numopt - 1) * padding;
     for (int i = 0; i < numopt; i++) {
       final double pos = (height - totalheight) * .5 + fontsize * i + padding * i;
@@ -179,6 +143,26 @@ public abstract class SimpleMenuOverlay extends MouseInputAdapter {
       }
     }
   }
-  
+
   abstract void menuItemClicked(int item);
+
+  @Override
+  public void mousePressed(MouseEvent e) {
+    // Ignore
+  }
+
+  @Override
+  public void mouseReleased(MouseEvent e) {
+    // Ignore
+  }
+
+  @Override
+  public void mouseEntered(MouseEvent e) {
+    // Ignore
+  }
+
+  @Override
+  public void mouseExited(MouseEvent e) {
+    // Ignore
+  }
 }
