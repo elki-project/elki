@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * <p>
  * Based on:<br />
- * Fabian Keller, Emmanuel Müller, and Klemens Böhm.<br />
+ * F. Keller, E. Müller, and K. Böhm.<br />
  * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking. <br />
  * In ICDE, pages 1037–1048, 2012.
  * </p>

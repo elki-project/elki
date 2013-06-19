@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * Reference:
  * <p>
- * Diansheng Guo<br />
+ * D. Guo<br />
  * Coordinating computational and visual approaches for interactive feature
  * selection and multivariate clustering<br />
  * Information Visualization, 2(4), 2003.
@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "Diansheng Guo", title = "Coordinating computational and visual approaches for interactive feature selection and multivariate clustering", booktitle = "Information Visualization, 2(4)", url = "http://dx.doi.org/10.1057/palgrave.ivs.9500053")
+@Reference(authors = "D. Guo", title = "Coordinating computational and visual approaches for interactive feature selection and multivariate clustering", booktitle = "Information Visualization, 2(4)", url = "http://dx.doi.org/10.1057/palgrave.ivs.9500053")
 public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
   /**
    * Static instance.
