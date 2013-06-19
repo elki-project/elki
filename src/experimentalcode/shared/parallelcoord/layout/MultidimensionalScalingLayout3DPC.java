@@ -31,13 +31,18 @@ import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
 
-public class SVDLayout3DPC extends AbstractLayout3DPC<SVDLayout3DPC.Node> {
+/**
+ * Layout the axes by multi-dimensional scaling.
+ * 
+ * @author Erich Schubert
+ */
+public class MultidimensionalScalingLayout3DPC extends AbstractLayout3DPC<MultidimensionalScalingLayout3DPC.Node> {
   /**
    * Constructor.
    * 
    * @param sim Similarity measure
    */
-  public SVDLayout3DPC(DimensionSimilarity<NumberVector<?>> sim) {
+  public MultidimensionalScalingLayout3DPC(DimensionSimilarity<NumberVector<?>> sim) {
     super(sim);
   }
 
@@ -65,18 +70,70 @@ public class SVDLayout3DPC extends AbstractLayout3DPC<SVDLayout3DPC.Node> {
 
   @Override
   Layout process(int dim, DimensionSimilarityMatrix mat) {
-    // Convert to a full matrix.
-    Matrix m = mat.copyToFullMatrix();
-    SingularValueDecomposition svd = new SingularValueDecomposition(m);
+    // Find maximum of |cij|
+    double max = 0;
+    for (int i = 0; i < dim; i++) {
+      for (int j = i + 1; j < dim; j++) {
+        double v = Math.abs(mat.get(j, i));
+        if (v > max) {
+          max = v;
+        }
+      }
+    }
+    // Assume that "max - |cij|" is now a distance.
+    // We use sqrt(v) instead of v*v, since this makes the method
+    // less aggressive overall, and we are not using euclidean anyway.
+    double means[] = new double[dim];
+    double mean = 0.0;
+    for (int i = 0; i < dim; i++) {
+      for (int j = i + 1; j < dim; j++) {
+        double v = max - Math.abs(mat.get(i, j));
+        v = -.5 * Math.sqrt(v);
+        means[i] += v;
+        means[j] += v;
+        mean += 2 * v;
+      }
+    }
+    for (int i = 0; i < dim; i++) {
+      means[i] /= dim;
+    }
+    mean /= (dim * dim);
+    // Build double centered matrix:
+    Matrix d = new Matrix(dim, dim);
+    for (int i = 0; i < dim; i++) {
+      d.set(i, i, -2 * means[i] + mean);
+      for (int j = i + 1; j < dim; j++) {
+        double v = max - Math.abs(mat.get(i, j));
+        v = -.5 * Math.sqrt(v) - means[i] - means[j] + mean;
+        d.set(i, j, v);
+        d.set(j, i, v);
+      }
+    }
+
+    SingularValueDecomposition svd = new SingularValueDecomposition(d);
     Matrix u = svd.getU();
+    double[] lambda = svd.getSingularValues();
+    lambda[0] = Math.sqrt(Math.abs(lambda[0]));
+    lambda[1] = Math.sqrt(Math.abs(lambda[1]));
 
     Layout l = new Layout();
-    /* Node rootnode = */buildSpanningTree(mat, l);
+    buildSpanningTree(mat, l);
 
+    double maxabs = 0;
     for (int i = 0; i < dim; i++) {
       Node n = (Node) l.getNode(i);
-      n.x = u.get(0, i);
-      n.y = u.get(1, i);
+      n.x = u.get(i, 0) * lambda[0];
+      n.y = u.get(i, 1) * lambda[1];
+      double v = n.x * n.x + n.y * n.y;
+      if (v > maxabs) {
+        maxabs = v;
+      }
+    }
+    maxabs = 1. / Math.sqrt(maxabs);
+    for (int i = 0; i < dim; i++) {
+      Node n = (Node) l.getNode(i);
+      n.x *= maxabs;
+      n.y *= maxabs;
     }
 
     return l;
@@ -91,8 +148,8 @@ public class SVDLayout3DPC extends AbstractLayout3DPC<SVDLayout3DPC.Node> {
    */
   public static class Parameterizer extends AbstractLayout3DPC.Parameterizer {
     @Override
-    protected SVDLayout3DPC makeInstance() {
-      return new SVDLayout3DPC(sim);
+    protected MultidimensionalScalingLayout3DPC makeInstance() {
+      return new MultidimensionalScalingLayout3DPC(sim);
     }
   }
 }
