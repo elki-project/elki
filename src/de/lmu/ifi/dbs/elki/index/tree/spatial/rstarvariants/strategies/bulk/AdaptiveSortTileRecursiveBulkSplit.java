@@ -92,15 +92,15 @@ public class AdaptiveSortTileRecursiveBulkSplit extends AbstractBulkSplit {
     }
     // Find maximum and compute extends
     double maxex = 0.0;
-    int sdim = -1;
+    int sdim = depth;
     double[] exts = new double[dims];
     for (int d = 0; d < mm.length; d += 2) {
       final double extend = mm[d + 1] - mm[d];
       if (extend > maxex) {
         maxex = extend;
-        sdim = d >> 1;
+        sdim = d >>> 1;
       }
-      exts[d >> 1] = extend;
+      exts[d >>> 1] = extend;
     }
     // Compute sum of the k largest extends:
     Arrays.sort(exts);
