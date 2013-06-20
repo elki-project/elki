@@ -1,4 +1,4 @@
-package experimentalcode.shared.parallelcoord.layout;
+package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
 
 /*
  This file is part of ELKI:

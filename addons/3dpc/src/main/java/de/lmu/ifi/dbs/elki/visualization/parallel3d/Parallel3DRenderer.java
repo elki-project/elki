@@ -1,4 +1,4 @@
-package experimentalcode.erich.jogl;
+package de.lmu.ifi.dbs.elki.visualization.parallel3d;
 
 /*
  This file is part of ELKI:
@@ -42,13 +42,13 @@ import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.OpenGL3DParallelCoordinates.Instance.Shared;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout.Node;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import experimentalcode.erich.jogl.OpenGL3DParallelCoordinates.Instance.Shared;
-import experimentalcode.shared.parallelcoord.layout.Layout;
-import experimentalcode.shared.parallelcoord.layout.Layout.Node;
 
 /**
  * Renderer for 3D parallel plots.
@@ -133,6 +133,13 @@ class Parallel3DRenderer<O extends NumberVector<?>> {
   }
 
   protected int prepare(GL2 gl) {
+    if (completedTextures < 0) {
+      if (textures != null) {
+        gl.glDeleteTextures(textures.length, textures, 0);
+        textures = null;
+      }
+      completedTextures = 0;
+    }
     if (completedTextures >= shared.layout.edges.size()) {
       return 0;
     }
@@ -413,11 +420,15 @@ class Parallel3DRenderer<O extends NumberVector<?>> {
   }
 
   protected void forgetTextures(GL gl) {
-    if (textures != null) {
-      gl.glDeleteTextures(textures.length, textures, 0);
-      textures = null;
+    if (gl == null) {
+      completedTextures = -1;
+    } else {
+      if (textures != null) {
+        gl.glDeleteTextures(textures.length, textures, 0);
+        textures = null;
+      }
+      completedTextures = 0;
     }
-    completedTextures = 0;
   }
 
   /**

@@ -1,4 +1,4 @@
-package experimentalcode.erich.jogl;
+package de.lmu.ifi.dbs.elki.visualization.parallel3d.util;
 
 /*
  This file is part of ELKI:
@@ -44,7 +44,7 @@ public class SimpleMessageOverlay extends AbstractSimpleOverlay {
   /**
    * Message to display.
    */
-  String message = new String();
+  private String message = "";
 
   /**
    * Font size.
@@ -63,7 +63,7 @@ public class SimpleMessageOverlay extends AbstractSimpleOverlay {
   @Override
   void renderContents(GL2 gl) {
     // Get text bounds.
-    Rectangle2D bounds = renderer.getBounds(message);
+    Rectangle2D bounds = renderer.getBounds(getMessage());
 
     // Render message background:
     final float bx1 = .45f * (float) (width - bounds.getWidth());
@@ -82,7 +82,21 @@ public class SimpleMessageOverlay extends AbstractSimpleOverlay {
     renderer.beginRendering(width, height);
     renderer.setColor(1f, 1f, 1f, 1f);
     renderer.setColor(1f, 1f, 1f, 1f);
-    renderer.draw(message, (width - (int) bounds.getWidth()) >> 1, (height - (int) bounds.getHeight()) >> 1);
+    renderer.draw(getMessage(), (width - (int) bounds.getWidth()) >> 1, (height - (int) bounds.getHeight()) >> 1);
     renderer.endRendering();
+  }
+
+  /**
+   * @return the message
+   */
+  public String getMessage() {
+    return message;
+  }
+
+  /**
+   * @param message the message to set
+   */
+  public void setMessage(String message) {
+    this.message = message;
   }
 }

@@ -28,6 +28,7 @@ import java.io.InputStream;
 import javax.media.opengl.GL2;
 
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.OpenGL3DParallelCoordinates;
 
 /**
  * Class to help dealing with shaders.

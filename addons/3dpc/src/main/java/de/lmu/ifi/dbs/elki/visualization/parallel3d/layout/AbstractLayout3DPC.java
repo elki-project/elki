@@ -1,4 +1,4 @@
-package experimentalcode.shared.parallelcoord.layout;
+package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
 
 /*
  This file is part of ELKI:
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import experimentalcode.shared.parallelcoord.layout.Layout.Edge;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout.Edge;
 
 /**
  * Abstract class for dimension similarity based layouters.

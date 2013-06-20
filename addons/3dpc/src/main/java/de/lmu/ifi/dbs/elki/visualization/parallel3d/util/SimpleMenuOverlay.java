@@ -1,4 +1,4 @@
-package experimentalcode.erich.jogl;
+package de.lmu.ifi.dbs.elki.visualization.parallel3d.util;
 
 /*
  This file is part of ELKI:
@@ -49,7 +49,7 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
   /**
    * Options to display.
    */
-  ArrayList<String> options = new ArrayList<>();
+  private ArrayList<String> options = new ArrayList<>();
 
   /**
    * Font size.
@@ -67,12 +67,12 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
 
   @Override
   void renderContents(GL2 gl) {
-    final int numopt = options.size();
+    final int numopt = getOptions().size();
 
     double maxwidth = 0.;
     Rectangle2D[] bounds = new Rectangle2D[numopt];
     for (int i = 0; i < numopt; i++) {
-      bounds[i] = renderer.getBounds(options.get(i));
+      bounds[i] = renderer.getBounds(getOptions().get(i));
       maxwidth = Math.max(bounds[i].getWidth(), maxwidth);
     }
     final double padding = .5 * fontsize;
@@ -104,7 +104,7 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
       // Extra offset .17 * fontsize because of text baseline!
       final double pos = (height - totalheight) * .5 + fontsize * i + padding * i + .17 * fontsize;
       renderer.setColor(1f, 1f, 1f, 1f);
-      renderer.draw(options.get(j), (width - (int) bounds[j].getWidth()) >> 1, (int) pos);
+      renderer.draw(getOptions().get(j), (width - (int) bounds[j].getWidth()) >> 1, (int) pos);
     }
     renderer.endRendering();
   }
@@ -116,11 +116,11 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
     }
     final int mx = e.getX(), my = e.getY();
 
-    final int numopt = options.size();
+    final int numopt = getOptions().size();
     double maxwidth = 0.;
     Rectangle2D[] bounds = new Rectangle2D[numopt];
     for (int i = 0; i < numopt; i++) {
-      bounds[i] = renderer.getBounds(options.get(i));
+      bounds[i] = renderer.getBounds(getOptions().get(i));
       maxwidth = Math.max(bounds[i].getWidth(), maxwidth);
     }
     final double padding = .5 * fontsize;
@@ -144,7 +144,12 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
     }
   }
 
-  abstract void menuItemClicked(int item);
+  /**
+   * Callback when a menu item was clicked.
+   * 
+   * @param item Item number that was clicked.
+   */
+  public abstract void menuItemClicked(int item);
 
   @Override
   public void mousePressed(MouseEvent e) {
@@ -164,5 +169,19 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
   @Override
   public void mouseExited(MouseEvent e) {
     // Ignore
+  }
+
+  /**
+   * @return the options
+   */
+  public ArrayList<String> getOptions() {
+    return options;
+  }
+
+  /**
+   * @param options the options to set
+   */
+  public void setOptions(ArrayList<String> options) {
+    this.options = options;
   }
 }

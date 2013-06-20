@@ -1,4 +1,4 @@
-package experimentalcode.shared.parallelcoord.layout;
+package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
 
 /*
  This file is part of ELKI:
@@ -34,13 +34,13 @@ import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
  * 
  * @author Erich Schubert
  */
-public class CompactCircularMSTLayout extends AbstractLayout3DPC<CompactCircularMSTLayout.Node> {
+public class CompactCircularMSTLayout3DPC extends AbstractLayout3DPC<CompactCircularMSTLayout3DPC.Node> {
   /**
    * Constructor.
    * 
    * @param sim Similarity measure
    */
-  public CompactCircularMSTLayout(DimensionSimilarity<NumberVector<?>> sim) {
+  public CompactCircularMSTLayout3DPC(DimensionSimilarity<NumberVector<?>> sim) {
     super(sim);
   }
 
@@ -137,8 +137,8 @@ public class CompactCircularMSTLayout extends AbstractLayout3DPC<CompactCircular
    */
   public static class Parameterizer extends AbstractLayout3DPC.Parameterizer {
     @Override
-    protected CompactCircularMSTLayout makeInstance() {
-      return new CompactCircularMSTLayout(sim);
+    protected CompactCircularMSTLayout3DPC makeInstance() {
+      return new CompactCircularMSTLayout3DPC(sim);
     }
   }
 }
