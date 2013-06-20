@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -48,11 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 // TODO: Add missing constructors. (ObjectListParameter also!)
 public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
-  /**
-   * Class loader
-   */
-  protected static final ClassLoader loader = ClassLoader.getSystemClassLoader();
-
   /**
    * The restriction class for the list of class names.
    */
@@ -138,52 +132,17 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
 
       List<Class<? extends C>> cls = new ArrayList<>(classes.length);
       for (String cl : classes) {
-        cls.add(parseClassString(cl));
+        Class<? extends C> clz = InspectionUtil.findImplementation(restrictionClass, cl);
+        if (clz != null) {
+          cls.add(clz);
+        } else {
+          throw new WrongParameterValueException(this, (String) obj, "Class '" + cl + "' not found for given value. Must be a subclass / implementation of " + restrictionClass.getName());
+        }
       }
       return cls;
     }
     // INCOMPLETE
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Class values!");
-  }
-
-  @SuppressWarnings("unchecked")
-  protected Class<? extends C> parseClassString(String value) throws WrongParameterValueException {
-    // Try exact class factory first.
-    try {
-      return (Class<? extends C>) loader.loadClass(value + ClassParameter.FACTORY_POSTFIX);
-    } catch (ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    try {
-      return (Class<? extends C>) loader.loadClass(value);
-    } catch (ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    // Try factory for guessed name next
-    try {
-      return (Class<? extends C>) loader.loadClass(restrictionClass.getPackage().getName() + "." + value + ClassParameter.FACTORY_POSTFIX);
-    } catch (ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    // Last try: guessed name prefix only
-    try {
-      return (Class<? extends C>) loader.loadClass(restrictionClass.getPackage().getName() + "." + value);
-    } catch (ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    // Try aliases:
-    for (Class<?> c : getKnownImplementations()) {
-      if (c.isAnnotationPresent(Alias.class)) {
-        Alias aliases = c.getAnnotation(Alias.class);
-        for (String alias : aliases.value()) {
-          if (alias.equalsIgnoreCase(value)) {
-            return (Class<? extends C>) c;
-          }
-        }
-      }
-    }
-    // Fail.
-    throw new WrongParameterValueException(this, value, "Given class \"" + value + "\" not found.");
   }
 
   @Override
