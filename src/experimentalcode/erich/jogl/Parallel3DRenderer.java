@@ -65,9 +65,13 @@ import experimentalcode.shared.parallelcoord.layout.Layout.Node;
  * 
  * Where obj.size = sum(col.sizes)
  * 
+ * TODO: generalize to non-numeric features and scales.
+ * 
  * @author Erich Schubert
+ * 
+ * @param <O> Object type
  */
-class Parallel3DRenderer {
+class Parallel3DRenderer<O extends NumberVector<?>> {
   /**
    * Logging class.
    */
@@ -76,7 +80,7 @@ class Parallel3DRenderer {
   /**
    * Shared data.
    */
-  Shared shared;
+  Shared<O> shared;
 
   /**
    * Prerendered textures.
@@ -118,7 +122,7 @@ class Parallel3DRenderer {
    * 
    * @param shared Shared data.
    */
-  protected Parallel3DRenderer(Shared shared) {
+  protected Parallel3DRenderer(Shared<O> shared) {
     super();
     this.shared = shared;
     this.dindex = new int[shared.dim];
@@ -304,10 +308,10 @@ class Parallel3DRenderer {
         FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
         int p = 0;
         for (DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p++) {
-          final NumberVector<?> vec = shared.rel.get(it);
+          final O vec = shared.rel.get(it);
           final int c = (csp.getStyleForDBID(it) - mincolor) * 3;
           final float v1 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
-          final float v2 = (float) shared.proj.fastProjectDataToRenderSpace(shared.rel.get(it).doubleValue(e.dim2), e.dim2);
+          final float v2 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim2), e.dim2);
           vertices.put(0.f);
           vertices.put(v1);
           vertices.put(colors[c]);
@@ -337,9 +341,9 @@ class Parallel3DRenderer {
         FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
         int p = 0;
         for (DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p++) {
-          final NumberVector<?> vec = shared.rel.get(it);
+          final O vec = shared.rel.get(it);
           final float v1 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
-          final float v2 = (float) shared.proj.fastProjectDataToRenderSpace(shared.rel.get(it).doubleValue(e.dim2), e.dim2);
+          final float v2 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim2), e.dim2);
           vertices.put(0.f);
           vertices.put(v1);
           vertices.put(1.f);

@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
 import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.shared.parallelcoord.layout.Layout.Edge;
@@ -46,38 +45,37 @@ import experimentalcode.shared.parallelcoord.layout.Layout.Edge;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layouter3DPC<NumberVector<?>> {
+public abstract class AbstractLayout3DPC<N extends Layout.Node> implements SimilarityBasedLayouter3DPC<NumberVector<?>> {
   /**
    * Similarity measure
    */
-  DimensionSimilarity<NumberVector<?>> sim = CovarianceDimensionSimilarity.STATIC;
+  DimensionSimilarity<? super NumberVector<?>> sim = CovarianceDimensionSimilarity.STATIC;
 
   /**
    * Constructor.
    * 
    * @param sim Similarity measure
    */
-  public AbstractLayout3DPC(DimensionSimilarity<NumberVector<?>> sim) {
+  public AbstractLayout3DPC(DimensionSimilarity<? super NumberVector<?>> sim) {
     super();
     this.sim = sim;
   }
-  
+
+  @Override
+  public DimensionSimilarity<? super NumberVector<?>> getSimilarity() {
+    return sim;
+  }
+
   @Override
   public Layout layout(Database database, Relation<? extends NumberVector<?>> rel) {
     int dim = RelationUtil.dimensionality(rel);
     DimensionSimilarityMatrix mat = DimensionSimilarityMatrix.make(dim);
     sim.computeDimensionSimilarites(database, rel, rel.getDBIDs(), mat);
-    return process(dim, mat);
+    return layout(dim, mat);
   }
 
-  /**
-   * Main analysis method.
-   * 
-   * @param dim Dimensionality
-   * @param mat Similarity matrix
-   * @return Layout
-   */
-  abstract Layout process(final int dim, DimensionSimilarityMatrix mat);
+  @Override
+  public abstract Layout layout(final int dim, DimensionSimilarityMatrix mat);
 
   /**
    * Build the minimum spanning tree.
@@ -282,11 +280,6 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**
-     * Option for similarity measure.
-     */
-    public static final OptionID SIM_ID = new OptionID("parallel3d.sim", "Similarity measure for spanning tree.");
-
-    /**
      * Similarity measure
      */
     DimensionSimilarity<NumberVector<?>> sim;
@@ -300,5 +293,4 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
       }
     }
   }
-
 }

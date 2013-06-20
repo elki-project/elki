@@ -67,7 +67,7 @@ public class CompactCircularMSTLayout extends AbstractLayout3DPC<CompactCircular
   }
 
   @Override
-  Layout process(int dim, DimensionSimilarityMatrix mat) {
+  public Layout layout(int dim, DimensionSimilarityMatrix mat) {
     Layout l = new Layout();
     Node rootnode = buildSpanningTree(mat, l);
     int maxdepth = maxDepth(rootnode);

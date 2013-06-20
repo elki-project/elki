@@ -67,7 +67,7 @@ public class SimpleCircularMSTLayout extends AbstractLayout3DPC<SimpleCircularMS
   }
 
   @Override
-  Layout process(int dim, DimensionSimilarityMatrix mat) {
+  public Layout layout(int dim, DimensionSimilarityMatrix mat) {
     Layout l = new Layout();
     Node rootnode = buildSpanningTree(mat, l);
     int maxdepth = maxDepth(rootnode);
