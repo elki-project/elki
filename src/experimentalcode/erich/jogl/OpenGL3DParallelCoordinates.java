@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
+import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -64,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -73,9 +75,9 @@ import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import experimentalcode.erich.jogl.Simple1DOFCamera.CameraListener;
-import experimentalcode.shared.parallelcoord.layout.AbstractLayout3DPC;
 import experimentalcode.shared.parallelcoord.layout.Layout;
 import experimentalcode.shared.parallelcoord.layout.Layouter3DPC;
+import experimentalcode.shared.parallelcoord.layout.SimilarityBasedLayouter3DPC;
 import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
 
 /**
@@ -83,11 +85,15 @@ import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
  * 
  * TODO: Improve generics of Layout3DPC.
  * 
+ * TODO: Generalize to multiple relations and non-numeric feature vectors.
+ * 
  * FIXME: proper depth-sorting of edges. It's not that simple, unfortunately.
  * 
  * @author Erich Schubert
+ * 
+ * @param <O> Object type
  */
-public class OpenGL3DParallelCoordinates implements ResultHandler {
+public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements ResultHandler {
   /**
    * Logging class.
    */
@@ -96,14 +102,14 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
   /**
    * Settings
    */
-  Settings settings = new Settings();
+  Settings<O> settings = new Settings<>();
 
   /**
    * Constructor.
    * 
    * @param layout Layout
    */
-  public OpenGL3DParallelCoordinates(Layouter3DPC<? super NumberVector<?>> layout) {
+  public OpenGL3DParallelCoordinates(Layouter3DPC<? super O> layout) {
     settings.layout = layout;
   }
 
@@ -116,10 +122,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         continue;
       }
       @SuppressWarnings("unchecked")
-      Relation<? extends NumberVector<?>> vrel = (Relation<? extends NumberVector<?>>) rel;
+      Relation<? extends O> vrel = (Relation<? extends O>) rel;
       ScalesResult scales = ResultUtil.getScalesResult(vrel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
-      new Instance(vrel, proj, settings, style).run();
+      new Instance<>(vrel, proj, settings, style).run();
     }
   }
 
@@ -150,12 +156,19 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
    * Class keeping the visualizer settings.
    * 
    * @author Erich Schubert
+   * 
+   * @param <O> Object type
    */
-  public static class Settings {
+  public static class Settings<O> {
+    /**
+     * Similarity measure in use.
+     */
+    public DimensionSimilarity<? super O> sim;
+
     /**
      * Layouting method.
      */
-    public Layouter3DPC<? super NumberVector<?>> layout;
+    public Layouter3DPC<? super O> layout;
 
     /**
      * Line width.
@@ -182,8 +195,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
    * Visualizer instance.
    * 
    * @author Erich Schubert
+   * 
+   * @param <O> Object type
    */
-  public static class Instance implements GLEventListener {
+  public static class Instance<O extends NumberVector<?>> implements GLEventListener {
     /**
      * Flag to enable debug rendering.
      */
@@ -202,7 +217,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     /**
      * 3D parallel coordinates renderer.
      */
-    private Parallel3DRenderer prenderer;
+    private Parallel3DRenderer<O> prenderer;
 
     /**
      * The OpenGL canvas
@@ -247,16 +262,23 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       MENU, // Menu open
     }
 
-    protected static class Shared {
+    /**
+     * Shared data for visualization modules.
+     * 
+     * @author Erich Schubert
+     * 
+     * @param <O> Relation data type
+     */
+    protected static class Shared<O> {
       /**
        * Dimensionality.
        */
       int dim;
 
       /**
-       * Relation to viualize
+       * Relation to visualize
        */
-      Relation<? extends NumberVector<?>> rel;
+      Relation<? extends O> rel;
 
       /**
        * Axis labels
@@ -281,7 +303,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       /**
        * Settings
        */
-      Settings settings;
+      Settings<O> settings;
 
       /**
        * Camera handling class
@@ -293,9 +315,13 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
        */
       TextRenderer textrenderer;
 
+      /**
+       * Current similarity matrix.
+       */
+      DimensionSimilarityMatrix mat;
     };
 
-    Shared shared = new Shared();
+    Shared<O> shared = new Shared<>();
 
     /**
      * Constructor.
@@ -305,7 +331,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
      * @param settings Settings
      * @param style Style result
      */
-    public Instance(Relation<? extends NumberVector<?>> rel, ProjectionParallel proj, Settings settings, StyleResult style) {
+    public Instance(Relation<? extends O> rel, ProjectionParallel proj, Settings<O> settings, StyleResult style) {
       super();
 
       this.shared.dim = RelationUtil.dimensionality(rel);
@@ -316,13 +342,13 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       // Labels:
       this.shared.labels = new String[this.shared.dim];
       {
-        VectorFieldTypeInformation<? extends NumberVector<?>> vrel = RelationUtil.assumeVectorField(rel);
+        VectorFieldTypeInformation<? extends O> vrel = RelationUtil.assumeVectorField(rel);
         for (int i = 0; i < this.shared.dim; i++) {
           this.shared.labels[i] = vrel.getLabel(i);
         }
       }
 
-      this.prenderer = new Parallel3DRenderer(shared);
+      this.prenderer = new Parallel3DRenderer<>(shared);
       this.menuOverlay = new SimpleMenuOverlay() {
         @Override
         void menuItemClicked(int item) {
@@ -374,9 +400,15 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     @SuppressWarnings("unchecked")
     protected void relayout(String simname) {
       try {
-        ListParameterization params = new ListParameterization();
-        params.addParameter(AbstractLayout3DPC.Parameterizer.SIM_ID, simname);
-        shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout.class, params);
+        final Class<?> simc = InspectionUtil.findImplementation(DimensionSimilarity.class, simname);
+        shared.settings.sim = ClassGenericsUtil.tryInstantiate(DimensionSimilarity.class, simc, new EmptyParameterization());
+        if (!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
+          ListParameterization params = new ListParameterization();
+          params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
+          shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout.class, params);
+        }
+        // Clear similarity matrix:
+        shared.mat = null;
         switchState(State.PREPARATION);
         startLayoutThread();
       } catch (Exception e) {
@@ -389,8 +421,22 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       new Thread() {
         @Override
         public void run() {
-          final Layout newlayout = shared.settings.layout.layout(shared.rel.getDatabase(), shared.rel);
-          setLayout(newlayout);
+          if (shared.settings.sim != null && shared.settings.layout instanceof SimilarityBasedLayouter3DPC) {
+            @SuppressWarnings("unchecked")
+            final SimilarityBasedLayouter3DPC<O> layouter = (SimilarityBasedLayouter3DPC<O>) shared.settings.layout;
+            if (shared.mat == null) {
+              LOG.debug("Recomputing similarity matrix.");
+              shared.mat = DimensionSimilarityMatrix.make(shared.dim);
+              shared.settings.sim.computeDimensionSimilarites(shared.rel.getDatabase(), shared.rel, shared.rel.getDBIDs(), shared.mat);
+            }
+            LOG.debug("Recomputing layout using similarity matrix.");
+            final Layout newlayout = layouter.layout(shared.dim, shared.mat);
+            setLayout(newlayout);
+          } else {
+            LOG.debug("Recomputing layout.");
+            final Layout newlayout = shared.settings.layout.layout(shared.rel.getDatabase(), shared.rel);
+            setLayout(newlayout);
+          }
         }
       }.start();
     }
@@ -551,8 +597,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Option for layouting method
      */
@@ -561,20 +609,20 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     /**
      * Similarity measure
      */
-    Layouter3DPC<? super NumberVector<?>> layout;
+    Layouter3DPC<O> layout;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Layouter3DPC<? super NumberVector<?>>> layoutP = new ObjectParameter<>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout.class);
+      ObjectParameter<Layouter3DPC<O>> layoutP = new ObjectParameter<>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout.class);
       if (config.grab(layoutP)) {
         layout = layoutP.instantiateClass(config);
       }
     }
 
     @Override
-    protected OpenGL3DParallelCoordinates makeInstance() {
-      return new OpenGL3DParallelCoordinates(layout);
+    protected OpenGL3DParallelCoordinates<O> makeInstance() {
+      return new OpenGL3DParallelCoordinates<>(layout);
     }
   }
 }

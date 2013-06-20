@@ -36,13 +36,13 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
  * 
  * @author Erich Schubert
  */
-public class MultidimensionalScalingLayout3DPC extends AbstractLayout3DPC<MultidimensionalScalingLayout3DPC.Node> {
+public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<MultidimensionalScalingMSTLayout3DPC.Node> {
   /**
    * Constructor.
    * 
    * @param sim Similarity measure
    */
-  public MultidimensionalScalingLayout3DPC(DimensionSimilarity<NumberVector<?>> sim) {
+  public MultidimensionalScalingMSTLayout3DPC(DimensionSimilarity<NumberVector<?>> sim) {
     super(sim);
   }
 
@@ -69,7 +69,7 @@ public class MultidimensionalScalingLayout3DPC extends AbstractLayout3DPC<Multid
   }
 
   @Override
-  Layout process(int dim, DimensionSimilarityMatrix mat) {
+  public Layout layout(int dim, DimensionSimilarityMatrix mat) {
     // Find maximum of |cij|
     double max = 0;
     for (int i = 0; i < dim; i++) {
@@ -148,8 +148,8 @@ public class MultidimensionalScalingLayout3DPC extends AbstractLayout3DPC<Multid
    */
   public static class Parameterizer extends AbstractLayout3DPC.Parameterizer {
     @Override
-    protected MultidimensionalScalingLayout3DPC makeInstance() {
-      return new MultidimensionalScalingLayout3DPC(sim);
+    protected MultidimensionalScalingMSTLayout3DPC makeInstance() {
+      return new MultidimensionalScalingMSTLayout3DPC(sim);
     }
   }
 }
