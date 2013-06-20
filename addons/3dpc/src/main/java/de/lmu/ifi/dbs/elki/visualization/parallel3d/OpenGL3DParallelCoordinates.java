@@ -1,4 +1,4 @@
-package experimentalcode.erich.jogl;
+package de.lmu.ifi.dbs.elki.visualization.parallel3d;
 
 /*
  This file is part of ELKI:
@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -69,16 +70,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layouter3DPC;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.SimilarityBasedLayouter3DPC;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.SimpleCircularMSTLayout3DPC;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Arcball1DOFAdapter;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Simple1DOFCamera;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Simple1DOFCamera.CameraListener;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.SimpleMenuOverlay;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.SimpleMessageOverlay;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
-import experimentalcode.erich.jogl.Simple1DOFCamera.CameraListener;
-import experimentalcode.shared.parallelcoord.layout.Layout;
-import experimentalcode.shared.parallelcoord.layout.Layouter3DPC;
-import experimentalcode.shared.parallelcoord.layout.SimilarityBasedLayouter3DPC;
-import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
 
 /**
  * Simple JOGL2 based parallel coordinates visualization.
@@ -93,6 +98,7 @@ import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
  * 
  * @param <O> Object type
  */
+@Alias({ "3dpc", "3DPC" })
 public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements ResultHandler {
   /**
    * Logging class.
@@ -351,10 +357,10 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
       this.prenderer = new Parallel3DRenderer<>(shared);
       this.menuOverlay = new SimpleMenuOverlay() {
         @Override
-        void menuItemClicked(int item) {
+        public void menuItemClicked(int item) {
           if (item >= 0) {
-            LOG.debug("Relayout chosen: " + menuOverlay.options.get(item));
-            relayout(menuOverlay.options.get(item));
+            LOG.debug("Relayout chosen: " + menuOverlay.getOptions().get(item));
+            relayout(menuOverlay.getOptions().get(item));
           } else {
             closeMenu();
           }
@@ -375,7 +381,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
 
       // Init menu for SIGMOD demo. TODO: make more flexible.
       for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(DimensionSimilarity.class)) {
-        menuOverlay.options.add(clz.getSimpleName());
+        menuOverlay.getOptions().add(clz.getSimpleName());
       }
 
       GLProfile glp = GLProfile.getDefault();
@@ -405,7 +411,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
         if (!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
           ListParameterization params = new ListParameterization();
           params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
-          shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout.class, params);
+          shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class, params);
         }
         // Clear similarity matrix:
         shared.mat = null;
@@ -421,6 +427,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
       new Thread() {
         @Override
         public void run() {
+          messageOverlay.setMessage("Computing axis similarities and layout...");
           if (shared.settings.sim != null && shared.settings.layout instanceof SimilarityBasedLayouter3DPC) {
             @SuppressWarnings("unchecked")
             final SimilarityBasedLayouter3DPC<O> layouter = (SimilarityBasedLayouter3DPC<O>) shared.settings.layout;
@@ -545,6 +552,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
           // Request a repaint, to generate the next texture.
           canvas.repaint();
         }
+        messageOverlay.setMessage("Texture rendering complete.");
         if (res == 2) {
           switchState(State.EXPLORE);
         }
@@ -563,7 +571,6 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
         menuOverlay.render(gl);
       }
       if (State.PREPARATION.equals(state)) {
-        messageOverlay.message = "Preparing ...";
         messageOverlay.render(gl);
       }
     }
@@ -578,7 +585,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
         @Override
         public void run() {
           shared.layout = newlayout;
-          prenderer.forgetTextures(canvas.getGL());
+          prenderer.forgetTextures(null);
+          messageOverlay.setMessage("Rendering Textures.");
           canvas.repaint();
         }
       });
@@ -614,7 +622,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Layouter3DPC<O>> layoutP = new ObjectParameter<>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout.class);
+      ObjectParameter<Layouter3DPC<O>> layoutP = new ObjectParameter<>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class);
       if (config.grab(layoutP)) {
         layout = layoutP.instantiateClass(config);
       }

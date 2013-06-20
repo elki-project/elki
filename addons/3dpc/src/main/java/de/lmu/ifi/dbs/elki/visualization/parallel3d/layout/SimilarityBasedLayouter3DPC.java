@@ -1,4 +1,4 @@
-package experimentalcode.shared.parallelcoord.layout;
+package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
 
 /*
  This file is part of ELKI:
@@ -22,27 +22,36 @@ package experimentalcode.shared.parallelcoord.layout;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
+import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
- * Arrange parallel coordinates on a 2D plane, for 3D parallel coordinates.
+ * Similarity based layouting algorithms.
  * 
  * @author Erich Schubert
  * 
- * @param <V> Object type
+ * @param <V> Data type
  */
-public interface Layouter3DPC<V> extends Parameterizable {
+public interface SimilarityBasedLayouter3DPC<V> extends Layouter3DPC<V> {
   /**
-   * Run the layouting algorithm.
-   * 
-   * @param database Database to use
-   * @param rel Relation to use
-   * 
-   * @return Layout, nodes indexed by dimension.
+   * Option for similarity measure.
    */
-  Layout layout(Database database, Relation<? extends V> rel);
+  public static final OptionID SIM_ID = new OptionID("parallel3d.sim", "Similarity measure for spanning tree.");
+
+  /**
+   * Get the similarity measure to use.
+   * 
+   * @return Similarity measure.
+   */
+  DimensionSimilarity<? super V> getSimilarity();
+
+  /**
+   * Main analysis method.
+   * 
+   * @param dim Dimensionality
+   * @param mat Similarity matrix
+   * @return Layout
+   */
+  Layout layout(final int dim, DimensionSimilarityMatrix mat);
 }
