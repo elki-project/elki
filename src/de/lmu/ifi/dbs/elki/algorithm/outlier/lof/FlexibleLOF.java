@@ -169,23 +169,6 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
   }
 
   /**
-   * Constructor.
-   * 
-   * Uses the same distance function for neighborhood computation and
-   * reachability distance (standard as in the original publication), same as
-   * {@link #LOF(int, DistanceFunction, DistanceFunction) LOF(int,
-   * distanceFunction, distanceFunction)}.
-   * 
-   * @param k the value of k
-   * @param distanceFunction the distance function
-   * @deprecated Use {@link LOF} instead, which is the original LOF.
-   */
-  @Deprecated
-  public FlexibleLOF(int k, DistanceFunction<? super O, D> distanceFunction) {
-    this(k, k, distanceFunction, distanceFunction);
-  }
-
-  /**
    * Performs the Generalized LOF algorithm on the given database by calling
    * {@link #doRunInTime}.
    * 
