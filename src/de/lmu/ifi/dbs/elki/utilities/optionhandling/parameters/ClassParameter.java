@@ -27,7 +27,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -51,16 +50,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // TODO: add additional constructors with parameter constraints.
 // TODO: turn restrictionClass into a constraint?
 public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
-  /**
-   * Class loader.
-   */
-  protected static final ClassLoader loader = ClassLoader.getSystemClassLoader();
-
-  /**
-   * Factory class postfix.
-   */
-  public static final String FACTORY_POSTFIX = "$Factory";
-
   /**
    * The restriction class for this class parameter.
    */
@@ -133,49 +122,12 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
       return (Class<? extends C>) obj;
     }
     if (obj instanceof String) {
-      return parseClassString((String) obj);
-    }
-    throw new WrongParameterValueException(this, obj.toString(), "Class not found for given value. Must be a subclass / implementation of " + restrictionClass.getName());
-  }
-
-  @SuppressWarnings("unchecked")
-  protected Class<? extends C> parseClassString(String value) throws WrongParameterValueException {
-    // Try exact class factory first.
-    try {
-      return (Class<? extends C>) loader.loadClass(value + FACTORY_POSTFIX);
-    } catch (ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    try {
-      return (Class<? extends C>) loader.loadClass(value);
-    } catch (ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    // Try factory for guessed name next
-    try {
-      return (Class<? extends C>) loader.loadClass(restrictionClass.getPackage().getName() + "." + value + FACTORY_POSTFIX);
-    } catch (ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    // Last try: guessed name prefix only
-    try {
-      return (Class<? extends C>) loader.loadClass(restrictionClass.getPackage().getName() + "." + value);
-    } catch (ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    // Try aliases:
-    for (Class<?> c : getKnownImplementations()) {
-      if (c.isAnnotationPresent(Alias.class)) {
-        Alias aliases = c.getAnnotation(Alias.class);
-        for (String alias : aliases.value()) {
-          if (alias.equalsIgnoreCase(value)) {
-            return (Class<? extends C>) c;
-          }
-        }
+      Class<? extends C> clz = InspectionUtil.findImplementation(restrictionClass, (String) obj);
+      if (clz != null) {
+        return clz;
       }
     }
-    // Fail.
-    throw new WrongParameterValueException(this, value, "Given class \"" + value + "\" not found.");
+    throw new WrongParameterValueException(this, obj.toString(), "Class not found for given value. Must be a subclass / implementation of " + restrictionClass.getName());
   }
 
   /**
@@ -348,9 +300,9 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
    */
   public static String canonicalClassName(Class<?> c, Class<?> parent) {
     if (parent == null) {
-      return canonicalClassName(c, null, FACTORY_POSTFIX);
+      return canonicalClassName(c, null, InspectionUtil.FACTORY_POSTFIX);
     }
-    return canonicalClassName(c, parent.getPackage(), FACTORY_POSTFIX);
+    return canonicalClassName(c, parent.getPackage(), InspectionUtil.FACTORY_POSTFIX);
   }
 
   @Override

@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -53,6 +52,11 @@ public class InspectionUtil {
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(InspectionUtil.class);
+
+  /**
+   * Class loader
+   */
+  private static final ClassLoader CLASSLOADER = ClassLoader.getSystemClassLoader();
 
   /**
    * Default package ignores.
@@ -74,6 +78,8 @@ public class InspectionUtil {
   "spin.", "osxadapter.", "antlr.", "ca.odell.", "com.jgoodies.", "com.michaelbaranov.", "com.mysql.", "gnu.dtools.", "net.sf.ext.", "net.sf.jabref.", "org.antlr.", "org.gjt.", "org.java.plugin.", "org.jempbox.", "org.pdfbox.", "wsi.ra.",
       // GNU trove
   "gnu.trove.",
+      // Java OpenGL
+  "jogamp.", "com.jogamp.", "javax.media.", "jogl.util."
   //
   };
 
@@ -82,6 +88,11 @@ public class InspectionUtil {
    * extensions.
    */
   public static final boolean NONSTATIC_CLASSPATH;
+
+  /**
+   * Factory class postfix.
+   */
+  public static final String FACTORY_POSTFIX = "$Factory";
 
   // Check for non-jar entries in classpath.
   static {
@@ -170,6 +181,54 @@ public class InspectionUtil {
   }
 
   /**
+   * Find an implementation of the given interface / super class, given a
+   * relative class name or alias name.
+   * 
+   * @param restrictionClass Restriction class
+   * @param value Class name, relative class name, or nickname.
+   * @return Class found or {@code null}
+   */
+  @SuppressWarnings("unchecked")
+  public static <C> Class<? extends C> findImplementation(Class<? super C> restrictionClass, String value) {
+    // Try exact class factory first.
+    try {
+      return (Class<? extends C>) CLASSLOADER.loadClass(value + FACTORY_POSTFIX);
+    } catch (ClassNotFoundException e) {
+      // Ignore, retry
+    }
+    try {
+      return (Class<? extends C>) CLASSLOADER.loadClass(value);
+    } catch (ClassNotFoundException e) {
+      // Ignore, retry
+    }
+    final String completedName = restrictionClass.getPackage().getName() + "." + value;
+    // Try factory for guessed name next
+    try {
+      return (Class<? extends C>) CLASSLOADER.loadClass(completedName + FACTORY_POSTFIX);
+    } catch (ClassNotFoundException e) {
+      // Ignore, retry
+    }
+    // Last try: guessed name prefix only
+    try {
+      return (Class<? extends C>) CLASSLOADER.loadClass(completedName);
+    } catch (ClassNotFoundException e) {
+      // Ignore, retry
+    }
+    // Try aliases:
+    for (Class<?> c : InspectionUtil.cachedFindAllImplementations(restrictionClass)) {
+      if (c.isAnnotationPresent(Alias.class)) {
+        Alias aliases = c.getAnnotation(Alias.class);
+        for (String alias : aliases.value()) {
+          if (alias.equalsIgnoreCase(value) || alias.equalsIgnoreCase(completedName)) {
+            return (Class<? extends C>) c;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
    * Perform a full (slow) scan for classes.
    * 
    * @return List with the scan result
@@ -177,8 +236,7 @@ public class InspectionUtil {
   private static List<Class<?>> slowScan() {
     ArrayList<Class<?>> res = new ArrayList<>();
     try {
-      ClassLoader cl = ClassLoader.getSystemClassLoader();
-      Enumeration<URL> cps = cl.getResources("");
+      Enumeration<URL> cps = CLASSLOADER.getResources("");
       while (cps.hasMoreElements()) {
         URL u = cps.nextElement();
         // Scan file sources only.
@@ -187,7 +245,7 @@ public class InspectionUtil {
           while (it.hasNext()) {
             String classname = it.next();
             try {
-              Class<?> cls = cl.loadClass(classname);
+              Class<?> cls = CLASSLOADER.loadClass(classname);
               // skip classes where we can't get a full name.
               if (cls.getCanonicalName() == null) {
                 continue;
@@ -222,7 +280,7 @@ public class InspectionUtil {
   static class DirClassIterator implements Iterator<String> {
     private static final String CLASS_EXT = ".class";
 
-    private static final String FACTORY_FILE_EXT = ClassParameter.FACTORY_POSTFIX + CLASS_EXT;
+    private static final String FACTORY_FILE_EXT = FACTORY_POSTFIX + CLASS_EXT;
 
     private static final int CLASS_EXT_LENGTH = CLASS_EXT.length();
 
