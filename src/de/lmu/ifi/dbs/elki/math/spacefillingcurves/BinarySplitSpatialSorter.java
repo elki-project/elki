@@ -71,7 +71,7 @@ public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
    * @param start Interval start
    * @param end Interval end (exclusive)
    * @param depth Recursion depth
-   * @param numdims Number of dimensions
+   * @param numdim Number of dimensions
    * @param dims Dimension indexes to sort by.
    * @param comp Comparator to use
    * @param <T> Object type
