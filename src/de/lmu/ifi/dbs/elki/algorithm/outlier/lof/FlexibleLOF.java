@@ -86,14 +86,15 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * The k nearest neighbors are determined using the parameter
  * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}
  * , while the reference set used in reachability distance computation is
- * configured using {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.
+ * configured using {@link Parameterizer#REACHABILITY_DISTANCE_FUNCTION_ID}.
  * </p>
  * 
  * <p>
- * The original LOF parameter was called &quot;minPts&quot;. Since kNN queries
- * in ELKI have slightly different semantics - exactly k neighbors are returned
- * - we chose to rename the parameter to {@link #K_ID} ({@code -lof.k}) to
- * reflect this difference.
+ * The original LOF parameter was called &quot;minPts&quot;. For consistency
+ * with the name "kNN query", we chose to rename the parameter to {@code k}.
+ * Flexible LOF allows you to set the two values different, which yields the
+ * parameters {@link Parameterizer#KREF_ID} ({@code -lof.krefer}) and
+ * {@link Parameterizer#KREACH_ID} ({@code -lof.kreach})
  * </p>
  * 
  * <p>
@@ -185,8 +186,8 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
   }
 
   /**
-   * Performs the Generalized LOF algorithm on the given database by
-   * calling {@link #doRunInTime}.
+   * Performs the Generalized LOF algorithm on the given database by calling
+   * {@link #doRunInTime}.
    * 
    * @param database Database to query
    * @param relation Data to process
@@ -601,7 +602,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
       if (config.grab(pK)) {
         krefer = pK.intValue();
       }
-      
+
       final IntParameter pK2 = new IntParameter(KREACH_ID);
       pK2.setOptional(true);
       pK2.addConstraint(new GreaterConstraint(1));

@@ -101,7 +101,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
   private static final Logging LOG = Logging.getLogger(LOF.class);
 
   /**
-   * Holds the value of {@link #K_ID}.
+   * Holds the value of {@link Parameterizer#K_ID}.
    */
   protected int k = 2;
 
@@ -117,8 +117,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
   }
 
   /**
-   * Performs the Generalized LOF_SCORE algorithm on the given database by
-   * calling {@link #doRunInTime}.
+   * Performs the Generalized LOF_SCORE algorithm on the given database.
    * 
    * @param database Database to query
    * @param relation Data to process
