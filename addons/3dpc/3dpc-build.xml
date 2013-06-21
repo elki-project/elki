@@ -15,7 +15,6 @@
 
 	<target name="init">
 		<!-- Create the build directory structure used by compile -->
-		<mkdir dir="${build}" />
 	</target>
 
 	<target name="compile" depends="init">
@@ -25,13 +24,8 @@
 			debuglevel="lines,vars,source" optimize="true" source="1.7" target="1.7">
 			<compilerarg value="-Xlint:all" />
 			<classpath>
-				<pathelement path="${elkibuild}" />
 				<pathelement path="${src}" />
-				<pathelement path="${elkiroot}/lib/batik-all-1.7.jar" />
-				<pathelement path="${elkiroot}/lib/xml-commons-external-1.4.01.jar" />
-				<pathelement path="${elkiroot}/lib/xml-commons-external-1.4.01-ext.jar" />
-				<pathelement path="${elkiroot}/lib/trove-3.0.3.jar" />
-				<pathelement path="${elkiroot}/lib/junit-4.8.1.jar" />
+				<pathelement path="${elkiroot}/elki.jar" />
 				<!-- YOU MAY NEED TO INSTALL THESE FOR BUILDING -->
 				<pathelement path="${elkiroot}/lib/gluegen2-rt.jar" />
 				<pathelement path="${elkiroot}/lib/jogl2.jar" />
@@ -40,30 +34,25 @@
 	</target>
 
 	<target name="install" depends="init">
+		<!-- Install resources. -->
 		<copy todir="${build}">
-			<fileset dir="${src}">
-				<include name="**/*.java" />
-			</fileset>
 			<fileset dir="${resources}">
+				<include name="*.CMD" />
+				<include name="*.txt" />
 				<include name="META-INF/elki/*" />
 			</fileset>
 		</copy>
-	</target>
-
-	<target name="updateservices" depends="compile, install">
-		<java dir="${build}" classname="${elki}.application.internal.CheckELKIServices"
-			fork="true">
-			<classpath>
-				<pathelement path="${elkiroot}/lib/batik-all-1.7.jar" />
-				<pathelement path="${elkiroot}/lib/xml-commons-external-1.4.01.jar" />
-				<pathelement path="${elkiroot}/lib/xml-commons-external-1.4.01-ext.jar" />
-				<pathelement path="${elkiroot}/lib/trove-3.0.3.jar" />
-				<pathelement path="${elkiroot}/lib/junit-4.8.1.jar" />
-				<pathelement path="${build}" />
-			</classpath>
-			<!-- <arg value="-update" /> -->
-			<arg value="-all" />
-		</java>
+		<fixcrlf srcDir="${build}" includes="*.CMD" eol="dos" />
+		<!-- Include source code: -->
+		<mkdir dir="${build}/src" />
+		<copy todir="${build}/src">
+			<fileset dir="${3dpc}/src">
+				<include name="**/*.java" />
+				<include name="**/*.txt" />
+				<include name="**/*build.xml" />
+				<include name="**/META-INF/elki/*" />
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="jar" depends="compile, install">
