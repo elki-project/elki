@@ -121,6 +121,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    boolean nonefound = true;
     StyleResult style = getStyleResult(baseResult);
     List<Relation<?>> rels = ResultUtil.getRelations(newResult);
     for (Relation<?> rel : rels) {
@@ -132,6 +133,10 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
       ScalesResult scales = ResultUtil.getScalesResult(vrel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
       new Instance<>(vrel, proj, settings, style).run();
+      nonefound = false;
+    }
+    if (nonefound && baseResult.equals(newResult)) {
+      LOG.warning("3DPC did not find a number vector field relation to visualize!");
     }
   }
 
