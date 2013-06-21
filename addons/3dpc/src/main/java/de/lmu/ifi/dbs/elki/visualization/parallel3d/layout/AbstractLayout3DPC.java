@@ -287,7 +287,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DimensionSimilarity<NumberVector<?>>> simP = new ObjectParameter<>(SIM_ID, DimensionSimilarity.class);
+      ObjectParameter<DimensionSimilarity<NumberVector<?>>> simP = new ObjectParameter<>(SIM_ID, DimensionSimilarity.class, CovarianceDimensionSimilarity.class);
       if (config.grab(simP)) {
         sim = simP.instantiateClass(config);
       }
