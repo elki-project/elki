@@ -480,13 +480,14 @@ class Parallel3DRenderer<O extends NumberVector<?>> {
 
     shared.textrenderer.setColor(0.0f, 0.0f, 0.0f, 1.0f);
     float defaultscale = .01f / (float) Math.sqrt(shared.dim);
-    float targetwidth = .2f; // TODO: div depth?
+    final float targetwidth = .2f; // TODO: div depth?
+    final float minratio = 8.f; // Assume all text is at least this width
     for (int i = 0; i < shared.dim; i++) {
       if (shared.labels[i] != null) {
         Rectangle2D b = shared.textrenderer.getBounds(shared.labels[i]);
         float scale = defaultscale;
-        if (b.getWidth() * scale > targetwidth) {
-          scale = targetwidth / (float) b.getWidth();
+        if (Math.max(b.getWidth(), b.getHeight() * minratio) * scale > targetwidth) {
+          scale = targetwidth / (float) Math.max(b.getWidth(), b.getHeight() * minratio);
         }
         float w = (float) b.getWidth() * scale;
         // Rotate manually, in x-z plane
