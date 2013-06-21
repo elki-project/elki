@@ -314,7 +314,7 @@ class Parallel3DRenderer<O extends NumberVector<?>> {
         ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
         FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
         int p = 0;
-        for (DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p++) {
+        for (DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p += 2) {
           final O vec = shared.rel.get(it);
           final int c = (csp.getStyleForDBID(it) - mincolor) * 3;
           final float v1 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
@@ -347,7 +347,7 @@ class Parallel3DRenderer<O extends NumberVector<?>> {
         ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
         FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
         int p = 0;
-        for (DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p++) {
+        for (DBIDIter it = shared.rel.iterDBIDs(); it.valid(); it.advance(), p += 2) {
           final O vec = shared.rel.get(it);
           final float v1 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim1), e.dim1);
           final float v2 = (float) shared.proj.fastProjectDataToRenderSpace(vec.doubleValue(e.dim2), e.dim2);
