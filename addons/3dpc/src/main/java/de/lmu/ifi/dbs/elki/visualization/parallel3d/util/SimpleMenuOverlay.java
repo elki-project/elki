@@ -72,8 +72,11 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
     double maxwidth = 0.;
     Rectangle2D[] bounds = new Rectangle2D[numopt];
     for (int i = 0; i < numopt; i++) {
-      bounds[i] = renderer.getBounds(getOptions().get(i));
-      maxwidth = Math.max(bounds[i].getWidth(), maxwidth);
+      final String string = getOptions().get(i);
+      if (string != null) {
+        bounds[i] = renderer.getBounds(string);
+        maxwidth = Math.max(bounds[i].getWidth(), maxwidth);
+      }
     }
     final double padding = .5 * fontsize;
     final double margin = padding * .3;
@@ -85,6 +88,9 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
     gl.glBegin(GL2.GL_QUADS);
     gl.glColor4f(0f, 0f, 0f, .75f);
     for (int i = 0; i < numopt; i++) {
+      if (bounds[numopt - i - 1] == null) {
+        continue;
+      }
       final double pos = (height - totalheight) * .5 + fontsize * i + padding * i;
 
       // Render a background button:
@@ -100,6 +106,9 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
     renderer.setColor(1f, 1f, 1f, 1f);
     // NOTE: renderer uses (0,0) as BOTTOM left!
     for (int j = 0; j < numopt; j++) {
+      if (bounds[j] == null) {
+        continue;
+      }
       final int i = numopt - j - 1;
       // Extra offset .17 * fontsize because of text baseline!
       final double pos = (height - totalheight) * .5 + fontsize * i + padding * i + .17 * fontsize;
@@ -111,6 +120,10 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
 
   @Override
   public void mouseClicked(MouseEvent e) {
+    // close with right mouse button:
+    if (e.getButton() == MouseEvent.BUTTON3) {
+      menuItemClicked(-1);
+    }
     if (e.getButton() != MouseEvent.BUTTON1) {
       return;
     }
@@ -118,16 +131,19 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
 
     final int numopt = getOptions().size();
     double maxwidth = 0.;
-    Rectangle2D[] bounds = new Rectangle2D[numopt];
     for (int i = 0; i < numopt; i++) {
-      bounds[i] = renderer.getBounds(getOptions().get(i));
-      maxwidth = Math.max(bounds[i].getWidth(), maxwidth);
+      final String string = getOptions().get(i);
+      if (string != null) {
+        Rectangle2D bounds = renderer.getBounds(string);
+        maxwidth = Math.max(bounds.getWidth(), maxwidth);
+      }
     }
     final double padding = .5 * fontsize;
     final double margin = padding * .3;
     final float bx1 = (float) (.5 * (width - maxwidth - padding));
     final float bx2 = (float) (.5 * (width + maxwidth + padding));
     if (mx < bx1 || mx > bx2) {
+      menuItemClicked(-1);
       return;
     }
 
@@ -135,6 +151,7 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
     for (int i = 0; i < numopt; i++) {
       final double pos = (height - totalheight) * .5 + fontsize * i + padding * i;
       if (my < pos - margin) {
+        menuItemClicked(-1);
         return;
       }
       if (my < pos + fontsize + margin) {
@@ -142,6 +159,8 @@ public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements
         return;
       }
     }
+    // Otherwise, close.
+    menuItemClicked(-1);
   }
 
   /**

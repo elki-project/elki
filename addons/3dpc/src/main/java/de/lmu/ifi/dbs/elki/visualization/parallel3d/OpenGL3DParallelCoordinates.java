@@ -363,12 +363,17 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
       this.menuOverlay = new SimpleMenuOverlay() {
         @Override
         public void menuItemClicked(int item) {
-          if (item >= 0) {
-            LOG.debug("Relayout chosen: " + menuOverlay.getOptions().get(item));
-            relayout(menuOverlay.getOptions().get(item));
-          } else {
-            closeMenu();
+          if (item < 0) {
+            switchState(State.EXPLORE);
+            return;
           }
+          final String name = menuOverlay.getOptions().get(item);
+          if (name == null) {
+            switchState(State.EXPLORE);
+            return;
+          }
+          LOG.debug("Relayout chosen: " + name);
+          relayout(name);
         }
       };
       this.menuStarter = new MouseAdapter() {
@@ -385,8 +390,17 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
       this.messageOverlay = new SimpleMessageOverlay();
 
       // Init menu for SIGMOD demo. TODO: make more flexible.
-      for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(DimensionSimilarity.class)) {
-        menuOverlay.getOptions().add(clz.getSimpleName());
+      {
+        ArrayList<String> options = menuOverlay.getOptions();
+        for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(Layouter3DPC.class)) {
+          options.add(clz.getSimpleName());
+        }
+        if (options.size() > 0) {
+          options.add(null); // Spacer.
+        }
+        for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(DimensionSimilarity.class)) {
+          options.add(clz.getSimpleName());
+        }
       }
 
       GLProfile glp = GLProfile.getDefault();
@@ -409,23 +423,43 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
     }
 
     @SuppressWarnings("unchecked")
-    protected void relayout(String simname) {
+    protected void relayout(String parname) {
       try {
-        final Class<?> simc = InspectionUtil.findImplementation(DimensionSimilarity.class, simname);
-        shared.settings.sim = ClassGenericsUtil.tryInstantiate(DimensionSimilarity.class, simc, new EmptyParameterization());
-        if (!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
+        final Class<?> layoutc = InspectionUtil.findImplementation(Layouter3DPC.class, parname);
+        if (layoutc != null) {
           ListParameterization params = new ListParameterization();
-          params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
-          shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class, params);
+          if (shared.settings.sim != null) {
+            params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
+          }
+          shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, layoutc, params);
+          switchState(State.PREPARATION);
+          startLayoutThread();
+          return;
         }
-        // Clear similarity matrix:
-        shared.mat = null;
-        switchState(State.PREPARATION);
-        startLayoutThread();
       } catch (Exception e) {
         LOG.exception(e);
-        return;
+        // Try with Dimension Similarity instead.
       }
+      try {
+        final Class<?> simc = InspectionUtil.findImplementation(DimensionSimilarity.class, parname);
+        if (simc != null) {
+          shared.settings.sim = ClassGenericsUtil.tryInstantiate(DimensionSimilarity.class, simc, new EmptyParameterization());
+          if (!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
+            ListParameterization params = new ListParameterization();
+            params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
+            shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class, params);
+          }
+          // Clear similarity matrix:
+          shared.mat = null;
+          switchState(State.PREPARATION);
+          startLayoutThread();
+          return;
+        }
+      } catch (Exception e) {
+        LOG.exception(e);
+      }
+      // TODO: improve menu, to allow pretty names and map name -> class.
+      LOG.warning("Menu parameter did not map to a class name - wrong package?");
     }
 
     private void startLayoutThread() {
@@ -437,25 +471,20 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
             @SuppressWarnings("unchecked")
             final SimilarityBasedLayouter3DPC<O> layouter = (SimilarityBasedLayouter3DPC<O>) shared.settings.layout;
             if (shared.mat == null) {
-              LOG.debug("Recomputing similarity matrix.");
+              messageOverlay.setMessage("Recomputing similarity matrix.");
               shared.mat = DimensionSimilarityMatrix.make(shared.dim);
               shared.settings.sim.computeDimensionSimilarites(shared.rel.getDatabase(), shared.rel, shared.rel.getDBIDs(), shared.mat);
             }
-            LOG.debug("Recomputing layout using similarity matrix.");
+            messageOverlay.setMessage("Recomputing layout using similarity matrix.");
             final Layout newlayout = layouter.layout(shared.dim, shared.mat);
             setLayout(newlayout);
           } else {
-            LOG.debug("Recomputing layout.");
+            messageOverlay.setMessage("Recomputing layout.");
             final Layout newlayout = shared.settings.layout.layout(shared.rel.getDatabase(), shared.rel);
             setLayout(newlayout);
           }
         }
       }.start();
-    }
-
-    protected void closeMenu() {
-      // TODO: which state to return to?
-      state = State.EXPLORE;
     }
 
     public void run() {
@@ -557,8 +586,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
           // Request a repaint, to generate the next texture.
           canvas.repaint();
         }
-        messageOverlay.setMessage("Texture rendering complete.");
         if (res == 2) {
+          messageOverlay.setMessage("Texture rendering completed.");
           switchState(State.EXPLORE);
         }
       }
