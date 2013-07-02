@@ -48,7 +48,7 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   /**
    * The ids object
    */
-  private final DBIDs ids;
+  private DBIDs ids;
 
   /**
    * Constructor.
@@ -80,10 +80,9 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
 
   @Override
   public void delete(DBIDRef id) {
-    if(database instanceof UpdatableDatabase) {
+    if (database instanceof UpdatableDatabase) {
       ((UpdatableDatabase) database).delete(id);
-    }
-    else {
+    } else {
       throw new UnsupportedOperationException("Deletions are not supported.");
     }
   }
@@ -101,6 +100,15 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   @Override
   public DBIDIter iterDBIDs() {
     return ids.iter();
+  }
+
+  /**
+   * Set the DBIDs of the view.
+   * 
+   * @param ids IDs to use
+   */
+  public void setDBIDs(DBIDs ids) {
+    this.ids = DBIDUtil.makeUnmodifiable(ids);
   }
 
   @Override
