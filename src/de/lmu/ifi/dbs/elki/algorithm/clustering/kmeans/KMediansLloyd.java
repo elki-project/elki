@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -42,11 +41,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Provides the k-medians clustering algorithm, using Lloyd-style bulk
@@ -84,13 +78,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
     super(distanceFunction, k, maxiter, initializer);
   }
 
-  /**
-   * Run k-medians.
-   * 
-   * @param database Database
-   * @param relation relation to use
-   * @return result
-   */
+  @Override
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
     if (relation.size() <= 0) {
       return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
@@ -141,41 +129,10 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?>, D> {
-    /**
-     * k Parameter.
-     */
-    protected int k;
-
-    /**
-     * Maximum number of iterations.
-     */
-    protected int maxiter;
-
-    /**
-     * Initialization method.
-     */
-    protected KMeansInitialization<V> initializer;
-
+  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans.Parameterizer<V, D> {
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(kP)) {
-        k = kP.intValue();
-      }
-
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
-      if (config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
-
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0);
-      maxiterP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(maxiterP)) {
-        maxiter = maxiterP.intValue();
-      }
+    protected Logging getLogger() {
+      return LOG;
     }
 
     @Override
