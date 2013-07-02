@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,12 +23,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+
 /**
  * Some constants and options shared among kmeans family algorithms.
  * 
  * @author Erich Schubert
+ * 
+ * @param <V> Number vector type
+ * @param <D> Distance type
+ * @param <M> Actual model type
  */
-public interface KMeans {
+public interface KMeans<V extends NumberVector<?>, D extends Distance<?>, M extends MeanModel<V>> extends ClusteringAlgorithm<Clustering<M>>, DistanceBasedAlgorithm<V, D> {
   /**
    * Parameter to specify the initialization method
    */
@@ -52,4 +64,13 @@ public interface KMeans {
    * Parameter to specify the random generator seed.
    */
   public static final OptionID SEED_ID = new OptionID("kmeans.seed", "The random number generator seed.");
+
+  /**
+   * Run the clustering algorithm.
+   * 
+   * @param database Database to run on.
+   * @param rel Relation to process.
+   * @return Clustering result
+   */
+  Clustering<M> run(Database database, Relation<V> rel);
 }
