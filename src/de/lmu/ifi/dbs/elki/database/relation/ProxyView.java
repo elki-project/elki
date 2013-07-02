@@ -48,7 +48,7 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
   /**
    * The DBIDs we contain
    */
-  private final DBIDs idview;
+  private DBIDs idview;
 
   /**
    * The wrapped representation where we get the IDs from.
@@ -90,7 +90,7 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
     assert (idview.contains(id)) : "Accessing object not included in view.";
     return inner.get(id);
   }
-  
+
   @Override
   public void set(DBIDRef id, O val) {
     assert (idview.contains(id)) : "Accessing object not included in view.";
@@ -130,5 +130,14 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
   @Override
   public String getShortName() {
     return "partition";
+  }
+
+  /**
+   * Set the DBIDs to use.
+   * 
+   * @param ids DBIDs
+   */
+  public void setDBIDs(DBIDs ids) {
+    this.idview = ids;
   }
 }
