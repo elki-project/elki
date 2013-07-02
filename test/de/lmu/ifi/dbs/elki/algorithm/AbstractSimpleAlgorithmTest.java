@@ -78,10 +78,10 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param config Parameterization to test
    */
   protected void testParameterizationOk(ListParameterization config) {
-    if(config.hasUnusedParameters()) {
+    if (config.hasUnusedParameters()) {
       fail("Unused parameters: " + config.getRemainingParameters());
     }
-    if(config.hasErrors()) {
+    if (config.hasErrors()) {
       config.logAndClearReportedErrors();
       fail("Parameterization errors.");
     }
@@ -101,8 +101,8 @@ public abstract class AbstractSimpleAlgorithmTest {
 
     List<Class<?>> filterlist = new ArrayList<>();
     filterlist.add(FixedDBIDsFilter.class);
-    if(filters != null) {
-      for(Class<?> filter : filters) {
+    if (filters != null) {
+      for (Class<?> filter : filters) {
         filterlist.add(filter);
       }
     }
@@ -157,7 +157,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
     ct.process(clustering, rbl);
     double score = ct.getPaircount().f1Measure();
-    if(logger.isVerbose()) {
+    if (logger.isVerbose()) {
       logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
     }
     org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match.", expected, score, 0.0001);
@@ -171,7 +171,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    */
   protected void testClusterSizes(Clustering<?> clustering, int[] expected) {
     List<Integer> sizes = new java.util.ArrayList<>();
-    for(Cluster<?> cl : clustering.getAllClusters()) {
+    for (Cluster<?> cl : clustering.getAllClusters()) {
       sizes.add(cl.size());
     }
     // Sort both
@@ -181,8 +181,8 @@ public abstract class AbstractSimpleAlgorithmTest {
     // if(logger.isVerbose()) {
     StringBuilder buf = new StringBuilder();
     buf.append("Cluster sizes: [");
-    for(int i = 0; i < sizes.size(); i++) {
-      if(i > 0) {
+    for (int i = 0; i < sizes.size(); i++) {
+      if (i > 0) {
         buf.append(", ");
       }
       buf.append(sizes.get(i));
@@ -190,9 +190,9 @@ public abstract class AbstractSimpleAlgorithmTest {
     buf.append("]");
     // }
     // Test
-    org.junit.Assert.assertEquals("Number of clusters does not match expectations." + buf.toString(), expected.length, sizes.size());
-    for(int i = 0; i < expected.length; i++) {
-      org.junit.Assert.assertEquals("Cluster size does not match at position " + i, expected[i], (int) sizes.get(i));
+    org.junit.Assert.assertEquals("Number of clusters does not match expectations. " + buf.toString(), expected.length, sizes.size());
+    for (int i = 0; i < expected.length; i++) {
+      org.junit.Assert.assertEquals("Cluster size does not match at position " + i + " in " + buf.toString(), expected[i], (int) sizes.get(i));
     }
   }
 
@@ -210,7 +210,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     OutlierROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(OutlierROCCurve.class, params);
 
     // Ensure the result has been added to the hierarchy:
-    if(db.getHierarchy().numParents(result) < 1) {
+    if (db.getHierarchy().numParents(result) < 1) {
       db.getHierarchy().add(db, result);
     }
 

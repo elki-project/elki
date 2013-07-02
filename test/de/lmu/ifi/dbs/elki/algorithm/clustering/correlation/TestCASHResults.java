@@ -67,7 +67,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
     Clustering<Model> result = cash.run(db);
 
     testFMeasure(db, result, 0.490551); // with hierarchical pairs: 0.64102
-    testClusterSizes(result, new int[] { 13, 65, 74, 75, 442 });
+    testClusterSizes(result, new int[] { 37, 71, 76, 442 });
   }
 
   /**
