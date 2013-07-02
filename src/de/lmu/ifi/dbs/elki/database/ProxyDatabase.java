@@ -43,14 +43,9 @@ public class ProxyDatabase extends AbstractDatabase {
   private static final Logging LOG = Logging.getLogger(ProxyDatabase.class);
 
   /**
-   * Our DBIDs
-   */
-  final protected DBIDs ids;
-
-  /**
    * Our DBID representation
    */
-  final protected DBIDView idrep;
+  protected DBIDView idrep;
 
   /**
    * Constructor.
@@ -59,8 +54,7 @@ public class ProxyDatabase extends AbstractDatabase {
    */
   public ProxyDatabase(DBIDs ids) {
     super();
-    this.ids = ids;
-    this.idrep = new DBIDView(this, this.ids);
+    this.idrep = new DBIDView(this, ids);
     this.relations.add(idrep);
     this.addChildResult(idrep);
   }
@@ -73,11 +67,10 @@ public class ProxyDatabase extends AbstractDatabase {
    */
   public ProxyDatabase(DBIDs ids, Iterable<Relation<?>> relations) {
     super();
-    this.ids = ids;
-    this.idrep = new DBIDView(this, this.ids);
+    this.idrep = new DBIDView(this, ids);
     this.relations.add(idrep);
     this.addChildResult(idrep);
-    for(Relation<?> orel : relations) {
+    for (Relation<?> orel : relations) {
       Relation<?> relation = ProxyView.wrap(this, ids, orel);
       this.relations.add(relation);
       this.addChildResult(relation);
@@ -121,5 +114,14 @@ public class ProxyDatabase extends AbstractDatabase {
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  /**
+   * Set the DBIDs to use.
+   * 
+   * @param ids DBIDs to use
+   */
+  public void setDBIDs(DBIDs ids) {
+    this.idrep.setDBIDs(ids);
   }
 }
