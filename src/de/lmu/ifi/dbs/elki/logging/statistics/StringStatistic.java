@@ -36,6 +36,17 @@ public class StringStatistic extends AbstractStatistic {
 
   /**
    * Constructor.
+   *
+   * @param key Key
+   * @param val Value
+   */
+  public StringStatistic(String key, String val) {
+    super(key);
+    this.val = val;
+  }
+
+  /**
+   * Constructor.
    * 
    * @param key Key
    */

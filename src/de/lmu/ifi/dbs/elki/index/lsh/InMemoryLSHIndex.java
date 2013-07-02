@@ -52,9 +52,7 @@ import de.lmu.ifi.dbs.elki.index.lsh.hashfamilies.LocalitySensitiveHashFunctionF
 import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -196,15 +194,22 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         progress.ensureCompleted(LOG);
       }
       if (LOG.isStatistics()) {
-        Mean bmean = new Mean();
+        int min = Integer.MAX_VALUE, max = 0;
         for (int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
           for (TIntObjectIterator<DBIDs> iter = table.iterator(); iter.hasNext();) {
             iter.advance();
-            bmean.put(iter.value().size());
+            int size = iter.value().size();
+            if (size < min) {
+              min = size;
+            }
+            if (size > max) {
+              max = size;
+            }
           }
         }
-        LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".mean-fill", bmean.getMean()));
+        LOG.statistics(new LongStatistic(this.getClass().getName() + ".fill.min", max));
+        LOG.statistics(new LongStatistic(this.getClass().getName() + ".fill.max", min));
         LOG.statistics(new LongStatistic(this.getClass().getName() + ".hashtables", hashtables.size()));
       }
     }
