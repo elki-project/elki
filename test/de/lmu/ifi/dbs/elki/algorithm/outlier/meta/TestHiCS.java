@@ -60,8 +60,8 @@ public class TestHiCS extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     // run HiCS on database
     OutlierResult result = fb.run(db);
 
-    testAUC(db, "Noise", result, 0.9024537815126049);
-    testSingleScore(result, 1293, 5.0754391836);
+    testAUC(db, "Noise", result, 0.85340056);
+    testSingleScore(result, 1293, 4.935802);
   }
 
   @Test
@@ -82,7 +82,7 @@ public class TestHiCS extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     // run HiCS on database
     OutlierResult result = fb.run(db);
 
-    testAUC(db, "Noise", result, 0.6597983193);
-    testSingleScore(result, 1293, 2.6993476951);
+    testAUC(db, "Noise", result, 0.6255238);
+    testSingleScore(result, 1293, 2.542272);
   }
 }
