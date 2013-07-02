@@ -100,7 +100,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
       }
       double r = random.nextDouble() * weightsum;
       int pos = 0;
-      while(r > 0 && pos < weights.length) {
+      while(r > 0 && pos < weights.length - 1) {
         r -= weights[pos];
         pos++;
       }
