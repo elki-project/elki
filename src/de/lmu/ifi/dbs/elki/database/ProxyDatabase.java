@@ -123,5 +123,11 @@ public class ProxyDatabase extends AbstractDatabase {
    */
   public void setDBIDs(DBIDs ids) {
     this.idrep.setDBIDs(ids);
+    // Update relations.
+    for (Relation<?> orel : this.relations) {
+      if (orel instanceof ProxyView) {
+        ((ProxyView<?>) orel).setDBIDs(this.idrep.getDBIDs());
+      }
+    }
   }
 }
