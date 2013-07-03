@@ -93,7 +93,7 @@ public final class SphereUtil {
 
   /**
    * Compute the approximate great-circle distance of two points using the
-   * Haversine formula
+   * Spherical law of cosines.
    * 
    * Complexity: 6 (2 of which emulated) trigonometric functions. Note that acos
    * is rather expensive apparently - roughly atan + sqrt.
