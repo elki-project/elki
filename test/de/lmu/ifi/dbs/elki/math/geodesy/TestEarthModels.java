@@ -167,7 +167,7 @@ public class TestEarthModels implements JUnit4Test {
   4.630842799431969e+06, 1.352557987715272e+07, 5.495190660363145e+06, //
   }, //
   { 1.099371420315689e+07, 7.750900176348899e+06, 7.723050836613588e+06, //
-  9.493543207645416e-02, 8.948985711203361e+06, 1.444578576429031e+07, //
+  0.000000000000000e+00, 8.948985711203361e+06, 1.444578576429031e+07, //
   5.569329306064145e+06, 9.021400867197569e+06, 1.222413440358347e+07, //
   }, //
   { 1.599344217645813e+07, 1.632910711431917e+07, 1.630864631433774e+07, //
@@ -336,12 +336,12 @@ public class TestEarthModels implements JUnit4Test {
 
   @Test
   public void testCosineEarth() {
-    // Spherical Cosine to WGS84 Haversine: .6% error on test set.
-    testEarthModel(SphericalCosineEarthModel.STATIC, R_SP_WGS84, .005674, 0.095);
-    // Spherical Cosine to WGS84 Vincenty: .4% error on test set.
-    testEarthModel(SphericalCosineEarthModel.STATIC, SDM_WGS84, .00405, 0.095);
+    // Spherical Cosine to WGS84 Haversine: 0% error on test set.
+    testEarthModel(SphericalCosineEarthModel.STATIC, R_SP_WGS84, .005674, 0.0);
+    // Spherical Cosine to WGS84 Vincenty: 0% error on test set.
+    testEarthModel(SphericalCosineEarthModel.STATIC, SDM_WGS84, .00405, 0.0);
     // Spherical Cosine to Cosine: with "geosphere" we have a high agreement.
-    testEarthModel(SphericalCosineEarthModel.STATIC, GEOSPHERE_COSINE, 1.042e-11, 1e-12);
+    testEarthModel(SphericalCosineEarthModel.STATIC, GEOSPHERE_COSINE, 4.4409e-16, 1e-12);
   }
 
   @Test
@@ -352,7 +352,7 @@ public class TestEarthModels implements JUnit4Test {
     testEarthModel(SphericalVincentyEarthModel.STATIC, SDM_WGS84, .00405, 1e-12);
     // Spherical Vincenty to Spherical Vincenty: with "geosphere" we have a high
     // agreement.
-    testEarthModel(SphericalVincentyEarthModel.STATIC, GEOSPHERE_VINCENTY_SPHERE, 1.999e-14, 1e-12);
+    testEarthModel(SphericalVincentyEarthModel.STATIC, GEOSPHERE_VINCENTY_SPHERE, 4.441e-16, 1e-12);
   }
 
   protected void testEarthModel(EarthModel model, final double[][] ref, final double relerror, final double abserror) {
@@ -379,7 +379,7 @@ public class TestEarthModels implements JUnit4Test {
         }
       }
     }
-    assertEquals("Relative error bound not tight.", maxrel, relerror, 1e-3 * relerror);
+    assertEquals("Relative error bound not tight.", maxrel, relerror, 1e-3 * relerror + 1e-12);
     assertEquals("Absolute error bound not tight.", maxabs, abserror, 1e-3 * abserror + 1e-12);
   }
 }

@@ -1311,6 +1311,6 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
     // FIXME: NEITHER OF THESE VALUE IS NOT VERIFIED.
     // THIS IS SOLELY A REGRESSION TEST.
     // assertEquals(0.45430463189141745, dist.cdf(1.0), 1e-15);
-    assertEquals(3.6332619726763034E-5, dist.cdf(1.0), 1e-15);
+    assertEquals(3.6330826914761E-4, dist.cdf(1.0), 1e-15);
   }
 }
