@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -88,6 +89,14 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 /**
  * Simple JOGL2 based parallel coordinates visualization.
  * 
+ * Reference:
+ * <p>
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
+ * Proceedings of the 2013 ACM International Conference on Management of Data
+ * (SIGMOD), New York City, NY, 2013.
+ * </p>
+ * 
  * TODO: Improve generics of Layout3DPC.
  * 
  * TODO: Generalize to multiple relations and non-numeric feature vectors.
@@ -99,6 +108,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
  * @param <O> Object type
  */
 @Alias({ "3dpc", "3DPC" })
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
 public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements ResultHandler {
   /**
    * Logging class.

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -37,11 +38,20 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * {@link SlopeDimensionSimilarity}, we also take the option of inverting an
  * axis into account.
  * 
+ * Reference:
+ * <p>
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
+ * Proceedings of the 2013 ACM International Conference on Management of Data
+ * (SIGMOD), New York City, NY, 2013.
+ * </p>
+ * 
  * TODO: shouldn't this be normalized by the single-dimension entropies or so?
  * 
  * @author Erich Schubert
  * @author Robert Rödler
  */
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
 public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity {
   /**
    * Static instance.

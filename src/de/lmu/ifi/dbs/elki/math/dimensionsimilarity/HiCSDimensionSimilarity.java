@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -53,8 +54,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 /**
  * Use the statistical tests as used by HiCS to arrange dimensions.
  * 
+ * Reference:
  * <p>
- * Based on:<br />
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
+ * Proceedings of the 2013 ACM International Conference on Management of Data
+ * (SIGMOD), New York City, NY, 2013.
+ * </p>
+ * 
+ * Based on:
+ * <p>
  * F. Keller, E. Müller, and K. Böhm.<br />
  * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking. <br />
  * In ICDE, pages 1037–1048, 2012.
@@ -63,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Erich Schubert
  * @author Robert Rödler
  */
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
 public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
   /**
    * Monte-Carlo iterations
@@ -222,12 +232,16 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
     private GoodnessOfFitTest statTest;
 
     /**
-     * Holds the value of {@link de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS.Parameterizer#M_ID}.
+     * Holds the value of
+     * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS.Parameterizer#M_ID}
+     * .
      */
     private int m = 50;
 
     /**
-     * Holds the value of {@link de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS.Parameterizer#ALPHA_ID}.
+     * Holds the value of
+     * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS.Parameterizer#ALPHA_ID}
+     * .
      */
     private double alpha = 0.1;
 

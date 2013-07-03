@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -65,13 +66,22 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * Where obj.size = sum(col.sizes)
  * 
+ * Reference:
+ * <p>
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
+ * Proceedings of the 2013 ACM International Conference on Management of Data
+ * (SIGMOD), New York City, NY, 2013.
+ * </p>
+ * 
  * TODO: generalize to non-numeric features and scales.
  * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  */
-class Parallel3DRenderer<O extends NumberVector<?>> {
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
+public class Parallel3DRenderer<O extends NumberVector<?>> {
   /**
    * Logging class.
    */

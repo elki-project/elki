@@ -30,12 +30,22 @@ import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Layout the axes by multi-dimensional scaling.
  * 
+ * Reference:
+ * <p>
+ * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
+ * Interactive Data Mining with 3D-Parallel-Coordinate-Trees.<br />
+ * Proceedings of the 2013 ACM International Conference on Management of Data
+ * (SIGMOD), New York City, NY, 2013.
+ * </p>
+ * 
  * @author Erich Schubert
  */
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
 public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<MultidimensionalScalingMSTLayout3DPC.Node> {
   /**
    * Constructor.
