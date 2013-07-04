@@ -28,6 +28,7 @@ import gnu.trove.set.hash.THashSet;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -241,7 +242,14 @@ public class InspectionUtil {
         URL u = cps.nextElement();
         // Scan file sources only.
         if ("file".equals(u.getProtocol())) {
-          Iterator<String> it = new DirClassIterator(new File(u.getFile()), DEFAULT_IGNORES);
+          File path;
+          try {
+            path = new File(u.toURI());
+          } catch (URISyntaxException e) {
+            LOG.exception("Error in classpath: " + u, e);
+            continue;
+          }
+          Iterator<String> it = new DirClassIterator(path, DEFAULT_IGNORES);
           while (it.hasNext()) {
             String classname = it.next();
             try {
