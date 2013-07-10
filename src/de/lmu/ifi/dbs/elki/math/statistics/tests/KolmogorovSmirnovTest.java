@@ -64,7 +64,7 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
    * 
    * @param sample1 first data sample positions
    * @param sample2 second data sample positions
-   * @return the largest distance between both functions
+   * @return the largest difference between both functions
    */
   public static double calculateTestStatistic(double[] sample1, double[] sample2) {
     double maximum = 0.0;
@@ -74,23 +74,23 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
 
     // Parallel iteration over both curves. We can stop if we reach either end,
     // As the difference can then only decrease!
-    while(index1 < sample1.length && index2 < sample2.length) {
+    while (index1 < sample1.length && index2 < sample2.length) {
       // Next (!) positions
       final double x1 = sample1[index1], x2 = sample2[index2];
       // Advance on first curve
-      if(x1 <= x2) {
+      if (x1 <= x2) {
         index1++;
         // Handle multiple points with same x:
-        while(index1 < sample1.length && sample1[index1] == x1) {
+        while (index1 < sample1.length && sample1[index1] == x1) {
           index1++;
         }
         cdf1 = ((double) index1) / sample1.length;
       }
       // Advance on second curve
-      if(x1 >= x2) {
+      if (x1 >= x2) {
         index2++;
         // Handle multiple points with same x:
-        while(index2 < sample2.length && sample2[index2] == x2) {
+        while (index2 < sample2.length && sample2[index2] == x2) {
           index2++;
         }
         cdf2 = ((double) index2) / sample2.length;
@@ -113,5 +113,28 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
     protected KolmogorovSmirnovTest makeInstance() {
       return STATIC;
     }
+  }
+
+  /**
+   * Simplest version of the test: test if a sorted array is approximately
+   * uniform distributed on the given interval.
+   * 
+   * @param test Presorted (!) array
+   * @param min Minimum of uniform distribution
+   * @param max Maximum of uniform distribution
+   * @return Maximum deviation from uniform.
+   */
+  public static double simpleTest(double[] test, final double min, final double max) {
+    double scale = (max - min) / test.length;
+    double maxdev = 0.;
+    for (int i = 0; i < test.length; i++) {
+      // Expected value at position i:
+      double expected = i * scale + min;
+      double dev = Math.abs(test[i] - expected);
+      if (dev > maxdev) {
+        maxdev = dev;
+      }
+    }
+    return maxdev;
   }
 }
