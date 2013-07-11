@@ -95,10 +95,8 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
       return objects;
     }
     for (int r = 0; r < objects.metaLength(); r++) {
-      @SuppressWarnings("unchecked")
-      SimpleTypeInformation<Object> type = (SimpleTypeInformation<Object>) objects.meta(r);
-      @SuppressWarnings("unchecked")
-      final List<Object> column = (List<Object>) objects.getColumn(r);
+      SimpleTypeInformation<?> type = (SimpleTypeInformation<?>) objects.meta(r);
+      final List<?> column = (List<?>) objects.getColumn(r);
       if (!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
         continue;
       }
@@ -167,7 +165,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
         for (int d = 0; d < dim; d++) {
           buf[d] = dists.get(d).cdf(obj.doubleValue(d));
         }
-        column.set(i, factory.newNumberVector(buf));
+        castColumn.set(i, factory.newNumberVector(buf));
       }
     }
     return objects;
