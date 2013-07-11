@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -54,6 +55,8 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
@@ -65,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
@@ -109,6 +113,16 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
   Mean mean = new Mean();
 
   /**
+   * Number of dimensions to use.
+   */
+  final int odim;
+
+  /**
+   * Random projection family to use.
+   */
+  RandomProjectionFamily proj;
+
+  /**
    * Random number generator.
    */
   Random random;
@@ -120,13 +134,16 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
    * @param curvegen Curve generators
    * @param window Window multiplicator
    * @param variants Number of curve variants to generate
+   * @param odim Number of dimensions to use -1 == all.
    * @param random Random number generator
    */
-  public SpacefillingKNNPreprocessor(Relation<O> relation, List<SpatialSorter> curvegen, double window, int variants, Random random) {
+  public SpacefillingKNNPreprocessor(Relation<O> relation, List<SpatialSorter> curvegen, double window, int variants, int odim, RandomProjectionFamily proj, Random random) {
     super(relation);
     this.curvegen = curvegen;
     this.window = window;
     this.variants = variants;
+    this.odim = odim;
+    this.proj = proj;
     this.random = random;
   }
 
@@ -152,50 +169,85 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       curves.add(new ArrayList<SpatialRef>(size));
     }
 
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final NumberVector<?> v = relation.get(iditer);
-      SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
-      for (List<SpatialRef> curve : curves) {
-        curve.add(ref);
+    if (proj == null) {
+      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        final NumberVector<?> v = relation.get(iditer);
+        SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
+        for (List<SpatialRef> curve : curves) {
+          curve.add(ref);
+        }
       }
-    }
 
-    // Sort spatially
-    final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
-    // Find maximum extend.
-    double extend = 0;
-    for (int i = 0; i < mms.length; i += 2) {
-      extend = Math.max(extend, mms[i + 1] - mms[i]);
-    }
-    final double[] mmscratch = new double[mms.length];
-    final int numdim = mms.length >>> 1;
-    final int[] permutation = new int[numdim];
-    for (int j = 0; j < numcurves; j++) {
-      int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
-      // Scale all axes by the same factor:
-      final double scale = 1. + random.nextDouble();
-      for (int i = 0; i < mms.length; i += 2) {
-        // Note: use global extend, to be unbiased against different scales.
-        mmscratch[i] = mms[i] - extend * random.nextDouble();
-        mmscratch[i + 1] = mms[i] + extend * scale;
+      // Sort spatially
+      final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+      // Find maximum extend.
+      double extend = 0;
+      for (int d2 = 0; d2 < mms.length; d2 += 2) {
+        extend = Math.max(extend, mms[d2 + 1] - mms[d2]);
       }
-      // Generate permutation:
-      for (int i = 0; i < numdim; i++) {
-        permutation[i] = i;
+      final double[] mmscratch = new double[mms.length];
+      final int idim = mms.length >>> 1;
+      final int dim = (odim < 0) ? idim : Math.min(odim, idim);
+      final int[] permutation = range(0, idim);
+      final int[] apermutation = (dim != idim) ? new int[dim] : permutation;
+      for (int j = 0; j < numcurves; j++) {
+        final int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
+        // Scale all axes by the same factor:
+        final double scale = 1. + random.nextDouble();
+        for (int d2 = 0; d2 < mms.length; d2 += 2) {
+          // Note: use global extend, to be unbiased against different scales.
+          mmscratch[d2] = mms[d2] - extend * random.nextDouble();
+          mmscratch[d2 + 1] = mmscratch[d2] + extend * scale;
+        }
+        // Generate permutation:
+        randomPermutation(permutation, random);
+        System.arraycopy(permutation, 0, apermutation, 0, dim);
+        curvegen.get(ctype).sort(curves.get(j), 0, size, mmscratch, apermutation);
       }
-      // Knuth / Fisher-Yates style shuffle
-      for (int i = numdim - 1; i > 0; i--) {
-        // Swap with random preceeding element.
-        int ri = random.nextInt(i + 1);
-        int tmp = permutation[ri];
-        permutation[ri] = permutation[i];
-        permutation[i] = tmp;
+    } else {
+      // With projections, min/max management gets more tricky and expensive.
+      final int idim = RelationUtil.dimensionality(relation);
+      final int dim = (odim < 0) ? idim : odim;
+      final int[] permutation = range(0, dim);
+      NumberVector.Factory<O, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+      final double[] mms = new double[odim << 1];
+
+      for (int j = 0; j < numcurves; j++) {
+        final List<SpatialRef> curve = curves.get(j);
+        final Matrix mat = proj.generateProjectionMatrix(idim, dim);
+        final int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
+
+        // Initialize min/max:
+        for (int d2 = 0; d2 < mms.length; d2 += 2) {
+          mms[d2] = Double.POSITIVE_INFINITY;
+          mms[d2 + 1] = Double.NEGATIVE_INFINITY;
+        }
+        // Project data set:
+        for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+          double[] proj = mat.times(relation.get(iditer).getColumnVector()).getArrayRef();
+          curve.add(new SpatialRef(DBIDUtil.deref(iditer), factory.newNumberVector(proj)));
+          for (int d2 = 0, d = 0; d2 < mms.length; d2 += 2, d++) {
+            mms[d2] = Math.min(mms[d2], proj[d]);
+            mms[d2 + 1] = Math.max(mms[d2 + 1], proj[d]);
+          }
+        }
+        // Find maximum extend.
+        double extend = 0.;
+        for (int d2 = 0; d2 < mms.length; d2 += 2) {
+          extend = Math.max(extend, mms[d2 + 1] - mms[d2]);
+        }
+        // Scale all axes by the same factor:
+        final double scale = 1. + random.nextDouble();
+        for (int d2 = 0; d2 < mms.length; d2 += 2) {
+          // Note: use global extend, to be unbiased against different scales.
+          mms[d2] -= extend * random.nextDouble();
+          mms[d2 + 1] = mms[d2] + extend * scale;
+        }
+        // Generate permutation:
+        randomPermutation(permutation, random);
+        // Sort spatially.
+        curvegen.get(ctype).sort(curve, 0, size, mms, permutation);
       }
-      // for (int ctype = 0; ctype < numgen; ctype++) {
-      // curvegen.get(ctype).sort(curves.get(ctype + numgen * j), 0, size,
-      // mmscratch, permutation);
-      // }
-      curvegen.get(ctype).sort(curves.get(j), 0, size, mmscratch, permutation);
     }
 
     // Build position index, DBID -> position in the three curves
@@ -218,6 +270,41 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     if (LOG.isVerbose()) {
       LOG.verbose("SFC preprocessor took " + ((end - starttime) / 1.E6) + " milliseconds.");
     }
+  }
+
+  /**
+   * Initialize an integer value range.
+   * 
+   * @param start Starting value
+   * @param end End value (exclusive)
+   * @return Array of integers start..end, excluding end.
+   */
+  public static int[] range(int start, int end) {
+    int[] out = new int[end - start];
+    for (int i = 0, j = start; j < end; i++, j++) {
+      out[i] = j;
+    }
+    return out;
+  }
+
+  /**
+   * Perform a random permutation of the array, in-place.
+   * 
+   * Knuth / Fisher-Yates style shuffle
+   * 
+   * @param existing Existing array
+   * @param random Random generator.
+   * @return Same array.
+   */
+  public static int[] randomPermutation(final int[] out, Random random) {
+    for (int i = out.length - 1; i > 0; i--) {
+      // Swap with random preceeding element.
+      int ri = random.nextInt(i + 1);
+      int tmp = out[ri];
+      out[ri] = out[i];
+      out[i] = tmp;
+    }
+    return out;
   }
 
   @Override
@@ -374,6 +461,16 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     int variants;
 
     /**
+     * Number of dimensions to use.
+     */
+    int odim;
+
+    /**
+     * Random projection family to use.
+     */
+    RandomProjectionFamily proj;
+
+    /**
      * Random number generator.
      */
     RandomFactory random;
@@ -384,19 +481,23 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
      * @param curvegen Curve generators
      * @param window Window multiplicator
      * @param variants Number of curve variants to generate
+     * @param odim Number of dimensions to use -1 == all.
+     * @param proj Random projection family
      * @param random Random number generator
      */
-    public Factory(List<SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
+    public Factory(List<SpatialSorter> curvegen, double window, int variants, int odim, RandomProjectionFamily proj, RandomFactory random) {
       super();
       this.curvegen = curvegen;
       this.window = window;
       this.variants = variants;
+      this.odim = odim;
+      this.proj = proj;
       this.random = random;
     }
 
     @Override
     public SpacefillingKNNPreprocessor<V> instantiate(Relation<V> relation) {
-      return new SpacefillingKNNPreprocessor<>(relation, curvegen, window, variants, random.getRandom());
+      return new SpacefillingKNNPreprocessor<>(relation, curvegen, window, variants, odim, proj, random.getRandom());
     }
 
     @Override
@@ -428,24 +529,44 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       public static final OptionID VARIANTS_ID = new OptionID("sfcknn.variants", "Number of curve variants to generate.");
 
       /**
+       * Parameter for choosing the number of dimensions to use for each curve.
+       */
+      public static final OptionID DIM_ID = new OptionID("sfcknn.dim", "Number of dimensions to use for each curve.");
+
+      /**
+       * Parameter for choosing the random projections.
+       */
+      public static final OptionID PROJECTION_ID = new OptionID("sfcknn.proj", "Random projection to use.");
+
+      /**
        * Parameter for choosing the number of variants to use.
        */
       public static final OptionID RANDOM_ID = new OptionID("sfcknn.seed", "Random generator.");
 
       /**
-       * Spatial curve generators
+       * Spatial curve generators.
        */
       List<SpatialSorter> curvegen;
 
       /**
-       * Curve window size
+       * Curve window size.
        */
       double window;
 
       /**
-       * Number of variants to generate for each curve
+       * Number of variants to generate for each curve.
        */
       int variants;
+
+      /**
+       * Number of dimensions to use.
+       */
+      int odim = -1;
+
+      /**
+       * Random projection family to use.
+       */
+      RandomProjectionFamily proj;
 
       /**
        * Random number generator.
@@ -468,6 +589,18 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
         if (config.grab(variantsP)) {
           variants = variantsP.getValue();
         }
+        IntParameter dimP = new IntParameter(DIM_ID);
+        dimP.setOptional(true);
+        dimP.addConstraint(new GreaterEqualConstraint(1));
+        if (config.grab(dimP)) {
+          odim = dimP.intValue();
+        }
+
+        ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<>(PROJECTION_ID, RandomProjectionFamily.class);
+        projP.setOptional(true);
+        if (config.grab(projP)) {
+          proj = projP.instantiateClass(config);
+        }
         RandomParameter randomP = new RandomParameter(RANDOM_ID);
         if (config.grab(randomP)) {
           random = randomP.getValue();
@@ -476,7 +609,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
       @Override
       protected Factory<?> makeInstance() {
-        return new Factory<DoubleVector>(curvegen, window, variants, random);
+        return new Factory<DoubleVector>(curvegen, window, variants, odim, proj, random);
       }
     }
   }
