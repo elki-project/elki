@@ -43,15 +43,14 @@ import experimentalcode.students.nuecke.utilities.datastructures.histogram.Histo
 import experimentalcode.students.nuecke.utilities.datastructures.histogram.SupportHistogram;
 
 /**
- * <p>
- * Provides the P3C algorithm, a projected clustering algorithm.
- * </p>
+ * HARP: Hierarchical approach with Automatic Relevant dimension selection for
+ * Projected clustering
  * 
  * <p>
  * Reference: <br/>
- * Gabriela Moise, J&ouml;rg Sander, Martin Ester<br />
+ * Gabriela Moise, Jörg Sander, Martin Ester<br />
  * P3C: A Robust Projected Clustering Algorithm. <br/>
- * In: TODO.
+ * In: Proc. Sixth International Conference on Data Mining (ICDM '06)
  * </p>
  * 
  * @author Florian Nuecke
@@ -61,51 +60,38 @@ import experimentalcode.students.nuecke.utilities.datastructures.histogram.Suppo
  * @param <V> the type of NumberVector handled by this Algorithm.
  */
 @Title("HARP: Hierarchical approach with Automatic Relevant dimension selection for Projected clustering")
-@Reference(authors = "Gabriela Moise, J&ouml;rg Sander, Martin Ester", title = "P3C: A Robust Projected Clustering Algorithm", booktitle = "TODO", url = "TODO")
+@Reference(authors = "Gabriela Moise, Jörg Sander, Martin Ester", title = "P3C: A Robust Projected Clustering Algorithm", booktitle = "Proc. Sixth International Conference on Data Mining (ICDM '06)", url = "http://dx.doi.org/10.1109/ICDM.2006.123")
 public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> {
-
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(P3C.class);
 
+  /**
+   * Minimum Log Likelihood.
+   */
   private static final double MIN_LOGLIKELIHOOD = -100000;
 
   /**
-   * Holds the value of {@link #POISSON_THRESHOLD_ID}.
+   * Parameter for the poisson test threshold.
    */
-  private double poissonThreshold;
+  protected double poissonThreshold;
 
   /**
-   * Holds the value of {@link #MAX_EM_ITERATIONS_ID}.
+   * Maximum number of iterations for the EM step.
    */
-  private int maxEmIterations;
+  protected int maxEmIterations;
 
   /**
-   * Holds the value of {@link #EM_DELTA_ID}.
+   * Threshold when to stop EM iterations.
    */
-  private double emDelta;
+  protected double emDelta;
 
   /**
-   * Holds the value of {@link #MIN_CLUSTER_SIZE_ID}.
+   * Minimum cluster size for noise flagging. (Not existant in the original
+   * publication).
    */
-  private int minClusterSize;
-
-  // ---------------------------------------------------------------------- //
-  // Relevant for a single run.
-  // ---------------------------------------------------------------------- //
-
-  /**
-   * The relation we're now working on.
-   */
-  private Relation<V> relation;
-
-  /**
-   * Dimensionality of the set we're now working on.
-   */
-  private int dimensionality;
-
-  // ---------------------------------------------------------------------- //
+  protected int minClusterSize;
 
   /**
    * Sets up a new instance of the algorithm's environment.
@@ -125,19 +111,18 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * Performs the P3C algorithm on the given Database.
    */
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
-    this.dimensionality = RelationUtil.dimensionality(relation);
-    this.relation = relation;
+    final int dim = RelationUtil.dimensionality(relation);
 
     // Allocate histograms and markers for attributes.
     final int binCount = HistogramUtil.getSturgeBinCount(relation.size());
     final SupportHistogram[] histograms = HistogramUtil.newSupportHistograms(relation, binCount);
-    final BitSet[] markers = new BitSet[dimensionality];
-    for (int dimension = 0; dimension < dimensionality; ++dimension) {
+    final BitSet[] markers = new BitSet[dim];
+    for (int dimension = 0; dimension < dim; ++dimension) {
       markers[dimension] = new BitSet(binCount);
     }
 
     // Set markers for each attribute until they're all deemed uniform.
-    for (int dimension = 0; dimension < dimensionality; ++dimension) {
+    for (int dimension = 0; dimension < dim; ++dimension) {
       final SupportHistogram histogram = histograms[dimension];
       final BitSet marked = markers[dimension];
       while (!chiSquaredUniformTest(histogram, marked)) {
@@ -163,7 +148,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Generate projected p-signature intervals.
     ArrayList<Interval> intervals = new ArrayList<>();
-    for (int dimension = 0; dimension < dimensionality; ++dimension) {
+    for (int dimension = 0; dimension < dim; ++dimension) {
       final SupportHistogram histogram = histograms[dimension];
       final BitSet marked = markers[dimension];
       boolean inInterval = false;
@@ -211,7 +196,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       // Skip previous 1-signatures: merges are symmetrical. But include newly
       // created cluster cores (i.e. those resulting from previous merges).
       for (int j = i + 1; j < k; ++j) {
-        final Signature merge = clusterCores.get(j).tryMerge(signature);
+        final Signature merge = clusterCores.get(j).tryMerge(signature, poissonThreshold);
         if (merge != null) {
           // We add each potential core to the list to allow remaining
           // 1-signatures to try merging with this p-signature as well.
@@ -224,7 +209,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     for (int i = clusterCores.size() - 1; i >= 0; --i) {
       Signature clusterCore = clusterCores.get(i);
       for (int j = 0; j < signatures.size(); ++j) {
-        if (!clusterCore.validate(signatures.get(j))) {
+        if (!clusterCore.validate(signatures.get(j), poissonThreshold)) {
           clusterCores.remove(i);
           break;
         }
@@ -234,9 +219,9 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Refine cluster cores into projected clusters (matrix row->DBID).
     ArrayModifiableDBIDs dbids = DBIDUtil.newArray(relation.size());
     ModifiableDBIDs noise = DBIDUtil.newHashSet();
-    Matrix M = computeFuzzyMembership(clusterCores, dbids, noise);
-    assignUnassigned(M, clusterCores, dbids, noise);
-    M = expectationMaximization(M, dbids);
+    Matrix M = computeFuzzyMembership(relation, clusterCores, dbids, noise);
+    assignUnassigned(relation, M, clusterCores, dbids, noise);
+    M = expectationMaximization(relation, dim, M, dbids);
 
     // Create a hard clustering, making sure each data point only is part of one
     // cluster, based on the best match from the membership matrix.
@@ -244,7 +229,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Outlier detection. Remove points from clusters that have a Mahalanobis
     // distance larger than the critical value of the ChiSquare distribution.
-    findOutliers(clusterCandidates, dimensionality - countUniformAttributes(markers), noise);
+    findOutliers(relation, clusterCandidates, dim - countUniformAttributes(markers), noise);
 
     // Remove empty clusters.
     for (int cluster = clusterCandidates.size() - 1; cluster >= 0; --cluster) {
@@ -276,11 +261,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * 
    * @param markers the markers used to tag intervals as non-uniform per
    *        dimension.
-   * @return
+   * @return Number of dimensions that are irrelevant to the clustering.
    */
   private int countUniformAttributes(BitSet[] markers) {
     int sum = 0;
-    for (int dimension = 0; dimension < dimensionality; ++dimension) {
+    for (int dimension = 0; dimension < markers.length; ++dimension) {
       if (markers[dimension].cardinality() == 0) {
         ++sum;
       }
@@ -336,12 +321,13 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * Computes a fuzzy membership with the weights based on which cluster cores
    * each data point is part of.
    * 
+   * @param relation Data relation
    * @param clusterCores the cluster cores.
    * @param assigned mapping of matrix row to DBID.
    * @param unassigned set to which to add unassigned points.
    * @return the fuzzy membership matrix.
    */
-  private Matrix computeFuzzyMembership(ArrayList<Signature> clusterCores, ModifiableDBIDs assigned, ModifiableDBIDs unassigned) {
+  private Matrix computeFuzzyMembership(Relation<V> relation, ArrayList<Signature> clusterCores, ModifiableDBIDs assigned, ModifiableDBIDs unassigned) {
     final int n = relation.size();
     final int k = clusterCores.size();
 
@@ -378,12 +364,13 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * Assign unassigned objects to best candidate based on shortest Mahalanobis
    * distance.
    * 
+   * @param relation Data relation
    * @param M fuzzy membership matrix.
    * @param clusterCores the cluster cores.
    * @param assigned mapping of matrix row to DBID.
    * @param unassigned the list of points not yet assigned.
    */
-  private void assignUnassigned(Matrix M, ArrayList<Signature> clusterCores, ArrayModifiableDBIDs assigned, ModifiableDBIDs unassigned) {
+  private void assignUnassigned(Relation<V> relation, Matrix M, ArrayList<Signature> clusterCores, ArrayModifiableDBIDs assigned, ModifiableDBIDs unassigned) {
     final int k = clusterCores.size();
 
     for (DBIDIter iter = unassigned.iter(); iter.valid(); iter.advance()) {
@@ -393,7 +380,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       int bestCluster = 0;
       double minDistance = Double.POSITIVE_INFINITY;
       for (int cluster = 1; cluster < k; ++cluster) {
-        final double distance = clusterCores.get(cluster).computeDistance(v);
+        final double distance = clusterCores.get(cluster).computeDistance(relation, v);
         if (distance < minDistance) {
           minDistance = distance;
           bestCluster = cluster;
@@ -415,10 +402,12 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * 
    * @see de.lmu.ifi.dbs.elki.algorithm.clustering.EM
    * 
+   * @param relation Data relation
+   * @param dim Dimensionality
    * @param M the initial membership matrix.
    * @param dbids mapping of matrix row to DBID.
    */
-  private Matrix expectationMaximization(Matrix M, ArrayModifiableDBIDs dbids) {
+  private Matrix expectationMaximization(Relation<V> relation, int dim, Matrix M, ArrayModifiableDBIDs dbids) {
     final int n = dbids.size();
     final int k = M.getColumnDimensionality();
 
@@ -442,7 +431,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       // Reset weights and covariance matrices.
       for (int cluster = 0; cluster < k; ++cluster) {
         clusterWeights[cluster] = 0.0;
-        cvms[cluster] = new CovarianceMatrix(dimensionality);
+        cvms[cluster] = new CovarianceMatrix(dim);
       }
 
       // Compute covariance matrices.
@@ -466,8 +455,9 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         clusterWeights[cluster] /= n;
       }
       // Compute normal distribution factor used for computing probabilities.
+      final double twopidim = Math.pow(MathUtil.TWOPI, dim);
       for (int cluster = 0; cluster < k; ++cluster) {
-        normalDistributionFactor[cluster] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * covariances[cluster].det());
+        normalDistributionFactor[cluster] = 1.0 / Math.sqrt(twopidim * covariances[cluster].det());
       }
 
       // Recompute probabilities.
@@ -549,12 +539,13 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * distribution with as many degrees of freedom as the cluster has relevant
    * attributes.
    * 
+   * @param relation Data relation
    * @param clusterCandidates the list of clusters to check.
    * @param nonUniformDimensionCount the number of dimensions to consider when
    *        testing.
    * @param noise the set to which to add points deemed outliers.
    */
-  private void findOutliers(ArrayList<ClusterCandidate> clusterCandidates, int nonUniformDimensionCount, ModifiableDBIDs noise) {
+  private void findOutliers(Relation<V> relation, ArrayList<ClusterCandidate> clusterCandidates, int nonUniformDimensionCount, ModifiableDBIDs noise) {
     final int k = clusterCandidates.size();
 
     for (int cluster = 0; cluster < k; ++cluster) {
@@ -591,7 +582,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * Important: this only overrides the methods used in this algorithm!
    * </p>
    */
-  private class Signature {
+  private static class Signature {
     /**
      * The intervals contributing to this signature.
      */
@@ -623,12 +614,12 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
      * @param relation the relation to get the support set.
      * @param interval the interval.
      */
-    public Signature(Relation<V> relation, Interval interval) {
+    public Signature(Relation<? extends NumberVector<?>> relation, Interval interval) {
       intervals.add(interval);
       dimensions.set(interval.getDimension());
       // TODO Replace with DB query? Only runs once, so probably not so
       // important.
-      ArrayModifiableDBIDs support = DBIDUtil.newArray();
+      ModifiableDBIDs support = DBIDUtil.newHashSet();
       for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         double value = relation.get(iter).doubleValue(interval.getDimension());
         if (interval.getMin() <= value && interval.getMax() >= value) {
@@ -666,7 +657,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
      * @param other the other signature to create a merge with.
      * @return the merged signature, or null if the merge failed.
      */
-    public Signature tryMerge(Signature other) {
+    public Signature tryMerge(Signature other, double poissonThreshold) {
       // Validate input.
       if (other.intervals.size() != 1) {
         throw new IllegalArgumentException("Other signature must be 1-signature.");
@@ -699,7 +690,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
      * @param other the interval to validate against.
      * @return true if the cluster core holds, else false.
      */
-    public boolean validate(Signature other) {
+    public boolean validate(Signature other, double poissonThreshold) {
       if (intervals.contains(other.intervals.get(0))) {
         // Interval is contained, don't check.
         return true;
@@ -718,10 +709,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
      * Computes the Mahalanobis distance for the specified vector to the
      * centroid of the cluster core represented by this signature.
      * 
+     * @param relation Data relation
      * @param v the vector to compute the distance for.
-     * @return
+     * @return Mahalanobis distance.
      */
-    public double computeDistance(Vector v) {
+    public double computeDistance(Relation<? extends NumberVector<?>> relation, Vector v) {
       // Lazy initialization.
       if (centroid == null) {
         centroid = Centroid.make(relation, supportSet);
@@ -761,8 +753,10 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
   /**
    * This class is used to represent potential clusters.
+   * 
+   * TODO: Documentation.
    */
-  private class ClusterCandidate {
+  private static class ClusterCandidate {
     public final BitSet dimensions = new BitSet();
 
     public final Signature clusterCore;
@@ -776,8 +770,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
   }
 
-  // ---------------------------------------------------------------------- //
-
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
@@ -788,10 +780,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     return LOG;
   }
 
-  // ---------------------------------------------------------------------- //
-  // Parameterization.
-  // ---------------------------------------------------------------------- //
-
   /**
    * Parameterization class.
    * 
@@ -800,20 +788,46 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    /**
+     * Parameter for the poisson test threshold.
+     */
     public static final OptionID POISSON_THRESHOLD_ID = new OptionID("p3c.threshold", "The threshold value for the poisson test used when merging signatures.");
 
+    /**
+     * Maximum number of iterations for the EM step.
+     */
     public static final OptionID MAX_EM_ITERATIONS_ID = new OptionID("p3c.em.maxiter", "The maximum number of iterations for the EM step.");
 
+    /**
+     * Threshold when to stop EM iterations.
+     */
     public static final OptionID EM_DELTA_ID = new OptionID("p3c.em.delta", "The change delta for the EM step below which to stop.");
 
+    /**
+     * Minimum cluster size for noise flagging. (Not existant in the original
+     * publication).
+     */
     public static final OptionID MIN_CLUSTER_SIZE_ID = new OptionID("p3c.minsize", "The minimum size of a cluster, otherwise it is seen as noise (this is a cheat, it is not mentioned in the paper).");
 
+    /**
+     * Parameter for the poisson test threshold.
+     */
     protected double poissonThreshold;
 
+    /**
+     * Maximum number of iterations for the EM step.
+     */
     protected int maxEmIterations;
 
+    /**
+     * Threshold when to stop EM iterations.
+     */
     protected double emDelta;
 
+    /**
+     * Minimum cluster size for noise flagging. (Not existant in the original
+     * publication).
+     */
     protected int minClusterSize;
 
     @Override
