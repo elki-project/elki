@@ -23,26 +23,17 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-
 /**
- * Class to sort a double and an integer DBID array, using a modified quicksort.
- * 
- * The implementation is closely based on:
- * <p>
- * Dual-Pivot Quicksort<br />
- * Vladimir Yaroslavskiy
- * </p>
+ * Class to sort a double and an integer DBID array, using a quicksort with a
+ * best of 5 heuristic.
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "Vladimir Yaroslavskiy", title = "Dual-Pivot Quicksort", booktitle = "http://iaroslavski.narod.ru/quicksort/", url = "http://iaroslavski.narod.ru/quicksort/")
 class DoubleIntegerArrayQuickSort {
   /**
-   * Threshold for using insertion sort. Value taken from Javas QuickSort,
-   * assuming that it will be similar for DBIDs.
+   * Threshold for using insertion sort.
    */
-  private static final int INSERTION_THRESHOLD = 47;
+  private static final int INSERTION_THRESHOLD = 22;
 
   /**
    * Sort the full array using the given comparator.
@@ -64,7 +55,7 @@ class DoubleIntegerArrayQuickSort {
    * @param end Last index (exclusive)
    */
   public static void sort(double[] keys, int[] values, int start, int end) {
-    quickSort(keys, values, start, end - 1);
+    quickSort(keys, values, start, end);
   }
 
   /**
@@ -73,13 +64,13 @@ class DoubleIntegerArrayQuickSort {
    * @param keys Keys for sorting
    * @param vals Values for sorting
    * @param start First index
-   * @param end Last index (inclusive!)
+   * @param end Last index (exclusive!)
    */
   private static void quickSort(double[] keys, int[] vals, final int start, final int end) {
     final int len = end - start;
     if (len < INSERTION_THRESHOLD) {
       // Classic insertion sort.
-      for (int i = start + 1; i <= end; i++) {
+      for (int i = start + 1; i < end; i++) {
         for (int j = i; j > start; j--) {
           if (keys[j] < keys[j - 1]) {
             swap(keys, vals, j, j - 1);
@@ -99,10 +90,16 @@ class DoubleIntegerArrayQuickSort {
     final int m4 = m3 + seventh;
     final int m5 = m4 + seventh;
 
-    // Explicit (and optimal) sorting network for 5 elements
-    // See Knuth for details.
+    // Mixture of insertion and merge sort:
     if (keys[m1] > keys[m2]) {
       swap(keys, vals, m1, m2);
+    }
+    if (keys[m3] > keys[m4]) {
+      swap(keys, vals, m3, m4);
+    }
+    // Merge 1+2 and 3+4
+    if (keys[m2] > keys[m4]) {
+      swap(keys, vals, m2, m4);
     }
     if (keys[m1] > keys[m3]) {
       swap(keys, vals, m1, m3);
@@ -110,102 +107,59 @@ class DoubleIntegerArrayQuickSort {
     if (keys[m2] > keys[m3]) {
       swap(keys, vals, m2, m3);
     }
+    // Insertion sort m5:
     if (keys[m4] > keys[m5]) {
       swap(keys, vals, m4, m5);
-    }
-    if (keys[m1] > keys[m4]) {
-      swap(keys, vals, m1, m4);
-    }
-    if (keys[m3] > keys[m4]) {
-      swap(keys, vals, m3, m4);
-    }
-    if (keys[m2] > keys[m5]) {
-      swap(keys, vals, m2, m5);
-    }
-    if (keys[m2] > keys[m3]) {
-      swap(keys, vals, m2, m3);
-    }
-    if (keys[m4] > keys[m5]) {
-      swap(keys, vals, m4, m5);
+      if (keys[m3] > keys[m4]) {
+        swap(keys, vals, m3, m4);
+        if (keys[m2] > keys[m3]) {
+          swap(keys, vals, m2, m3);
+          if (keys[m1] > keys[m1]) {
+            swap(keys, vals, m1, m2);
+          }
+        }
+      }
     }
 
-    // Choose the 2 and 4th as pivots, as we want to get three parts
-    // Copy to variables v1 and v3, replace them with the start and end
-    // Note: do not modify v1 or v3 until we put them back!
-    double keyl = keys[m2];
-    int vall = vals[m2];
-    double keyr = keys[m4];
-    int valr = vals[m4];
-    keys[m2] = keys[start];
-    vals[m2] = vals[start];
-    keys[m4] = keys[end];
-    vals[m4] = vals[end];
+    // Move pivot to the front.
+    double pivotkey = keys[m3];
+    int pivotval = vals[m3];
+    keys[m3] = keys[start];
+    vals[m3] = vals[start];
 
-    // A tie is when the two chosen pivots are the same
-    final boolean tied = Double.compare(keyl, keyr) == 0;
-
-    // Insertion points for pivot areas.
+    // The interval to pivotize
     int left = start + 1;
     int right = end - 1;
 
-    // Note: we merged the ties and no ties cases.
-    // This likely is marginally slower, but not at a macro level
-    // And you never know with hotspot.
-    for (int k = left; k <= right; k++) {
-      double keyt = keys[k];
-      int valt = vals[k];
-      final int c = Double.compare(keyt, keyl);
-      if (c == 0) {
-        continue;
-      } else if (c < 0) {
-        // Traditional quicksort
-        keys[k] = keys[left];
-        vals[k] = vals[left];
-        keys[left] = keyt;
-        vals[left] = valt;
+    // This is the classic QuickSort loop:
+    while (true) {
+      while (left <= right && keys[left] <= pivotkey) {
         left++;
-      } else if (tied || keyt > keyr) {
-        // Now look at the right. First skip correct entries there, too
-        while (true) {
-          if (keys[right] > keyr && k < right) {
-            right--;
-          } else {
-            break;
-          }
-        }
-        // Now move tmp from k to the right.
-        keys[k] = keys[right];
-        vals[k] = vals[right];
-        keys[right] = keyt;
-        vals[right] = valt;
-        right--;
-        // Test the element we just inserted: left or center?
-        if (keys[k] < keyl) {
-          swap(keys, vals, k, left);
-          left++;
-        } // else: center. cannot be on right.
       }
+      while (left <= right && pivotkey <= keys[right]) {
+        right--;
+      }
+      if (right <= left) {
+        break;
+      }
+      swap(keys, vals, left, right);
+      left++;
+      right--;
     }
-    // Put the pivot elements back in.
-    // Remember: we must not modify v1 and v3 above.
-    keys[start] = keys[left - 1];
-    vals[start] = vals[left - 1];
-    keys[left - 1] = keyl;
-    vals[left - 1] = vall;
-    keys[end] = keys[right + 1];
-    vals[end] = vals[right + 1];
-    keys[right + 1] = keyr;
-    vals[right + 1] = valr;
-    // v1 and v3 are now safe to modify again. Perform recursion:
-    quickSort(keys, vals, start, left - 2);
-    // Handle the middle part - if necessary:
-    if (!tied) {
-      // TODO: the original publication had a special tie handling here.
-      // It shouldn't affect correctness, but probably improves situations
-      // with a lot of tied elements.
-      quickSort(keys, vals, left, right);
+
+    // Move pivot back into the appropriate place
+    keys[start] = keys[right];
+    vals[start] = vals[right];
+    keys[right] = pivotkey;
+    vals[right] = pivotval;
+
+    // Recursion:
+    if (start + 1 < right) {
+      quickSort(keys, vals, start, right);
     }
-    quickSort(keys, vals, right + 2, end);
+    if (right + 2 < end) {
+      quickSort(keys, vals, right + 1, end);
+    }
   }
 
   /**

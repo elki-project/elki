@@ -142,8 +142,6 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
    * @param id Object ID
    */
   protected void add(double dist, int id) {
-    // Ensure we have enough space.
-    ensureSize(size + 1);
     if(size < k) {
       dists[size] = dist;
       ids[size] = id;
@@ -156,6 +154,8 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
     if (dist > dists[size - 1]) {
       return;
     }
+    // Ensure we have enough space.
+    ensureSize(size + 1);
     // Insertion sort:
     int pos = size;
     while(pos > 0 && dists[pos - 1] > dist) {
@@ -166,8 +166,8 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
     dists[pos] = dist;
     ids[pos] = id;
     ++size;
-    // Truncate.
-    if(size > k && dists[k] > dists[k - 1]) {
+    // Truncate if necessary:
+    if(dists[k] > dists[k - 1]) {
       size = k;
     }
   }
