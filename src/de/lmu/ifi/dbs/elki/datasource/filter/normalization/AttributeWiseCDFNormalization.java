@@ -115,7 +115,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
       factory = FilterUtil.guessFactory(castType);
 
       // Scan to find the best
-      int dim = castType.getDimensionality();
+      final int dim = castType.getDimensionality();
       dists = new ArrayList<>(dim);
       // Scratch space for testing:
       double[] test = new double[castColumn.size()];
