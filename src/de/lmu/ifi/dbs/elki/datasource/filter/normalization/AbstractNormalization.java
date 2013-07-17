@@ -52,7 +52,7 @@ public abstract class AbstractNormalization<O extends NumberVector<?>> extends A
 
   @Override
   public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) {
-    return super.filter(objects);
+    return filter(objects);
   }
 
   @Override
