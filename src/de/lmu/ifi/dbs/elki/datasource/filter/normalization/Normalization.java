@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -43,16 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <O> object type
  */
 public interface Normalization<O> extends ObjectFilter, Parameterizable {
-  /**
-   * Performs a normalization on a database object bundle.
-   *
-   * @param objects the database objects package
-   * @return modified object bundle
-   * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
-   *                                     suitable to normalization
-   */
-  MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) throws NonNumericFeaturesException;
-
   /**
    * Transforms a feature vector to the original attribute ranges.
    *
