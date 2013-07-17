@@ -238,6 +238,11 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
     return result.toString();
   }
 
+  @Override
+  protected Logging getLogger() {
+    return LOG;
+  }
+
   /**
    * Parameterization class.
    * 

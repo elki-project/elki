@@ -268,6 +268,11 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     return in;
   }
 
+  @Override
+  protected Logging getLogger() {
+    return LOG;
+  }
+
   /**
    * Parameterization class.
    * 
@@ -416,7 +421,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
 
     @Override
     protected PerturbationFilter<V> makeInstance() {
-      return new PerturbationFilter<V>(seed, percentage, scalingreference, minima, maxima, noisedistribution);
+      return new PerturbationFilter<>(seed, percentage, scalingreference, minima, maxima, noisedistribution);
     }
   }
 }

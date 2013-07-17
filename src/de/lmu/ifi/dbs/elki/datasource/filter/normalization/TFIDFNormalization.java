@@ -28,6 +28,7 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Perform full TF-IDF Normalization as commonly used in text mining.
@@ -43,6 +44,11 @@ import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
  * @param <V> Vector type
  */
 public class TFIDFNormalization<V extends SparseNumberVector<?>> extends InverseDocumentFrequencyNormalization<V> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(TFIDFNormalization.class);
+
   /**
    * Constructor.
    */
@@ -65,5 +71,10 @@ public class TFIDFNormalization<V extends SparseNumberVector<?>> extends Inverse
       vals.put(i, (float) (featureVector.doubleValue(i) / sum * idf.get(i)));
     }
     return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

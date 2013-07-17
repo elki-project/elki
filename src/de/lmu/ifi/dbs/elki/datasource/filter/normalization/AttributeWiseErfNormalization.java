@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 
 /**
@@ -39,6 +40,11 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
  * @apiviz.uses NumberVector
  */
 public class AttributeWiseErfNormalization<O extends NumberVector<?>> extends AbstractNormalization<O> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(AttributeWiseErfNormalization.class);
+
   /**
    * Constructor.
    */
@@ -54,7 +60,7 @@ public class AttributeWiseErfNormalization<O extends NumberVector<?>> extends Ab
   @Override
   protected O filterSingleObject(O obj) {
     double[] val = new double[obj.getDimensionality()];
-    for(int i = 0; i < val.length; i++) {
+    for (int i = 0; i < val.length; i++) {
       val[i] = NormalDistribution.erf(obj.doubleValue(i));
     }
     return factory.newNumberVector(val);
@@ -63,5 +69,10 @@ public class AttributeWiseErfNormalization<O extends NumberVector<?>> extends Ab
   @Override
   protected SimpleTypeInformation<? super O> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

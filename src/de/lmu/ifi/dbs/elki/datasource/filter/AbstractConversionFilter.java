@@ -27,6 +27,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -71,10 +73,17 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
 
       // When necessary, perform an initialization scan
       if(prepareStart(castType)) {
+        FiniteProgress pprog = getLogger().isVerbose() ? new FiniteProgress("Preparing normalization.", objects.dataLength(), getLogger()) : null;
         for(Object o : column) {
           @SuppressWarnings("unchecked")
           final I obj = (I) o;
           prepareProcessInstance(obj);
+          if (pprog != null) {
+            pprog.incrementProcessed(getLogger());
+          }
+        }
+        if (pprog != null) {
+          pprog.ensureCompleted(getLogger());
         }
         prepareComplete();
       }
@@ -84,15 +93,29 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
       bundle.appendColumn(convertedType(castType), castColumn);
 
       // Normalization scan
+      FiniteProgress nprog = getLogger().isVerbose() ? new FiniteProgress("Data normalization.", objects.dataLength(), getLogger()) : null;
       for(int i = 0; i < objects.dataLength(); i++) {
         @SuppressWarnings("unchecked")
         final I obj = (I) column.get(i);
         final O normalizedObj = filterSingleObject(obj);
         castColumn.set(i, normalizedObj);
+        if (nprog != null) {
+          nprog.incrementProcessed(getLogger());
+        }
+      }
+      if (nprog != null) {
+        nprog.ensureCompleted(getLogger());
       }
     }
     return bundle;
   }
+
+  /**
+   * Class logger.
+   * 
+   * @return Logger
+   */
+  abstract protected Logging getLogger();
 
   /**
    * Normalize a single instance.

@@ -32,6 +32,7 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Normalization for text frequency vectors, using the inverse document
@@ -44,6 +45,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
  * @param <V> Vector type
  */
 public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<?>> extends AbstractNormalization<V> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(InverseDocumentFrequencyNormalization.class);
+
   /**
    * The IDF storage.
    */
@@ -115,5 +121,10 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<
   @Override
   protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
     return TypeUtil.SPARSE_VECTOR_FIELD;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

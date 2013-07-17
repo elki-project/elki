@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
@@ -51,6 +52,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
 public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends AbstractNormalization<V> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(AttributeWiseMinMaxNormalization.class);
+
   /**
    * Parameter for minimum.
    */
@@ -91,24 +97,24 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
   @Override
   protected void prepareProcessInstance(V featureVector) {
     // First object? Then initialize.
-    if(minima.length == 0 || maxima.length == 0) {
+    if (minima.length == 0 || maxima.length == 0) {
       int dimensionality = featureVector.getDimensionality();
       minima = new double[dimensionality];
       maxima = new double[dimensionality];
-      for(int i = 0; i < dimensionality; i++) {
+      for (int i = 0; i < dimensionality; i++) {
         maxima[i] = -Double.MAX_VALUE;
         minima[i] = Double.MAX_VALUE;
       }
     }
-    if(minima.length != featureVector.getDimensionality()) {
+    if (minima.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors differ in length.");
     }
-    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+    for (int d = 0; d < featureVector.getDimensionality(); d++) {
       final double val = featureVector.doubleValue(d);
-      if(val > maxima[d]) {
+      if (val > maxima[d]) {
         maxima[d] = val;
       }
-      if(val < minima[d]) {
+      if (val < minima[d]) {
         minima[d] = val;
       }
     }
@@ -117,10 +123,10 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
   @Override
   protected V filterSingleObject(V featureVector) {
     double[] values = new double[featureVector.getDimensionality()];
-    if(minima.length != featureVector.getDimensionality()) {
+    if (minima.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors and given Minima/Maxima differ in length.");
     }
-    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+    for (int d = 0; d < featureVector.getDimensionality(); d++) {
       values[d] = (featureVector.doubleValue(d) - minima[d]) / factor(d);
     }
     return factory.newNumberVector(values);
@@ -128,14 +134,13 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
 
   @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
-    if(featureVector.getDimensionality() == maxima.length && featureVector.getDimensionality() == minima.length) {
+    if (featureVector.getDimensionality() == maxima.length && featureVector.getDimensionality() == minima.length) {
       double[] values = new double[featureVector.getDimensionality()];
-      for(int d = 0; d < featureVector.getDimensionality(); d++) {
+      for (int d = 0; d < featureVector.getDimensionality(); d++) {
         values[d] = (featureVector.doubleValue(d) * (factor(d)) + minima[d]);
       }
       return factory.newNumberVector(values);
-    }
-    else {
+    } else {
       throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + maxima.length);
     }
   }
@@ -161,10 +166,10 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
     int[] row = linearEquationSystem.getRowPermutations();
     int[] col = linearEquationSystem.getColumnPermutations();
 
-    for(int i = 0; i < coeff.length; i++) {
-      for(int r = 0; r < coeff.length; r++) {
+    for (int i = 0; i < coeff.length; i++) {
+      for (int r = 0; r < coeff.length; r++) {
         double sum = 0.0;
-        for(int c = 0; c < coeff[0].length; c++) {
+        for (int c = 0; c < coeff[0].length; c++) {
           sum += minima[c] * coeff[row[r]][col[c]] / factor(c);
           coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / factor(c);
         }
@@ -186,10 +191,15 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
     result.append("normalization maxima: ").append(FormatUtil.format(maxima));
     return result.toString();
   }
-  
+
   @Override
   protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 
   /**
@@ -214,11 +224,11 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
-      if(config.grab(minimaP)) {
+      if (config.grab(minimaP)) {
         minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
-      if(config.grab(maximaP)) {
+      if (config.grab(maximaP)) {
         maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
