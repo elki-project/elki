@@ -150,11 +150,6 @@ public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements
   }
 
   @Override
-  public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) throws NonNumericFeaturesException {
-    return filter(objects);
-  }
-
-  @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
     if (featureVector.getDimensionality() == median.length) {
       double[] values = new double[featureVector.getDimensionality()];

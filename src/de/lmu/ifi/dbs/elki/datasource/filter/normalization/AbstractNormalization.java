@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 
@@ -48,11 +47,6 @@ public abstract class AbstractNormalization<O extends NumberVector<?>> extends A
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
     initializeOutputType(in);
     return in;
-  }
-
-  @Override
-  public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) {
-    return filter(objects);
   }
 
   @Override
