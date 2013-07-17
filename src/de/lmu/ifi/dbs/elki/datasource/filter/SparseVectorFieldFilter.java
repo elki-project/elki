@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Class that turns sparse float vectors into a proper vector field, by setting
@@ -37,6 +38,11 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
  * @param <V> Vector type
  */
 public class SparseVectorFieldFilter<V extends SparseNumberVector<?>> extends AbstractConversionFilter<V, V> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(SparseVectorFieldFilter.class);
+
   /**
    * Maximum dimension.
    */
@@ -75,5 +81,10 @@ public class SparseVectorFieldFilter<V extends SparseNumberVector<?>> extends Ab
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
     SparseNumberVector.Factory<V, ?> factory = (SparseNumberVector.Factory<V, ?>) FilterUtil.guessFactory(in);
     return new VectorFieldTypeInformation<>(factory, maxdim);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

@@ -182,6 +182,11 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
     }
   }
 
+  @Override
+  protected Logging getLogger() {
+    return LOG;
+  }
+
   /**
    * Parameterization class.
    * 

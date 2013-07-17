@@ -31,13 +31,13 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Median Absolute Deviation is used for scaling the data set as follows:
@@ -55,6 +55,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
 public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements Normalization<V> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(AttributeWiseMADNormalization.class);
+
   /**
    * Number vector factory.
    */
@@ -102,6 +107,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements
       // Scratch space for testing:
       double[] test = new double[castColumn.size()];
 
+      FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Analyzing data.", dim, LOG) : null;
       // We iterate over dimensions, this kind of filter needs fast random
       // access.
       for (int d = 0; d < dim; d++) {
@@ -115,8 +121,15 @@ public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements
         }
         // Rescale the true MAD for the best standard deviation estimate:
         madsigma[d] = QuickSelect.median(test) * NormalDistribution.ONEBYPHIINV075;
+        if (dprog != null) {
+          dprog.incrementProcessed(LOG);
+        }
+      }
+      if (dprog != null) {
+        dprog.ensureCompleted(LOG);
       }
 
+      FiniteProgress nprog = LOG.isVerbose() ? new FiniteProgress("Data normalization.", objects.dataLength(), LOG) : null;
       // Normalization scan
       double[] buf = new double[dim];
       for (int i = 0; i < objects.dataLength(); i++) {
@@ -125,6 +138,12 @@ public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements
           buf[d] = normalize(d, obj.doubleValue(d));
         }
         castColumn.set(i, factory.newNumberVector(buf));
+        if (nprog != null) {
+          nprog.incrementProcessed(LOG);
+        }
+      }
+      if (nprog != null) {
+        nprog.ensureCompleted(LOG);
       }
     }
     return objects;
@@ -184,24 +203,5 @@ public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements
     result.append('\n');
     result.append("normalization MAD sigma: ").append(FormatUtil.format(madsigma));
     return result.toString();
-  }
-
-  /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
-    @Override
-    protected AttributeWiseMADNormalization<V> makeInstance() {
-      return new AttributeWiseMADNormalization<>();
-    }
   }
 }
