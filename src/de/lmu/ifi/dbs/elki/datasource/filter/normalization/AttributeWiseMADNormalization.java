@@ -1,0 +1,207 @@
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+
+/**
+ * Median Absolute Deviation is used for scaling the data set as follows:
+ * 
+ * First, the median, and median absolute deviation are computed in each axis.
+ * Then, each value is projected to (x - median(X)) / MAD(X).
+ * 
+ * This is similar to z-standardization of data sets, except that it is more
+ * robust towards outliers, and only slightly more expensive to compute.
+ * 
+ * @author Erich Schubert
+ * @param <V> vector type
+ * 
+ * @apiviz.uses NumberVector
+ */
+// TODO: extract superclass AbstractAttributeWiseNormalization
+public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements Normalization<V> {
+  /**
+   * Number vector factory.
+   */
+  protected NumberVector.Factory<V, ?> factory;
+
+  /**
+   * Stores the median in each dimension.
+   */
+  private double[] median = new double[0];
+
+  /**
+   * Stores the median absolute deviation in each dimension.
+   */
+  private double[] madsigma = new double[0];
+
+  /**
+   * Constructor.
+   */
+  public AttributeWiseMADNormalization() {
+    super();
+  }
+
+  @Override
+  public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
+    if (objects.dataLength() == 0) {
+      return objects;
+    }
+    for (int r = 0; r < objects.metaLength(); r++) {
+      SimpleTypeInformation<?> type = (SimpleTypeInformation<?>) objects.meta(r);
+      final List<?> column = (List<?>) objects.getColumn(r);
+      if (!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
+        continue;
+      }
+      @SuppressWarnings("unchecked")
+      final List<V> castColumn = (List<V>) column;
+      // Get the replacement type information
+      @SuppressWarnings("unchecked")
+      final VectorFieldTypeInformation<V> castType = (VectorFieldTypeInformation<V>) type;
+      factory = FilterUtil.guessFactory(castType);
+
+      // Scan to find the best
+      final int dim = castType.getDimensionality();
+      median = new double[dim];
+      madsigma = new double[dim];
+      // Scratch space for testing:
+      double[] test = new double[castColumn.size()];
+
+      // We iterate over dimensions, this kind of filter needs fast random
+      // access.
+      for (int d = 0; d < dim; d++) {
+        for (int i = 0; i < test.length; i++) {
+          test[i] = castColumn.get(i).doubleValue(d);
+        }
+        final double med = QuickSelect.median(test);
+        median[d] = med;
+        for (int i = 0; i < test.length; i++) {
+          test[i] = Math.abs(test[i] - med);
+        }
+        // Rescale the true MAD for the best standard deviation estimate:
+        madsigma[d] = QuickSelect.median(test) * NormalDistribution.ONEBYPHIINV075;
+      }
+
+      // Normalization scan
+      double[] buf = new double[dim];
+      for (int i = 0; i < objects.dataLength(); i++) {
+        final V obj = castColumn.get(i);
+        for (int d = 0; d < dim; d++) {
+          buf[d] = normalize(d, obj.doubleValue(d));
+        }
+        castColumn.set(i, factory.newNumberVector(buf));
+      }
+    }
+    return objects;
+  }
+
+  @Override
+  public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) throws NonNumericFeaturesException {
+    return filter(objects);
+  }
+
+  @Override
+  public V restore(V featureVector) throws NonNumericFeaturesException {
+    if (featureVector.getDimensionality() == median.length) {
+      double[] values = new double[featureVector.getDimensionality()];
+      for (int d = 0; d < featureVector.getDimensionality(); d++) {
+        values[d] = restore(d, featureVector.doubleValue(d));
+      }
+      return factory.newNumberVector(values);
+    } else {
+      throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + median.length);
+    }
+  }
+
+  @Override
+  public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
+  /**
+   * Normalize a single dimension.
+   * 
+   * @param d Dimension
+   * @param val Value
+   * @return Normalized value
+   */
+  private double normalize(int d, double val) {
+    return (val - median[d]) / madsigma[d];
+  }
+
+  /**
+   * Restore a single dimension.
+   * 
+   * @param d Dimension
+   * @param val Value
+   * @return Normalized value
+   */
+  private double restore(int d, double val) {
+    return (val * madsigma[d]) + median[d];
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append("normalization class: ").append(getClass().getName());
+    result.append('\n');
+    result.append("normalization median: ").append(FormatUtil.format(median));
+    result.append('\n');
+    result.append("normalization MAD sigma: ").append(FormatUtil.format(madsigma));
+    return result.toString();
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+    }
+
+    @Override
+    protected AttributeWiseMADNormalization<V> makeInstance() {
+      return new AttributeWiseMADNormalization<>();
+    }
+  }
+}

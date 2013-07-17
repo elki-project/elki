@@ -14,6 +14,7 @@ de.lmu.ifi.dbs.elki.datasource.filter.HistogramJitterFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SplitNumberVectorFilter
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMADNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseCDFNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.LengthNormalization
