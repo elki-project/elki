@@ -51,6 +51,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * objects to the cumulative density function (CDF) value at the original
  * coordinate.
  * 
+ * This process is for example also discussed in section 3.4 of
+ * <p>
+ * Effects of Feature Normalization on Image Retrieval <br/>
+ * S. Aksoy, R. M. Haralick
+ * </p>
+ * but they do not detail how to obtain an appropriate function `F`.
+ * 
  * @author Erich Schubert
  * @param <V> vector type
  * 
