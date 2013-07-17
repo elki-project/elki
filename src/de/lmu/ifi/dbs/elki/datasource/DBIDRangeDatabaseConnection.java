@@ -63,6 +63,8 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
    */
   public DBIDRangeDatabaseConnection(int start, int count) {
     super();
+    this.start = start;
+    this.count = count;
   }
 
   @Override
