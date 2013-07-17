@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -47,12 +48,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Apply principal component analysis to the data set.
  * 
- * TODO: add dimensionality reduction
+ * This process is also known as "Whitening transformation".
+ * 
+ * If you want to also reduce dimensionality, set the
+ * {@link Parameterizer#FILTER_ID} parameter!
  * 
  * @author Erich Schubert
  * 
  * @param <O> Vector type
  */
+@Alias({ "whiten", "whitening", "pca" })
 public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>> extends AbstractVectorConversionFilter<O, O> {
   /**
    * Class logger.
@@ -101,7 +106,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
 
   @Override
   protected boolean prepareStart(SimpleTypeInformation<O> in) {
-    if(!(in instanceof VectorFieldTypeInformation)) {
+    if (!(in instanceof VectorFieldTypeInformation)) {
       throw new AbortException("PCA can only applied to fixed dimensionality vectors");
     }
     dim = ((VectorFieldTypeInformation<?>) in).getDimensionality();
@@ -121,31 +126,30 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
     SortedEigenPairs eps = pcares.getEigenPairs();
     covmat = null;
 
-    if(filter == null) {
+    if (filter == null) {
       proj = new double[dim][dim];
-      for(int d = 0; d < dim; d++) {
+      for (int d = 0; d < dim; d++) {
         EigenPair ep = eps.getEigenPair(d);
         double[] ev = ep.getEigenvector().getArrayRef();
         double eval = Math.sqrt(ep.getEigenvalue());
         // Fill weighted and transposed:
-        for(int i = 0; i < dim; i++) {
+        for (int i = 0; i < dim; i++) {
           proj[d][i] = ev[i] / eval;
         }
       }
-    }
-    else {
+    } else {
       List<EigenPair> axes = filter.filter(eps).getStrongEigenPairs();
       final int pdim = axes.size(); // Projection dimensionality
       if (LOG.isVerbose()) {
-        LOG.verbose("Reducing dimensionality from "+dim+" to "+pdim+" via PCA.");
+        LOG.verbose("Reducing dimensionality from " + dim + " to " + pdim + " via PCA.");
       }
       proj = new double[pdim][dim];
-      for(int d = 0; d < pdim; d++) {
+      for (int d = 0; d < pdim; d++) {
         EigenPair ep = axes.get(d);
         double[] ev = ep.getEigenvector().getArrayRef();
         double eval = Math.sqrt(ep.getEigenvalue());
         // Fill weighted and transposed:
-        for(int i = 0; i < dim; i++) {
+        for (int i = 0; i < dim; i++) {
           proj[d][i] = ev[i] / eval;
         }
       }
@@ -156,7 +160,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
   @Override
   protected O filterSingleObject(O obj) {
     // Shift by mean and copy
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       buf[i] = obj.doubleValue(i) - mean[i];
     }
     double[] p = VMath.times(proj, buf);
@@ -171,10 +175,9 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
   @Override
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
     initializeOutputType(in);
-    if(proj.length == dim) {
+    if (proj.length == dim) {
       return in;
-    }
-    else {
+    } else {
       return new VectorFieldTypeInformation<>(factory, proj.length);
     }
   }
@@ -202,7 +205,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
       super.makeOptions(config);
 
       ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(FILTER_ID, EigenPairFilter.class, true);
-      if(config.grab(filterP)) {
+      if (config.grab(filterP)) {
         filter = filterP.instantiateClass(config);
       }
     }
