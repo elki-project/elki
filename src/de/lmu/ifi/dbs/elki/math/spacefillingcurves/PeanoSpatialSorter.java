@@ -105,8 +105,9 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
     // Safeguard against duplicate points:
     if(max - tsecond < 1E-10 || tsecond - tfirst < 1E-10 || tfirst - min < 1E-10) {
       boolean ok = false;
-      for(int d = 0; d < mms.length; d += 2) {
-        if(mms[d + 1] - mms[d] >= 1E-10) {
+      for (int d = 0; d < numdim; d++) {
+        int d2 = ((dims != null) ? dims[d] : d) << 1;
+        if (mms[d2 + 1] - mms[d2] >= 1E-10) {
           ok = true;
           break;
         }

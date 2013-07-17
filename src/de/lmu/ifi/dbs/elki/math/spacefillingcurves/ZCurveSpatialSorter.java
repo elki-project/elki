@@ -58,27 +58,28 @@ public class ZCurveSpatialSorter extends AbstractSpatialSorter {
     final double min = mms[2 * edim], max = mms[2 * edim + 1];
     double spos = (min + max) / 2.;
     // Safeguard against duplicate points:
-    if(max - spos < STOPVAL || spos - min < STOPVAL) {
+    if (max - spos < STOPVAL || spos - min < STOPVAL) {
       boolean ok = false;
-      for(int d = 0; d < mms.length; d += 2) {
-        if(mms[d + 1] - mms[d] >= STOPVAL) {
+      for (int d = 0; d < numdim; d++) {
+        int d2 = ((dims != null) ? dims[d] : d) << 1;
+        if (mms[d2 + 1] - mms[d2] >= STOPVAL) {
           ok = true;
           break;
         }
       }
-      if(!ok) {
+      if (!ok) {
         return;
       }
     }
     int split = pivotizeList1D(objs, start, end, edim, spos, false);
     assert (start <= split && split <= end);
     int nextdim = (depth + 1) % numdim;
-    if(start < split - 1) {
+    if (start < split - 1) {
       mms[2 * edim] = min;
       mms[2 * edim + 1] = spos;
       zSort(objs, start, split, mms, dims, nextdim);
     }
-    if(split < end - 1) {
+    if (split < end - 1) {
       mms[2 * edim] = spos;
       mms[2 * edim + 1] = max;
       zSort(objs, split, end, mms, dims, nextdim);
