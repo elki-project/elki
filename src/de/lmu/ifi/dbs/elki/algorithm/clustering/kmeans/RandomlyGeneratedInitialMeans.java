@@ -55,7 +55,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
     final int dim = RelationUtil.dimensionality(relation);
     NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);

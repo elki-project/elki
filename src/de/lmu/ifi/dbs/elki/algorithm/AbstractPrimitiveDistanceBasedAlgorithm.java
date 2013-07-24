@@ -50,7 +50,7 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, D extends Dista
    * Holds the instance of the distance function specified by
    * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.
    */
-  private PrimitiveDistanceFunction<? super O, D> distanceFunction;
+  protected PrimitiveDistanceFunction<? super O, D> distanceFunction;
 
   /**
    * Constructor.

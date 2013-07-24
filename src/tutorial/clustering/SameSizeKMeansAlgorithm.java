@@ -104,6 +104,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
    * @param relation relation to use
    * @return result
    */
+  @Override
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();

@@ -52,7 +52,7 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
     DBIDIter iter = relation.iterDBIDs();
     List<V> means = new ArrayList<>(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {

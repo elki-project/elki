@@ -330,6 +330,16 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
     return changed;
   }
 
+  @Override
+  public void setK(int k) {
+    this.k = k;
+  }
+
+  @Override
+  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction) {
+    this.distanceFunction = distanceFunction;
+  }
+
   /**
    * Parameterization class.
    * 
