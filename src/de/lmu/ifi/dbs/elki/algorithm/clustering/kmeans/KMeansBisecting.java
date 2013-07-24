@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -154,6 +155,16 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
   @Override
   public DistanceFunction<? super V, D> getDistanceFunction() {
     return innerkMeans.getDistanceFunction();
+  }
+
+  @Override
+  public void setK(int k) {
+    this.k = k;
+  }
+
+  @Override
+  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction) {
+    innerkMeans.setDistanceFunction(distanceFunction);
   }
 
   @Override

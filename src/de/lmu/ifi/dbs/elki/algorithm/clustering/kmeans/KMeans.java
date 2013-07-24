@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
@@ -73,4 +74,18 @@ public interface KMeans<V extends NumberVector<?>, D extends Distance<?>, M exte
    * @return Clustering result
    */
   Clustering<M> run(Database database, Relation<V> rel);
+
+  /**
+   * Set the value of k. Needed for some types of nested k-means.
+   * 
+   * @param k K parameter
+   */
+  void setK(int k);
+  
+  /**
+   * Set the distance function to use.
+   * 
+   * @param distanceFunction Distance function.
+   */
+  void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction);
 }

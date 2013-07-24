@@ -135,6 +135,16 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
   }
 
   @Override
+  public void setK(int k) {
+    innerkMeans.setK(k);
+  }
+
+  @Override
+  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction) {
+    innerkMeans.setDistanceFunction(distanceFunction);
+  }
+
+  @Override
   protected Logging getLogger() {
     return LOG;
   }
