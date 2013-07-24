@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
@@ -214,7 +213,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
       for (int j = 0; j < numcurves; j++) {
         final List<SpatialRef> curve = curves.get(j);
-        final Matrix mat = proj.generateProjectionMatrix(idim, dim);
+        final RandomProjectionFamily.Projection mat = proj.generateProjection(idim, dim);
         final int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
 
         // Initialize min/max:
@@ -224,7 +223,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
         }
         // Project data set:
         for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-          double[] proj = mat.times(relation.get(iditer).getColumnVector()).getArrayRef();
+          double[] proj = mat.project(relation.get(iditer));
           curve.add(new SpatialRef(DBIDUtil.deref(iditer), factory.newNumberVector(proj)));
           for (int d2 = 0, d = 0; d2 < mms.length; d2 += 2, d++) {
             mms[d2] = Math.min(mms[d2], proj[d]);

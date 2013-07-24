@@ -54,8 +54,6 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -167,11 +165,11 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
         }
       }
     } else {
-      final Matrix mat = proj.generateProjectionMatrix(idim, odim);
+      final RandomProjectionFamily.Projection mat = proj.generateProjection(idim, odim);
       for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        Vector v = mat.times(relation.get(iditer).getColumnVector());
+        double[] v = mat.project(relation.get(iditer));
         for (int j = 0; j < odim; j++) {
-          projected.get(j).add(v.doubleValue(j), iditer);
+          projected.get(j).add(v[j], iditer);
         }
       }
     }
