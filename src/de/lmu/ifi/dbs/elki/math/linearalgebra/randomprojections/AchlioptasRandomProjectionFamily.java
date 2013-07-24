@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -62,9 +61,9 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     super(random);
     this.sparsity = sparsity;
   }
-
+  
   @Override
-  public Matrix generateProjectionMatrix(int idim, int odim) {
+  public Projection generateProjection(int idim, int odim) {
     final double pPos = .5 / sparsity;
     final double pNeg = pPos + pPos; // Threshold
     double baseValuePart = Math.sqrt(this.sparsity);
@@ -85,30 +84,7 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
         projectionMatrix.set(i, j, value);
       }
     }
-    return projectionMatrix;
-  }
-
-  @Override
-  public Vector generateProjectionVector(int odim) {
-    final double pPos = .5 / sparsity;
-    final double pNeg = pPos + pPos; // Threshold
-    double baseValuePart = Math.sqrt(this.sparsity);
-
-    double[] vec = new double[odim];
-    for (int j = 0; j < odim; ++j) {
-      final double r = random.nextDouble();
-      final double value;
-      if (r < pPos) {
-        value = baseValuePart;
-      } else if (r < pNeg) {
-        value = -baseValuePart;
-      } else {
-        value = 0.;
-      }
-
-      vec[j] = value;
-    }
-    return null;
+    return new MatrixProjection(projectionMatrix);
   }
 
   /**

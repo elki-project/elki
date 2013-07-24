@@ -22,8 +22,10 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import java.util.Arrays;
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -55,19 +57,98 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
   }
 
   @Override
-  public Matrix generateProjectionMatrix(int dim, int odim) {
-    Matrix projectionMatrix = new Matrix(odim, dim);
-    for (int i = 0; i < odim; i++) {
-      projectionMatrix.set(i, random.nextInt(dim), 1.);
+  public Projection generateProjection(int idim, int odim) {
+    int[] dims;
+    if (odim < idim) {
+      dims = Arrays.copyOf(randomPermutation(range(0, idim), random), odim);
+    } else if (odim == idim) {
+      dims = randomPermutation(range(0, idim), random);
+    } else {
+      int mdim = idim;
+      while (mdim < odim) {
+        mdim += idim;
+      }
+      dims = new int[mdim];
+      for (int i = 0; i < mdim; i++) {
+        dims[i] = i % idim;
+      }
+      dims = Arrays.copyOf(randomPermutation(dims, random), odim);
     }
-    return projectionMatrix;
+    return new SubsetProjection(dims);
   }
 
-  @Override
-  public Vector generateProjectionVector(int dim) {
-    Vector vec = new Vector(dim);
-    vec.set(random.nextInt(dim), 1.);
-    return vec;
+  /**
+   * Initialize an integer value range.
+   * 
+   * FIXME: move to shared code.
+   * 
+   * @param start Starting value
+   * @param end End value (exclusive)
+   * @return Array of integers start..end, excluding end.
+   */
+  public static int[] range(int start, int end) {
+    int[] out = new int[end - start];
+    for (int i = 0, j = start; j < end; i++, j++) {
+      out[i] = j;
+    }
+    return out;
+  }
+
+  /**
+   * Perform a random permutation of the array, in-place.
+   * 
+   * Knuth / Fisher-Yates style shuffle
+   * 
+   * FIXME: move to shared code.
+   * 
+   * @param existing Existing array
+   * @param random Random generator.
+   * @return Same array.
+   */
+  public static int[] randomPermutation(final int[] out, Random random) {
+    for (int i = out.length - 1; i > 0; i--) {
+      // Swap with random preceeding element.
+      int ri = random.nextInt(i + 1);
+      int tmp = out[ri];
+      out[ri] = out[i];
+      out[i] = tmp;
+    }
+    return out;
+  }
+
+  /**
+   * Random subset projection.
+   * 
+   * @author Erich Schubert
+   */
+  public static class SubsetProjection implements Projection {
+    /**
+     * Input dimensions.
+     */
+    private int[] dims;
+
+    /**
+     * Constructor.
+     * 
+     * @param dims Data permutation.
+     */
+    public SubsetProjection(int[] dims) {
+      this.dims = dims;
+    }
+
+    @Override
+    public double[] project(NumberVector<?> in) {
+      double[] buf = new double[dims.length];
+      for (int i = 0; i < dims.length; i++) {
+        buf[i] = in.doubleValue(dims[i]);
+      }
+      return buf;
+    }
+
+    @Override
+    public int getOutputDimensionality() {
+      return dims.length;
+    }
   }
 
   /**

@@ -23,13 +23,11 @@ package de.lmu.ifi.dbs.elki.data.projection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.AchlioptasRandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -70,7 +68,7 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
   /**
    * Projection matrix.
    */
-  private Matrix projectionMatrix = null;
+  private RandomProjectionFamily.Projection projection = null;
 
   /**
    * Random projection family
@@ -95,16 +93,15 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
     factory = (NumberVector.Factory<V, ?>) vin.getFactory();
     int inputdim = vin.getDimensionality();
 
-    projectionMatrix = family.generateProjectionMatrix(inputdim, dimensionality);
+    projection = family.generateProjection(inputdim, dimensionality);
     if (LOG.isDebugging()) {
-      LOG.debug(projectionMatrix.toString());
+      LOG.debug(projection.toString());
     }
   }
 
   @Override
   public V project(V data) {
-    // TODO: remove getColumnVector overhead?
-    return factory.newNumberVector(VectorUtil.fastTimes(projectionMatrix, data.getColumnVector()));
+    return factory.newNumberVector(projection.project(data));
   }
 
   @Override
