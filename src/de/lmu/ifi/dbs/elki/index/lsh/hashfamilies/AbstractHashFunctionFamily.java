@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.MultipleProjectionsLocalitySensitiveHashFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -92,7 +91,7 @@ public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHas
     ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(l);
     final Random rnd = random.getRandom();
     for (int i = 0; i < l; i++) {
-      Matrix mat = proj.generateProjectionMatrix(dim, k);
+      RandomProjectionFamily.Projection mat = proj.generateProjection(dim, k);
       ps.add(new MultipleProjectionsLocalitySensitiveHashFunction(mat, width, rnd));
     }
     return ps;

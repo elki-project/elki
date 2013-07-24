@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,26 +23,44 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+
 /**
  * Interface for random projection families.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Projection
  */
 public interface RandomProjectionFamily {
   /**
    * Generate a projection matrix for the given dimensionalities.
    * 
-   * @param dim Input Dimensionality
+   * @param idim Input Dimensionality
    * @param odim Output Dimensionality
    * @return Projection matrix
    */
-  Matrix generateProjectionMatrix(int dim, int odim);
+  Projection generateProjection(int idim, int odim);
 
   /**
-   * Generate a random projection vector for the given dimensionality.
+   * Interface for projection instances.
    * 
-   * @param dim Input Dimensionality
-   * @return Projection vector
+   * @author Erich Schubert
    */
-  Vector generateProjectionVector(int dim);
+  static interface Projection {
+    /**
+     * Project a single vector.
+     * 
+     * @param in Input vector
+     * @return Projected vector
+     */
+    double[] project(NumberVector<?> in);
+
+    /**
+     * Get the output dimensionality.
+     * 
+     * @return Output dimensionality
+     */
+    int getOutputDimensionality();
+  }
 }

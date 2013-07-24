@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -51,7 +50,7 @@ public class GaussianRandomProjectionFamily extends AbstractRandomProjectionFami
   }
 
   @Override
-  public Matrix generateProjectionMatrix(int idim, int odim) {
+  public Projection generateProjection(int idim, int odim) {
     Matrix projectionMatrix = new Matrix(odim, idim);
     for (int i = 0; i < odim; ++i) {
       for (int j = 0; j < idim; ++j) {
@@ -59,17 +58,7 @@ public class GaussianRandomProjectionFamily extends AbstractRandomProjectionFami
         projectionMatrix.set(i, j, value);
       }
     }
-    return projectionMatrix;
-  }
-
-  @Override
-  public Vector generateProjectionVector(int odim) {
-    double[] vec = new double[odim];
-    for (int j = 0; j < odim; ++j) {
-      final double value = random.nextGaussian();
-      vec[j] = value;
-    }
-    return null;
+    return new MatrixProjection(projectionMatrix);
   }
 
   /**

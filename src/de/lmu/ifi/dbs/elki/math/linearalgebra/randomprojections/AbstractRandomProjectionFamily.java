@@ -25,6 +25,10 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -75,6 +79,53 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
       if (config.grab(rndP)) {
         random = rndP.getValue();
       }
+    }
+  }
+
+  /**
+   * Class to project using a matrix multiplication.
+   * 
+   * @author Erich Schubert
+   */
+  public static class MatrixProjection implements Projection {
+    /**
+     * Projection matrix.
+     */
+    Matrix matrix;
+
+    /**
+     * Projection buffer.
+     */
+    Vector buf;
+
+    /**
+     * Projection buffer values.
+     */
+    double[] vals;
+    
+    /**
+     * Constructor.
+     *
+     * @param matrix Projection matrix.
+     */
+    public MatrixProjection(Matrix matrix) {
+      super();
+      this.matrix = matrix;
+      this.buf = new Vector(matrix.getColumnDimensionality());
+      this.vals = buf.getArrayRef();
+    }
+
+    @Override
+    public double[] project(NumberVector<?> in) {
+      for (int d = 0; d < vals.length; d++) {
+        vals[d] = in.doubleValue(d);
+      }
+      return VectorUtil.fastTimes(matrix, buf);
+    }
+
+    @Override
+    public int getOutputDimensionality() {
+      return matrix.getRowDimensionality();
     }
   }
 }

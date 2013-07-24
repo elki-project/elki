@@ -25,8 +25,7 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -47,7 +46,7 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
   /**
    * Projection matrix.
    */
-  Matrix projection;
+  RandomProjectionFamily.Projection projection;
 
   /**
    * Shift offset.
@@ -71,12 +70,12 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
    * @param width Width of bins
    * @param rnd Random number generator
    */
-  public MultipleProjectionsLocalitySensitiveHashFunction(Matrix projection, double width, Random rnd) {
+  public MultipleProjectionsLocalitySensitiveHashFunction(RandomProjectionFamily.Projection projection, double width, Random rnd) {
     super();
     this.projection = projection;
     this.width = width;
     // Generate random shifts:
-    final int num = projection.getRowDimensionality();
+    final int num = projection.getOutputDimensionality();
     this.shift = new double[num];
     this.randoms1 = new int[num];
     for (int i = 0; i < num; i++) {
@@ -92,7 +91,7 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
   public int hashObject(NumberVector<?> vec) {
     long t1sum = 0L;
     // Project the vector:
-    final double[] proj = VectorUtil.fastTimes(projection, vec);
+    final double[] proj = projection.project(vec);
     for (int i = 0; i < shift.length; i++) {
       int ai = (int) Math.floor((proj[i] + shift[i]) / width);
       t1sum += randoms1[i] * (long) ai;
