@@ -907,12 +907,20 @@ public class GammaDistribution implements DistributionWithRandom {
   /**
    * Simple parameter estimation for the Gamma distribution.
    * 
-   * This is a very naive estimation, based on the mean and variance only.
+   * This is a very naive estimation, based on the mean and variance only,
+   * sometimes referred to as the "Method of Moments" (MOM).
+   * 
+   * Reference:
+   * <p>
+   * G. Casella, R. L. Berger<br />
+   * Statistical inference. Vol. 70
+   * </p>
    * 
    * @author Erich Schubert
    * 
    * @apiviz.has GammaDistribution - - estimates
    */
+  @Reference(authors = "G. Casella, R. L. Berger", title = "Statistical inference. Vol. 70", booktitle = "Statistical inference. Vol. 70")
   public static class NaiveEstimator implements DistributionEstimator<GammaDistribution> {
     /**
      * Private constructor.
