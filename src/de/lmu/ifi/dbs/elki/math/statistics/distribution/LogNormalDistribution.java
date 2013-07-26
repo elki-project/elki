@@ -274,6 +274,20 @@ public class LogNormalDistribution implements DistributionWithRandom {
         x[i] = Math.abs(x[i] - median);
       }
       double mdev = QuickSelect.median(x);
+      // Fallback if we have more than 50% ties to next largest.
+      if (!(mdev > 0.)) {
+        double min = Double.POSITIVE_INFINITY;
+        for (double xi : x) {
+          if (xi > 0. && xi < min) {
+            min = xi;
+          }
+        }
+        if (min < Double.POSITIVE_INFINITY) {
+          mdev = min;
+        } else {
+          mdev = 1.0; // Maybe all constant. No real value.
+        }
+      }
       // The scaling factor is for consistency
       return new LogNormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mdev, 0.);
     }

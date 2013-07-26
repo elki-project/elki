@@ -11,6 +11,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.StudentsTDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ConstantDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.HaltonUniformDistribution

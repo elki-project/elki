@@ -12,3 +12,6 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution$NaiveEsti
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution$MADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution$ChoiWetteEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution$NaiveEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution$NaiveEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution$MADEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution$MADEstimator
