@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -30,7 +32,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  * 
  * @author Erich Schubert
  */
-public class WeibullDistribution implements Distribution {
+public class WeibullDistribution implements DistributionWithRandom {
   /**
    * Shift offset.
    */
@@ -47,16 +49,18 @@ public class WeibullDistribution implements Distribution {
   double lambda;
 
   /**
+   * Random number generator.
+   */
+  Random random;
+
+  /**
    * Constructor.
    * 
    * @param k Shape parameter
    * @param lambda Scale parameter
    */
   public WeibullDistribution(double k, double lambda) {
-    super();
-    this.k = k;
-    this.lambda = lambda;
-    this.theta = 0.0;
+    this(k, lambda, 0.0, null);
   }
 
   /**
@@ -67,10 +71,34 @@ public class WeibullDistribution implements Distribution {
    * @param theta Shift offset parameter
    */
   public WeibullDistribution(double k, double lambda, double theta) {
+    this(k, lambda, theta, null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param k Shape parameter
+   * @param lambda Scale parameter
+   * @param random Random number generator
+   */
+  public WeibullDistribution(double k, double lambda, Random random) {
+    this(k, lambda, 0.0, random);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param k Shape parameter
+   * @param lambda Scale parameter
+   * @param theta Shift offset parameter
+   * @param random Random number generator
+   */
+  public WeibullDistribution(double k, double lambda, double theta, Random random) {
     super();
     this.k = k;
     this.lambda = lambda;
     this.theta = theta;
+    this.random = random;
   }
 
   @Override
@@ -142,5 +170,10 @@ public class WeibullDistribution implements Distribution {
   @Override
   public double quantile(double val) {
     return quantile(val, k, lambda, theta);
+  }
+
+  @Override
+  public double nextRandom() {
+    return theta + lambda * Math.pow(-Math.log(1 - random.nextDouble()), 1. / k);
   }
 }
