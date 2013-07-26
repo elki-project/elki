@@ -147,7 +147,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
               Arrays.sort(test);
               double q = KolmogorovSmirnovTest.simpleTest(test, 0., 1.);
               if (LOG.isVeryVerbose()) {
-                LOG.veryverbose("Distribution " + est.toString() + " has maximum deviation " + q + " for dimension " + d);
+                LOG.veryverbose("Estimator " + est.toString() + " (" + dist.toString() + ") has maximum deviation " + q + " for dimension " + d);
               }
               if (best == null || q < bestq) {
                 best = dist;
