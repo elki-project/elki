@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 /**
  * Unit test for the Gumbel distribution in ELKI.
  * 
- * The reference values were computed using GNU R and SciPy.
+ * The reference values were computed using SciPy.
  * 
  * @author Erich Schubert
  */
