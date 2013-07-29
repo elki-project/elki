@@ -91,6 +91,11 @@ public final class MathUtil {
   public static final double LOG2 = Math.log(2);
 
   /**
+   * Logarithm of 3 to the basis e, for logarithm conversion.
+   */
+  public static final double LOG3 = Math.log(3);
+
+  /**
    * Natural logarithm of 10.
    */
   public static final double LOG10 = Math.log(10);
