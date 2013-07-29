@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedExtremeValueDistribution;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -197,7 +196,6 @@ public class ProbabilityWeightedMoments implements DistributionEstimator<General
     }
     Arrays.sort(sorted);
     double[] xmom = samLMR(sorted, ArrayLikeUtil.DOUBLEARRAYADAPTER, 3);
-    System.err.println("L-Moments: " + FormatUtil.format(xmom, FormatUtil.NF8));
     double t3 = xmom[2];
     if (Math.abs(t3) < 1e-50 || (t3 >= 1.)) {
       throw new ArithmeticException("Invalid moment estimation.");
@@ -240,7 +238,6 @@ public class ProbabilityWeightedMoments implements DistributionEstimator<General
       }
     }
     double gam = Math.exp(GammaDistribution.logGamma(1. + g));
-    System.err.println("g: " + g + " gam: " + gam);
     final double mu, sigma, k;
     k = g;
     sigma = xmom[1] * g / (gam * (1. - Math.pow(2., -g)));
