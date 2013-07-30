@@ -60,31 +60,32 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
     // Get the bit masks
     BitSet b1 = v1.getNotNullMask();
     BitSet b2 = v2.getNotNullMask();
-    double sqrDist = 0;
+    double accu = 0;
     int i1 = b1.nextSetBit(0);
     int i2 = b2.nextSetBit(0);
-    while(i1 >= 0 && i2 >= 0) {
-      if(i1 == i2) {
-        // Set in both
-        double manhattanI = Math.abs(v1.doubleValue(i1) - v2.doubleValue(i2));
-        sqrDist += Math.pow(manhattanI, p);
+    while (true) {
+      if (i1 == i2) {
+        if (i1 < 0) {
+          break;
+        }
+        // Both vectors have a value.
+        double val = Math.abs(v1.doubleValue(i1) - v2.doubleValue(i2));
+        accu += Math.pow(val, p);
         i1 = b1.nextSetBit(i1 + 1);
         i2 = b2.nextSetBit(i2 + 1);
-      }
-      else if(i1 < i2 && i1 >= 0) {
+      } else if (i2 < 0 || (i1 < i2 && i1 >= 0)) {
         // In first only
-        double manhattanI = Math.abs(v1.doubleValue(i1));
-        sqrDist += Math.pow(manhattanI, p);
+        double val = Math.abs(v1.doubleValue(i1));
+        accu += Math.pow(val, p);
         i1 = b1.nextSetBit(i1 + 1);
-      }
-      else {
+      } else {
         // In second only
-        double manhattanI = Math.abs(v2.doubleValue(i2));
-        sqrDist += Math.pow(manhattanI, p);
-        i2 = b1.nextSetBit(i2 + 1);
+        double val = Math.abs(v2.doubleValue(i2));
+        accu += Math.pow(val, p);
+        i2 = b2.nextSetBit(i2 + 1);
       }
     }
-    return Math.pow(sqrDist, 1.0 / p);
+    return Math.pow(accu, 1.0 / p);
   }
 
   @Override
