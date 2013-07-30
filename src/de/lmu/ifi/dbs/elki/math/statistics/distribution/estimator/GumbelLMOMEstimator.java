@@ -22,13 +22,15 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate the parameters of a normal distribution using the L-Moments.
+ * Estimate the parameters of a Gumbel Distribution, using the methods of
+ * L-Moments (LMOM).
  * 
  * Reference:
  * <p>
@@ -36,22 +38,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Fortran routines for use with the method of L-moments Version 3.03<br />
  * IBM Research.
  * </p>
- *
+ * 
+ * 
  * @author Erich Schubert
  * 
- * @apiviz.has NormalDistribution
+ * @apiviz.has GumbelDistribution
  */
 @Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class NormalLMOMEstimator extends AbstractLMOMEstimator<NormalDistribution> {
+public class GumbelLMOMEstimator extends AbstractLMOMEstimator<GumbelDistribution> {
   /**
-   * Static instance
+   * Static instance.
    */
-  public static final NormalLMOMEstimator STATIC = new NormalLMOMEstimator();
+  public static final GumbelLMOMEstimator STATIC = new GumbelLMOMEstimator();
 
   /**
    * Constructor. Private: use static instance.
    */
-  private NormalLMOMEstimator() {
+  private GumbelLMOMEstimator() {
     super();
   }
 
@@ -61,13 +64,14 @@ public class NormalLMOMEstimator extends AbstractLMOMEstimator<NormalDistributio
   }
 
   @Override
-  public NormalDistribution estimateFromLMoments(double[] xmom) {
-    return new NormalDistribution(xmom[0], xmom[1] * MathUtil.SQRTPI);
+  public GumbelDistribution estimateFromLMoments(double[] xmom) {
+    double scale = xmom[2] / MathUtil.LOG2;
+    return new GumbelDistribution(xmom[1] - Math.E * scale, scale);
   }
 
   @Override
-  public Class<? super NormalDistribution> getDistributionClass() {
-    return NormalDistribution.class;
+  public Class<? super GumbelDistribution> getDistributionClass() {
+    return GumbelDistribution.class;
   }
 
   /**
@@ -79,7 +83,7 @@ public class NormalLMOMEstimator extends AbstractLMOMEstimator<NormalDistributio
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected NormalLMOMEstimator makeInstance() {
+    protected GumbelLMOMEstimator makeInstance() {
       return STATIC;
     }
   }

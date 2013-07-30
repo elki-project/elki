@@ -23,48 +23,57 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate a Weibull distribution from the statistical moments.
+ * Estimate the parameters of a Gamma Distribution, using the methods of
+ * L-Moments (LMOM).
  * 
- * FIXME: is this sound at all? There is currently no reference associated, and
- * this was probably just created during testing by copy and pasting from the
- * L-Moments based code!
+ * Reference:
+ * <p>
+ * J. R. M. Hosking<br />
+ * Fortran routines for use with the method of L-moments Version 3.03<br />
+ * IBM Research.
+ * </p>
+ * 
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has ExponentialDistribution
  */
-public class WeibullMOMEstimator extends AbstractMOMEstimator<WeibullDistribution> {
+@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
+public class ExponentialLMOMEstimator extends AbstractLMOMEstimator<ExponentialDistribution> {
   /**
    * Static instance.
    */
-  public static final WeibullMOMEstimator STATIC = new WeibullMOMEstimator();
+  public static final ExponentialLMOMEstimator STATIC = new ExponentialLMOMEstimator();
 
   /**
    * Constructor. Private: use static instance.
    */
-  private WeibullMOMEstimator() {
+  private ExponentialLMOMEstimator() {
     super();
   }
 
   @Override
-  public WeibullDistribution estimateFromStatisticalMoments(StatisticalMoments mom) {
-    double l = mom.getSampleSkewness(), l2 = l * l, l3 = l2 * l, l4 = l3 * l, l5 = l4 * l, l6 = l5 * l;
-    double k = 285.3 * l6 - 658.6 * l5 + 622.8 * l4 - 317.2 * l3 + 98.52 * l2 - 21.256 * l + 3.516;
-
-    double gam = GammaDistribution.gamma(1. + 1. / k);
-    double lambda = mom.getSampleStddev() / (1. - Math.pow(2., -1. / k) * gam);
-    double mu = mom.getMean() - lambda * gam;
-
-    return new WeibullDistribution(k, lambda, mu);
+  public int getNumMoments() {
+    return 2;
   }
 
   @Override
-  public Class<? super WeibullDistribution> getDistributionClass() {
-    return WeibullDistribution.class;
+  public ExponentialDistribution estimateFromLMoments(double[] xmom) {
+    double scale = 2. * xmom[1];
+    if (!(scale > 0.)) {
+      throw new ArithmeticException("Constant data cannot be exponential distributed.");
+    }
+    return new ExponentialDistribution(1. / scale, xmom[0] - scale);
+  }
+
+  @Override
+  public Class<? super ExponentialDistribution> getDistributionClass() {
+    return ExponentialDistribution.class;
   }
 
   /**
@@ -76,7 +85,7 @@ public class WeibullMOMEstimator extends AbstractMOMEstimator<WeibullDistributio
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WeibullMOMEstimator makeInstance() {
+    protected ExponentialLMOMEstimator makeInstance() {
       return STATIC;
     }
   }

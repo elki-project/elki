@@ -4,6 +4,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaChoiWetteEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMOMEstimator
@@ -14,13 +15,14 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimato
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMedianEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelMADEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.CauchyMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLevenbergMarquardtKDEEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLevenbergMarquardtKDEEstimator
-# de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullMOMEstimator
