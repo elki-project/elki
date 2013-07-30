@@ -1,0 +1,181 @@
+package de.lmu.ifi.dbs.elki.math.statistics.distribution;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
+/**
+ * Logistic distribution.
+ * 
+ * @author Erich Schubert
+ */
+public class LogisticDistribution implements DistributionWithRandom {
+  /**
+   * Parameters: location and scale
+   */
+  double location, scale;
+
+  /**
+   * Random number generator
+   */
+  Random random;
+
+  /**
+   * Constructor.
+   * 
+   * @param location Location
+   * @param scale Scale
+   */
+  public LogisticDistribution(double location, double scale) {
+    this(location, scale, null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param location Location
+   * @param scale Scale
+   * @param random Random number generator
+   */
+  public LogisticDistribution(double location, double scale, Random random) {
+    super();
+    this.location = location;
+    this.scale = scale;
+    this.random = random;
+  }
+
+  /**
+   * Probability density function.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @return PDF
+   */
+  public static double pdf(double val, double loc, double scale) {
+    val = Math.abs((val - loc) / scale);
+    double e = Math.exp(-val);
+    double f = 1.0 + e;
+    return e / (scale * f * f);
+  }
+
+  /**
+   * log Probability density function.
+   * 
+   * TODO: untested.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @return log PDF
+   */
+  public static double logpdf(double val, double loc, double scale) {
+    val = Math.abs((val - loc) / scale);
+    double e = Math.exp(-val);
+    double f = 1.0 + e;
+    return -(val + Math.log(scale * f * f));
+  }
+
+  @Override
+  public double pdf(double val) {
+    return pdf(val, location, scale);
+  }
+
+  /**
+   * Cumulative density function.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @return CDF
+   */
+  public static double cdf(double val, double loc, double scale) {
+    val = (val - loc) / scale;
+    return 1. / (1. + Math.exp(-val));
+  }
+
+  /**
+   * log Cumulative density function.
+   * 
+   * TODO: untested.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @return log PDF
+   */
+  public static double logcdf(double val, double loc, double scale) {
+    val = (val - loc) / scale;
+    if (val <= 18.) {
+      return -Math.log1p(Math.exp(-val));
+    } else if (val > 33.3) {
+      return val;
+    } else {
+      return val - Math.exp(val);
+    }
+  }
+
+  @Override
+  public double cdf(double val) {
+    return cdf(val, location, scale);
+  }
+
+  /**
+   * Quantile function.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @return Quantile
+   */
+  public static double quantile(double val, double loc, double scale) {
+    return loc + scale * Math.log(val / (1. - val));
+  }
+
+  /**
+   * log Quantile function.
+   * 
+   * TODO: untested.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @return Quantile
+   */
+  public static double logquantile(double val, double loc, double scale) {
+    return loc + scale * (val - MathUtil.log1mexp(-val));
+  }
+
+  @Override
+  public double quantile(double val) {
+    return quantile(val, location, scale);
+  }
+
+  @Override
+  public double nextRandom() {
+    double u = random.nextDouble();
+    return location + scale * Math.log(u / (1. - u));
+  }
+}

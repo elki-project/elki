@@ -820,4 +820,14 @@ public final class MathUtil {
       return Double.longBitsToDouble(bits);
     }
   }
+
+  /**
+   * More stable than {@code Math.log(1 - Math.exp(x))}
+   * 
+   * @param x Value
+   * @return log(1-exp(x))
+   */
+  public static double log1mexp(double x) {
+    return (x > -LOG2) ? Math.log(-Math.expm1(x)) : Math.log1p(-Math.exp(x));
+  }
 }

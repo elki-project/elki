@@ -6,6 +6,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.CauchyDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.LogisticDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution
