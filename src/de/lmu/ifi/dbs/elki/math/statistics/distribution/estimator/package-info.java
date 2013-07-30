@@ -1,4 +1,9 @@
-package de.lmu.ifi.dbs.elki.math.statistics.distribution;
+/**
+ * Estimators for statistical distributions.
+ * 
+ * @author Erich Schubert
+ */
+package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
 /*
  This file is part of ELKI:
@@ -22,30 +27,3 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-
-/**
- * Estimate distribution parameters from a sample.
- * 
- * @author Erich Schubert
- * 
- * @param <D> Distribution type
- */
-public interface DistributionEstimator<D extends Distribution> {
-  /**
-   * General form of the parameter estimation
-   * 
-   * @param data Data set
-   * @param adapter Number array adapter
-   * @return Estimated distribution
-   */
-  <A> D estimate(A data, NumberArrayAdapter<?, A> adapter);
-
-  /**
-   * Get the class that is produced by the estimator.
-   * 
-   * @return Distribution class
-   */
-  Class<? super D> getDistributionClass();
-}

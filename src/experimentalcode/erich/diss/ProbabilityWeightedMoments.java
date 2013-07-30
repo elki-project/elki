@@ -26,9 +26,13 @@ package experimentalcode.erich.diss;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionEstimator;
+import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedExtremeValueDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -54,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  */
 @Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", booktitle = "Technometrics 27.3", url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
-public class ProbabilityWeightedMoments implements DistributionEstimator<GeneralizedExtremeValueDistribution> {
+public class ProbabilityWeightedMoments {
   /**
    * Compute the alpha_r factors using the method of probability-weighted
    * moments.
@@ -165,7 +169,7 @@ public class ProbabilityWeightedMoments implements DistributionEstimator<General
       sum[k] = temp;
     }
     if (nmom > 2 && !(sum[1] > 0)) {
-      throw new ArithmeticException("Can't compute higher order moments for constant data.");
+      throw new ArithmeticException("Can't compute higher order moments for constant data. Sum: "+sum[1]);
     }
     for (int i = 2; i < nmom; i++) {
       sum[i] /= sum[1];
@@ -176,7 +180,7 @@ public class ProbabilityWeightedMoments implements DistributionEstimator<General
   /**
    * Constants for fast rational approximations.
    */
-  private final double //
+  private static final double //
       A0 = 0.28377530,
       A1 = -1.21096399, A2 = -2.50728214, A3 = -1.13455566, A4 = -0.07138022, //
       B1 = 2.06189696, B2 = 1.31912239, B3 = 0.25077104, //
@@ -184,69 +188,145 @@ public class ProbabilityWeightedMoments implements DistributionEstimator<General
       D1 = -0.64363929, D2 = 0.08985247;
 
   /** Maximum number of iterations. */
-  private int MAXIT = 20;
+  private static int MAXIT = 20;
 
-  @Override
-  public <A> GeneralizedExtremeValueDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    // Sort:
-    final int size = adapter.size(data);
-    double[] sorted = new double[size];
-    for (int i = 0; i < size; i++) {
-      sorted[i] = adapter.getDouble(data, i);
-    }
-    Arrays.sort(sorted);
-    double[] xmom = samLMR(sorted, ArrayLikeUtil.DOUBLEARRAYADAPTER, 3);
-    double t3 = xmom[2];
-    if (Math.abs(t3) < 1e-50 || (t3 >= 1.)) {
-      throw new ArithmeticException("Invalid moment estimation.");
-    }
-    // Approximation for t3 between 0 and 1:
-    double g;
-    if (t3 > 0.) {
-      double z = 1. - t3;
-      g = (-1. + z * (C1 + z * (C2 + z * C3))) / (1. + z * (D1 + z * D2));
-      // g: Almost zero?
-      if (Math.abs(g) < 1e-50) {
-        double k = 0;
-        double sigma = xmom[1] / MathUtil.LOG2;
-        double mu = xmom[0] - Math.E * sigma;
-        return new GeneralizedExtremeValueDistribution(mu, sigma, k);
+  @Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", booktitle = "Technometrics 27.3", url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
+  public static class GEVLMomentsEstimator implements DistributionEstimator<GeneralizedExtremeValueDistribution> {
+    @Override
+    public <A> GeneralizedExtremeValueDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      // Sort:
+      final int size = adapter.size(data);
+      double[] sorted = new double[size];
+      for (int i = 0; i < size; i++) {
+        sorted[i] = adapter.getDouble(data, i);
       }
-    } else {
-      // Approximation for t3 between -.8 and 0L:
-      g = (A0 + t3 * (A1 + t3 * (A2 + t3 * (A3 + t3 * A4)))) / (1. + t3 * (B1 + t3 * (B2 + t3 * B3)));
-      if (t3 < -.8) {
-        // Newton-Raphson iteration for t3 < -.8
-        if (t3 <= -.97) {
-          g = 1. - Math.log(1. + t3) / MathUtil.LOG2;
+      Arrays.sort(sorted);
+      double[] xmom = samLMR(sorted, ArrayLikeUtil.DOUBLEARRAYADAPTER, 3);
+      System.err.println(FormatUtil.format(xmom, FormatUtil.NF8));
+      double t3 = xmom[2];
+      if (Math.abs(t3) < 1e-50 || (t3 >= 1.)) {
+        throw new ArithmeticException("Invalid moment estimation.");
+      }
+      // Approximation for t3 between 0 and 1:
+      double g;
+      if (t3 > 0.) {
+        double z = 1. - t3;
+        g = (-1. + z * (C1 + z * (C2 + z * C3))) / (1. + z * (D1 + z * D2));
+        // g: Almost zero?
+        if (Math.abs(g) < 1e-50) {
+          double k = 0;
+          double sigma = xmom[1] / MathUtil.LOG2;
+          double mu = xmom[0] - Math.E * sigma;
+          return new GeneralizedExtremeValueDistribution(mu, sigma, k);
         }
-        double t0 = .5 * (t3 + 3.);
-        for (int it = 1;; it++) {
-          double x2 = Math.pow(2., -g), xx2 = 1. - x2;
-          double x3 = Math.pow(3., -g), xx3 = 1. - x3;
-          double t = xx3 / xx2;
-          double deriv = (xx2 * x3 * MathUtil.LOG3 - xx3 * x2 * MathUtil.LOG2) / (xx2 * x2);
-          double oldg = g;
-          g -= (t - t0) / deriv;
-          if (Math.abs(g - oldg) < 1e-20 * g) {
-            break;
+      } else {
+        // Approximation for t3 between -.8 and 0L:
+        g = (A0 + t3 * (A1 + t3 * (A2 + t3 * (A3 + t3 * A4)))) / (1. + t3 * (B1 + t3 * (B2 + t3 * B3)));
+        if (t3 < -.8) {
+          // Newton-Raphson iteration for t3 < -.8
+          if (t3 <= -.97) {
+            g = 1. - Math.log(1. + t3) / MathUtil.LOG2;
           }
-          if (it >= MAXIT) {
-            throw new ArithmeticException("Newton-Raphson did not converge.");
+          double t0 = .5 * (t3 + 3.);
+          for (int it = 1;; it++) {
+            double x2 = Math.pow(2., -g), xx2 = 1. - x2;
+            double x3 = Math.pow(3., -g), xx3 = 1. - x3;
+            double t = xx3 / xx2;
+            double deriv = (xx2 * x3 * MathUtil.LOG3 - xx3 * x2 * MathUtil.LOG2) / (xx2 * x2);
+            double oldg = g;
+            g -= (t - t0) / deriv;
+            if (Math.abs(g - oldg) < 1e-20 * g) {
+              break;
+            }
+            if (it >= MAXIT) {
+              throw new ArithmeticException("Newton-Raphson did not converge.");
+            }
           }
         }
       }
+      double gam = Math.exp(GammaDistribution.logGamma(1. + g));
+      final double mu, sigma, k;
+      k = g;
+      sigma = xmom[1] * g / (gam * (1. - Math.pow(2., -g)));
+      mu = xmom[0] - sigma * (1. - gam) / g;
+      return new GeneralizedExtremeValueDistribution(mu, sigma, k);
     }
-    double gam = Math.exp(GammaDistribution.logGamma(1. + g));
-    final double mu, sigma, k;
-    k = g;
-    sigma = xmom[1] * g / (gam * (1. - Math.pow(2., -g)));
-    mu = xmom[0] - sigma * (1. - gam) / g;
-    return new GeneralizedExtremeValueDistribution(mu, sigma, k);
+
+    @Override
+    public Class<? super GeneralizedExtremeValueDistribution> getDistributionClass() {
+      return GeneralizedExtremeValueDistribution.class;
+    }
   }
 
-  @Override
-  public Class<? super GeneralizedExtremeValueDistribution> getDistributionClass() {
-    return GeneralizedExtremeValueDistribution.class;
+  public static class WeibullLMomentsEstimator implements DistributionEstimator<WeibullDistribution> {
+    @Override
+    public <A> WeibullDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      // Sort:
+      final int size = adapter.size(data);
+      double[] sorted = new double[size];
+      for (int i = 0; i < size; i++) {
+        sorted[i] = adapter.getDouble(data, i);
+      }
+      Arrays.sort(sorted);
+      double[] xmom = samLMR(sorted, ArrayLikeUtil.DOUBLEARRAYADAPTER, 3);
+      double l = xmom[2], l2 = l * l, l3 = l2 * l, l4 = l3 * l, l5 = l4 * l, l6 = l5 * l;
+      double k = 285.3 * l6 - 658.6 * l5 + 622.8 * l4 - 317.2 * l3 + 98.52 * l2 - 21.256 * l + 3.516;
+
+      double gam = GammaDistribution.gamma(1. + 1. / k);
+      double lambda = xmom[1] / (1. - Math.pow(2., -1. / k) * gam);
+      double mu = xmom[0] - lambda * gam;
+
+      return new WeibullDistribution(k, lambda, mu);
+    }
+
+    @Override
+    public Class<? super WeibullDistribution> getDistributionClass() {
+      return WeibullDistribution.class;
+    }
+  }
+
+  public static class WeibullMomentsEstimator implements DistributionEstimator<WeibullDistribution> {
+    @Override
+    public <A> WeibullDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      StatisticalMoments mom = new StatisticalMoments();
+      final int size = adapter.size(data);
+      for (int i = 0; i < size; i++) {
+        mom.put(adapter.getDouble(data, i));
+      }
+      double l = mom.getSampleSkewness(), l2 = l * l, l3 = l2 * l, l4 = l3 * l, l5 = l4 * l, l6 = l5 * l;
+      double k = 285.3 * l6 - 658.6 * l5 + 622.8 * l4 - 317.2 * l3 + 98.52 * l2 - 21.256 * l + 3.516;
+
+      double gam = GammaDistribution.gamma(1. + 1. / k);
+      double lambda = mom.getSampleStddev() / (1. - Math.pow(2., -1. / k) * gam);
+      double mu = mom.getMean() - lambda * gam;
+
+      return new WeibullDistribution(k, lambda, mu);
+    }
+
+    @Override
+    public Class<? super WeibullDistribution> getDistributionClass() {
+      return WeibullDistribution.class;
+    }
+  }
+
+  public static class NormalLMomentsEstimator implements DistributionEstimator<NormalDistribution> {
+    @Override
+    public <A> NormalDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      // Sort:
+      final int size = adapter.size(data);
+      double[] sorted = new double[size];
+      for (int i = 0; i < size; i++) {
+        sorted[i] = adapter.getDouble(data, i);
+      }
+      Arrays.sort(sorted);
+      double[] xmom = samLMR(sorted, ArrayLikeUtil.DOUBLEARRAYADAPTER, 2);
+
+      return new NormalDistribution(xmom[0], xmom[1]);
+    }
+
+    @Override
+    public Class<? super NormalDistribution> getDistributionClass() {
+      return NormalDistribution.class;
+    }
   }
 }
