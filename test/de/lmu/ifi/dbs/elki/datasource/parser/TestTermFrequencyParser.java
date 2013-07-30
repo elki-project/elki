@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 
@@ -35,7 +36,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
@@ -51,9 +51,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test the term frequency parser by loading an example data set derived
  * from DBLP.
  * 
+ * TODO: maybe also run an example algorithm?
+ * 
  * @author Erich Schubert
  */
 public class TestTermFrequencyParser implements JUnit4Test {
+  /** Test data set to use. */
   public static String DBLP_DATA = "data/testdata/parsing/termfreq-dblp.ascii.gz";
 
   @Test
@@ -64,9 +67,10 @@ public class TestTermFrequencyParser implements JUnit4Test {
 
     ArrayList<Object> filters = new ArrayList<>();
     filters.add(TFIDFNormalization.class);
+    // Note: this filter is needed for the non-sparse euclidean distance below.
     filters.add(SparseVectorFieldFilter.class);
     config.addParameter(AbstractDatabaseConnection.FILTERS_ID, filters);
-    
+
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, config);
 
     if (config.hasUnusedParameters()) {
@@ -78,9 +82,9 @@ public class TestTermFrequencyParser implements JUnit4Test {
     }
 
     db.initialize();
-    
+
     Relation<SparseNumberVector<?>> rel = db.getRelation(TypeUtil.SPARSE_VECTOR_FIELD);
-    
+
     // Get first three objects:
     DBIDIter iter = rel.iterDBIDs();
     SparseNumberVector<?> v1 = rel.get(iter);
@@ -88,7 +92,7 @@ public class TestTermFrequencyParser implements JUnit4Test {
     SparseNumberVector<?> v2 = rel.get(iter);
     iter.advance();
     SparseNumberVector<?> v3 = rel.get(iter);
-    
+
     // "Dense" euclidean distance:
     double euclid1_12 = EuclideanDistanceFunction.STATIC.doubleDistance(v1, v2);
     double euclid1_13 = EuclideanDistanceFunction.STATIC.doubleDistance(v1, v3);
@@ -111,7 +115,7 @@ public class TestTermFrequencyParser implements JUnit4Test {
     assertEquals("Euclidean distance not symmetric.", euclid1_12, euclid1_21, Double.MIN_VALUE);
     assertEquals("Sparse Euclidean distance not symmetric.", euclid2_12, euclid2_21, Double.MIN_VALUE);
     assertEquals("Arccos distance not symmetric.", arccos_12, arccos_21, Double.MIN_VALUE);
-    
+
     assertEquals("Euclidean distance 1-2 not as expected.", 684.4165398352088, euclid1_12, 1e-20);
     assertEquals("Sparse Euclidean distance 1-2 not as expected.", 684.4165398352088, euclid2_12, 1e-20);
     assertEquals("Arccos distance 1-2 not as expected.", 0.1901934493141418, arccos_12, 1e-20);
