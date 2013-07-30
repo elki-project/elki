@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -36,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogGammaDistribution - - estimates
  */
-public class LogGammaLogMADEstimator implements DistributionEstimator<LogGammaDistribution> {
+public class LogGammaLogMADEstimator extends AbstractLogMADEstimator<LogGammaDistribution> {
   /**
    * Static estimator, more robust to outliers by using the median.
    */
@@ -50,37 +48,7 @@ public class LogGammaLogMADEstimator implements DistributionEstimator<LogGammaDi
   }
 
   @Override
-  public <A> LogGammaDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int len = adapter.size(data);
-    // Modifiable copy:
-    double[] x = new double[len];
-    double shift = Double.MAX_VALUE;
-    for (int i = 0; i < len; i++) {
-      x[i] = adapter.getDouble(data, i);
-      shift = Math.min(shift, x[i]);
-    }
-    shift -= 1; // So no negative values arise after log
-    for (int i = 0; i < len; i++) {
-      final double val = x[i] - shift;
-      if (val > 1.) {
-        x[i] = Math.log(val);
-      } else {
-        x[i] = 0.;
-      }
-    }
-    double median = QuickSelect.median(x);
-    if (!(median > 0)) {
-      median = Double.MIN_NORMAL;
-    }
-    // Compute deviations:
-    for (int i = 0; i < len; i++) {
-      x[i] = Math.abs(x[i] - median);
-    }
-    double mad = QuickSelect.median(x);
-    if (!(mad > 0)) {
-      throw new ArithmeticException("Cannot estimate LogGamma parameters on a distribution with zero MAD.");
-    }
-
+  public LogGammaDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
     final double theta = (mad * mad) / median;
     final double k = median / theta;
     return new LogGammaDistribution(k, 1 / theta, shift);

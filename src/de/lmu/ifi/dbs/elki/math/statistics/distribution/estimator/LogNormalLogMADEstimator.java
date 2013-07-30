@@ -24,8 +24,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  */
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -37,14 +35,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <p>
  * F. R. Hampel<br />
  * The Influence Curve and Its Role in Robust Estimation<br />
- * in: Journal of the American Statistical Association, June 1974, Vol. 69,
- * No. 346
+ * in: Journal of the American Statistical Association, June 1974, Vol. 69, No.
+ * 346
  * </p>
  * <p>
  * P. J. Rousseeuw, C. Croux<br />
  * Alternatives to the Median Absolute Deviation<br />
- * in: Journal of the American Statistical Association, December 1993, Vol.
- * 88, No. 424, Theory and Methods
+ * in: Journal of the American Statistical Association, December 1993, Vol. 88,
+ * No. 424, Theory and Methods
  * </p>
  * 
  * @author Erich Schubert
@@ -52,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has LogNormalDistribution - - estimates
  */
 @Reference(authors = "F. R. Hampel", title = "The Influence Curve and Its Role in Robust Estimation", booktitle = "Journal of the American Statistical Association, June 1974, Vol. 69, No. 346", url = "http://www.jstor.org/stable/10.2307/2285666")
-public class LogNormalLogMADEstimator implements DistributionEstimator<LogNormalDistribution> {
+public class LogNormalLogMADEstimator extends AbstractLogMADEstimator<LogNormalDistribution> {
   /**
    * Static estimator, more robust to outliers by using the median.
    */
@@ -66,40 +64,8 @@ public class LogNormalLogMADEstimator implements DistributionEstimator<LogNormal
   }
 
   @Override
-  public <A> LogNormalDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    // TODO: detect pre-sorted data?
-    final int len = adapter.size(data);
-    // Modifiable copy:
-    double[] x = new double[len];
-    for (int i = 0; i < len; i++) {
-      final double val = adapter.getDouble(data, i);
-      if (!(val > 0)) {
-        throw new ArithmeticException("Cannot fit logNormal to a data set which includes non-positive values: " + val);
-      }
-      x[i] = Math.log(val);
-    }
-    double median = QuickSelect.median(x);
-    // Compute absolute deviations:
-    for (int i = 0; i < len; i++) {
-      x[i] = Math.abs(x[i] - median);
-    }
-    double mdev = QuickSelect.median(x);
-    // Fallback if we have more than 50% ties to next largest.
-    if (!(mdev > 0.)) {
-      double min = Double.POSITIVE_INFINITY;
-      for (double xi : x) {
-        if (xi > 0. && xi < min) {
-          min = xi;
-        }
-      }
-      if (min < Double.POSITIVE_INFINITY) {
-        mdev = min;
-      } else {
-        mdev = 1.0; // Maybe all constant. No real value.
-      }
-    }
-    // The scaling factor is for consistency
-    return new LogNormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mdev, 0.);
+  public LogNormalDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
+    return new LogNormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mad, shift);
   }
 
   @Override

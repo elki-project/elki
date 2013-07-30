@@ -14,5 +14,5 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMOMEstimato
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator
-de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLevenbergMarquardtKDEEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLevenbergMarquardtKDEEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLevenbergMarquardtKDEEstimator

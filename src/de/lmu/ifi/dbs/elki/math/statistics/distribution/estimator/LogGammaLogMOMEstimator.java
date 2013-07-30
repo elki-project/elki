@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  */
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -37,43 +36,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogGammaDistribution - - estimates
  */
-public class LogGammaLogMOMEstimator implements DistributionEstimator<LogGammaDistribution> {
+public class LogGammaLogMOMEstimator extends AbstractLogMeanVarianceEstimator<LogGammaDistribution> {
   /**
    * Static estimation using just the mean and variance.
    */
   public static final LogGammaLogMOMEstimator STATIC = new LogGammaLogMOMEstimator();
 
   /**
-   * Private constructor.
+   * Private constructor: use static instance.
    */
   private LogGammaLogMOMEstimator() {
-    // Do not instantiate - use static class
+    super();
   }
 
   @Override
-  public <A> LogGammaDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int len = adapter.size(data);
-    double shift = Double.MAX_VALUE;
-    for (int i = 0; i < len; i++) {
-      shift = Math.min(shift, adapter.getDouble(data, i));
-    }
-    shift -= 1; // So no negative values arise after log
-    MeanVariance mv = new MeanVariance();
-    for (int i = 0; i < len; i++) {
-      final double val = adapter.getDouble(data, i) - shift;
-      mv.put(val > 1 ? Math.log(val) : 0);
-    }
-    return estimate(mv, shift);
-  }
-
-  /**
-   * Simple parameter estimation for Gamma distribution.
-   * 
-   * @param mv Mean and Variance
-   * @param shift Shift
-   * @return LogGamma distribution
-   */
-  private LogGammaDistribution estimate(MeanVariance mv, double shift) {
+  public LogGammaDistribution estimateFromLogMeanVariance(MeanVariance mv, double shift) {
     final double mu = mv.getMean();
     final double var = mv.getSampleVariance();
     if (!(mu > 0.) || !(var > 0.)) {
