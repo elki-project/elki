@@ -52,7 +52,10 @@ public abstract class AbstractLogMOMEstimator<D extends Distribution> implements
     StatisticalMoments mv = new StatisticalMoments();
     for (int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i) - min;
-      mv.put(val > 0. ? Math.log(val) : Double.NEGATIVE_INFINITY);
+      if (Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
+        continue;
+      }
+      mv.put(Math.log(val));
     }
     return estimateFromLogStatisticalMoments(mv, min);
   }

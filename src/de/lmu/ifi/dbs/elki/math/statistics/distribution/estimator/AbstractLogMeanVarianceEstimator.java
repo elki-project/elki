@@ -64,7 +64,10 @@ public abstract class AbstractLogMeanVarianceEstimator<D extends Distribution> e
     MeanVariance mv = new MeanVariance();
     for (int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i) - min;
-      mv.put(val > 0. ? Math.log(val) : Double.NEGATIVE_INFINITY);
+      if (Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
+        continue;
+      }
+      mv.put(Math.log(val));
     }
     return estimateFromLogMeanVariance(mv, min);
   }
