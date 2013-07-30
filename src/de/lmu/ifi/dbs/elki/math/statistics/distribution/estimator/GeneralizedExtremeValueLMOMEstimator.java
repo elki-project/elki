@@ -33,6 +33,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Estimate the parameters of a Generalized Extreme Value Distribution, using
  * the methods of L-Moments (LMOM).
  * 
+ * Reference:
+ * <p>
+ * J. R. M. Hosking, J. R. Wallis, and E. F. Wood<br />
+ * Estimation of the generalized extreme-value distribution by the method of
+ * probability-weighted moments.<br />
+ * Technometrics 27.3
+ * </p>
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.has GeneralizedExtremeValueDistribution
@@ -136,6 +144,7 @@ public class GeneralizedExtremeValueLMOMEstimator extends AbstractLMOMEstimator<
   public Class<? super GeneralizedExtremeValueDistribution> getDistributionClass() {
     return GeneralizedExtremeValueDistribution.class;
   }
+
   /**
    * Parameterization class.
    * 

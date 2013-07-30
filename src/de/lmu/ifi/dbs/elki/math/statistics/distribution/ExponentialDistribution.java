@@ -40,6 +40,11 @@ public class ExponentialDistribution implements DistributionWithRandom {
    * Rate, inverse of mean
    */
   double rate;
+  
+  /**
+   * Location parameter.
+   */
+  double location;
 
   /**
    * Constructor.
@@ -47,7 +52,17 @@ public class ExponentialDistribution implements DistributionWithRandom {
    * @param rate Rate parameter (1/scale)
    */
   public ExponentialDistribution(double rate) {
-    this(rate, new Random());
+    this(rate, 0.0, null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param rate Rate parameter (1/scale)
+   * @param location Location parameter
+   */
+  public ExponentialDistribution(double rate, double location) {
+    this(rate, location, null);
   }
 
   /**
@@ -57,14 +72,26 @@ public class ExponentialDistribution implements DistributionWithRandom {
    * @param random Random generator
    */
   public ExponentialDistribution(double rate, Random random) {
+    this(rate, 0.0, random);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param rate Rate parameter (1/scale)
+   * @param location Location parameter
+   * @param random Random generator
+   */
+  public ExponentialDistribution(double rate, double location, Random random) {
     super();
     this.rate = rate;
+    this.location = location;
     this.rnd = random;
   }
 
   @Override
   public double pdf(double val) {
-    return rate * Math.exp(-rate * val);
+    return rate * Math.exp(-rate * (val - location));
   }
 
   /**
@@ -80,7 +107,7 @@ public class ExponentialDistribution implements DistributionWithRandom {
 
   @Override
   public double cdf(double val) {
-    return 1 - Math.exp(-rate * val);
+    return 1 - Math.exp(-rate * (val - location));
   }
 
   /**
@@ -96,7 +123,7 @@ public class ExponentialDistribution implements DistributionWithRandom {
 
   @Override
   public double quantile(double val) {
-    return -Math.log(1 - val) / rate;
+    return -Math.log(1 - val) / rate + location;
   }
 
   /**
@@ -121,6 +148,6 @@ public class ExponentialDistribution implements DistributionWithRandom {
    */
   @Override
   public double nextRandom() {
-    return -Math.log(rnd.nextDouble()) / rate;
+    return -Math.log(rnd.nextDouble()) / rate + location;
   }
 }
