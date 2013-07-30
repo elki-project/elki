@@ -87,4 +87,9 @@ public class StudentsTDistribution implements Distribution {
     double x = v / (val * val + v);
     return 1 - (0.5 * BetaDistribution.regularizedIncBeta(x, v * .5, 0.5));
   }
+
+  @Override
+  public String toString() {
+    return "StudentsTDistribution(v=" + v + ")";
+  }
 }

@@ -59,14 +59,14 @@ public class ChiSquaredDistribution extends GammaDistribution {
    * @return probability density
    */
   public static double pdf(double x, double dof) {
-    if(x <= 0) {
+    if (x <= 0) {
       return 0.0;
     }
-    if(x == 0) {
+    if (x == 0) {
       return 0.0;
     }
     final double k = dof * .5;
-    if(Math.abs(k - 1.0) < Double.MIN_NORMAL) {
+    if (Math.abs(k - 1.0) < Double.MIN_NORMAL) {
       return Math.exp(-x * 2.0) * 2.0;
     }
     return Math.exp((k - 1.0) * Math.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
@@ -89,5 +89,10 @@ public class ChiSquaredDistribution extends GammaDistribution {
   @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", authors = "D.J. Best, D. E. Roberts", booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
   public static double quantile(double x, double dof) {
     return GammaDistribution.quantile(x, .5 * dof, .5);
+  }
+
+  @Override
+  public String toString() {
+    return "ChiSquaredDistribution(dof=" + (2 * getK()) + ")";
   }
 }
