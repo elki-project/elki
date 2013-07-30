@@ -95,7 +95,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
     super(colSep, quoteChar, comment, labelIndices, factory);
     this.normalize = normalize;
     this.maxdim = 0;
-    this.keymap = new TObjectIntHashMap<>();
+    this.keymap = new TObjectIntHashMap<>(1001, .5f, -1);
     this.sparsefactory = factory;
   }
 
@@ -114,11 +114,11 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
       } else {
         try {
           double attribute = Double.parseDouble(entries.get(i));
-          Integer curdim = keymap.get(curterm);
-          if (curdim == null) {
-            curdim = Integer.valueOf(maxdim + 1);
+          int curdim = keymap.get(curterm);
+          if (curdim < 0) {
+            curdim = maxdim;
             keymap.put(curterm, curdim);
-            maxdim += 1;
+            ++maxdim;
           }
           values.put(curdim, attribute);
           len += attribute;
