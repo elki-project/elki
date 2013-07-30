@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaChoiWetteEstimator;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -289,7 +289,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           // Sort, so we can trim the top 15% below.
           Arrays.sort(dists[d]);
           // Evaluate
-          double score = 1 - GammaDistribution.CHOI_WETTE_ESTIMATOR.estimate(dists[d], SHORTENED_ARRAY).cdf(sqdevs);
+          double score = 1 - GammaChoiWetteEstimator.STATIC.estimate(dists[d], SHORTENED_ARRAY).cdf(sqdevs);
           if (score < min) {
             min = score;
             vdim = d + 1;
