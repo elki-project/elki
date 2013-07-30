@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  */
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -45,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has GammaDistribution - - estimates
  */
 @Reference(authors = "G. Casella, R. L. Berger", title = "Statistical inference. Vol. 70", booktitle = "Statistical inference. Vol. 70")
-public class GammaMOMEstimator implements DistributionEstimator<GammaDistribution> {
+public class GammaMOMEstimator extends AbstractMeanVarianceEstimator<GammaDistribution> {
   /**
    * Static estimation using just the mean and variance.
    */
@@ -59,22 +58,7 @@ public class GammaMOMEstimator implements DistributionEstimator<GammaDistributio
   }
 
   @Override
-  public <A> GammaDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int len = adapter.size(data);
-    MeanVariance mv = new MeanVariance();
-    for (int i = 0; i < len; i++) {
-      mv.put(adapter.getDouble(data, i));
-    }
-    return estimate(mv);
-  }
-
-  /**
-   * Simple parameter estimation for Gamma distribution.
-   * 
-   * @param mv Mean and Variance
-   * @return Gamma distribution
-   */
-  private GammaDistribution estimate(MeanVariance mv) {
+  public GammaDistribution estimateFromMeanVariance(MeanVariance mv) {
     final double mu = mv.getMean();
     final double var = mv.getSampleVariance();
     if (mu < Double.MIN_NORMAL || var < Double.MIN_NORMAL) {
