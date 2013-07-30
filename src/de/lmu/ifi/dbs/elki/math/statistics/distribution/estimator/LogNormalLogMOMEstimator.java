@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  */
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogNormalDistribution - - estimates
  */
-public class LogNormalLogMOMEstimator implements DistributionEstimator<LogNormalDistribution> {
+public class LogNormalLogMOMEstimator extends AbstractLogMeanVarianceEstimator<LogNormalDistribution> {
   /**
    * Static estimator, using mean and variance.
    */
@@ -44,21 +43,12 @@ public class LogNormalLogMOMEstimator implements DistributionEstimator<LogNormal
    * Private constructor, use static instance!
    */
   private LogNormalLogMOMEstimator() {
-    // Do not instantiate
+    super();
   }
 
   @Override
-  public <A> LogNormalDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    MeanVariance mv = new MeanVariance();
-    int size = adapter.size(data);
-    for (int i = 0; i < size; i++) {
-      final double val = adapter.getDouble(data, i);
-      if (!(val > 0)) {
-        throw new ArithmeticException("Cannot fit logNormal to a data set which includes non-positive values: " + val);
-      }
-      mv.put(Math.log(val));
-    }
-    return new LogNormalDistribution(mv.getMean(), mv.getSampleStddev(), 0.);
+  public LogNormalDistribution estimateFromLogMeanVariance(MeanVariance mv, double shift) {
+    return new LogNormalDistribution(mv.getMean(), mv.getSampleStddev(), shift);
   }
 
   @Override

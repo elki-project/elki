@@ -24,8 +24,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  */
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -44,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has WeibullDistribution - - estimates
  */
 @Reference(title = "Robust Estimators for Transformed Location Scale Families", authors = "D. J. Olive", booktitle = "")
-public class WeibullLogMADEstimator implements DistributionEstimator<WeibullDistribution> {
+public class WeibullLogMADEstimator extends AbstractLogMADEstimator<WeibullDistribution> {
   /**
    * The more robust median based estimator.
    */
@@ -58,37 +56,9 @@ public class WeibullLogMADEstimator implements DistributionEstimator<WeibullDist
   }
 
   @Override
-  public <A> WeibullDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    int size = adapter.size(data);
-    double[] logx = new double[size];
-    for (int i = 0; i < size; i++) {
-      final double val = adapter.getDouble(data, i);
-      if (!(val > 0)) {
-        throw new ArithmeticException("Cannot least squares fit weibull to a data set which includes non-positive values: " + val);
-      }
-      logx[i] = Math.log(val);
-    }
-    double med = QuickSelect.median(logx);
-    for (int i = 0; i < size; i++) {
-      logx[i] = Math.abs(logx[i] - med);
-    }
-    double mad = QuickSelect.median(logx);
-    // Work around degenerate cases:
-    if (!(mad > 0.)) {
-      double min = Double.POSITIVE_INFINITY;
-      for (double val : logx) {
-        if (val > 0 && val < min) {
-          min = val;
-        }
-      }
-      if (min < Double.POSITIVE_INFINITY) {
-        mad = min;
-      } else {
-        mad = 1.;
-      }
-    }
+  public WeibullDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
     double isigma = 1.30370 / mad;
-    double lambda = Math.exp(isigma * med - MathUtil.LOGLOG2);
+    double lambda = Math.exp(isigma * median - MathUtil.LOGLOG2);
 
     return new WeibullDistribution(isigma, lambda);
   }
