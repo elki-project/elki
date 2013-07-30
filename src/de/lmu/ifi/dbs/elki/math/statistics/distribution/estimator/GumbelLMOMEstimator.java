@@ -65,8 +65,8 @@ public class GumbelLMOMEstimator extends AbstractLMOMEstimator<GumbelDistributio
 
   @Override
   public GumbelDistribution estimateFromLMoments(double[] xmom) {
-    double scale = xmom[2] / MathUtil.LOG2;
-    return new GumbelDistribution(xmom[1] - Math.E * scale, scale);
+    double scale = xmom[1] / MathUtil.LOG2;
+    return new GumbelDistribution(xmom[0] - Math.E * scale, scale);
   }
 
   @Override
