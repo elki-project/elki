@@ -22,13 +22,12 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Parameter estimation via median and median absolute deviation from median
- * (MAD).
+ * Estimate Exponential distribution parameters using Median and MAD.
  * 
  * Reference:
  * <p>
@@ -38,31 +37,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has GumbelDistribution - - estimates
+ * @apiviz.has ExponentialDistribution
  */
 @Reference(title = "Robust Estimators for Transformed Location Scale Families", authors = "D. J. Olive", booktitle = "")
-public class GumbelMADEstimator extends AbstractMADEstimator<GumbelDistribution> {
+public class ExponentialMADEstimator extends AbstractMADEstimator<ExponentialDistribution> {
   /**
    * Static instance.
    */
-  public static final GumbelMADEstimator STATIC = new GumbelMADEstimator();
+  public static final ExponentialMADEstimator STATIC = new ExponentialMADEstimator();
 
   /**
    * Private constructor, use static instance!
    */
-  private GumbelMADEstimator() {
+  private ExponentialMADEstimator() {
     // Do not instantiate
   }
 
   @Override
-  public GumbelDistribution estimateFromMedianMAD(double median, double mad) {
-    // TODO: Work around degenerate cases?
-    return new GumbelDistribution(median + 0.4778 * mad, 1.3037 * mad);
+  public ExponentialDistribution estimateFromMedianMAD(double median, double mad) {
+    return new ExponentialDistribution(2.0781 * mad);
   }
 
   @Override
-  public Class<? super GumbelDistribution> getDistributionClass() {
-    return GumbelDistribution.class;
+  public Class<? super ExponentialDistribution> getDistributionClass() {
+    return ExponentialDistribution.class;
   }
 
   /**
@@ -74,7 +72,7 @@ public class GumbelMADEstimator extends AbstractMADEstimator<GumbelDistribution>
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected GumbelMADEstimator makeInstance() {
+    protected ExponentialMADEstimator makeInstance() {
       return STATIC;
     }
   }
