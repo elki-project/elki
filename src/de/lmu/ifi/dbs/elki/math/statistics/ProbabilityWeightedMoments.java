@@ -134,6 +134,10 @@ public class ProbabilityWeightedMoments {
     // Estimate probability weighted moments (unbiased)
     for (int i = 0; i < n; i++) {
       double term = adapter.getDouble(sorted, i);
+      // Robustness: skip bad values
+      if (Double.isInfinite(term) || Double.isNaN(term)) {
+        continue;
+      }
       sum[0] += term;
       for (int j = 1, z = i; j < nmom; j++, z--) {
         term *= z;
