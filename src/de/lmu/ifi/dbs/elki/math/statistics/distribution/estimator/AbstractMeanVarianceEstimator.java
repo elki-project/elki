@@ -61,7 +61,11 @@ public abstract class AbstractMeanVarianceEstimator<D extends Distribution> exte
     MeanVariance mv = new MeanVariance();
     int size = adapter.size(data);
     for (int i = 0; i < size; i++) {
-      mv.put(adapter.getDouble(data, i));
+      final double val = adapter.getDouble(data, i);
+      if (Double.isInfinite(val) || Double.isNaN(val)) {
+        continue;
+      }
+      mv.put(val);
     }
     return estimateFromMeanVariance(mv);
   }

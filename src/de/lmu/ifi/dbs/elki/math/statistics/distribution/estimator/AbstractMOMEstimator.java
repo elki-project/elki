@@ -50,7 +50,11 @@ public abstract class AbstractMOMEstimator<D extends Distribution> implements MO
     StatisticalMoments mv = new StatisticalMoments();
     int size = adapter.size(data);
     for (int i = 0; i < size; i++) {
-      mv.put(adapter.getDouble(data, i));
+      final double val = adapter.getDouble(data, i);
+      if (Double.isInfinite(val) || Double.isNaN(val)) {
+        continue;
+      }
+      mv.put(val);
     }
     return estimateFromStatisticalMoments(mv);
   }
