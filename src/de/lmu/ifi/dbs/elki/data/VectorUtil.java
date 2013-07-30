@@ -114,6 +114,7 @@ public final class VectorUtil {
     BitSet both = (BitSet) b1.clone();
     both.and(b2);
 
+    // TODO: add precomputed length to data type!
     // Length of first vector
     double l1 = 0.0;
     for (int i = b1.nextSetBit(0); i >= 0; i = b1.nextSetBit(i + 1)) {
@@ -135,7 +136,8 @@ public final class VectorUtil {
     for (int i = both.nextSetBit(0); i >= 0; i = both.nextSetBit(i + 1)) {
       cross += v1.doubleValue(i) * v2.doubleValue(i);
     }
-    return cross / (l1 * l2);
+    final double a = cross / (l1 * l2);
+    return (a > 1.0) ? 1.0 : a;
   }
 
   /**
@@ -161,7 +163,8 @@ public final class VectorUtil {
       e1 += r1 * r1;
       e2 += r2 * r2;
     }
-    return Math.sqrt((s / e1) * (s / e2));
+    final double a = Math.sqrt((s / e1) * (s / e2));
+    return (a > 1.0) ? 1.0 : a;
   }
 
   /**
@@ -186,7 +189,8 @@ public final class VectorUtil {
       e1 += r1 * r1;
       e2 += r2 * r2;
     }
-    return Math.sqrt((s / e1) * (s / e2));
+    final double a = Math.sqrt((s / e1) * (s / e2));
+    return (a > 1.0) ? 1.0 : a;
   }
 
   /**
@@ -224,7 +228,8 @@ public final class VectorUtil {
       final double r2 = v2.doubleValue(k);
       e2 += r2 * r2;
     }
-    return Math.min(Math.sqrt((s / e1) * (s / e2)), 1);
+    final double a = Math.sqrt((s / e1) * (s / e2));
+    return (a > 1.0) ? 1.0 : a;
   }
 
   // TODO: add more precise but slower O(n^2) angle computation according to:
@@ -266,7 +271,8 @@ public final class VectorUtil {
       } // else: 0
     }
     final double s = Math.max(s1, Math.abs(s2));
-    return Math.min(Math.sqrt((s / e1) * (s / e2)), 1.0);
+    final double a = Math.sqrt((s / e1) * (s / e2));
+    return (a > 1.0) ? 1.0 : a;
   }
 
   /**
