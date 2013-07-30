@@ -400,4 +400,9 @@ public class PoissonDistribution implements Distribution {
     final double y = -stirlingError(x) - devianceTerm(x, lambda);
     return -0.5 * Math.log(f) + y;
   }
+
+  @Override
+  public String toString() {
+    return "PoissonDistribution(n=" + n + ", p=" + p + ")";
+  }
 }

@@ -150,4 +150,9 @@ public class ExponentialDistribution implements DistributionWithRandom {
   public double nextRandom() {
     return -Math.log(rnd.nextDouble()) / rate + location;
   }
+
+  @Override
+  public String toString() {
+    return "ExponentialDistribution(rate=" + rate + ", location=" + location + ")";
+  }
 }

@@ -177,6 +177,6 @@ public class WeibullDistribution implements DistributionWithRandom {
 
   @Override
   public String toString() {
-    return "WeibullDistribution(" + k + ", " + lambda + ", " + theta + ")";
+    return "WeibullDistribution(k=" + k + ", lambda=" + lambda + ", theta=" + theta + ")";
   }
 }

@@ -127,4 +127,9 @@ public class CauchyDistribution implements DistributionWithRandom {
   public static double quantile(double x, double location, double shape) {
     return location + shape * Math.tan(Math.PI * (x - .5));
   }
+
+  @Override
+  public String toString() {
+    return "CauchyDistribution(location=" + location + ", shape=" + shape + ")";
+  }
 }

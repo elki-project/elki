@@ -129,6 +129,6 @@ public class GumbelDistribution implements DistributionWithRandom {
 
   @Override
   public String toString() {
-    return "GumbelDistribution(" + mu + ", " + beta + ")";
+    return "GumbelDistribution(mu=" + mu + ", beta=" + beta + ")";
   }
 }

@@ -162,6 +162,6 @@ public class GeneralizedExtremeValueDistribution implements DistributionWithRand
 
   @Override
   public String toString() {
-    return "GeneralizedExtremeValueDistribution(" + sigma + ", " + mu + ", " + k + ")";
+    return "GeneralizedExtremeValueDistribution(sigma=" + sigma + ", mu=" + mu + ", k=" + k + ")";
   }
 }
