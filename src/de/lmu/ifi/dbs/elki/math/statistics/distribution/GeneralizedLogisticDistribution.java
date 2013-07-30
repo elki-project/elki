@@ -174,4 +174,9 @@ public class GeneralizedLogisticDistribution implements DistributionWithRandom {
     double u = random.nextDouble();
     return location + scale * -Math.log(Math.pow(u, -1.0 / shape) - 1);
   }
+
+  @Override
+  public String toString() {
+    return "GeneralizedLogisticDistribution(location=" + location + ", scale=" + scale + ", shape=" + shape + ")";
+  }
 }
