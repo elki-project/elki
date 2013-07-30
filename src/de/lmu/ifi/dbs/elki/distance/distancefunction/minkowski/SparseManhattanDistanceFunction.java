@@ -53,29 +53,32 @@ public class SparseManhattanDistanceFunction extends SparseLPNormDistanceFunctio
     // Get the bit masks
     BitSet b1 = v1.getNotNullMask();
     BitSet b2 = v2.getNotNullMask();
-    double sqrDist = 0;
+    double accu = 0;
     int i1 = b1.nextSetBit(0);
     int i2 = b2.nextSetBit(0);
-    while(i1 >= 0 && i2 >= 0) {
-      if(i1 == i2) {
-        // Set in both
-        sqrDist += Math.abs(v1.doubleValue(i1) - v2.doubleValue(i2));
+    while (true) {
+      if (i1 == i2) {
+        if (i1 < 0) {
+          break;
+        }
+        // Both vectors have a value.
+        double val = Math.abs(v1.doubleValue(i1) - v2.doubleValue(i2));
+        accu += val;
         i1 = b1.nextSetBit(i1 + 1);
         i2 = b2.nextSetBit(i2 + 1);
-      }
-      else if(i1 < i2 && i1 >= 0) {
+      } else if (i2 < 0 || (i1 < i2 && i1 >= 0)) {
         // In first only
-        sqrDist += Math.abs(v1.doubleValue(i1));
+        double val = Math.abs(v1.doubleValue(i1));
+        accu += val;
         i1 = b1.nextSetBit(i1 + 1);
-      }
-      else {
+      } else {
         // In second only
-        double manhattanI = Math.abs(v2.doubleValue(i2));
-        sqrDist += manhattanI;
-        i2 = b1.nextSetBit(i2 + 1);
+        double val = Math.abs(v2.doubleValue(i2));
+        accu += val;
+        i2 = b2.nextSetBit(i2 + 1);
       }
     }
-    return sqrDist;
+    return accu;
   }
 
   @Override
