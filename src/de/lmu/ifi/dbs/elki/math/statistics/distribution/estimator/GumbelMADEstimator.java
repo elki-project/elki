@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -43,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has GumbelDistribution - - estimates
  */
 @Reference(title = "Robust Estimators for Transformed Location Scale Families", authors = "D. J. Olive", booktitle = "")
-public class GumbelMADEstimator implements DistributionEstimator<GumbelDistribution> {
+public class GumbelMADEstimator extends AbstractMADEstimator<GumbelDistribution> {
   /**
    * The more robust median based estimator.
    */
@@ -57,32 +55,9 @@ public class GumbelMADEstimator implements DistributionEstimator<GumbelDistribut
   }
 
   @Override
-  public <A> GumbelDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    int size = adapter.size(data);
-    double[] x = new double[size];
-    for (int i = 0; i < size; i++) {
-      x[i] = adapter.getDouble(data, i);
-    }
-    double med = QuickSelect.median(x);
-    for (int i = 0; i < size; i++) {
-      x[i] = Math.abs(x[i] - med);
-    }
-    double mad = QuickSelect.median(x);
-    // Work around degenerate cases:
-    if (!(mad > 0.)) {
-      double min = Double.POSITIVE_INFINITY;
-      for (double val : x) {
-        if (val > 0 && val < min) {
-          min = val;
-        }
-      }
-      if (min < Double.POSITIVE_INFINITY) {
-        mad = min;
-      } else {
-        mad = 1.;
-      }
-    }
-    return new GumbelDistribution(med + 0.4778 * mad, 1.3037 * mad);
+  public GumbelDistribution estimateFromMedianMAD(double median, double mad) {
+    // TODO: Work around degenerate cases?
+    return new GumbelDistribution(median + 0.4778 * mad, 1.3037 * mad);
   }
 
   @Override

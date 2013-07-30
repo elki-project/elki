@@ -23,50 +23,46 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
- * Naive distribution estimation using mean and sample variance.
+ * Estimators that work on Mean and Variance only (i.e. the first two moments
+ * only).
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has NormalDistribution - - estimates
+ * @param <D> Distribution to estimate.
  */
-public class NormalMOMEstimator extends AbstractMeanVarianceEstimator<NormalDistribution> {
+public abstract class AbstractMeanVarianceEstimator<D extends Distribution> extends AbstractMOMEstimator<D> {
   /**
-   * Static estimator, using mean and variance.
+   * Constructor.
    */
-  public static NormalMOMEstimator STATIC = new NormalMOMEstimator();
-
-  /**
-   * Private constructor, use static instance!
-   */
-  private NormalMOMEstimator() {
-    // Do not instantiate
+  public AbstractMeanVarianceEstimator() {
+    super();
   }
 
   @Override
-  public NormalDistribution estimateFromMeanVariance(MeanVariance mv) {
-    return new NormalDistribution(mv.getMean(), mv.getSampleStddev());
-  }
-
-  @Override
-  public Class<? super NormalDistribution> getDistributionClass() {
-    return NormalDistribution.class;
+  public D estimateFromStatisticalMoments(StatisticalMoments moments) {
+    return estimateFromMeanVariance(moments);
   }
 
   /**
-   * Parameterization class.
+   * Estimate the distribution from mean and variance.
    * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
+   * @param mv Mean and variance.
+   * @return Distribution
    */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected NormalMOMEstimator makeInstance() {
-      return STATIC;
+  public abstract D estimateFromMeanVariance(MeanVariance mv);
+
+  @Override
+  public <A> D estimate(A data, NumberArrayAdapter<?, A> adapter) {
+    MeanVariance mv = new MeanVariance();
+    int size = adapter.size(data);
+    for (int i = 0; i < size; i++) {
+      mv.put(adapter.getDouble(data, i));
     }
+    return estimateFromMeanVariance(mv);
   }
 }

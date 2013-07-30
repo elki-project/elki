@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -51,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has NormalDistribution - - estimates
  */
 @Reference(authors = "F. R. Hampel", title = "The Influence Curve and Its Role in Robust Estimation", booktitle = "Journal of the American Statistical Association, June 1974, Vol. 69, No. 346", url = "http://www.jstor.org/stable/10.2307/2285666")
-public class NormalMADEstimator implements DistributionEstimator<NormalDistribution> {
+public class NormalMADEstimator extends AbstractMADEstimator<NormalDistribution> {
   /**
    * Static estimator, more robust to outliers by using the median.
    */
@@ -65,36 +63,8 @@ public class NormalMADEstimator implements DistributionEstimator<NormalDistribut
   }
 
   @Override
-  public <A> NormalDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    // TODO: detect pre-sorted data?
-    final int len = adapter.size(data);
-    // Modifiable copy:
-    double[] x = new double[len];
-    for (int i = 0; i < len; i++) {
-      x[i] = adapter.getDouble(data, i);
-    }
-    double median = QuickSelect.median(x);
-    // Compute absolute deviations:
-    for (int i = 0; i < len; i++) {
-      x[i] = Math.abs(x[i] - median);
-    }
-    double mdev = QuickSelect.median(x);
-    // Fallback if we have more than 50% ties to next largest.
-    if (!(mdev > 0.)) {
-      double min = Double.POSITIVE_INFINITY;
-      for (double xi : x) {
-        if (xi > 0. && xi < min) {
-          min = xi;
-        }
-      }
-      if (min < Double.POSITIVE_INFINITY) {
-        mdev = min;
-      } else {
-        mdev = 1.0; // Maybe all constant. No real value.
-      }
-    }
-    // The scaling factor is for consistency
-    return new NormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mdev);
+  public NormalDistribution estimateFromMedianMAD(double median, double mad) {
+    return new NormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mad);
   }
 
   @Override
