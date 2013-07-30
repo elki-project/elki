@@ -178,4 +178,9 @@ public class LogisticDistribution implements DistributionWithRandom {
     double u = random.nextDouble();
     return location + scale * Math.log(u / (1. - u));
   }
+
+  @Override
+  public String toString() {
+    return "LogisticDistribution(location=" + location + ", scale=" + scale + ")";
+  }
 }
