@@ -25,13 +25,9 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Exponentially modified Gaussian (EMG) distribution (ExGaussian distribution)
@@ -41,11 +37,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Alias({ "exgaussian" })
 public class ExponentiallyModifiedGaussianDistribution implements DistributionWithRandom {
-  /**
-   * Static estimator class.
-   */
-  public static OlivierNorbergEstimator OLIVIER_NORBERG_ESTIMATOR = new OlivierNorbergEstimator();
-
   /**
    * Mean value for the generator
    */
@@ -192,70 +183,6 @@ public class ExponentiallyModifiedGaussianDistribution implements DistributionWi
   public static double quantile(double x, double mu, double sigma, double lambda) {
     // FIXME: implement!
     throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
-
-  /**
-   * Naive distribution estimation using mean and sample variance.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.has ExponentiallyModifiedGaussianDistribution - - estimates
-   */
-  @Reference(authors = "J. Olivier, M. M. Norberg", title = "Positively skewed data: Revisiting the Box-Cox power transformation", booktitle = "International Journal of Psychological Research Vol. 3 No. 1")
-  public static class OlivierNorbergEstimator implements DistributionEstimator<ExponentiallyModifiedGaussianDistribution> {
-    /**
-     * Private constructor, use static instance!
-     */
-    private OlivierNorbergEstimator() {
-      // Do not instantiate
-    }
-
-    @Override
-    public <A> ExponentiallyModifiedGaussianDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-      StatisticalMoments mv = new StatisticalMoments();
-      int size = adapter.size(data);
-      for (int i = 0; i < size; i++) {
-        mv.put(adapter.getDouble(data, i));
-      }
-      return estimate(mv);
-    }
-
-    /**
-     * Estimate parameters from a
-     * 
-     * @param mv Mean and Variance
-     * @return Distribution
-     */
-    public ExponentiallyModifiedGaussianDistribution estimate(StatisticalMoments mv) {
-      // Avoid NaN by disallowing negative kurtosis.
-      final double halfsk13 = Math.pow(Math.max(0, mv.getSampleExcessKurtosis() * .5), 1. / 3.);
-      final double st = mv.getSampleStddev();
-      final double mu = mv.getMean() - st * halfsk13;
-      // Note: we added "abs" here, to avoid even more NaNs.
-      final double si = st * Math.sqrt(Math.abs((1 + halfsk13) * (1 - halfsk13)));
-      // One more workaround to ensure finite lambda...
-      final double la = (halfsk13 > 0) ? 1 / (st * halfsk13) : 1;
-      return new ExponentiallyModifiedGaussianDistribution(mu, si, la);
-    }
-
-    @Override
-    public Class<? super ExponentiallyModifiedGaussianDistribution> getDistributionClass() {
-      return ExponentiallyModifiedGaussianDistribution.class;
-    }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      @Override
-      protected OlivierNorbergEstimator makeInstance() {
-        return OLIVIER_NORBERG_ESTIMATOR;
-      }
-    }
   }
 
   // TODO: add levenberg-marquard fitting.

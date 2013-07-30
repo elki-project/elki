@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
