@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -127,22 +128,23 @@ public abstract class AbstractApplication implements Parameterizable {
     try {
       TrackParameters config = new TrackParameters(params);
       if (config.grab(verboseF) && verboseF.isTrue()) {
-        LoggingConfiguration.setVerbose(true);
         // Extra verbosity by repeating the flag:
         final Flag verbose2F = new Flag(Parameterizer.VERBOSE_ID);
         if (config.grab(verbose2F) && verbose2F.isTrue()) {
-          LoggingConfiguration.setVerbose(true);
+          LoggingConfiguration.setVerbose(Level.VERYVERBOSE);
+        } else {
+          LoggingConfiguration.setVerbose(Level.VERBOSE);
         }
       }
       AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
       if ((helpF.isDefined() && helpF.getValue()) || (helpLongF.isDefined() && helpLongF.getValue())) {
-        LoggingConfiguration.setVerbose(true);
+        LoggingConfiguration.setVerbose(Level.VERBOSE);
         LOG.verbose(usage(config.getAllParameters()));
       } else {
         params.logUnusedParameters();
         if (params.getErrors().size() > 0) {
-          LoggingConfiguration.setVerbose(true);
+          LoggingConfiguration.setVerbose(Level.VERBOSE);
           LOG.verbose("The following configuration errors prevented execution:\n");
           for (ParameterException e : params.getErrors()) {
             LOG.verbose(e.getMessage());
@@ -184,7 +186,7 @@ public abstract class AbstractApplication implements Parameterizable {
   protected static void printErrorMessage(Exception e) {
     if (e instanceof AbortException) {
       // ensure we actually show the message:
-      LoggingConfiguration.setVerbose(true);
+      LoggingConfiguration.setVerbose(Level.VERBOSE);
       LOG.verbose(e.getMessage());
     } else if (e instanceof UnspecifiedParameterException) {
       LOG.error(e.getMessage());
@@ -200,7 +202,7 @@ public abstract class AbstractApplication implements Parameterizable {
    */
   private static void printDescription(Class<?> descriptionClass) {
     if (descriptionClass != null) {
-      LoggingConfiguration.setVerbose(true);
+      LoggingConfiguration.setVerbose(Level.VERBOSE);
       LOG.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
     }
   }

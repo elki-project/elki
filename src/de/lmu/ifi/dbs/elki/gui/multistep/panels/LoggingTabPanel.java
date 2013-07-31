@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -56,8 +57,9 @@ public class LoggingTabPanel extends ParameterTabPanel {
     Flag verboseFlag = new Flag(AbstractApplication.Parameterizer.VERBOSE_ID);
     // Verbose mode is a lot simpler
     if (config.grab(verboseFlag) && verboseFlag.isTrue()) {
-      LoggingConfiguration.setVerbose(true);
+      LoggingConfiguration.setVerbose(Level.VERBOSE);
     }
+    // FIXME: add second level of verbosity!
     if (config.grab(debugParam)) {
       try {
         LoggingUtil.parseDebugParameter(debugParam);

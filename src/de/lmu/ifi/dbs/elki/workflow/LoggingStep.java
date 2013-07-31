@@ -23,10 +23,9 @@ package de.lmu.ifi.dbs.elki.workflow;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.logging.Level;
-
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -56,10 +55,13 @@ public class LoggingStep implements WorkflowStep {
    */
   public LoggingStep(int verbose, String[][] levels) {
     super();
-    LoggingConfiguration.setVerbose((verbose > 0));
-    // Extra verbosity - do not call with "false" to not undo!
-    if (verbose > 1) {
-      LoggingConfiguration.setVerbose(true);
+    if (verbose <= 0) {
+      LoggingConfiguration.setVerbose(Level.WARNING);
+    } else if (verbose == 1) {
+      LoggingConfiguration.setVerbose(Level.VERBOSE);
+    } else if (verbose > 1) {
+      // Extra verbosity - do not call with "false" to not undo!
+      LoggingConfiguration.setVerbose(Level.VERYVERBOSE);
     }
     if (levels != null) {
       for (String[] pair : levels) {
@@ -67,7 +69,7 @@ public class LoggingStep implements WorkflowStep {
           if (pair.length == 1) {
             // Try to parse as level:
             try {
-              Level level = Level.parse(pair[0]);
+              java.util.logging.Level level = Level.parse(pair[0]);
               LoggingConfiguration.setDefaultLevel(level);
             } catch (IllegalArgumentException e) {
               LoggingConfiguration.setLevelFor(pair[0], Level.FINEST.getName());

@@ -146,33 +146,30 @@ public final class LoggingConfiguration {
   /**
    * Reconfigure logging to enable 'verbose' logging at the top level.
    * 
-   * @param verbose verbose flag
+   * @param verbose verbosity level.
    */
-  public static void setVerbose(boolean verbose) {
-    if (verbose) {
+  public static void setVerbose(java.util.logging.Level verbose) {
+    if (verbose.intValue() >= Level.VERBOSE.intValue()) {
       // decrease to VERBOSE if it was higher, otherwise further to VERYVERBOSE
-      if (LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > Level.VERBOSE.intValue()) {
-        LOGGER_GLOBAL_TOP.setLevel(Level.VERBOSE);
-      } else if (LOGGER_GLOBAL_TOP.getLevel().intValue() > Level.VERYVERBOSE.intValue()) {
-        LOGGER_GLOBAL_TOP.setLevel(Level.VERYVERBOSE);
+      if (LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > verbose.intValue()) {
+        LOGGER_GLOBAL_TOP.setLevel(verbose);
       }
-      if (LOGGER_ELKI_TOP.getLevel() == null || LOGGER_ELKI_TOP.getLevel().intValue() > Level.VERBOSE.intValue()) {
-        LOGGER_ELKI_TOP.setLevel(Level.VERBOSE);
-      } else if (LOGGER_ELKI_TOP.getLevel().intValue() > Level.VERYVERBOSE.intValue()) {
-        LOGGER_ELKI_TOP.setLevel(Level.VERYVERBOSE);
+      if (LOGGER_ELKI_TOP.getLevel() == null || LOGGER_ELKI_TOP.getLevel().intValue() > verbose.intValue()) {
+        LOGGER_ELKI_TOP.setLevel(verbose);
       }
     } else {
-      // increase to warning level if it was verbose, and to verbose if it was
-      // "very verbose".
-      if (Level.VERYVERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel())) {
-        LOGGER_GLOBAL_TOP.setLevel(Level.VERBOSE);
-      } else if (LOGGER_GLOBAL_TOP.getLevel() == null || Level.VERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel())) {
-        LOGGER_GLOBAL_TOP.setLevel(Level.WARNING);
+      // re-increase to given level if it was verbose or "very verbose".
+      if (LOGGER_GLOBAL_TOP.getLevel() != null && (//
+      Level.VERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel()) || //
+      Level.VERYVERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel()) //
+      )) {
+        LOGGER_GLOBAL_TOP.setLevel(verbose);
       }
-      if (Level.VERYVERBOSE.equals(LOGGER_ELKI_TOP.getLevel())) {
-        LOGGER_ELKI_TOP.setLevel(Level.VERBOSE);
-      } else if (LOGGER_ELKI_TOP.getLevel() == null || Level.VERBOSE.equals(LOGGER_ELKI_TOP.getLevel())) {
-        LOGGER_ELKI_TOP.setLevel(Level.WARNING);
+      if (LOGGER_ELKI_TOP.getLevel() != null && (//
+      Level.VERBOSE.equals(LOGGER_ELKI_TOP.getLevel()) || //
+      Level.VERYVERBOSE.equals(LOGGER_ELKI_TOP.getLevel()) //
+      )) {
+        LOGGER_ELKI_TOP.setLevel(verbose);
       }
     }
   }
