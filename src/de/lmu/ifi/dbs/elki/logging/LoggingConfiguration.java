@@ -149,7 +149,7 @@ public final class LoggingConfiguration {
    * @param verbose verbosity level.
    */
   public static void setVerbose(java.util.logging.Level verbose) {
-    if (verbose.intValue() >= Level.VERBOSE.intValue()) {
+    if (verbose.intValue() <= Level.VERBOSE.intValue()) {
       // decrease to VERBOSE if it was higher, otherwise further to VERYVERBOSE
       if (LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > verbose.intValue()) {
         LOGGER_GLOBAL_TOP.setLevel(verbose);
