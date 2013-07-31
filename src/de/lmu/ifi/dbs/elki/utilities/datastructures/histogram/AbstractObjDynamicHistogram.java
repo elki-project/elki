@@ -127,21 +127,33 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
     // Store in cache
     if (cachefill >= 0) {
       if (cachefill < cacheposs.length) {
-
         cacheposs[cachefill] = coord;
         cachevals[cachefill] = cloneForCache(value);
-        cachefill++;
+        ++cachefill;
         return;
-      } else {
-        materialize();
-        // But continue below!
       }
     }
-    // Check if we need to resample to accomodate this bin.
-    testResample(coord);
-    // super class will handle histogram resizing / shifting
-    T exist = get(coord);
-    data[getBinNr(coord)] = aggregate(exist, value);
+    if (coord == Double.NEGATIVE_INFINITY) {
+      aggregateSpecial(value, 0);
+    } else if (coord == Double.POSITIVE_INFINITY) {
+      aggregateSpecial(value, 1);
+    } else if (Double.isNaN(coord)) {
+      aggregateSpecial(value, 2);
+    } else {
+      // super class will handle histogram resizing / shifting
+      T exist = get(coord);
+      data[getBinNr(coord)] = aggregate(exist, value);
+    }
+  }
+
+  /**
+   * Aggregate for a special value.
+   * 
+   * @param value Parameter value
+   * @param bin Special bin index.
+   */
+  protected void aggregateSpecial(T value, int bin) {
+    special[bin] = aggregate(getSpecial(bin), value);
   }
 
   /**
