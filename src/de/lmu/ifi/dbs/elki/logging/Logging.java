@@ -93,7 +93,7 @@ public class Logging {
     /**
      * Additional level for logging: additional verbose messages.
      * 
-     * Inbetween of "verbose" and "config".
+     * Inbetween of "verbose" and "config", usually 750.
      */
     public static final Level VERYVERBOSE = new Level("VERYVERBOSE", (INFO.intValue() + CONFIG.intValue()) >> 1);
 
@@ -185,7 +185,7 @@ public class Logging {
   }
 
   /**
-   * Test whether to log 'verbose' aka 'info'.
+   * Test whether to log 'veryverbose'.
    * 
    * @return true if extra verbose
    */

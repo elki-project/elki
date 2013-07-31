@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -114,7 +115,7 @@ public class DocumentParameters {
    * @param args Command line arguments
    */
   public static void main(String[] args) {
-    LoggingConfiguration.setVerbose(true);
+    LoggingConfiguration.setVerbose(Level.VERBOSE);
     if (args.length != 2 && args.length != 4) {
       LOG.warning("I need exactly two or four file names to operate!");
       System.exit(1);

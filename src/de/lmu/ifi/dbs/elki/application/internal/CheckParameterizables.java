@@ -29,6 +29,7 @@ import java.lang.reflect.Modifier;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -56,7 +57,7 @@ public class CheckParameterizables {
    * methods)
    */
   public void checkParameterizables() {
-    LoggingConfiguration.setVerbose(true);
+    LoggingConfiguration.setVerbose(Level.VERBOSE);
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
       final Constructor<?> constructor;
       try {
