@@ -62,11 +62,7 @@ public class LogGammaChoiWetteEstimator implements DistributionEstimator<LogGamm
   @Override
   public <A> LogGammaDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int len = adapter.size(data);
-    double shift = Double.MAX_VALUE;
-    for (int i = 0; i < len; i++) {
-      shift = Math.min(shift, adapter.getDouble(data, i));
-    }
-    shift -= 1; // So no negative values arise after log
+    double shift = AbstractLogMOMEstimator.min(data, adapter, 0, 1e-10);
     double meanx = 0, meanlogx = 0;
     for (int i = 0; i < len; i++) {
       final double shifted = adapter.getDouble(data, i) - shift;

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExt
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LMOMDistributionEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogMADDistributionEstimator;
@@ -135,12 +136,13 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     madests.add(CauchyMADEstimator.STATIC);
     madests.add(LogisticMADEstimator.STATIC);
     madests.add(UniformMADEstimator.STATIC);
-    lmomests = new ArrayList<>(8);
+    lmomests = new ArrayList<>(9);
     lmomests.add(NormalLMOMEstimator.STATIC);
     lmomests.add(GammaLMOMEstimator.STATIC);
     lmomests.add(ExponentialLMOMEstimator.STATIC);
     lmomests.add(GumbelLMOMEstimator.STATIC);
     lmomests.add(LogisticLMOMEstimator.STATIC);
+    lmomests.add(LogNormalLMOMEstimator.STATIC);
     lmomests.add(GeneralizedExtremeValueLMOMEstimator.STATIC);
     lmomests.add(WeibullLMOMEstimator.STATIC);
     lmomests.add(UniformLMOMEstimator.STATIC);
