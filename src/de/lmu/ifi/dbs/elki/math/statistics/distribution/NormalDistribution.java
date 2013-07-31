@@ -261,7 +261,7 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return erfinv(x)
    */
   public static double erfinv(double x) {
-    return standardNormalQuantile(0.5 * (x + 1)) / MathUtil.SQRT2;
+    return standardNormalQuantile(0.5 * (x + 1)) * MathUtil.SQRTHALF;
   }
 
   /**
@@ -277,9 +277,8 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return PDF of the given normal distribution at x.
    */
   public static double pdf(double x, double mu, double sigma) {
-    final double x_mu = x - mu;
-    final double sigmasq = sigma * sigma;
-    return 1 / (Math.sqrt(MathUtil.TWOPI * sigmasq)) * Math.exp(-.5 * x_mu * x_mu / sigmasq);
+    x = (x - mu) / sigma;
+    return MathUtil.ONE_BY_SQRTTWOPI / sigma * Math.exp(-.5 * x * x);
   }
 
   /**
@@ -293,7 +292,7 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return PDF of the given normal distribution at x.
    */
   public static double standardNormalPDF(double x) {
-    return Math.exp(-.5 * x * x) / MathUtil.SQRTTWOPI;
+    return Math.exp(-.5 * x * x) * MathUtil.SQRTHALF;
   }
 
   /**
@@ -305,7 +304,8 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return The CDF of the given normal distribution at x.
    */
   public static double cdf(double x, double mu, double sigma) {
-    return .5 * (1 + erf((x - mu) / (MathUtil.SQRT2 * sigma)));
+    x = (x - mu) / sigma;
+    return .5 + .5 * erf(x * MathUtil.SQRTHALF);
   }
 
   /**
@@ -315,7 +315,7 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return The CDF of the given normal distribution at x.
    */
   public static double standardNormalCDF(double x) {
-    return .5 * (1 + erf(x / MathUtil.SQRT2));
+    return .5 + .5 * erf(x * MathUtil.SQRTHALF);
   }
 
   /**

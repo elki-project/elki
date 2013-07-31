@@ -24,14 +24,14 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  */
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewNormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate the parameters of a log Normal Distribution, using the methods of
- * L-Moments (LMOM) for the Generalized Normal Distribution.
+ * Estimate the parameters of a skew Normal Distribution (Hoskin's Generalized
+ * Normal Distribution), using the methods of L-Moments (LMOM).
  * 
  * Reference:
  * <p>
@@ -42,14 +42,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has LogNormalDistribution
+ * @apiviz.has SkewNormalDistribution
  */
 @Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class LogNormalLMOMEstimator extends AbstractLMOMEstimator<LogNormalDistribution> {
+public class SkewNormalLMOMEstimator extends AbstractLMOMEstimator<SkewNormalDistribution> {
   /**
    * Static instance.
    */
-  public static final LogNormalLMOMEstimator STATIC = new LogNormalLMOMEstimator();
+  public static final SkewNormalLMOMEstimator STATIC = new SkewNormalLMOMEstimator();
 
   /** Polynomial approximation */
   private static final double //
@@ -67,7 +67,7 @@ public class LogNormalLMOMEstimator extends AbstractLMOMEstimator<LogNormalDistr
   /**
    * Constructor. Private: use static instance.
    */
-  private LogNormalLMOMEstimator() {
+  private SkewNormalLMOMEstimator() {
     super();
   }
 
@@ -77,10 +77,8 @@ public class LogNormalLMOMEstimator extends AbstractLMOMEstimator<LogNormalDistr
   }
 
   @Override
-  public LogNormalDistribution estimateFromLMoments(double[] xmom) {
-    // Note: the third condition probably is okay for Generalized Normal, but
-    // not for lognormal estimation.
-    if (!(xmom[1] > 0.) || !(Math.abs(xmom[2]) < 1.0) || !(xmom[2] > 0.0)) {
+  public SkewNormalDistribution estimateFromLMoments(double[] xmom) {
+    if (!(xmom[1] > 0.) || !(Math.abs(xmom[2]) < 1.0)) {
       throw new ArithmeticException("L-Moments invalid");
     }
     // Generalized Normal Distribution estimation:
@@ -103,15 +101,12 @@ public class LogNormalLMOMEstimator extends AbstractLMOMEstimator<LogNormalDistr
       scale = xmom[1] * shape / (e * NormalDistribution.erf(.5 * shape));
       location = xmom[0] + scale * (e - 1.) / shape;
     }
-    // Estimate logNormal from generalized normal:
-    final double sigma = -shape;
-    final double expmu = scale / sigma;
-    return new LogNormalDistribution(Math.log(expmu), sigma, location - expmu);
+    return new SkewNormalDistribution(location, scale, shape);
   }
 
   @Override
-  public Class<? super LogNormalDistribution> getDistributionClass() {
-    return LogNormalDistribution.class;
+  public Class<? super SkewNormalDistribution> getDistributionClass() {
+    return SkewNormalDistribution.class;
   }
 
   /**
@@ -123,7 +118,7 @@ public class LogNormalLMOMEstimator extends AbstractLMOMEstimator<LogNormalDistr
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected LogNormalLMOMEstimator makeInstance() {
+    protected SkewNormalLMOMEstimator makeInstance() {
       return STATIC;
     }
   }
