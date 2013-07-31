@@ -22,37 +22,26 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogisticDistribution;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate the parameters of a Logistic Distribution, using the methods of
- * L-Moments (LMOM).
- * 
- * Reference:
- * <p>
- * J. R. M. Hosking<br />
- * Fortran routines for use with the method of L-moments Version 3.03<br />
- * IBM Research.
- * </p>
+ * Estimate the parameters of a normal distribution using the L-Moments.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has LogisticDistribution
+ * @apiviz.has UniformDistribution
  */
-@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class LogisticLMOMEstimator extends AbstractLMOMEstimator<LogisticDistribution> {
+public class UniformLMOMEstimator extends AbstractLMOMEstimator<UniformDistribution> {
   /**
-   * Static instance.
+   * Static instance
    */
-  public static final LogisticLMOMEstimator STATIC = new LogisticLMOMEstimator();
+  public static final UniformLMOMEstimator STATIC = new UniformLMOMEstimator();
 
   /**
    * Constructor. Private: use static instance.
    */
-  private LogisticLMOMEstimator() {
+  private UniformLMOMEstimator() {
     super();
   }
 
@@ -62,16 +51,13 @@ public class LogisticLMOMEstimator extends AbstractLMOMEstimator<LogisticDistrib
   }
 
   @Override
-  public LogisticDistribution estimateFromLMoments(double[] xmom) {
-    // The original publication would also estimate a shape, but we don't have
-    // the generalized logistic distribution yet.
-    // So we continue as if the Type II shape is 0, fairly trivial:
-    return new LogisticDistribution(xmom[0], xmom[1]);
+  public UniformDistribution estimateFromLMoments(double[] xmom) {
+    return new UniformDistribution(xmom[0] - 3 * xmom[1], xmom[0] + 3 * xmom[1]);
   }
 
   @Override
-  public Class<? super LogisticDistribution> getDistributionClass() {
-    return LogisticDistribution.class;
+  public Class<? super UniformDistribution> getDistributionClass() {
+    return UniformDistribution.class;
   }
 
   /**
@@ -83,7 +69,7 @@ public class LogisticLMOMEstimator extends AbstractLMOMEstimator<LogisticDistrib
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected LogisticLMOMEstimator makeInstance() {
+    protected UniformLMOMEstimator makeInstance() {
       return STATIC;
     }
   }

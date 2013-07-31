@@ -13,6 +13,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaChoiWetteEsti
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhancedMinMaxEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMedianEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMOMEstimator
@@ -28,3 +29,4 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.CauchyMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLevenbergMarquardtKDEEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLevenbergMarquardtKDEEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.TrimmedEstimator
