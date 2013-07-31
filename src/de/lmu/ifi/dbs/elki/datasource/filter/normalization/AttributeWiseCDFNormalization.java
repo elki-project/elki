@@ -155,7 +155,9 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
                 bestq = q;
               }
             } catch (ArithmeticException e) {
-              LOG.warning("Fitting distribution " + est + " failed: " + e.getMessage());
+              if (LOG.isVeryVerbose()) {
+                LOG.veryverbose("Fitting distribution " + est + " failed: " + e.getMessage());
+              }
               continue;
             }
           }
