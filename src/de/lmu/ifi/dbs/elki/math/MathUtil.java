@@ -43,12 +43,12 @@ public final class MathUtil {
   /**
    * Two times Pi.
    */
-  public static final double TWOPI = 2 * Math.PI;
+  public static final double TWOPI = 2. * Math.PI;
 
   /**
    * Half the value of Pi.
    */
-  public static final double HALFPI = 0.5 * Math.PI;
+  public static final double HALFPI = .5 * Math.PI;
 
   /**
    * 1.5 times Pi.
@@ -68,12 +68,12 @@ public final class MathUtil {
   /**
    * Square root of 2.
    */
-  public static final double SQRT2 = Math.sqrt(2);
+  public static final double SQRT2 = Math.sqrt(2.);
 
   /**
    * Square root of 5.
    */
-  public static final double SQRT5 = Math.sqrt(5);
+  public static final double SQRT5 = Math.sqrt(5.);
 
   /**
    * Square root of 0.5 == 1 / sqrt(2).
@@ -83,22 +83,27 @@ public final class MathUtil {
   /**
    * Precomputed value of 1 / sqrt(pi).
    */
-  public static final double ONE_BY_SQRTPI = 1 / Math.sqrt(Math.PI);
+  public static final double ONE_BY_SQRTPI = 1. / Math.sqrt(Math.PI);
+
+  /**
+   * Precomputed value of 1 / sqrt(2 * pi).
+   */
+  public static final double ONE_BY_SQRTTWOPI = 1. / Math.sqrt(2. * Math.PI);
 
   /**
    * Logarithm of 2 to the basis e, for logarithm conversion.
    */
-  public static final double LOG2 = Math.log(2);
+  public static final double LOG2 = Math.log(2.);
 
   /**
    * Logarithm of 3 to the basis e, for logarithm conversion.
    */
-  public static final double LOG3 = Math.log(3);
+  public static final double LOG3 = Math.log(3.);
 
   /**
    * Natural logarithm of 10.
    */
-  public static final double LOG10 = Math.log(10);
+  public static final double LOG10 = Math.log(10.);
 
   /**
    * Math.log(Math.PI).

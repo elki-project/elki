@@ -9,6 +9,8 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLMOMEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalBilkovaLMOMEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewNormalLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaChoiWetteEstimator
