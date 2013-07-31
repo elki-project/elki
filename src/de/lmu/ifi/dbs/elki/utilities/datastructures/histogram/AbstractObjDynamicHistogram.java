@@ -153,7 +153,10 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
    * @param bin Special bin index.
    */
   protected void aggregateSpecial(T value, int bin) {
-    special[bin] = aggregate(getSpecial(bin), value);
+    final T exist = getSpecial(bin);
+    // Note: do not inline above accessor, as getSpecial will initialize the
+    // special variable used below!
+    special[bin] = aggregate(exist, value);
   }
 
   /**
