@@ -382,7 +382,7 @@ public class Logging {
    * @param e Exception
    */
   public void veryverbose(CharSequence message, Throwable e) {
-    log(Level.INFO, message, e);
+    log(Level.VERYVERBOSE, message, e);
   }
 
   /**
@@ -393,7 +393,7 @@ public class Logging {
    * @param message Informational log message.
    */
   public void veryverbose(CharSequence message) {
-    log(Level.INFO, message);
+    log(Level.VERYVERBOSE, message);
   }
 
   /**
