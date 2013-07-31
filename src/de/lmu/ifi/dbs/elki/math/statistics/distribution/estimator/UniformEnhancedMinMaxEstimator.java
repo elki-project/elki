@@ -55,8 +55,20 @@ public class UniformEnhancedMinMaxEstimator implements DistributionEstimator<Uni
     for (int i = 0; i < len; i++) {
       mm.put(adapter.getDouble(data, i));
     }
-    double grow = (len > 1) ? 0.5 * mm.getDiff() / (len - 1) : 0.;
-    return new UniformDistribution(mm.getMin() - grow, mm.getMax() + grow);
+    return estimate(mm.getMin(), mm.getMax(), len);
+  }
+
+  /**
+   * Estimate from simple characteristics.
+   * 
+   * @param min Minimum
+   * @param max Maximum
+   * @param count Number of observations
+   * @return Distribution
+   */
+  public UniformDistribution estimate(double min, double max, final int count) {
+    double grow = (count > 1) ? 0.5 * (max - min) / (count - 1) : 0.;
+    return new UniformDistribution(min - grow, max + grow);
   }
 
   @Override

@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -65,6 +66,16 @@ public class UniformMinMaxEstimator implements DistributionEstimator<UniformDist
    */
   public UniformDistribution estimate(DoubleMinMax mm) {
     return new UniformDistribution(mm.getMin(), mm.getMax());
+  }
+
+  /**
+   * Estimate parameters from minimum and maximum observed.
+   * 
+   * @param mm Minimum and Maximum
+   * @return Estimation
+   */
+  public Distribution estimate(double min, double max) {
+    return new UniformDistribution(min, max);
   }
 
   @Override
