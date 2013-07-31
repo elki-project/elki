@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  */
 import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has ExponentiallyModifiedGaussianDistribution - - estimates
  */
 @Reference(authors = "J. Olivier, M. M. Norberg", title = "Positively skewed data: Revisiting the Box-Cox power transformation", booktitle = "International Journal of Psychological Research Vol. 3 No. 1")
-public class EMGOlivierNorbergEstimator implements DistributionEstimator<ExponentiallyModifiedGaussianDistribution> {
+public class EMGOlivierNorbergEstimator extends AbstractMOMEstimator<ExponentiallyModifiedGaussianDistribution> {
   /**
    * Static estimator class.
    */
@@ -50,26 +49,11 @@ public class EMGOlivierNorbergEstimator implements DistributionEstimator<Exponen
   }
 
   @Override
-  public <A> ExponentiallyModifiedGaussianDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    StatisticalMoments mv = new StatisticalMoments();
-    int size = adapter.size(data);
-    for (int i = 0; i < size; i++) {
-      mv.put(adapter.getDouble(data, i));
-    }
-    return estimate(mv);
-  }
-
-  /**
-   * Estimate parameters from a
-   * 
-   * @param mv Mean and Variance
-   * @return Distribution
-   */
-  public ExponentiallyModifiedGaussianDistribution estimate(StatisticalMoments mv) {
+  public ExponentiallyModifiedGaussianDistribution estimateFromStatisticalMoments(StatisticalMoments moments) {
     // Avoid NaN by disallowing negative kurtosis.
-    final double halfsk13 = Math.pow(Math.max(0, mv.getSampleExcessKurtosis() * .5), 1. / 3.);
-    final double st = mv.getSampleStddev();
-    final double mu = mv.getMean() - st * halfsk13;
+    final double halfsk13 = Math.pow(Math.max(0, moments.getSampleExcessKurtosis() * .5), 1. / 3.);
+    final double st = moments.getSampleStddev();
+    final double mu = moments.getMean() - st * halfsk13;
     // Note: we added "abs" here, to avoid even more NaNs.
     final double si = st * Math.sqrt(Math.abs((1 + halfsk13) * (1 - halfsk13)));
     // One more workaround to ensure finite lambda...

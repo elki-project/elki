@@ -28,12 +28,12 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.CauchyMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMedianEstimator;
@@ -53,18 +53,21 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMO
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MADDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MeanVarianceDistributionEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MOMDistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhancedMinMaxEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * A meta estimator that will try a number of (inexpensive) estimations, then
@@ -72,6 +75,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf MOMDistributionEstimator
+ * @apiviz.composedOf MADDistributionEstimator
+ * @apiviz.composedOf LMOMDistributionEstimator
+ * @apiviz.composedOf LogMOMDistributionEstimator
+ * @apiviz.composedOf LogMADDistributionEstimator
  */
 public class BestFitEstimator implements DistributionEstimator<Distribution> {
   /**
@@ -80,9 +88,14 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
   private static final Logging LOG = Logging.getLogger(BestFitEstimator.class);
 
   /**
+   * Static instance.
+   */
+  public static final BestFitEstimator STATIC = new BestFitEstimator();
+
+  /**
    * Mean and variance based estimators.
    */
-  private Collection<MeanVarianceDistributionEstimator<?>> momests;
+  private Collection<MOMDistributionEstimator<?>> momests;
 
   /**
    * Median average deviation from median estimators.
@@ -104,11 +117,15 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
    */
   private Collection<LogMADDistributionEstimator<?>> logmadests;
 
-  public BestFitEstimator() {
+  /**
+   * Constructor. Use static instance instead!
+   */
+  protected BestFitEstimator() {
     super();
-    momests = new ArrayList<>(2);
+    momests = new ArrayList<>(3);
     momests.add(NormalMOMEstimator.STATIC);
     momests.add(GammaMOMEstimator.STATIC);
+    momests.add(EMGOlivierNorbergEstimator.STATIC);
     madests = new ArrayList<>(8);
     madests.add(NormalMADEstimator.STATIC);
     madests.add(GammaMADEstimator.STATIC);
@@ -146,8 +163,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     final int len = adapter.size(data);
 
     // Build various statistics:
-    MeanVariance mom = new MeanVariance();
-    StatisticalMoments logmom = new StatisticalMoments();
+    StatisticalMoments mom = new StatisticalMoments(), logmom = new StatisticalMoments();
     double[] x = new double[len], scratch = new double[len], logx = new double[len];
 
     if (LOG.isVeryVerbose()) {
@@ -185,11 +201,11 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     Distribution best = null;
     double bestscore = Double.POSITIVE_INFINITY;
 
-    final int numest = momests.size() + madests.size() + lmomests.size() + logmomests.size() + logmadests.size();
+    final int numest = momests.size() + madests.size() + lmomests.size() + logmomests.size() + logmadests.size() + 2;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Estimating distribution.", numest, LOG) : null;
-    for (MeanVarianceDistributionEstimator<?> est : momests) {
+    for (MOMDistributionEstimator<?> est : momests) {
       try {
-        Distribution d = est.estimateFromMeanVariance(mom);
+        Distribution d = est.estimateFromStatisticalMoments(mom);
         double score = testFit(x, scratch, d);
         if (LOG.isVeryVerbose()) {
           LOG.veryverbose(est.toString() + ": " + score + " " + d.toString());
@@ -287,6 +303,28 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
         prog.incrementProcessed(LOG);
       }
     }
+    { // Uniform estimators.
+      Distribution d = UniformMinMaxEstimator.STATIC.estimate(min, max);
+      double score = testFit(x, scratch, d);
+      if (score < bestscore) {
+        best = d;
+        bestscore = score;
+      }
+      if (prog != null) {
+        prog.incrementProcessed(LOG);
+      }
+    }
+    { // Uniform estimators.
+      Distribution d = UniformEnhancedMinMaxEstimator.STATIC.estimate(min, max, len);
+      double score = testFit(x, scratch, d);
+      if (score < bestscore) {
+        best = d;
+        bestscore = score;
+      }
+      if (prog != null) {
+        prog.incrementProcessed(LOG);
+      }
+    }
     if (prog != null) {
       prog.ensureCompleted(LOG);
     }
@@ -345,5 +383,19 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
   @Override
   public Class<? super Distribution> getDistributionClass() {
     return Distribution.class; // No guarantees, sorry.
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected BestFitEstimator makeInstance() {
+      return STATIC;
+    }
   }
 }
