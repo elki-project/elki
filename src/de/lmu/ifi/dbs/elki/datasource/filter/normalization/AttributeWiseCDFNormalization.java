@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -275,6 +276,9 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectListParameter<DistributionEstimator<?>> estP = new ObjectListParameter<>(DISTRIBUTIONS_ID, DistributionEstimator.class);
+      List<Class<? extends DistributionEstimator<?>>> def = new ArrayList<>(1);
+      def.add(BestFitEstimator.class);
+      estP.setDefaultValue(def);
       if (config.grab(estP)) {
         estimators = estP.instantiateClasses(config);
       }
