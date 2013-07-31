@@ -83,6 +83,9 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
     }
     // Estimate theta:
     final double theta = k / meanx;
+    if (!(k > 0.0) || !(theta > 0.0)) {
+      throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
+    }
     return new GammaDistribution(k, theta);
   }
 

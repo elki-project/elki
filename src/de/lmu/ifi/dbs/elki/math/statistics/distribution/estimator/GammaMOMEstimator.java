@@ -64,9 +64,12 @@ public class GammaMOMEstimator extends AbstractMeanVarianceEstimator<GammaDistri
     if (mu < Double.MIN_NORMAL || var < Double.MIN_NORMAL) {
       throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero mean or variance: " + mv.toString());
     }
-    final double theta = var / mu;
-    final double k = mu / theta;
-    return new GammaDistribution(k, 1 / theta);
+    final double theta = mu / var;
+    final double k = mu * theta;
+    if (!(k > 0.0) || !(theta > 0.0)) {
+      throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
+    }
+    return new GammaDistribution(k, theta);
   }
 
   @Override

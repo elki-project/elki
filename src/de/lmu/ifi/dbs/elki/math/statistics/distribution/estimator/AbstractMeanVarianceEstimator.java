@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * 
  * @param <D> Distribution to estimate.
  */
-public abstract class AbstractMeanVarianceEstimator<D extends Distribution> extends AbstractMOMEstimator<D> {
+public abstract class AbstractMeanVarianceEstimator<D extends Distribution> extends AbstractMOMEstimator<D> implements MeanVarianceDistributionEstimator<D> {
   /**
    * Constructor.
    */
@@ -48,12 +48,7 @@ public abstract class AbstractMeanVarianceEstimator<D extends Distribution> exte
     return estimateFromMeanVariance(moments);
   }
 
-  /**
-   * Estimate the distribution from mean and variance.
-   * 
-   * @param mv Mean and variance.
-   * @return Distribution
-   */
+  @Override
   public abstract D estimateFromMeanVariance(MeanVariance mv);
 
   @Override

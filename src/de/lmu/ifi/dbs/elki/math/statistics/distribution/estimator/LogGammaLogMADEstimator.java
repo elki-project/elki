@@ -51,6 +51,9 @@ public class LogGammaLogMADEstimator extends AbstractLogMADEstimator<LogGammaDis
   public LogGammaDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
     final double theta = (mad * mad) / median;
     final double k = median / theta;
+    if (!(k > 0.) || !(theta > 0.)) {
+      throw new ArithmeticException("LogGamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
+    }
     return new LogGammaDistribution(k, 1 / theta, shift);
   }
 
