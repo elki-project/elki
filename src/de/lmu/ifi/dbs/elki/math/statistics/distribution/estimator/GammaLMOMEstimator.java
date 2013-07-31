@@ -85,7 +85,11 @@ public class GammaLMOMEstimator extends AbstractLMOMEstimator<GammaDistribution>
       double t = 1. - cv;
       alpha = t * (B1 + t * B2) / (1. + t * (B3 + t * B4));
     }
-    return new GammaDistribution(alpha, alpha / xmom[0]);
+    final double theta = alpha / xmom[0];
+    if (!(alpha > 0.0) || !(theta > 0.0)) {
+      throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + alpha + " theta=" + theta);
+    }
+    return new GammaDistribution(alpha, theta);
   }
 
   @Override
