@@ -55,6 +55,11 @@ public abstract class AbstractObjStaticHistogram<T> extends AbstractStaticHistog
   Object[] data;
 
   /**
+   * Special value storage: infinity, NaN
+   */
+  Object[] special = null;
+
+  /**
    * Access the value of a bin with new data.
    * 
    * @param coord Coordinate
@@ -62,6 +67,15 @@ public abstract class AbstractObjStaticHistogram<T> extends AbstractStaticHistog
    */
   @SuppressWarnings("unchecked")
   public T get(double coord) {
+    if (coord == Double.NEGATIVE_INFINITY) {
+      return getSpecial(0);
+    }
+    if (coord == Double.NEGATIVE_INFINITY) {
+      return getSpecial(1);
+    }
+    if (Double.isNaN(coord)) {
+      return getSpecial(2);
+    }
     int bin = getBinNr(coord);
     if (bin < 0) {
       if (size - bin > data.length) {
@@ -100,6 +114,19 @@ public abstract class AbstractObjStaticHistogram<T> extends AbstractStaticHistog
     } else {
       return (T) data[bin];
     }
+  }
+
+  /**
+   * Ensure that we have storage for special values (infinity, NaN)
+   * 
+   * @param idx Index to return.
+   */
+  @SuppressWarnings("unchecked")
+  protected T getSpecial(int idx) {
+    if (special == null) {
+      special = new Object[] { makeObject(), makeObject(), makeObject() };
+    }
+    return (T) special[idx];
   }
 
   /**
