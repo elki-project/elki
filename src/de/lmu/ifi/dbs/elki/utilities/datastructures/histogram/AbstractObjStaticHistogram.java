@@ -70,7 +70,7 @@ public abstract class AbstractObjStaticHistogram<T> extends AbstractStaticHistog
     if (coord == Double.NEGATIVE_INFINITY) {
       return getSpecial(0);
     }
-    if (coord == Double.NEGATIVE_INFINITY) {
+    if (coord == Double.POSITIVE_INFINITY) {
       return getSpecial(1);
     }
     if (Double.isNaN(coord)) {
