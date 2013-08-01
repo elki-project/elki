@@ -35,6 +35,16 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  */
 public abstract class AbstractObjStaticHistogram<T> extends AbstractStaticHistogram implements ObjHistogram<T> {
   /**
+   * Data store
+   */
+  Object[] data;
+
+  /**
+   * Special value storage: infinity, NaN
+   */
+  Object[] special = null;
+
+  /**
    * Constructor.
    * 
    * @param bins Number of bins
@@ -46,18 +56,11 @@ public abstract class AbstractObjStaticHistogram<T> extends AbstractStaticHistog
     if (bins >= 0) {
       // -1 will be used by FlexiHistogram to delay initialization.
       data = new Object[bins];
+      for (int i = 0; i < bins; i++) {
+        data[i] = makeObject();
+      }
     }
   }
-
-  /**
-   * Data store
-   */
-  Object[] data;
-
-  /**
-   * Special value storage: infinity, NaN
-   */
-  Object[] special = null;
 
   /**
    * Access the value of a bin with new data.
