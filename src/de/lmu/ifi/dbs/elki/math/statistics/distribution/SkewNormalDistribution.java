@@ -124,13 +124,9 @@ public class SkewNormalDistribution implements DistributionWithRandom {
   public static double pdf(double x, double mu, double sigma, double skew) {
     x = (x - mu) / sigma;
     if (Math.abs(skew) > 0.) {
-      double t = 1. - skew * x;
-      if (t < 1e-15) {
-        return 0.;
-      }
-      x = Math.log(t) / skew;
+      x = -Math.log(1. - skew * x) / skew;
     }
-    return MathUtil.SQRTHALF * Math.exp(-.5 * x * x);
+    return MathUtil.SQRTHALF * Math.exp(-.5 * x * x) / sigma / (1 - skew * x);
   }
 
   /**
@@ -144,11 +140,7 @@ public class SkewNormalDistribution implements DistributionWithRandom {
   public static double cdf(double x, double mu, double sigma, double skew) {
     x = (x - mu) / sigma;
     if (Math.abs(skew) > 0.) {
-      double t = 1. - skew * x;
-      if (t < 1e-15) {
-        return (skew < 0.) ? 0. : 1.;
-      }
-      x = Math.log(t) / skew;
+      x = -Math.log(1. - skew * x) / skew;
     }
     return .5 + .5 * NormalDistribution.erf(x * MathUtil.SQRTHALF);
   }

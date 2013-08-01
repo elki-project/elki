@@ -87,9 +87,9 @@ public class SkewNormalLMOMEstimator extends AbstractLMOMEstimator<SkewNormalDis
     if (Math.abs(t3) >= .95) {
       // Extreme skewness
       location = 0.;
-      scale = -1;
+      scale = -1.;
       shape = 0.;
-    } else if (Math.abs(t3) < 1e-8) {
+    } else if (Math.abs(t3) <= 1e-8) {
       // t3 effectively zero.
       location = xmom[0];
       scale = xmom[1] * MathUtil.SQRTPI;
