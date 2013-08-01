@@ -28,14 +28,14 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
- * Skewed Gaussian distribution.
+ * Generalized Gaussian distribution by adding a skew term, similar to lognormal distributions.
  * 
  * This is one kind of generalized normal distributions. Note that there are
  * multiple that go by the name of a "Generalized Normal Distribution".
  * 
  * @author Erich Schubert
  */
-public class SkewNormalDistribution implements DistributionWithRandom {
+public class SkewGeneralizedNormalDistribution implements DistributionWithRandom {
   /**
    * Mean value for the generator
    */
@@ -64,7 +64,7 @@ public class SkewNormalDistribution implements DistributionWithRandom {
    * @param skew Skew
    * @param random Random generator
    */
-  public SkewNormalDistribution(double mean, double stddev, double skew, Random random) {
+  public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew, Random random) {
     super();
     this.mean = mean;
     this.stddev = stddev;
@@ -79,7 +79,7 @@ public class SkewNormalDistribution implements DistributionWithRandom {
    * @param stddev Standard Deviation
    * @param skew Skew
    */
-  public SkewNormalDistribution(double mean, double stddev, double skew) {
+  public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew) {
     this(mean, stddev, skew, null);
   }
 

@@ -9,7 +9,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogisticDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedLogisticDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution
-de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewNormalDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.StudentsTDistribution
