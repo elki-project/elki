@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MOMDistributio
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewNormalLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewGNormalLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhancedMinMaxEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator;
@@ -146,7 +146,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     lmomests.add(LogisticLMOMEstimator.STATIC);
     lmomests.add(LogNormalLMOMEstimator.STATIC);
     lmomests.add(LogNormalBilkovaLMOMEstimator.STATIC);
-    lmomests.add(SkewNormalLMOMEstimator.STATIC);
+    lmomests.add(SkewGNormalLMOMEstimator.STATIC);
     lmomests.add(GeneralizedExtremeValueLMOMEstimator.STATIC);
     lmomests.add(WeibullLMOMEstimator.STATIC);
     lmomests.add(UniformLMOMEstimator.STATIC);

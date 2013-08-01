@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewNormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -45,11 +45,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has SkewNormalDistribution
  */
 @Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class SkewNormalLMOMEstimator extends AbstractLMOMEstimator<SkewNormalDistribution> {
+public class SkewGNormalLMOMEstimator extends AbstractLMOMEstimator<SkewGeneralizedNormalDistribution> {
   /**
    * Static instance.
    */
-  public static final SkewNormalLMOMEstimator STATIC = new SkewNormalLMOMEstimator();
+  public static final SkewGNormalLMOMEstimator STATIC = new SkewGNormalLMOMEstimator();
 
   /** Polynomial approximation */
   private static final double //
@@ -67,7 +67,7 @@ public class SkewNormalLMOMEstimator extends AbstractLMOMEstimator<SkewNormalDis
   /**
    * Constructor. Private: use static instance.
    */
-  private SkewNormalLMOMEstimator() {
+  private SkewGNormalLMOMEstimator() {
     super();
   }
 
@@ -77,7 +77,7 @@ public class SkewNormalLMOMEstimator extends AbstractLMOMEstimator<SkewNormalDis
   }
 
   @Override
-  public SkewNormalDistribution estimateFromLMoments(double[] xmom) {
+  public SkewGeneralizedNormalDistribution estimateFromLMoments(double[] xmom) {
     if (!(xmom[1] > 0.) || !(Math.abs(xmom[2]) < 1.0)) {
       throw new ArithmeticException("L-Moments invalid");
     }
@@ -101,12 +101,12 @@ public class SkewNormalLMOMEstimator extends AbstractLMOMEstimator<SkewNormalDis
       scale = xmom[1] * shape / (e * NormalDistribution.erf(.5 * shape));
       location = xmom[0] + scale * (e - 1.) / shape;
     }
-    return new SkewNormalDistribution(location, scale, shape);
+    return new SkewGeneralizedNormalDistribution(location, scale, shape);
   }
 
   @Override
-  public Class<? super SkewNormalDistribution> getDistributionClass() {
-    return SkewNormalDistribution.class;
+  public Class<? super SkewGeneralizedNormalDistribution> getDistributionClass() {
+    return SkewGeneralizedNormalDistribution.class;
   }
 
   /**
@@ -118,7 +118,7 @@ public class SkewNormalLMOMEstimator extends AbstractLMOMEstimator<SkewNormalDis
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected SkewNormalLMOMEstimator makeInstance() {
+    protected SkewGNormalLMOMEstimator makeInstance() {
       return STATIC;
     }
   }
