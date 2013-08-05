@@ -125,8 +125,8 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
    * @return Maximum deviation from uniform.
    */
   public static double simpleTest(double[] test, final double min, final double max) {
-    double scale = (max - min) / test.length;
-    double maxdev = 0.;
+    double scale = (max - min) / (test.length - 1);
+    double maxdev = Double.NEGATIVE_INFINITY;
     for (int i = 0; i < test.length; i++) {
       // Expected value at position i:
       double expected = i * scale + min;
@@ -135,6 +135,6 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
         maxdev = dev;
       }
     }
-    return maxdev;
+    return Math.abs(maxdev);
   }
 }

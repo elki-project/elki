@@ -66,6 +66,9 @@ public class LogGammaChoiWetteEstimator implements DistributionEstimator<LogGamm
     double meanx = 0, meanlogx = 0;
     for (int i = 0; i < len; i++) {
       final double shifted = adapter.getDouble(data, i) - shift;
+      if (shifted <= 0 || Double.isInfinite(shifted) || Double.isNaN(shifted)) {
+        continue;
+      }
       final double val = shifted > 1 ? Math.log(shifted) : 1.;
       final double logx = (val > 0) ? Math.log(val) : meanlogx;
       final double deltax = val - meanx;
@@ -100,6 +103,11 @@ public class LogGammaChoiWetteEstimator implements DistributionEstimator<LogGamm
   @Override
   public Class<? super LogGammaDistribution> getDistributionClass() {
     return LogGammaDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

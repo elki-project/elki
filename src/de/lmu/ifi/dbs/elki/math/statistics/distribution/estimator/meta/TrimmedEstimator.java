@@ -97,6 +97,11 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
     return inner.getDistributionClass();
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + "(" + inner.toString() + ", trim=" + trim + ")";
+  }
+
   /**
    * Parameterization class.
    * 

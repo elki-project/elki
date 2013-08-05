@@ -101,6 +101,11 @@ public class LogNormalLevenbergMarquardtKDEEstimator implements DistributionEsti
     return LogNormalDistribution.class;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
+  }
+
   /**
    * Parameterization class.
    * 

@@ -176,7 +176,9 @@ public class MeanVariance extends Mean {
    * @return sample variance
    */
   public double getSampleVariance() {
-    assert (n > 1.) : "Cannot compute a reasonable sample variance with weight <= 1.0!";
+    if (!(n > 1.)) {
+      throw new ArithmeticException("Cannot compute a reasonable sample variance with weight <= 1.0!");
+    }
     return m2 / (n - 1);
   }
 

@@ -55,6 +55,9 @@ public abstract class AbstractLogMADEstimator<D extends Distribution> implements
     for (int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i) - min;
       x[i] = val > 0. ? Math.log(val) : Double.NEGATIVE_INFINITY;
+      if (Double.isNaN(x[i])) {
+        throw new ArithmeticException("NaN value.");
+      }
     }
     double median = QuickSelect.median(x);
     double mad = computeMAD(x, median);
@@ -89,5 +92,10 @@ public abstract class AbstractLogMADEstimator<D extends Distribution> implements
       }
     }
     return mad;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 }

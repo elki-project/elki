@@ -62,7 +62,7 @@ public class NormalLMOMEstimator extends AbstractLMOMEstimator<NormalDistributio
 
   @Override
   public NormalDistribution estimateFromLMoments(double[] xmom) {
-    return new NormalDistribution(xmom[0], xmom[1] * MathUtil.SQRTPI);
+    return new NormalDistribution(xmom[0], Math.max(xmom[1] * MathUtil.SQRTPI, Double.MIN_NORMAL));
   }
 
   @Override

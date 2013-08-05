@@ -80,7 +80,7 @@ public class LogNormalBilkovaLMOMEstimator extends AbstractLMOMEstimator<LogNorm
     final double sigma = 0.999281 * z - 0.006118 * z * z2 + 0.000127 * z * z2 * z2;
     final double sigmasqhalf = sigma * sigma * .5;
     final double logmu = Math.log(xmom[1] / NormalDistribution.erf(.5 * sigma)) - sigmasqhalf;
-    return new LogNormalDistribution(logmu, sigma, xmom[0] - Math.exp(logmu + sigmasqhalf));
+    return new LogNormalDistribution(logmu, Math.max(sigma, Double.MIN_NORMAL), xmom[0] - Math.exp(logmu + sigmasqhalf));
   }
 
   @Override

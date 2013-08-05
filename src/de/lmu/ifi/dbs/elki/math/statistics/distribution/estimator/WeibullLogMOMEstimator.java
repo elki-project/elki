@@ -80,6 +80,11 @@ public class WeibullLogMOMEstimator implements DistributionEstimator<WeibullDist
     return WeibullDistribution.class;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
+  }
+
   /**
    * Parameterization class.
    * 

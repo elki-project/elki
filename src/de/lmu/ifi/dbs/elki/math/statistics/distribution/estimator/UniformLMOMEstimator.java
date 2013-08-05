@@ -52,7 +52,7 @@ public class UniformLMOMEstimator extends AbstractLMOMEstimator<UniformDistribut
 
   @Override
   public UniformDistribution estimateFromLMoments(double[] xmom) {
-    return new UniformDistribution(xmom[0] - 3 * xmom[1], xmom[0] + 3 * xmom[1]);
+    return new UniformDistribution(Math.max(xmom[0] - 3 * xmom[1], -Double.MAX_VALUE), Math.min(xmom[0] + 3 * xmom[1], Double.MAX_VALUE));
   }
 
   @Override

@@ -48,7 +48,7 @@ public class LogNormalLogMOMEstimator extends AbstractLogMeanVarianceEstimator<L
 
   @Override
   public LogNormalDistribution estimateFromLogMeanVariance(MeanVariance mv, double shift) {
-    return new LogNormalDistribution(mv.getMean(), mv.getSampleStddev(), shift);
+    return new LogNormalDistribution(mv.getMean(), Math.max(mv.getSampleStddev(), Double.MIN_NORMAL), shift);
   }
 
   @Override

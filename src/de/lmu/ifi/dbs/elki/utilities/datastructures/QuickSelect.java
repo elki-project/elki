@@ -506,6 +506,8 @@ public class QuickSelect {
           break;
         }
         swap(data, i, j);
+        i++;
+        j--;
       }
 
       // Move pivot (former middle element) back into the appropriate place

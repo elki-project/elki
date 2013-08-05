@@ -97,6 +97,11 @@ public class NormalLevenbergMarquardtKDEEstimator implements DistributionEstimat
     return NormalDistribution.class;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
+  }
+
   /**
    * Parameterization class.
    * 
