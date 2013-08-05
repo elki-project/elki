@@ -48,7 +48,7 @@ public class NormalMOMEstimator extends AbstractMeanVarianceEstimator<NormalDist
 
   @Override
   public NormalDistribution estimateFromMeanVariance(MeanVariance mv) {
-    return new NormalDistribution(mv.getMean(), mv.getSampleStddev());
+    return new NormalDistribution(mv.getMean(), Math.max(mv.getSampleStddev(), Double.MIN_NORMAL));
   }
 
   @Override

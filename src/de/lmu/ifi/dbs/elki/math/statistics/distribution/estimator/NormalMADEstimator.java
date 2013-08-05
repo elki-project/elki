@@ -64,7 +64,7 @@ public class NormalMADEstimator extends AbstractMADEstimator<NormalDistribution>
 
   @Override
   public NormalDistribution estimateFromMedianMAD(double median, double mad) {
-    return new NormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mad);
+    return new NormalDistribution(median, Math.max(NormalDistribution.ONEBYPHIINV075 * mad, Double.MIN_NORMAL));
   }
 
   @Override

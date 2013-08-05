@@ -65,7 +65,7 @@ public class LogNormalLogMADEstimator extends AbstractLogMADEstimator<LogNormalD
 
   @Override
   public LogNormalDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
-    return new LogNormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mad, shift);
+    return new LogNormalDistribution(median, Math.max(NormalDistribution.ONEBYPHIINV075 * mad, Double.MIN_NORMAL), shift);
   }
 
   @Override

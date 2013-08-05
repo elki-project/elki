@@ -106,7 +106,7 @@ public class LogNormalLMOMEstimator extends AbstractLMOMEstimator<LogNormalDistr
     // Estimate logNormal from generalized normal:
     final double sigma = -shape;
     final double expmu = scale / sigma;
-    return new LogNormalDistribution(Math.log(expmu), sigma, location - expmu);
+    return new LogNormalDistribution(Math.log(expmu), Math.max(sigma, Double.MIN_NORMAL), location - expmu);
   }
 
   @Override

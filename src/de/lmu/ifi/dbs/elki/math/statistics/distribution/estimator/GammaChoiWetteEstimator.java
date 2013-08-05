@@ -62,6 +62,9 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
     double meanx = 0, meanlogx = 0;
     for (int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i);
+      if (val <= 0 || Double.isInfinite(val) || Double.isNaN(val)) {
+        continue;
+      }
       final double logx = (val > 0) ? Math.log(val) : meanlogx;
       final double deltax = val - meanx;
       final double deltalogx = logx - meanlogx;
@@ -92,6 +95,11 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
   @Override
   public Class<? super GammaDistribution> getDistributionClass() {
     return GammaDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**

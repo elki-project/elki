@@ -60,6 +60,12 @@ public class UniformDistribution implements DistributionWithRandom {
    */
   public UniformDistribution(double min, double max, Random random) {
     super();
+    if (Double.isInfinite(min) || Double.isInfinite(max)) {
+      throw new ArithmeticException("Infinite values given for uniform distribution.");
+    }
+    if (Double.isNaN(min) || Double.isNaN(max)) {
+      throw new ArithmeticException("NaN values given for uniform distribution.");
+    }
     // Swap parameters if they were given incorrectly.
     if (min > max) {
       double tmp = min;
@@ -79,7 +85,7 @@ public class UniformDistribution implements DistributionWithRandom {
    * @param max Maximum value
    */
   public UniformDistribution(double min, double max) {
-    this(min, max, new Random());
+    this(min, max, null);
   }
 
   @Override

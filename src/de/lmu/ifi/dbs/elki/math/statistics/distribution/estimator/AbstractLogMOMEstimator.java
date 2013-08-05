@@ -71,8 +71,8 @@ public abstract class AbstractLogMOMEstimator<D extends Distribution> implements
    */
   public static <A> double min(A data, NumberArrayAdapter<?, A> adapter, double minmin, double margin) {
     final int len = adapter.size(data);
-    double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-    for (int i = 0; i < len; i++) {
+    double min = adapter.getDouble(data, 0), max = min;
+    for (int i = 1; i < len; i++) {
       final double val = adapter.getDouble(data, i);
       if (val < min) {
         min = val;
@@ -80,10 +80,15 @@ public abstract class AbstractLogMOMEstimator<D extends Distribution> implements
         max = val;
       }
     }
-    if (min > 0.) {
+    if (min > minmin) {
       return minmin;
     }
     // Add some extra margin, to not have 0s.
     return min - (max - min) * margin;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 }

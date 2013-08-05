@@ -63,4 +63,9 @@ public abstract class AbstractLMOMEstimator<D extends Distribution> implements L
 
   @Override
   abstract public int getNumMoments();
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
+  }
 }

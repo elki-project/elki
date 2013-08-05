@@ -55,7 +55,7 @@ public class UniformMADEstimator extends AbstractMADEstimator<UniformDistributio
 
   @Override
   public UniformDistribution estimateFromMedianMAD(double median, double mad) {
-    return new UniformDistribution(median - 2 * mad, median + 2 * mad);
+    return new UniformDistribution(Math.max(median - 2 * mad, -Double.MAX_VALUE), Math.min(median + 2 * mad, Double.MAX_VALUE));
   }
 
   @Override

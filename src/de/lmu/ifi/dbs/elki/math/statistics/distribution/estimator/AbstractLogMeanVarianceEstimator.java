@@ -45,6 +45,9 @@ public abstract class AbstractLogMeanVarianceEstimator<D extends Distribution> e
 
   @Override
   public D estimateFromLogStatisticalMoments(StatisticalMoments moments, double shift) {
+    if (!(moments.getCount() > 1.)) {
+      throw new ArithmeticException("Too small sample size to estimate variance.");
+    }
     return estimateFromLogMeanVariance(moments, shift);
   }
 
@@ -68,6 +71,9 @@ public abstract class AbstractLogMeanVarianceEstimator<D extends Distribution> e
         continue;
       }
       mv.put(Math.log(val));
+    }
+    if (!(mv.getCount() > 1.)) {
+      throw new ArithmeticException("Too small sample size to estimate variance.");
     }
     return estimateFromLogMeanVariance(mv, min);
   }

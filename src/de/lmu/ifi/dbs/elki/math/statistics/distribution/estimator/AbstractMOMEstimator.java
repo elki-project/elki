@@ -58,4 +58,9 @@ public abstract class AbstractMOMEstimator<D extends Distribution> implements MO
     }
     return estimateFromStatisticalMoments(mv);
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
+  }
 }

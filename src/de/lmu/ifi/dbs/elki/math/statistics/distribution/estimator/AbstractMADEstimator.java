@@ -86,6 +86,24 @@ public abstract class AbstractMADEstimator<D extends Distribution> implements MA
         mad = 1.0; // Maybe all constant. No real value.
       }
     }
+    if (mad == Double.POSITIVE_INFINITY) {
+      double max = 0.;
+      for (double xi : x) {
+        if (xi < Double.POSITIVE_INFINITY && xi > max) {
+          max = xi;
+        }
+      }
+      if (max < Double.POSITIVE_INFINITY) {
+        mad = max;
+      } else {
+        mad = 1.0; // No reasonable value. Give up.
+      }
+    }
     return mad;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 }
