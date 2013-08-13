@@ -437,14 +437,15 @@ public class QuickSelect {
    * @param start Interval start
    * @param end Interval end (exclusive)
    * @param rank rank position we are interested in (starting at 0)
+   * @return Element at the given rank (starting at 0).
    */
-  public static void quickSelect(double[] data, int start, int end, int rank) {
+  public static double quickSelect(double[] data, int start, int end, int rank) {
     while (true) {
       // Optimization for small arrays
       // This also ensures a minimum size below
       if (start + SMALL > end) {
         insertionSort(data, start, end);
-        return;
+        return data[rank];
       }
 
       // Best of 5 pivot picking:
@@ -523,6 +524,7 @@ public class QuickSelect {
         break;
       }
     } // Loop until rank==i
+    return data[rank];
   }
 
   /**
