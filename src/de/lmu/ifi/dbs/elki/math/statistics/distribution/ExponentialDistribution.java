@@ -91,6 +91,9 @@ public class ExponentialDistribution implements DistributionWithRandom {
 
   @Override
   public double pdf(double val) {
+    if (val < location) {
+      return 0.;
+    }
     return rate * Math.exp(-rate * (val - location));
   }
 
@@ -102,11 +105,17 @@ public class ExponentialDistribution implements DistributionWithRandom {
    * @return probability density
    */
   public static double pdf(double val, double rate) {
+    if (val < 0.) {
+      return 0.;
+    }
     return rate * Math.exp(-rate * val);
   }
 
   @Override
   public double cdf(double val) {
+    if (val < location) {
+      return 0.;
+    }
     return 1 - Math.exp(-rate * (val - location));
   }
 
@@ -118,6 +127,9 @@ public class ExponentialDistribution implements DistributionWithRandom {
    * @return cumulative density
    */
   public static double cdf(double val, double rate) {
+    if (val < 0.) {
+      return 0.;
+    }
     return 1 - Math.exp(-rate * val);
   }
 
