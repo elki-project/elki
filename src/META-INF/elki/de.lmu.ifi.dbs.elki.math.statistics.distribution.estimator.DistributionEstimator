@@ -20,6 +20,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhancedMinMax
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMOMEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMedianEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMOMEstimator

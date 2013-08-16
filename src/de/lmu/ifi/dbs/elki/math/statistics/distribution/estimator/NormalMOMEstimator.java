@@ -27,7 +27,11 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Naive distribution estimation using mean and sample variance.
+ * Naive maximum-likelihood estimations for the normal distribution using mean
+ * and sample variance.
+ * 
+ * While this is the most commonly used estimator, it is not very robust against
+ * extreme values.
  * 
  * @author Erich Schubert
  * 

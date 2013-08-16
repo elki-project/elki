@@ -22,40 +22,34 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate Exponential distribution parameters using Median and MAD.
- * 
- * Reference:
- * <p>
- * Robust Estimators for Transformed Location Scale Families<br />
- * D. J. Olive
- * </p>
+ * Estimate Exponential distribution parameters using the mean, which is the
+ * maximum-likelihood estimate (MLE), but not very robust.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has ExponentialDistribution
  */
-@Reference(title = "Robust Estimators for Transformed Location Scale Families", authors = "D. J. Olive", booktitle = "")
-public class ExponentialMedianEstimator extends AbstractMADEstimator<ExponentialDistribution> {
+public class ExponentialMOMEstimator extends AbstractMeanVarianceEstimator<ExponentialDistribution> {
   /**
    * Static instance.
    */
-  public static final ExponentialMedianEstimator STATIC = new ExponentialMedianEstimator();
+  public static final ExponentialMOMEstimator STATIC = new ExponentialMOMEstimator();
 
   /**
    * Private constructor, use static instance!
    */
-  private ExponentialMedianEstimator() {
+  private ExponentialMOMEstimator() {
     // Do not instantiate
   }
 
   @Override
-  public ExponentialDistribution estimateFromMedianMAD(double median, double mad) {
-    final double scale = 1.441 * median;
+  public ExponentialDistribution estimateFromMeanVariance(MeanVariance mv) {
+    final double scale = mv.getMean();
     if (!(scale > 0.)) {
       throw new ArithmeticException("Data with non-positive mean cannot be exponential distributed.");
     }
@@ -76,7 +70,7 @@ public class ExponentialMedianEstimator extends AbstractMADEstimator<Exponential
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected ExponentialMedianEstimator makeInstance() {
+    protected ExponentialMOMEstimator makeInstance() {
       return STATIC;
     }
   }
