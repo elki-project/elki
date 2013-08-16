@@ -55,7 +55,12 @@ public class ExponentialMADEstimator extends AbstractMADEstimator<ExponentialDis
 
   @Override
   public ExponentialDistribution estimateFromMedianMAD(double median, double mad) {
-    return new ExponentialDistribution(2.0781 * mad, median - 1.440 * mad);
+    final double location = median - 1.440 * mad;
+    final double scale = 2.0781 * mad;
+    if (!(scale > 0.)) {
+      throw new ArithmeticException("Data with non-positive MAD cannot be exponential distributed.");
+    }
+    return new ExponentialDistribution(1./scale, location);
   }
 
   @Override

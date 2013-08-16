@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Naive distribution estimation using mean and sample variance.
  * 
+ * This is a maximum-likelihood-estimator (MLE).
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.has LogNormalDistribution - - estimates

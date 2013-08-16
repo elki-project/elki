@@ -66,7 +66,7 @@ public class ExponentialLMOMEstimator extends AbstractLMOMEstimator<ExponentialD
   public ExponentialDistribution estimateFromLMoments(double[] xmom) {
     double scale = 2. * xmom[1];
     if (!(scale > 0.)) {
-      throw new ArithmeticException("Constant data cannot be exponential distributed.");
+      throw new ArithmeticException("Data with non-positive scale cannot be exponential distributed.");
     }
     return new ExponentialDistribution(1. / scale, xmom[0] - scale);
   }

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEs
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMADEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMedianEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaMADEstimator;
@@ -125,9 +126,10 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
    */
   protected BestFitEstimator() {
     super();
-    momests = new ArrayList<>(3);
+    momests = new ArrayList<>(4);
     momests.add(NormalMOMEstimator.STATIC);
     momests.add(GammaMOMEstimator.STATIC);
+    momests.add(ExponentialMOMEstimator.STATIC);
     momests.add(EMGOlivierNorbergEstimator.STATIC);
     madests = new ArrayList<>(8);
     madests.add(NormalMADEstimator.STATIC);
