@@ -24,6 +24,9 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMOMEstimat
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMedianEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMOMEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceMLEEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceMADEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMOMEstimator
