@@ -22,12 +22,13 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.LaplaceDistribution;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogLogisticDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate Laplace distribution parameters using Median and MAD.
+ * Estimate Logistic distribution parameters using Median and MAD.
  * 
  * Reference:
  * <p>
@@ -37,32 +38,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has ExponentialDistribution
+ * @apiviz.has LogLogisticDistribution
  */
 @Reference(title = "Applied robust statistics", authors = "D. J. Olive", booktitle = "")
-public class LaplaceMADEstimator extends AbstractMADEstimator<LaplaceDistribution> {
+public class LogLogisticMADEstimator extends AbstractMADEstimator<LogLogisticDistribution> {
   /**
    * Static instance.
    */
-  public static final LaplaceMADEstimator STATIC = new LaplaceMADEstimator();
+  public static final LogLogisticMADEstimator STATIC = new LogLogisticMADEstimator();
 
   /**
    * Private constructor, use static instance!
    */
-  private LaplaceMADEstimator() {
+  private LogLogisticMADEstimator() {
     // Do not instantiate
   }
 
   @Override
-  public LaplaceDistribution estimateFromMedianMAD(double median, double mad) {
-    final double location = median;
-    final double scale = 1.443 * mad;
-    return new LaplaceDistribution(1. / scale, location);
+  public LogLogisticDistribution estimateFromMedianMAD(double median, double mad) {
+    return new LogLogisticDistribution(1. / median, MathUtil.LOG3 / mad);
   }
 
   @Override
-  public Class<? super LaplaceDistribution> getDistributionClass() {
-    return LaplaceDistribution.class;
+  public Class<? super LogLogisticDistribution> getDistributionClass() {
+    return LogLogisticDistribution.class;
   }
 
   /**
@@ -74,7 +73,7 @@ public class LaplaceMADEstimator extends AbstractMADEstimator<LaplaceDistributio
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected LaplaceMADEstimator makeInstance() {
+    protected LogLogisticMADEstimator makeInstance() {
       return STATIC;
     }
   }

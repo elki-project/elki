@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogisticDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -55,7 +56,7 @@ public class LogisticMADEstimator extends AbstractMADEstimator<LogisticDistribut
 
   @Override
   public LogisticDistribution estimateFromMedianMAD(double median, double mad) {
-    return new LogisticDistribution(median, 0.9102 * mad);
+    return new LogisticDistribution(median, mad / MathUtil.LOG3);
   }
 
   @Override
