@@ -48,15 +48,15 @@ public class WaldMLEstimator implements DistributionEstimator<WaldDistribution> 
       mean += v;
     }
     mean /= len;
-    double invmean = len / mean;
+    double invmean = 1. / mean;
     double invdev = 0.;
     for(int i = 0; i < len; i++) {
       double v = adapter.getDouble(data, i);
       if(v > 0.) {
-        invdev += len / v - invmean;
+        invdev += 1. / v - invmean;
       }
     }
-    return new WaldDistribution(mean, 1. / invdev);
+    return new WaldDistribution(mean, invdev);
   }
 
   @Override
