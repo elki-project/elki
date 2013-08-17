@@ -51,11 +51,11 @@ public class EMGOlivierNorbergEstimator extends AbstractMOMEstimator<Exponential
   @Override
   public ExponentiallyModifiedGaussianDistribution estimateFromStatisticalMoments(StatisticalMoments moments) {
     // Avoid NaN by disallowing negative kurtosis.
-    final double halfsk13 = Math.pow(Math.max(0, moments.getSampleExcessKurtosis() * .5), 1. / 3.);
+    final double halfsk13 = Math.pow(Math.max(0., moments.getSampleSkewness() * .5), 1. / 3.);
     final double st = moments.getSampleStddev();
     final double mu = moments.getMean() - st * halfsk13;
     // Note: we added "abs" here, to avoid even more NaNs.
-    final double si = st * Math.sqrt(Math.abs((1 + halfsk13) * (1 - halfsk13)));
+    final double si = st * Math.sqrt(Math.abs((1. + halfsk13) * (1. - halfsk13)));
     // One more workaround to ensure finite lambda...
     final double la = (halfsk13 > 0) ? 1 / (st * halfsk13) : 1;
     return new ExponentiallyModifiedGaussianDistribution(mu, si, la);
