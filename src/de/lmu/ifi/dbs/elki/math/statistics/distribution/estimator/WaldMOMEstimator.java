@@ -22,8 +22,8 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -33,30 +33,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has WaldDistribution
  */
-public class WaldMLEstimator implements DistributionEstimator<WaldDistribution> {
+public class WaldMOMEstimator extends AbstractMeanVarianceEstimator<WaldDistribution> {
   /**
    * Static instance.
    */
-  public static final WaldMLEstimator STATIC = new WaldMLEstimator();
+  public static final WaldMOMEstimator STATIC = new WaldMOMEstimator();
 
   @Override
-  public <A> WaldDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int len = adapter.size(data);
-    double mean = 0.;
-    for(int i = 0; i < len; i++) {
-      double v = adapter.getDouble(data, i);
-      mean += v;
-    }
-    mean /= len;
-    double invmean = len / mean;
-    double invdev = 0.;
-    for(int i = 0; i < len; i++) {
-      double v = adapter.getDouble(data, i);
-      if(v > 0.) {
-        invdev += len / v - invmean;
-      }
-    }
-    return new WaldDistribution(mean, 1. / invdev);
+  public WaldDistribution estimateFromMeanVariance(MeanVariance mv) {
+    double mean = mv.getMean();
+    return new WaldDistribution(mean, mean * mean * mean / mv.getSampleVariance());
   }
 
   @Override
@@ -78,7 +64,7 @@ public class WaldMLEstimator implements DistributionEstimator<WaldDistribution> 
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WaldMLEstimator makeInstance() {
+    protected WaldMOMEstimator makeInstance() {
       return STATIC;
     }
   }
