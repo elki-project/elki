@@ -81,7 +81,7 @@ public class ExponentiallyModifiedGaussianDistribution implements DistributionWi
    * @param lambda Rate
    */
   public ExponentiallyModifiedGaussianDistribution(double mean, double stddev, double lambda) {
-    this(mean, stddev, lambda, new Random());
+    this(mean, stddev, lambda, null);
   }
 
   @Override
@@ -146,8 +146,9 @@ public class ExponentiallyModifiedGaussianDistribution implements DistributionWi
    * @return PDF of the given exgauss distribution at x.
    */
   public static double pdf(double x, double mu, double sigma, double lambda) {
-    final double cdf = NormalDistribution.standardNormalCDF((x - mu) / sigma - sigma * lambda);
-    return cdf * lambda * Math.exp(sigma * sigma * .5 * lambda * lambda - (x - mu) * lambda);
+    final double dx = x - mu;
+    final double erfc = NormalDistribution.erfc(lambda * sigma * sigma - dx);
+    return .5 * lambda * Math.exp(lambda * (lambda * sigma * sigma * .5 - dx)) * erfc;
   }
 
   /**
@@ -163,8 +164,8 @@ public class ExponentiallyModifiedGaussianDistribution implements DistributionWi
     final double u = lambda * (x - mu);
     final double v = lambda * sigma;
     final double v2 = v * v;
-    final double phi = NormalDistribution.cdf(u, v2, v);
-    return NormalDistribution.cdf(u, 0., v) - Math.exp(-u + v2 * .5 + Math.log(phi));
+    final double logphi = Math.log(NormalDistribution.cdf(u, v2, v));
+    return NormalDistribution.cdf(u, 0., v) - Math.exp(-u + v2 * .5 + logphi);
   }
 
   /**
@@ -184,6 +185,4 @@ public class ExponentiallyModifiedGaussianDistribution implements DistributionWi
     // FIXME: implement!
     throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
-
-  // TODO: add levenberg-marquard fitting.
 }
