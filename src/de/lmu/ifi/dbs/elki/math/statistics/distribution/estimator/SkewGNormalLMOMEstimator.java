@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has SkewNormalDistribution
+ * @apiviz.has SkewGeneralizedNormalDistribution
  */
 @Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
 public class SkewGNormalLMOMEstimator extends AbstractLMOMEstimator<SkewGeneralizedNormalDistribution> {
