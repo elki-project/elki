@@ -33,14 +33,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Reference:
  * <p>
  * D. J. Olive<br />
- * Applied robust statistics
+ * Applied Robust Statistics<br />
+ * Preprint of an upcoming book, University of Minnesota
  * </p>
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has LogLogisticDistribution
  */
-@Reference(title = "Applied robust statistics", authors = "D. J. Olive", booktitle = "")
+@Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
 public class LogLogisticMADEstimator extends AbstractMADEstimator<LogLogisticDistribution> {
   /**
    * Static instance.
