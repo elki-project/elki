@@ -33,15 +33,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * Reference:
  * <p>
- * Robust Estimators for Transformed Location Scale Families<br />
- * D. J. Olive
+ * D. J. Olive<br />
+ * Applied Robust Statistics<br />
+ * Preprint of an upcoming book, University of Minnesota
  * </p>
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has WeibullDistribution - - estimates
  */
-@Reference(title = "Robust Estimators for Transformed Location Scale Families", authors = "D. J. Olive", booktitle = "")
+@Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
 public class WeibullLogMADEstimator extends AbstractLogMADEstimator<WeibullDistribution> {
   /**
    * The more robust median based estimator.
