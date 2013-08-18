@@ -25,11 +25,13 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 import java.util.Random;
 
 /**
- * Generalized logistic distribution. (Type I, skew-logistic distribution)
+ * Generalized logistic distribution. (Type I, Skew-logistic distribution)
  * 
  * One of multiple ways of generalizing the logistic distribution.
  * 
- * {@code f(x) = shape * Math.exp(-x) / (1 + Math.exp(-x))**(shape+1)}
+ * {@code pdf(x) = shape * Math.exp(-x) / (1 + Math.exp(-x))**(shape+1)}
+ * 
+ * {@code cdf(x) = Math.pow(1+Math.exp(-x), -shape)}
  * 
  * Where {@code shape=1} yields the regular logistic distribution.
  * 
