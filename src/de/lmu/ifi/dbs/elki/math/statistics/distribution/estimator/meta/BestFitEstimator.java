@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MOMDistributio
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.RayleighMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewGNormalLMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhancedMinMaxEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMOMEstimator;
@@ -136,7 +137,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     momests.add(WaldMOMEstimator.STATIC);
     momests.add(ExponentialMOMEstimator.STATIC);
     momests.add(EMGOlivierNorbergEstimator.STATIC);
-    madests = new ArrayList<>(10);
+    madests = new ArrayList<>(11);
     madests.add(NormalMADEstimator.STATIC);
     madests.add(GammaMADEstimator.STATIC);
     madests.add(ExponentialMADEstimator.STATIC);
@@ -146,6 +147,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     madests.add(CauchyMADEstimator.STATIC);
     madests.add(LogisticMADEstimator.STATIC);
     madests.add(LogLogisticMADEstimator.STATIC);
+    madests.add(RayleighMADEstimator.STATIC);
     madests.add(UniformMADEstimator.STATIC);
     lmomests = new ArrayList<>(12);
     lmomests.add(NormalLMOMEstimator.STATIC);
