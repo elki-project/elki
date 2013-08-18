@@ -56,7 +56,7 @@ public class WaldMLEstimator implements DistributionEstimator<WaldDistribution> 
         invdev += 1. / v - invmean;
       }
     }
-    return new WaldDistribution(mean, invdev);
+    return new WaldDistribution(mean, len / invdev);
   }
 
   @Override
