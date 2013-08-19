@@ -29,6 +29,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticLMOMEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogLogisticMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator
@@ -36,6 +37,10 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelLMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.CauchyMADEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.RayleighMADEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.RayleighMLEEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMLEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLevenbergMarquardtKDEEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLevenbergMarquardtKDEEstimator
