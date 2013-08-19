@@ -46,7 +46,7 @@ public class LogGammaLogMOMEstimator extends AbstractLogMeanVarianceEstimator<Lo
    * Private constructor: use static instance.
    */
   private LogGammaLogMOMEstimator() {
-	// Do not instantiate - use static class
+    // Do not instantiate - use static class
   }
 
   @Override
@@ -54,14 +54,14 @@ public class LogGammaLogMOMEstimator extends AbstractLogMeanVarianceEstimator<Lo
     final double mu = mv.getMean();
     final double var = mv.getSampleVariance();
     if (mu < Double.MIN_NORMAL || var < Double.MIN_NORMAL) {
-        throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero mean or variance: " + mv.toString());
-      }
+      throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero mean or variance: " + mv.toString());
+    }
     final double theta = mu / var;
     final double k = mu * theta;
     if (!(k > 0.) || !(theta > 0.)) {
       throw new ArithmeticException("LogGamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
     }
-    return new LogGammaDistribution(k, theta, shift);
+    return new LogGammaDistribution(k, theta, shift - 1);
   }
 
   @Override

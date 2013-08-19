@@ -61,7 +61,7 @@ public class LogGammaLogMADEstimator extends AbstractLogMADEstimator<LogGammaDis
     if (!(k > 0.) || !(theta > 0.)) {
       throw new ArithmeticException("LogGamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
     }
-    return new LogGammaDistribution(k, theta, shift);
+    return new LogGammaDistribution(k, theta, shift - 1);
   }
 
   @Override
