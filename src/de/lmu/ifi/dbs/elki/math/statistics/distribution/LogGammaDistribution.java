@@ -79,7 +79,7 @@ public class LogGammaDistribution implements DistributionWithRandom {
    * @param shift Location offset
    */
   public LogGammaDistribution(double k, double theta, double shift) {
-    this(k, theta, shift, new Random());
+    this(k, theta, shift, null);
   }
 
   @Override
@@ -129,31 +129,33 @@ public class LogGammaDistribution implements DistributionWithRandom {
   /**
    * The CDF, static version.
    * 
-   * @param val Value
+   * @param x Value
    * @param k Shape k
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return cdf value
    */
-  public static double cdf(double val, double k, double theta, double shift) {
-    if (val <= shift) {
+  public static double cdf(double x, double k, double theta, double shift) {
+    if (x <= shift) {
       return 0.0;
     }
-    return GammaDistribution.regularizedGammaP(k, Math.log(val - shift) * theta);
+    x = (x - shift) * theta;
+    return GammaDistribution.regularizedGammaP(k, Math.exp(x));
   }
 
   /**
    * The log CDF, static version.
    * 
-   * @param val Value
+   * @param x Value
    * @param k Shape k
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return cdf value
    */
-  public static double logcdf(double val, double k, double theta, double shift) {
-    if (val <= shift) {
+  public static double logcdf(double x, double k, double theta, double shift) {
+    if (x <= shift) {
       return 0.0;
     }
-    return GammaDistribution.logregularizedGammaP(k, Math.log(val - shift) * theta);
+    x = (x - shift) * theta;
+    return GammaDistribution.logregularizedGammaP(k, Math.exp(x));
   }
 
   /**
@@ -168,7 +170,8 @@ public class LogGammaDistribution implements DistributionWithRandom {
     if (x <= shift) {
       return 0.0;
     }
-    return GammaDistribution.pdf(Math.log(x - shift), k, theta);
+    x = (x - shift) * theta;
+    return theta * Math.exp(k * x - Math.exp(x) - GammaDistribution.logGamma(k));
   }
 
   /**
@@ -183,7 +186,8 @@ public class LogGammaDistribution implements DistributionWithRandom {
     if (x <= shift) {
       return 0.0;
     }
-    return GammaDistribution.logpdf(Math.log(x - shift), k, theta);
+    x = (x - shift) * theta;
+    return Math.log(theta) + k * x - Math.exp(x) - GammaDistribution.logGamma(k);
   }
 
   /**
@@ -195,6 +199,6 @@ public class LogGammaDistribution implements DistributionWithRandom {
    * @return Probit for Gamma distribution
    */
   public static double quantile(double p, double k, double theta, double shift) {
-    return Math.exp(GammaDistribution.pdf(p, k, theta)) + shift;
+    return Math.log(GammaDistribution.quantile(p, k, 1.)) / theta + shift;
   }
 }
