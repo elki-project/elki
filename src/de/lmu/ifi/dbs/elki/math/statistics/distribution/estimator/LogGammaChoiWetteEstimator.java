@@ -92,11 +92,11 @@ public class LogGammaChoiWetteEstimator implements DistributionEstimator<LogGamm
       }
       k += kdelta;
     }
-    if (!(k > 0)) {
-      throw new ArithmeticException("LogGamma estimation failed: k <= 0.");
-    }
     // Estimate theta:
     final double theta = k / meanx;
+    if (!(k > 0.0) || !(theta > 0.0)) {
+      throw new ArithmeticException("LogGamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
+    }
     return new LogGammaDistribution(k, theta, shift);
   }
 

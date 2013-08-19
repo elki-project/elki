@@ -103,8 +103,8 @@ public class RayleighDistribution implements DistributionWithRandom {
    */
   public static double pdf(double x, double sigma) {
     if(x > 0.) {
-      double invsigsq = 1. / (sigma * sigma);
-      return x * invsigsq * Math.exp(-.5 * x * x * invsigsq);
+      x = x / sigma;
+      return x / sigma * Math.exp(-.5 * x * x);
     }
     else {
       return 0.;
