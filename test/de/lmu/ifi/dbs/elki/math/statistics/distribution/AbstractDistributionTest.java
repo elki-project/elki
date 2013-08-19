@@ -56,6 +56,9 @@ public class AbstractDistributionTest {
   public void checkQuantile(Distribution d, double[] x, double[] expected, double err) {
     int maxerrlev = Integer.MIN_VALUE;
     for(int i = 0; i < x.length; i++) {
+      if (Double.isNaN(expected[i])) {
+        continue;
+      }
       double val = d.quantile(x[i]);
       if(val == expected[i]) {
         continue;
