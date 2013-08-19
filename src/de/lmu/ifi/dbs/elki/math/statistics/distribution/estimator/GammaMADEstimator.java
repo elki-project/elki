@@ -68,7 +68,7 @@ public class GammaMADEstimator extends AbstractMADEstimator<GammaDistribution> {
 
     final double theta = median / (mad * mad);
     final double k = median * theta;
-    if (!(k > 0.0) || !(theta > 0.0)) {
+    if (!(k > 0.) || !(theta > 0.)) {
       throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
     }
     return new GammaDistribution(k, theta);

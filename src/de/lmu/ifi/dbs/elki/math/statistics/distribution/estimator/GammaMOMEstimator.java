@@ -66,7 +66,7 @@ public class GammaMOMEstimator extends AbstractMeanVarianceEstimator<GammaDistri
     }
     final double theta = mu / var;
     final double k = mu * theta;
-    if (!(k > 0.0) || !(theta > 0.0)) {
+    if (!(k > 0.) || !(theta > 0.)) {
       throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
     }
     return new GammaDistribution(k, theta);

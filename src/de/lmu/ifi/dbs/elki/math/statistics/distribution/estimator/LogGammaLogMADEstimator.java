@@ -49,12 +49,19 @@ public class LogGammaLogMADEstimator extends AbstractLogMADEstimator<LogGammaDis
 
   @Override
   public LogGammaDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
-    final double theta = (mad * mad) / median;
-    final double k = median / theta;
+    if (median < Double.MIN_NORMAL) {
+      throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero median.");
+    }
+    if (mad < Double.MIN_NORMAL) {
+      throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero MAD.");
+    }
+
+    final double theta = median / (mad * mad);
+    final double k = median * theta;
     if (!(k > 0.) || !(theta > 0.)) {
       throw new ArithmeticException("LogGamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
     }
-    return new LogGammaDistribution(k, 1 / theta, shift);
+    return new LogGammaDistribution(k, theta, shift);
   }
 
   @Override

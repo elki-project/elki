@@ -69,7 +69,7 @@ public class LogGammaChoiWetteEstimator implements DistributionEstimator<LogGamm
       if (shifted <= 0 || Double.isInfinite(shifted) || Double.isNaN(shifted)) {
         continue;
       }
-      final double val = shifted > 1 ? Math.log(shifted) : 1.;
+      final double val = shifted > 0 ? Math.log(shifted) : 0.;
       final double logx = (val > 0) ? Math.log(val) : meanlogx;
       final double deltax = val - meanx;
       final double deltalogx = logx - meanlogx;
@@ -77,7 +77,7 @@ public class LogGammaChoiWetteEstimator implements DistributionEstimator<LogGamm
       meanlogx += deltalogx / (i + 1.);
     }
     if (!(meanx > 0)) {
-      throw new ArithmeticException("Cannot estimate LogGamma distribution with mean ");
+      throw new ArithmeticException("Cannot estimate LogGamma distribution with mean " + meanx);
     }
     // Initial approximation
     final double logmeanx = Math.log(meanx);
@@ -87,7 +87,7 @@ public class LogGammaChoiWetteEstimator implements DistributionEstimator<LogGamm
     // Refine via newton iteration, based on Choi and Wette equation
     while (true) {
       double kdelta = (Math.log(k) - GammaDistribution.digamma(k) - diff) / (1 / k - GammaDistribution.trigamma(k));
-      if (Math.abs(kdelta) < 1E-8 || Double.isNaN(kdelta)) {
+      if (Math.abs(kdelta) / k < 1E-8 || !(kdelta < Double.POSITIVE_INFINITY)) {
         break;
       }
       k += kdelta;
