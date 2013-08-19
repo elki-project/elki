@@ -8,6 +8,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LaplaceDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogisticDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.LogLogisticDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedLogisticDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDistribution
@@ -18,5 +19,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedExtremeValueDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.RayleighDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ConstantDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.HaltonUniformDistribution
