@@ -167,6 +167,6 @@ public class RayleighDistribution implements DistributionWithRandom {
 
   @Override
   public String toString() {
-    return "RaleighDistribution(mu=" + mu + ", sigma=" + sigma + ")";
+    return "RayleighDistribution(mu=" + mu + ", sigma=" + sigma + ")";
   }
 }
