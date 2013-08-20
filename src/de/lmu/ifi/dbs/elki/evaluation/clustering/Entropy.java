@@ -25,18 +25,18 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Entropy based measures
+ * Entropy based measures.
  * 
  * References:
  * <p>
  * Meilă, M.<br />
  * Comparing clusterings by the variation of information<br />
- * Learning theory and kernel machines Volume 2777/2003
+ * Learning theory and kernel machines
  * </p>
  * 
  * @author Sascha Goldhofer
  */
-@Reference(authors = "Meilă, M.", title = "Comparing clusterings by the variation of information", booktitle = "Learning theory and kernel machines Volume 2777/2003", url = "http://dx.doi.org/10.1007/978-3-540-45167-9_14")
+@Reference(authors = "Meilă, M.", title = "Comparing clusterings by the variation of information", booktitle = "Learning theory and kernel machines", url = "http://dx.doi.org/10.1007/978-3-540-45167-9_14")
 public class Entropy {
   /**
    * Entropy in first

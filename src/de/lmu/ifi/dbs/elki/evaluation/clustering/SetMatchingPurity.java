@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Set matching purity measures
+ * Set matching purity measures.
  * 
  * References:
  * <p>
