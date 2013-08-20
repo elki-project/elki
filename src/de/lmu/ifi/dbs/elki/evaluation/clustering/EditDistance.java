@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable.Util;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Edit distance measures
+ * Edit distance measures.
  * 
  * <p>
  * Pantel, P. and Lin, D.<br />
