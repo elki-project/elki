@@ -23,13 +23,14 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate the parameters of a Gamma Distribution, using the methods of
- * L-Moments (LMOM).
+ * Estimate the parameters of a Gumbel Distribution, using the methods of
+ * L-Moments (LMM).
  * 
  * Reference:
  * <p>
@@ -41,19 +42,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has ExponentialDistribution
+ * @apiviz.has GumbelDistribution
  */
 @Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class ExponentialLMOMEstimator extends AbstractLMOMEstimator<ExponentialDistribution> {
+public class GumbelLMMEstimator extends AbstractLMMEstimator<GumbelDistribution> {
   /**
    * Static instance.
    */
-  public static final ExponentialLMOMEstimator STATIC = new ExponentialLMOMEstimator();
+  public static final GumbelLMMEstimator STATIC = new GumbelLMMEstimator();
 
   /**
    * Constructor. Private: use static instance.
    */
-  private ExponentialLMOMEstimator() {
+  private GumbelLMMEstimator() {
     super();
   }
 
@@ -63,17 +64,14 @@ public class ExponentialLMOMEstimator extends AbstractLMOMEstimator<ExponentialD
   }
 
   @Override
-  public ExponentialDistribution estimateFromLMoments(double[] xmom) {
-    double scale = 2. * xmom[1];
-    if (!(scale > 0.)) {
-      throw new ArithmeticException("Data with non-positive scale cannot be exponential distributed.");
-    }
-    return new ExponentialDistribution(1. / scale, xmom[0] - scale);
+  public GumbelDistribution estimateFromLMoments(double[] xmom) {
+    double scale = xmom[1] / MathUtil.LOG2;
+    return new GumbelDistribution(xmom[0] - Math.E * scale, scale);
   }
 
   @Override
-  public Class<? super ExponentialDistribution> getDistributionClass() {
-    return ExponentialDistribution.class;
+  public Class<? super GumbelDistribution> getDistributionClass() {
+    return GumbelDistribution.class;
   }
 
   /**
@@ -85,7 +83,7 @@ public class ExponentialLMOMEstimator extends AbstractLMOMEstimator<ExponentialD
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected ExponentialLMOMEstimator makeInstance() {
+    protected GumbelLMMEstimator makeInstance() {
       return STATIC;
     }
   }

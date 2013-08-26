@@ -22,13 +22,14 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate the parameters of a normal distribution using the L-Moments.
+ * Estimate the parameters of a Gamma Distribution, using the methods of
+ * L-Moments (LMM).
  * 
  * Reference:
  * <p>
@@ -36,22 +37,35 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Fortran routines for use with the method of L-moments Version 3.03<br />
  * IBM Research.
  * </p>
- *
+ * 
  * @author Erich Schubert
  * 
- * @apiviz.has NormalDistribution
+ * @apiviz.has GammaDistribution
  */
 @Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class NormalLMOMEstimator extends AbstractLMOMEstimator<NormalDistribution> {
+public class GammaLMMEstimator extends AbstractLMMEstimator<GammaDistribution> {
   /**
-   * Static instance
+   * Static instance.
    */
-  public static final NormalLMOMEstimator STATIC = new NormalLMOMEstimator();
+  public static final GammaLMMEstimator STATIC = new GammaLMMEstimator();
+
+  /** Coefficients for polynomial approximation */
+  private static double //
+      A1 = -0.3080, //
+      A2 = -0.05812, //
+      A3 = 0.01765;
+
+  /** Coefficients for polynomial approximation */
+  private static double //
+      B1 = 0.7213, //
+      B2 = -0.5947, //
+      B3 = -2.1817, //
+      B4 = 1.2113;
 
   /**
    * Constructor. Private: use static instance.
    */
-  private NormalLMOMEstimator() {
+  private GammaLMMEstimator() {
     super();
   }
 
@@ -61,13 +75,26 @@ public class NormalLMOMEstimator extends AbstractLMOMEstimator<NormalDistributio
   }
 
   @Override
-  public NormalDistribution estimateFromLMoments(double[] xmom) {
-    return new NormalDistribution(xmom[0], Math.max(xmom[1] * MathUtil.SQRTPI, Double.MIN_NORMAL));
+  public GammaDistribution estimateFromLMoments(double[] xmom) {
+    double cv = xmom[1] / xmom[0];
+    double alpha;
+    if (cv < .5) {
+      double t = Math.PI * cv * cv;
+      alpha = (1. + A1 * t) / (t * (1. + t * (A2 + t * A3)));
+    } else {
+      double t = 1. - cv;
+      alpha = t * (B1 + t * B2) / (1. + t * (B3 + t * B4));
+    }
+    final double theta = alpha / xmom[0];
+    if (!(alpha > 0.0) || !(theta > 0.0)) {
+      throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + alpha + " theta=" + theta);
+    }
+    return new GammaDistribution(alpha, theta);
   }
 
   @Override
-  public Class<? super NormalDistribution> getDistributionClass() {
-    return NormalDistribution.class;
+  public Class<? super GammaDistribution> getDistributionClass() {
+    return GammaDistribution.class;
   }
 
   /**
@@ -79,7 +106,7 @@ public class NormalLMOMEstimator extends AbstractLMOMEstimator<NormalDistributio
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected NormalLMOMEstimator makeInstance() {
+    protected GammaLMMEstimator makeInstance() {
       return STATIC;
     }
   }

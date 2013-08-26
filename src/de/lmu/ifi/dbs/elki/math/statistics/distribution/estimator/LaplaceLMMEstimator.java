@@ -22,27 +22,34 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.LaplaceDistribution;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate the parameters of a normal distribution using the L-Moments.
+ * Estimate Laplace distribution parameters using the method L-Moments (LMM).
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has UniformDistribution
+ * @apiviz.has ExponentialDistribution
  */
-public class UniformLMOMEstimator extends AbstractLMOMEstimator<UniformDistribution> {
+public class LaplaceLMMEstimator extends AbstractLMMEstimator<LaplaceDistribution> {
   /**
-   * Static instance
+   * Static instance.
    */
-  public static final UniformLMOMEstimator STATIC = new UniformLMOMEstimator();
+  public static final LaplaceLMMEstimator STATIC = new LaplaceLMMEstimator();
 
   /**
-   * Constructor. Private: use static instance.
+   * Private constructor, use static instance!
    */
-  private UniformLMOMEstimator() {
-    super();
+  private LaplaceLMMEstimator() {
+    // Do not instantiate
+  }
+
+  @Override
+  public LaplaceDistribution estimateFromLMoments(double[] xmom) {
+    final double location = xmom[0];
+    final double scale = 4. / 3. * xmom[1];
+    return new LaplaceDistribution(1. / scale, location);
   }
 
   @Override
@@ -51,13 +58,8 @@ public class UniformLMOMEstimator extends AbstractLMOMEstimator<UniformDistribut
   }
 
   @Override
-  public UniformDistribution estimateFromLMoments(double[] xmom) {
-    return new UniformDistribution(Math.max(xmom[0] - 3 * xmom[1], -Double.MAX_VALUE), Math.min(xmom[0] + 3 * xmom[1], Double.MAX_VALUE));
-  }
-
-  @Override
-  public Class<? super UniformDistribution> getDistributionClass() {
-    return UniformDistribution.class;
+  public Class<? super LaplaceDistribution> getDistributionClass() {
+    return LaplaceDistribution.class;
   }
 
   /**
@@ -69,7 +71,7 @@ public class UniformLMOMEstimator extends AbstractLMOMEstimator<UniformDistribut
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected UniformLMOMEstimator makeInstance() {
+    protected LaplaceLMMEstimator makeInstance() {
       return STATIC;
     }
   }

@@ -22,50 +22,43 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate parameters of the Weibull distribution using the L-Moments.
+ * Estimate the parameters of a normal distribution using the method of
+ * L-Moments (LMM).
  * 
  * @author Erich Schubert
- *
- * @apiviz.has WeibullDistribution
+ * 
+ * @apiviz.has UniformDistribution
  */
-public class WeibullLMOMEstimator extends AbstractLMOMEstimator<WeibullDistribution> {
+public class UniformLMMEstimator extends AbstractLMMEstimator<UniformDistribution> {
   /**
-   * Static instance.
+   * Static instance
    */
-  public static final WeibullLMOMEstimator STATIC = new WeibullLMOMEstimator();
+  public static final UniformLMMEstimator STATIC = new UniformLMMEstimator();
 
   /**
-   * Constructor. Private: use static instance!
+   * Constructor. Private: use static instance.
    */
-  private WeibullLMOMEstimator() {
+  private UniformLMMEstimator() {
     super();
   }
 
   @Override
   public int getNumMoments() {
-    return 3;
+    return 2;
   }
 
   @Override
-  public WeibullDistribution estimateFromLMoments(double[] xmom) {
-    double l = xmom[2], l2 = l * l, l3 = l2 * l, l4 = l3 * l, l5 = l4 * l, l6 = l5 * l;
-    double k = 285.3 * l6 - 658.6 * l5 + 622.8 * l4 - 317.2 * l3 + 98.52 * l2 - 21.256 * l + 3.516;
-
-    double gam = GammaDistribution.gamma(1. + 1. / k);
-    double lambda = xmom[1] / (1. - Math.pow(2., -1. / k) * gam);
-    double mu = xmom[0] - lambda * gam;
-
-    return new WeibullDistribution(k, lambda, mu);
+  public UniformDistribution estimateFromLMoments(double[] xmom) {
+    return new UniformDistribution(Math.max(xmom[0] - 3 * xmom[1], -Double.MAX_VALUE), Math.min(xmom[0] + 3 * xmom[1], Double.MAX_VALUE));
   }
 
   @Override
-  public Class<? super WeibullDistribution> getDistributionClass() {
-    return WeibullDistribution.class;
+  public Class<? super UniformDistribution> getDistributionClass() {
+    return UniformDistribution.class;
   }
 
   /**
@@ -77,7 +70,7 @@ public class WeibullLMOMEstimator extends AbstractLMOMEstimator<WeibullDistribut
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WeibullLMOMEstimator makeInstance() {
+    protected UniformLMMEstimator makeInstance() {
       return STATIC;
     }
   }

@@ -23,13 +23,13 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogisticDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate the parameters of a Logistic Distribution, using the methods of
- * L-Moments (LMOM).
+ * Estimate the parameters of a Gamma Distribution, using the methods of
+ * L-Moments (LMM).
  * 
  * Reference:
  * <p>
@@ -38,21 +38,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * IBM Research.
  * </p>
  * 
+ * 
  * @author Erich Schubert
  * 
- * @apiviz.has LogisticDistribution
+ * @apiviz.has ExponentialDistribution
  */
 @Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class LogisticLMOMEstimator extends AbstractLMOMEstimator<LogisticDistribution> {
+public class ExponentialLMMEstimator extends AbstractLMMEstimator<ExponentialDistribution> {
   /**
    * Static instance.
    */
-  public static final LogisticLMOMEstimator STATIC = new LogisticLMOMEstimator();
+  public static final ExponentialLMMEstimator STATIC = new ExponentialLMMEstimator();
 
   /**
    * Constructor. Private: use static instance.
    */
-  private LogisticLMOMEstimator() {
+  private ExponentialLMMEstimator() {
     super();
   }
 
@@ -62,16 +63,17 @@ public class LogisticLMOMEstimator extends AbstractLMOMEstimator<LogisticDistrib
   }
 
   @Override
-  public LogisticDistribution estimateFromLMoments(double[] xmom) {
-    // The original publication would also estimate a shape, but we don't have
-    // the generalized logistic distribution yet.
-    // So we continue as if the Type II shape is 0, fairly trivial:
-    return new LogisticDistribution(xmom[0], xmom[1]);
+  public ExponentialDistribution estimateFromLMoments(double[] xmom) {
+    double scale = 2. * xmom[1];
+    if (!(scale > 0.)) {
+      throw new ArithmeticException("Data with non-positive scale cannot be exponential distributed.");
+    }
+    return new ExponentialDistribution(1. / scale, xmom[0] - scale);
   }
 
   @Override
-  public Class<? super LogisticDistribution> getDistributionClass() {
-    return LogisticDistribution.class;
+  public Class<? super ExponentialDistribution> getDistributionClass() {
+    return ExponentialDistribution.class;
   }
 
   /**
@@ -83,7 +85,7 @@ public class LogisticLMOMEstimator extends AbstractLMOMEstimator<LogisticDistrib
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected LogisticLMOMEstimator makeInstance() {
+    protected ExponentialLMMEstimator makeInstance() {
       return STATIC;
     }
   }

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Estimate the parameters of a Generalized Extreme Value Distribution, using
- * the methods of L-Moments (LMOM).
+ * the methods of L-Moments (LMM).
  * 
  * Reference:
  * <p>
@@ -46,11 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has GeneralizedExtremeValueDistribution
  */
 @Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", booktitle = "Technometrics 27.3", url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
-public class GeneralizedExtremeValueLMOMEstimator extends AbstractLMOMEstimator<GeneralizedExtremeValueDistribution> {
+public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<GeneralizedExtremeValueDistribution> {
   /**
    * Static instance.
    */
-  public static final GeneralizedExtremeValueLMOMEstimator STATIC = new GeneralizedExtremeValueLMOMEstimator();
+  public static final GeneralizedExtremeValueLMMEstimator STATIC = new GeneralizedExtremeValueLMMEstimator();
 
   /**
    * Constants for fast rational approximations.
@@ -80,7 +80,7 @@ public class GeneralizedExtremeValueLMOMEstimator extends AbstractLMOMEstimator<
   /**
    * Constructor. Private: use static instance.
    */
-  private GeneralizedExtremeValueLMOMEstimator() {
+  private GeneralizedExtremeValueLMMEstimator() {
     super();
   }
 
@@ -154,7 +154,7 @@ public class GeneralizedExtremeValueLMOMEstimator extends AbstractLMOMEstimator<
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected GeneralizedExtremeValueLMOMEstimator makeInstance() {
+    protected GeneralizedExtremeValueLMMEstimator makeInstance() {
       return STATIC;
     }
   }

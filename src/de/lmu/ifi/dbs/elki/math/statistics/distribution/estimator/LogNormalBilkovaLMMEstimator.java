@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Alternate estimate the parameters of a log Gamma Distribution, using the
- * methods of L-Moments (LMOM) for the Generalized Normal Distribution.
+ * methods of L-Moments (LMM) for the Generalized Normal Distribution.
  * 
  * Reference:
  * <p>
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Int. Journal of Mathematical Models and Methods in Applied Sciences (NAUN)
  * </p>
  * 
- * See also {@link LogNormalLMOMEstimator} for a similar estimator, based on the
+ * See also {@link LogNormalLMMEstimator} for a similar estimator, based on the
  * generalized normal distribution, as used by Hosking.
  * 
  * @author Erich Schubert
@@ -48,11 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.has LogNormalDistribution
  */
 @Reference(authors = "D. Bílková", title = "Lognormal distribution and using L-moment method for estimating its parameters", booktitle = "Int. Journal of Mathematical Models and Methods in Applied Sciences (NAUN)", url = "http://www.naun.org/multimedia/NAUN/m3as/17-079.pdf")
-public class LogNormalBilkovaLMOMEstimator extends AbstractLMOMEstimator<LogNormalDistribution> {
+public class LogNormalBilkovaLMMEstimator extends AbstractLMMEstimator<LogNormalDistribution> {
   /**
    * Static instance.
    */
-  public static final LogNormalBilkovaLMOMEstimator STATIC = new LogNormalBilkovaLMOMEstimator();
+  public static final LogNormalBilkovaLMMEstimator STATIC = new LogNormalBilkovaLMMEstimator();
 
   /**
    * Scaling constant.
@@ -62,7 +62,7 @@ public class LogNormalBilkovaLMOMEstimator extends AbstractLMOMEstimator<LogNorm
   /**
    * Constructor. Private: use static instance.
    */
-  private LogNormalBilkovaLMOMEstimator() {
+  private LogNormalBilkovaLMMEstimator() {
     super();
   }
 
@@ -97,7 +97,7 @@ public class LogNormalBilkovaLMOMEstimator extends AbstractLMOMEstimator<LogNorm
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected LogNormalBilkovaLMOMEstimator makeInstance() {
+    protected LogNormalBilkovaLMMEstimator makeInstance() {
       return STATIC;
     }
   }

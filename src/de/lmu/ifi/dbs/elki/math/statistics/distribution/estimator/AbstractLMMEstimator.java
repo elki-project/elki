@@ -31,17 +31,17 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
- * Abstract base class for L-Moments based estimators (LMOM).
+ * Abstract base class for L-Moments based estimators (LMM).
  * 
  * @author Erich Schubert
  * 
  * @param <D> Distribution class.
  */
-public abstract class AbstractLMOMEstimator<D extends Distribution> implements LMOMDistributionEstimator<D> {
+public abstract class AbstractLMMEstimator<D extends Distribution> implements LMMDistributionEstimator<D> {
   /**
    * Constructor.
    */
-  public AbstractLMOMEstimator() {
+  public AbstractLMMEstimator() {
     super();
   }
 
