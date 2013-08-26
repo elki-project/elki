@@ -145,8 +145,8 @@ public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
     } else {
       double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
       Object[] twovals = new Object[TWO_HEAP_INITIAL_SIZE];
-      double[] fourheap = new double[minsize - TWO_HEAP_MAX_SIZE];
-      Object[] fourvals = new Object[minsize - TWO_HEAP_MAX_SIZE];
+      double[] fourheap = new double[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
+      Object[] fourvals = new Object[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
       this.twoheap = twoheap;
       this.twovals = twovals;
       this.fourheap = fourheap;

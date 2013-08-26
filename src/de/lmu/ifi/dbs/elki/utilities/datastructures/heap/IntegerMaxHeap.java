@@ -127,7 +127,7 @@ public class IntegerMaxHeap implements IntegerHeap {
       this.fourheap = null;
     } else {
       int[] twoheap = new int[TWO_HEAP_INITIAL_SIZE];
-      int[] fourheap = new int[minsize - TWO_HEAP_MAX_SIZE];
+      int[] fourheap = new int[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
       this.twoheap = twoheap;
       this.fourheap = fourheap;
     }
