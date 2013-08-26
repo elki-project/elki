@@ -26,15 +26,16 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 import java.util.Random;
 
 /**
- * Log-Gamma Distribution, with random generation and density functions.
+ * Alternate Log-Gamma Distribution, with random generation and density
+ * functions.
  * 
- * This distribution can be outlined as Y=e^X with X Gamma distributed.
+ * This distribution can be outlined as Y=log X with X Gamma distributed.
  * 
- * Note: this is a different loggamma than scipy uses.
+ * Note: this matches the loggamma of SciPy.
  * 
  * @author Erich Schubert
  */
-public class LogGammaDistribution implements DistributionWithRandom {
+public class LogGammaAlternateDistribution implements DistributionWithRandom {
   /**
    * Alpha == k.
    */
@@ -63,7 +64,7 @@ public class LogGammaDistribution implements DistributionWithRandom {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @param random Random generator
    */
-  public LogGammaDistribution(double k, double theta, double shift, Random random) {
+  public LogGammaAlternateDistribution(double k, double theta, double shift, Random random) {
     super();
     if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
@@ -82,7 +83,7 @@ public class LogGammaDistribution implements DistributionWithRandom {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @param shift Location offset
    */
-  public LogGammaDistribution(double k, double theta, double shift) {
+  public LogGammaAlternateDistribution(double k, double theta, double shift) {
     this(k, theta, shift, null);
   }
 
@@ -103,7 +104,7 @@ public class LogGammaDistribution implements DistributionWithRandom {
 
   @Override
   public double nextRandom() {
-    return Math.exp(GammaDistribution.nextRandom(k, theta, random)) + shift;
+    return Math.log(GammaDistribution.nextRandom(k, 1., random)) / theta + shift;
   }
 
   /**
@@ -113,7 +114,7 @@ public class LogGammaDistribution implements DistributionWithRandom {
    */
   @Override
   public String toString() {
-    return "LogGammaDistribution(k=" + k + ", theta=" + theta + ", shift=" + shift + ")";
+    return "LogGammaAlternateDistribution(k=" + k + ", theta=" + theta + ", shift=" + shift + ")";
   }
 
   /**
@@ -139,11 +140,11 @@ public class LogGammaDistribution implements DistributionWithRandom {
    * @return cdf value
    */
   public static double cdf(double x, double k, double theta, double shift) {
-    x = (x - shift);
-    if (x <= 1.) {
+    if (x <= shift) {
       return 0.;
     }
-    return GammaDistribution.regularizedGammaP(k, Math.log(x));
+    x = (x - shift) * theta;
+    return GammaDistribution.regularizedGammaP(k, Math.exp(x));
   }
 
   /**
@@ -155,11 +156,11 @@ public class LogGammaDistribution implements DistributionWithRandom {
    * @return cdf value
    */
   public static double logcdf(double x, double k, double theta, double shift) {
-    x = (x - shift);
-    if (x <= 1.) {
+    if (x <= shift) {
       return 0.;
     }
-    return GammaDistribution.logregularizedGammaP(k, Math.log(x));
+    x = (x - shift) * theta;
+    return GammaDistribution.logregularizedGammaP(k, Math.exp(x));
   }
 
   /**
@@ -171,14 +172,28 @@ public class LogGammaDistribution implements DistributionWithRandom {
    * @return probability density
    */
   public static double pdf(double x, double k, double theta, double shift) {
-    x = (x - shift);
-    if (x <= 1.) {
+    if (x <= shift) {
       return 0.;
     }
-    return Math.pow(theta, -k) / GammaDistribution.gamma(k) * Math.pow(x, -(1. / theta + 1.)) * Math.pow(Math.log(x), k - 1.);
+    x = (x - shift) * theta;
+    return theta * Math.exp(k * x - Math.exp(x) - GammaDistribution.logGamma(k));
   }
 
-  // TODO: logpdf
+  /**
+   * LogGamma distribution PDF (with 0.0 for x &lt; 0)
+   * 
+   * @param x query value
+   * @param k Alpha
+   * @param theta Theta = 1 / Beta
+   * @return probability density
+   */
+  public static double logpdf(double x, double k, double theta, double shift) {
+    if (x <= shift) {
+      return 0.0;
+    }
+    x = (x - shift) * theta;
+    return Math.log(theta) + k * x - Math.exp(x) - GammaDistribution.logGamma(k);
+  }
 
   /**
    * Compute probit (inverse cdf) for LogGamma distributions.
@@ -189,6 +204,6 @@ public class LogGammaDistribution implements DistributionWithRandom {
    * @return Probit for Gamma distribution
    */
   public static double quantile(double p, double k, double theta, double shift) {
-    return Math.exp(GammaDistribution.quantile(p, k, theta)) + shift;
+    return Math.log(GammaDistribution.quantile(p, k, 1.)) / theta + shift;
   }
 }
