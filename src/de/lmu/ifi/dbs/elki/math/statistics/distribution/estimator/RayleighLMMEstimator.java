@@ -22,34 +22,29 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.LaplaceDistribution;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.RayleighDistribution;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate Laplace distribution parameters using the method of L-Moments (LMM).
+ * Estimate the scale parameter of a (non-shifted) RayleighDistribution using
+ * the method of L-Moments (LMM).
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has ExponentialDistribution
+ * @apiviz.has RayleighDistribution - - estimates
  */
-public class LaplaceLMMEstimator extends AbstractLMMEstimator<LaplaceDistribution> {
+public class RayleighLMMEstimator extends AbstractLMMEstimator<RayleighDistribution> {
   /**
    * Static instance.
    */
-  public static final LaplaceLMMEstimator STATIC = new LaplaceLMMEstimator();
+  public static final RayleighLMMEstimator STATIC = new RayleighLMMEstimator();
 
   /**
-   * Private constructor, use static instance!
+   * Constructor. Private: use static instance!
    */
-  private LaplaceLMMEstimator() {
-    // Do not instantiate
-  }
-
-  @Override
-  public LaplaceDistribution estimateFromLMoments(double[] xmom) {
-    final double location = xmom[0];
-    final double scale = 4. / 3. * xmom[1];
-    return new LaplaceDistribution(1. / scale, location);
+  private RayleighLMMEstimator() {
+    super();
   }
 
   @Override
@@ -58,8 +53,20 @@ public class LaplaceLMMEstimator extends AbstractLMMEstimator<LaplaceDistributio
   }
 
   @Override
-  public Class<? super LaplaceDistribution> getDistributionClass() {
-    return LaplaceDistribution.class;
+  public RayleighDistribution estimateFromLMoments(double[] xmom) {
+    double sigma = 2. * xmom[1] / (MathUtil.SQRTPI * (MathUtil.SQRT2 - 1.));
+    double mu = xmom[0] - sigma * MathUtil.SQRTHALFPI;
+    return new RayleighDistribution(mu, sigma);
+  }
+
+  @Override
+  public Class<? super RayleighDistribution> getDistributionClass() {
+    return RayleighDistribution.class;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
   }
 
   /**
@@ -71,7 +78,7 @@ public class LaplaceLMMEstimator extends AbstractLMMEstimator<LaplaceDistributio
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected LaplaceLMMEstimator makeInstance() {
+    protected RayleighLMMEstimator makeInstance() {
       return STATIC;
     }
   }
