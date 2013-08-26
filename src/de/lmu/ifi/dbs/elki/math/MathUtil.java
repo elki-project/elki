@@ -66,6 +66,11 @@ public final class MathUtil {
   public static final double SQRTTWOPI = Math.sqrt(TWOPI);
 
   /**
+   * Constant for sqrt(pi/2)
+   */
+  public static final double SQRTHALFPI = Math.sqrt(HALFPI);
+
+  /**
    * Square root of 2.
    */
   public static final double SQRT2 = Math.sqrt(2.);
@@ -83,12 +88,12 @@ public final class MathUtil {
   /**
    * Precomputed value of 1 / sqrt(pi).
    */
-  public static final double ONE_BY_SQRTPI = 1. / Math.sqrt(Math.PI);
+  public static final double ONE_BY_SQRTPI = 1. / SQRTPI;
 
   /**
    * Precomputed value of 1 / sqrt(2 * pi).
    */
-  public static final double ONE_BY_SQRTTWOPI = 1. / Math.sqrt(2. * Math.PI);
+  public static final double ONE_BY_SQRTTWOPI = 1. / SQRTTWOPI;
 
   /**
    * Logarithm of 2 to the basis e, for logarithm conversion.

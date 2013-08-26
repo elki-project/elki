@@ -102,35 +102,36 @@ public class RayleighDistribution implements DistributionWithRandom {
    * @return PDF at position x.
    */
   public static double pdf(double x, double sigma) {
-    if(x > 0.) {
-      x = x / sigma;
-      return x / sigma * Math.exp(-.5 * x * x);
-    }
-    else {
+    if (x <= 0.) {
       return 0.;
     }
-  }
-
-  /**
-   * CDF of Rayleigh distribution
-   * 
-   * @param val Value
-   * @param sigma Scale parameter
-   * @return CDF at position x.
-   */
-  public static double cdf(double val, double sigma) {
-    if(val > 0.) {
-      double x = val / sigma;
-      return 1.0 - Math.exp(-.5 * x * x);
-    }
-    else {
-      return 0.0;
-    }
+    final double xs = x / sigma;
+    return xs / sigma * Math.exp(-.5 * xs * xs);
   }
 
   @Override
   public double cdf(double val) {
     return cdf(val - mu, sigma);
+  }
+
+  /**
+   * CDF of Rayleigh distribution
+   * 
+   * @param x Value
+   * @param sigma Scale parameter
+   * @return CDF at position x.
+   */
+  public static double cdf(double x, double sigma) {
+    if (x <= 0.) {
+      return 0.;
+    }
+    final double xs = x / sigma;
+    return 1. - Math.exp(-.5 * xs * xs);
+  }
+
+  @Override
+  public double quantile(double val) {
+    return mu + quantile(val, sigma);
   }
 
   /**
@@ -141,23 +142,15 @@ public class RayleighDistribution implements DistributionWithRandom {
    * @return Quantile function at position x.
    */
   public static double quantile(double val, double sigma) {
-    if(val < 0.0 || val > 1.0) {
+    if (!(val >= 0.) || !(val <= 1.)) {
       return Double.NaN;
-    }
-    else if(val == 0) {
-      return 0.0;
-    }
-    else if(val == 1) {
+    } else if (val == 0.) {
+      return 0.;
+    } else if (val == 1.) {
       return Double.POSITIVE_INFINITY;
-    }
-    else {
+    } else {
       return sigma * Math.sqrt(-2. * Math.log(val));
     }
-  }
-
-  @Override
-  public double quantile(double val) {
-    return mu + quantile(val, sigma);
   }
 
   @Override
