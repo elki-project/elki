@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * 
  * @author Erich Schubert
  */
-public class TestLogGammaDistribution extends AbstractDistributionTest implements JUnit4Test {
+public class TestLogGammaAlternateDistribution extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //
   1e-10, 1e-05, 0.1, 0.1234567, 0.2, 0.271828182846, 0.3, 0.314159265359, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.71828182846, 3.14159265359 //
   };
@@ -636,37 +636,37 @@ public class TestLogGammaDistribution extends AbstractDistributionTest implement
 
   @Test
   public void testPDF() {
-    checkPDF(new LogGammaDistribution(1., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_1_1, 1e-10);
-    checkPDF(new LogGammaDistribution(2., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_2_1, 1e-12);
-    checkPDF(new LogGammaDistribution(4., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_4_1, 1e-12);
-    checkPDF(new LogGammaDistribution(4., 10, 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_4_10, 1e-10);
-    checkPDF(new LogGammaDistribution(.1, 10, 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_01_10, 1e-11);
-    checkPDF(new LogGammaDistribution(.1, 20, 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_01_20, 1e-14);
-    checkPDF(new LogGammaDistribution(.1, 4., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_01_4, 1e-12);
-    checkPDF(new LogGammaDistribution(.1, 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_01_1, 1e-12);
+    checkPDF(new LogGammaAlternateDistribution(1., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_1_1, 1e-10);
+    checkPDF(new LogGammaAlternateDistribution(2., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_2_1, 1e-12);
+    checkPDF(new LogGammaAlternateDistribution(4., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_4_1, 1e-12);
+    checkPDF(new LogGammaAlternateDistribution(4., 10, 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_4_10, 1e-10);
+    checkPDF(new LogGammaAlternateDistribution(.1, 10, 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_01_10, 1e-11);
+    checkPDF(new LogGammaAlternateDistribution(.1, 20, 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_01_20, 1e-14);
+    checkPDF(new LogGammaAlternateDistribution(.1, 4., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_01_4, 1e-12);
+    checkPDF(new LogGammaAlternateDistribution(.1, 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_PDF_01_1, 1e-12);
   }
 
   @Test
   public void testCDF() {
-    checkCDF(new LogGammaDistribution(1., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_1_1, 1e-13);
-    checkCDF(new LogGammaDistribution(2., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_2_1, 1e-12);
-    checkCDF(new LogGammaDistribution(4., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_4_1, 1e-12);
-    checkCDF(new LogGammaDistribution(4., 10, 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_4_10, 1e-14);
-    checkCDF(new LogGammaDistribution(.1, 10, 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_01_10, 1e-15);
-    checkCDF(new LogGammaDistribution(.1, 20, 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_01_20, 1e-15);
-    checkCDF(new LogGammaDistribution(.1, 4., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_01_4, 1e-14);
-    checkCDF(new LogGammaDistribution(.1, 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_01_1, 1e-14);
+    checkCDF(new LogGammaAlternateDistribution(1., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_1_1, 1e-13);
+    checkCDF(new LogGammaAlternateDistribution(2., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_2_1, 1e-12);
+    checkCDF(new LogGammaAlternateDistribution(4., 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_4_1, 1e-12);
+    checkCDF(new LogGammaAlternateDistribution(4., 10, 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_4_10, 1e-14);
+    checkCDF(new LogGammaAlternateDistribution(.1, 10, 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_01_10, 1e-15);
+    checkCDF(new LogGammaAlternateDistribution(.1, 20, 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_01_20, 1e-15);
+    checkCDF(new LogGammaAlternateDistribution(.1, 4., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_01_4, 1e-14);
+    checkCDF(new LogGammaAlternateDistribution(.1, 1., 0.), P_CDFPDF, SCIPY_LOGGAMMA_CDF_01_1, 1e-14);
   }
 
   @Test
   public void testProbit() {
-    checkQuantile(new LogGammaDistribution(1., 1., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_1_1, 1e-14);
-    checkQuantile(new LogGammaDistribution(2., 1., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_2_1, 1e-13);
-    checkQuantile(new LogGammaDistribution(4., 1., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_4_1, 1e-13);
-    checkQuantile(new LogGammaDistribution(4., 10, 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_4_10, 1e-13);
-    checkQuantile(new LogGammaDistribution(.1, 10, 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_01_10, 1e-13);
-    checkQuantile(new LogGammaDistribution(.1, 20, 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_01_20, 1e-14);
-    checkQuantile(new LogGammaDistribution(.1, 4., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_01_4, 1e-13);
-    checkQuantile(new LogGammaDistribution(.1, 1., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_01_1, 1e-13);
+    checkQuantile(new LogGammaAlternateDistribution(1., 1., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_1_1, 1e-14);
+    checkQuantile(new LogGammaAlternateDistribution(2., 1., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_2_1, 1e-13);
+    checkQuantile(new LogGammaAlternateDistribution(4., 1., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_4_1, 1e-13);
+    checkQuantile(new LogGammaAlternateDistribution(4., 10, 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_4_10, 1e-13);
+    checkQuantile(new LogGammaAlternateDistribution(.1, 10, 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_01_10, 1e-13);
+    checkQuantile(new LogGammaAlternateDistribution(.1, 20, 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_01_20, 1e-14);
+    checkQuantile(new LogGammaAlternateDistribution(.1, 4., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_01_4, 1e-13);
+    checkQuantile(new LogGammaAlternateDistribution(.1, 1., 0.), P_QUANT, SCIPY_LOGGAMMA_QUANT_01_1, 1e-13);
   }
 }
