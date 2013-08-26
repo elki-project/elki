@@ -140,7 +140,7 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
       this.fourheap = null;
     } else {
       Object[] twoheap = new Object[TWO_HEAP_INITIAL_SIZE];
-      Object[] fourheap = new Object[minsize - TWO_HEAP_MAX_SIZE];
+      Object[] fourheap = new Object[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
       this.twoheap = twoheap;
       this.fourheap = fourheap;
     }

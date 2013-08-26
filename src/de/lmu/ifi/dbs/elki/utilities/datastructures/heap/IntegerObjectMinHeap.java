@@ -145,8 +145,8 @@ public class IntegerObjectMinHeap<V> implements IntegerObjectHeap<V> {
     } else {
       int[] twoheap = new int[TWO_HEAP_INITIAL_SIZE];
       Object[] twovals = new Object[TWO_HEAP_INITIAL_SIZE];
-      int[] fourheap = new int[minsize - TWO_HEAP_MAX_SIZE];
-      Object[] fourvals = new Object[minsize - TWO_HEAP_MAX_SIZE];
+      int[] fourheap = new int[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
+      Object[] fourvals = new Object[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
       this.twoheap = twoheap;
       this.twovals = twovals;
       this.fourheap = fourheap;

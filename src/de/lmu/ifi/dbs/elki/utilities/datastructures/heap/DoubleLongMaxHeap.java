@@ -144,8 +144,8 @@ public class DoubleLongMaxHeap implements DoubleLongHeap {
     } else {
       double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
       long[] twovals = new long[TWO_HEAP_INITIAL_SIZE];
-      double[] fourheap = new double[minsize - TWO_HEAP_MAX_SIZE];
-      long[] fourvals = new long[minsize - TWO_HEAP_MAX_SIZE];
+      double[] fourheap = new double[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
+      long[] fourvals = new long[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
       this.twoheap = twoheap;
       this.twovals = twovals;
       this.fourheap = fourheap;

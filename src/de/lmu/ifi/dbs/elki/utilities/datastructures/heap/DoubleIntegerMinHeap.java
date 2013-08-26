@@ -144,8 +144,8 @@ public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
     } else {
       double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
       int[] twovals = new int[TWO_HEAP_INITIAL_SIZE];
-      double[] fourheap = new double[minsize - TWO_HEAP_MAX_SIZE];
-      int[] fourvals = new int[minsize - TWO_HEAP_MAX_SIZE];
+      double[] fourheap = new double[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
+      int[] fourvals = new int[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
       this.twoheap = twoheap;
       this.twovals = twovals;
       this.fourheap = fourheap;

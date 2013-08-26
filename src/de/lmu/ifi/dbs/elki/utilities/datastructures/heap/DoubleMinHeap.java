@@ -127,7 +127,7 @@ public class DoubleMinHeap implements DoubleHeap {
       this.fourheap = null;
     } else {
       double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
-      double[] fourheap = new double[minsize - TWO_HEAP_MAX_SIZE];
+      double[] fourheap = new double[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
       this.twoheap = twoheap;
       this.fourheap = fourheap;
     }
