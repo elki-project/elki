@@ -27,13 +27,13 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 
 /**
  * Interface for distribution estimators based on the methods of L-Moments
- * (LMOM).
+ * (LMM).
  * 
  * @author Erich Schubert
  * 
  * @param <D> Distribution class.
  */
-public interface LMOMDistributionEstimator<D extends Distribution> extends DistributionEstimator<D> {
+public interface LMMDistributionEstimator<D extends Distribution> extends DistributionEstimator<D> {
   /**
    * Estimate from the L-Moments.
    * 

@@ -34,43 +34,43 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.CauchyMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExponentialMedianEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LMOMDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LMMDistributionEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogLogisticMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogMADDistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogMOMDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalBilkovaLMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalBilkovaLMMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MADDistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.MOMDistributionEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.RayleighMADEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewGNormalLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewGNormalLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhancedMinMaxEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
@@ -86,7 +86,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.composedOf MOMDistributionEstimator
  * @apiviz.composedOf MADDistributionEstimator
- * @apiviz.composedOf LMOMDistributionEstimator
+ * @apiviz.composedOf LMMDistributionEstimator
  * @apiviz.composedOf LogMOMDistributionEstimator
  * @apiviz.composedOf LogMADDistributionEstimator
  */
@@ -114,7 +114,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
   /**
    * L-Moment estimators.
    */
-  private Collection<LMOMDistributionEstimator<?>> lmomests;
+  private Collection<LMMDistributionEstimator<?>> lmmests;
 
   /**
    * Logspace Method of Moments estimators.
@@ -149,19 +149,19 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     madests.add(LogLogisticMADEstimator.STATIC);
     madests.add(RayleighMADEstimator.STATIC);
     madests.add(UniformMADEstimator.STATIC);
-    lmomests = new ArrayList<>(12);
-    lmomests.add(NormalLMOMEstimator.STATIC);
-    lmomests.add(GammaLMOMEstimator.STATIC);
-    lmomests.add(ExponentialLMOMEstimator.STATIC);
-    lmomests.add(LaplaceLMOMEstimator.STATIC);
-    lmomests.add(GumbelLMOMEstimator.STATIC);
-    lmomests.add(LogisticLMOMEstimator.STATIC);
-    lmomests.add(LogNormalLMOMEstimator.STATIC);
-    lmomests.add(LogNormalBilkovaLMOMEstimator.STATIC);
-    lmomests.add(SkewGNormalLMOMEstimator.STATIC);
-    lmomests.add(GeneralizedExtremeValueLMOMEstimator.STATIC);
-    lmomests.add(WeibullLMOMEstimator.STATIC);
-    lmomests.add(UniformLMOMEstimator.STATIC);
+    lmmests = new ArrayList<>(12);
+    lmmests.add(NormalLMMEstimator.STATIC);
+    lmmests.add(GammaLMMEstimator.STATIC);
+    lmmests.add(ExponentialLMMEstimator.STATIC);
+    lmmests.add(LaplaceLMMEstimator.STATIC);
+    lmmests.add(GumbelLMMEstimator.STATIC);
+    lmmests.add(LogisticLMMEstimator.STATIC);
+    lmmests.add(LogNormalLMMEstimator.STATIC);
+    lmmests.add(LogNormalBilkovaLMMEstimator.STATIC);
+    lmmests.add(SkewGNormalLMMEstimator.STATIC);
+    lmmests.add(GeneralizedExtremeValueLMMEstimator.STATIC);
+    lmmests.add(WeibullLMMEstimator.STATIC);
+    lmmests.add(UniformLMMEstimator.STATIC);
     logmomests = new ArrayList<>(2);
     logmomests.add(LogNormalLogMOMEstimator.STATIC);
     logmomests.add(LogGammaLogMOMEstimator.STATIC);
@@ -173,9 +173,9 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
 
   @Override
   public <A> Distribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    int numlmom = 0;
-    for (LMOMDistributionEstimator<?> est : lmomests) {
-      numlmom = Math.max(numlmom, est.getNumMoments());
+    int numlmm = 0;
+    for (LMMDistributionEstimator<?> est : lmmests) {
+      numlmm = Math.max(numlmm, est.getNumMoments());
     }
 
     final int len = adapter.size(data);
@@ -194,7 +194,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     }
     // Sort: for L-Moments, but getting the median is now also cheap.
     Arrays.sort(x);
-    double[] lmom = (numlmom > 0) ? ProbabilityWeightedMoments.samLMR(x, ArrayLikeUtil.DOUBLEARRAYADAPTER, numlmom) : null;
+    double[] lmm = (numlmm > 0) ? ProbabilityWeightedMoments.samLMR(x, ArrayLikeUtil.DOUBLEARRAYADAPTER, numlmm) : null;
     final double min = x[0], median = .5 * (x[len >> 1] + x[(len + 1) >> 1]), max = x[len - 1];
     if (LOG.isVeryVerbose()) {
       LOG.veryverbose("Computing statistical moments in logspace.");
@@ -220,7 +220,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     double bestscore = Double.POSITIVE_INFINITY;
     DistributionEstimator<?> bestest = null;
 
-    final int numest = momests.size() + madests.size() + lmomests.size() + logmomests.size() + logmadests.size() + 2;
+    final int numest = momests.size() + madests.size() + lmmests.size() + logmomests.size() + logmadests.size() + 2;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Estimating distribution.", numest, LOG) : null;
     for (MOMDistributionEstimator<?> est : momests) {
       try {
@@ -264,9 +264,9 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
         prog.incrementProcessed(LOG);
       }
     }
-    for (LMOMDistributionEstimator<?> est : lmomests) {
+    for (LMMDistributionEstimator<?> est : lmmests) {
       try {
-        Distribution d = est.estimateFromLMoments(lmom);
+        Distribution d = est.estimateFromLMoments(lmm);
         double score = testFit(x, scratch, d);
         if (LOG.isVeryVerbose()) {
           LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());

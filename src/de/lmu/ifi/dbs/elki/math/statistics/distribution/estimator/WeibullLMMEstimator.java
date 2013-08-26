@@ -22,44 +22,51 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.LaplaceDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate Laplace distribution parameters using L-Moments.
+ * Estimate parameters of the Weibull distribution using the method of L-Moments
+ * (LMM).
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has ExponentialDistribution
+ * @apiviz.has WeibullDistribution
  */
-public class LaplaceLMOMEstimator extends AbstractLMOMEstimator<LaplaceDistribution> {
+public class WeibullLMMEstimator extends AbstractLMMEstimator<WeibullDistribution> {
   /**
    * Static instance.
    */
-  public static final LaplaceLMOMEstimator STATIC = new LaplaceLMOMEstimator();
+  public static final WeibullLMMEstimator STATIC = new WeibullLMMEstimator();
 
   /**
-   * Private constructor, use static instance!
+   * Constructor. Private: use static instance!
    */
-  private LaplaceLMOMEstimator() {
-    // Do not instantiate
-  }
-
-  @Override
-  public LaplaceDistribution estimateFromLMoments(double[] xmom) {
-    final double location = xmom[0];
-    final double scale = 4. / 3. * xmom[1];
-    return new LaplaceDistribution(1. / scale, location);
+  private WeibullLMMEstimator() {
+    super();
   }
 
   @Override
   public int getNumMoments() {
-    return 2;
+    return 3;
   }
 
   @Override
-  public Class<? super LaplaceDistribution> getDistributionClass() {
-    return LaplaceDistribution.class;
+  public WeibullDistribution estimateFromLMoments(double[] xmom) {
+    double l = xmom[2], l2 = l * l, l3 = l2 * l, l4 = l3 * l, l5 = l4 * l, l6 = l5 * l;
+    double k = 285.3 * l6 - 658.6 * l5 + 622.8 * l4 - 317.2 * l3 + 98.52 * l2 - 21.256 * l + 3.516;
+
+    double gam = GammaDistribution.gamma(1. + 1. / k);
+    double lambda = xmom[1] / (1. - Math.pow(2., -1. / k) * gam);
+    double mu = xmom[0] - lambda * gam;
+
+    return new WeibullDistribution(k, lambda, mu);
+  }
+
+  @Override
+  public Class<? super WeibullDistribution> getDistributionClass() {
+    return WeibullDistribution.class;
   }
 
   /**
@@ -71,7 +78,7 @@ public class LaplaceLMOMEstimator extends AbstractLMOMEstimator<LaplaceDistribut
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected LaplaceLMOMEstimator makeInstance() {
+    protected WeibullLMMEstimator makeInstance() {
       return STATIC;
     }
   }

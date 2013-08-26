@@ -23,14 +23,13 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogisticDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate the parameters of a Gumbel Distribution, using the methods of
- * L-Moments (LMOM).
+ * Estimate the parameters of a Logistic Distribution, using the methods of
+ * L-Moments (LMM).
  * 
  * Reference:
  * <p>
@@ -39,22 +38,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * IBM Research.
  * </p>
  * 
- * 
  * @author Erich Schubert
  * 
- * @apiviz.has GumbelDistribution
+ * @apiviz.has LogisticDistribution
  */
 @Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
-public class GumbelLMOMEstimator extends AbstractLMOMEstimator<GumbelDistribution> {
+public class LogisticLMMEstimator extends AbstractLMMEstimator<LogisticDistribution> {
   /**
    * Static instance.
    */
-  public static final GumbelLMOMEstimator STATIC = new GumbelLMOMEstimator();
+  public static final LogisticLMMEstimator STATIC = new LogisticLMMEstimator();
 
   /**
    * Constructor. Private: use static instance.
    */
-  private GumbelLMOMEstimator() {
+  private LogisticLMMEstimator() {
     super();
   }
 
@@ -64,14 +62,16 @@ public class GumbelLMOMEstimator extends AbstractLMOMEstimator<GumbelDistributio
   }
 
   @Override
-  public GumbelDistribution estimateFromLMoments(double[] xmom) {
-    double scale = xmom[1] / MathUtil.LOG2;
-    return new GumbelDistribution(xmom[0] - Math.E * scale, scale);
+  public LogisticDistribution estimateFromLMoments(double[] xmom) {
+    // The original publication would also estimate a shape, but we don't have
+    // the generalized logistic distribution yet.
+    // So we continue as if the Type II shape is 0, fairly trivial:
+    return new LogisticDistribution(xmom[0], xmom[1]);
   }
 
   @Override
-  public Class<? super GumbelDistribution> getDistributionClass() {
-    return GumbelDistribution.class;
+  public Class<? super LogisticDistribution> getDistributionClass() {
+    return LogisticDistribution.class;
   }
 
   /**
@@ -83,7 +83,7 @@ public class GumbelLMOMEstimator extends AbstractLMOMEstimator<GumbelDistributio
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected GumbelLMOMEstimator makeInstance() {
+    protected LogisticLMMEstimator makeInstance() {
       return STATIC;
     }
   }
