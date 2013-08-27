@@ -117,6 +117,9 @@ public class LogNormalDistribution implements DistributionWithRandom {
    * @return PDF of the given normal distribution at x.
    */
   public static double pdf(double x, double mu, double sigma) {
+    if (x <= 0.) {
+      return 0.;
+    }
     final double x_mu = Math.log(x) - mu;
     final double sigmasq = sigma * sigma;
     return 1 / (MathUtil.SQRTTWOPI * sigma * x) * Math.exp(-.5 * x_mu * x_mu / sigmasq);
@@ -131,6 +134,9 @@ public class LogNormalDistribution implements DistributionWithRandom {
    * @return The CDF of the given normal distribution at x.
    */
   public static double cdf(double x, double mu, double sigma) {
+    if (x <= 0.) {
+      return 0.;
+    }
     return .5 * (1 + NormalDistribution.erf((Math.log(x) - mu) / (MathUtil.SQRT2 * sigma)));
   }
 
