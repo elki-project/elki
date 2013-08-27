@@ -412,8 +412,9 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
         throw new ArithmeticException("Got infinite value after fitting " + dist.toString());
       }
     }
+    // Should actually be sorted already...
     Arrays.sort(test);
-    return KolmogorovSmirnovTest.simpleTest(test, 0., 1.);
+    return KolmogorovSmirnovTest.simpleTest(test);
   }
 
   @Override

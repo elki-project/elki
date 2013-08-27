@@ -84,7 +84,7 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
         while (index1 < sample1.length && sample1[index1] == x1) {
           index1++;
         }
-        cdf1 = ((double) index1) / sample1.length;
+        cdf1 = ((double) index1 + 1.) / (sample1.length + 1.);
       }
       // Advance on second curve
       if (x1 >= x2) {
@@ -93,7 +93,7 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
         while (index2 < sample2.length && sample2[index2] == x2) {
           index2++;
         }
-        cdf2 = ((double) index2) / sample2.length;
+        cdf2 = ((double) index2 + 1.) / (sample2.length + 1.);
       }
       maximum = Math.max(maximum, Math.abs(cdf1 - cdf2));
     }
@@ -117,6 +117,28 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
 
   /**
    * Simplest version of the test: test if a sorted array is approximately
+   * uniform distributed on [0:1].
+   * 
+   * @param test Presorted (!) array
+   * @return Maximum deviation from uniform.
+   */
+  public static double simpleTest(double[] test) {
+    // Weibull style empirical quantiles: (i+1) / (n+1)
+    double scale = 1. / (test.length + 1.);
+    double maxdev = Double.NEGATIVE_INFINITY;
+    for (int i = 0; i < test.length; i++) {
+      // Expected value at position i (Weibull style):
+      double expected = (i + 1.) * scale;
+      double dev = Math.abs(test[i] - expected);
+      if (dev > maxdev) {
+        maxdev = dev;
+      }
+    }
+    return Math.abs(maxdev);
+  }
+
+  /**
+   * Simplest version of the test: test if a sorted array is approximately
    * uniform distributed on the given interval.
    * 
    * @param test Presorted (!) array
@@ -125,11 +147,11 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
    * @return Maximum deviation from uniform.
    */
   public static double simpleTest(double[] test, final double min, final double max) {
-    double scale = (max - min) / (test.length - 1);
+    double scale = (max - min) / (test.length + 1.);
     double maxdev = Double.NEGATIVE_INFINITY;
     for (int i = 0; i < test.length; i++) {
-      // Expected value at position i:
-      double expected = i * scale + min;
+      // Expected value at position i (Weibull style):
+      double expected = (i + 1.) * scale + min;
       double dev = Math.abs(test[i] - expected);
       if (dev > maxdev) {
         maxdev = dev;
