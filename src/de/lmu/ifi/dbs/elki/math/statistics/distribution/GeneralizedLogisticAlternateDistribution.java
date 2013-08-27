@@ -74,8 +74,8 @@ public class GeneralizedLogisticAlternateDistribution implements DistributionWit
     this.scale = scale;
     this.shape = shape;
     this.random = random;
-    if(shape < 1. || shape > 1.) {
-      throw new ArithmeticException("Invalid shape parameter - must be -1 to +1!");
+    if(!(shape > -1.) || !(shape < 1.)) {
+      throw new ArithmeticException("Invalid shape parameter - must be -1 to +1, is: "+shape);
     }
   }
 
