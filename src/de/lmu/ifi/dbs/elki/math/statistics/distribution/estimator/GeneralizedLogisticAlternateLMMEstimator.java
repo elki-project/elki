@@ -1,0 +1,98 @@
+package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedLogisticAlternateDistribution;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
+/**
+ * Estimate the parameters of a Generalized Logistic Distribution, using the
+ * methods of L-Moments (LMM).
+ * 
+ * Reference:
+ * <p>
+ * J. R. M. Hosking<br />
+ * Fortran routines for use with the method of L-moments Version 3.03<br />
+ * IBM Research.
+ * </p>
+ * 
+ * @author Erich Schubert
+ * 
+ * @apiviz.has GeneralizedLogisticAlternateDistribution
+ */
+@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
+public class GeneralizedLogisticAlternateLMMEstimator extends AbstractLMMEstimator<GeneralizedLogisticAlternateDistribution> {
+  /**
+   * Static instance.
+   */
+  public static final GeneralizedLogisticAlternateLMMEstimator STATIC = new GeneralizedLogisticAlternateLMMEstimator();
+
+  /**
+   * Constructor. Private: use static instance.
+   */
+  private GeneralizedLogisticAlternateLMMEstimator() {
+    super();
+  }
+
+  @Override
+  public int getNumMoments() {
+    return 3;
+  }
+
+  @Override
+  public GeneralizedLogisticAlternateDistribution estimateFromLMoments(double[] xmom) {
+    double shape = -xmom[2];
+    if(!(shape >= -1 && shape <= 1)) {
+      throw new ArithmeticException("Invalid moment estimation.");
+    }
+    if(Math.abs(shape) < 1e-20) {
+      // Effectively zero, so non-generalized.
+      return new GeneralizedLogisticAlternateDistribution(xmom[0], xmom[1], 0.);
+    }
+    double tmp = Math.sin(shape * Math.PI) / Math.PI;
+    double scale = xmom[1] * tmp / shape;
+    double location = -xmom[0] - scale * (1. / shape - 1. / tmp);
+    return new GeneralizedLogisticAlternateDistribution(location, scale, shape);
+  }
+
+  @Override
+  public Class<? super GeneralizedLogisticAlternateDistribution> getDistributionClass() {
+    return GeneralizedLogisticAlternateDistribution.class;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected GeneralizedLogisticAlternateLMMEstimator makeInstance() {
+      return STATIC;
+    }
+  }
+}
