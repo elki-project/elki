@@ -126,10 +126,13 @@ public class ProbabilityWeightedMoments {
    * 
    * @param sorted <b>Presorted</b> data array.
    * @param nmom Number of moments to compute
-   * @return Alpha and Beta moments (0-indexed, interleaved)
+   * @return Array containing Lambda1, Lambda2, Tau3 ... TauN
    */
   public static <A> double[] samLMR(A sorted, NumberArrayAdapter<?, A> adapter, final int nmom) {
     final int n = adapter.size(sorted);
+    if (nmom >= n) {
+      throw new ArithmeticException("Can't compute higher order moments for just" + n + " observations.");
+    }
     final double[] sum = new double[nmom];
     // Estimate probability weighted moments (unbiased)
     for (int i = 0; i < n; i++) {
@@ -164,6 +167,7 @@ public class ProbabilityWeightedMoments {
     if (nmom > 2 && !(sum[1] > 0)) {
       throw new ArithmeticException("Can't compute higher order moments for constant data. Sum: " + sum[1]);
     }
+    // Map lambda3...lambdaN to tau3...tauN
     for (int i = 2; i < nmom; i++) {
       sum[i] /= sum[1];
     }

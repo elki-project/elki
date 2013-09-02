@@ -67,13 +67,13 @@ public class GeneralizedLogisticAlternateLMMEstimator extends AbstractLMMEstimat
     if (!(shape >= -1 && shape <= 1)) {
       throw new ArithmeticException("Invalid moment estimation.");
     }
-    if (Math.abs(shape) < 1e-20) {
+    if (Math.abs(shape) < 1e-6) {
       // Effectively zero, so non-generalized.
       return new GeneralizedLogisticAlternateDistribution(xmom[0], xmom[1], 0.);
     }
     double tmp = shape * Math.PI / Math.sin(shape * Math.PI);
     double scale = xmom[1] / tmp;
-    double location = -xmom[0] - scale * (1. - tmp) / shape;
+    double location = xmom[0] - scale * (1. - tmp) / shape;
     return new GeneralizedLogisticAlternateDistribution(location, scale, shape);
   }
 

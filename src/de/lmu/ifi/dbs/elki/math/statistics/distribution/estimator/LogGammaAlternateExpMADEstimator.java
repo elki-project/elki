@@ -59,7 +59,7 @@ public class LogGammaAlternateExpMADEstimator extends AbstractExpMADEstimator<Lo
     final double b = median / (mad * mad);
     final double k = median * b;
     if (!(k > 0.) || !(b > 0.)) {
-      throw new ArithmeticException("LogGammaAlternate estimation produced non-positive parameter values: k=" + k + " b=" + b);
+      throw new ArithmeticException("LogGammaAlternate estimation produced non-positive parameter values: k=" + k + " b=" + b + " median=" + median + " mad=" + mad);
     }
     return new LogGammaAlternateDistribution(k, Math.log(b), 0.);
   }

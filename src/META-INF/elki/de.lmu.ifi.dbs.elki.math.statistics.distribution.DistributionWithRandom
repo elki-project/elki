@@ -10,6 +10,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.LaplaceDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogisticDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogLogisticDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedLogisticDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedLogisticAlternateDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution
@@ -22,3 +23,4 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.ConstantDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.HaltonUniformDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.RayleighDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.KappaDistribution

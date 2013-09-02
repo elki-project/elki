@@ -101,10 +101,9 @@ public class WaldDistribution implements DistributionWithRandom {
     v *= v;
     double x = mean + mean * .5 / shape * (mean * v - Math.sqrt(4. * mean * shape * v + mean * mean * v * v));
     double u = random.nextDouble();
-    if(u * (mean + x) <= mean) {
+    if (u * (mean + x) <= mean) {
       return x;
-    }
-    else {
+    } else {
       return mean * mean / x;
     }
   }
@@ -124,7 +123,7 @@ public class WaldDistribution implements DistributionWithRandom {
    * @return PDF of the given Wald distribution at x.
    */
   public static double pdf(double x, double mu, double shape) {
-    if(!(x > 0)) {
+    if (!(x > 0)) {
       return 0;
     }
     final double v = (x - mu);
@@ -140,15 +139,19 @@ public class WaldDistribution implements DistributionWithRandom {
    * @return The CDF of the given Wald distribution at x.
    */
   public static double cdf(double x, double mu, double shape) {
-    if(!(x > 0)) {
-      return 0;
+    if (!(x > 0.)) {
+      return 0.;
     }
     // TODO: accelerate by caching exp(2 * shape / mu).
     final double v0 = x / mu;
     final double v1 = Math.sqrt(shape / x);
     double c1 = NormalDistribution.standardNormalCDF(v1 * (v0 - 1.));
     double c2 = NormalDistribution.standardNormalCDF(-v1 * (v0 + 1.));
-    return c1 + Math.exp(2 * shape / mu) * c2;
+    if (c2 > 0.) {
+      return c1 + Math.exp(2 * shape / mu) * c2;
+    } else {
+      return c1;
+    }
   }
 
   /**

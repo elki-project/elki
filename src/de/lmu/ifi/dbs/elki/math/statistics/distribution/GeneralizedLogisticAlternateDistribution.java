@@ -74,8 +74,8 @@ public class GeneralizedLogisticAlternateDistribution implements DistributionWit
     this.scale = scale;
     this.shape = shape;
     this.random = random;
-    if(!(shape > -1.) || !(shape < 1.)) {
-      throw new ArithmeticException("Invalid shape parameter - must be -1 to +1, is: "+shape);
+    if (!(shape > -1.) || !(shape < 1.)) {
+      throw new ArithmeticException("Invalid shape parameter - must be -1 to +1, is: " + shape);
     }
   }
 
@@ -90,7 +90,7 @@ public class GeneralizedLogisticAlternateDistribution implements DistributionWit
    */
   public static double pdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
-    if(shape != 0.) {
+    if (shape != 0.) {
       val = -Math.log(1 - shape * val) / shape;
     }
     double f = 1. + Math.exp(-val);
@@ -113,8 +113,12 @@ public class GeneralizedLogisticAlternateDistribution implements DistributionWit
    */
   public static double cdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
-    if(shape != 0.) {
-      val = -Math.log(1 - shape * val) / shape;
+    if (shape != 0.) {
+      final double tmp = 1 - shape * val;
+      if (tmp < 1e-15) {
+        return (shape < 0) ? 0 : 1;
+      }
+      val = -Math.log(tmp) / shape;
     }
     return 1. / (1. + Math.exp(-val));
   }
@@ -134,7 +138,7 @@ public class GeneralizedLogisticAlternateDistribution implements DistributionWit
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale, double shape) {
-    if(shape == 0.) {
+    if (shape == 0.) {
       return loc - scale * Math.log((1 - val) / val);
     }
     return loc + scale * (1 - Math.pow((1 - val) / val, shape)) / shape;
