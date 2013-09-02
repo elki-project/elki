@@ -87,7 +87,7 @@ public class LogGammaChoiWetteEstimator implements DistributionEstimator<LogGamm
     // Refine via newton iteration, based on Choi and Wette equation
     while (true) {
       double kdelta = (Math.log(k) - GammaDistribution.digamma(k) - diff) / (1 / k - GammaDistribution.trigamma(k));
-      if (Math.abs(kdelta) / k < 1E-8 || !(kdelta < Double.POSITIVE_INFINITY)) {
+      if (Math.abs(kdelta) / k < 1E-8 || !(kdelta < Double.POSITIVE_INFINITY) || !(kdelta > Double.NEGATIVE_INFINITY)) {
         break;
       }
       k += kdelta;
