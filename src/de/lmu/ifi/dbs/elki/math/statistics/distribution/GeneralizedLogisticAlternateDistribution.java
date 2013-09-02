@@ -33,7 +33,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class GeneralizedLogisticAlternateDistribution implements DistributionWithRandom {
+public class GeneralizedLogisticAlternateDistribution implements Distribution {
   /**
    * Parameters: location and scale
    */

@@ -35,7 +35,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class LogGammaAlternateDistribution implements DistributionWithRandom {
+public class LogGammaAlternateDistribution implements Distribution {
   /**
    * Alpha == k.
    */

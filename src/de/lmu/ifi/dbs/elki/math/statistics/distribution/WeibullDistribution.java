@@ -30,7 +30,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class WeibullDistribution implements DistributionWithRandom {
+public class WeibullDistribution implements Distribution {
   /**
    * Shift offset.
    */

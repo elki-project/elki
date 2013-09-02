@@ -29,7 +29,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class LogLogisticDistribution implements DistributionWithRandom {
+public class LogLogisticDistribution implements Distribution {
   /**
    * Parameters: scale and shape
    */

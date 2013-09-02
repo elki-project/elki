@@ -208,6 +208,12 @@ public class PoissonDistribution implements Distribution {
     throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
+  // FIXME: implement!
+  @Override
+  public double nextRandom() {
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
   /**
    * Compute the poisson distribution PDF with an offset of + 1
    * 

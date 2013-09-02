@@ -30,7 +30,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class RayleighDistribution implements DistributionWithRandom {
+public class RayleighDistribution implements Distribution {
   /**
    * Position parameter.
    */

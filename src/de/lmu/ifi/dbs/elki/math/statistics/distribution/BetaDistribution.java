@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Jan Brusis
  * @author Erich Schubert
  */
-public class BetaDistribution implements DistributionWithRandom {
+public class BetaDistribution implements Distribution {
   /**
    * Numerical precision to use
    */

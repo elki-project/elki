@@ -64,6 +64,12 @@ public class StudentsTDistribution implements Distribution {
     throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
+  // FIXME: implement!
+  @Override
+  public double nextRandom() {
+    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
   /**
    * Static version of the t distribution's PDF.
    * 

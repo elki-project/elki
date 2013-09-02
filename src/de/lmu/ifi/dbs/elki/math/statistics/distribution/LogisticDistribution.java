@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @author Erich Schubert
  */
-public class LogisticDistribution implements DistributionWithRandom {
+public class LogisticDistribution implements Distribution {
   /**
    * Parameters: location and scale
    */

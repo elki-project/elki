@@ -37,7 +37,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class GeneralizedExtremeValueDistribution implements DistributionWithRandom {
+public class GeneralizedExtremeValueDistribution implements Distribution {
   /**
    * Parameters (location, scale, shape)
    */

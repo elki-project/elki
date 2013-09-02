@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @author Erich Schubert
  */
 @Alias({ "lognormal" })
-public class LogNormalDistribution implements DistributionWithRandom {
+public class LogNormalDistribution implements Distribution {
   /**
    * Mean value for the generator
    */
