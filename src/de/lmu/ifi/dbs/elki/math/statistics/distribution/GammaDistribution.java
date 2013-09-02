@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  */
-public class GammaDistribution implements DistributionWithRandom {
+public class GammaDistribution implements Distribution {
   /**
    * Euler–Mascheroni constant
    */

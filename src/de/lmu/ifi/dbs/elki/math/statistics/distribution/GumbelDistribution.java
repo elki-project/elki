@@ -30,7 +30,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class GumbelDistribution implements DistributionWithRandom {
+public class GumbelDistribution implements Distribution {
   /**
    * Mode parameter mu.
    */

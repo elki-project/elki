@@ -31,7 +31,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class KappaDistribution implements DistributionWithRandom {
+public class KappaDistribution implements Distribution {
   /**
    * Parameters: location and scale
    */

@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * @author Erich Schubert
  */
 @Alias({ "InverseGaussianDistribution", "invgauss" })
-public class WaldDistribution implements DistributionWithRandom {
+public class WaldDistribution implements Distribution {
   /**
    * Mean value
    */

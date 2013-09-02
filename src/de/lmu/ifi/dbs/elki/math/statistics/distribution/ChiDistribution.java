@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * 
  * @apiviz.composedOf ChiSquaredDistribution
  */
-public class ChiDistribution implements DistributionWithRandom {
+public class ChiDistribution implements Distribution {
   /**
    * Degrees of freedom. Usually integer.
    */

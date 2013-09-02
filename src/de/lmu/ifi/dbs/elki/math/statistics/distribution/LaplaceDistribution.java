@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @author Erich Schubert
  */
 @Alias("DoubleExponentialDistribution")
-public class LaplaceDistribution implements DistributionWithRandom {
+public class LaplaceDistribution implements Distribution {
   /**
    * Random generator.
    */

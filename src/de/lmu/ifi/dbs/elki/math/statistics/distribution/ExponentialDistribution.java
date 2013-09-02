@@ -30,7 +30,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class ExponentialDistribution implements DistributionWithRandom {
+public class ExponentialDistribution implements Distribution {
   /**
    * Random generator.
    */

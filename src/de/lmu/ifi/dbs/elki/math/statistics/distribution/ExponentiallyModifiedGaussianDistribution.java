@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * @author Erich Schubert
  */
 @Alias({ "exgaussian" })
-public class ExponentiallyModifiedGaussianDistribution implements DistributionWithRandom {
+public class ExponentiallyModifiedGaussianDistribution implements Distribution {
   /**
    * Mean value for the generator
    */

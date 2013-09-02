@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @author Erich Schubert
  */
-public class SkewGeneralizedNormalDistribution implements DistributionWithRandom {
+public class SkewGeneralizedNormalDistribution implements Distribution {
   /**
    * Mean value for the generator
    */

@@ -30,7 +30,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class CauchyDistribution implements DistributionWithRandom {
+public class CauchyDistribution implements Distribution {
   /**
    * The location (x0) parameter.
    */

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @author Erich Schubert
  */
 @Alias({ "GaussianDistribution", "normal", "gauss" })
-public class NormalDistribution implements DistributionWithRandom {
+public class NormalDistribution implements Distribution {
   /**
    * Coefficients for erf approximation.
    * 

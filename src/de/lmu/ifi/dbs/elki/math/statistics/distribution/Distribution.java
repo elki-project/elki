@@ -24,9 +24,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 
 /**
- * Statistical distributions, with their common functions. See
- * {@link DistributionWithRandom} for distributions that also have a random
- * generator included.
+ * Statistical distributions, with their common functions.
  * 
  * @author Erich Schubert
  */
@@ -54,6 +52,13 @@ public interface Distribution {
    * @return Quantile position
    */
   double quantile(double val);
+
+  /**
+   * Generate a new random value
+   * 
+   * @return new random value
+   */
+  double nextRandom();
 
   /**
    * Describe the distribution
