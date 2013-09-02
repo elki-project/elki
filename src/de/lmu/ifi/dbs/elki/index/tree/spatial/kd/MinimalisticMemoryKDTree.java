@@ -73,7 +73,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <O> Vector type
  */
 @Reference(authors = "J. L. Bentley", title = "Multidimensional binary search trees used for associative searching", booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", url = "http://dx.doi.org/10.1145/361002.361007")
-@Alias({"minikd", "kd"})
 public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends AbstractIndex<O> implements KNNIndex<O>, RangeIndex<O> {
   /**
    * Class logger
@@ -422,6 +421,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
    * 
    * @param <O> Vector type
    */
+  @Alias({"minikd", "kd"})
   public static class Factory<O extends NumberVector<?>> implements IndexFactory<O, MinimalisticMemoryKDTree<O>> {
     /**
      * Constructor. Trivial parameterizable.
