@@ -51,9 +51,19 @@ public final class MathUtil {
   public static final double HALFPI = .5 * Math.PI;
 
   /**
+   * One quarter of Pi.
+   */
+  public static final double QUARTERPI = .25 * Math.PI;
+
+  /**
    * 1.5 times Pi.
    */
   public static final double ONEHALFPI = 1.5 * Math.PI;
+
+  /**
+   * Pi squared
+   */
+  public static final double PISQUARE = Math.PI * Math.PI;
 
   /**
    * Square root of Pi.

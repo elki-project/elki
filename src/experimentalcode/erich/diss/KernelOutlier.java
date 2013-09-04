@@ -51,8 +51,8 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -81,9 +81,9 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
 
   double scale;
 
-  double minBandwidth = 0.001;
+  double minBandwidth = 0.00001;
 
-  final static double CUTOFF = 1e-10;
+  final static double CUTOFF = 1e-100;
 
   boolean usemad = false;
 
@@ -95,13 +95,15 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
    * @param kmax Maximum number of neighbors
    * @param kernel Kernel function
    * @param scale Kernel scaling parameter
+   * @param usemad Use MAD instead of mean and variance.
    */
-  public KernelOutlier(DistanceFunction<? super O, D> distanceFunction, int kmin, int kmax, KernelDensityFunction kernel, double scale) {
+  public KernelOutlier(DistanceFunction<? super O, D> distanceFunction, int kmin, int kmax, KernelDensityFunction kernel, double scale, boolean usemad) {
     super(distanceFunction);
     this.kmin = kmin;
     this.kmax = kmax;
     this.kernel = kernel;
     this.scale = scale;
+    this.usemad = usemad;
   }
 
   public OutlierResult run(Database database, Relation<O> rel) {
@@ -139,11 +141,9 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
           if (k < kmin) {
             continue;
           }
-          final double bw = Math.max(minBandwidth, kneighbor.doubleDistance()) * scale;
-          // We should be using the bandwidth here, but results were better without?!
-          final double powbw = .75; // .75 / Math.pow(bw, dim);
+          final double ibw = 1. / (Math.max(minBandwidth, kneighbor.doubleDistance()) * scale);
           for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-            double dens = kernel.density(neighbor.doubleDistance() / bw) * powbw;
+            double dens = kernel.density(neighbor.doubleDistance() * ibw); // * ibw;
             densities.get(neighbor)[k - kmin] += dens;
             if (dens < CUTOFF) {
               break;
@@ -191,7 +191,7 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
             for (int j = 0; j < neighbors.size(); j++) {
               scratch[k][j] = Math.abs(scratch[k][j] - meds[k]);
             }
-            mads[k] = QuickSelect.median(scratch[k], 0, neighbors.size());
+            mads[k] = NormalDistribution.ONEBYPHIINV075 * QuickSelect.median(scratch[k], 0, neighbors.size());
           }
           for (int k = 0; k < knum; k++) {
             if (mads[k] > 0) {
@@ -212,7 +212,7 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
             mv.reset();
           }
           for (int k = 0; k < knum; k++) {
-            final double s = (mads[k] > 0) ? (-(dens[k] - meds[k]) / mads[k]) : 0;
+            final double s = (mads[k] > 0.) ? (-(dens[k] - meds[k]) / mads[k]) : 0.;
             score += s;
           }
           score /= knum;

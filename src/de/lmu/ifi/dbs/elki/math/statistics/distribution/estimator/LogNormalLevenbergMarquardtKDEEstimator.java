@@ -27,9 +27,9 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
-import de.lmu.ifi.dbs.elki.math.statistics.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
