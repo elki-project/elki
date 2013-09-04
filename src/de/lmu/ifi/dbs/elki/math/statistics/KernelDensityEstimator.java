@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.math.statistics;
 
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
