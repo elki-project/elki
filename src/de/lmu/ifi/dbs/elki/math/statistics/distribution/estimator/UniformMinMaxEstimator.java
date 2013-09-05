@@ -53,7 +53,10 @@ public class UniformMinMaxEstimator implements DistributionEstimator<UniformDist
     final int len = adapter.size(data);
     DoubleMinMax mm = new DoubleMinMax();
     for (int i = 0; i < len; i++) {
-      mm.put(adapter.getDouble(data, i));
+      final double val = adapter.getDouble(data, i);
+      if (val > Double.NEGATIVE_INFINITY && val < Double.POSITIVE_INFINITY) {
+        mm.put(val);
+      }
     }
     return estimate(mm);
   }
