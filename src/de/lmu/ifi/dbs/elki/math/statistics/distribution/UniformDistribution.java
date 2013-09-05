@@ -90,25 +90,21 @@ public class UniformDistribution implements Distribution {
 
   @Override
   public double pdf(double val) {
-    if (val < min || val >= max || !(len > 0)) {
+    if (!(val >= min) || val >= max) {
       return 0.0;
     }
-    return 1.0 / len;
+    return (len > 0.) ? 1.0 / len : Double.POSITIVE_INFINITY;
   }
 
   @Override
   public double cdf(double val) {
-    if (val <= min) {
-      return 0.0;
+    if (!(val > min)) {
+      return 0.;
     }
     if (val >= max) {
-      return 1.0;
+      return 1.;
     }
-    if (len > 0) {
-      return (val - min) / len;
-    } else {
-      return .5;
-    }
+    return (len > 0.) ? (val - min) / len : .5;
   }
 
   @Override
