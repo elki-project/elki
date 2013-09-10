@@ -127,7 +127,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
   @Override
   public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distQ2) {
     if(!(distQ2.getDistanceFactory() instanceof NumberDistance)) {
-      throw new AbortException("PAM initialization can only be used with numerical distances.");
+      throw new AbortException("K-Means++ initialization initialization can only be used with numerical distances.");
     }
     @SuppressWarnings("unchecked")
     DistanceQuery<? super V, D> distQ = (DistanceQuery<? super V, D>) distQ2;
