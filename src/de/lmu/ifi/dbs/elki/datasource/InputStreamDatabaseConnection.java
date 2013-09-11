@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.datasource.parser.StreamingParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -87,17 +88,41 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
       if(LOG.isDebugging()) {
         LOG.debugFine("Invoking filters.");
       }
+      Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".load") : null;
+      if (duration != null) {
+        duration.begin();
+      }
       MultipleObjectsBundle objects = MultipleObjectsBundle.fromStream(invokeFilters(streamParser));
+      if (duration != null) {
+        duration.end();
+        LOG.statistics(duration);
+      }
       return objects;
     }
     else {
+      Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".parse") : null;
+      if (duration != null) {
+        duration.begin();
+      }
       MultipleObjectsBundle parsingResult = parser.parse(in);
+      if (duration != null) {
+        duration.end();
+        LOG.statistics(duration);
+      }
 
       // normalize objects and transform labels
       if(LOG.isDebugging()) {
         LOG.debugFine("Invoking filters.");
       }
+      Duration fduration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".filter") : null;
+      if (fduration != null) {
+        fduration.begin();
+      }
       MultipleObjectsBundle objects = invokeFilters(parsingResult);
+      if (fduration != null) {
+        fduration.end();
+        LOG.statistics(fduration);
+      }
       return objects;
     }
   }
