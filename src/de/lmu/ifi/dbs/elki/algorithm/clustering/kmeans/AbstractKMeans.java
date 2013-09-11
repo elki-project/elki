@@ -379,7 +379,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
         k = kP.getValue();
       }
 
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
+      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
       if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
