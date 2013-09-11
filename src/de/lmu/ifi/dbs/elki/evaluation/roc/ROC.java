@@ -427,17 +427,17 @@ public class ROC {
      * Order of dimensions.
      */
     private int[] sort;
-  
+
     /**
      * Data vector.
      */
     private NumberVector<?> vec;
-  
+
     /**
      * Current position.
      */
     int pos = 0;
-  
+
     /**
      * Constructor.
      * 
@@ -452,46 +452,46 @@ public class ROC {
       }
       IntegerArrayQuickSort.sort(sort, this);
     }
-  
+
     @Override
     public int compare(int x, int y) {
       return Double.compare(vec.doubleValue(x), vec.doubleValue(y));
     }
-  
+
     public int dim() {
       return sort[pos];
     }
-  
+
     @Override
     public boolean valid() {
       return pos < vec.getDimensionality();
     }
-  
+
     @Override
     public void advance() {
       ++pos;
     }
-  
+
     @Override
     public boolean tiedToPrevious() {
       return pos > 0 && Double.compare(vec.doubleValue(sort[pos]), vec.doubleValue(sort[pos - 1])) == 0;
     }
-  
+
     @Override
     public int getOffset() {
       return pos;
     }
-  
+
     @Override
     public void advance(int count) {
       pos += count;
     }
-  
+
     @Override
     public void retract() {
       pos--;
     }
-  
+
     @Override
     public void seek(int off) {
       pos = off;
@@ -503,27 +503,54 @@ public class ROC {
    * values as positive entries.
    * 
    * @apiviz.composedOf NumberVector
-   *
+   * 
    * @author Erich Schubert
    */
-  public static class VectorNonZero implements Predicate<DecreasingVectorIter> {
-    /**
-     * Vector to use as reference
-     */
-    NumberVector<?> vec;
-
+  public static class VectorNonZero extends VectorOverThreshold {
     /**
      * Constructor.
      * 
      * @param vec Reference vector.
      */
     public VectorNonZero(NumberVector<?> vec) {
+      super(vec, 0.);
+    }
+  }
+  
+  /**
+   * Class that uses a NumberVector as reference, and considers all non-zero
+   * values as positive entries.
+   * 
+   * @apiviz.composedOf NumberVector
+   * 
+   * @author Erich Schubert
+   */
+  public static class VectorOverThreshold implements Predicate<DecreasingVectorIter> {
+    /**
+     * Vector to use as reference
+     */
+    NumberVector<?> vec;
+
+    /**
+     * Threshold
+     */
+    double threshold;
+
+    /**
+     * Constructor.
+     * 
+     * @param vec Reference vector.
+     * @param threshold Threshold value.
+     */
+    public VectorOverThreshold(NumberVector<?> vec, double threshold) {
+      super();
       this.vec = vec;
+      this.threshold = threshold;
     }
 
     @Override
     public boolean test(DecreasingVectorIter o) {
-      return Math.abs(vec.doubleValue(o.dim())) > 0;
+      return Math.abs(vec.doubleValue(o.dim())) > threshold;
     }
   }
 
