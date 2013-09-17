@@ -45,12 +45,15 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -81,9 +84,9 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
 
   double scale;
 
-  double minBandwidth = 0.00001;
+  double minBandwidth = 1e-6;
 
-  final static double CUTOFF = 1e-100;
+  final static double CUTOFF = 1e-20;
 
   boolean usemad = false;
 
@@ -107,8 +110,9 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
   }
 
   public OutlierResult run(Database database, Relation<O> rel) {
-    DistanceQuery<O, D> dq = database.getDistanceQuery(rel, getDistanceFunction());
-    DBIDs ids = rel.getDBIDs();
+    final DistanceQuery<O, D> dq = database.getDistanceQuery(rel, getDistanceFunction());
+    final int dim = RelationUtil.dimensionality(rel);
+    final DBIDs ids = rel.getDBIDs();
 
     KNNQuery<O, D> knnq;
     // We need each neighborhood twice - use "HEAVY" flag.
@@ -132,22 +136,20 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNList<D> neighbors = knnq.getKNNForDBID(iter, kmax + 1);
       if (neighbors instanceof DoubleDistanceKNNList) {
-        int k = 0;
-        for (DoubleDistanceDBIDListIter kneighbor = ((DoubleDistanceKNNList) neighbors).iter(); kneighbor.valid(); kneighbor.advance()) {
-          if (DBIDUtil.equal(kneighbor, iter)) {
-            continue;
-          }
-          ++k;
+        final DoubleDistanceKNNList dneighbors = (DoubleDistanceKNNList) neighbors;
+        int k = 1;
+        double sum = 0.;
+        for (DoubleDistanceDBIDListIter kneighbor = dneighbors.iter(); kneighbor.valid(); kneighbor.advance(), k++) {
+          sum += kneighbor.doubleDistance();
           if (k < kmin) {
             continue;
           }
-          final double ibw = 1. / (Math.max(minBandwidth, kneighbor.doubleDistance()) * scale);
-          for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-            double dens = kernel.density(neighbor.doubleDistance() * ibw); // * ibw;
+          final double ibw = k / (.5*sum * scale);
+          final double sca = 1.; // Math.pow(ibw, dim);
+          for (DoubleDistanceDBIDListIter neighbor = dneighbors.iter(); neighbor.valid(); neighbor.advance()) {
+            double dens = sca * kernel.density(neighbor.doubleDistance() * ibw);
             densities.get(neighbor)[k - kmin] += dens;
-            if (dens < CUTOFF) {
-              break;
-            }
+            if (dens < CUTOFF) { break; }
           }
           if (k == kmax) {
             break;
