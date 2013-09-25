@@ -174,7 +174,7 @@ public class DoubleDistanceKNNSubList implements DoubleDistanceKNNList {
 
     @Override
     public void advance(int count) {
-      pos -= count;
+      pos += count;
     }
 
     @Override
