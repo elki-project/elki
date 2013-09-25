@@ -175,11 +175,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
   @Override
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
     initializeOutputType(in);
-    if (proj.length == dim) {
-      return in;
-    } else {
-      return new VectorFieldTypeInformation<>(factory, proj.length);
-    }
+    return new VectorFieldTypeInformation<>(factory, proj.length);
   }
 
   @Override
