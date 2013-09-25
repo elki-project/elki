@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
@@ -51,9 +50,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -144,12 +141,14 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
           if (k < kmin) {
             continue;
           }
-          final double ibw = k / (.5*sum * scale);
+          final double ibw = k / (sum * scale);
           final double sca = 1.; // Math.pow(ibw, dim);
           for (DoubleDistanceDBIDListIter neighbor = dneighbors.iter(); neighbor.valid(); neighbor.advance()) {
             double dens = sca * kernel.density(neighbor.doubleDistance() * ibw);
             densities.get(neighbor)[k - kmin] += dens;
-            if (dens < CUTOFF) { break; }
+            if (dens < CUTOFF) {
+              break;
+            }
           }
           if (k == kmax) {
             break;
