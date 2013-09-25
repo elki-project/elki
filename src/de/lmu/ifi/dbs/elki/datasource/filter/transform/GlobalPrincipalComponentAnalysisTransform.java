@@ -216,8 +216,8 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
     }
 
     @Override
-    protected Object makeInstance() {
-      return new GlobalPrincipalComponentAnalysisTransform<O>(filter);
+    protected GlobalPrincipalComponentAnalysisTransform<O> makeInstance() {
+      return new GlobalPrincipalComponentAnalysisTransform<>(filter);
     }
   }
 }
