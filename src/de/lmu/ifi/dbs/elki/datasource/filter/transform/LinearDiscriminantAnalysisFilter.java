@@ -40,9 +40,17 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Linear Discriminant Analysis (LDA) / Fisher's linear discriminant.
+ * 
+ * Reference:
+ * <p>
+ * R. A. Fisher<br />
+ * The use of multiple measurements in taxonomic problems<br />
+ * Annals of Eugenics 7.2 (1936): 179-188.
+ * </p>
  * 
  * @author Angela Peng
  * @author Erich Schubert
@@ -50,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @param <V> Vector type
  */
 @Alias("lda")
+@Reference(authors = "R. A. Fisher", title = "The use of multiple measurements in taxonomic problems", booktitle = "Annals of eugenics 7.2 (1936)", url = "http://dx.doi.org/10.1111/j.1469-1809.1936.tb02137.x")
 public class LinearDiscriminantAnalysisFilter<V extends NumberVector<?>> extends AbstractSupervisedProjectionVectorFilter<V> {
   /**
    * Class logger.
@@ -73,30 +82,35 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector<?>> extends
     // Compute centroids:
     List<Centroid> centroids = computeCentroids(dim, vectorcolumn, keys, classes);
 
+    final Matrix sigmaB, sigmaI;
     // Between classes covariance:
-    CovarianceMatrix covmake = new CovarianceMatrix(dim);
-    for (Centroid c : centroids) {
-      covmake.put(c);
+    {
+      CovarianceMatrix covmake = new CovarianceMatrix(dim);
+      for (Centroid c : centroids) {
+        covmake.put(c);
+      }
+      sigmaB = covmake.destroyToSampleMatrix();
     }
-    Matrix sigmaB = covmake.destroyToSampleMatrix();
-    // (Average) within class variance:
-    covmake = new CovarianceMatrix(dim);
-    int numc = keys.size();
-    for (int i = 0; i < numc; i++) {
-      Centroid c = centroids.get(i);
-      // TODO: different weighting strategies? Sampling?
-      // Note: GNU Trove iterator, not ELKI style!
-      for (TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
-        Vector delta = vectorcolumn.get(it.next()).getColumnVector().minusEquals(c);
-        covmake.put(delta);
+    {
+      // (Average) within class variance:
+      CovarianceMatrix covmake = new CovarianceMatrix(dim);
+      int numc = keys.size();
+      for (int i = 0; i < numc; i++) {
+        Centroid c = centroids.get(i);
+        // TODO: different weighting strategies? Sampling?
+        // Note: GNU Trove iterator, not ELKI style!
+        for (TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
+          Vector delta = vectorcolumn.get(it.next()).getColumnVector().minusEquals(c);
+          covmake.put(delta);
+        }
+      }
+      sigmaI = covmake.destroyToSampleMatrix();
+      if (sigmaI.det() == 0) {
+        sigmaI.cheatToAvoidSingularity(1e-10);
       }
     }
-    Matrix sigmaI = covmake.destroyToSampleMatrix();
-    if (sigmaI.det() == 0) {
-      sigmaI.cheatToAvoidSingularity(1e-10);
-    }
-    Matrix sol = sigmaI.inverse().times(sigmaB);
 
+    Matrix sol = sigmaI.inverse().times(sigmaB);
     EigenvalueDecomposition decomp = new EigenvalueDecomposition(sol);
     SortedEigenPairs sorted = new SortedEigenPairs(decomp, false);
     return sorted.eigenVectors(tdim).transpose();
