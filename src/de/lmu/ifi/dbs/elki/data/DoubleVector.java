@@ -342,7 +342,6 @@ public class DoubleVector extends AbstractNumberVector<Double> {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length);
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
       for (int i = 0; i < vec.values.length; i++) {
@@ -352,7 +351,6 @@ public class DoubleVector extends AbstractNumberVector<Double> {
 
     @Override
     public int getByteSize(DoubleVector vec) {
-      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.getUnsignedVarintSize(vec.values.length) + ByteArrayUtil.SIZE_DOUBLE * vec.values.length;
     }
   }
