@@ -28,10 +28,13 @@ import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -47,12 +50,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-// TODO: implement ByteArraySerializer<SparseDoubleVector>
 public class SparseDoubleVector extends AbstractNumberVector<Double> implements SparseNumberVector<Double> {
   /**
    * Static instance.
    */
   public static final SparseDoubleVector.Factory FACTORY = new SparseDoubleVector.Factory();
+
+  /**
+   * Serializer using varint encoding.
+   */
+  public static final ByteBufferSerializer<SparseDoubleVector> VARIABLE_SERIALIZER = new VariableSerializer();
 
   /**
    * Indexes of values.
@@ -296,7 +303,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
       for (int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i);
       }
-      // TODO: inefficient
+      // TODO: improve efficiency
       return new SparseDoubleVector(values);
     }
 
@@ -307,7 +314,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
       for (int i = 0; i < dim; i++) {
         values[i] = adapter.getDouble(array, i);
       }
-      // TODO: inefficient
+      // TODO: improve efficiency
       return new SparseDoubleVector(values);
     }
 
@@ -318,10 +325,9 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
 
     @Override
     public ByteBufferSerializer<SparseDoubleVector> getDefaultSerializer() {
-      // FIXME: add a serializer
-      return null;
+      return VARIABLE_SERIALIZER;
     }
-    
+
     @Override
     public Class<? super SparseDoubleVector> getRestrictionClass() {
       return SparseDoubleVector.class;
@@ -355,4 +361,48 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * Empty map.
    */
   public static final TIntDoubleMap EMPTYMAP = new TUnmodifiableIntDoubleMap(new TIntDoubleHashMap());
+
+  /**
+   * Serialization class using VarInt encodings.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.uses SparseDoubleVector - - «serializes»
+   */
+  public static class VariableSerializer implements ByteBufferSerializer<SparseDoubleVector> {
+    @Override
+    public SparseDoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
+      final int nonzero = ByteArrayUtil.readUnsignedVarint(buffer);
+      final int[] dims = new int[nonzero];
+      final double[] values = new double[nonzero];
+      for (int i = 0; i < nonzero; i++) {
+        dims[i] = ByteArrayUtil.readUnsignedVarint(buffer);
+        values[i] = buffer.getDouble();
+      }
+      return new SparseDoubleVector(dims, values, dimensionality);
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, SparseDoubleVector vec) throws IOException {
+      ByteArrayUtil.writeUnsignedVarint(buffer, vec.dimensionality);
+      ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
+      for (int i = 0; i < vec.values.length; i++) {
+        ByteArrayUtil.writeUnsignedVarint(buffer, vec.indexes[i]);
+        buffer.putDouble(vec.values[i]);
+      }
+    }
+
+    @Override
+    public int getByteSize(SparseDoubleVector vec) {
+      int sum = 0;
+      sum += ByteArrayUtil.getUnsignedVarintSize(vec.dimensionality);
+      sum += ByteArrayUtil.getUnsignedVarintSize(vec.values.length);
+      for (int d : vec.indexes) {
+        sum += ByteArrayUtil.getUnsignedVarintSize(d);
+      }
+      sum += vec.values.length * ByteArrayUtil.SIZE_DOUBLE;
+      return sum;
+    }
+  }
 }

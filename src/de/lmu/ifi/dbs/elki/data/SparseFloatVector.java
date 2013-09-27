@@ -30,10 +30,13 @@ import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.TIntFloatMap;
 import gnu.trove.map.hash.TIntFloatHashMap;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -49,12 +52,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-// TODO: implement ByteArraySerializer<SparseFloatVector>
 public class SparseFloatVector extends AbstractNumberVector<Float> implements SparseNumberVector<Float> {
   /**
    * Static instance.
    */
   public static final SparseFloatVector.Factory FACTORY = new SparseFloatVector.Factory();
+
+  /**
+   * Serializer using varint encoding.
+   */
+  public static final ByteBufferSerializer<SparseFloatVector> VARIABLE_SERIALIZER = new VariableSerializer();
 
   /**
    * Indexes of values.
@@ -333,8 +340,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
 
     @Override
     public ByteBufferSerializer<SparseFloatVector> getDefaultSerializer() {
-      // FIXME: add a serializer
-      return null;
+      return VARIABLE_SERIALIZER;
     }
 
     @Override
@@ -370,4 +376,48 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
    * Empty map.
    */
   public static final TIntFloatMap EMPTYMAP = new TUnmodifiableIntFloatMap(new TIntFloatHashMap());
+
+  /**
+   * Serialization class using VarInt encodings.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.uses SparseFloatVector - - «serializes»
+   */
+  public static class VariableSerializer implements ByteBufferSerializer<SparseFloatVector> {
+    @Override
+    public SparseFloatVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
+      final int nonzero = ByteArrayUtil.readUnsignedVarint(buffer);
+      final int[] dims = new int[nonzero];
+      final float[] values = new float[nonzero];
+      for (int i = 0; i < nonzero; i++) {
+        dims[i] = ByteArrayUtil.readUnsignedVarint(buffer);
+        values[i] = buffer.getFloat();
+      }
+      return new SparseFloatVector(dims, values, dimensionality);
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, SparseFloatVector vec) throws IOException {
+      ByteArrayUtil.writeUnsignedVarint(buffer, vec.dimensionality);
+      ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
+      for (int i = 0; i < vec.values.length; i++) {
+        ByteArrayUtil.writeUnsignedVarint(buffer, vec.indexes[i]);
+        buffer.putFloat(vec.values[i]);
+      }
+    }
+
+    @Override
+    public int getByteSize(SparseFloatVector vec) {
+      int sum = 0;
+      sum += ByteArrayUtil.getUnsignedVarintSize(vec.dimensionality);
+      sum += ByteArrayUtil.getUnsignedVarintSize(vec.values.length);
+      for (int d : vec.indexes) {
+        sum += ByteArrayUtil.getUnsignedVarintSize(d);
+      }
+      sum += vec.values.length * ByteArrayUtil.SIZE_FLOAT;
+      return sum;
+    }
+  }
 }
