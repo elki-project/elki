@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /**
- * Weighted version of the Euclidean distance function.
+ * Weighted version of the Minkowski L_p metrics distance function.
  * 
  * @author Erich Schubert
  */
@@ -63,9 +63,9 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
 
     final double p = getP();
     double sqrDist = 0;
-    for(int i = 0; i < dim; i++) {
-      final double delta = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
-      sqrDist += Math.pow(delta, p) * weights[i];
+    for(int d = 0; d < dim; d++) {
+      final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
+      sqrDist += Math.pow(delta, p) * weights[d];
     }
     return Math.pow(sqrDist, 1.0 / p);
   }
