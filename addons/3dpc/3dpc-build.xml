@@ -15,6 +15,7 @@
 
 	<target name="init">
 		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
 	</target>
 
 	<target name="compile" depends="init">
