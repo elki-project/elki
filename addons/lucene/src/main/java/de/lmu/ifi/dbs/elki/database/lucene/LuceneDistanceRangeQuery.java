@@ -77,7 +77,6 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID, D
     this.mlt = new MoreLikeThis(ir);
     this.is = new IndexSearcher(ir);
     mlt.setAnalyzer(new StandardAnalyzer(Version.LUCENE_36));
-    mlt.setFieldNames(new String[] { "content" });
   }
 
   @Override
