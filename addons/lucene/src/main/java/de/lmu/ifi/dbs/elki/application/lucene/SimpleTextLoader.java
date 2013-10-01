@@ -80,7 +80,7 @@ public class SimpleTextLoader extends AbstractApplication {
         String id = suri.relativize(inf.toURI()).getPath();
         String text = FileUtil.slurp(new FileInputStream(inf));
         doc.add(new Field("id", id, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("content", text, Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("contents", text, Field.Store.YES, Field.Index.ANALYZED));
         writer.addDocument(doc);
       }
       writer.close();

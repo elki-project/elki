@@ -76,7 +76,6 @@ public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID, Doubl
     this.mlt = new MoreLikeThis(ir);
     this.is = new IndexSearcher(ir);
     mlt.setAnalyzer(new StandardAnalyzer(Version.LUCENE_36));
-    mlt.setFieldNames(new String[] { "content" });
   }
 
   @Override
