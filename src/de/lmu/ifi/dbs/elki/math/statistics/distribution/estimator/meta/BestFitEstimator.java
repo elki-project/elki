@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.CauchyMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.EMGOlivierNorbergEstimator;
@@ -195,6 +196,10 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
       final double val = adapter.getDouble(data, i);
       x[i] = val;
       mom.put(val);
+    }
+    if (mom.getMax() <= mom.getMin()) {
+      LOG.warning("Constant distribution detected. Cannot fit.");
+      return new UniformDistribution(mom.getMin() - .1, mom.getMax() + .1);
     }
     // Sort: for L-Moments, but getting the median is now also cheap.
     Arrays.sort(x);
