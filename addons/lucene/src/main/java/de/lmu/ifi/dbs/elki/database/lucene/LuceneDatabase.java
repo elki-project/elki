@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -116,12 +117,22 @@ public class LuceneDatabase extends AbstractDatabase {
       throw new AbortException("I/O error reading index.", e);
     }
   }
+  
+  @Override
+  public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+    if (distanceQuery.getDistanceFunction() instanceof LuceneDistanceFunction) {
+      @SuppressWarnings("unchecked")
+      final RangeQuery<O, D> rq = (RangeQuery<O, D>) new LuceneDistanceRangeQuery((DistanceQuery<DBID, DoubleDistance>) distanceQuery, reader, ids);
+      return rq;
+    }
+    return super.getRangeQuery(distanceQuery, hints);
+  }
 
   @Override
   public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if (distanceQuery.getDistanceFunction() instanceof LuceneDistanceFunction) {
       @SuppressWarnings("unchecked")
-      final KNNQuery<O, D> kq = (KNNQuery<O, D>) new LuceneDistanceQuery((DistanceQuery<DBID, DoubleDistance>) distanceQuery, reader, ids);
+      final KNNQuery<O, D> kq = (KNNQuery<O, D>) new LuceneDistanceKNNQuery((DistanceQuery<DBID, DoubleDistance>) distanceQuery, reader, ids);
       return kq;
     }
     return super.getKNNQuery(distanceQuery, hints);

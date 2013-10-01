@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-public class LuceneDistanceQuery extends AbstractDistanceKNNQuery<DBID, DoubleDistance> {
+public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID, DoubleDistance> {
   /**
    * Lucene search function.
    */
@@ -70,7 +70,7 @@ public class LuceneDistanceQuery extends AbstractDistanceKNNQuery<DBID, DoubleDi
    * 
    * @param distanceQuery Distance query
    */
-  public LuceneDistanceQuery(DistanceQuery<DBID, DoubleDistance> distanceQuery, IndexReader ir, DBIDRange range) {
+  public LuceneDistanceKNNQuery(DistanceQuery<DBID, DoubleDistance> distanceQuery, IndexReader ir, DBIDRange range) {
     super(distanceQuery);
     this.range = range;
     this.mlt = new MoreLikeThis(ir);
