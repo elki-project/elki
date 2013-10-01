@@ -45,9 +45,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Where mean can be fixed to a given value, and stddev is then computed against
  * this mean.
  * 
+ * Reference:
+ * <p>
+ * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
+ * Interpreting and Unifying Outlier Scores<br />
+ * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
+ * </p>
+ * 
  * @author Erich Schubert
  */
-@Reference(authors="H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title="Interpreting and Unifying Outlier Scores", booktitle="Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url="http://siam.omnibooksonline.com/2011datamining/data/papers/018.pdf")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://siam.omnibooksonline.com/2011datamining/data/papers/018.pdf")
 public class StandardDeviationScaling implements OutlierScalingFunction {
   /**
    * Parameter to specify a fixed mean to use.
@@ -107,7 +114,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    if(value <= mean) {
+    if (value <= mean) {
       return 0;
     }
     return Math.max(0, NormalDistribution.erf((value - mean) / factor));
@@ -115,12 +122,12 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
 
   @Override
   public void prepare(OutlierResult or) {
-    if(fixedmean == null) {
+    if (fixedmean == null) {
       MeanVariance mv = new MeanVariance();
       Relation<Double> scores = or.getScores();
-      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         double val = scores.get(id);
-        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+        if (!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
       }
@@ -129,14 +136,13 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
       if (factor == 0.0) {
         factor = Double.MIN_NORMAL;
       }
-    }
-    else {
+    } else {
       mean = fixedmean;
       Mean sqsum = new Mean();
       Relation<Double> scores = or.getScores();
-      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         double val = scores.get(id);
-        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+        if (!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum.put((val - mean) * (val - mean));
         }
       }
@@ -174,11 +180,11 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
       super.makeOptions(config);
       DoubleParameter meanP = new DoubleParameter(MEAN_ID);
       meanP.setOptional(true);
-      if(config.grab(meanP)) {
+      if (config.grab(meanP)) {
         fixedmean = meanP.getValue();
       }
       DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, 3.0);
-      if(config.grab(lambdaP)) {
+      if (config.grab(lambdaP)) {
         lambda = lambdaP.getValue();
       }
     }

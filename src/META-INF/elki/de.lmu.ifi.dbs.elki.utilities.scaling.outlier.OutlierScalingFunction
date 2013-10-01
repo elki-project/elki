@@ -12,3 +12,4 @@ de.lmu.ifi.dbs.elki.utilities.scaling.outlier.StandardDeviationScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.HeDESNormalizationOutlierScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MixtureModelOutlierScalingFunction
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.SigmoidOutlierScalingFunction
+de.lmu.ifi.dbs.elki.utilities.scaling.outlier.CDFOutlierScaling
