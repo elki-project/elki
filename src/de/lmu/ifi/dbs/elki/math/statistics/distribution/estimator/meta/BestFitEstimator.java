@@ -178,7 +178,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
   @Override
   public <A> Distribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
     int numlmm = 0;
-    for(LMMDistributionEstimator<?> est : lmmests) {
+    for (LMMDistributionEstimator<?> est : lmmests) {
       numlmm = Math.max(numlmm, est.getNumMoments());
     }
 
@@ -188,33 +188,38 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     StatisticalMoments mom = new StatisticalMoments(), logmom = new StatisticalMoments();
     double[] x = new double[len], scratch = new double[len], logx = new double[len];
 
-    if(LOG.isVeryVerbose()) {
+    if (LOG.isVeryVerbose()) {
       LOG.veryverbose("Computing statistical moments and L-Moments.");
     }
-    for(int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i);
       x[i] = val;
       mom.put(val);
     }
     // Sort: for L-Moments, but getting the median is now also cheap.
     Arrays.sort(x);
-    double[] lmm = (numlmm > 0) ? ProbabilityWeightedMoments.samLMR(x, ArrayLikeUtil.DOUBLEARRAYADAPTER, numlmm) : null;
+    double[] lmm;
+    try {
+      lmm = (numlmm > 0) ? ProbabilityWeightedMoments.samLMR(x, ArrayLikeUtil.DOUBLEARRAYADAPTER, numlmm) : null;
+    } catch (ArithmeticException e) {
+      lmm = null;
+    }
     final double min = x[0], median = .5 * (x[len >> 1] + x[(len + 1) >> 1]), max = x[len - 1];
-    if(LOG.isVeryVerbose()) {
+    if (LOG.isVeryVerbose()) {
       LOG.veryverbose("Computing statistical moments in logspace.");
     }
     // Build logspace copy:
     double shift = Math.min(0., min - (max - min) * 1e-10);
-    for(int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
       double val = x[i] - shift;
       val = val > 0. ? Math.log(val) : Double.NEGATIVE_INFINITY;
       logx[i] = val;
-      if(!Double.isInfinite(val) && !Double.isNaN(val)) {
+      if (!Double.isInfinite(val) && !Double.isNaN(val)) {
         logmom.put(val);
       }
     }
     double logmedian = .5 * (logx[len >> 1] + logx[(len + 1) >> 1]);
-    if(LOG.isVeryVerbose()) {
+    if (LOG.isVeryVerbose()) {
       LOG.veryverbose("Computing MADs.");
     }
     double mad = computeMAD(x, median, scratch, len);
@@ -226,113 +231,110 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
 
     final int numest = momests.size() + madests.size() + lmmests.size() + logmomests.size() + logmadests.size() + 2;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Estimating distribution.", numest, LOG) : null;
-    for(MOMDistributionEstimator<?> est : momests) {
+    for (MOMDistributionEstimator<?> est : momests) {
       try {
         Distribution d = est.estimateFromStatisticalMoments(mom);
         double score = testFit(x, scratch, d);
-        if(LOG.isVeryVerbose()) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
         }
-        if(score < bestscore) {
+        if (score < bestscore) {
           best = d;
           bestscore = score;
           bestest = est;
         }
-      }
-      catch(ArithmeticException e) {
-        if(LOG.isVeryVerbose()) {
+      } catch (ArithmeticException e) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if(prog != null) {
+      if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    for(MADDistributionEstimator<?> est : madests) {
+    for (MADDistributionEstimator<?> est : madests) {
       try {
         Distribution d = est.estimateFromMedianMAD(median, mad);
         double score = testFit(x, scratch, d);
-        if(LOG.isVeryVerbose()) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
         }
-        if(score < bestscore) {
+        if (score < bestscore) {
           best = d;
           bestscore = score;
           bestest = est;
         }
-      }
-      catch(ArithmeticException e) {
-        if(LOG.isVeryVerbose()) {
+      } catch (ArithmeticException e) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if(prog != null) {
+      if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    for(LMMDistributionEstimator<?> est : lmmests) {
-      try {
-        Distribution d = est.estimateFromLMoments(lmm);
-        double score = testFit(x, scratch, d);
-        if(LOG.isVeryVerbose()) {
-          LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
-        }
-        if(score < bestscore) {
-          best = d;
-          bestscore = score;
-          bestest = est;
+    for (LMMDistributionEstimator<?> est : lmmests) {
+      if (lmm != null) {
+        try {
+          Distribution d = est.estimateFromLMoments(lmm);
+          double score = testFit(x, scratch, d);
+          if (LOG.isVeryVerbose()) {
+            LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
+          }
+          if (score < bestscore) {
+            best = d;
+            bestscore = score;
+            bestest = est;
+          }
+        } catch (ArithmeticException e) {
+          if (LOG.isVeryVerbose()) {
+            LOG.veryverbose("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
+          }
         }
       }
-      catch(ArithmeticException e) {
-        if(LOG.isVeryVerbose()) {
-          LOG.veryverbose("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
-        }
-      }
-      if(prog != null) {
+      if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    for(LogMOMDistributionEstimator<?> est : logmomests) {
+    for (LogMOMDistributionEstimator<?> est : logmomests) {
       try {
         Distribution d = est.estimateFromLogStatisticalMoments(logmom, shift);
         double score = testFit(x, scratch, d);
-        if(LOG.isVeryVerbose()) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
         }
-        if(score < bestscore) {
+        if (score < bestscore) {
           best = d;
           bestscore = score;
           bestest = est;
         }
-      }
-      catch(ArithmeticException e) {
-        if(LOG.isVeryVerbose()) {
+      } catch (ArithmeticException e) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if(prog != null) {
+      if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    for(LogMADDistributionEstimator<?> est : logmadests) {
+    for (LogMADDistributionEstimator<?> est : logmadests) {
       try {
         Distribution d = est.estimateFromLogMedianMAD(logmedian, logmad, shift);
         double score = testFit(x, scratch, d);
-        if(LOG.isVeryVerbose()) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
         }
-        if(score < bestscore) {
+        if (score < bestscore) {
           best = d;
           bestscore = score;
           bestest = est;
         }
-      }
-      catch(ArithmeticException e) {
-        if(LOG.isVeryVerbose()) {
+      } catch (ArithmeticException e) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if(prog != null) {
+      if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
@@ -341,21 +343,20 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
       try {
         Distribution d = est.estimate(min, max);
         double score = testFit(x, scratch, d);
-        if(LOG.isVeryVerbose()) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
         }
-        if(score < bestscore) {
+        if (score < bestscore) {
           best = d;
           bestscore = score;
           bestest = est;
         }
-      }
-      catch(ArithmeticException e) {
-        if(LOG.isVeryVerbose()) {
+      } catch (ArithmeticException e) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if(prog != null) {
+      if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
@@ -364,29 +365,28 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
       try {
         Distribution d = est.estimate(min, max, len);
         double score = testFit(x, scratch, d);
-        if(LOG.isVeryVerbose()) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose(est.getClass().getSimpleName() + ": " + score + " " + d.toString());
         }
-        if(score < bestscore) {
+        if (score < bestscore) {
           best = d;
           bestscore = score;
           bestest = est;
         }
-      }
-      catch(ArithmeticException e) {
-        if(LOG.isVeryVerbose()) {
+      } catch (ArithmeticException e) {
+        if (LOG.isVeryVerbose()) {
           LOG.veryverbose("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if(prog != null) {
+      if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    if(prog != null) {
+    if (prog != null) {
       prog.ensureCompleted(LOG);
     }
 
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("Best distribution fit: " + bestscore + " " + best.toString() + " via " + bestest);
     }
 
@@ -395,19 +395,19 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
 
   public double computeMAD(double[] data, double median, double[] scratch, final int len) {
     // Compute LogMAD:
-    for(int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
       scratch[i] = Math.abs(data[i] - median);
     }
     double logmad = QuickSelect.median(scratch);
     // Adjust LogMAD if 0:
-    if(!(logmad > 0.)) {
+    if (!(logmad > 0.)) {
       double xmin = Double.POSITIVE_INFINITY;
-      for(int i = (len >> 1); i < len; i++) {
-        if(scratch[i] > 0. && scratch[i] < xmin) {
+      for (int i = (len >> 1); i < len; i++) {
+        if (scratch[i] > 0. && scratch[i] < xmin) {
           xmin = scratch[i];
         }
       }
-      if(!Double.isInfinite(xmin)) {
+      if (!Double.isInfinite(xmin)) {
         logmad = xmin;
       }
     }
@@ -424,15 +424,15 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
    * @throws ArithmeticException
    */
   private double testFit(double[] x, double[] test, Distribution dist) throws ArithmeticException {
-    for(int i = 0; i < test.length; i++) {
+    for (int i = 0; i < test.length; i++) {
       test[i] = dist.cdf(x[i]);
-      if(test[i] > 1.) {
+      if (test[i] > 1.) {
         test[i] = 1.;
       }
-      if(test[i] < 0.) {
+      if (test[i] < 0.) {
         test[i] = 0.;
       }
-      if(Double.isNaN(test[i])) {
+      if (Double.isNaN(test[i])) {
         throw new ArithmeticException("Got NaN after fitting " + dist.toString());
       }
     }
