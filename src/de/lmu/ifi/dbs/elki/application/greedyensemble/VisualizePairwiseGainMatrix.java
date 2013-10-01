@@ -44,13 +44,18 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVoting;
+import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMean;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -101,14 +106,21 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   private VisualizerParameterizer vispar;
 
   /**
+   * Ensemble voting function.
+   */
+  private EnsembleVoting voting;
+
+  /**
    * Constructor.
    * 
    * @param inputstep Input step
+   * @param voting Voting function
    * @param vispar Visualizer parameterizer
    */
-  public VisualizePairwiseGainMatrix(InputStep inputstep, VisualizerParameterizer vispar) {
+  public VisualizePairwiseGainMatrix(InputStep inputstep, EnsembleVoting voting, VisualizerParameterizer vispar) {
     super();
     this.inputstep = inputstep;
+    this.voting = voting;
     this.vispar = vispar;
   }
 
@@ -119,7 +131,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
-    if(!firstlabel.matches(".*by.?label.*")) {
+    if (!firstlabel.matches(".*by.?label.*")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
 
@@ -132,14 +144,17 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
     ids.remove(firstid);
+    ids.sort();
     final int size = ids.size();
 
     double[][] data = new double[size][size];
     DoubleMinMax minmax = new DoubleMinMax();
 
     {
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing ensemble gain.", size * (size + 1) >> 1, LOG) : null;
+      double[] buf = new double[2]; // Vote combination buffer.
       int a = 0;
-      for(DBIDIter id = ids.iter(); id.valid(); id.advance(), a++) {
+      for (DBIDIter id = ids.iter(); id.valid(); id.advance(), a++) {
         final NumberVector<?> veca = relation.get(id);
         // Direct AUC score:
         {
@@ -147,15 +162,20 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
           data[a][a] = auc;
           // minmax.put(auc);
           // logger.verbose(auc + " " + labels.get(ids.get(a)));
+          if (prog != null) {
+            prog.incrementProcessed(LOG);
+          }
         }
         // Compare to others, exploiting symmetry
         DBIDArrayIter id2 = ids.iter();
         id2.seek(a + 1);
-        for(int b = a + 1; b < size; b++, id2.advance()) {
+        for (int b = a + 1; b < size; b++, id2.advance()) {
           final NumberVector<?> vecb = relation.get(id2);
           double[] combined = new double[dim];
-          for(int d = 0; d < dim; d++) {
-            combined[d] = veca.doubleValue(d) + vecb.doubleValue(d);
+          for (int d = 0; d < dim; d++) {
+            buf[0] = veca.doubleValue(d);
+            buf[1] = vecb.doubleValue(d);
+            combined[d] = voting.combine(buf);
           }
           double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(new DoubleVector(combined))));
           // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
@@ -163,11 +183,17 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
           data[a][b] = auc;
           data[b][a] = auc;
           // minmax.put(auc);
+          if (prog != null) {
+            prog.incrementProcessed(LOG);
+          }
         }
       }
+      if (prog != null) {
+        prog.ensureCompleted(LOG);
+      }
     }
-    for(int a = 0; a < size; a++) {
-      for(int b = a + 1; b < size; b++) {
+    for (int a = 0; a < size; a++) {
+      for (int b = a + 1; b < size; b++) {
         double ref = Math.max(data[a][a], data[b][b]);
         data[a][b] = (data[a][b] - ref) / (1 - ref);
         data[b][a] = (data[b][a] - ref) / (1 - ref);
@@ -176,7 +202,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         minmax.put(data[a][b]);
       }
     }
-    for(int a = 0; a < size; a++) {
+    for (int a = 0; a < size; a++) {
       data[a][a] = 0;
     }
 
@@ -184,31 +210,28 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     boolean hasneg = (minmax.getMin() < -1E-3);
     LinearScaling scale;
-    if(!hasneg) {
+    if (!hasneg) {
       scale = new LinearScaling(minmax);
-    }
-    else {
+    } else {
       scale = LinearScaling.fromMinMax(0.0, Math.max(minmax.getMax(), -minmax.getMin()));
     }
 
     BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
-    for(int x = 0; x < size; x++) {
-      for(int y = x; y < size; y++) {
+    for (int x = 0; x < size; x++) {
+      for (int y = x; y < size; y++) {
         double val = data[x][y];
         val = scale.getScaled(val);
         // Compute color:
         final int col;
         {
-          if(!hasneg) {
+          if (!hasneg) {
             int ival = 0xFF & (int) (255 * Math.max(0, val));
             col = 0xff000000 | (ival << 16) | (ival << 8) | ival;
-          }
-          else {
-            if(val >= 0) {
+          } else {
+            if (val >= 0) {
               int ival = 0xFF & (int) (255 * val);
               col = 0xff000000 | (ival << 8);
-            }
-            else {
+            } else {
               int ival = 0xFF & (int) (255 * -val);
               col = 0xff000000 | (ival << 16);
             }
@@ -228,8 +251,8 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     factory.processNewResult(database, database);
 
     List<VisualizationTask> tasks = ResultUtil.filterResults(database, VisualizationTask.class);
-    for(VisualizationTask task : tasks) {
-      if(task.getFactory() == factory) {
+    for (VisualizationTask task : tasks) {
+      if (task.getFactory() == factory) {
         showVisualization(context, factory, task);
       }
     }
@@ -263,6 +286,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**
+     * Option ID for the ensemble voting function.
+     */
+    public static final OptionID VOTING_ID = new OptionID("ensemble.voting", "Voting function for the ensembles.");
+
+    /**
      * Data source.
      */
     InputStep inputstep;
@@ -272,6 +300,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
      */
     private VisualizerParameterizer vispar;
 
+    /**
+     * Voring function.
+     */
+    EnsembleVoting voting;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -279,11 +312,16 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       inputstep = config.tryInstantiate(InputStep.class);
       // Visualization options
       vispar = config.tryInstantiate(VisualizerParameterizer.class);
+
+      ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class);
+      if (config.grab(votingP)) {
+        voting = votingP.instantiateClass(config);
+      }
     }
 
     @Override
     protected VisualizePairwiseGainMatrix makeInstance() {
-      return new VisualizePairwiseGainMatrix(inputstep, vispar);
+      return new VisualizePairwiseGainMatrix(inputstep, voting, vispar);
     }
   }
 
