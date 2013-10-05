@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors="J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title="Empirical evaluation of dissimilarity measures for color and texture", booktitle="Proc. 7th IEEE International Conference on Computer Vision", url="http://dx.doi.org/10.1109/ICCV.1999.790412")
+@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
 public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Static instance. Use this!
@@ -58,7 +58,13 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
     for(int i = 0; i < dim1; i++) {
       final double xi = v1.doubleValue(i);
       final double yi = v2.doubleValue(i);
+      if(xi == yi) {
+        continue;
+      }
       final double mi = .5 * (xi + yi);
+      if(!(mi > 0 || mi < 0)) {
+        continue;
+      }
       dist += xi * Math.log(xi / mi);
       dist += yi * Math.log(yi / mi);
     }
