@@ -65,8 +65,12 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
       if(!(mi > 0 || mi < 0)) {
         continue;
       }
-      dist += xi * Math.log(xi / mi);
-      dist += yi * Math.log(yi / mi);
+      if(xi > 0.) {
+        dist += xi * Math.log(xi / mi);
+      }
+      if(yi > 0.) {
+        dist += yi * Math.log(yi / mi);
+      }
     }
     return dist;
   }
