@@ -28,31 +28,31 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides the Jeffrey Divergence Distance for FeatureVectors.
+ * The square root of Jensen-Shannon divergence is metric.
  * 
- * Reference:
+ * Reference (proof of triangle inequality, distance called D_PQ):
  * <p>
- * J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi<br />
- * Empirical evaluation of dissimilarity measures for color and texture<br />
- * Proc. 7th IEEE International Conference on Computer Vision
+ * D. M. Endres, J. E. Schindelin<br />
+ * A new metric for probability distributions<br />
+ * IEEE Transactions on Information Theory, 49(7).
  * </p>
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
-public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+@Reference(authors = "D. M. Endres, J. E. Schindelin", title = "A new metric for probability distributions", booktitle = "IEEE Transactions on Information Theory, 49(7)", url = "http://dx.doi.org/10.1109/TIT.2003.813506")
+public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Static instance. Use this!
    */
-  public static final JeffreyDivergenceDistanceFunction STATIC = new JeffreyDivergenceDistanceFunction();
+  public static final SqrtJensenShannonDivergenceDistanceFunction STATIC = new SqrtJensenShannonDivergenceDistanceFunction();
 
   /**
-   * Constructor for the Jeffrey divergence.
+   * Constructor for sqrt Jensen Shannon divergence.
    * 
    * @deprecated Use static instance!
    */
   @Deprecated
-  public JeffreyDivergenceDistanceFunction() {
+  public SqrtJensenShannonDivergenceDistanceFunction() {
     super();
   }
 
@@ -80,12 +80,17 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
         dist += yi * Math.log(yi / mi);
       }
     }
-    return dist;
+    return Math.sqrt(dist);
+  }
+
+  @Override
+  public boolean isMetric() {
+    return true;
   }
 
   @Override
   public String toString() {
-    return "JeffreyDivergenceDistance";
+    return "SqrtJensenShannonDivergenceDistance";
   }
 
   @Override
@@ -111,7 +116,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected JeffreyDivergenceDistanceFunction makeInstance() {
+    protected SqrtJensenShannonDivergenceDistanceFunction makeInstance() {
       return STATIC;
     }
   }

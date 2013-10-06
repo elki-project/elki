@@ -24,11 +24,12 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides the Jeffrey Divergence Distance for FeatureVectors.
+ * Chi-Squared distance function.
  * 
  * Reference:
  * <p>
@@ -39,20 +40,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
+@Alias("chisq")
 @Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
-public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class ChiSquaredDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Static instance. Use this!
    */
-  public static final JeffreyDivergenceDistanceFunction STATIC = new JeffreyDivergenceDistanceFunction();
+  public static final ChiSquaredDistanceFunction STATIC = new ChiSquaredDistanceFunction();
 
   /**
-   * Constructor for the Jeffrey divergence.
+   * Constructor for the Chi-Squared distance function.
    * 
    * @deprecated Use static instance!
    */
   @Deprecated
-  public JeffreyDivergenceDistanceFunction() {
+  public ChiSquaredDistanceFunction() {
     super();
   }
 
@@ -66,21 +68,14 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
     for(int i = 0; i < dim1; i++) {
       final double xi = v1.doubleValue(i);
       final double yi = v2.doubleValue(i);
-      if(xi == yi) {
+      final double di = xi - yi;
+      final double si = xi + yi;
+      if(!(si > 0. || si < 0.) || !(di > 0. || di < 0.)) {
         continue;
       }
-      final double mi = .5 * (xi + yi);
-      if(!(mi > 0. || mi < 0.)) {
-        continue;
-      }
-      if(xi > 0.) {
-        dist += xi * Math.log(xi / mi);
-      }
-      if(yi > 0.) {
-        dist += yi * Math.log(yi / mi);
-      }
+      dist += di * di / si;
     }
-    return dist;
+    return .5 * dist;
   }
 
   @Override
@@ -111,7 +106,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected JeffreyDivergenceDistanceFunction makeInstance() {
+    protected ChiSquaredDistanceFunction makeInstance() {
       return STATIC;
     }
   }

@@ -28,23 +28,25 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides the Jeffrey Divergence Distance for FeatureVectors.
+ * Kullback-Leibler (asymmetric!) Distance
+ * 
+ * For a symmetric version, see {@link JeffreyDivergenceDistanceFunction}.
  * 
  * Reference:
  * <p>
- * J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi<br />
- * Empirical evaluation of dissimilarity measures for color and texture<br />
- * Proc. 7th IEEE International Conference on Computer Vision
+ * S. Kullback<br />
+ * Information theory and statistics<br />
+ * Courier Dover Publications, 1997.
  * </p>
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
-public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+@Reference(authors = "S. Kullback", title = "Information theory and statistics", booktitle = "Information theory and statistics, Courier Dover Publications, 1997.")
+public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Static instance. Use this!
    */
-  public static final JeffreyDivergenceDistanceFunction STATIC = new JeffreyDivergenceDistanceFunction();
+  public static final KullbackLeiblerDivergenceAsymmetricDistanceFunction STATIC = new KullbackLeiblerDivergenceAsymmetricDistanceFunction();
 
   /**
    * Constructor for the Jeffrey divergence.
@@ -52,7 +54,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
    * @deprecated Use static instance!
    */
   @Deprecated
-  public JeffreyDivergenceDistanceFunction() {
+  public KullbackLeiblerDivergenceAsymmetricDistanceFunction() {
     super();
   }
 
@@ -66,26 +68,21 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
     for(int i = 0; i < dim1; i++) {
       final double xi = v1.doubleValue(i);
       final double yi = v2.doubleValue(i);
-      if(xi == yi) {
-        continue;
-      }
-      final double mi = .5 * (xi + yi);
-      if(!(mi > 0. || mi < 0.)) {
-        continue;
-      }
-      if(xi > 0.) {
-        dist += xi * Math.log(xi / mi);
-      }
-      if(yi > 0.) {
-        dist += yi * Math.log(yi / mi);
+      if(xi > 0. && yi > 0.) {
+        dist += xi * Math.log(xi / yi);
       }
     }
     return dist;
   }
 
   @Override
+  public boolean isSymmetric() {
+    return false;
+  }
+
+  @Override
   public String toString() {
-    return "JeffreyDivergenceDistance";
+    return "KullbackLeiblerDivergenceDistance";
   }
 
   @Override
@@ -111,7 +108,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected JeffreyDivergenceDistanceFunction makeInstance() {
+    protected KullbackLeiblerDivergenceAsymmetricDistanceFunction makeInstance() {
       return STATIC;
     }
   }

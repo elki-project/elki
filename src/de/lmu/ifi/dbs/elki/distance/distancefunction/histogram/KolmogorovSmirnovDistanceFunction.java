@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.histogram;
 
 /*
  This file is part of ELKI:
@@ -24,35 +24,30 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides the Jeffrey Divergence Distance for FeatureVectors.
+ * Distance function based on the Kolmogorov-Smirnov goodness of fit test.
  * 
- * Reference:
- * <p>
- * J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi<br />
- * Empirical evaluation of dissimilarity measures for color and texture<br />
- * Proc. 7th IEEE International Conference on Computer Vision
- * </p>
+ * This distance function assumes there exist a natural order in the vectors,
+ * i.e. they should be some 1-dimensional histogram.
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
-public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class KolmogorovSmirnovDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Static instance. Use this!
    */
-  public static final JeffreyDivergenceDistanceFunction STATIC = new JeffreyDivergenceDistanceFunction();
+  public static final KolmogorovSmirnovDistanceFunction STATIC = new KolmogorovSmirnovDistanceFunction();
 
   /**
-   * Constructor for the Jeffrey divergence.
+   * Constructor for the Kolmogorov-Smirnov distance function.
    * 
    * @deprecated Use static instance!
    */
   @Deprecated
-  public JeffreyDivergenceDistanceFunction() {
+  public KolmogorovSmirnovDistanceFunction() {
     super();
   }
 
@@ -62,30 +57,18 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
     if(dim1 != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
-    double dist = 0;
+    double xs = 0., ys = 0., max = 0.;
     for(int i = 0; i < dim1; i++) {
-      final double xi = v1.doubleValue(i);
-      final double yi = v2.doubleValue(i);
-      if(xi == yi) {
-        continue;
-      }
-      final double mi = .5 * (xi + yi);
-      if(!(mi > 0. || mi < 0.)) {
-        continue;
-      }
-      if(xi > 0.) {
-        dist += xi * Math.log(xi / mi);
-      }
-      if(yi > 0.) {
-        dist += yi * Math.log(yi / mi);
-      }
+      xs += v1.doubleValue(i);
+      ys += v2.doubleValue(i);
+      max = Math.max(max, Math.abs(xs - ys));
     }
-    return dist;
+    return max;
   }
 
   @Override
   public String toString() {
-    return "JeffreyDivergenceDistance";
+    return "KolmogorovSmirnovDistanceFunction";
   }
 
   @Override
@@ -111,7 +94,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected JeffreyDivergenceDistanceFunction makeInstance() {
+    protected KolmogorovSmirnovDistanceFunction makeInstance() {
       return STATIC;
     }
   }
