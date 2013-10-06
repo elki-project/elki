@@ -235,7 +235,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     DistributionEstimator<?> bestest = null;
 
     final int numest = momests.size() + madests.size() + lmmests.size() + logmomests.size() + logmadests.size() + 2;
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Estimating distribution.", numest, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding best matching distribution", numest, LOG) : null;
     for (MOMDistributionEstimator<?> est : momests) {
       try {
         Distribution d = est.estimateFromStatisticalMoments(mom);
