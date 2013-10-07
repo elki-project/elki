@@ -23,18 +23,26 @@ package de.lmu.ifi.dbs.elki.utilities.ensemble;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 /**
- * Simple combination rule, by taking the mean
+ * Inverse multiplicative voting:
+ * 
+ * {@code product(s_i)}
  * 
  * @author Erich Schubert
  */
-public class EnsembleVotingMean implements EnsembleVoting {
+public class EnsembleVotingMultiplicative implements EnsembleVoting {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Static instance.
    */
-  public EnsembleVotingMean() {
-    // Empty.
+  public static final EnsembleVotingMultiplicative STATIC = new EnsembleVotingMultiplicative();
+
+  /**
+   * Constructor.
+   */
+  public EnsembleVotingMultiplicative() {
+    super();
   }
 
   @Override
@@ -44,10 +52,24 @@ public class EnsembleVotingMean implements EnsembleVoting {
 
   @Override
   public double combine(double[] scores, int count) {
-    double sum = 0.0;
+    double prod = 1.;
     for (int i = 0; i < count; i++) {
-      sum += scores[i];
+      prod *= scores[i];
     }
-    return sum / count;
+    return prod;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected EnsembleVotingMultiplicative makeInstance() {
+      return STATIC;
+    }
   }
 }

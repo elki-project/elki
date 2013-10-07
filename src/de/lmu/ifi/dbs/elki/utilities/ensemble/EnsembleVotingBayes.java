@@ -54,9 +54,15 @@ public class EnsembleVotingBayes implements EnsembleVoting {
 
   @Override
   public double combine(double[] scores) {
+    return combine(scores, scores.length);
+  }
+
+  @Override
+  public double combine(double[] scores, int count) {
     double pos = 1.0;
     double neg = 1.0;
-    for (double score : scores) {
+    for (int i = 0; i < count; i++) {
+      double score = scores[i];
       if (score < minvote) {
         score = minvote;
       } else if (score > 1.0 - minvote) {
