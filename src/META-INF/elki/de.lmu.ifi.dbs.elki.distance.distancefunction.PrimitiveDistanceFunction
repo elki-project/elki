@@ -10,11 +10,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.BrayCurtisDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedCanberraDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.ClarkDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.JeffreyDivergenceDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.ChiSquaredDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.JensenShannonDivergenceDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.KullbackLeiblerDivergenceAsymmetricDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.SqrtJensenShannonDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.LorentzianDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction
@@ -36,6 +31,12 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.HistogramMatchDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.KolmogorovSmirnovDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDivergenceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceAsymmetricDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.SqrtJensenShannonDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.strings.LevenshteinDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.strings.NormalizedLevenshteinDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
