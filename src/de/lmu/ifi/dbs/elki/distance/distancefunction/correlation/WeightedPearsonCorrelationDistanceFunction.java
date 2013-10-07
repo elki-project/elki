@@ -93,4 +93,9 @@ public class WeightedPearsonCorrelationDistanceFunction extends AbstractVectorDo
     }
     return Arrays.equals(this.weights, ((WeightedPearsonCorrelationDistanceFunction)obj).weights);
   }
+
+  @Override
+  public String toString() {
+    return "WeightedPearsonCorrelationDistanceFunction";
+  }
 }
