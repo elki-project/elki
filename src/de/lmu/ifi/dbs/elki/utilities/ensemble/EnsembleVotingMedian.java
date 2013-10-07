@@ -55,7 +55,12 @@ public class EnsembleVotingMedian implements EnsembleVoting {
 
   @Override
   public double combine(double[] scores) {
-    return QuickSelect.quantile(scores, quantile);
+    return combine(scores, scores.length);
+  }
+
+  @Override
+  public double combine(double[] scores, int count) {
+    return QuickSelect.quantile(scores, 0, count, quantile);
   }
 
   /**

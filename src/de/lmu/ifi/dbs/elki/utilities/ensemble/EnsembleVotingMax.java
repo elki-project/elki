@@ -39,9 +39,14 @@ public class EnsembleVotingMax implements EnsembleVoting {
 
   @Override
   public double combine(double[] scores) {
+    return combine(scores, scores.length);
+  }
+
+  @Override
+  public double combine(double[] scores, int count) {
     double max = Double.NEGATIVE_INFINITY;
-    for (double val : scores) {
-      max = Math.max(max, val);
+    for (int i = 0; i < count; i++) {
+      max = Math.max(max, scores[i]);
     }
     return max;
   }

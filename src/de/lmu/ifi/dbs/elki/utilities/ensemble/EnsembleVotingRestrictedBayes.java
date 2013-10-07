@@ -62,10 +62,15 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
 
   @Override
   public double combine(double[] scores) {
+    return combine(scores, scores.length);
+  }
+
+  @Override
+  public double combine(double[] scores, int count) {
     double pos = 1.0;
     double neg = 1.0;
-    for (double score : scores) {
-      score = Math.min(minvote, Math.max(maxvote, score));
+    for (int i = 0; i < count; i++) {
+      double score = Math.min(minvote, Math.max(maxvote, scores[i]));
       final double cscore = score;
       pos *= cscore;
       neg *= (1.0 - cscore);
