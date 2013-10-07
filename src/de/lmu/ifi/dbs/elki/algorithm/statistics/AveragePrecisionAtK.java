@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
@@ -60,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * at k, when ranking the objects by distance.
  * 
  * @author Erich Schubert
+ * 
  * @param <V> Vector type
  * @param <D> Distance type
  */
@@ -73,16 +75,21 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
    * The parameter k - the number of neighbors to retrieve.
    */
   private int k;
-  
+
   /**
    * Relative number of object to use in sampling.
    */
   private double sampling = 1.0;
-  
+
   /**
    * Random sampling seed.
    */
   private Long seed = null;
+
+  /**
+   * Include query object in evaluation.
+   */
+  private boolean includeSelf;
 
   /**
    * Constructor.
@@ -91,12 +98,14 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
    * @param k K parameter
    * @param sampling Sampling rate
    * @param seed Random sampling seed (may be null)
+   * @param includeSelf Include query object in evaluation
    */
-  public AveragePrecisionAtK(DistanceFunction<? super V, D> distanceFunction, int k, double sampling, Long seed) {
+  public AveragePrecisionAtK(DistanceFunction<? super V, D> distanceFunction, int k, double sampling, Long seed, boolean includeSelf) {
     super(distanceFunction);
     this.k = k;
     this.sampling = sampling;
     this.seed = seed;
+    this.includeSelf = includeSelf;
   }
 
   @Override
@@ -104,7 +113,8 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
     final Relation<Object> lrelation = database.getRelation(getInputTypeRestriction()[1]);
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, k);
+    final int qk = k + (includeSelf ? 0 : 1);
+    final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, qk);
 
     MeanVariance[] mvs = MeanVariance.newArray(k);
 
@@ -115,44 +125,47 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     } else {
       ids = relation.getDBIDs();
     }
-    
-    if(LOG.isVerbose()) {
+
+    if (LOG.isVerbose()) {
       LOG.verbose("Processing points...");
     }
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), LOG) : null;
     // sort neighbors
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList<D> knn = knnQuery.getKNNForDBID(iter, k);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      KNNList<D> knn = knnQuery.getKNNForDBID(iter, qk);
       Object label = lrelation.get(iter);
 
       int positive = 0, i = 0;
-      for (DBIDIter ri = knn.iter(); i < k && ri.valid(); ri.advance(), i++) {
+      for (DBIDIter ri = knn.iter(); i < k && ri.valid(); ri.advance()) {
+        if (!includeSelf && DBIDUtil.equal(iter, ri)) {
+          continue;
+        }
         Object olabel = lrelation.get(ri);
-        if(label == null) {
-          if(olabel == null) {
+        if (label == null) {
+          if (olabel == null) {
             positive += 1;
           }
-        }
-        else {
-          if(label.equals(olabel)) {
+        } else {
+          if (label.equals(olabel)) {
             positive += 1;
           }
         }
         final double precision = positive / (double) (i + 1);
         mvs[i].put(precision);
+        i++;
       }
-      if(objloop != null) {
+      if (objloop != null) {
         objloop.incrementProcessed(LOG);
       }
     }
-    if(objloop != null) {
+    if (objloop != null) {
       objloop.ensureCompleted(LOG);
     }
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<>(k);
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       DoubleVector row = new DoubleVector(new double[] { mvs[i].getMean(), mvs[i].getSampleStddev() });
       res.add(row);
     }
@@ -161,7 +174,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.GUESSED_LABEL);
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.CLASSLABEL);
   }
 
   @Override
@@ -193,26 +206,36 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     public static final OptionID SEED_ID = new OptionID("avep.sampling-seed", "Random seed for deterministic sampling.");
 
     /**
+     * Parameter to include the query object.
+     */
+    public static final OptionID INCLUDESELF_ID = new OptionID("avep.includeself", "Include the query object in the evaluation.");
+
+    /**
      * Neighborhood size.
      */
     protected int k = 20;
-    
+
     /**
      * Relative amount of data to sample.
      */
     protected double sampling = 1.0;
-    
+
     /**
      * Random sampling seed.
      */
     protected Long seed = null;
+
+    /**
+     * Include query object in evaluation.
+     */
+    protected boolean includeSelf;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(new GreaterEqualConstraint(2));
-      if(config.grab(kP)) {
+      if (config.grab(kP)) {
         k = kP.getValue();
       }
       final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID);
@@ -227,11 +250,15 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
       if (config.grab(rndP)) {
         seed = rndP.getValue();
       }
+      final Flag includeP = new Flag(INCLUDESELF_ID);
+      if (config.grab(includeP)) {
+        includeSelf = includeP.isTrue();
+      }
     }
 
     @Override
     protected AveragePrecisionAtK<V, D> makeInstance() {
-      return new AveragePrecisionAtK<>(distanceFunction, k, sampling, seed);
+      return new AveragePrecisionAtK<>(distanceFunction, k, sampling, seed, includeSelf);
     }
   }
 }
