@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 
 /**
@@ -105,7 +106,7 @@ public abstract class AbstractStreamConversionFilter<I, O> extends AbstractStrea
    * 
    * @return Type restriction
    */
-  protected abstract SimpleTypeInformation<? super I> getInputTypeRestriction();
+  protected abstract TypeInformation getInputTypeRestriction();
 
   /**
    * Get the output type from the input type after conversion.
