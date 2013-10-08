@@ -205,6 +205,9 @@ public final class ArrayLikeUtil {
    * @return primitive double array
    */
   public static <A> double[] toPrimitiveDoubleArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
+    if (adapter == DOUBLEARRAYADAPTER) {
+      return ((double[]) array).clone();
+    }
     double[] ret = new double[adapter.size(array)];
     for (int i = 0; i < ret.length; i++) {
       ret[i] = adapter.getDouble(array, i);
@@ -240,6 +243,9 @@ public final class ArrayLikeUtil {
    * @return primitive float array
    */
   public static <A> float[] toPrimitiveFloatArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
+    if (adapter == FLOATARRAYADAPTER) {
+      return ((float[]) array).clone();
+    }
     float[] ret = new float[adapter.size(array)];
     for (int i = 0; i < ret.length; i++) {
       ret[i] = adapter.getFloat(array, i);
