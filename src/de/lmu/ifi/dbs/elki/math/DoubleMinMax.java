@@ -68,8 +68,12 @@ public class DoubleMinMax extends DoubleDoublePair {
    * @param data New value
    */
   public void put(double data) {
-    this.first = Math.min(this.first, data);
-    this.second = Math.max(this.second, data);
+    if (data < first) {
+      first = data;
+    }
+    if (data > second) {
+      second = data;
+    }
   }
 
   /**

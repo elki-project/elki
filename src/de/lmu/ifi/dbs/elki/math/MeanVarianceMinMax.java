@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,6 +22,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+
 /**
  * Class collecting mean, variance, minimum and maximum statistics.
  * 
@@ -61,25 +62,32 @@ public class MeanVarianceMinMax extends MeanVariance {
   @Override
   public void put(double val) {
     super.put(val);
-    min = Math.min(min, val);
-    max = Math.max(max, val);
+    if (val < min) {
+      min = val;
+    }
+    if (val > max) {
+      max = val;
+    }
   }
 
   @Override
   public void put(double val, double weight) {
     super.put(val, weight);
-    min = Math.min(min, val);
-    max = Math.max(max, val);
+    if (val < min) {
+      min = val;
+    }
+    if (val > max) {
+      max = val;
+    }
   }
 
   @Override
   public void put(Mean other) {
-    if(other instanceof MeanVarianceMinMax) {
+    if (other instanceof MeanVarianceMinMax) {
       super.put(other);
       min = Math.min(min, ((MeanVarianceMinMax) other).min);
       max = Math.max(max, ((MeanVarianceMinMax) other).max);
-    }
-    else {
+    } else {
       throw new AbortException("Cannot aggregate into a minmax statistic: " + other.getClass());
     }
   }
@@ -101,14 +109,14 @@ public class MeanVarianceMinMax extends MeanVariance {
   public double getMax() {
     return this.max;
   }
-  
+
   /**
    * Get the current minimum and maximum.
    * 
    * @return current minimum and maximum
    */
-  public DoubleMinMax getDoubleMinMax(){
-    return new DoubleMinMax(this.min,this.max);
+  public DoubleMinMax getDoubleMinMax() {
+    return new DoubleMinMax(this.min, this.max);
   }
 
   /**
@@ -119,7 +127,7 @@ public class MeanVarianceMinMax extends MeanVariance {
   public double getDiff() {
     return this.getMax() - this.getMin();
   }
-  
+
   /**
    * Create and initialize a new array of MeanVarianceMinMax
    * 
@@ -128,7 +136,7 @@ public class MeanVarianceMinMax extends MeanVariance {
    */
   public static MeanVarianceMinMax[] newArray(int dimensionality) {
     MeanVarianceMinMax[] arr = new MeanVarianceMinMax[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
+    for (int i = 0; i < dimensionality; i++) {
       arr[i] = new MeanVarianceMinMax();
     }
     return arr;
