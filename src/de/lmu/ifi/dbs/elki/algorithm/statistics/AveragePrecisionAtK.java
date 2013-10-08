@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -45,7 +46,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -108,10 +108,15 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     this.includeSelf = includeSelf;
   }
 
-  @Override
-  public HistogramResult<DoubleVector> run(Database database) {
-    final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
-    final Relation<Object> lrelation = database.getRelation(getInputTypeRestriction()[1]);
+  /**
+   * Run the algorithm
+   * 
+   * @param database Database to run on (for kNN queries)
+   * @param relation Relation for distance computations
+   * @param lrelation Relation for class label comparison
+   * @return Vectors containing mean and standard deviation.
+   */
+  public CollectionResult<DoubleVector> run(Database database, Relation<V> relation, Relation<ClassLabel> lrelation) {
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final int qk = k + (includeSelf ? 0 : 1);
     final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, qk);
@@ -169,7 +174,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
       DoubleVector row = new DoubleVector(new double[] { mvs[i].getMean(), mvs[i].getSampleStddev() });
       res.add(row);
     }
-    return new HistogramResult<>("Average Precision", "average-precision", res);
+    return new CollectionResult<>("Average Precision", "average-precision", res);
   }
 
   @Override
