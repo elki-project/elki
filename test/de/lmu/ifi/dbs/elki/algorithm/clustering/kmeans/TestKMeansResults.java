@@ -61,7 +61,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 3);
+    params.addParameter(KMeans.INIT_ID, FirstKInitialMeans.class);
     AbstractKMeans<DoubleVector, DoubleDistance, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
     testParameterizationOk(params);
 
@@ -84,7 +84,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 3);
+    params.addParameter(KMeans.INIT_ID, FirstKInitialMeans.class);
     AbstractKMeans<DoubleVector, DoubleDistance, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMacQueen.class, params);
     testParameterizationOk(params);
 
@@ -107,7 +107,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 3);
+    params.addParameter(KMeans.INIT_ID, FirstKInitialMeans.class);
     AbstractKMeans<DoubleVector, DoubleDistance, ?> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMediansLloyd.class, params);
     testParameterizationOk(params);
 
