@@ -26,6 +26,9 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -94,29 +97,44 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
 
   @Override
   public void prepare(OutlierResult or) {
-    if(k <= 0) {
+    if (k <= 0) {
       LoggingUtil.warning("No k configured for Top-k outlier scaling!");
     }
     DBIDIter order = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter();
-    for(int i = 0; i < k && order.valid(); i++, order.advance()) {
+    for (int i = 0; i < k && order.valid(); i++, order.advance()) {
       cutoff = or.getScores().get(order);
     }
     max = or.getOutlierMeta().getActualMaximum();
     ground = or.getOutlierMeta().getTheoreticalBaseline();
-    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
+    if (Double.isInfinite(ground) || Double.isNaN(ground)) {
       ground = or.getOutlierMeta().getTheoreticalMinimum();
     }
-    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
+    if (Double.isInfinite(ground) || Double.isNaN(ground)) {
       ground = or.getOutlierMeta().getActualMinimum();
     }
-    if(Double.isInfinite(ground) || Double.isNaN(ground)) {
+    if (Double.isInfinite(ground) || Double.isNaN(ground)) {
       ground = Math.min(0.0, cutoff);
     }
   }
 
   @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    if (k <= 0) {
+      LoggingUtil.warning("No k configured for Top-k outlier scaling!");
+    }
+    double[] scores = ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter);
+    QuickSelect.quickSelect(scores, k);
+    cutoff = scores[k - 1];
+    max = Double.NEGATIVE_INFINITY;
+    for (double v : scores) {
+      max = Math.max(max, v);
+    }
+    ground = Math.min(0.0, cutoff);
+  }
+
+  @Override
   public double getMax() {
-    if(binary) {
+    if (binary) {
       return 1.0;
     }
     return max;
@@ -124,7 +142,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
 
   @Override
   public double getMin() {
-    if(binary) {
+    if (binary) {
       return 0.0;
     }
     return ground;
@@ -132,19 +150,16 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
-    if(binary) {
-      if(value >= cutoff) {
+    if (binary) {
+      if (value >= cutoff) {
         return 1;
-      }
-      else {
+      } else {
         return 0;
       }
-    }
-    else {
-      if(value >= cutoff) {
+    } else {
+      if (value >= cutoff) {
         return (value - ground) / (max - ground);
-      }
-      else {
+      } else {
         return 0.0;
       }
     }
@@ -167,12 +182,12 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(new GreaterConstraint(1));
-      if(config.grab(kP)) {
+      if (config.grab(kP)) {
         k = kP.intValue();
       }
 
       Flag binaryF = new Flag(BINARY_ID);
-      if(config.grab(binaryF)) {
+      if (config.grab(binaryF)) {
         binary = binaryF.isTrue();
       }
     }

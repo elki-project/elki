@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -57,22 +58,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://siam.omnibooksonline.com/2011datamining/data/papers/018.pdf")
 public class StandardDeviationScaling implements OutlierScalingFunction {
   /**
-   * Parameter to specify a fixed mean to use.
-   * <p>
-   * Key: {@code -stddevscale.mean}
-   * </p>
-   */
-  public static final OptionID MEAN_ID = new OptionID("stddevscale.mean", "Fixed mean to use in standard deviation scaling.");
-
-  /**
-   * Parameter to specify the lambda value
-   * <p>
-   * Key: {@code -stddevscale.lambda}
-   * </p>
-   */
-  public static final OptionID LAMBDA_ID = new OptionID("stddevscale.lambda", "Significance level to use for error function.");
-
-  /**
    * Field storing the fixed mean to use
    */
   protected Double fixedmean = null;
@@ -80,7 +65,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
   /**
    * Field storing the lambda value
    */
-  protected Double lambda = null;
+  protected double lambda;
 
   /**
    * Mean to use
@@ -95,10 +80,10 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
   /**
    * Constructor.
    * 
-   * @param fixedmean
-   * @param lambda
+   * @param fixedmean Fixed mean
+   * @param lambda Scaling factor lambda
    */
-  public StandardDeviationScaling(Double fixedmean, Double lambda) {
+  public StandardDeviationScaling(Double fixedmean, double lambda) {
     super();
     this.fixedmean = fixedmean;
     this.lambda = lambda;
@@ -154,6 +139,39 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
   }
 
   @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    if (fixedmean == null) {
+      MeanVariance mv = new MeanVariance();
+      final int size = adapter.size(array);
+      for (int i = 0; i < size; i++) {
+        double val = adapter.getDouble(array, i);
+        if (!Double.isInfinite(val)) {
+          mv.put(val);
+        }
+      }
+      mean = mv.getMean();
+      factor = lambda * mv.getSampleStddev() * MathUtil.SQRT2;
+      if (factor == 0.0) {
+        factor = Double.MIN_NORMAL;
+      }
+    } else {
+      mean = fixedmean;
+      Mean sqsum = new Mean();
+      final int size = adapter.size(array);
+      for (int i = 0; i < size; i++) {
+        double val = adapter.getDouble(array, i);
+        if (!Double.isInfinite(val)) {
+          sqsum.put((val - mean) * (val - mean));
+        }
+      }
+      factor = lambda * Math.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
+      if (factor == 0.0) {
+        factor = Double.MIN_NORMAL;
+      }
+    }
+  }
+
+  @Override
   public double getMin() {
     return 0.0;
   }
@@ -171,9 +189,25 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify a fixed mean to use.
+     * <p>
+     * Key: {@code -stddevscale.mean}
+     * </p>
+     */
+    public static final OptionID MEAN_ID = new OptionID("stddevscale.mean", "Fixed mean to use in standard deviation scaling.");
+
+    /**
+     * Parameter to specify the lambda value
+     * <p>
+     * Key: {@code -stddevscale.lambda}
+     * </p>
+     */
+    public static final OptionID LAMBDA_ID = new OptionID("stddevscale.lambda", "Significance level to use for error function.");
+
     protected Double fixedmean = null;
 
-    protected Double lambda = null;
+    protected double lambda;
 
     @Override
     protected void makeOptions(Parameterization config) {

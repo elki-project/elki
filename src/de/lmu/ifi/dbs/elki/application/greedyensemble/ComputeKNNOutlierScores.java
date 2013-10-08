@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.ByLabelOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialAllOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialNoOutlier;
@@ -139,7 +140,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
   /**
    * Scaling function.
    */
-  OutlierScalingFunction scaling;
+  ScalingFunction scaling;
 
   /**
    * Constructor.
@@ -153,7 +154,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
    * @param outfile Output file
    * @param scaling Scaling function
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O, D> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile, OutlierScalingFunction scaling) {
+  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O, D> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling) {
     super();
     this.distf = distf;
     this.startk = startk;
@@ -169,12 +170,17 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
   public void run() {
     final Database database = inputstep.getDatabase();
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
-    LOG.verbose("Running preprocessor ...");
-    MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, distf, maxk + 2);
-    database.addIndex(preproc);
 
-    // Test that we did get a proper index query
-    KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, distf);
+    // If there is no kNN preprocessor already, then precompute.
+    KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);
+    if (!(knnq instanceof PreprocessorKNNQuery)) {
+      LOG.verbose("Running preprocessor ...");
+      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, distf, maxk + 2);
+      database.addIndex(preproc);
+    }
+
+    // Test that we now get a proper index query
+    knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);
     if (!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.warning("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }
@@ -192,7 +198,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       try {
         MessageDigest md = MessageDigest.getInstance("MD5");
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          md.update(" ".getBytes());
+          md.update((byte) ' ');
           md.update(DBIDUtil.toString(iter).getBytes());
         }
         fout.append("# DBID-series MD5:");
@@ -224,8 +230,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       public void run(int k, String kstr) {
         KNNOutlier<O, D> knn = new KNNOutlier<>(distf, k);
         OutlierResult knnresult = knn.run(database, relation);
-        // Setup scaling
-        scaling.prepare(knnresult);
         writeResult(fout, ids, knnresult, scaling, "KNN-" + kstr);
         database.getHierarchy().removeSubtree(knnresult);
       }
@@ -237,8 +241,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       public void run(int k, String kstr) {
         KNNWeightOutlier<O, D> knnw = new KNNWeightOutlier<>(distf, k);
         OutlierResult knnresult = knnw.run(database, relation);
-        // Setup scaling
-        scaling.prepare(knnresult);
         writeResult(fout, ids, knnresult, scaling, "KNNW-" + kstr);
         database.getHierarchy().removeSubtree(knnresult);
       }
@@ -250,9 +252,18 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       public void run(int k, String kstr) {
         LOF<O, D> lof = new LOF<>(k, distf);
         OutlierResult lofresult = lof.run(database, relation);
-        // Setup scaling
-        scaling.prepare(lofresult);
         writeResult(fout, ids, lofresult, scaling, "LOF-" + kstr);
+        database.getHierarchy().removeSubtree(lofresult);
+      }
+    });
+    // Run Simplified-LOF
+    LOG.verbose("Running Simplified-LOF");
+    runForEachK(new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
+        SimplifiedLOF<O, D> lof = new SimplifiedLOF<>(k, distf);
+        OutlierResult lofresult = lof.run(database, relation);
+        writeResult(fout, ids, lofresult, scaling, "Simplified-LOF-" + kstr);
         database.getHierarchy().removeSubtree(lofresult);
       }
     });
@@ -263,7 +274,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       public void run(int k, String kstr) {
         LoOP<O, D> loop = new LoOP<>(k, k, distf, distf, 1.0);
         OutlierResult loopresult = loop.run(database, relation);
-        scaling.prepare(loopresult);
         writeResult(fout, ids, loopresult, scaling, "LOOP-" + kstr);
         database.getHierarchy().removeSubtree(loopresult);
       }
@@ -273,10 +283,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LDOF<O, D> ldof = new LDOF<>(distf, k);
+        LDOF<O, D> ldof = new LDOF<>(distf, k + 1);
         OutlierResult ldofresult = ldof.run(database, relation);
-        // Setup scaling
-        scaling.prepare(ldofresult);
         writeResult(fout, ids, ldofresult, scaling, "LDOF-" + kstr);
         database.getHierarchy().removeSubtree(ldofresult);
       }
@@ -288,8 +296,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       public void run(int k, String kstr) {
         LDF<O, D> ldf = new LDF<>(k, distf, GaussianKernelDensityFunction.KERNEL, 2, .1);
         OutlierResult ldfresult = ldf.run(database, relation);
-        // Setup scaling
-        scaling.prepare(ldfresult);
         writeResult(fout, ids, ldfresult, scaling, "LDF-" + kstr);
         database.getHierarchy().removeSubtree(ldfresult);
       }
@@ -306,8 +312,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
           public void run(int k, String kstr) {
             ABOD<DoubleVector> abod = new ABOD<>(k, poly, df);
             OutlierResult abodresult = abod.run(database);
-            // Setup scaling
-            scaling.prepare(abodresult);
             writeResult(fout, ids, abodresult, scaling, "ABOD-" + kstr);
             database.getHierarchy().removeSubtree(abodresult);
           }
@@ -325,14 +329,20 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
    * @param out Output stream
    * @param ids DBIDs
    * @param result Outlier result
-   * @param scaling Scaling function.
+   * @param scaling Scaling function
    * @param label Identification label
    */
   void writeResult(PrintStream out, DBIDs ids, OutlierResult result, ScalingFunction scaling, String label) {
+    if (scaling instanceof OutlierScalingFunction) {
+      ((OutlierScalingFunction) scaling).prepare(result);
+    }
     out.append(label);
     Relation<Double> scores = result.getScores();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final double value = scaling.getScaled(scores.get(iter));
+      double value = scores.get(iter);
+      if (scaling != null) {
+        value = scaling.getScaled(value);
+      }
       out.append(' ').append(FormatUtil.NF.format(value));
     }
     out.append(FormatUtil.NEWLINE);
@@ -424,7 +434,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     /**
      * Scaling function.
      */
-    OutlierScalingFunction scaling;
+    ScalingFunction scaling = null;
 
     /**
      * Output destination file
@@ -463,7 +473,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       // Output
       outfile = super.getParameterOutputFile(config, "File to output the resulting score vectors to.");
 
-      ObjectParameter<OutlierScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScalingFunction.class);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class);
+      scalingP.setOptional(true);
       if (config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

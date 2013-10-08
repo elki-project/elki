@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -43,30 +44,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 public class OutlierSqrtScaling implements OutlierScalingFunction {
   /**
-   * Parameter to specify the fixed minimum to use.
-   * <p>
-   * Key: {@code -sqrtscale.min}
-   * </p>
+   * Minimum and maximum values.
    */
-  public static final OptionID MIN_ID = new OptionID("sqrtscale.min", "Fixed minimum to use in sqrt scaling.");
+  protected double min, max;
 
   /**
-   * Parameter to specify the fixed maximum to use.
-   * <p>
-   * Key: {@code -sqrtscale.max}
-   * </p>
+   * Predefined minimum and maximum values.
    */
-  public static final OptionID MAX_ID = new OptionID("sqrtscale.max", "Fixed maximum to use in sqrt scaling.");
-
-  /**
-   * Field storing the minimum value
-   */
-  protected Double min = null;
-
-  /**
-   * Field storing the Maximum value
-   */
-  protected Double max = null;
+  protected Double pmin = null, pmax = null;
 
   /**
    * Scaling factor
@@ -76,19 +61,19 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
   /**
    * Constructor.
    * 
-   * @param min
-   * @param max
+   * @param pmin Predefined minimum
+   * @param pmax Predefined maximum
    */
-  public OutlierSqrtScaling(Double min, Double max) {
+  public OutlierSqrtScaling(Double pmin, Double pmax) {
     super();
-    this.min = min;
-    this.max = max;
+    this.pmin = pmin;
+    this.pmax = pmax;
   }
 
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    if(value <= min) {
+    if (value <= min) {
       return 0;
     }
     return Math.min(1, (Math.sqrt(value - min) / factor));
@@ -96,21 +81,34 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
 
   @Override
   public void prepare(OutlierResult or) {
-    if(min == null || max == null) {
+    if (pmin == null || pmax == null) {
       DoubleMinMax mm = new DoubleMinMax();
       Relation<Double> scores = or.getScores();
-      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         double val = scores.get(id);
-        if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+        if (!Double.isInfinite(val)) {
           mm.put(val);
         }
       }
-      if(min == null) {
-        min = mm.getMin();
+      min = (pmin == null) ? mm.getMin() : pmin;
+      max = (pmax == null) ? mm.getMax() : pmax;
+    }
+    factor = Math.sqrt(max - min);
+  }
+
+  @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    if (pmin == null || pmax == null) {
+      DoubleMinMax mm = new DoubleMinMax();
+      final int size = adapter.size(array);
+      for (int i = 0; i < size; i++) {
+        double val = adapter.getDouble(array, i);
+        if (!Double.isInfinite(val)) {
+          mm.put(val);
+        }
       }
-      if(max == null) {
-        max = mm.getMax();
-      }
+      min = (pmin == null) ? mm.getMin() : pmin;
+      max = (pmax == null) ? mm.getMax() : pmax;
     }
     factor = Math.sqrt(max - min);
   }
@@ -133,8 +131,30 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the fixed minimum to use.
+     * <p>
+     * Key: {@code -sqrtscale.min}
+     * </p>
+     */
+    public static final OptionID MIN_ID = new OptionID("sqrtscale.min", "Fixed minimum to use in sqrt scaling.");
+
+    /**
+     * Parameter to specify the fixed maximum to use.
+     * <p>
+     * Key: {@code -sqrtscale.max}
+     * </p>
+     */
+    public static final OptionID MAX_ID = new OptionID("sqrtscale.max", "Fixed maximum to use in sqrt scaling.");
+
+    /**
+     * Predefined minimum value.
+     */
     protected double min;
 
+    /**
+     * Predefined maximum value.
+     */
     protected double max;
 
     @Override
@@ -142,12 +162,12 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
       super.makeOptions(config);
       DoubleParameter minP = new DoubleParameter(MIN_ID);
       minP.setOptional(true);
-      if(config.grab(minP)) {
+      if (config.grab(minP)) {
         min = minP.getValue();
       }
       DoubleParameter maxP = new DoubleParameter(MAX_ID);
       maxP.setOptional(true);
-      if(config.grab(maxP)) {
+      if (config.grab(maxP)) {
         max = maxP.getValue();
       }
     }

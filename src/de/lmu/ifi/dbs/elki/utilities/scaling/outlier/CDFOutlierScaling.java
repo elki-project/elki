@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEs
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -126,6 +127,14 @@ public class CDFOutlierScaling implements OutlierScalingFunction {
     Arrays.sort(s);
     dist = BestFitEstimator.STATIC.estimate(s, ArrayLikeUtil.DOUBLEARRAYADAPTER);
     inverted = (or.getOutlierMeta() instanceof InvertedOutlierScoreMeta);
+  }
+
+  @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    double[] s = ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter);
+    Arrays.sort(s);
+    dist = BestFitEstimator.STATIC.estimate(s, ArrayLikeUtil.DOUBLEARRAYADAPTER);
+    inverted = false; // Not supported
   }
 
   /**

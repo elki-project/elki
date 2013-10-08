@@ -26,12 +26,14 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -46,7 +48,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(SigmoidOutlierScalingFunction.class);
-  
+
   /**
    * Sigmoid parameter
    */
@@ -62,30 +64,31 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
     Relation<Double> scores = or.getScores();
-    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+    for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
       double val = scores.get(id);
       mv.put(val);
     }
     double a = 1.0;
-    double b = - mv.getMean();
+    double b = -mv.getMean();
     int iter = 0;
 
     ArrayDBIDs ids = DBIDUtil.ensureArray(or.getScores().getDBIDs());
+    DBIDArrayIter it = ids.iter();
     BitSet t = new BitSet(ids.size());
     boolean changing = true;
-    while(changing) {
+    while (changing) {
       changing = false;
       // E-Step
-      for(int i = 0; i < ids.size(); i++) {
-        double val = or.getScores().get(ids.get(i));
+      it.seek(0);
+      for (int i = 0; i < ids.size(); i++, it.advance()) {
+        double val = or.getScores().get(it);
         double targ = a * val + b;
-        if(targ > 0) {
-          if (!t.get(i)) { 
+        if (targ > 0) {
+          if (!t.get(i)) {
             t.set(i);
             changing = true;
           }
-        }
-        else {
+        } else {
           if (t.get(i)) {
             t.clear(i);
             changing = true;
@@ -95,7 +98,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
       if (!changing) {
         break;
       }
-      //logger.debugFine("Number of outliers in sigmoid: " + t.cardinality());
+      // logger.debugFine("Number of outliers in sigmoid: " + t.cardinality());
       // M-Step
       // Implementation based on:<br />
       // H.-T. Lin, C.-J. Lin, R. C. Weng:<br />
@@ -107,14 +110,74 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
       }
 
       iter++;
-      if(iter > 100) {
+      if (iter > 100) {
         LOG.warning("Max iterations met in sigmoid fitting.");
         break;
       }
     }
     Afinal = a;
     Bfinal = b;
-    LOG.debugFine("A = "+Afinal+" B = "+Bfinal);
+    LOG.debugFine("A = " + Afinal + " B = " + Bfinal);
+  }
+
+  @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    // Initial parameters - are these defaults sounds?
+    MeanVariance mv = new MeanVariance();
+    final int size = adapter.size(array);
+    for (int i = 0; i < size; i++) {
+      double val = adapter.getDouble(array, i);
+      if (!Double.isInfinite(val)) {
+        mv.put(val);
+      }
+    }
+    double a = 1.0;
+    double b = -mv.getMean();
+    int iter = 0;
+
+    BitSet t = new BitSet(size);
+    boolean changing = true;
+    while (changing) {
+      changing = false;
+      // E-Step
+      for (int i = 0; i < size; i++) {
+        double val = adapter.getDouble(array, i);
+        double targ = a * val + b;
+        if (targ > 0) {
+          if (!t.get(i)) {
+            t.set(i);
+            changing = true;
+          }
+        } else {
+          if (t.get(i)) {
+            t.clear(i);
+            changing = true;
+          }
+        }
+      }
+      if (!changing) {
+        break;
+      }
+      // logger.debugFine("Number of outliers in sigmoid: " + t.cardinality());
+      // M-Step
+      // Implementation based on:<br />
+      // H.-T. Lin, C.-J. Lin, R. C. Weng:<br />
+      // A Note on Platt’s Probabilistic Outputs for Support Vector Machines
+      {
+        double[] newab = MStepLevenbergMarquardt(a, b, t, array, adapter);
+        a = newab[0];
+        b = newab[1];
+      }
+
+      iter++;
+      if (iter > 100) {
+        LOG.warning("Max iterations met in sigmoid fitting.");
+        break;
+      }
+    }
+    Afinal = a;
+    Bfinal = b;
+    LOG.debugFine("A = " + Afinal + " B = " + Bfinal);
   }
 
   /**
@@ -136,6 +199,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
   private final double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, BitSet t, Relation<Double> scores) {
     final int prior1 = t.cardinality();
     final int prior0 = ids.size() - prior1;
+    DBIDArrayIter iter = ids.iter();
 
     final int maxiter = 10;
     final double minstep = 1e-8;
@@ -147,38 +211,38 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
     // t[i] := t.get(i) ? hiTarget : loTarget.
 
     // Reset, or continue with previous values?
-    //a = 0.0;
-    //b = Math.log((prior0 + 1.0) / (prior1 + 1.0));
+    // a = 0.0;
+    // b = Math.log((prior0 + 1.0) / (prior1 + 1.0));
     double fval = 0.0;
-    for(int i = 0; i < ids.size(); i++) {
-      final double val = scores.get(ids.get(i));
+    iter.seek(0);
+    for (int i = 0; i < ids.size(); i++, iter.advance()) {
+      final double val = scores.get(iter);
       final double fApB = val * a + b;
       final double ti = t.get(i) ? hiTarget : loTarget;
-      if(fApB >= 0) {
+      if (fApB >= 0) {
         fval += ti * fApB + Math.log(1 + Math.exp(-fApB));
-      }
-      else {
+      } else {
         fval += (ti - 1) * fApB + Math.log(1 + Math.exp(fApB));
       }
     }
-    for(int it = 0; it < maxiter; it++) {
-      //logger.debugFinest("Iter: " + it + "a: " + a + " b: " + b);
+    for (int it = 0; it < maxiter; it++) {
+      // logger.debugFinest("Iter: " + it + "a: " + a + " b: " + b);
       // Update Gradient and Hessian (use H’ = H + sigma I)
       double h11 = sigma;
       double h22 = sigma;
       double h21 = 0.0;
       double g1 = 0.0;
       double g2 = 0.0;
-      for(int i = 0; i < ids.size(); i++) {
-        final double val = scores.get(ids.get(i));
+      iter.seek(0);
+      for (int i = 0; i < ids.size(); i++, iter.advance()) {
+        final double val = scores.get(iter);
         final double fApB = val * a + b;
         final double p;
         final double q;
-        if(fApB >= 0) {
+        if (fApB >= 0) {
           p = Math.exp(-fApB) / (1.0 + Math.exp(-fApB));
           q = 1.0 / (1.0 + Math.exp(-fApB));
-        }
-        else {
+        } else {
           p = 1.0 / (1.0 + Math.exp(fApB));
           q = Math.exp(fApB) / (1.0 + Math.exp(fApB));
         }
@@ -191,7 +255,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
         g2 += d1;
       }
       // Stop condition
-      if(Math.abs(g1) < 1e-5 && Math.abs(g2) < 1e-5) {
+      if (Math.abs(g1) < 1e-5 && Math.abs(g2) < 1e-5) {
         break;
       }
       // Compute modified Newton directions
@@ -200,36 +264,152 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
       final double dB = -(-h21 * g1 + h11 * g2) / det;
       final double gd = g1 * dA + g2 * dB;
       double stepsize = 1.0;
-      while(stepsize >= minstep) { // Line search
+      while (stepsize >= minstep) { // Line search
         final double newA = a + stepsize * dA;
         final double newB = b + stepsize * dB;
         double newf = 0.0;
-        for(int i = 0; i < ids.size(); i++) {
-          final double val = scores.get(ids.get(i));
+        iter.seek(0);
+        for (int i = 0; i < ids.size(); i++, iter.advance()) {
+          final double val = scores.get(iter);
           final double fApB = val * newA + newB;
           final double ti = t.get(i) ? hiTarget : loTarget;
-          if(fApB >= 0) {
+          if (fApB >= 0) {
             newf += ti * fApB + Math.log(1 + Math.exp(-fApB));
-          }
-          else {
+          } else {
             newf += (ti - 1) * fApB + Math.log(1 + Math.exp(fApB));
           }
         }
-        if(newf < fval + 0.0001 * stepsize * gd) {
+        if (newf < fval + 0.0001 * stepsize * gd) {
           a = newA;
           b = newB;
           fval = newf;
           break; // Sufficient decrease satisfied
-        }
-        else {
+        } else {
           stepsize /= 2.0;
         }
-        if(stepsize < minstep) {
+        if (stepsize < minstep) {
           LOG.debug("Minstep hit.");
           break;
         }
       }
-      if(it + 1 >= maxiter) {
+      if (it + 1 >= maxiter) {
+        LOG.debug("Maximum iterations hit.");
+        break;
+      }
+    }
+    return new double[] { a, b };
+  }
+
+  /**
+   * M-Step using a modified Levenberg-Marquardt method.
+   * 
+   * <p>
+   * Implementation based on:<br />
+   * H.-T. Lin, C.-J. Lin, R. C. Weng:<br />
+   * A Note on Platt’s Probabilistic Outputs for Support Vector Machines
+   * </p>
+   * 
+   * @param a A parameter
+   * @param b B parameter
+   * @param t Bitset containing the assignment
+   * @param array Score array
+   * @param adapter Array adapter
+   * @return new values for A and B.
+   */
+  private final <A> double[] MStepLevenbergMarquardt(double a, double b, BitSet t, A array, NumberArrayAdapter<?, A> adapter) {
+    final int size = adapter.size(array);
+    final int prior1 = t.cardinality();
+    final int prior0 = size - prior1;
+
+    final int maxiter = 10;
+    final double minstep = 1e-8;
+    final double sigma = 1e-12;
+    // target value for "set" objects
+    final double loTarget = (prior1 + 1.0) / (prior1 + 2.0);
+    // target value for "unset" objects
+    final double hiTarget = 1.0 / (prior0 + 2.0);
+    // t[i] := t.get(i) ? hiTarget : loTarget.
+
+    // Reset, or continue with previous values?
+    // a = 0.0;
+    // b = Math.log((prior0 + 1.0) / (prior1 + 1.0));
+    double fval = 0.0;
+    for (int i = 0; i < size; i++) {
+      final double val = adapter.getDouble(array, i);
+      final double fApB = val * a + b;
+      final double ti = t.get(i) ? hiTarget : loTarget;
+      if (fApB >= 0) {
+        fval += ti * fApB + Math.log(1 + Math.exp(-fApB));
+      } else {
+        fval += (ti - 1) * fApB + Math.log(1 + Math.exp(fApB));
+      }
+    }
+    for (int it = 0; it < maxiter; it++) {
+      // logger.debugFinest("Iter: " + it + "a: " + a + " b: " + b);
+      // Update Gradient and Hessian (use H’ = H + sigma I)
+      double h11 = sigma;
+      double h22 = sigma;
+      double h21 = 0.0;
+      double g1 = 0.0;
+      double g2 = 0.0;
+      for (int i = 0; i < size; i++) {
+        final double val = adapter.getDouble(array, i);
+        final double fApB = val * a + b;
+        final double p;
+        final double q;
+        if (fApB >= 0) {
+          p = Math.exp(-fApB) / (1.0 + Math.exp(-fApB));
+          q = 1.0 / (1.0 + Math.exp(-fApB));
+        } else {
+          p = 1.0 / (1.0 + Math.exp(fApB));
+          q = Math.exp(fApB) / (1.0 + Math.exp(fApB));
+        }
+        final double d2 = p * q;
+        h11 += val * val * d2;
+        h22 += d2;
+        h21 += val * d2;
+        final double d1 = (t.get(i) ? hiTarget : loTarget) - p;
+        g1 += val * d1;
+        g2 += d1;
+      }
+      // Stop condition
+      if (Math.abs(g1) < 1e-5 && Math.abs(g2) < 1e-5) {
+        break;
+      }
+      // Compute modified Newton directions
+      final double det = h11 * h22 - h21 * h21;
+      final double dA = -(h22 * g1 - h21 * g2) / det;
+      final double dB = -(-h21 * g1 + h11 * g2) / det;
+      final double gd = g1 * dA + g2 * dB;
+      double stepsize = 1.0;
+      while (stepsize >= minstep) { // Line search
+        final double newA = a + stepsize * dA;
+        final double newB = b + stepsize * dB;
+        double newf = 0.0;
+        for (int i = 0; i < size; i++) {
+          final double val = adapter.getDouble(array, i);
+          final double fApB = val * newA + newB;
+          final double ti = t.get(i) ? hiTarget : loTarget;
+          if (fApB >= 0) {
+            newf += ti * fApB + Math.log(1 + Math.exp(-fApB));
+          } else {
+            newf += (ti - 1) * fApB + Math.log(1 + Math.exp(fApB));
+          }
+        }
+        if (newf < fval + 0.0001 * stepsize * gd) {
+          a = newA;
+          b = newB;
+          fval = newf;
+          break; // Sufficient decrease satisfied
+        } else {
+          stepsize /= 2.0;
+        }
+        if (stepsize < minstep) {
+          LOG.debug("Minstep hit.");
+          break;
+        }
+      }
+      if (it + 1 >= maxiter) {
         LOG.debug("Maximum iterations hit.");
         break;
       }

@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -68,16 +69,6 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
 
   @Override
   public void prepare(OutlierResult or) {
-    scaleval = getScaleValue(or);
-  }
-
-  /**
-   * Compute the scaling value in a linear scan over the annotation.
-   * 
-   * @param or Outlier result
-   * @return Scaling value.
-   */
-  private static double getScaleValue(OutlierResult or) {
     double max = Double.MIN_VALUE;
     Relation<Double> scores = or.getScores();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
@@ -87,9 +78,22 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
         max = Math.max(max, inv);
       }
     }
-    return max;
+    scaleval = max;
   }
-  
+
+  @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    double max = Double.MIN_VALUE;
+    final int size = adapter.size(array);
+    for (int i = 0; i < size; i++) {
+      double inv = Math.abs(1.0 / adapter.getDouble(array, i));
+      if(!Double.isInfinite(inv) && !Double.isNaN(inv)) {
+        max = Math.max(max, inv);
+      }
+    }
+    scaleval = max;
+  }
+
   @Override
   public double getMin() {
     return 0.0;
