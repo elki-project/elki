@@ -122,7 +122,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
             maxdim = index + 1;
           }
           thismax = Math.max(thismax, index);
-          double attribute = Double.parseDouble(entries.get(i));
+          double attribute = parseDouble(entries.get(i));
           values.put(index, attribute);
           i++;
         } catch (NumberFormatException e) {
