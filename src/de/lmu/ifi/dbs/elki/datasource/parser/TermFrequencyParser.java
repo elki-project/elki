@@ -113,7 +113,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
         curterm = entries.get(i);
       } else {
         try {
-          double attribute = Double.parseDouble(entries.get(i));
+          double attribute = parseDouble(entries.get(i));
           int curdim = keymap.get(curterm);
           if (curdim < 0) {
             curdim = numterms;

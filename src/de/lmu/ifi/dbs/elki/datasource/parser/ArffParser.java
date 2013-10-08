@@ -230,7 +230,7 @@ public class ArffParser implements Parser {
         nextToken(tokenizer);
         if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
           if(TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[targ[dim]])) {
-            map.put(dim, Double.parseDouble(tokenizer.sval));
+            map.put(dim, AbstractParser.parseDouble(tokenizer.sval));
           }
           else {
             map.put(dim, tokenizer.sval);
@@ -327,7 +327,7 @@ public class ArffParser implements Parser {
           }
           else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
             try {
-              cur[k] = Double.parseDouble(tokenizer.sval);
+              cur[k] = AbstractParser.parseDouble(tokenizer.sval);
             }
             catch(NumberFormatException e) {
               throw new AbortException("Expected number value, got: " + tokenizer.sval);

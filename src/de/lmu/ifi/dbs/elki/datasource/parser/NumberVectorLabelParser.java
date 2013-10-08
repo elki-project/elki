@@ -283,7 +283,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
       String ent = itr.next();
       if (labelIndices == null || !labelIndices.get(i)) {
         try {
-          double attribute = Double.parseDouble(ent);
+          double attribute = parseDouble(ent);
           attributes.add(attribute);
           continue;
         } catch (NumberFormatException e) {
