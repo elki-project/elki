@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
@@ -97,16 +98,6 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   public static final OptionID VECTOR_TYPE_ID = new OptionID("parser.vector-type", "The type of vectors to create for numerical attributes.");
 
   /**
-   * Constant used for unknown dimensionality (e.g. empty files)
-   */
-  public static final int DIMENSIONALITY_UNKNOWN = -1;
-
-  /**
-   * Constant used for records of variable dimensionality (e.g. time series)
-   */
-  public static final int DIMENSIONALITY_VARIABLE = -2;
-
-  /**
    * Keeps the indices of the attributes to be treated as a string label.
    */
   protected BitSet labelIndices;
@@ -129,7 +120,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   /**
    * Dimensionality reported.
    */
-  protected int dimensionality;
+  protected int mindim, maxdim;
 
   /**
    * Metadata.
@@ -189,7 +180,8 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   public void initStream(InputStream in) {
     reader = new BufferedReader(new InputStreamReader(in));
     lineNumber = 1;
-    dimensionality = DIMENSIONALITY_UNKNOWN;
+    mindim = Integer.MAX_VALUE;
+    maxdim = 0;
     columnnames = null;
     labelcolumns = new BitSet();
     if (labelIndices != null) {
@@ -220,18 +212,19 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
         if (curvec == null) {
           continue;
         }
-        if (dimensionality == DIMENSIONALITY_UNKNOWN) {
-          dimensionality = curvec.getDimensionality();
+        final int curdim = curvec.getDimensionality();
+        if (maxdim < mindim) {
+          mindim = curdim;
+          maxdim = curdim;
           buildMeta();
           nextevent = Event.NEXT_OBJECT;
           return Event.META_CHANGED;
-        } else if (dimensionality > 0) {
-          if (dimensionality != curvec.getDimensionality()) {
-            dimensionality = DIMENSIONALITY_VARIABLE;
-            buildMeta();
-            nextevent = Event.NEXT_OBJECT;
-            return Event.META_CHANGED;
-          }
+        } else if (mindim < curdim || maxdim > curdim) {
+          mindim = Math.min(mindim, curdim);
+          maxdim = Math.max(maxdim, curdim);
+          buildMeta();
+          nextevent = Event.NEXT_OBJECT;
+          return Event.META_CHANGED;
         } else if (curlbl != null && meta != null && meta.size() == 1) {
           buildMeta();
           nextevent = Event.NEXT_OBJECT;
@@ -253,11 +246,11 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   protected void buildMeta() {
     if (labelcolumns.cardinality() > 0 || (labelIndices != null && labelIndices.cardinality() > 0)) {
       meta = new BundleMeta(2);
-      meta.add(getTypeInformation(dimensionality));
+      meta.add(getTypeInformation(mindim, maxdim));
       meta.add(TypeUtil.LABELLIST);
     } else {
       meta = new BundleMeta(1);
-      meta.add(getTypeInformation(dimensionality));
+      meta.add(getTypeInformation(mindim, maxdim));
     }
   }
 
@@ -336,15 +329,16 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   /**
    * Get a prototype object for the given dimensionality.
    * 
-   * @param dimensionality Dimensionality
+   * @param mindim Minimum dimensionality
+   * @param maxdim Maximum dimensionality
    * @return Prototype object
    */
-  SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
-    if (dimensionality > 0) {
+  SimpleTypeInformation<V> getTypeInformation(int mindim, int maxdim) {
+    if (mindim == maxdim) {
       String[] colnames = null;
       if (columnnames != null) {
-        if (columnnames.size() - labelcolumns.cardinality() == dimensionality) {
-          colnames = new String[dimensionality];
+        if (columnnames.size() - labelcolumns.cardinality() == mindim) {
+          colnames = new String[mindim];
           for (int i = 0, j = 0; i < columnnames.size(); i++) {
             if (!labelcolumns.get(i)) {
               colnames[j] = columnnames.get(i);
@@ -353,13 +347,13 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
           }
         }
       }
-      return new VectorFieldTypeInformation<>(factory, dimensionality, colnames);
+      return new VectorFieldTypeInformation<>(factory, mindim, colnames);
+    } else if (mindim < maxdim) {
+      // Variable dimensionality - return non-vector field type
+      return new VectorTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer(), mindim, maxdim);
+    } else {
+      throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
     }
-    // Variable dimensionality - return non-vector field type
-    if (dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer());
-    }
-    throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
 
   @Override
