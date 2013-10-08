@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -63,9 +64,9 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
   private static final Logging LOG = Logging.getLogger(TermFrequencyParser.class);
 
   /**
-   * Maximum dimension used.
+   * Number of different terms observed.
    */
-  int maxdim;
+  int numterms;
 
   /**
    * Map.
@@ -94,7 +95,6 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
   public TermFrequencyParser(boolean normalize, Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V, ?> factory) {
     super(colSep, quoteChar, comment, labelIndices, factory);
     this.normalize = normalize;
-    this.maxdim = 0;
     this.keymap = new TObjectIntHashMap<>(1001, .5f, -1);
     this.sparsefactory = factory;
   }
@@ -116,9 +116,9 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
           double attribute = Double.parseDouble(entries.get(i));
           int curdim = keymap.get(curterm);
           if (curdim < 0) {
-            curdim = maxdim;
+            curdim = numterms;
             keymap.put(curterm, curdim);
-            ++maxdim;
+            ++numterms;
           }
           values.put(curdim, attribute);
           len += attribute;
@@ -149,17 +149,16 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
       }
     }
 
-    curvec = sparsefactory.newNumberVector(values, maxdim);
+    curvec = sparsefactory.newNumberVector(values, numterms);
     curlbl = labels;
   }
 
   @Override
-  protected SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
-    if (dimensionality > 0) {
-      return new VectorFieldTypeInformation<>(factory, dimensionality);
-    }
-    if (dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer());
+  protected SimpleTypeInformation<V> getTypeInformation(int mindim, int maxdim) {
+    if (mindim == maxdim) {
+      return new VectorFieldTypeInformation<>(factory, mindim);
+    } else if (mindim < maxdim) {
+      return new VectorTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer(), mindim, maxdim);
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
