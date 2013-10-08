@@ -47,44 +47,39 @@ public class WeightedCanberraDistanceFunction extends AbstractSpatialDoubleDista
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
-    final int dim = weights.length;
-    double sum = 0.0;
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+    final int dim = dimensionality(v1, v2, weights.length);
+    double agg = 0.;
     for (int d = 0; d < dim; d++) {
-      double v1 = o1.doubleValue(d);
-      double v2 = o2.doubleValue(d);
-      final double div = Math.abs(v1) + Math.abs(v2);
-      if (div > 0) {
-        sum += weights[d] * Math.abs(v1 - v2) / div;
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double div = Math.abs(xd) + Math.abs(yd);
+      if (div > 0.) {
+        agg += weights[d] * Math.abs(xd - yd) / div;
       }
     }
-    return sum;
+    return agg;
   }
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim = weights.length;
-    double sum = 0.0;
+    final int dim = dimensionality(mbr1, mbr2, weights.length);
+    double agg = 0.0;
     for (int d = 0; d < dim; d++) {
-      final double m1, m2;
+      final double diff;
       if (mbr1.getMax(d) < mbr2.getMin(d)) {
-        m1 = mbr2.getMin(d);
-        m2 = mbr1.getMax(d);
+        diff = mbr2.getMin(d) - mbr1.getMax(d);
       } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
-        m1 = mbr1.getMin(d);
-        m2 = mbr2.getMax(d);
+        diff = mbr1.getMin(d) - mbr2.getMax(d);
       } else { // The mbrs intersect!
         continue;
       }
-      final double manhattanI = m1 - m2;
       final double a1 = Math.max(-mbr1.getMin(d), mbr1.getMax(d));
       final double a2 = Math.max(-mbr2.getMin(d), mbr2.getMax(d));
       final double div = a1 + a2;
-      if (div > 0) {
-        sum += weights[d] * manhattanI / div;
-      }
+      // Cannot be 0, because then diff = 0, and we continued before.
+      agg += weights[d] * diff / div;
     }
-    return sum;
+    return agg;
   }
 
   @Override

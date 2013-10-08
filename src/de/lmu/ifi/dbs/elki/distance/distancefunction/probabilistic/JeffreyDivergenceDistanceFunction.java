@@ -24,7 +24,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
-public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class JeffreyDivergenceDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -59,29 +60,46 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if(dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
-    }
-    double dist = 0;
-    for(int i = 0; i < dim1; i++) {
-      final double xi = v1.doubleValue(i);
-      final double yi = v2.doubleValue(i);
-      if(xi == yi) {
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      if (xd == yd) {
         continue;
       }
-      final double mi = .5 * (xi + yi);
-      if(!(mi > 0. || mi < 0.)) {
+      final double md = .5 * (xd + yd);
+      if (!(md > 0. || md < 0.)) {
         continue;
       }
-      if(xi > 0.) {
-        dist += xi * Math.log(xi / mi);
+      if (xd > 0.) {
+        agg += xd * Math.log(xd / md);
       }
-      if(yi > 0.) {
-        dist += yi * Math.log(yi / mi);
+      if (yd > 0.) {
+        agg += yd * Math.log(yd / md);
       }
     }
-    return dist;
+    return agg;
+  }
+
+  @Override
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim = dimensionality(mbr1, mbr2);
+    double agg = 0;
+    for (int d = 0; d < dim; d++) {
+      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
+      final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
+      final double md = .5 * (max1 + max2);
+      if (!(md > 0. || md < 0.)) {
+        continue;
+      }
+      if (min1 > 0.) {
+        agg += min1 * Math.log(min1 / md);
+      }
+      if (min2 > 0.) {
+        agg += min2 * Math.log(min2 / md);
+      }
+    }
+    return agg;
   }
 
   @Override
@@ -91,13 +109,13 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(obj == this) {
+    if (obj == this) {
       return true;
     }
-    if(this.getClass().equals(obj.getClass())) {
+    if (this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);

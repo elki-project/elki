@@ -48,9 +48,9 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   public static final OptionID P_ID = new OptionID("lpnorm.p", "the degree of the L-P-Norm (positive number)");
 
   /**
-   * Keeps the currently set p.
+   * Keeps the currently set p and its inverse
    */
-  private double p;
+  protected double p, invp;
 
   /**
    * Constructor, internal version.
@@ -60,50 +60,30 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   public LPNormDistanceFunction(double p) {
     super();
     this.p = p;
+    this.invp = 1. / p;
   }
 
-  /**
-   * Returns the distance between the specified FeatureVectors as a LP-Norm for
-   * the currently set p.
-   * 
-   * @param v1 first FeatureVector
-   * @param v2 second FeatureVector
-   * @return the distance between the specified FeatureVectors as a LP-Norm for
-   *         the currently set p
-   */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if (dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double delta = (xd >= yd) ? xd - yd : yd - xd;
+      agg += Math.pow(delta, p);
     }
-
-    double sqrDist = 0;
-    for (int i = 0; i < dim1; i++) {
-      final double delta = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
-      sqrDist += Math.pow(delta, p);
-    }
-    return Math.pow(sqrDist, 1.0 / p);
+    return Math.pow(agg, invp);
   }
 
   @Override
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
-    double sqrDist = 0;
-    for (int i = 0; i < dim; i++) {
-      final double delta = v.doubleValue(i);
-      sqrDist += Math.pow(delta, p);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v.doubleValue(d);
+      agg += Math.pow(xd >= 0. ? xd : -xd, p);
     }
-    return Math.pow(sqrDist, 1.0 / p);
-  }
-
-  /**
-   * Get the functions p parameter.
-   * 
-   * @return p
-   */
-  public double getP() {
-    return p;
+    return Math.pow(agg, invp);
   }
 
   @Override
@@ -115,27 +95,25 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
       }
     }
     // TODO: optimize for more simpler cases: obj vs. rect?
-    final int dim1 = mbr1.getDimensionality();
-    if (dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
-    }
+    final int dim = dimensionality(mbr1, mbr2);
 
-    double sumDist = 0;
-    for (int d = 0; d < dim1; d++) {
-      final double m1, m2;
-      if (mbr1.getMax(d) < mbr2.getMin(d)) {
-        m1 = mbr2.getMin(d);
-        m2 = mbr1.getMax(d);
-      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
-        m1 = mbr1.getMin(d);
-        m2 = mbr2.getMax(d);
-      } else { // The mbrs intersect!
-        continue;
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double diff;
+      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
+      if (d1 > 0.) {
+        diff = d1;
+      } else {
+        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
+        if (d2 > 0.) {
+          diff = d2;
+        } else { // The mbrs intersect!
+          continue;
+        }
       }
-      final double manhattanI = m1 - m2;
-      sumDist += Math.pow(manhattanI, p);
+      agg += Math.pow(diff, p);
     }
-    return Math.pow(sumDist, 1.0 / p);
+    return Math.pow(agg, invp);
   }
 
   @Override
@@ -145,7 +123,16 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
 
   @Override
   public String toString() {
-    return "L_" + p + " Norm";
+    return "L_" + p + "Norm";
+  }
+
+  /**
+   * Get the functions p parameter.
+   * 
+   * @return p
+   */
+  public double getP() {
+    return p;
   }
 
   @Override
@@ -170,13 +157,13 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     /**
      * The value of p.
      */
-    protected double p = 0.0;
+    protected double p;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter paramP = new DoubleParameter(P_ID);
-      paramP.addConstraint(new GreaterConstraint(0));
+      paramP.addConstraint(new GreaterConstraint(0.));
       if (config.grab(paramP)) {
         p = paramP.getValue();
       }

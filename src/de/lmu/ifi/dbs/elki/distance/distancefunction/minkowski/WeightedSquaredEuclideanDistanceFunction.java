@@ -58,16 +58,13 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractVectorDoub
    */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if(dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double delta = (v1.doubleValue(d) - v2.doubleValue(d)) * weights[d - 1];
+      agg += delta * delta;
     }
-    double sqrDist = 0;
-    for(int i = 0; i < dim1; i++) {
-      final double delta = v1.doubleValue(i) - v2.doubleValue(i);
-      sqrDist += delta * delta * weights[i - 1];
-    }
-    return sqrDist;
+    return agg;
   }
 
   @Override
@@ -77,16 +74,16 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractVectorDoub
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
+    if (this == obj) {
       return true;
     }
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(!(obj instanceof WeightedSquaredEuclideanDistanceFunction)) {
-      if(obj.getClass().equals(SquaredEuclideanDistanceFunction.class)) {
-        for(double d : weights) {
-          if(d != 1.0) {
+    if (!(obj instanceof WeightedSquaredEuclideanDistanceFunction)) {
+      if (obj.getClass().equals(SquaredEuclideanDistanceFunction.class)) {
+        for (double d : weights) {
+          if (d != 1.0) {
             return false;
           }
         }

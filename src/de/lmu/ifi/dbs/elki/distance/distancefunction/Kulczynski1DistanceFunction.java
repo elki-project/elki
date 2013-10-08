@@ -58,13 +58,10 @@ public class Kulczynski1DistanceFunction extends AbstractSpatialDoubleDistanceFu
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if (dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
-    }
+    final int dim = dimensionality(v1, v2);
     double sumdiff = 0., summin = 0.;
-    for (int d = 0; d < dim1; d++) {
-      double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       sumdiff += Math.abs(xd - yd);
       summin += Math.min(xd, yd);
     }
@@ -73,19 +70,13 @@ public class Kulczynski1DistanceFunction extends AbstractSpatialDoubleDistanceFu
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if (mbr1 instanceof NumberVector && mbr2 instanceof NumberVector) {
-      return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
-    }
-    final int dim1 = mbr1.getDimensionality();
-    if (dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n" + mbr1.getDimensionality() + "!=" + mbr2.getDimensionality());
-    }
+    final int dim = dimensionality(mbr1, mbr2);
     double sumdiff = 0., summin = 0.;
-    for (int d = 0; d < dim1; d++) {
-      final double min1 = mbr1.getMin(d), maxy = mbr1.getMax(d);
+    for (int d = 0; d < dim; d++) {
+      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
-      if (maxy < min2) {
-        sumdiff += min2 - maxy;
+      if (max1 < min2) {
+        sumdiff += min2 - max1;
       } else if (min1 > max2) {
         sumdiff += min1 - max2;
       } else {

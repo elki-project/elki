@@ -53,70 +53,63 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = weights.length;
-    if(dim != v1.getDimensionality()) {
-      throw new IllegalArgumentException("Dimensionality of FeatureVector doesn't match weights!");
+    final int dim = dimensionality(v1, v2, weights.length);
+    double agg = 0;
+    for (int d = 0; d < dim; d++) {
+      final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d)) * weights[d];
+      agg += Math.pow(delta, p);
     }
-    if(dim != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Dimensionality of FeatureVector doesn't match weights!");
-    }
-
-    final double p = getP();
-    double sqrDist = 0;
-    for(int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
-      sqrDist += Math.pow(delta, p) * weights[d];
-    }
-    return Math.pow(sqrDist, 1.0 / p);
+    return Math.pow(agg, invp);
   }
-  
+
+  @Override
+  public double doubleNorm(NumberVector<?> v) {
+    final int dim = v.getDimensionality();
+    double agg = 0;
+    for (int d = 0; d < dim; d++) {
+      final double delta = Math.abs(v.doubleValue(d)) * weights[d];
+      agg += Math.pow(delta, p);
+    }
+    return Math.pow(agg, invp);
+  }
+
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Optimization for the simplest case
-    if(mbr1 instanceof NumberVector) {
-      if(mbr2 instanceof NumberVector) {
+    if (mbr1 instanceof NumberVector) {
+      if (mbr2 instanceof NumberVector) {
         return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       }
     }
     // TODO: optimize for more simpler cases: obj vs. rect?
-    final int dim1 = mbr1.getDimensionality();
-    if(dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
-    }
-
-    final double p = getP();
-    double sumDist = 0;
-    for(int d = 0; d < dim1; d++) {
-      final double m1, m2;
-      if(mbr1.getMax(d) < mbr2.getMin(d)) {
-        m1 = mbr2.getMin(d);
-        m2 = mbr1.getMax(d);
-      }
-      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
-        m1 = mbr1.getMin(d);
-        m2 = mbr2.getMax(d);
-      }
-      else { // The mbrs intersect!
+    final int dim = dimensionality(mbr1, mbr2);
+    double agg = 0;
+    for (int d = 0; d < dim; d++) {
+      final double diff;
+      if (mbr1.getMax(d) < mbr2.getMin(d)) {
+        diff = mbr2.getMin(d) - mbr1.getMax(d);
+      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
+        diff = mbr1.getMin(d) - mbr2.getMax(d);
+      } else { // The mbrs intersect!
         continue;
       }
-      final double manhattanI = m1 - m2;
-      sumDist += Math.pow(manhattanI, p) * weights[d];
+      agg += Math.pow(diff * weights[d], p);
     }
-    return Math.pow(sumDist, 1.0 / p);
+    return Math.pow(agg, invp);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
+    if (this == obj) {
       return true;
     }
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(!(obj instanceof WeightedLPNormDistanceFunction)) {
-      if(obj instanceof LPNormDistanceFunction && super.equals(obj)) {
-        for(double d : weights) {
-          if(d != 1.0) {
+    if (!(obj instanceof WeightedLPNormDistanceFunction)) {
+      if (obj instanceof LPNormDistanceFunction && super.equals(obj)) {
+        for (double d : weights) {
+          if (d != 1.0) {
             return false;
           }
         }

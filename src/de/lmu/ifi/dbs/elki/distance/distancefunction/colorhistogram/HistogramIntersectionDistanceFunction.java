@@ -61,44 +61,32 @@ public class HistogramIntersectionDistanceFunction extends AbstractSpatialDouble
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if (dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
-    }
-    double dist = 0;
-    double norm1 = 0;
-    double norm2 = 0;
-    for (int i = 0; i < dim1; i++) {
+    final int dim = dimensionality(v1, v2);
+    double agg = 0., norm1 = 0., norm2 = 0.;
+    for (int i = 0; i < dim; i++) {
       final double val1 = v1.doubleValue(i);
       final double val2 = v2.doubleValue(i);
-      dist += Math.min(val1, val2);
+      agg += Math.min(val1, val2);
       norm1 += val1;
       norm2 += val2;
     }
-    dist = 1 - dist / Math.min(norm1, norm2);
-    return dist;
+    return 1. - agg / Math.min(norm1, norm2);
   }
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim1 = mbr1.getDimensionality();
-    if (dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n" + mbr1.getDimensionality() + "!=" + mbr2.getDimensionality());
-    }
-    double dist = 0;
-    double norm1 = 0;
-    double norm2 = 0;
-    for (int i = 0; i < dim1; i++) {
+    final int dim = dimensionality(mbr1, mbr2);
+    double agg = 0., norm1 = 0, norm2 = 0.;
+    for (int i = 0; i < dim; i++) {
       final double min1 = mbr1.getMin(i);
       final double max1 = mbr1.getMax(i);
       final double min2 = mbr2.getMin(i);
       final double max2 = mbr2.getMax(i);
-      dist += Math.min(max1, max2);
+      agg += Math.min(max1, max2);
       norm1 += min1;
       norm2 += min2;
     }
-    dist = 1 - dist / Math.min(norm1, norm2);
-    return dist;
+    return 1 - agg / Math.min(norm1, norm2);
   }
 
   @Override

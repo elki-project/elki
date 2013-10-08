@@ -54,48 +54,62 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if (dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double val = (xd >= yd) ? xd - yd : yd - xd;
+      if (val > agg) {
+        agg = val;
+      }
     }
-    double max = 0;
-    for (int i = 0; i < dim1; i++) {
-      final double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
-      max = Math.max(d, max);
-    }
-    return max;
+    return agg;
   }
 
   @Override
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
-    double max = 0;
-    for (int i = 0; i < dim; i++) {
-      max = Math.max(v.doubleValue(i), max);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v.doubleValue(d);
+      final double val = (xd >= 0.) ? xd : -xd;
+      if (val > agg) {
+        agg = val;
+      }
     }
-    return max;
+    return agg;
   }
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim1 = mbr1.getDimensionality();
-    if (dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects.");
-    }
-    double max = 0;
-    for (int i = 0; i < dim1; i++) {
-      final double d;
-      if (mbr1.getMax(i) < mbr2.getMin(i)) {
-        d = mbr2.getMin(i) - mbr1.getMin(i);
-      } else if (mbr1.getMin(i) > mbr2.getMax(i)) {
-        d = mbr1.getMin(i) - mbr2.getMax(i);
-      } else {
-        // The object overlap in this dimension.
-        continue;
+    // Some optimizations for simpler cases.
+    if (mbr1 instanceof NumberVector) {
+      if (mbr2 instanceof NumberVector) {
+        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       }
-      max = Math.max(d, max);
     }
-    return max;
+    // TODO: add optimization for point to MBR?
+    final int dim = dimensionality(mbr1, mbr2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double diff;
+      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
+      if (d1 > 0.) {
+        diff = d1;
+      } else {
+        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
+        if (d2 > 0.) {
+          diff = d2;
+        } else {
+          // The objects overlap in this dimension.
+          continue;
+        }
+      }
+      if (diff > agg) {
+        agg = diff;
+      }
+    }
+    return agg;
   }
 
   @Override

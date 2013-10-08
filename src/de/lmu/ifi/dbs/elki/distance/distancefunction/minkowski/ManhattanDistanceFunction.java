@@ -49,67 +49,47 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction {
    */
   @Deprecated
   public ManhattanDistanceFunction() {
-    super(1.0);
+    super(1.);
   }
 
-  /**
-   * Compute the Manhattan distance.
-   * 
-   * @param v1 first vector
-   * @param v2 second vector
-   * @return Manhattan distance value
-   */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = v1.getDimensionality();
-    if (dim != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double val = (xd >= yd) ? xd - yd : yd - xd;
+      agg += val;
     }
-    double sum = 0;
-    for (int i = 0; i < dim; i++) {
-      sum += Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
-    }
-    return sum;
+    return agg;
   }
 
-  /**
-   * Returns the Manhattan norm of the given vector.
-   * 
-   * @param v the vector to compute the norm of
-   * @return the Manhattan norm of the given vector
-   */
   @Override
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
-    double sum = 0;
-    for (int i = 0; i < dim; i++) {
-      sum += Math.abs(v.doubleValue(i));
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v.doubleValue(d);
+      agg += (xd >= 0.) ? xd : -xd;
     }
-    return sum;
+    return agg;
   }
 
-  private double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
-    final int dim = mbr.getDimensionality();
-    if (dim != v.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString() + "\n" + dim + "!=" + v.getDimensionality());
-    }
-
-    double sumDist = 0;
+  protected double doubleMinDistObject(NumberVector<?> v, SpatialComparable mbr) {
+    final int dim = dimensionality(mbr, v);
+    double agg = 0.;
     for (int d = 0; d < dim; d++) {
-      final double value = v.doubleValue(d);
-      final double r;
-      if (value < mbr.getMin(d)) {
-        r = mbr.getMin(d);
-      } else if (value > mbr.getMax(d)) {
-        r = mbr.getMax(d);
+      final double value = v.doubleValue(d), min = mbr.getMin(d);
+      if (value < min) {
+        agg += min - value;
       } else {
-        r = value;
+        final double max = mbr.getMax(d);
+        if (value > max) {
+          agg += value - max;
+        }
       }
-
-      final double manhattanI = Math.abs(value - r);
-      sumDist += manhattanI;
     }
-    return sumDist;
+    return agg;
   }
 
   @Override
@@ -119,32 +99,26 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction {
       if (mbr2 instanceof NumberVector) {
         return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       } else {
-        return doubleMinDistObject(mbr2, (NumberVector<?>) mbr1);
+        return doubleMinDistObject((NumberVector<?>) mbr1, mbr2);
       }
     } else if (mbr2 instanceof NumberVector) {
-      return doubleMinDistObject(mbr1, (NumberVector<?>) mbr2);
+      return doubleMinDistObject((NumberVector<?>) mbr2, mbr1);
     }
-    final int dim1 = mbr1.getDimensionality();
-    if (dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
-    }
+    final int dim = dimensionality(mbr1, mbr2);
 
-    double sumDist = 0;
-    for (int d = 0; d < dim1; d++) {
-      final double m1, m2;
-      if (mbr1.getMax(d) < mbr2.getMin(d)) {
-        m1 = mbr2.getMin(d);
-        m2 = mbr1.getMax(d);
-      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
-        m1 = mbr1.getMin(d);
-        m2 = mbr2.getMax(d);
-      } else { // The mbrs intersect!
-        continue;
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
+      if (d1 > 0.) {
+        agg += d1;
+      } else {
+        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
+        if (d2 > 0.) {
+          agg += d2;
+        }
       }
-      final double manhattanI = m1 - m2;
-      sumDist += manhattanI;
     }
-    return sumDist;
+    return agg;
   }
 
   @Override

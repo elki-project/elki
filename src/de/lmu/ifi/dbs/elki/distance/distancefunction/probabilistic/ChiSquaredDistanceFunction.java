@@ -24,7 +24,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -43,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Alias("chisq")
 @Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
-public class ChiSquaredDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class ChiSquaredDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -61,22 +62,42 @@ public class ChiSquaredDistanceFunction extends AbstractVectorDoubleDistanceFunc
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if(dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
-    }
-    double dist = 0;
-    for(int i = 0; i < dim1; i++) {
-      final double xi = v1.doubleValue(i);
-      final double yi = v2.doubleValue(i);
-      final double di = xi - yi;
-      final double si = xi + yi;
-      if(!(si > 0. || si < 0.) || !(di > 0. || di < 0.)) {
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double di = xd - yd;
+      final double si = xd + yd;
+      if (!(si > 0. || si < 0.) || !(di > 0. || di < 0.)) {
         continue;
       }
-      dist += di * di / si;
+      agg += di * di / si;
     }
-    return 2. * dist;
+    return 2. * agg;
+  }
+
+  @Override
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim = dimensionality(mbr1, mbr2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
+      final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
+      final double diff; // Minimum difference
+      if (max1 < min2) {
+        diff = min2 - max1;
+      } else if (max2 < min1) {
+        diff = max2 - min1;
+      } else {
+        continue; // 0.
+      }
+      final double si = max1 + max2; // Maximum sum
+      if (!(si > 0. || si < 0.) || !(diff > 0. || diff < 0.)) {
+        continue;
+      }
+      agg += diff * diff / si;
+    }
+    return 2. * agg;
   }
 
   @Override
@@ -86,13 +107,13 @@ public class ChiSquaredDistanceFunction extends AbstractVectorDoubleDistanceFunc
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(obj == this) {
+    if (obj == this) {
       return true;
     }
-    if(this.getClass().equals(obj.getClass())) {
+    if (this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);
