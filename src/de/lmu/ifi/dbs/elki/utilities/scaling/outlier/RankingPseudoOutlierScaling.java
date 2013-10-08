@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -67,6 +69,12 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
     }
     // sort them
     // TODO: Inverted scores!
+    Arrays.sort(scores);
+  }
+  
+  @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    scores = ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter);
     Arrays.sort(scores);
   }
 

@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -63,9 +64,29 @@ public class HeDESNormalizationOutlierScaling implements OutlierScalingFunction 
     DoubleMinMax minmax = new DoubleMinMax();
 
     Relation<Double> scores = or.getScores();
-    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+    for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
       double val = scores.get(id);
-      if(!Double.isNaN(val) && !Double.isInfinite(val)) {
+      if (!Double.isNaN(val) && !Double.isInfinite(val)) {
+        mv.put(val);
+        minmax.put(val);
+      }
+    }
+
+    mean = mv.getMean();
+    stddev = mv.getSampleStddev();
+    scaledmax = getScaled(minmax.getMax());
+    scaledmin = getScaled(minmax.getMin());
+  }
+
+  @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    MeanVariance mv = new MeanVariance();
+    DoubleMinMax minmax = new DoubleMinMax();
+
+    final int size = adapter.size(array);
+    for (int i = 0; i < size; i++) {
+      double val = adapter.getDouble(array, i);
+      if (!Double.isNaN(val) && !Double.isInfinite(val)) {
         mv.put(val);
         minmax.put(val);
       }

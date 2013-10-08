@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 
 /**
@@ -37,9 +38,22 @@ public interface OutlierScalingFunction extends ScalingFunction {
   /**
    * Prepare is called once for each data set, before getScaled() will be
    * called. This function can be used to extract global parameters such as
-   * means, minimums or maximums from the Database, Result or Annotation.
+   * means, minimums or maximums from the outlier scores.
    * 
    * @param or Outlier result to use
    */
   public void prepare(OutlierResult or);
+
+  /**
+   * Prepare is called once for each data set, before getScaled() will be
+   * called. This function can be used to extract global parameters such as
+   * means, minimums or maximums from the score array.
+   * 
+   * The method using a full {@link OutlierResult} is preferred, as it will
+   * allow access to the metadata.
+   * 
+   * @param array Data to process
+   * @param adapter Array adapter 
+   */
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter);
 }

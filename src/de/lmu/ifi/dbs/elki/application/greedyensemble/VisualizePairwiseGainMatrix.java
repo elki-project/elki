@@ -53,10 +53,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVoting;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMean;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
+import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
@@ -106,6 +106,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   private VisualizerParameterizer vispar;
 
   /**
+   * Outlier scaling to apply during preprocessing.
+   */
+  private ScalingFunction prescaling;
+
+  /**
    * Ensemble voting function.
    */
   private EnsembleVoting voting;
@@ -114,12 +119,14 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    * Constructor.
    * 
    * @param inputstep Input step
+   * @param prescaling Scaling function for input scores.
    * @param voting Voting function
    * @param vispar Visualizer parameterizer
    */
-  public VisualizePairwiseGainMatrix(InputStep inputstep, EnsembleVoting voting, VisualizerParameterizer vispar) {
+  public VisualizePairwiseGainMatrix(InputStep inputstep, ScalingFunction prescaling, EnsembleVoting voting, VisualizerParameterizer vispar) {
     super();
     this.inputstep = inputstep;
+    this.prescaling = prescaling;
     this.voting = voting;
     this.vispar = vispar;
   }
@@ -127,13 +134,14 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   @Override
   public void run() {
     final Database database = inputstep.getDatabase();
-    final Relation<NumberVector<?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector<?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
     if (!firstlabel.matches(".*by.?label.*")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
+    relation = GreedyEnsembleExperiment.applyPrescaling(prescaling, relation, firstid);
 
     // Dimensionality and reference vector
     final int dim = RelationUtil.dimensionality(relation);
@@ -286,14 +294,9 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**
-     * Option ID for the ensemble voting function.
-     */
-    public static final OptionID VOTING_ID = new OptionID("ensemble.voting", "Voting function for the ensembles.");
-
-    /**
      * Data source.
      */
-    InputStep inputstep;
+    private InputStep inputstep;
 
     /**
      * Parameterizer for visualizers.
@@ -301,9 +304,14 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     private VisualizerParameterizer vispar;
 
     /**
+     * Outlier scaling to apply during preprocessing.
+     */
+    private ScalingFunction prescaling;
+
+    /**
      * Voring function.
      */
-    EnsembleVoting voting;
+    private EnsembleVoting voting;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -313,7 +321,14 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       // Visualization options
       vispar = config.tryInstantiate(VisualizerParameterizer.class);
 
-      ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class);
+      // Prescaling
+      ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<>(GreedyEnsembleExperiment.Parameterizer.PRESCALING_ID, ScalingFunction.class);
+      prescalingP.setOptional(true);
+      if (config.grab(prescalingP)) {
+        prescaling = prescalingP.instantiateClass(config);
+      }
+
+      ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(GreedyEnsembleExperiment.Parameterizer.VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class);
       if (config.grab(votingP)) {
         voting = votingP.instantiateClass(config);
       }
@@ -321,7 +336,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     @Override
     protected VisualizePairwiseGainMatrix makeInstance() {
-      return new VisualizePairwiseGainMatrix(inputstep, voting, vispar);
+      return new VisualizePairwiseGainMatrix(inputstep, prescaling, voting, vispar);
     }
   }
 

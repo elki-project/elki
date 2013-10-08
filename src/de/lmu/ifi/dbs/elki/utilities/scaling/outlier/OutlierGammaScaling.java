@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -91,7 +92,7 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
   public double getScaled(double value) {
     assert (theta > 0) : "prepare() was not run prior to using the scaling function.";
     value = preScale(value);
-    if(Double.isNaN(value) || Double.isInfinite(value)) {
+    if (Double.isNaN(value) || Double.isInfinite(value)) {
       return 1.0;
     }
     return Math.max(0, (GammaDistribution.regularizedGammaP(k, value / theta) - atmean) / (1 - atmean));
@@ -102,10 +103,29 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
     meta = or.getOutlierMeta();
     MeanVariance mv = new MeanVariance();
     Relation<Double> scores = or.getScores();
-    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+    for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
       double score = scores.get(id);
       score = preScale(score);
-      if(!Double.isNaN(score) && !Double.isInfinite(score)) {
+      if (!Double.isNaN(score) && !Double.isInfinite(score)) {
+        mv.put(score);
+      }
+    }
+    final double mean = mv.getMean();
+    final double var = mv.getSampleVariance();
+    k = (mean * mean) / var;
+    theta = var / mean;
+    atmean = GammaDistribution.regularizedGammaP(k, mean / theta);
+    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
+  }
+
+  @Override
+  public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
+    MeanVariance mv = new MeanVariance();
+    final int size = adapter.size(array);
+    for (int i = 0; i < size; i++) {
+      double score = adapter.getDouble(array, i);
+      score = preScale(score);
+      if (!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);
       }
     }
@@ -126,7 +146,7 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
    * @return Normalized score.
    */
   protected double preScale(double score) {
-    if(normalize) {
+    if (normalize) {
       score = meta.normalizeScore(score);
     }
     return score;
@@ -156,7 +176,7 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag normalizeF = new Flag(NORMALIZE_ID);
-      if(config.grab(normalizeF)) {
+      if (config.grab(normalizeF)) {
         normalize = normalizeF.getValue();
       }
     }
