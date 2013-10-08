@@ -54,58 +54,46 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDista
   }
 
   @Override
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double delta = v1.doubleValue(d) - v2.doubleValue(d);
+      agg += delta * delta;
+    }
+    return agg;
+  }
+
+  @Override
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
-    double sum = 0;
-    for (int i = 0; i < dim; i++) {
-      final double val = v.doubleValue(i);
-      sum += val * val;
-    }
-    return sum;
-  }
-
-  /**
-   * Provides the squared Euclidean distance between the given two vectors.
-   * 
-   * @return the squared Euclidean distance between the given two vectors as raw
-   *         double value
-   */
-  @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if (dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
-    }
-    double sqrDist = 0;
-    for (int i = 0; i < dim1; i++) {
-      final double delta = v1.doubleValue(i) - v2.doubleValue(i);
-      sqrDist += delta * delta;
-    }
-    return sqrDist;
-  }
-
-  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
-    final int dim = mbr.getDimensionality();
-    if (dim != v.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString() + "\n" + dim + "!=" + v.getDimensionality());
-    }
-
-    double sqrDist = 0;
+    double agg = 0.;
     for (int d = 0; d < dim; d++) {
-      double value = v.doubleValue(d);
-      double r;
-      if (value < mbr.getMin(d)) {
-        r = mbr.getMin(d);
-      } else if (value > mbr.getMax(d)) {
-        r = mbr.getMax(d);
-      } else {
-        r = value;
-      }
-
-      final double manhattanI = value - r;
-      sqrDist += manhattanI * manhattanI;
+      final double val = v.doubleValue(d);
+      agg += val * val;
     }
-    return sqrDist;
+    return agg;
+  }
+
+  protected double doubleMinDistObject(NumberVector<?> v, SpatialComparable mbr) {
+    final int dim = dimensionality(mbr, v);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double value = v.doubleValue(d), min = mbr.getMin(d);
+      final double diff;
+      if (value < min) {
+        diff = min - value;
+      } else {
+        final double max = mbr.getMax(d);
+        if (value > max) {
+          diff = value - max;
+        } else {
+          continue;
+        }
+      }
+      agg += diff * diff;
+    }
+    return agg;
   }
 
   @Override
@@ -115,32 +103,30 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDista
       if (mbr2 instanceof NumberVector) {
         return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       } else {
-        return doubleMinDistObject(mbr2, (NumberVector<?>) mbr1);
+        return doubleMinDistObject((NumberVector<?>) mbr1, mbr2);
       }
     } else if (mbr2 instanceof NumberVector) {
-      return doubleMinDistObject(mbr1, (NumberVector<?>) mbr2);
+      return doubleMinDistObject((NumberVector<?>) mbr2, mbr1);
     }
-    final int dim1 = mbr1.getDimensionality();
-    if (dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
-    }
+    final int dim = dimensionality(mbr1, mbr2);
 
-    double sqrDist = 0;
-    for (int d = 0; d < dim1; d++) {
-      final double m1, m2;
-      if (mbr1.getMax(d) < mbr2.getMin(d)) {
-        m1 = mbr2.getMin(d);
-        m2 = mbr1.getMax(d);
-      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
-        m1 = mbr1.getMin(d);
-        m2 = mbr2.getMax(d);
-      } else { // The mbrs intersect!
-        continue;
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double diff;
+      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
+      if (d1 > 0.) {
+        diff = d1;
+      } else {
+        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
+        if (d2 > 0.) {
+          diff = d2;
+        } else {
+          continue;
+        }
       }
-      final double manhattanI = m1 - m2;
-      sqrDist += manhattanI * manhattanI;
+      agg += diff * diff;
     }
-    return sqrDist;
+    return agg;
   }
 
   @Override

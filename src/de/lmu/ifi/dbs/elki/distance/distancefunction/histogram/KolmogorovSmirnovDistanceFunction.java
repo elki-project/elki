@@ -53,17 +53,17 @@ public class KolmogorovSmirnovDistanceFunction extends AbstractVectorDoubleDista
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if(dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
-    }
-    double xs = 0., ys = 0., max = 0.;
-    for(int i = 0; i < dim1; i++) {
+    final int dim = dimensionality(v1, v2);
+    double xs = 0., ys = 0., agg = 0.;
+    for (int i = 0; i < dim; i++) {
       xs += v1.doubleValue(i);
       ys += v2.doubleValue(i);
-      max = Math.max(max, Math.abs(xs - ys));
+      double diff = Math.abs(xs - ys);
+      if (diff > agg) {
+        agg = diff;
+      }
     }
-    return max;
+    return agg;
   }
 
   @Override
@@ -73,13 +73,13 @@ public class KolmogorovSmirnovDistanceFunction extends AbstractVectorDoubleDista
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(obj == this) {
+    if (obj == this) {
       return true;
     }
-    if(this.getClass().equals(obj.getClass())) {
+    if (this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);

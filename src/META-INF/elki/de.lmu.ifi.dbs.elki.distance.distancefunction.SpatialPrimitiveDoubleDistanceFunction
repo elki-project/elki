@@ -17,6 +17,9 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersecti
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.DimensionSelectingLatLngDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction

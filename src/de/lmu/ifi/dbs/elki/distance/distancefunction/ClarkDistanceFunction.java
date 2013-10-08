@@ -58,30 +58,24 @@ public class ClarkDistanceFunction extends AbstractSpatialDoubleDistanceFunction
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if (dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double div = Math.abs(xd) + Math.abs(yd);
+      if (div > 0.) {
+        final double v = (xd - yd) / div;
+        agg += v * v;
+      }
     }
-    double sqsum = 0.;
-    for (int d = 0; d < dim1; d++) {
-      double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      double v = (xd - yd) / (Math.abs(xd) + Math.abs(yd));
-      sqsum += v * v;
-    }
-    return Math.sqrt(sqsum / dim1);
+    return Math.sqrt(agg / dim);
   }
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if (mbr1 instanceof NumberVector && mbr2 instanceof NumberVector) {
-      return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
-    }
-    final int dim1 = mbr1.getDimensionality();
-    if (dim1 != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n" + mbr1.getDimensionality() + "!=" + mbr2.getDimensionality());
-    }
-    double sqsum = 0.;
-    for (int d = 0; d < dim1; d++) {
+    final int dim = dimensionality(mbr1, mbr2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
       final double diff;
@@ -96,10 +90,10 @@ public class ClarkDistanceFunction extends AbstractSpatialDoubleDistanceFunction
       final double absmax1 = Math.max(-min1, max1);
       final double absmax2 = Math.max(-min2, max2);
       // Division by 0 cannot happen: then diff = 0 and we continued above!
-      double v = diff / (absmax1 + absmax2);
-      sqsum += v * v;
+      final double v = diff / (absmax1 + absmax2);
+      agg += v * v;
     }
-    return Math.sqrt(sqsum / dim1);
+    return Math.sqrt(agg / dim);
   }
 
   /**

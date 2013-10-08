@@ -55,53 +55,67 @@ public class MinimumDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = v1.getDimensionality();
-    if (dim != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+    final int dim = dimensionality(v1, v2);
+    double agg = Double.POSITIVE_INFINITY;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double val = (xd >= yd) ? xd - yd : yd - xd;
+      if (val < agg) {
+        agg = val;
+      }
     }
-    double min = Double.MAX_VALUE;
-    for (int i = 0; i < dim; i++) {
-      final double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
-      min = Math.min(d, min);
-    }
-    return min;
+    return agg;
   }
 
   @Override
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
-    double min = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < dim; i++) {
-      min = Math.min(v.doubleValue(i), min);
+    double agg = Double.POSITIVE_INFINITY;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v.doubleValue(d);
+      final double val = (xd >= 0.) ? xd : -xd;
+      if (val < agg) {
+        agg = val;
+      }
     }
-    return min;
+    return agg;
   }
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim = mbr1.getDimensionality();
-    if (dim != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
-    }
-    double min = Double.MAX_VALUE;
-    for (int i = 0; i < dim; i++) {
-      final double min1 = mbr1.getMin(i);
-      final double max1 = mbr1.getMax(i);
-      final double min2 = mbr2.getMin(i);
-      final double max2 = mbr2.getMax(i);
-      final double d;
-      if (max1 <= min2) {
-        d = min2 - max1;
-      } else if (max2 <= min1) {
-        d = min1 - max2;
-      } else {
-        // Overlap in this dimension
-        min = 0.0;
-        break;
+    // Some optimizations for simpler cases.
+    if (mbr1 instanceof NumberVector) {
+      if (mbr2 instanceof NumberVector) {
+        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       }
-      min = Math.min(d, min);
     }
-    return min;
+    // TODO: add optimization for point to MBR?
+    final int dim = dimensionality(mbr1, mbr2);
+    double agg = Double.POSITIVE_INFINITY;
+    for (int d = 0; d < dim; d++) {
+      final double diff;
+      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
+      if (d1 > 0.) {
+        diff = d1;
+      } else {
+        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
+        if (d2 > 0.) {
+          diff = d2;
+        } else {
+          // The objects overlap in this dimension.
+          return 0.;
+        }
+      }
+      if (diff < agg) {
+        agg = diff;
+      }
+    }
+    return agg;
+  }
+
+  @Override
+  public boolean isMetric() {
+    return false;
   }
 
   @Override
@@ -117,7 +131,10 @@ public class MinimumDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     if (obj == this) {
       return true;
     }
-    return this.getClass().equals(obj.getClass());
+    if (this.getClass().equals(obj.getClass())) {
+      return true;
+    }
+    return super.equals(obj);
   }
 
   /**

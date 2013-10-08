@@ -33,7 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Kullback-Leibler (asymmetric!) Distance, also known as relative entropy,
  * information deviation or just KL-distance
  * 
- * For a version with the arguments reversed, see {@link KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction}.
+ * For a version with the arguments reversed, see
+ * {@link KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction}.
  * 
  * For a symmetric version, see {@link JeffreyDivergenceDistanceFunction}.
  * 
@@ -66,19 +67,18 @@ public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends Abstrac
 
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if (dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
-    }
-    double dist = 0;
-    for (int i = 0; i < dim1; i++) {
-      final double xi = v1.doubleValue(i);
-      final double yi = v2.doubleValue(i);
-      if (xi > 0. && yi > 0.) {
-        dist += xi * Math.log(xi / yi);
+    final int dim = dimensionality(v1, v2);
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      if (yd <= 0.) {
+        return Double.POSITIVE_INFINITY;
+      }
+      if (xd > 0.) {
+        agg += xd * Math.log(xd / yd);
       }
     }
-    return dist;
+    return agg;
   }
 
   @Override
