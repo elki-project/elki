@@ -56,8 +56,8 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     final int dim = dimensionality(v1, v2, weights.length);
     double agg = 0;
     for (int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d)) * weights[d];
-      agg += Math.pow(delta, p);
+      final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
+      agg += Math.pow(delta, p) * weights[d];
     }
     return Math.pow(agg, invp);
   }
@@ -67,8 +67,8 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     final int dim = v.getDimensionality();
     double agg = 0;
     for (int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v.doubleValue(d)) * weights[d];
-      agg += Math.pow(delta, p);
+      final double delta = Math.abs(v.doubleValue(d));
+      agg += Math.pow(delta, p) * weights[d];
     }
     return Math.pow(agg, invp);
   }
@@ -93,7 +93,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
       } else { // The mbrs intersect!
         continue;
       }
-      agg += Math.pow(diff * weights[d], p);
+      agg += Math.pow(diff, p) * weights[d];
     }
     return Math.pow(agg, invp);
   }
