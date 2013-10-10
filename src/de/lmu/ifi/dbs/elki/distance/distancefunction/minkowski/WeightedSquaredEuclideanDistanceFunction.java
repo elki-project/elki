@@ -59,7 +59,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialDou
    */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = dimensionality(v1, v2);
+    final int dim = dimensionality(v1, v2, weights.length);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
       final double delta = (v1.doubleValue(d) - v2.doubleValue(d));
@@ -88,7 +88,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialDou
       }
     }
     // TODO: optimize for more simpler cases: obj vs. rect?
-    final int dim = dimensionality(mbr1, mbr2);
+    final int dim = dimensionality(mbr1, mbr2, weights.length);
     double agg = 0;
     for (int d = 0; d < dim; d++) {
       final double diff;

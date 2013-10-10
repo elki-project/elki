@@ -33,22 +33,14 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * 
  * @author Erich Schubert
  */
-// TODO: make parameterizable; add optimized variants
-public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
-  /**
-   * Weight array
-   */
-  protected double[] weights;
-
+public class WeightedManhattanDistanceFunction extends WeightedLPNormDistanceFunction {
   /**
    * Constructor.
    * 
-   * @param p p value
    * @param weights Weight vector
    */
-  public WeightedLPNormDistanceFunction(double p, double[] weights) {
-    super(p);
-    this.weights = weights;
+  public WeightedManhattanDistanceFunction(double[] weights) {
+    super(1.0, weights);
   }
 
   @Override
@@ -57,9 +49,9 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     double agg = 0;
     for (int d = 0; d < dim; d++) {
       final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
-      agg += Math.pow(delta, p) * weights[d];
+      agg += delta * weights[d];
     }
-    return Math.pow(agg, invp);
+    return agg;
   }
 
   @Override
@@ -68,9 +60,9 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     double agg = 0;
     for (int d = 0; d < dim; d++) {
       final double delta = Math.abs(v.doubleValue(d));
-      agg += Math.pow(delta, p) * weights[d];
+      agg += delta * weights[d];
     }
-    return Math.pow(agg, invp);
+    return agg;
   }
 
   @Override
@@ -93,9 +85,9 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
       } else { // The mbrs intersect!
         continue;
       }
-      agg += Math.pow(diff, p) * weights[d];
+      agg += diff * weights[d];
     }
-    return Math.pow(agg, invp);
+    return agg;
   }
 
   @Override
@@ -106,18 +98,13 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof WeightedLPNormDistanceFunction)) {
-      if (obj instanceof LPNormDistanceFunction && super.equals(obj)) {
-        for (double d : weights) {
-          if (d != 1.0) {
-            return false;
-          }
-        }
-        return true;
+    if (!(obj instanceof WeightedManhattanDistanceFunction)) {
+      if (obj instanceof WeightedLPNormDistanceFunction) {
+        return super.equals(obj);
       }
       return false;
     }
-    WeightedLPNormDistanceFunction other = (WeightedLPNormDistanceFunction) obj;
+    WeightedManhattanDistanceFunction other = (WeightedManhattanDistanceFunction) obj;
     return Arrays.equals(this.weights, other.weights);
   }
 }
