@@ -68,7 +68,7 @@ public class UniformMinMaxEstimator implements DistributionEstimator<UniformDist
    * @return Estimation
    */
   public UniformDistribution estimate(DoubleMinMax mm) {
-    return new UniformDistribution(Math.max(mm.getMin(), Double.MAX_VALUE), Math.min(mm.getMax(), Double.MAX_VALUE));
+    return new UniformDistribution(Math.max(mm.getMin(), -Double.MAX_VALUE), Math.min(mm.getMax(), Double.MAX_VALUE));
   }
 
   /**
