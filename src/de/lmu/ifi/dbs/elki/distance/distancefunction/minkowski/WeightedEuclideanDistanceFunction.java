@@ -29,48 +29,46 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /**
- * Weighted version of the Minkowski L_p metrics distance function.
+ * Provides the Euclidean distance for FeatureVectors.
  * 
  * @author Erich Schubert
  */
-// TODO: make parameterizable; add optimized variants
-public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
-  /**
-   * Weight array
-   */
-  protected double[] weights;
-
+public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFunction {
   /**
    * Constructor.
    * 
-   * @param p p value
-   * @param weights Weight vector
+   * @param weights
    */
-  public WeightedLPNormDistanceFunction(double p, double[] weights) {
-    super(p);
-    this.weights = weights;
+  public WeightedEuclideanDistanceFunction(double[] weights) {
+    super(2.0, weights);
   }
 
+  /**
+   * Provides the Euclidean distance between the given two vectors.
+   * 
+   * @return the Euclidean distance between the given two vectors as raw double
+   *         value
+   */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim = dimensionality(v1, v2, weights.length);
-    double agg = 0;
+    double agg = 0.;
     for (int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
-      agg += Math.pow(delta, p) * weights[d];
+      final double delta = (v1.doubleValue(d) - v2.doubleValue(d));
+      agg += delta * delta * weights[d];
     }
-    return Math.pow(agg, invp);
+    return Math.sqrt(agg);
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> v) {
-    final int dim = v.getDimensionality();
-    double agg = 0;
+  public double doubleNorm(NumberVector<?> obj) {
+    final int dim = obj.getDimensionality();
+    double agg = 0.;
     for (int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v.doubleValue(d));
-      agg += Math.pow(delta, p) * weights[d];
+      final double delta = obj.doubleValue(dim);
+      agg += delta * delta * weights[d];
     }
-    return Math.pow(agg, invp);
+    return Math.sqrt(agg);
   }
 
   @Override
@@ -93,9 +91,9 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
       } else { // The mbrs intersect!
         continue;
       }
-      agg += Math.pow(diff, p) * weights[d];
+      agg += diff * diff * weights[d];
     }
-    return Math.pow(agg, invp);
+    return Math.sqrt(agg);
   }
 
   @Override
@@ -106,8 +104,11 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof WeightedLPNormDistanceFunction)) {
-      if (obj instanceof LPNormDistanceFunction && super.equals(obj)) {
+    if (!(obj instanceof WeightedEuclideanDistanceFunction)) {
+      if (obj.getClass().equals(WeightedLPNormDistanceFunction.class)) {
+        return super.equals(obj);
+      }
+      if (obj.getClass().equals(EuclideanDistanceFunction.class)) {
         for (double d : weights) {
           if (d != 1.0) {
             return false;
@@ -117,7 +118,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
       }
       return false;
     }
-    WeightedLPNormDistanceFunction other = (WeightedLPNormDistanceFunction) obj;
+    WeightedEuclideanDistanceFunction other = (WeightedEuclideanDistanceFunction) obj;
     return Arrays.equals(this.weights, other.weights);
   }
 }

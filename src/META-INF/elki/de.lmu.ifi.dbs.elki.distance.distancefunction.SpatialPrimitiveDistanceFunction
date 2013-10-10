@@ -13,6 +13,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.LorentzianDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedManhattanDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction
