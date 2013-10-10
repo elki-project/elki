@@ -123,9 +123,6 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
   public OutlierResult run(Relation<Model> models, Relation<NumberVector<?>> vecs, Relation<?> labels) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(models.getDBIDs(), DataStoreFactory.HINT_HOT);
 
-    // Adjustment constant
-    final double minscore = expect / (expect + 1);
-
     HashSet<GeneratorSingleCluster> generators = new HashSet<>();
     for (DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       Model model = models.get(iditer);
@@ -146,7 +143,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     }
 
     for (DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double score = 0.0;
+      double score = 1.;
       // Convert to a math vector
       Vector v = vecs.get(iditer).getColumnVector();
       for (GeneratorSingleCluster gen : generators) {
@@ -169,16 +166,15 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
             throw new AbortException("TrivialGeneratedOutlier currently only supports normal distributions, got: " + dist);
           }
         }
-        if (norm > 0) {
+        if (norm > 0.) {
           // The squared distances are ChiSquared distributed
-          score = Math.max(score, 1 - ChiSquaredDistribution.cdf(lensq, norm));
+          score = Math.min(score, ChiSquaredDistribution.cdf(lensq, norm));
+        } else {
+          score = 0.;
         }
       }
       if (expect < 1) {
-        // score inversion.
-        score = expect / (expect + score);
-        // adjust to 0 to 1 range:
-        score = (score - minscore) / (1 - minscore);
+        score = expect * score / (1 - score + expect);
       }
       scores.putDouble(iditer, score);
     }
