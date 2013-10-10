@@ -5,6 +5,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MinimumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseLPNormDistanceFunction

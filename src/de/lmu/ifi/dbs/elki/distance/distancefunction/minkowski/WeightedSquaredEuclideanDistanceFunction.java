@@ -26,7 +26,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceNorm;
 
 /**
  * Provides the squared Euclidean distance for FeatureVectors. This results in
@@ -34,7 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanc
  * 
  * @author Arthur Zimek
  */
-public class WeightedSquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   /**
    * Weight array
    */
@@ -61,8 +62,44 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractVectorDoub
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
-      final double delta = (v1.doubleValue(d) - v2.doubleValue(d)) * weights[d - 1];
-      agg += delta * delta;
+      final double delta = (v1.doubleValue(d) - v2.doubleValue(d));
+      agg += delta * delta * weights[d];
+    }
+    return agg;
+  }
+
+  @Override
+  public double doubleNorm(NumberVector<?> obj) {
+    final int dim = obj.getDimensionality();
+    double agg = 0.;
+    for (int d = 0; d < dim; d++) {
+      final double delta = obj.doubleValue(dim);
+      agg += delta * delta * weights[d];
+    }
+    return agg;
+  }
+
+  @Override
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    // Optimization for the simplest case
+    if (mbr1 instanceof NumberVector) {
+      if (mbr2 instanceof NumberVector) {
+        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+      }
+    }
+    // TODO: optimize for more simpler cases: obj vs. rect?
+    final int dim = dimensionality(mbr1, mbr2);
+    double agg = 0;
+    for (int d = 0; d < dim; d++) {
+      final double diff;
+      if (mbr1.getMax(d) < mbr2.getMin(d)) {
+        diff = mbr2.getMin(d) - mbr1.getMax(d);
+      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
+        diff = mbr1.getMin(d) - mbr2.getMax(d);
+      } else { // The mbrs intersect!
+        continue;
+      }
+      agg += diff * diff * weights[d];
     }
     return agg;
   }
