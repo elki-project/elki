@@ -108,8 +108,10 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
       NumberVector.Factory<? extends NumberVector<?>, ?> factory = null;
       {
         if (type instanceof VectorFieldTypeInformation) {
+          final VectorFieldTypeInformation<?> ctype = (VectorFieldTypeInformation<?>) type;
+          // Note two-step cast, to make stricter compilers happy.
           @SuppressWarnings("unchecked")
-          final VectorFieldTypeInformation<? extends NumberVector<?>> vtype = (VectorFieldTypeInformation<? extends NumberVector<?>>) type;
+          final VectorFieldTypeInformation<? extends NumberVector<?>> vtype = (VectorFieldTypeInformation<? extends NumberVector<?>>) ctype;
           factory = (NumberVector.Factory<? extends NumberVector<?>, ?>) vtype.getFactory();
         } else {
           factory = DoubleVector.FACTORY;
