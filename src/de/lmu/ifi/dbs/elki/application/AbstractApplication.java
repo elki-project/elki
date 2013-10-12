@@ -151,6 +151,7 @@ public abstract class AbstractApplication implements Parameterizable {
           }
           LOG.verbose("\n");
           LOG.verbose("Stopping execution because of configuration errors.");
+          System.exit(1);
         } else {
           task.run();
         }
