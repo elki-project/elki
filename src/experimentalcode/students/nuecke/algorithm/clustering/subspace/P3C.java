@@ -1,8 +1,5 @@
 package experimentalcode.students.nuecke.algorithm.clustering.subspace;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -25,6 +22,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
@@ -113,12 +112,24 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
+    // Overall progress.
+    StepProgress stepProgress = LOG.isVerbose() ? new StepProgress(10) : null;
+    int progressStep = 1;
+
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Computing support histograms.", LOG);
+    }
+
     // Allocate histograms and markers for attributes.
     final int binCount = HistogramUtil.getSturgeBinCount(relation.size());
     final SupportHistogram[] histograms = HistogramUtil.newSupportHistograms(relation, binCount);
     final BitSet[] markers = new BitSet[dim];
     for (int dimension = 0; dimension < dim; ++dimension) {
       markers[dimension] = new BitSet(binCount);
+    }
+
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Searching for non-uniform bins in support histograms.", LOG);
     }
 
     // Set markers for each attribute until they're all deemed uniform.
@@ -144,6 +155,10 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         }
         marked.set(bestBin);
       }
+    }
+
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Merging marked bins to itnervals.", LOG);
     }
 
     // Generate projected p-signature intervals.
@@ -180,11 +195,21 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       }
     }
 
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Initializing 1-signatures from intervals.", LOG);
+    }
+
     // Build 1-signatures from intervals.
     ArrayList<Signature> signatures = new ArrayList<>(intervals.size());
     for (Interval i : intervals) {
       signatures.add(new Signature(relation, i));
     }
+
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Computing cluster cores from merged p-signatures.", LOG);
+    }
+
+    FiniteProgress mergeProgress = LOG.isVerbose() ? new FiniteProgress("1-signatures merges", signatures.size(), LOG) : null;
 
     // Merge to (p+1)-signatures (cluster cores).
     ArrayList<Signature> clusterCores = new ArrayList<>(signatures);
@@ -195,6 +220,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       final int k = clusterCores.size();
       // Skip previous 1-signatures: merges are symmetrical. But include newly
       // created cluster cores (i.e. those resulting from previous merges).
+      FiniteProgress submergeProgress = LOG.isVerbose() ? new FiniteProgress("p-signatures merges", k - (i + 1), LOG) : null;
       for (int j = i + 1; j < k; ++j) {
         final Signature merge = clusterCores.get(j).tryMerge(signature, poissonThreshold);
         if (merge != null) {
@@ -202,7 +228,23 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
           // 1-signatures to try merging with this p-signature as well.
           clusterCores.add(merge);
         }
+        if (submergeProgress != null) {
+          submergeProgress.incrementProcessed(LOG);
+        }
       }
+      if (submergeProgress != null) {
+        submergeProgress.ensureCompleted(LOG);
+      }
+      if (mergeProgress != null) {
+        mergeProgress.incrementProcessed(LOG);
+      }
+    }
+    if (mergeProgress != null) {
+      mergeProgress.ensureCompleted(LOG);
+    }
+
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Pruning incomplete cluster cores.", LOG);
     }
 
     // Prune cluster cores based on Definition 3, Condition 2.
@@ -215,6 +257,15 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         }
       }
     }
+    
+    if (clusterCores.size() == 0) {
+      stepProgress.setCompleted(LOG);
+      return null;
+    }
+
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Refining cluster cores to clusters via EM.", LOG);
+    }
 
     // Refine cluster cores into projected clusters (matrix row->DBID).
     ArrayModifiableDBIDs dbids = DBIDUtil.newArray(relation.size());
@@ -223,13 +274,25 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     assignUnassigned(relation, M, clusterCores, dbids, noise);
     M = expectationMaximization(relation, dim, M, dbids);
 
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Generating hard clustering.", LOG);
+    }
+
     // Create a hard clustering, making sure each data point only is part of one
     // cluster, based on the best match from the membership matrix.
     ArrayList<ClusterCandidate> clusterCandidates = hardClustering(M, clusterCores, dbids);
 
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Looking for outliers and moving them to the noise set.", LOG);
+    }
+
     // Outlier detection. Remove points from clusters that have a Mahalanobis
     // distance larger than the critical value of the ChiSquare distribution.
     findOutliers(relation, clusterCandidates, dim - countUniformAttributes(markers), noise);
+
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Removing empty clusters.", LOG);
+    }
 
     // Remove empty clusters.
     for (int cluster = clusterCandidates.size() - 1; cluster >= 0; --cluster) {
@@ -244,6 +307,10 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       // TODO Check all attributes previously deemed uniform (section 3.5).
     }
 
+    if (stepProgress != null) {
+      stepProgress.beginStep(progressStep++, "Generating final result.", LOG);
+    }
+
     // Generate final output.
     Clustering<SubspaceModel<V>> result = new Clustering<>("P3C", "P3C");
     result.addToplevelCluster(new Cluster<SubspaceModel<V>>(noise, true));
@@ -252,6 +319,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       CovarianceMatrix cvm = CovarianceMatrix.make(relation, candidate.data);
       result.addToplevelCluster(new Cluster<>(candidate.data, new SubspaceModel<>(new Subspace(candidate.dimensions), cvm.getMeanVector(relation))));
     }
+
+    if (stepProgress != null) {
+      stepProgress.ensureCompleted(LOG);
+    }
+    
     return result;
   }
 
@@ -424,6 +496,8 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     for (int cluster = 0; cluster < k; ++cluster) {
       clusterWeights[cluster] = 1.0 / k;
     }
+    
+    FiniteProgress emIterProgress = LOG.isVerbose() ? new FiniteProgress("EM iteration", maxEmIterations, LOG) : null;
 
     // Iterate until maximum number of iteration hits or computation converges.
     double em = Double.NEGATIVE_INFINITY;
@@ -450,6 +524,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         covariances[cluster] = cvms[cluster].destroyToNaiveMatrix().cheatToAvoidSingularity(1e-9);
         inverseCovariances[cluster] = covariances[cluster].inverse();
       }
+
       // Normalize weights.
       for (int cluster = 0; cluster < k; ++cluster) {
         clusterWeights[cluster] /= n;
@@ -459,6 +534,8 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       for (int cluster = 0; cluster < k; ++cluster) {
         normalDistributionFactor[cluster] = 1.0 / Math.sqrt(twopidim * covariances[cluster].det());
       }
+
+      FiniteProgress emProbProgress = LOG.isVerbose() ? new FiniteProgress("Computing probabilities for points", n, LOG) : null;
 
       // Recompute probabilities.
       double emNew = 0.0;
@@ -486,13 +563,32 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
             probabilities.set(point, cluster, newProbabilities[cluster] / priorProbability * clusterWeights[cluster]);
           }
         }
+
+        if (emProbProgress != null) {
+          emProbProgress.incrementProcessed(LOG);
+        }
+      }
+
+      if (emProbProgress != null) {
+        emProbProgress.ensureCompleted(LOG);
       }
 
       // See if the delta is very small, if so we can stop.
       if (Math.abs(em - emNew) < emDelta) {
+        if (emIterProgress != null) {
+          emIterProgress.setProcessed(maxEmIterations, LOG);
+        }
         break;
       }
       em = emNew;
+
+      if (emIterProgress != null) {
+        emIterProgress.incrementProcessed(LOG);
+      }
+    }
+    
+    if (emIterProgress != null) {
+      emIterProgress.ensureCompleted(LOG);
     }
 
     return probabilities;
@@ -742,12 +838,26 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
      * @return the probability of observing the observation.
      */
     private double poisson(int v, double E) {
+      /*
+      // This is precise but - as you would expect - very very slow.
       final BigDecimal exp = BigDecimal.valueOf(Math.exp(-E));
       final BigDecimal pow = BigDecimal.valueOf(E).pow(v);
       final BigDecimal dividend = exp.multiply(pow);
       final BigDecimal divisor = new BigDecimal(MathUtil.factorial(BigInteger.valueOf(v)));
       final double result = dividend.divide(divisor, 40, RoundingMode.HALF_DOWN).doubleValue();
       return result;
+      /*/
+      // This is fast but tends to become inaccurate.
+      //return Math.exp(-E) * Math.pow(E, v) / MathUtil.approximateFactorial(v);
+      // So we move to log space which allows a fast approximation of the
+      // factorial (using the natural logarithm) via `v! = sum[i=1-v](log(i))`.
+      // e^-E * e^v / v! = e^(log(e^-E * E^v / v!)) = e^(log(e^-E) + log(E^v) - log(v!)) = e^(E + log(E^v) - sum[i=1-v](log(i)))
+      double sum = 0;
+      for (int i = 1; i <= v; ++i) {
+        sum += Math.log(sum);
+      }
+      return Math.exp(E + Math.log(Math.pow(E, v)) - sum);
+      //*/
     }
   }
 
