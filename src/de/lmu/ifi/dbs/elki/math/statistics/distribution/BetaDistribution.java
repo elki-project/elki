@@ -264,7 +264,8 @@ public class BetaDistribution implements Distribution {
     if(x >= 1.0) {
       return 1.0;
     }
-    if(alpha > SWITCH && beta > SWITCH) {
+    if(alpha > SWITCH && beta > SWITCH && false) {
+      // FIXME: fix bugs of quadrature implementation. Add unit tests
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
     double bt = Math.exp(-logBeta(alpha, beta) + alpha * Math.log(x) + beta * Math.log1p(-x));
