@@ -193,7 +193,13 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     for (int i = 0; i < k; i++) {
       Matrix m = Matrix.identity(dimensionality, dimensionality);
       covarianceMatrices.add(m);
-      normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * m.det());
+      final double det = m.det();
+      if (det > 0.) {
+        normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * det);
+      } else {
+        LOG.warning("Encountered matrix with 0 determinant - degenerated.");
+        normDistrFactor[i] = 1.0; // Not really well defined
+      }
       invCovMatr.add(m.inverse());
       clusterWeights[i] = 1.0 / k;
       if (LOG.isDebuggingFinest()) {
@@ -201,7 +207,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
         msg.append(" model ").append(i).append(":\n");
         msg.append(" mean:    ").append(means.get(i)).append('\n');
         msg.append(" m:\n").append(FormatUtil.format(m, "        ")).append('\n');
-        msg.append(" m.det(): ").append(m.det()).append('\n');
+        msg.append(" m.det(): ").append(det).append('\n');
         msg.append(" cluster weight: ").append(clusterWeights[i]).append('\n');
         msg.append(" normDistFact:   ").append(normDistrFactor[i]).append('\n');
         LOG.debugFine(msg.toString());
@@ -260,7 +266,13 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
         covarianceMatrices.set(i, covarianceMatrices.get(i).times(1 / sumOfClusterProbabilities[i]).cheatToAvoidSingularity(SINGULARITY_CHEAT));
       }
       for (int i = 0; i < k; i++) {
-        normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * covarianceMatrices.get(i).det());
+        final double det = covarianceMatrices.get(i).det();
+        if (det > 0.) {
+          normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * det);
+        } else {
+          LOG.warning("Encountered matrix with 0 determinant - degenerated.");
+          normDistrFactor[i] = 1.0; // Not really well defined
+        }
         invCovMatr.set(i, covarianceMatrices.get(i).inverse());
       }
       // reassign probabilities
@@ -339,6 +351,9 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
         if (LOG.isDebuggingFinest()) {
           LOG.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
         }
+        if (!(prob >= 0.)) {
+          LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor[i]);
+        }
         probabilities[i] = prob;
       }
       double priorProbability = 0.0;
@@ -352,13 +367,12 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
 
       double[] clusterProbabilities = new double[k];
       for (int i = 0; i < k; i++) {
-        assert (priorProbability >= 0.0);
         assert (clusterWeights[i] >= 0.0);
         // do not divide by zero!
-        if (priorProbability == 0.0) {
-          clusterProbabilities[i] = 0.0;
-        } else {
+        if (priorProbability > 0.0) {
           clusterProbabilities[i] = probabilities[i] / priorProbability * clusterWeights[i];
+        } else {
+          clusterProbabilities[i] = 0.0;
         }
       }
       probClusterIGivenX.put(iditer, clusterProbabilities);
