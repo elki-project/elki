@@ -175,21 +175,32 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
-          double nkdist = ((DoubleDistanceKNNList) knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
-
-          final double v = Math.max(nkdist, neighbor.doubleDistance()) / (h * nkdist);
-          sum += kernel.density(v) / Math.pow(h * nkdist, dim);
-          count++;
+          final double nkdist = ((DoubleDistanceKNNList) knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
+          if (nkdist > 0.) {
+            final double v = Math.max(nkdist, neighbor.doubleDistance()) / (h * nkdist);
+            sum += kernel.density(v) / Math.pow(h * nkdist, dim);
+            count++;
+          } else {
+            sum = Double.POSITIVE_INFINITY;
+            count++;
+            break;
+          }
         }
       } else {
         for (DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
-          double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
-          final double v = Math.max(nkdist, neighbor.getDistance().doubleValue()) / (h * nkdist);
-          sum += kernel.density(v) / Math.pow(h * nkdist, dim);
-          count++;
+          final double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
+          if (nkdist > 0.) {
+            final double v = Math.max(nkdist, neighbor.getDistance().doubleValue()) / (h * nkdist);
+            sum += kernel.density(v) / Math.pow(h * nkdist, dim);
+            count++;
+          } else {
+            sum = Double.POSITIVE_INFINITY;
+            count++;
+            break;
+          }
         }
       }
       ldes.putDouble(it, sum / count);
