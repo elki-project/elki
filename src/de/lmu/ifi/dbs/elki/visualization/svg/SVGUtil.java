@@ -86,11 +86,6 @@ public final class SVGUtil {
    */
   final private static int NO_VALUE = 0x00123456;
 
-  /**
-   * For hex encoding;
-   */
-  final private static char[] HEX = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
   static {
     // Build a reasonably sized hashmap. Use 0
     SVG_COLOR_NAMES = new TObjectIntHashMap<>(90, .8f, NO_VALUE);
@@ -527,9 +522,10 @@ public final class SVGUtil {
    * @return Color string
    */
   public static String colorToString(int col) {
-    char[] buf = new char[] { '#', 'X', 'X', 'X', 'X', 'X', 'X' };
+    final char[] buf = new char[] { '#', 'X', 'X', 'X', 'X', 'X', 'X' };
     for (int i = 6; i > 0; i--) {
-      buf[i] = HEX[col & 0xF];
+      final int v = (col & 0xF);
+      buf[i] = (char) ((v < 10) ? ('0' + v) : ('a' + v - 10));
       col >>>= 4;
     }
     return new String(buf);
