@@ -513,18 +513,19 @@ public final class SVGUtil {
   }
 
   /**
-   * Convert a color name from an AWT color object to CSS syntax
+   * Convert a color name from an integer RGB color to CSS syntax
    * 
-   * Note: currently only RGB (from ARGB order) are supported.
+   * Note: currently only RGB (from ARGB order) are supported. The alpha channel
+   * will be ignored.
    * 
    * @param col Color value
    * @return Color string
    */
   public static String colorToString(int col) {
     char[] buf = new char[] { '#', '0', '0', '0', '0', '0', '0' };
-    for (int i = 7; i > 0; i--) {
+    for (int i = 6; i > 0; i--) {
       buf[i] += (col & 0xF);
-      col >>= 4;
+      col >>>= 4;
     }
     return new String(buf);
   }
