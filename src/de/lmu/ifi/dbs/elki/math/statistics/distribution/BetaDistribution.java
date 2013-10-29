@@ -233,6 +233,42 @@ public class BetaDistribution implements Distribution {
   }
 
   /**
+   * Static version of the PDF of the beta distribution
+   * 
+   * @param val Value
+   * @param alpha Shape parameter a
+   * @param beta Shape parameter b
+   * @return probability density
+   */
+  public static double logpdf(double val, double alpha, double beta) {
+    if (alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) {
+      return Double.NaN;
+    }
+    if (val < 0. || val > 1.) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    if (val == 0.) {
+      if (alpha > 1.) {
+        return Double.NEGATIVE_INFINITY;
+      }
+      if (alpha < 1.) {
+        return Double.POSITIVE_INFINITY;
+      }
+      return Math.log(beta);
+    }
+    if (val == 1.) {
+      if (beta > 1.) {
+        return Double.NEGATIVE_INFINITY;
+      }
+      if (beta < 1.) {
+        return Double.POSITIVE_INFINITY;
+      }
+      return Math.log(alpha);
+    }
+    return -logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1);
+  }
+
+  /**
    * Compute log beta(a,b)
    * 
    * @param alpha Shape parameter a
