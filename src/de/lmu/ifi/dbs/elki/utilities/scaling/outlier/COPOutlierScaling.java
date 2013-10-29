@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Erich Schubert
  */
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://siam.omnibooksonline.com/2011datamining/data/papers/018.pdf")
-public class CDFOutlierScaling implements OutlierScalingFunction {
+public class COPOutlierScaling implements OutlierScalingFunction {
   /**
    * Phi parameter.
    */
@@ -81,7 +81,7 @@ public class CDFOutlierScaling implements OutlierScalingFunction {
    * 
    * @param phi Phi parameter
    */
-  public CDFOutlierScaling(double phi) {
+  public COPOutlierScaling(double phi) {
     super();
     this.phi = phi;
   }
@@ -100,7 +100,7 @@ public class CDFOutlierScaling implements OutlierScalingFunction {
       throw new AbortException("Programming error: outlier scaling not initialized.");
     }
     double s = inverted ? (1 - dist.cdf(value)) : dist.cdf(value);
-    return (phi > 0) ? (phi * s / ((1 - s) + phi)) : s;
+    return (phi > 0.) ? (phi * s) / (1 - s + phi) : s;
   }
 
   @Override
@@ -148,7 +148,7 @@ public class CDFOutlierScaling implements OutlierScalingFunction {
     /**
      * Phi parameter.
      */
-    public static final OptionID PHI_ID = new OptionID("cdfscaling.phi", "Phi parameter, expected rate of outliers. Set to 0 to use raw CDF values.");
+    public static final OptionID PHI_ID = new OptionID("copscaling.phi", "Phi parameter, expected rate of outliers. Set to 0 to use raw CDF values.");
 
     /**
      * Phi value.
@@ -165,8 +165,8 @@ public class CDFOutlierScaling implements OutlierScalingFunction {
     }
 
     @Override
-    protected CDFOutlierScaling makeInstance() {
-      return new CDFOutlierScaling(phi);
+    protected COPOutlierScaling makeInstance() {
+      return new COPOutlierScaling(phi);
     }
   }
 }

@@ -45,9 +45,11 @@ public class EnsembleVotingMin implements EnsembleVoting {
 
   @Override
   public double combine(double[] scores, int count) {
-    double min = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < count; i++) {
-      min = Math.min(min, scores[i]);
+    double min = scores[0];
+    for (int i = 1; i < count; i++) {
+      if (scores[i] < min) {
+        min = scores[i];
+      }
     }
     return min;
   }

@@ -111,6 +111,10 @@ public class HeDESNormalizationOutlierScaling implements OutlierScalingFunction 
   @Override
   public double getScaled(double value) {
     assert (stddev > 0 || (value == mean)) : "prepare() was not run prior to using the scaling function.";
-    return (value - mean) / stddev;
+    if (stddev > 0.) {
+      return (value - mean) / stddev;
+    } else {
+      return 0.;
+    }
   }
 }

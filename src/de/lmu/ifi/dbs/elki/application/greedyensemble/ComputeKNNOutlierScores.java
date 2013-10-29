@@ -279,6 +279,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       }
     });
     // LDOF
+    boolean runldof = false;
+    if (runldof) {
     LOG.verbose("Running LDOF");
     runForEachK(new AlgRunner() {
       @Override
@@ -288,7 +290,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
         writeResult(fout, ids, ldofresult, scaling, "LDOF-" + kstr);
         database.getHierarchy().removeSubtree(ldofresult);
       }
-    });
+    });}
     // Run LDF
     LOG.verbose("Running LDF");
     runForEachK(new AlgRunner() {
