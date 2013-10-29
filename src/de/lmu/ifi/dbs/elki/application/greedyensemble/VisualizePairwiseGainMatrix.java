@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -47,6 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -156,7 +156,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     final int size = ids.size();
 
     double[][] data = new double[size][size];
-    DoubleMinMax minmax = new DoubleMinMax();
+    DoubleMinMax minmax = new DoubleMinMax(), commax = new DoubleMinMax();
 
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing ensemble gain.", size * (size + 1) >> 1, LOG) : null;
@@ -169,7 +169,6 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
           double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(veca)));
           data[a][a] = auc;
           // minmax.put(auc);
-          // logger.verbose(auc + " " + labels.get(ids.get(a)));
           if (prog != null) {
             prog.incrementProcessed(LOG);
           }
@@ -185,11 +184,12 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
             buf[1] = vecb.doubleValue(d);
             combined[d] = voting.combine(buf);
           }
-          double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(new DoubleVector(combined))));
+          double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(new Vector(combined))));
           // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
           // labels.get(ids.get(b)));
           data[a][b] = auc;
           data[b][a] = auc;
+          commax.put(data[a][b]);
           // minmax.put(auc);
           if (prog != null) {
             prog.incrementProcessed(LOG);
@@ -214,35 +214,31 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       data[a][a] = 0;
     }
 
-    LOG.verbose(minmax.toString());
+    LOG.verbose("Gain: " + minmax.toString() + " AUC: " + commax.toString());
 
     boolean hasneg = (minmax.getMin() < -1E-3);
     LinearScaling scale;
     if (!hasneg) {
-      scale = new LinearScaling(minmax);
+      scale = LinearScaling.fromMinMax(0., minmax.getMax());
     } else {
       scale = LinearScaling.fromMinMax(0.0, Math.max(minmax.getMax(), -minmax.getMin()));
     }
+    scale = LinearScaling.fromMinMax(0., .5);
 
     BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
     for (int x = 0; x < size; x++) {
       for (int y = x; y < size; y++) {
         double val = data[x][y];
-        val = scale.getScaled(val);
+        val = Math.max(-1, Math.min(1., scale.getScaled(val)));
         // Compute color:
         final int col;
         {
-          if (!hasneg) {
-            int ival = 0xFF & (int) (255 * Math.max(0, val));
-            col = 0xff000000 | (ival << 16) | (ival << 8) | ival;
+          if (val >= 0) {
+            int ival = 0xFF & (int) (255 * val);
+            col = 0xff000000 | (ival << 8);
           } else {
-            if (val >= 0) {
-              int ival = 0xFF & (int) (255 * val);
-              col = 0xff000000 | (ival << 8);
-            } else {
-              int ival = 0xFF & (int) (255 * -val);
-              col = 0xff000000 | (ival << 16);
-            }
+            int ival = 0xFF & (int) (255 * -val);
+            col = 0xff000000 | (ival << 16);
           }
         }
         img.setRGB(x, y, col);

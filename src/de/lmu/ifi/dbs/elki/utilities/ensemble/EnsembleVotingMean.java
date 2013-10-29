@@ -44,7 +44,7 @@ public class EnsembleVotingMean implements EnsembleVoting {
 
   @Override
   public double combine(double[] scores, int count) {
-    double sum = 0.0;
+    double sum = 0.;
     for (int i = 0; i < count; i++) {
       sum += scores[i];
     }

@@ -5,7 +5,7 @@ de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.MinusLogScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.TopKOutlierScaling
-de.lmu.ifi.dbs.elki.utilities.scaling.outlier.CDFOutlierScaling
+de.lmu.ifi.dbs.elki.utilities.scaling.outlier.COPOutlierScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MinusLogGammaScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MinusLogStandardDeviationScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.MultiplicativeInverseScaling
