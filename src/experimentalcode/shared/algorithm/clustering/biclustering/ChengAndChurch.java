@@ -23,15 +23,15 @@ package experimentalcode.shared.algorithm.clustering.biclustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import gnu.trove.map.TLongDoubleMap;
+import gnu.trove.map.hash.TLongDoubleHashMap;
+
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclustering;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.BiclusterWithInverted;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
@@ -108,7 +107,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * datamatrix.
    * </p>
    */
-  private static final int MIN_COLUMN_REMOE_THRESHOLD = 100;
+  private static final int MIN_COLUMN_REMOVE_THRESHOLD = 100;
 
   /**
    * The minimum number of rows that the database must have so that a removal of
@@ -123,7 +122,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * </p>
    * -->
    */
-  private static final int MIN_ROW_REMOE_THRESHOLD = 100;
+  private static final int MIN_ROW_REMOVE_THRESHOLD = 100;
 
   /**
    * Default value for {@link #MULTIPLE_ADDITION_PARAM}
@@ -222,7 +221,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * {@link #maxMissingValue}.
    * </p>
    */
-  private Map<IntIntPair, Double> maskedVals;
+  private TLongDoubleMap maskedVals;
 
   /**
    * <p>
@@ -236,12 +235,12 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * </p>
    * 
    */
-  private Map<IntIntPair, Double> missingValues;
+  private TLongDoubleMap missingValues;
 
   private int numberOfAddition = DEFAULT_MULTIPLE_ADDITION;
 
   /**
-   * FIXME: document
+   * Value that indicates a missing value (e.g. NaN)
    */
   private double missing;
 
@@ -260,18 +259,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     this.maxMissingValue = maxMissingValue;
     this.numberOfAddition = numberOfAddition;
     this.missing = missing;
-    this.maskedVals = new HashMap<>();
-    this.missingValues = new HashMap<>();
-  }
-
-  @Override
-  public void biclustering() {
-    long t = System.currentTimeMillis();
-
-    chengAndChurch();
-    if (LOG.isVerbose()) {
-      LOG.verbose("Runtime: " + (System.currentTimeMillis() - t));
-    }
+    this.random = rnd.getRandom();
   }
 
   /**
@@ -279,7 +267,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * {@link #n} biclusters.</p>
    * <p>
    * It first checks if some missing (<code>NULL</code>) values are in the
-   * database and masks them ({@link #fillMissingValues()}).<br />
+   * database and masks them ({@link #replaceMissingValues()}).<br />
    * For each iteration it starts with the complete database as subspace cluster
    * and performs multiple row and column deletions (
    * {@link #multipleNodeDeletion()}) if more than 100 rows or columns are in
@@ -290,30 +278,23 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * start with the complete database as starting subspace cluster again (
    * {@link #reset()}).
    * </p>
+   * 
+   * @return
    */
-  private void chengAndChurch() {
-    this.reset();
-    // long t = System.currentTimeMillis();
-    this.fillMissingValues();
-    // logger.verbose("fillMissingValues() finished. (" +
-    // (System.currentTimeMillis() - t) + ")");
+  @Override
+  public Clustering<BiclusterWithInverted<V>> biclustering() {
+    this.maskedVals = new TLongDoubleHashMap(getRowDim() * getColDim(), .5f, -1, Double.NaN);
+
+    Clustering<BiclusterWithInverted<V>> result = new Clustering<>("cheng-and-church", "Cheng and Church Biclustering");
+    this.replaceMissingValues();
     for (int i = 0; i < n; i++) {
-      // t = System.currentTimeMillis();
+      this.reset();
       this.multipleNodeDeletion();
-      // logger.verbose("\tmultipleNodeDeletion() finished. (" +
-      // (System.currentTimeMillis() - t) + ")");
-      // t = System.currentTimeMillis();
       this.nodeAddition();
-      // logger.verbose("\tnodeAddition() finished. (" +
-      // (System.currentTimeMillis() - t) + ")");
-      // t = System.currentTimeMillis();
       this.maskMatrix();
-      // logger.verbose("\tmaskMatrix() finished. (" +
-      // (System.currentTimeMillis() - t) + ")");
-      // t = System.currentTimeMillis();
       BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<>(rowsBitsetToIDs(currentRows), colsBitsetToIDs(currentCols), getRelation());
       bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
-      addBiclusterToResult(bicluster);
+      addBiclusterToResult(result, bicluster);
 
       if (LOG.isVerbose()) {
         LOG.verbose("Score of bicluster" + (i + 1) + ": " + this.currentResidue);
@@ -321,29 +302,53 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         LOG.verbose("Number of columns: " + currentCols.cardinality());
         LOG.verbose("Total number of masked values: " + maskedVals.size() + "\n");
       }
-      this.reset();
     }
+    return result;
+  }
+
+  /**
+   * <p>
+   * Resets the values for the next iteration to start.
+   * </p>
+   * <p>
+   * These are {@link #rowMeans}, {@link #columnMeans}, {@link #currentMean},
+   * {@link #currentResidue}, {@link #invertedRows}. It sets the
+   * {@link #currentRows} and {@link #currentCols} from 0 to
+   * {@link #getRowDim()} ({@link #getColDim()} resp.).<br/>
+   * It calls {@link #updateValues()} at the end.
+   * </p>
+   */
+  private void reset() {
+    currentResidue = 0.;
+    currentMean = 0.;
+
+    rowMeans = new double[getRowDim()];
+    Arrays.fill(rowMeans, Double.NaN); // not computed yet.
+    columnMeans = new double[getColDim()];
+    Arrays.fill(columnMeans, Double.NaN); // not computed yet.
+
+    invertedRows.clear();
+
+    currentCols = new BitSet(getColDim());
+    currentCols.set(0, getColDim());
+    currentRows = new BitSet(getRowDim());
+    currentRows.set(0, getRowDim());
+    updateValues();
   }
 
   //
   /**
-   * <p>
-   * Removes alternating rows and columns until the residue of the current
-   * bicluster is smaller than {@link #delta}.
-   * </p>
-   * <p>
-   * If the dimension of the database is small ({@link #getColDim()} >
-   * {@link #MIN_COLUMN_REMOE_THRESHOLD}), no column deletion is performed. Same
-   * for rows ({@link #MIN_ROW_REMOE_THRESHOLD}).<br />
-   * If a single iteration does not remove anything a single node deletion
-   * algorithm ({@link #singleNodeDeletion()}) is performed.
-   * </p>
+   * Algorithm 2 of Cheng and Church.
+   * 
+   * Remove all rows and columns that reduce the residue by alpha.
    */
   private void multipleNodeDeletion() {
     // If something has been removed:
     boolean removed = false;
 
-    while (this.currentResidue > this.delta) {
+    // Note: assumes that currentResidue = H(I,J)
+    BitSet unionRows = new BitSet(getRowDim());
+    while (this.currentResidue > delta) {
       removed = false;
       // TODO: Proposal in paper: use an adaptive alpha based on the new scores
       // of the current bicluster.
@@ -351,87 +356,92 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       // TODO: Maybe use the row dim of the current cluster instead of the dim
       // of the database?
 
-      if (getRowDim() > MIN_ROW_REMOE_THRESHOLD) {
+      // Step 2: remove rows above threshold
+      if (getRowDim() > MIN_ROW_REMOVE_THRESHOLD) {
         // Compute row mean for each row i
-        BitSet unionRows = new BitSet();
+        unionRows.clear();
         unionRows.or(currentRows);
         unionRows.or(invertedRows);
-        List<Integer> rowsToRemove = new ArrayList<>();
-        // List<Integer> invertedRowsToRemove = new ArrayList<>();
+        // BitSet invertedRowsToRemove = new ArrayList<>();
         for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
           if (computeRowResidue(i, false) > alphaResidue) {
-            rowsToRemove.add(i);
+            currentRows.clear(i);
+            invertedRows.clear(i);
+            removed = true;
           }
         }
-        // Inverted:
-        // for(int i = invertedRows.nextSetBit(0); i >= 0; i =
-        // invertedRows.nextSetBit(i + 1)) {
-        // if(computeRowResidue(i, false) > alphaResidue) {
-        // invertedRowsToRemove.add(i);
-        // }
-        // }
-        // remove the found ones
-        for (Integer row : rowsToRemove) {
-          currentRows.clear(row);
-          invertedRows.clear(row);
-          removed = true;
-        }
-        // for(Integer row : invertedRowsToRemove) {
-        // invertedRows.clear(row);
-        // currentRows.clear(row);
-        // removed = true;
-        // }
+        // TODO: same for inverted rows.
+
+        // Step 3: update residue
         if (removed) {
           updateValues();
+          alphaResidue = alpha * currentResidue;
         }
       }
 
-      // CARINA: alpharesidue updaten
-      alphaResidue = alpha * this.currentResidue;
-
-      if (getColDim() > MIN_COLUMN_REMOE_THRESHOLD) {
+      // Step 4: remove columns above threshold
+      if (getColDim() > MIN_COLUMN_REMOVE_THRESHOLD) {
+        boolean colRemoved = false;
         // Compute row mean for each column j
-        List<Integer> colsToRemove = new ArrayList<>();
         for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
           if (computeColResidue(j) > alphaResidue) {
-            colsToRemove.add(j);
+            currentCols.clear(j);
+            removed = true;
+            colRemoved = true;
           }
-        }
-        boolean colRemoved = false;
-        // remove them
-        for (Integer col : colsToRemove) {
-          currentCols.clear(col);
-          removed = true;
-          colRemoved = true;
         }
         if (colRemoved) {
           updateValues();
         }
       }
 
+      // Step 5: if nothing has been removed, try removing single nodes.
       if (!removed) {
-        // TODO: Paper is not clear when to call singleNodeDeletion()
         singleNodeDeletion();
       }
     }
   }
 
   /**
-   * <p>
-   * Performs a single node deletion per iteration until the score of the
-   * resulting bicluster is lower or equal to delta.
-   * </p>
+   * Algorithm 1 of Cheng and Church:
+   * 
+   * Find a single row or column to remove.
    */
   private void singleNodeDeletion() {
+    // Assume that currentResidue is up to date!
     while (this.currentResidue > delta) {
-      IntDoublePair maxRowResidue = getLargestRowResidue();
-      IntDoublePair maxColResidue = getLargestColResidue();
-      if (maxRowResidue.second > maxColResidue.second) {
-        currentRows.clear(maxRowResidue.first);
-        invertedRows.clear(maxRowResidue.first);
-      } else {
-        currentCols.clear(maxColResidue.first);
+      // Current maximum saving
+      double max = 0.;
+      int bestrow = -1, bestcol = -1;
+      BitSet unionRows = getUnionRows();
+
+      // Test rows
+      for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
+        double rowResidue = computeRowResidue(i, false);
+        if (max < rowResidue) {
+          max = rowResidue;
+          bestrow = i;
+        }
+        // TODO: add support for inverted?
       }
+
+      // Test columns:
+      for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+        double colResidue = computeColResidue(j);
+        if (max < colResidue) {
+          max = colResidue;
+          bestcol = j;
+        }
+      }
+
+      if (bestcol > -1) { // then override bestrow!
+        currentCols.clear(bestcol);
+      } else {
+        assert (bestrow >= 0);
+        currentRows.clear(bestrow);
+        invertedRows.clear(bestrow);
+      }
+      // TODO: update only as much as necessary!
       updateValues();
     }
   }
@@ -453,16 +463,11 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       added = false;
       numberOfAddition--;
       // Compute row mean for each col j
-      List<Integer> colToAdd = new ArrayList<>();
       for (int j = currentCols.nextClearBit(0); j < getColDim(); j = currentCols.nextClearBit(j + 1)) {
         if (computeColResidue(j) <= currentResidue) {
-          colToAdd.add(j);
+          currentCols.set(j);
+          added = true;
         }
-      }
-      // Add the found ones
-      for (Integer col : colToAdd) {
-        currentCols.set(col);
-        added = true;
       }
       if (added) {
         updateValues();
@@ -473,65 +478,24 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       // unionRows.or(currentRows);
       // unionRows.or(invertedRows);
 
-      List<Integer> rowsToAdd = new ArrayList<>();
-      List<Integer> invertedRowsToAdd = new ArrayList<>();
       for (int i = currentRows.nextClearBit(0); i < getRowDim(); i = currentRows.nextClearBit(i + 1)) {
         if (computeRowResidue(i, false) <= currentResidue) {
-          rowsToAdd.add(i);
+          currentRows.set(i);
+          invertedRows.clear(i);
+          added = true;
         }
       }
       for (int i = invertedRows.nextClearBit(0); i < getRowDim(); i = invertedRows.nextClearBit(i + 1)) {
         if (computeRowResidue(i, true) <= currentResidue) {
-          invertedRowsToAdd.add(i);
+          invertedRows.set(i);
+          currentRows.clear(i);
+          added = true;
         }
-      }
-      // Add the found ones
-      for (Integer row : rowsToAdd) {
-        currentRows.set(row);
-        invertedRows.clear(row); // Make sure that just one of them has the row.
-        added = true;
-      }
-      for (Integer row : invertedRowsToAdd) {
-        invertedRows.set(row);
-        currentRows.clear(row); // Make sure that just one of them has the row.
-        added = true;
       }
       if (added) {
         updateValues();
       }
     }
-  }
-
-  /**
-   * <p>
-   * Resets the values for the next iteration to start.
-   * </p>
-   * <p>
-   * These are {@link #rowMeans}, {@link #columnMeans}, {@link #currentMean},
-   * {@link #currentResidue}, {@link #invertedRows}. It sets the
-   * {@link #currentRows} and {@link #currentCols} from 0 to
-   * {@link #getRowDim()} ({@link #getColDim()} resp.).<br/>
-   * It calls {@link #updateValues()} at the end.
-   * </p>
-   */
-  private void reset() {
-    currentResidue = 0.0;
-    currentMean = 0.0;
-
-    rowMeans = new double[getRowDim()];
-    Arrays.fill(rowMeans, Double.NaN); // not computed yet.
-    columnMeans = new double[getColDim()];
-    Arrays.fill(columnMeans, Double.NaN); // not computed yet.
-
-    invertedRows.clear();
-
-    currentCols = new BitSet(getColDim());
-    currentCols.set(0, getColDim());
-
-    currentRows = new BitSet(getRowDim());
-    currentRows.set(0, getRowDim());
-    updateValues();
-
   }
 
   /**
@@ -546,17 +510,15 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * @see #BEGIN_PARAM
    * @see #END_PARAM
    */
-  private void fillMissingValues() {
+  private void replaceMissingValues() {
     if (this.missingValues == null) {
-      this.missingValues = new HashMap<>();
+      this.missingValues = new TLongDoubleHashMap(getRowDim(), .5f, -1, Double.NaN);
     }
-    if (Double.isNaN(missing)) {
-      return;
-    }
+    final double range = maxMissingValue - minMissingValue;
     for (int i = 0; i < getRowDim(); i++) {
       for (int j = 0; j < getColDim(); j++) {
         if (super.valueAt(i, j) == missing) {
-          missingValues.put(new IntIntPair(i, j), minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
+          missingValues.put((i << 32) | j, minMissingValue + random.nextDouble() * range);
         }
       }
     }
@@ -574,13 +536,10 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * @see #END_PARAM
    */
   private void maskMatrix() {
-    BitSet unionRows = new BitSet();
-    unionRows.or(currentRows);
-    unionRows.or(invertedRows);
+    BitSet unionRows = getUnionRows();
     for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
       for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
-        IntIntPair key = new IntIntPair(i, j);
-        maskedVals.put(key, minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
+        maskedVals.put((i << 32) | j, minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
       }
     }
   }
@@ -593,14 +552,11 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * </p>
    */
   private void updateValues() {
-    BitSet unionRows = new BitSet();
-    unionRows.or(currentRows);
-    unionRows.or(invertedRows);
-
-    this.currentMean = meanOfSubmatrix(unionRows, currentCols);
+    BitSet unionRows = getUnionRows();
+    currentMean = meanOfSubmatrix(unionRows, currentCols);
     updateAllRowMeans();
     updateAllColMeans();
-    this.currentResidue = computeMeanSquaredResidue(unionRows, currentCols);
+    currentResidue = computeMeanSquaredResidue(unionRows, currentCols);
   }
 
   /**
@@ -616,11 +572,8 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   private void updateAllRowMeans() {
     this.rowMeans = new double[getRowDim()];
     Arrays.fill(rowMeans, Double.NaN);
-    
-    BitSet unionRows = new BitSet();
-    unionRows.or(currentRows);
-    unionRows.or(invertedRows);
 
+    BitSet unionRows = getUnionRows();
     for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
       rowMeans[i] = meanOfRow(i, currentCols);
     }
@@ -640,9 +593,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     this.columnMeans = new double[getColDim()];
     Arrays.fill(columnMeans, Double.NaN);
 
-    BitSet unionRows = new BitSet();
-    unionRows.or(currentRows);
-    unionRows.or(invertedRows);
+    BitSet unionRows = getUnionRows();
     for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
       columnMeans[j] = meanOfCol(unionRows, j);
     }
@@ -696,95 +647,57 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   }
 
   /**
-   * Finds the <b>largest row residue</b> in the current biclsuter by examine
-   * the its current row means. The row means and current rows of the current
-   * cluster are used. </p>
-   * 
-   * @return An {@link IntDoublePair} that holds the row as FIRST and the value
-   *         of that row residue as SECOND.
-   */
-  private IntDoublePair getLargestRowResidue() {
-    Double max = 0.0;
-    BitSet unionRows = new BitSet();
-    unionRows.or(currentRows);
-    unionRows.or(invertedRows);
-
-    int row = unionRows.nextSetBit(0);
-    for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
-      double rowResidue = computeRowResidue(i, false);
-      if (max < rowResidue) {
-        max = rowResidue;
-        row = i;
-      }
-    }
-    return new IntDoublePair(row, max);
-  }
-
-  /**
    * Computes the <b>mean row residue</b> of the given <code>row</code>.
    * 
    * @param row The row who's residue should be computed.
-   * @param inverted Indicates if the residue should be computed as the inverted
-   *        (<code>true</code>).
+   * @param rowinverted Indicates if the row should be considered inverted.
    * @return The row residue of the given <code>row</code>.
    */
-  private double computeRowResidue(int row, boolean inverted) {
+  private double computeRowResidue(int row, boolean rowinverted) {
     double rowResidue = 0.;
     for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
-      // if rowMeans does not contains the row: recompute it...
-      double rowMean = getRowMean(row);
-      double colMean = getColMean(j);
+      double rowMean = cachedRowMean(row);
+      double colMean = cachedColumnMean(j);
       double val = 0.;
-      if (inverted) {
-        val = currentMean + rowMean - colMean - valueAt(row, j);
+      if (!rowinverted) {
+        val = valueAt(row, j) - rowMean - colMean + currentMean;
       } else {
-        val = valueAt(row, j) - colMean - rowMean + currentMean;
+        val = -valueAt(row, j) + rowMean - colMean + currentMean;
       }
       rowResidue += (val * val);
     }
     return (rowResidue / currentCols.cardinality());
   }
 
-  protected double getColMean(int j) {
+  /**
+   * Compute the union of positive and inverted rows.
+   * 
+   * @return
+   */
+  protected BitSet getUnionRows() {
+    BitSet unionRows = new BitSet(getRowDim());
+    unionRows.or(currentRows);
+    unionRows.or(invertedRows);
+    return unionRows;
+  }
+
+  protected double cachedColumnMean(int j) {
     double colMean = columnMeans[j];
     if (Double.isNaN(colMean)) {
-      BitSet unionRows = new BitSet();
-      unionRows.or(currentRows);
-      unionRows.or(invertedRows);
-      colMean = this.meanOfCol(unionRows, j);
+      BitSet unionRows = getUnionRows();
+      colMean = super.meanOfCol(unionRows, j);
       columnMeans[j] = colMean;
     }
     return colMean;
   }
 
-  protected double getRowMean(int row) {
+  protected double cachedRowMean(int row) {
     double rowMean = rowMeans[row];
     if (Double.isNaN(rowMean)) {
-      rowMean = this.meanOfRow(row, currentCols);
+      rowMean = super.meanOfRow(row, currentCols);
       rowMeans[row] = rowMean;
     }
     return rowMean;
-  }
-
-  /**
-   * Finds the <b>largest column residue</b> in the current biclsuter by examine
-   * the its current column means. The column means and current columns of the
-   * current cluster are used. </p>
-   * 
-   * @return An {@link IntDoublePair} that holds the column as FIRST and the
-   *         value of that column residue as SECOND.
-   */
-  private IntDoublePair getLargestColResidue() {
-    Double max = 0.0;
-    int col = currentCols.nextSetBit(0);
-    for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
-      double colResidue = computeColResidue(j);
-      if (max < colResidue) {
-        max = colResidue;
-        col = j;
-      }
-    }
-    return new IntDoublePair(col, max);
   }
 
   /**
@@ -795,13 +708,13 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * @return The row residue of the given <code>col</code>um.
    */
   private double computeColResidue(int col) {
-    double colResidue = 0.0;
-    BitSet unionRows = new BitSet();
-    unionRows.or(currentRows);
-    unionRows.or(invertedRows);
+    BitSet unionRows = getUnionRows();
 
+    final double bias = cachedColumnMean(col) + currentMean;
+
+    double colResidue = 0.;
     for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
-      double val = valueAt(i, col) - getRowMean(i) - getColMean(col) + currentMean;
+      double val = valueAt(i, col) - cachedRowMean(i) - bias;
       colResidue += val * val;
     }
     return colResidue / unionRows.cardinality();
@@ -824,7 +737,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    */
   @Override
   protected double valueAt(int row, int col) {
-    IntIntPair key = new IntIntPair(row, col);
+    long key = (row << 32) | col;
     if (maskedVals.containsKey(key)) {
       return maskedVals.get(key);
     }
@@ -844,6 +757,15 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     return LOG;
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   * 
+   * @param <V> Vector type
+   */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Parameter to specify the seed for the random that creates the missing
@@ -916,12 +838,12 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
      * values are <code>double</code> and not <code>int</code>.
      * </p>
      * <p>
-     * Default: No replacement of missing parameters occurs.
+     * Default: Replace Double.NaN values.
      * <p/>
      * Key: {@code -chengandchurch.missing}
      * </p>
      */
-    public static final OptionID MISSING_ID = new OptionID("chengandchurch.missing", "This value in database will be replaced with random values in the range from begin to end.");
+    public static final OptionID MISSING_ID = new OptionID("chengandchurch.missing", "Value indicating missing values. The default is NaN, but you can use this to indicate that e.g. -1 is invalid.");
 
     /**
      * Parameter to indicate how many times an addition should be performed in
@@ -1004,7 +926,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         n = nP.intValue();
       }
 
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID);
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.);
       alphaP.addConstraint(new GreaterEqualConstraint(1.));
       if (config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
