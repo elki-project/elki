@@ -23,9 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -40,12 +38,12 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
 
 /**
  * Abstract class as a convenience for different biclustering approaches.
@@ -70,25 +68,24 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   private Database database;
 
   /**
-   * Relation we use
+   * Relation we use.
    */
   protected Relation<V> relation;
+  
+  /**
+   * Iterator to use for more efficient random access.
+   */
+  private DBIDArrayIter iter;
 
   /**
    * The row ids corresponding to the currently set {@link #relation}.
    */
-  private ArrayModifiableDBIDs rowIDs;
+  private ArrayDBIDs rowIDs;
 
   /**
-   * The column ids corresponding to the currently set {@link #relation}.
+   * Column dimensionality.
    */
-  private int[] colIDs;
-
-  /**
-   * Keeps the result. A new ResultObject is assigned when the method
-   * {@link #run(Database)} is called.
-   */
-  private Clustering<M> result;
+  private int colDim;
 
   /**
    * Constructor.
@@ -114,15 +111,10 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
     if(this.relation == null || this.relation.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
-    // FIXME: move this into subclasses!
-    this.result = new Clustering<>("Biclustering", "biclustering");
-    colIDs = new int[RelationUtil.dimensionality(this.relation)];
-    for(int i = 0; i < colIDs.length; i++) {
-      colIDs[i] = i + 1;
-    }
-    rowIDs = DBIDUtil.newArray(this.relation.getDBIDs());
-    biclustering();
-    return result;
+    colDim = RelationUtil.dimensionality(relation);
+    rowIDs = DBIDUtil.ensureArray(this.relation.getDBIDs());
+    iter = rowIDs.iter();
+    return biclustering();
   }
 
   /**
@@ -141,7 +133,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * {@link #defineBicluster(BitSet,BitSet)} and
    * {@link #addBiclusterToResult(Bicluster)} should be used.
    */
-  protected abstract void biclustering();
+  protected abstract Clustering<M> biclustering();
 
   /**
    * Convert a bitset into integer column ids.
@@ -153,7 +145,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
     int[] colIDs = new int[cols.cardinality()];
     int colsIndex = 0;
     for(int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
-      colIDs[colsIndex] = this.colIDs[i];
+      colIDs[colsIndex] = i;
       colsIndex++;
     }
     return colIDs;
@@ -167,8 +159,10 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    */
   protected ArrayDBIDs rowsBitsetToIDs(BitSet rows) {
     ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray(rows.cardinality());
+    DBIDArrayIter iter = this.rowIDs.iter();
     for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-      rowIDs.add(this.rowIDs.get(i));
+      iter.seek(i);
+      rowIDs.add(iter);
     }
     return rowIDs;
   }
@@ -189,93 +183,11 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   /**
    * Adds the given Bicluster to the result of this Biclustering.
    * 
+   * @param result Result to add to
    * @param bicluster the bicluster to add to the result
    */
-  protected void addBiclusterToResult(M bicluster) {
+  protected void addBiclusterToResult(Clustering<M> result, M bicluster) {
     result.addToplevelCluster(new Cluster<>(bicluster.getDatabaseObjectGroup(), bicluster));
-  }
-
-  /**
-   * Sorts the rows. The rows of the data matrix within the range from row
-   * <code>from</code> (inclusively) to row <code>to</code> (exclusively) are
-   * sorted according to the specified <code>properties</code> and Comparator.
-   * <p/>
-   * The List of properties must be of size <code>to - from</code> and reflect
-   * the properties corresponding to the row ids
-   * <code>{@link #rowIDs rowIDs[from]}</code> to
-   * <code>{@link #rowIDs rowIDs[to-1]}</code>.
-   * 
-   * @param <P> the type of <code>properties</code> suitable to the comparator
-   * @param from begin of range to be sorted (inclusively)
-   * @param to end of range to be sorted (exclusively)
-   * @param properties the properties to sort the rows of the data matrix
-   *        according to
-   * @param comp a Comparator suitable to the type of <code>properties</code>
-   */
-  protected <P> void sortRows(int from, int to, List<P> properties, Comparator<P> comp) {
-    if(from >= to) {
-      throw new IllegalArgumentException("Parameter from (=" + from + ") >= parameter to (=" + to + ")");
-    }
-    if(from < 0) {
-      throw new IllegalArgumentException("Parameter from (=" + from + ") < 0");
-    }
-    if(to > rowIDs.size()) {
-      throw new IllegalArgumentException("Parameter to (=" + to + ") > array length (=" + rowIDs.size() + ")");
-    }
-    if(properties.size() != to - from) {
-      throw new IllegalArgumentException("Length of properties (=" + properties.size() + ") does not conform specified length (=" + (to - from) + ")");
-    }
-    List<Pair<DBID, P>> pairs = new ArrayList<>(to - from);
-    for(int i = 0; i < properties.size(); i++) {
-      pairs.add(new Pair<>(rowIDs.get(i + from), properties.get(i)));
-    }
-    Collections.sort(pairs, new PairUtil.CompareBySecond<DBID, P>(comp));
-
-    for(int i = from; i < to; i++) {
-      rowIDs.set(i, pairs.get(i - from).getFirst());
-    }
-  }
-
-  /**
-   * Sorts the columns. The columns of the data matrix within the range from
-   * column <code>from</code> (inclusively) to column <code>to</code>
-   * (exclusively) are sorted according to the specified <code>properties</code>
-   * and Comparator.
-   * <p/>
-   * The List of properties must be of size <code>to - from</code> and reflect
-   * the properties corresponding to the column ids
-   * <code>{@link #colIDs colIDs[from]}</code> to
-   * <code>{@link #colIDs colIDs[to-1]}</code>.
-   * 
-   * @param <P> the type of <code>properties</code> suitable to the comparator
-   * @param from begin of range to be sorted (inclusively)
-   * @param to end of range to be sorted (exclusively)
-   * @param properties the properties to sort the columns of the data matrix
-   *        according to
-   * @param comp a Comparator suitable to the type of <code>properties</code>
-   */
-  protected <P> void sortCols(int from, int to, List<P> properties, Comparator<P> comp) {
-    if(from >= to) {
-      throw new IllegalArgumentException("Parameter from (=" + from + ") >= parameter to (=" + to + ")");
-    }
-    if(from < 0) {
-      throw new IllegalArgumentException("Parameter from (=" + from + ") < 0");
-    }
-    if(to > colIDs.length) {
-      throw new IllegalArgumentException("Parameter to (=" + to + ") > array length (=" + colIDs.length + ")");
-    }
-    if(properties.size() != to - from) {
-      throw new IllegalArgumentException("Length of properties (=" + properties.size() + ") does not conform specified length (=" + (to - from) + ")");
-    }
-    List<Pair<Integer, P>> pairs = new ArrayList<>(to - from);
-    for(int i = 0; i < properties.size(); i++) {
-      pairs.add(new Pair<>(colIDs[i + from], properties.get(i)));
-    }
-    Collections.sort(pairs, new PairUtil.CompareBySecond<Integer, P>(comp));
-
-    for(int i = from; i < to; i++) {
-      colIDs[i] = pairs.get(i - from).getFirst();
-    }
   }
 
   /**
@@ -292,7 +204,8 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    *         <code>database.get(rowIDs[row]).getValue(colIDs[col])</code>
    */
   protected double valueAt(int row, int col) {
-    return relation.get(rowIDs.get(row)).doubleValue(colIDs[col]);
+    iter.seek(row);
+    return relation.get(iter).doubleValue(col);
   }
   
   /**
@@ -300,7 +213,9 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * 
    * @param row Row number
    * @return DBID of this row
+   * @deprecated Expensive!
    */
+  @Deprecated
   protected DBID getRowDBID(int row) {
     return rowIDs.get(row);
   }
@@ -318,11 +233,11 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * @return the mean value of the specified row over the specified columns
    */
   protected double meanOfRow(int row, BitSet cols) {
-    double sum = 0;
+    Mean m = new Mean();
     for(int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
-      sum += valueAt(row, i);
+      m.put(valueAt(row, i));
     }
-    return sum / cols.cardinality();
+    return m.getMean();
   }
 
   /**
@@ -339,11 +254,11 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * @return the mean value of the specified column over the specified rows
    */
   protected double meanOfCol(BitSet rows, int col) {
-    double sum = 0;
+    Mean m = new Mean();
     for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-      sum += valueAt(i, col);
+      m.put(valueAt(i, col));
     }
-    return sum / rows.cardinality();
+    return m.getMean();
   }
 
   /**
@@ -379,7 +294,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * @return the number of columns of the data matrix
    */
   protected int getColDim() {
-    return this.colIDs.length;
+    return colDim;
   }
 
   /**
