@@ -1,28 +1,30 @@
 package experimentalcode.shared.algorithm.clustering.biclustering;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2013
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -36,16 +38,18 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
@@ -95,7 +99,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(ChengAndChurch.class);
-  
+
   /**
    * The minimum number of columns that the database must have so that a removal
    * of columns is performed in {@link #multipleNodeDeletion()}.</p>
@@ -125,139 +129,6 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * Default value for {@link #MULTIPLE_ADDITION_PARAM}
    */
   private static final int DEFAULT_MULTIPLE_ADDITION = 1;
-
-  /**
-   * OptionID for the parameter {@link #SEED_PARAM}.
-   */
-  public static final OptionID SEED_ID = new OptionID("chengandchurch.random", "Seed for the random that creates the missing values.");
-
-  /**
-   * Parameter to specify the seed for the random that creates the missing
-   * values.
-   * <p>
-   * Default value: 0
-   * </p>
-   * <p>
-   * Key: {@code -chengandchurch.random}
-   * </p>
-   */
-  private final LongParameter SEED_PARAM = new LongParameter(SEED_ID, 0L);
-
-  /**
-   * OptionID for the parameter {@link #DELTA_PARAM}.
-   */
-  public static final OptionID DELTA_ID = new OptionID("chengandchurch.delta", "Threshold value to determine the maximal acceptable score (mean squared residue) of a bicluster.");
-
-  /**
-   * Threshold value to determine the maximal acceptable score (mean squared
-   * residue) of a bicluster.
-   * <p/>
-   * Key: {@code -chengandchurch.delta}
-   * </p>
-   */
-  public final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0.0));
-
-  /**
-   * OptionID for the parameter {@link #ALPHA_PARAM}.
-   */
-  public static final OptionID ALPHA_ID = new OptionID("chengandchurch.alpha", "Parameter for multiple node deletion to accelerate the algorithm.");
-
-  /**
-   * Parameter for multiple node deletion to accelerate the algorithm. (&gt;= 1)
-   * <p/>
-   * Key: {@code -chengandchurch.alpha}
-   * </p>
-   */
-  public final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new GreaterEqualConstraint(1.0));
-
-  /**
-   * OptionID for the parameter {@link #N_PARAM}.
-   */
-  public static final OptionID N_ID = new OptionID("chengandchurch.n", "The number of biclusters to be found.");
-
-  /**
-   * Number of biclusters to be found.
-   * <p/>
-   * Default value: 1
-   * </p>
-   * <p/>
-   * Key: {@code -chengandchurch.n}
-   * </p>
-   */
-  public final IntParameter N_PARAM = new IntParameter(N_ID, new GreaterEqualConstraint(1));
-
-  /**
-   * OptionID for the parameter {@link #BEGIN_PARAM}.
-   */
-  public static final OptionID BEGIN_ID = new OptionID("chengandchurch.begin", "The lower limit for the masking and missing values. Must be smaller than the upper limit.");
-
-  /**
-   * Lower limit for the masking and missing values.
-   * <p/>
-   * Key: {@code -chengandchurch.begin}
-   * </p>
-   */
-  public final DoubleParameter BEGIN_PARAM = new DoubleParameter(BEGIN_ID);
-
-  /**
-   * OptionID for the parameter {@link #END_PARAM}.
-   */
-  public static final OptionID END_ID = new OptionID("chengandchurch.end", "The upper limit for the masking and missing values.");
-
-  /**
-   * Upper limit for the masking and missing values.
-   * <p/>
-   * Key: {@code -chengandchurch.end}
-   * </p>
-   */
-  public final DoubleParameter END_PARAM = new DoubleParameter(END_ID);
-
-  /**
-   * OptionID for the parameter {@link #MISSING_PARAM}.
-   */
-  public static final OptionID MISSING_ID = new OptionID("chengandchurch.missing", "This value in database will be replaced with random values in the range from begin to end.");
-
-  /**
-   * A parameter to indicate what value the missing values in the database
-   * have.</p>
-   * <p>
-   * If a value is missing in the database, you have to give them a value (e.g.
-   * -10000) and specify -10000 as this parameter.
-   * </p>
-   * <p>
-   * The missing values in database will be replaced by a random generated value
-   * in the range between {@link #BEGIN_PARAM} and {@link #END_PARAM}. The
-   * missing values will be uniform distributed. Note that the random values are
-   * <code>double</code> and not <code>int</code>.
-   * </p>
-   * <p>
-   * Default: No replacement of missing parameters occurs.
-   * <p/>
-   * Key: {@code -chengandchurch.missing}
-   * </p>
-   */
-  public final IntParameter MISSING_PARAM = new IntParameter(MISSING_ID);
-
-  /**
-   * OptionID for the parameter {@link #MULTIPLE_ADDITION_PARAM}.
-   */
-  public static final OptionID MULTIPLE_ADDITION_ID = new OptionID("chengandchurch.multipleAddition", "Indicates how many times the algorithm to add Nodes should be performed.");
-
-  /**
-   * Parameter to indicate how many times an addition should be performed in
-   * each of the <code>n</code> iterations.</p>
-   * <p>
-   * A greater value will result in a more accurate result but will require more
-   * time.
-   * </p>
-   * <p/>
-   * Default value: 1 ({@value #DEFAULT_MULTIPLE_ADDITION})
-   * </p>
-   * <p/>
-   * Key: {@code -chengandchurch.multipleAddition}
-   * </p>
-   */
-  public final IntParameter MULTIPLE_ADDITION_PARAM = new IntParameter(MULTIPLE_ADDITION_ID, new GreaterEqualConstraint(1));
 
   /**
    * Threshold for the score ({@link #DELTA_PARAM}).
@@ -306,7 +177,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * row mean.
    * </p>
    */
-  private Map<Integer, Double> rowMeans;
+  private double[] rowMeans;
 
   /**
    * All column means of the current bicluster.</p>
@@ -316,7 +187,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * column mean.
    * </p>
    */
-  private Map<Integer, Double> columnMeans;
+  private double[] columnMeans;
 
   /**
    * Keeps the position of the inverted rows belonging to the current bicluster.
@@ -367,91 +238,38 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    */
   private Map<IntIntPair, Double> missingValues;
 
+  private int numberOfAddition = DEFAULT_MULTIPLE_ADDITION;
+
+  /**
+   * FIXME: document
+   */
+  private double missing;
+
   /**
    * A random for generating values for the missing or masking
    * currentRows/columns.
    */
   private Random random;
 
-  /**
-   * Sets the options for the parameter values {@link #random}, {@link #delta},
-   * {@link #alpha}, {@link #n}, {@link #MISSING_PARAM},
-   * {@link #minMissingValue} and {@link #maxMissingValue}.
-   */
-  public ChengAndChurch(Parameterization config) {
+  public ChengAndChurch(double delta, double alpha, int n, double minMissingValue, double maxMissingValue, int numberOfAddition, double missing, RandomFactory rnd) {
     super();
-    config = config.descend(this);
-
-    // random = new Random(SEED_PARAM.getValue());
-    // delta = DELTA_PARAM.getValue();
-    // alpha = ALPHA_PARAM.getValue();
-    // n = N_PARAM.getValue();
-    // minMissingValue = BEGIN_PARAM.getValue();
-    // maxMissingValue = END_PARAM.getValue();
-    // if(minMissingValue > maxMissingValue) {
-    // throw new WrongParameterValueException(BEGIN_PARAM,
-    // "The minimum value for missing values is larger than the maximum value",
-    // "Minimum value: " + minMissingValue + "  maximum value: " +
-    // maxMissingValue);
-    // }
-    // SEED_PARAM.setOptional(true);
-    DELTA_PARAM.setOptional(false);
-    ALPHA_PARAM.setOptional(false);
-    N_PARAM.setDefaultValue(1);
-    MULTIPLE_ADDITION_PARAM.setOptional(true);
-    MULTIPLE_ADDITION_PARAM.setDefaultValue(DEFAULT_MULTIPLE_ADDITION);
-    MISSING_PARAM.setOptional(true);
-    BEGIN_PARAM.setOptional(false);
-    END_PARAM.setOptional(false);
-
-    if(config.grab(SEED_PARAM)) {
-      random = new Random(SEED_PARAM.getValue());
-    }
-    if(config.grab(DELTA_PARAM)) {
-      delta = DELTA_PARAM.getValue();
-    }
-    if(config.grab(N_PARAM)) {
-      n = N_PARAM.getValue();
-    }
-    if(config.grab(ALPHA_PARAM)) {
-      alpha = ALPHA_PARAM.getValue();
-    }
-    if(config.grab(MULTIPLE_ADDITION_PARAM)) {
-      // TODO: make instance variable?
-    }
-    if(config.grab(MISSING_PARAM)) {
-      // TODO: make instance variable?
-    }
-    if(config.grab(BEGIN_PARAM)) {
-      minMissingValue = BEGIN_PARAM.getValue();
-    }
-    if(config.grab(END_PARAM)) {
-      maxMissingValue = END_PARAM.getValue();
-    }
-
-    if(minMissingValue > maxMissingValue) {
-      config.reportError(new WrongParameterValueException(BEGIN_PARAM, "The minimum value for missing values is larger than the maximum value", "Minimum value: " + minMissingValue + "  maximum value: " + maxMissingValue));
-    }
-
+    this.delta = delta;
+    this.alpha = alpha;
+    this.n = n;
+    this.minMissingValue = minMissingValue;
+    this.maxMissingValue = maxMissingValue;
+    this.numberOfAddition = numberOfAddition;
+    this.missing = missing;
     this.maskedVals = new HashMap<>();
     this.missingValues = new HashMap<>();
-    this.rowMeans = new HashMap<>();
-    this.columnMeans = new HashMap<>();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclustering
-   * #biclustering()
-   */
   @Override
   public void biclustering() {
     long t = System.currentTimeMillis();
 
     chengAndChurch();
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("Runtime: " + (System.currentTimeMillis() - t));
     }
   }
@@ -479,7 +297,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     this.fillMissingValues();
     // logger.verbose("fillMissingValues() finished. (" +
     // (System.currentTimeMillis() - t) + ")");
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
       // t = System.currentTimeMillis();
       this.multipleNodeDeletion();
       // logger.verbose("\tmultipleNodeDeletion() finished. (" +
@@ -497,7 +315,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
       addBiclusterToResult(bicluster);
 
-      if(LOG.isVerbose()) {
+      if (LOG.isVerbose()) {
         LOG.verbose("Score of bicluster" + (i + 1) + ": " + this.currentResidue);
         LOG.verbose("Number of rows: " + currentRows.cardinality());
         LOG.verbose("Number of columns: " + currentCols.cardinality());
@@ -522,11 +340,10 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * </p>
    */
   private void multipleNodeDeletion() {
-
     // If something has been removed:
     boolean removed = false;
 
-    while(this.currentResidue > this.delta) {
+    while (this.currentResidue > this.delta) {
       removed = false;
       // TODO: Proposal in paper: use an adaptive alpha based on the new scores
       // of the current bicluster.
@@ -534,15 +351,15 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       // TODO: Maybe use the row dim of the current cluster instead of the dim
       // of the database?
 
-      if(getRowDim() > MIN_ROW_REMOE_THRESHOLD) {
+      if (getRowDim() > MIN_ROW_REMOE_THRESHOLD) {
         // Compute row mean for each row i
         BitSet unionRows = new BitSet();
         unionRows.or(currentRows);
         unionRows.or(invertedRows);
         List<Integer> rowsToRemove = new ArrayList<>();
         // List<Integer> invertedRowsToRemove = new ArrayList<>();
-        for(int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
-          if(computeRowResidue(i, false) > alphaResidue) {
+        for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
+          if (computeRowResidue(i, false) > alphaResidue) {
             rowsToRemove.add(i);
           }
         }
@@ -554,7 +371,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         // }
         // }
         // remove the found ones
-        for(Integer row : rowsToRemove) {
+        for (Integer row : rowsToRemove) {
           currentRows.clear(row);
           invertedRows.clear(row);
           removed = true;
@@ -564,35 +381,35 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         // currentRows.clear(row);
         // removed = true;
         // }
-        if(removed) {
+        if (removed) {
           updateValues();
         }
       }
 
-      //CARINA: alpharesidue updaten
+      // CARINA: alpharesidue updaten
       alphaResidue = alpha * this.currentResidue;
 
-      if(getColDim() > MIN_COLUMN_REMOE_THRESHOLD) {
+      if (getColDim() > MIN_COLUMN_REMOE_THRESHOLD) {
         // Compute row mean for each column j
         List<Integer> colsToRemove = new ArrayList<>();
-        for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
-          if(computeColResidue(j) > alphaResidue) {
+        for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+          if (computeColResidue(j) > alphaResidue) {
             colsToRemove.add(j);
           }
         }
         boolean colRemoved = false;
         // remove them
-        for(Integer col : colsToRemove) {
+        for (Integer col : colsToRemove) {
           currentCols.clear(col);
           removed = true;
           colRemoved = true;
         }
-        if(colRemoved) {
+        if (colRemoved) {
           updateValues();
         }
       }
 
-      if(!removed) {
+      if (!removed) {
         // TODO: Paper is not clear when to call singleNodeDeletion()
         singleNodeDeletion();
       }
@@ -606,14 +423,13 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * </p>
    */
   private void singleNodeDeletion() {
-    while(this.currentResidue > delta) {
+    while (this.currentResidue > delta) {
       IntDoublePair maxRowResidue = getLargestRowResidue();
       IntDoublePair maxColResidue = getLargestColResidue();
-      if(maxRowResidue.second > maxColResidue.second) {
+      if (maxRowResidue.second > maxColResidue.second) {
         currentRows.clear(maxRowResidue.first);
         invertedRows.clear(maxRowResidue.first);
-      }
-      else {
+      } else {
         currentCols.clear(maxColResidue.first);
       }
       updateValues();
@@ -632,27 +448,23 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    */
   private void nodeAddition() {
     boolean added = true;
-    int numberOfAddition = DEFAULT_MULTIPLE_ADDITION;
-    if(MULTIPLE_ADDITION_PARAM.isDefined()) {
-      numberOfAddition = MULTIPLE_ADDITION_PARAM.getValue();
-    }
 
-    while(added && numberOfAddition > 0) {
+    while (added && numberOfAddition > 0) {
       added = false;
       numberOfAddition--;
       // Compute row mean for each col j
       List<Integer> colToAdd = new ArrayList<>();
-      for(int j = currentCols.nextClearBit(0); j < getColDim(); j = currentCols.nextClearBit(j + 1)) {
-        if(computeColResidue(j) <= currentResidue) {
+      for (int j = currentCols.nextClearBit(0); j < getColDim(); j = currentCols.nextClearBit(j + 1)) {
+        if (computeColResidue(j) <= currentResidue) {
           colToAdd.add(j);
         }
       }
       // Add the found ones
-      for(Integer col : colToAdd) {
+      for (Integer col : colToAdd) {
         currentCols.set(col);
         added = true;
       }
-      if(added) {
+      if (added) {
         updateValues();
       }
 
@@ -663,28 +475,28 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
 
       List<Integer> rowsToAdd = new ArrayList<>();
       List<Integer> invertedRowsToAdd = new ArrayList<>();
-      for(int i = currentRows.nextClearBit(0); i < getRowDim(); i = currentRows.nextClearBit(i + 1)) {
-        if(computeRowResidue(i, false) <= currentResidue) {
+      for (int i = currentRows.nextClearBit(0); i < getRowDim(); i = currentRows.nextClearBit(i + 1)) {
+        if (computeRowResidue(i, false) <= currentResidue) {
           rowsToAdd.add(i);
         }
       }
-      for(int i = invertedRows.nextClearBit(0); i < getRowDim(); i = invertedRows.nextClearBit(i + 1)) {
-        if(computeRowResidue(i, true) <= currentResidue) {
+      for (int i = invertedRows.nextClearBit(0); i < getRowDim(); i = invertedRows.nextClearBit(i + 1)) {
+        if (computeRowResidue(i, true) <= currentResidue) {
           invertedRowsToAdd.add(i);
         }
       }
       // Add the found ones
-      for(Integer row : rowsToAdd) {
+      for (Integer row : rowsToAdd) {
         currentRows.set(row);
         invertedRows.clear(row); // Make sure that just one of them has the row.
         added = true;
       }
-      for(Integer row : invertedRowsToAdd) {
+      for (Integer row : invertedRowsToAdd) {
         invertedRows.set(row);
         currentRows.clear(row); // Make sure that just one of them has the row.
         added = true;
       }
-      if(added) {
+      if (added) {
         updateValues();
       }
     }
@@ -703,12 +515,13 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * </p>
    */
   private void reset() {
-
     currentResidue = 0.0;
     currentMean = 0.0;
 
-    rowMeans = new HashMap<>();
-    columnMeans = new HashMap<>();
+    rowMeans = new double[getRowDim()];
+    Arrays.fill(rowMeans, Double.NaN); // not computed yet.
+    columnMeans = new double[getColDim()];
+    Arrays.fill(columnMeans, Double.NaN); // not computed yet.
 
     invertedRows.clear();
 
@@ -734,15 +547,15 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * @see #END_PARAM
    */
   private void fillMissingValues() {
-    if(this.missingValues == null) {
+    if (this.missingValues == null) {
       this.missingValues = new HashMap<>();
     }
-    if(!MISSING_PARAM.isDefined()) {
+    if (Double.isNaN(missing)) {
       return;
     }
-    for(int i = 0; i < getRowDim(); i++) {
-      for(int j = 0; j < getColDim(); j++) {
-        if(super.valueAt(i, j) == MISSING_PARAM.getValue()) {
+    for (int i = 0; i < getRowDim(); i++) {
+      for (int j = 0; j < getColDim(); j++) {
+        if (super.valueAt(i, j) == missing) {
           missingValues.put(new IntIntPair(i, j), minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
         }
       }
@@ -764,8 +577,8 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     BitSet unionRows = new BitSet();
     unionRows.or(currentRows);
     unionRows.or(invertedRows);
-    for(int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
-      for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+    for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
+      for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
         IntIntPair key = new IntIntPair(i, j);
         maskedVals.put(key, minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
       }
@@ -801,13 +614,15 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    *         <code>currentRows</code>. -->
    */
   private void updateAllRowMeans() {
+    this.rowMeans = new double[getRowDim()];
+    Arrays.fill(rowMeans, Double.NaN);
+    
     BitSet unionRows = new BitSet();
     unionRows.or(currentRows);
     unionRows.or(invertedRows);
 
-    this.rowMeans = new HashMap<>();
-    for(int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
-      rowMeans.put(i, meanOfRow(i, currentCols));
+    for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
+      rowMeans[i] = meanOfRow(i, currentCols);
     }
     // return rowMeans;
   }
@@ -822,13 +637,14 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    *         column in <code>currentCols</code>. -->
    */
   private void updateAllColMeans() {
-    this.columnMeans = new HashMap<>();
+    this.columnMeans = new double[getColDim()];
+    Arrays.fill(columnMeans, Double.NaN);
 
     BitSet unionRows = new BitSet();
     unionRows.or(currentRows);
     unionRows.or(invertedRows);
-    for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
-      columnMeans.put(j, meanOfCol(unionRows, j));
+    for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+      columnMeans[j] = meanOfCol(unionRows, j);
     }
   }
 
@@ -844,10 +660,10 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    */
   private double computeMeanSquaredResidue(BitSet rows, BitSet cols) {
     double msr = 0.0;
-    for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-      for(int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
+    for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+      for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
         // TODO: Handling of inverted rows?
-        double val = valueAt(i, j) - rowMeans.get(i) - columnMeans.get(j) + currentMean;
+        double val = valueAt(i, j) - rowMeans[i] - columnMeans[j] + currentMean;
         msr += (val * val);
       }
     }
@@ -871,8 +687,8 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    */
   private double meanOfSubmatrix(BitSet rows, BitSet cols) {
     double sum = 0.0;
-    for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-      for(int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
+    for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+      for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
         sum += valueAt(i, j);
       }
     }
@@ -894,9 +710,9 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     unionRows.or(invertedRows);
 
     int row = unionRows.nextSetBit(0);
-    for(int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
+    for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
       double rowResidue = computeRowResidue(i, false);
-      if(max < rowResidue) {
+      if (max < rowResidue) {
         max = rowResidue;
         row = i;
       }
@@ -913,32 +729,41 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * @return The row residue of the given <code>row</code>.
    */
   private double computeRowResidue(int row, boolean inverted) {
-    double rowResidue = 0.0;
-    for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+    double rowResidue = 0.;
+    for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
       // if rowMeans does not contains the row: recompute it...
-      Double rowMean = rowMeans.get(row);
-      if(rowMean == null) {
-        rowMean = this.meanOfRow(row, currentCols);
-        rowMeans.put(row, rowMean);
-      }
-      Double colMean = columnMeans.get(j);
-      if(colMean == null) {
-        BitSet unionRows = new BitSet();
-        unionRows.or(currentRows);
-        unionRows.or(invertedRows);
-        colMean = this.meanOfCol(unionRows, j);
-        columnMeans.put(j, colMean);
-      }
-      double val = 0.0;
-      if(inverted) {
+      double rowMean = getRowMean(row);
+      double colMean = getColMean(j);
+      double val = 0.;
+      if (inverted) {
         val = currentMean + rowMean - colMean - valueAt(row, j);
-      }
-      else {
+      } else {
         val = valueAt(row, j) - colMean - rowMean + currentMean;
       }
       rowResidue += (val * val);
     }
     return (rowResidue / currentCols.cardinality());
+  }
+
+  protected double getColMean(int j) {
+    double colMean = columnMeans[j];
+    if (Double.isNaN(colMean)) {
+      BitSet unionRows = new BitSet();
+      unionRows.or(currentRows);
+      unionRows.or(invertedRows);
+      colMean = this.meanOfCol(unionRows, j);
+      columnMeans[j] = colMean;
+    }
+    return colMean;
+  }
+
+  protected double getRowMean(int row) {
+    double rowMean = rowMeans[row];
+    if (Double.isNaN(rowMean)) {
+      rowMean = this.meanOfRow(row, currentCols);
+      rowMeans[row] = rowMean;
+    }
+    return rowMean;
   }
 
   /**
@@ -952,9 +777,9 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   private IntDoublePair getLargestColResidue() {
     Double max = 0.0;
     int col = currentCols.nextSetBit(0);
-    for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+    for (int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
       double colResidue = computeColResidue(j);
-      if(max < colResidue) {
+      if (max < colResidue) {
         max = colResidue;
         col = j;
       }
@@ -975,22 +800,11 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     unionRows.or(currentRows);
     unionRows.or(invertedRows);
 
-    for(int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
-      Double colMean = columnMeans.get(col);
-      // if columnMeans does not contains the column: recompute it...
-      if(colMean == null) {
-        colMean = this.meanOfCol(unionRows, col);
-        columnMeans.put(col, colMean);
-      }
-      Double rowMean = rowMeans.get(i);
-      if(rowMean == null) {
-        rowMean = this.meanOfRow(i, currentCols);
-        rowMeans.put(i, rowMean);
-      }
-      double val = valueAt(i, col) - rowMean - colMean + currentMean;
-      colResidue += (val * val);
+    for (int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
+      double val = valueAt(i, col) - getRowMean(i) - getColMean(col) + currentMean;
+      colResidue += val * val;
     }
-    return (colResidue / unionRows.cardinality());
+    return colResidue / unionRows.cardinality();
   }
 
   /**
@@ -1011,10 +825,10 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   @Override
   protected double valueAt(int row, int col) {
     IntIntPair key = new IntIntPair(row, col);
-    if(maskedVals.containsKey(key)) {
+    if (maskedVals.containsKey(key)) {
       return maskedVals.get(key);
     }
-    if(missingValues.containsKey(key)) {
+    if (missingValues.containsKey(key)) {
       return missingValues.get(key);
     }
     return super.valueAt(row, col);
@@ -1028,5 +842,204 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    /**
+     * Parameter to specify the seed for the random that creates the missing
+     * values.
+     * <p>
+     * Default value: 0
+     * </p>
+     * <p>
+     * Key: {@code -chengandchurch.random}
+     * </p>
+     */
+    public static final OptionID SEED_ID = new OptionID("chengandchurch.random", "Seed for the random that creates the missing values.");
+
+    /**
+     * Threshold value to determine the maximal acceptable score (mean squared
+     * residue) of a bicluster.
+     * <p/>
+     * Key: {@code -chengandchurch.delta}
+     * </p>
+     */
+    public static final OptionID DELTA_ID = new OptionID("chengandchurch.delta", "Threshold value to determine the maximal acceptable score (mean squared residue) of a bicluster.");
+
+    /**
+     * Parameter for multiple node deletion to accelerate the algorithm. (&gt;=
+     * 1)
+     * <p/>
+     * Key: {@code -chengandchurch.alpha}
+     * </p>
+     */
+    public static final OptionID ALPHA_ID = new OptionID("chengandchurch.alpha", "Parameter for multiple node deletion to accelerate the algorithm.");
+
+    /**
+     * Number of biclusters to be found.
+     * <p/>
+     * Default value: 1
+     * </p>
+     * <p/>
+     * Key: {@code -chengandchurch.n}
+     * </p>
+     */
+    public static final OptionID N_ID = new OptionID("chengandchurch.n", "The number of biclusters to be found.");
+
+    /**
+     * Lower limit for the masking and missing values.
+     * <p/>
+     * Key: {@code -chengandchurch.begin}
+     * </p>
+     */
+    public static final OptionID BEGIN_ID = new OptionID("chengandchurch.begin", "The lower limit for the masking and missing values. Must be smaller than the upper limit.");
+
+    /**
+     * Upper limit for the masking and missing values.
+     * <p/>
+     * Key: {@code -chengandchurch.end}
+     * </p>
+     */
+    public static final OptionID END_ID = new OptionID("chengandchurch.end", "The upper limit for the masking and missing values.");
+
+    /**
+     * A parameter to indicate what value the missing values in the database
+     * have.</p>
+     * <p>
+     * If a value is missing in the database, you have to give them a value
+     * (e.g. -10000) and specify -10000 as this parameter.
+     * </p>
+     * <p>
+     * The missing values in database will be replaced by a random generated
+     * value in the range between {@link #BEGIN_PARAM} and {@link #END_PARAM}.
+     * The missing values will be uniform distributed. Note that the random
+     * values are <code>double</code> and not <code>int</code>.
+     * </p>
+     * <p>
+     * Default: No replacement of missing parameters occurs.
+     * <p/>
+     * Key: {@code -chengandchurch.missing}
+     * </p>
+     */
+    public static final OptionID MISSING_ID = new OptionID("chengandchurch.missing", "This value in database will be replaced with random values in the range from begin to end.");
+
+    /**
+     * Parameter to indicate how many times an addition should be performed in
+     * each of the <code>n</code> iterations.</p>
+     * <p>
+     * A greater value will result in a more accurate result but will require
+     * more time.
+     * </p>
+     * <p/>
+     * Default value: 1 ({@value #DEFAULT_MULTIPLE_ADDITION})
+     * </p>
+     * <p/>
+     * Key: {@code -chengandchurch.multipleAddition}
+     * </p>
+     */
+    public static final OptionID MULTIPLE_ADDITION_ID = new OptionID("chengandchurch.multipleAddition", "Indicates how many times the algorithm to add Nodes should be performed.");
+
+    /**
+     * Random factory.
+     */
+    private RandomFactory rnd;
+
+    /**
+     * Threshold for the score ({@link #DELTA_PARAM}).
+     */
+    private double delta;
+
+    /**
+     * The parameter for multiple node deletion.</p>
+     * <p>
+     * It is used to magnify the {@link #delta} value in the
+     * {@link #multipleNodeDeletion()} method.
+     * </p>
+     */
+    private double alpha;
+
+    /**
+     * Number of biclusters to be found.
+     */
+    private int n;
+
+    /**
+     * Lower threshold for random maskedValues.
+     */
+    private double minMissingValue;
+
+    /**
+     * Upper threshold for random maskedValues.
+     */
+    private double maxMissingValue;
+
+    /**
+     * FIXME: document
+     */
+    private int numberOfAddition = DEFAULT_MULTIPLE_ADDITION;
+
+    /**
+     * FIXME: document
+     */
+    private double missing = Double.NaN;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      RandomParameter randomP = new RandomParameter(SEED_ID);
+      if (config.grab(randomP)) {
+        rnd = randomP.getValue();
+      }
+
+      DoubleParameter deltaP = new DoubleParameter(DELTA_ID);
+      if (config.grab(deltaP)) {
+        delta = deltaP.doubleValue();
+      }
+      deltaP.addConstraint(new GreaterEqualConstraint(0.));
+
+      IntParameter nP = new IntParameter(N_ID);
+      nP.setDefaultValue(1);
+      nP.addConstraint(new GreaterEqualConstraint(1));
+      if (config.grab(nP)) {
+        n = nP.intValue();
+      }
+
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID);
+      alphaP.addConstraint(new GreaterEqualConstraint(1.));
+      if (config.grab(alphaP)) {
+        alpha = alphaP.doubleValue();
+      }
+
+      DoubleParameter beginP = new DoubleParameter(BEGIN_ID);
+      if (config.grab(beginP)) {
+        minMissingValue = beginP.doubleValue();
+      }
+
+      DoubleParameter endP = new DoubleParameter(END_ID);
+      if (config.grab(endP)) {
+        maxMissingValue = endP.doubleValue();
+      }
+      if (minMissingValue > maxMissingValue) {
+        config.reportError(new WrongParameterValueException(beginP, "The minimum value for missing values is larger than the maximum value", "Minimum value: " + minMissingValue + "  maximum value: " + maxMissingValue));
+      }
+
+      IntParameter missingP = new IntParameter(MISSING_ID);
+      missingP.setOptional(true);
+      if (config.grab(missingP)) {
+        missing = missingP.intValue();
+      }
+
+      IntParameter multiaddP = new IntParameter(MULTIPLE_ADDITION_ID, DEFAULT_MULTIPLE_ADDITION);
+      multiaddP.setOptional(true);
+      multiaddP.addConstraint(new GreaterEqualConstraint(1));
+      if (config.grab(multiaddP)) {
+        numberOfAddition = multiaddP.getValue();
+      }
+    }
+
+    @Override
+    protected ChengAndChurch<V> makeInstance() {
+      return new ChengAndChurch<>(delta, alpha, n, minMissingValue, maxMissingValue, numberOfAddition, missing, rnd);
+    }
   }
 }
