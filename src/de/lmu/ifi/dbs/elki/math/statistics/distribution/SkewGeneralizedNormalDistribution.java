@@ -26,6 +26,11 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Generalized Gaussian distribution by adding a skew term, similar to lognormal
@@ -36,7 +41,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @author Erich Schubert
  */
-public class SkewGeneralizedNormalDistribution implements Distribution {
+public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   /**
    * Mean value for the generator
    */
@@ -53,9 +58,19 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
   private double skew;
 
   /**
-   * The random generator.
+   * Constructor for Gaussian distribution
+   * 
+   * @param mean Mean
+   * @param stddev Standard Deviation
+   * @param skew Skew
+   * @param random Random generator
    */
-  private Random random;
+  public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew, Random random) {
+    super(random);
+    this.mean = mean;
+    this.stddev = stddev;
+    this.skew = skew;
+  }
 
   /**
    * Constructor for Gaussian distribution
@@ -65,12 +80,11 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
    * @param skew Skew
    * @param random Random generator
    */
-  public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew, Random random) {
-    super();
+  public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew, RandomFactory random) {
+    super(random);
     this.mean = mean;
     this.stddev = stddev;
     this.skew = skew;
-    this.random = random;
   }
 
   /**
@@ -81,7 +95,7 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
    * @param skew Skew
    */
   public SkewGeneralizedNormalDistribution(double mean, double stddev, double skew) {
-    this(mean, stddev, skew, null);
+    this(mean, stddev, skew, (Random) null);
   }
 
   @Override
@@ -165,5 +179,48 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
       x = (1. - Math.exp(-skew * x)) / skew;
     }
     return mu + sigma * x;
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Skew parameter
+     */
+    public static final OptionID SKEW_ID = new OptionID("distribution.skewgnormal.skew", "Skew of the distribution.");
+
+    /** Parameters. */
+    double mean, sigma, skew;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter meanP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(meanP)) {
+        mean = meanP.doubleValue();
+      }
+
+      DoubleParameter sigmaP = new DoubleParameter(SCALE_ID);
+      sigmaP.addConstraint(new GreaterConstraint(0.));
+      if (config.grab(sigmaP)) {
+        sigma = sigmaP.doubleValue();
+      }
+
+      DoubleParameter skewP = new DoubleParameter(SKEW_ID);
+      if (config.grab(skewP)) {
+        skew = skewP.doubleValue();
+      }
+    }
+
+    @Override
+    protected SkewGeneralizedNormalDistribution makeInstance() {
+      return new SkewGeneralizedNormalDistribution(mean, sigma, skew, rnd);
+    }
   }
 }

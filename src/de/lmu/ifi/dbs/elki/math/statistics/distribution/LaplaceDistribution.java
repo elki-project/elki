@@ -26,6 +26,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Laplace distribution also known as double exponential distribution
@@ -33,12 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @author Erich Schubert
  */
 @Alias("DoubleExponentialDistribution")
-public class LaplaceDistribution implements Distribution {
-  /**
-   * Random generator.
-   */
-  Random rnd;
-
+public class LaplaceDistribution extends AbstractDistribution {
   /**
    * Rate, inverse of mean
    */
@@ -55,7 +54,7 @@ public class LaplaceDistribution implements Distribution {
    * @param rate Rate parameter (1/scale)
    */
   public LaplaceDistribution(double rate) {
-    this(rate, 0.0, null);
+    this(rate, 0., (Random) null);
   }
 
   /**
@@ -65,7 +64,7 @@ public class LaplaceDistribution implements Distribution {
    * @param location Location parameter
    */
   public LaplaceDistribution(double rate, double location) {
-    this(rate, location, null);
+    this(rate, location, (Random) null);
   }
 
   /**
@@ -75,7 +74,7 @@ public class LaplaceDistribution implements Distribution {
    * @param random Random generator
    */
   public LaplaceDistribution(double rate, Random random) {
-    this(rate, 0.0, random);
+    this(rate, 0., random);
   }
 
   /**
@@ -86,10 +85,22 @@ public class LaplaceDistribution implements Distribution {
    * @param random Random generator
    */
   public LaplaceDistribution(double rate, double location, Random random) {
-    super();
+    super(random);
     this.rate = rate;
     this.location = location;
-    this.rnd = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param rate Rate parameter (1/scale)
+   * @param location Location parameter
+   * @param random Random generator
+   */
+  public LaplaceDistribution(double rate, double location, RandomFactory random) {
+    super(random);
+    this.rate = rate;
+    this.location = location;
   }
 
   @Override
@@ -157,7 +168,7 @@ public class LaplaceDistribution implements Distribution {
    */
   @Override
   public double nextRandom() {
-    double val = rnd.nextDouble();
+    double val = random.nextDouble();
     if (val < .5) {
       return Math.log(2 * val) / rate + location;
     } else {
@@ -168,5 +179,42 @@ public class LaplaceDistribution implements Distribution {
   @Override
   public String toString() {
     return "LaplaceDistribution(rate=" + rate + ", location=" + location + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Shape parameter gamma.
+     */
+    public static final OptionID RATE_ID = new OptionID("distribution.laplace.rate", "Laplace distribution rate (lambda) parameter (inverse of scale).");
+
+    /** Parameters. */
+    double location, rate;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter locP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(locP)) {
+        location = locP.doubleValue();
+      }
+
+      DoubleParameter rateP = new DoubleParameter(RATE_ID);
+      if (config.grab(rateP)) {
+        rate = rateP.doubleValue();
+      }
+    }
+
+    @Override
+    protected LaplaceDistribution makeInstance() {
+      return new LaplaceDistribution(rate, location, rnd);
+    }
   }
 }

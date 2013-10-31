@@ -24,6 +24,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Generalized logistic distribution. (Type I, Skew-logistic distribution)
  * 
@@ -37,7 +41,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class GeneralizedLogisticDistribution implements Distribution {
+public class GeneralizedLogisticDistribution extends AbstractDistribution {
   /**
    * Parameters: location and scale
    */
@@ -49,11 +53,6 @@ public class GeneralizedLogisticDistribution implements Distribution {
   double shape;
 
   /**
-   * Random number generator
-   */
-  Random random;
-
-  /**
    * Constructor.
    * 
    * @param location Location
@@ -61,7 +60,7 @@ public class GeneralizedLogisticDistribution implements Distribution {
    * @param shape Shape parameter
    */
   public GeneralizedLogisticDistribution(double location, double scale, double shape) {
-    this(location, scale, shape, null);
+    this(location, scale, shape, (Random) null);
   }
 
   /**
@@ -73,11 +72,25 @@ public class GeneralizedLogisticDistribution implements Distribution {
    * @param random Random number generator
    */
   public GeneralizedLogisticDistribution(double location, double scale, double shape, Random random) {
-    super();
+    super(random);
     this.location = location;
     this.scale = scale;
     this.shape = shape;
-    this.random = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param location Location
+   * @param scale Scale
+   * @param shape Shape parameter
+   * @param random Random number generator
+   */
+  public GeneralizedLogisticDistribution(double location, double scale, double shape, RandomFactory random) {
+    super(random);
+    this.location = location;
+    this.scale = scale;
+    this.shape = shape;
   }
 
   /**
@@ -180,5 +193,42 @@ public class GeneralizedLogisticDistribution implements Distribution {
   @Override
   public String toString() {
     return "GeneralizedLogisticDistribution(location=" + location + ", scale=" + scale + ", shape=" + shape + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double location, scale, shape;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(locationP)) {
+        location = locationP.doubleValue();
+      }
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
+      if (config.grab(scaleP)) {
+        scale = scaleP.doubleValue();
+      }
+
+      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
+      if (config.grab(shapeP)) {
+        shape = shapeP.doubleValue();
+      }
+    }
+
+    @Override
+    protected GeneralizedLogisticDistribution makeInstance() {
+      return new GeneralizedLogisticDistribution(location, scale, shape, rnd);
+    }
   }
 }

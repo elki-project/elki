@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,6 +22,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Statistical distributions, with their common functions.

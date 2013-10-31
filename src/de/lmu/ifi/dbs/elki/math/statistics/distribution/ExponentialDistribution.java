@@ -213,7 +213,7 @@ public class ExponentialDistribution extends AbstractDistribution {
 
     @Override
     protected ExponentialDistribution makeInstance() {
-      return new ExponentialDistribution(location, rate, rnd);
+      return new ExponentialDistribution(rate, location, rnd);
     }
   }
 }

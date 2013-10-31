@@ -24,6 +24,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Generalized logistic distribution.
  * 
@@ -33,7 +37,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class GeneralizedLogisticAlternateDistribution implements Distribution {
+public class GeneralizedLogisticAlternateDistribution extends AbstractDistribution {
   /**
    * Parameters: location and scale
    */
@@ -45,11 +49,6 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
   double shape;
 
   /**
-   * Random number generator
-   */
-  Random random;
-
-  /**
    * Constructor.
    * 
    * @param location Location
@@ -57,7 +56,7 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
    * @param shape Shape parameter
    */
   public GeneralizedLogisticAlternateDistribution(double location, double scale, double shape) {
-    this(location, scale, shape, null);
+    this(location, scale, shape, (Random) null);
   }
 
   /**
@@ -69,11 +68,28 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
    * @param random Random number generator
    */
   public GeneralizedLogisticAlternateDistribution(double location, double scale, double shape, Random random) {
-    super();
+    super(random);
     this.location = location;
     this.scale = scale;
     this.shape = shape;
-    this.random = random;
+    if (!(shape > -1.) || !(shape < 1.)) {
+      throw new ArithmeticException("Invalid shape parameter - must be -1 to +1, is: " + shape);
+    }
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param location Location
+   * @param scale Scale
+   * @param shape Shape parameter
+   * @param random Random number generator
+   */
+  public GeneralizedLogisticAlternateDistribution(double location, double scale, double shape, RandomFactory random) {
+    super(random);
+    this.location = location;
+    this.scale = scale;
+    this.shape = shape;
     if (!(shape > -1.) || !(shape < 1.)) {
       throw new ArithmeticException("Invalid shape parameter - must be -1 to +1, is: " + shape);
     }
@@ -158,5 +174,42 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
   @Override
   public String toString() {
     return "GeneralizedLogisticAlternateDistribution(location=" + location + ", scale=" + scale + ", shape=" + shape + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double location, scale, shape;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(locationP)) {
+        location = locationP.doubleValue();
+      }
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
+      if (config.grab(scaleP)) {
+        scale = scaleP.doubleValue();
+      }
+
+      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
+      if (config.grab(shapeP)) {
+        shape = shapeP.doubleValue();
+      }
+    }
+
+    @Override
+    protected GeneralizedLogisticAlternateDistribution makeInstance() {
+      return new GeneralizedLogisticAlternateDistribution(location, scale, shape, rnd);
+    }
   }
 }

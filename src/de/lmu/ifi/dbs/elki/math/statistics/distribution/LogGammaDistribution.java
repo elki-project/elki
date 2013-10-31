@@ -25,6 +25,11 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Log-Gamma Distribution, with random generation and density functions.
  * 
@@ -34,7 +39,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class LogGammaDistribution implements Distribution {
+public class LogGammaDistribution extends AbstractDistribution {
   /**
    * Alpha == k.
    */
@@ -51,9 +56,23 @@ public class LogGammaDistribution implements Distribution {
   private final double shift;
 
   /**
-   * The random generator.
+   * Constructor for Gamma distribution.
+   * 
+   * @param k k, alpha aka. "shape" parameter
+   * @param shift Location offset
+   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @param random Random generator
    */
-  private Random random;
+  public LogGammaDistribution(double k, double theta, double shift, Random random) {
+    super(random);
+    if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
+    }
+
+    this.k = k;
+    this.theta = theta;
+    this.shift = shift;
+  }
 
   /**
    * Constructor for Gamma distribution.
@@ -63,8 +82,8 @@ public class LogGammaDistribution implements Distribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @param random Random generator
    */
-  public LogGammaDistribution(double k, double theta, double shift, Random random) {
-    super();
+  public LogGammaDistribution(double k, double theta, double shift, RandomFactory random) {
+    super(random);
     if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
     }
@@ -72,7 +91,6 @@ public class LogGammaDistribution implements Distribution {
     this.k = k;
     this.theta = theta;
     this.shift = shift;
-    this.random = random;
   }
 
   /**
@@ -83,7 +101,7 @@ public class LogGammaDistribution implements Distribution {
    * @param shift Location offset
    */
   public LogGammaDistribution(double k, double theta, double shift) {
-    this(k, theta, shift, null);
+    this(k, theta, shift, (Random) null);
   }
 
   @Override
@@ -190,5 +208,47 @@ public class LogGammaDistribution implements Distribution {
    */
   public static double quantile(double p, double k, double theta, double shift) {
     return Math.exp(GammaDistribution.quantile(p, k, theta)) + shift;
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Shifting offset parameter.
+     */
+    public static final OptionID SHIFT_ID = new OptionID("distribution.loggamma.shift", "Shift offset parameter.");
+
+    /** Parameters. */
+    double k, theta, shift;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter kP = new DoubleParameter(GammaDistribution.Parameterizer.K_ID);
+      if (config.grab(kP)) {
+        k = kP.doubleValue();
+      }
+
+      DoubleParameter thetaP = new DoubleParameter(GammaDistribution.Parameterizer.THETA_ID);
+      if (config.grab(thetaP)) {
+        theta = thetaP.doubleValue();
+      }
+
+      DoubleParameter shiftP = new DoubleParameter(SHIFT_ID);
+      if (config.grab(shiftP)) {
+        shift = shiftP.doubleValue();
+      }
+    }
+
+    @Override
+    protected LogGammaDistribution makeInstance() {
+      return new LogGammaDistribution(k, theta, shift, rnd);
+    }
   }
 }

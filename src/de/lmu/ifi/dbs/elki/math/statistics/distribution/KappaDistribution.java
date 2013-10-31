@@ -24,6 +24,11 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Kappa distribution, by Hosking.
  * 
@@ -31,7 +36,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class KappaDistribution implements Distribution {
+public class KappaDistribution extends AbstractDistribution {
   /**
    * Parameters: location and scale
    */
@@ -43,11 +48,6 @@ public class KappaDistribution implements Distribution {
   double shape1, shape2;
 
   /**
-   * Random number generator
-   */
-  Random random;
-
-  /**
    * Constructor.
    * 
    * @param location Location
@@ -56,7 +56,7 @@ public class KappaDistribution implements Distribution {
    * @param shape2 Shape parameter
    */
   public KappaDistribution(double location, double scale, double shape1, double shape2) {
-    this(location, scale, shape1, shape2, null);
+    this(location, scale, shape1, shape2, (Random) null);
   }
 
   /**
@@ -69,19 +69,43 @@ public class KappaDistribution implements Distribution {
    * @param random Random number generator
    */
   public KappaDistribution(double location, double scale, double shape1, double shape2, Random random) {
-    super();
+    super(random);
     this.location = location;
     this.scale = scale;
     this.shape1 = shape1;
     this.shape2 = shape2;
-    this.random = random;
-    if(shape2 >= 0.) {
-      if(shape1 < -1.) {
+    if (shape2 >= 0.) {
+      if (shape1 < -1.) {
         throw new ArithmeticException("Invalid shape1 parameter - must be greater than -1 if shape2 >= 0.!");
       }
+    } else {
+      if (shape1 < 1. || shape1 > 1. / shape2) {
+        throw new ArithmeticException("Invalid shape1 parameter - must be -1 to +1/shape2 if shape2 < 0.!");
+      }
     }
-    else {
-      if(shape1 < 1. || shape1 > 1. / shape2) {
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param location Location
+   * @param scale Scale
+   * @param shape1 Shape parameter
+   * @param shape2 Shape parameter
+   * @param random Random number generator
+   */
+  public KappaDistribution(double location, double scale, double shape1, double shape2, RandomFactory random) {
+    super(random);
+    this.location = location;
+    this.scale = scale;
+    this.shape1 = shape1;
+    this.shape2 = shape2;
+    if (shape2 >= 0.) {
+      if (shape1 < -1.) {
+        throw new ArithmeticException("Invalid shape1 parameter - must be greater than -1 if shape2 >= 0.!");
+      }
+    } else {
+      if (shape1 < 1. || shape1 > 1. / shape2) {
         throw new ArithmeticException("Invalid shape1 parameter - must be -1 to +1/shape2 if shape2 < 0.!");
       }
     }
@@ -100,9 +124,9 @@ public class KappaDistribution implements Distribution {
   public static double pdf(double val, double loc, double scale, double shape1, double shape2) {
     final double c = cdf(val, loc, scale, shape1, shape2);
     val = (val - loc) / scale;
-    if(shape1 != 0.) {
+    if (shape1 != 0.) {
       val = 1 - shape1 * val;
-      if(val < 1e-15) {
+      if (val < 1e-15) {
         return 0.;
       }
       val = (1. - 1. / shape1) * Math.log(val);
@@ -128,24 +152,22 @@ public class KappaDistribution implements Distribution {
    */
   public static double cdf(double val, double loc, double scale, double shape1, double shape2) {
     val = (val - loc) / scale;
-    if(shape1 != 0.) {
+    if (shape1 != 0.) {
       double tmp = 1. - shape1 * val;
-      if(tmp < 1e-15) {
+      if (tmp < 1e-15) {
         return (shape1 < 0.) ? 0. : 1.;
       }
       val = Math.exp(Math.log(tmp) / shape1);
-    }
-    else {
+    } else {
       val = Math.exp(-val);
     }
-    if(shape2 != 0.) {
+    if (shape2 != 0.) {
       double tmp = 1. - shape2 * val;
-      if(tmp < 1e-15) {
+      if (tmp < 1e-15) {
         return 0.;
       }
       val = Math.exp(Math.log(tmp) / shape2);
-    }
-    else {
+    } else {
       val = Math.exp(-val);
     }
     return val;
@@ -167,39 +189,36 @@ public class KappaDistribution implements Distribution {
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale, double shape1, double shape2) {
-    if(!(val >= 0.) || !(val <= 1.)) {
+    if (!(val >= 0.) || !(val <= 1.)) {
       return Double.NaN;
     }
-    if(val == 0.) {
-      if(shape2 <= 0.) {
-        if(shape1 < 0.) {
+    if (val == 0.) {
+      if (shape2 <= 0.) {
+        if (shape1 < 0.) {
           return loc + scale / shape1;
-        }
-        else {
+        } else {
           return Double.NEGATIVE_INFINITY;
         }
-      }
-      else {
-        if(shape1 != 0.) {
+      } else {
+        if (shape1 != 0.) {
           return loc + scale / shape1 * (1. - Math.pow(shape2, -shape1));
-        }
-        else {
+        } else {
           return loc + scale * Math.log(shape2);
         }
       }
     }
-    if(val == 1.) {
-      if(shape1 <= 0.) {
+    if (val == 1.) {
+      if (shape1 <= 0.) {
         return Double.NEGATIVE_INFINITY;
       }
       return loc + scale / shape1;
     }
     val = -Math.log(val);
-    if(shape2 != 0.) {
+    if (shape2 != 0.) {
       val = (1 - Math.exp(-shape2 * val)) / shape2;
     }
     val = -Math.log(val);
-    if(shape1 != 0.) {
+    if (shape1 != 0.) {
       val = (1 - Math.exp(-shape1 * val)) / shape1;
     }
     return loc + scale * val;
@@ -219,5 +238,57 @@ public class KappaDistribution implements Distribution {
   @Override
   public String toString() {
     return "KappaDistribution(location=" + location + ", scale=" + scale + ", shape1=" + shape1 + ", shape2=" + shape2 + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * First shape parameter.
+     */
+    public static final OptionID SHAPE1_ID = new OptionID("distribution.kappa.shape1", "First shape parameter of kappa distribution.");
+
+    /**
+     * Second shape parameter.
+     */
+    public static final OptionID SHAPE2_ID = new OptionID("distribution.kappa.shape2", "Second shape parameter of kappa distribution.");
+
+    /** Parameters. */
+    double location, scale, shape1, shape2;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(locationP)) {
+        location = locationP.doubleValue();
+      }
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
+      if (config.grab(scaleP)) {
+        scale = scaleP.doubleValue();
+      }
+
+      DoubleParameter shape1P = new DoubleParameter(SHAPE1_ID);
+      if (config.grab(shape1P)) {
+        shape1 = shape1P.doubleValue();
+      }
+
+      DoubleParameter shape2P = new DoubleParameter(SHAPE2_ID);
+      if (config.grab(shape2P)) {
+        shape2 = shape2P.doubleValue();
+      }
+    }
+
+    @Override
+    protected KappaDistribution makeInstance() {
+      return new KappaDistribution(location, scale, shape1, shape2, rnd);
+    }
   }
 }

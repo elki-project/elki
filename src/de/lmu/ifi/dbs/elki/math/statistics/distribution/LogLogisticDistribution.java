@@ -24,21 +24,22 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Log-Logistic distribution also known as Fisk distribution.
  * 
  * @author Erich Schubert
  */
-public class LogLogisticDistribution implements Distribution {
+@Alias({ "fisk", "loglog" })
+public class LogLogisticDistribution extends AbstractDistribution {
   /**
    * Parameters: scale and shape
    */
   double scale, shape;
-
-  /**
-   * Random number generator
-   */
-  Random random;
 
   /**
    * Constructor.
@@ -47,7 +48,7 @@ public class LogLogisticDistribution implements Distribution {
    * @param shape Shape
    */
   public LogLogisticDistribution(double scale, double shape) {
-    this(scale, shape, null);
+    this(scale, shape, (Random) null);
   }
 
   /**
@@ -58,10 +59,22 @@ public class LogLogisticDistribution implements Distribution {
    * @param random Random number generator
    */
   public LogLogisticDistribution(double scale, double shape, Random random) {
-    super();
+    super(random);
     this.scale = scale;
     this.shape = shape;
-    this.random = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param scale Scale
+   * @param shape Shape
+   * @param random Random number generator
+   */
+  public LogLogisticDistribution(double scale, double shape, RandomFactory random) {
+    super(random);
+    this.scale = scale;
+    this.shape = shape;
   }
 
   /**
@@ -73,7 +86,7 @@ public class LogLogisticDistribution implements Distribution {
    * @return PDF
    */
   public static double pdf(double val, double scale, double shape) {
-    if(val < 0) {
+    if (val < 0) {
       return 0;
     }
     val = Math.abs(val / scale);
@@ -96,7 +109,7 @@ public class LogLogisticDistribution implements Distribution {
    * @return CDF
    */
   public static double cdf(double val, double scale, double shape) {
-    if(val < 0) {
+    if (val < 0) {
       return 0;
     }
     return 1. / (1. + Math.pow(val / scale, -shape));
@@ -133,5 +146,37 @@ public class LogLogisticDistribution implements Distribution {
   @Override
   public String toString() {
     return "LogLogisticDistribution(scale=" + scale + ", shape=" + shape + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double scale, shape;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
+      if (config.grab(scaleP)) {
+        scale = scaleP.doubleValue();
+      }
+
+      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
+      if (config.grab(shapeP)) {
+        shape = shapeP.doubleValue();
+      }
+    }
+
+    @Override
+    protected LogLogisticDistribution makeInstance() {
+      return new LogLogisticDistribution(scale, shape, rnd);
+    }
   }
 }
