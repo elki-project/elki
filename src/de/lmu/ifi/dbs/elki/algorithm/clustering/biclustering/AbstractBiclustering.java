@@ -23,17 +23,16 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.TLongDoubleMap;
+
 import java.util.BitSet;
-import java.util.Comparator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Bicluster;
+import de.lmu.ifi.dbs.elki.data.model.BiclusterModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -43,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
@@ -52,8 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * corresponding values within a database of NumberVectors.
  * <p/>
  * The database is supposed to present a data matrix with a row representing an
- * entry ({@link FeatureVector}), a column representing a dimension (attribute)
- * of the {@link FeatureVector}s.
+ * entry ({@link NumberVector}), a column representing a dimension (attribute)
+ * of the {@link NumberVector}s.
  * 
  * @author Arthur Zimek
  * @param <V> a certain subtype of NumberVector - the data matrix is supposed to
@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  *        columns relate to the attribute values of these objects
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends Bicluster<V>> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends BiclusterModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * Keeps the currently set database.
    */
@@ -71,7 +71,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * Relation we use.
    */
   protected Relation<V> relation;
-  
+
   /**
    * Iterator to use for more efficient random access.
    */
@@ -108,7 +108,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    */
   public final Clustering<M> run(Relation<V> relation) {
     this.relation = relation;
-    if(this.relation == null || this.relation.size() == 0) {
+    if (this.relation == null || this.relation.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     colDim = RelationUtil.dimensionality(relation);
@@ -118,20 +118,14 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   }
 
   /**
-   * Any concrete biclustering algorithm should be implemented within this
-   * method. The database of double-valued <code>NumberVector</code>s is
-   * encapsulated, methods {@link #sortRows(int,int,List,Comparator)},
-   * {@link #sortCols(int,int,List,Comparator)},
-   * {@link #meanOfBicluster(BitSet,BitSet)}, {@link #meanOfRow(int,BitSet)},
-   * {@link #meanOfCol(BitSet,int)}, {@link #valueAt(int,int)}, allow typical
-   * operations like on a data matrix.
+   * Run the actual biclustering algorithm.
    * <p/>
    * This method is supposed to be called only from the method
    * {@link #run(Database)}.
    * <p/>
    * If a bicluster is to be appended to the result, the methods
    * {@link #defineBicluster(BitSet,BitSet)} and
-   * {@link #addBiclusterToResult(Bicluster)} should be used.
+   * {@link #addBiclusterToResult(BiclusterModel)} should be used.
    */
   protected abstract Clustering<M> biclustering();
 
@@ -144,7 +138,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   protected int[] colsBitsetToIDs(BitSet cols) {
     int[] colIDs = new int[cols.cardinality()];
     int colsIndex = 0;
-    for(int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
+    for (int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
       colIDs[colsIndex] = i;
       colsIndex++;
     }
@@ -160,7 +154,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   protected ArrayDBIDs rowsBitsetToIDs(BitSet rows) {
     ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray(rows.cardinality());
     DBIDArrayIter iter = this.rowIDs.iter();
-    for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+    for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
       iter.seek(i);
       rowIDs.add(iter);
     }
@@ -168,26 +162,29 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   }
 
   /**
-   * Defines a bicluster as given by the included rows and columns.
+   * Defines a Bicluster as given by the included rows and columns.
    * 
-   * @param rows the rows included in the bicluster
-   * @param cols the columns included in the bicluster
-   * @return a bicluster as given by the included rows and columns
+   * @param rows the rows included in the Bicluster
+   * @param cols the columns included in the Bicluster
+   * @return a Bicluster as given by the included rows and columns
    */
-  protected Bicluster<V> defineBicluster(BitSet rows, BitSet cols) {
+  protected Cluster<BiclusterModel> defineBicluster(BitSet rows, BitSet cols) {
     ArrayDBIDs rowIDs = rowsBitsetToIDs(rows);
     int[] colIDs = colsBitsetToIDs(cols);
-    return new Bicluster<>(rowIDs, colIDs, relation);
+    return new Cluster<>(rowIDs, new BiclusterModel(colIDs));
   }
 
   /**
-   * Adds the given Bicluster to the result of this Biclustering.
+   * Defines a Bicluster as given by the included rows and columns.
    * 
-   * @param result Result to add to
-   * @param bicluster the bicluster to add to the result
+   * @param rows the rows included in the Bicluster
+   * @param cols the columns included in the Bicluster
+   * @return A Bicluster as given by the included rows and columns
    */
-  protected void addBiclusterToResult(Clustering<M> result, M bicluster) {
-    result.addToplevelCluster(new Cluster<>(bicluster.getDatabaseObjectGroup(), bicluster));
+  protected Cluster<BiclusterModel> defineBicluster(long[] rows, long[] cols) {
+    ArrayDBIDs rowIDs = rowsBitsetToIDs(rows);
+    int[] colIDs = colsBitsetToIDs(cols);
+    return new Cluster<>(rowIDs, new BiclusterModel(colIDs));
   }
 
   /**
@@ -207,7 +204,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
     iter.seek(row);
     return relation.get(iter).doubleValue(col);
   }
-  
+
   /**
    * Get the DBID of a certain row
    * 
@@ -221,62 +218,241 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   }
 
   /**
-   * Provides the mean value for a row on a set of columns. The columns are
-   * specified by a BitSet where the indices of a set bit relate to the indices
-   * in {@link #colIDs}.
+   * Update the row means and column means.
    * 
-   * @param row the row to compute the mean value w.r.t. the given set of
-   *        columns (relates to database entry id
-   *        <code>{@link #rowIDs rowIDs[row]}</code>)
-   * @param cols the set of columns to include in the computation of the mean of
-   *        the given row
-   * @return the mean value of the specified row over the specified columns
+   * @param rows Masked rows
+   * @param cols Masked columns
+   * @param rowmeans Output array for row means
+   * @param colmeans Output array for column means
+   * @param mask Mask with substitution values
+   * @return overall mean
    */
-  protected double meanOfRow(int row, BitSet cols) {
-    Mean m = new Mean();
-    for(int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
-      m.put(valueAt(row, i));
+  protected double updateRowAndColumnMeans(long[] rows, long[] cols, double[] rowmeans, double[] colmeans, TLongDoubleMap mask) {
+    Mean overall = new Mean(), rowmean = new Mean();
+    Mean[] colmean = Mean.newArray(colmeans.length);
+    // For efficiency, we manually iterate over the rows and column bitmasks.
+    // This saves repeated shifting needed by the manual bit access.
+    DBIDArrayIter iter = rowIDs.iter();
+    outer: for (int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
+      long rlong = rows[rlpos];
+      // Fast skip blocks of 64 masked values.
+      if (rlong == 0L) {
+        rpos += Long.SIZE;
+        iter.advance(Long.SIZE);
+        continue;
+      }
+      for (int i = 0; i < Long.SIZE; ++i, ++rpos, rlong >>>= 1, iter.advance()) {
+        if (!iter.valid()) {
+          break outer;
+        }
+        if ((rlong & 1L) == 1L) {
+          rowmean.reset();
+          V vec = relation.get(iter);
+          for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
+            long clong = cols[clpos];
+            if (clong == 0L) {
+              cpos += Long.SIZE;
+              continue;
+            }
+            for (int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
+              if ((clong & 1L) == 1L) {
+                double v = getMaskedValue(vec, cpos, mask, rpos);
+                rowmean.put(v);
+                colmean[cpos].put(v);
+                overall.put(v);
+              }
+            }
+          }
+          rowmeans[rpos] = rowmean.getMean();
+        }
+      }
     }
-    return m.getMean();
+    for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
+      long clong = cols[clpos];
+      if (clong == 0L) {
+        cpos += Long.SIZE;
+        continue;
+      }
+      for (int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
+        if ((clong & 1L) == 1L) {
+          colmeans[cpos] = colmean[cpos].getMean();
+        }
+      }
+    }
+    return overall.getMean();
   }
 
   /**
-   * Provides the mean value for a column on a set of rows. The rows are
-   * specified by a BitSet where the indices of a set bit relate to the indices
-   * in {@link #rowIDs}.
+   * Update all row means and column means, only partially ignoring masks.
    * 
-   * @param rows the set of rows to include in the computation of the mean of
-   *        the given column
-   * @param col the column index to compute the mean value w.r.t. the given set
-   *        of rows (relates to attribute
-   *        <code>{@link #colIDs colIDs[col]}</code> of the corresponding
-   *        database entries)
-   * @return the mean value of the specified column over the specified rows
+   * @param rows Masked rows
+   * @param cols Masked columns
+   * @param rowmeans Output array for row means
+   * @param colmeans Output array for column means
+   * @param mask Mask with substitution values
+   * @return overall mean
    */
-  protected double meanOfCol(BitSet rows, int col) {
-    Mean m = new Mean();
-    for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-      m.put(valueAt(i, col));
+  protected double updateAllRowAndColumnMeans(long[] rows, long[] cols, double[] rowmeans, double[] colmeans, TLongDoubleMap mask) {
+    Mean overall = new Mean(), rowmean = new Mean();
+    Mean[] colmean = Mean.newArray(colmeans.length);
+    // For efficiency, we manually iterate over the rows and column bitmasks.
+    // This saves repeated shifting needed by the manual bit access.
+    DBIDArrayIter iter = rowIDs.iter();
+    outer: for (int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
+      long rlong = rows[rlpos];
+      // Fast skip blocks of 64 masked values.
+      for (int i = 0; i < Long.SIZE && rpos < rowmeans.length; ++i, ++rpos, rlong >>>= 1, iter.advance()) {
+        if (!iter.valid()) {
+          break outer;
+        }
+        boolean rselected = ((rlong & 1L) == 1L);
+        rowmean.reset();
+        V vec = relation.get(iter);
+        for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
+          long clong = cols[clpos];
+          for (int j = 0; j < Long.SIZE && cpos < colmeans.length; ++j, ++cpos, clong >>>= 1) {
+            boolean cselected = ((clong & 1L) == 1L);
+            double v = getMaskedValue(vec, cpos, mask, rpos);
+            if (cselected) {
+              rowmean.put(v);
+            }
+            if (rselected) {
+              colmean[cpos].put(v);
+            }
+            if (rselected && cselected) {
+              overall.put(v);
+            }
+          }
+          rowmeans[rpos] = rowmean.getMean();
+        }
+      }
     }
-    return m.getMean();
+    for (int cpos = 0; cpos < colmean.length; ++cpos) {
+      colmeans[cpos] = colmean[cpos].getMean();
+    }
+    return overall.getMean();
   }
 
   /**
-   * Provides the mean of all entries in the submatrix as specified by a set of
-   * columns and a set of rows.
+   * Compute the mean square residue.
    * 
-   * @param rows the set of rows to include in the computation of the mean of
-   *        the submatrix
-   * @param cols the set of columns to include in the computation of the mean of
-   *        the submatrix
-   * @return the mean of all entries in the submatrix
+   * @param rows Masked rows
+   * @param cols Masked columns
+   * @param rowmeans Output array for row means
+   * @param colmeans Output array for column means
+   * @param allmean overall mean
+   * @param mask Mask with substitution values
+   * @return mean squared residue
    */
-  protected double meanOfBicluster(BitSet rows, BitSet cols) {
-    double sum = 0;
-    for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-      sum += meanOfRow(i, cols);
+  protected double computeMeanSquaredDeviation(long[] rows, long[] cols, double[] rowmeans, double[] colmeans, double allmean, TLongDoubleMap mask) {
+    Mean msr = new Mean();
+    // For efficiency, we manually iterate over the rows and column bitmasks.
+    // This saves repeated shifting needed by the manual bit access.
+    DBIDArrayIter iter = rowIDs.iter();
+    outer: for (int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
+      long rlong = rows[rlpos];
+      // Fast skip blocks of 64 masked values.
+      if (rlong == 0L) {
+        rpos += Long.SIZE;
+        iter.advance(Long.SIZE);
+        continue;
+      }
+      for (int i = 0; i < Long.SIZE; ++i, ++rpos, rlong >>>= 1, iter.advance()) {
+        if (!iter.valid()) {
+          break outer;
+        }
+        if ((rlong & 1L) == 1L) {
+          V vec = relation.get(iter);
+          for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
+            long clong = cols[clpos];
+            if (clong == 0L) {
+              cpos += Long.SIZE;
+              continue;
+            }
+            for (int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
+              if ((clong & 1L) == 1L) {
+                double v = getMaskedValue(vec, cpos, mask, rpos);
+                v = v - rowmeans[rpos] - colmeans[cpos] + allmean;
+                msr.put(v * v);
+              }
+            }
+          }
+        }
+      }
     }
-    return sum / rows.cardinality();
+    return msr.getMean();
+  }
+
+  /**
+   * Get masked values instead of actual scores.
+   * 
+   * @param vec Vector from database
+   * @param cpos Column position
+   * @param mask Mask
+   * @param rpos Row position
+   * @return Value from mask or vector.
+   */
+  protected double getMaskedValue(V vec, int cpos, TLongDoubleMap mask, int rpos) {
+    if (mask != null) {
+      double v = mask.get((((long)rpos) << 32) | cpos);
+      if (v == v) { // NOT TRUE for NaN values.
+        return v;
+      }
+    }
+    return vec.doubleValue(cpos);
+  }
+
+  /**
+   * Convert a bitset into integer column ids.
+   * 
+   * @param cols
+   * @return integer column ids
+   */
+  protected int[] colsBitsetToIDs(long[] cols) {
+    int[] colIDs = new int[(int) BitsUtil.cardinality(cols)];
+    int colsIndex = 0;
+    for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
+      long clong = cols[clpos];
+      if (clong == 0L) {
+        cpos += Long.SIZE;
+        continue;
+      }
+      for (int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
+        if ((clong & 1L) == 1L) {
+          colIDs[colsIndex] = cpos;
+          ++colsIndex;
+        }
+      }
+    }
+    return colIDs;
+  }
+
+  /**
+   * Convert a bitset into integer row ids.
+   * 
+   * @param rows
+   * @return integer row ids
+   */
+  protected ArrayDBIDs rowsBitsetToIDs(long[] rows) {
+    ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray((int) BitsUtil.cardinality(rows));
+    DBIDArrayIter iter = this.rowIDs.iter();
+    outer: for (int rlpos = 0; rlpos < rows.length; ++rlpos) {
+      long rlong = rows[rlpos];
+      // Fast skip blocks of 64 masked values.
+      if (rlong == 0L) {
+        iter.advance(Long.SIZE);
+        continue;
+      }
+      for (int i = 0; i < Long.SIZE; ++i, rlong >>>= 1, iter.advance()) {
+        if (!iter.valid()) {
+          break outer;
+        }
+        if ((rlong & 1L) == 1L) {
+          rowIDs.add(iter);
+        }
+      }
+    }
+    return rowIDs;
   }
 
   /**
