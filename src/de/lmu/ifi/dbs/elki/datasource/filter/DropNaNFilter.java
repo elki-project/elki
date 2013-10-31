@@ -43,11 +43,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class NaNFilter extends AbstractStreamFilter {
+public class DropNaNFilter extends AbstractStreamFilter {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(NaNFilter.class);
+  private static final Logging LOG = Logging.getLogger(DropNaNFilter.class);
 
   /**
    * Columns to check.
@@ -57,7 +57,7 @@ public class NaNFilter extends AbstractStreamFilter {
   /**
    * Constructor.
    */
-  public NaNFilter() {
+  public DropNaNFilter() {
     super();
   }
 
@@ -178,8 +178,8 @@ public class NaNFilter extends AbstractStreamFilter {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected Object makeInstance() {
-      return new NaNFilter();
+    protected DropNaNFilter makeInstance() {
+      return new DropNaNFilter();
     }
   }
 }
