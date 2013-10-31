@@ -27,8 +27,11 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Inverse Gaussian distribution aka Wald distribution
@@ -36,9 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * @author Erich Schubert
  */
 @Alias({ "InverseGaussianDistribution", "invgauss" })
-public class WaldDistribution implements Distribution {
+public class WaldDistribution extends AbstractDistribution {
   /**
-   * Mean value
+   * Location value
    */
   private double mean;
 
@@ -48,9 +51,17 @@ public class WaldDistribution implements Distribution {
   private double shape;
 
   /**
-   * The random generator.
+   * Constructor for wald distribution
+   * 
+   * @param mean Mean
+   * @param shape Shape parameter
+   * @param random Random generator
    */
-  private Random random;
+  public WaldDistribution(double mean, double shape, Random random) {
+    super(random);
+    this.mean = mean;
+    this.shape = shape;
+  }
 
   /**
    * Constructor for wald distribution
@@ -59,11 +70,10 @@ public class WaldDistribution implements Distribution {
    * @param shape Shape parameter
    * @param random Random generator
    */
-  public WaldDistribution(double mean, double shape, Random random) {
-    super();
+  public WaldDistribution(double mean, double shape, RandomFactory random) {
+    super(random);
     this.mean = mean;
     this.shape = shape;
-    this.random = random;
   }
 
   /**
@@ -73,7 +83,7 @@ public class WaldDistribution implements Distribution {
    * @param shape Shape parameter
    */
   public WaldDistribution(double mean, double shape) {
-    this(mean, shape, null);
+    this(mean, shape, (Random) null);
   }
 
   @Override
@@ -169,5 +179,37 @@ public class WaldDistribution implements Distribution {
   public static double quantile(double x, double mu, double shape) {
     // FIXME: implement!
     throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double mean, shape;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter meanP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(meanP)) {
+        mean = meanP.doubleValue();
+      }
+
+      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
+      if (config.grab(shapeP)) {
+        shape = shapeP.doubleValue();
+      }
+    }
+
+    @Override
+    protected WaldDistribution makeInstance() {
+      return new WaldDistribution(mean, shape, rnd);
+    }
   }
 }

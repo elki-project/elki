@@ -25,12 +25,16 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Gumbel distribution, also known as Log-Weibull distribution.
  * 
  * @author Erich Schubert
  */
-public class GumbelDistribution implements Distribution {
+public class GumbelDistribution extends AbstractDistribution {
   /**
    * Mode parameter mu.
    */
@@ -42,18 +46,13 @@ public class GumbelDistribution implements Distribution {
   double beta;
 
   /**
-   * Random number generator.
-   */
-  Random random;
-
-  /**
    * Constructor.
    * 
    * @param mu Mode
    * @param beta Shape
    */
   public GumbelDistribution(double mu, double beta) {
-    this(mu, beta, null);
+    this(mu, beta, (Random) null);
   }
 
   /**
@@ -64,10 +63,22 @@ public class GumbelDistribution implements Distribution {
    * @param random Random number generator
    */
   public GumbelDistribution(double mu, double beta, Random random) {
-    super();
+    super(random);
     this.mu = mu;
     this.beta = beta;
-    this.random = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param mu Mode
+   * @param beta Shape
+   * @param random Random number generator
+   */
+  public GumbelDistribution(double mu, double beta, RandomFactory random) {
+    super(random);
+    this.mu = mu;
+    this.beta = beta;
   }
 
   /**
@@ -130,5 +141,37 @@ public class GumbelDistribution implements Distribution {
   @Override
   public String toString() {
     return "GumbelDistribution(mu=" + mu + ", beta=" + beta + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double mean, shape;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter meanP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(meanP)) {
+        mean = meanP.doubleValue();
+      }
+
+      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
+      if (config.grab(shapeP)) {
+        shape = shapeP.doubleValue();
+      }
+    }
+
+    @Override
+    protected GumbelDistribution makeInstance() {
+      return new GumbelDistribution(mean, shape, rnd);
+    }
   }
 }

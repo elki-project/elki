@@ -25,16 +25,20 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Weibull distribution.
  * 
  * @author Erich Schubert
  */
-public class WeibullDistribution implements Distribution {
+public class WeibullDistribution extends AbstractDistribution {
   /**
    * Shift offset.
    */
-  double theta = 0.0;
+  double theta = 0.;
 
   /**
    * Shape parameter k.
@@ -47,18 +51,13 @@ public class WeibullDistribution implements Distribution {
   double lambda;
 
   /**
-   * Random number generator.
-   */
-  Random random;
-
-  /**
    * Constructor.
    * 
    * @param k Shape parameter
    * @param lambda Scale parameter
    */
   public WeibullDistribution(double k, double lambda) {
-    this(k, lambda, 0.0, null);
+    this(k, lambda, 0.0, (Random) null);
   }
 
   /**
@@ -69,7 +68,7 @@ public class WeibullDistribution implements Distribution {
    * @param theta Shift offset parameter
    */
   public WeibullDistribution(double k, double lambda, double theta) {
-    this(k, lambda, theta, null);
+    this(k, lambda, theta, (Random) null);
   }
 
   /**
@@ -80,7 +79,7 @@ public class WeibullDistribution implements Distribution {
    * @param random Random number generator
    */
   public WeibullDistribution(double k, double lambda, Random random) {
-    this(k, lambda, 0.0, random);
+    this(k, lambda, 0., random);
   }
 
   /**
@@ -92,11 +91,25 @@ public class WeibullDistribution implements Distribution {
    * @param random Random number generator
    */
   public WeibullDistribution(double k, double lambda, double theta, Random random) {
-    super();
+    super(random);
     this.k = k;
     this.lambda = lambda;
     this.theta = theta;
-    this.random = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param k Shape parameter
+   * @param lambda Scale parameter
+   * @param theta Shift offset parameter
+   * @param random Random number generator
+   */
+  public WeibullDistribution(double k, double lambda, double theta, RandomFactory random) {
+    super(random);
+    this.k = k;
+    this.lambda = lambda;
+    this.theta = theta;
   }
 
   @Override
@@ -178,5 +191,42 @@ public class WeibullDistribution implements Distribution {
   @Override
   public String toString() {
     return "WeibullDistribution(k=" + k + ", lambda=" + lambda + ", theta=" + theta + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double theta, k, lambda;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter thetaP = new DoubleParameter(LOCATION_ID, 0.);
+      if (config.grab(thetaP)) {
+        theta = thetaP.doubleValue();
+      }
+
+      DoubleParameter lambdaP = new DoubleParameter(SCALE_ID);
+      if (config.grab(lambdaP)) {
+        lambda = lambdaP.doubleValue();
+      }
+
+      DoubleParameter kP = new DoubleParameter(SHAPE_ID);
+      if (config.grab(kP)) {
+        k = kP.doubleValue();
+      }
+    }
+
+    @Override
+    protected WeibullDistribution makeInstance() {
+      return new WeibullDistribution(theta, k, lambda, rnd);
+    }
   }
 }

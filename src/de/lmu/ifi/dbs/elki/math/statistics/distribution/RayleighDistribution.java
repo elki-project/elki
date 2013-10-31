@@ -25,16 +25,20 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Rayleigh distribution.
  * 
  * @author Erich Schubert
  */
-public class RayleighDistribution implements Distribution {
+public class RayleighDistribution extends AbstractDistribution {
   /**
-   * Position parameter.
+   * Location parameter.
    */
-  double mu = 0.0;
+  double mu = 0.;
 
   /**
    * Scale parameter.
@@ -42,17 +46,12 @@ public class RayleighDistribution implements Distribution {
   double sigma;
 
   /**
-   * Random number generator.
-   */
-  Random random;
-
-  /**
    * Constructor.
    * 
    * @param sigma Scale parameter
    */
   public RayleighDistribution(double sigma) {
-    this(0., sigma, null);
+    this(0., sigma, (Random) null);
   }
 
   /**
@@ -62,7 +61,7 @@ public class RayleighDistribution implements Distribution {
    * @param sigma Scale parameter
    */
   public RayleighDistribution(double mu, double sigma) {
-    this(mu, sigma, null);
+    this(mu, sigma, (Random) null);
   }
 
   /**
@@ -83,10 +82,22 @@ public class RayleighDistribution implements Distribution {
    * @param random Random number generator
    */
   public RayleighDistribution(double mu, double sigma, Random random) {
-    super();
+    super(random);
     this.mu = mu;
     this.sigma = sigma;
-    this.random = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param mu Position parameter
+   * @param sigma Scale parameter
+   * @param random Random number generator
+   */
+  public RayleighDistribution(double mu, double sigma, RandomFactory random) {
+    super(random);
+    this.mu = mu;
+    this.sigma = sigma;
   }
 
   @Override
@@ -161,5 +172,37 @@ public class RayleighDistribution implements Distribution {
   @Override
   public String toString() {
     return "RayleighDistribution(mu=" + mu + ", sigma=" + sigma + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double mean, scale;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter meanP = new DoubleParameter(LOCATION_ID, 0.);
+      if (config.grab(meanP)) {
+        mean = meanP.doubleValue();
+      }
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
+      if (config.grab(scaleP)) {
+        scale = scaleP.doubleValue();
+      }
+    }
+
+    @Override
+    protected RayleighDistribution makeInstance() {
+      return new RayleighDistribution(mean, scale, rnd);
+    }
   }
 }
