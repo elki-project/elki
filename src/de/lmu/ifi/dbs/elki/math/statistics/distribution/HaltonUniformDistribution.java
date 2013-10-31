@@ -27,7 +27,10 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Primes;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Halton sequences are a pseudo-uniform distribution. The data is actually too
@@ -162,7 +165,6 @@ public class HaltonUniformDistribution implements Distribution {
    * @param max Maximum value
    */
   public HaltonUniformDistribution(double min, double max) {
-    // TODO: use different starting primes?
     this(min, max, new Random());
   }
 
@@ -175,8 +177,19 @@ public class HaltonUniformDistribution implements Distribution {
    * @param rnd Random generator
    */
   public HaltonUniformDistribution(double min, double max, Random rnd) {
-    // TODO: use different starting primes?
     this(min, max, choosePrime(rnd), rnd.nextDouble());
+  }
+
+  /**
+   * Constructor for a halton pseudo uniform distribution on the interval [min,
+   * max[
+   * 
+   * @param min Minimum value
+   * @param max Maximum value
+   * @param rnd Random generator
+   */
+  public HaltonUniformDistribution(double min, double max, RandomFactory rnd) {
+    this(min, max, rnd.getRandom());
   }
 
   /**
@@ -309,5 +322,39 @@ public class HaltonUniformDistribution implements Distribution {
    */
   public double getMax() {
     return max;
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * TODO: allow manual parameterization of sequence parameters!
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double min, max;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter minP = new DoubleParameter(UniformDistribution.Parameterizer.MIN_ID);
+      if (config.grab(minP)) {
+        min = minP.doubleValue();
+      }
+
+      DoubleParameter maxP = new DoubleParameter(UniformDistribution.Parameterizer.MAX_ID);
+      if (config.grab(maxP)) {
+        max = maxP.doubleValue();
+      }
+    }
+
+    @Override
+    protected HaltonUniformDistribution makeInstance() {
+      return new HaltonUniformDistribution(min, max, rnd);
+    }
   }
 }

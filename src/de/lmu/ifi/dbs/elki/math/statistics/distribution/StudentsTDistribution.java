@@ -23,17 +23,23 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Student's t distribution.
  * 
- * FIXME: add quantile function!
+ * FIXME: add quantile and random function!
  * 
  * @author Jan Brusis
  */
-public class StudentsTDistribution implements Distribution {
+public class StudentsTDistribution extends AbstractDistribution {
   /**
    * Degrees of freedom
    */
@@ -45,6 +51,28 @@ public class StudentsTDistribution implements Distribution {
    * @param v Degrees of freedom
    */
   public StudentsTDistribution(int v) {
+    this(v, (Random) null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param v Degrees of freedom
+   * @param random Random generator
+   */
+  public StudentsTDistribution(int v, Random random) {
+    super(random);
+    this.v = v;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param v Degrees of freedom
+   * @param random Random generator
+   */
+  public StudentsTDistribution(int v, RandomFactory random) {
+    super(random);
     this.v = v;
   }
 
@@ -97,5 +125,37 @@ public class StudentsTDistribution implements Distribution {
   @Override
   public String toString() {
     return "StudentsTDistribution(v=" + v + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Degrees of freedom.
+     */
+    public static final OptionID NU_ID = new OptionID("distribution.studentst.nu", "Degrees of freedom.");
+
+    /** Parameters. */
+    int nu;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      IntParameter nuP = new IntParameter(NU_ID);
+      if (config.grab(nuP)) {
+        nu = nuP.intValue();
+      }
+    }
+
+    @Override
+    protected StudentsTDistribution makeInstance() {
+      return new StudentsTDistribution(nu, rnd);
+    }
   }
 }

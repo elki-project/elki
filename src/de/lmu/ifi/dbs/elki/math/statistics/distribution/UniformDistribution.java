@@ -199,7 +199,7 @@ public class UniformDistribution extends AbstractDistribution {
 
     @Override
     protected UniformDistribution makeInstance() {
-      return new UniformDistribution(min, max);
+      return new UniformDistribution(min, max, rnd);
     }
   }
 }

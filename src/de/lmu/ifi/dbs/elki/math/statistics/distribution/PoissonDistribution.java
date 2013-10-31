@@ -22,10 +22,19 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * INCOMPLETE implementation of the poisson distribution.
@@ -40,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * 
  * @author Erich Schubert
  */
-public class PoissonDistribution implements Distribution {
+public class PoissonDistribution extends AbstractDistribution {
   /**
    * Number of tries
    */
@@ -108,13 +117,35 @@ public class PoissonDistribution implements Distribution {
   /**
    * Constructor.
    * 
-   * Private: API not yet completely implemented!
-   * 
    * @param n Number of tries
    * @param p Success probability
    */
   public PoissonDistribution(int n, double p) {
-    super();
+    this(n, p, (Random) null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param n Number of tries
+   * @param p Success probability
+   * @param random Random generator
+   */
+  public PoissonDistribution(int n, double p, Random random) {
+    super(random);
+    this.n = n;
+    this.p = p;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param n Number of tries
+   * @param p Success probability
+   * @param random Random generator
+   */
+  public PoissonDistribution(int n, double p, RandomFactory random) {
+    super(random);
     this.n = n;
     this.p = p;
   }
@@ -410,5 +441,57 @@ public class PoissonDistribution implements Distribution {
   @Override
   public String toString() {
     return "PoissonDistribution(n=" + n + ", p=" + p + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Number of trials.
+     */
+    public static final OptionID N_ID = new OptionID("distribution.poisson.n", "Number of trials.");
+
+    /**
+     * Success probability.
+     */
+    public static final OptionID PROB_ID = new OptionID("distribution.poisson.probability", "Success probability.");
+
+    /**
+     * Number of trials.
+     */
+    int n;
+
+    /**
+     * Success probability.
+     */
+    double p;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      IntParameter nP = new IntParameter(N_ID);
+      nP.addConstraint(new GreaterEqualConstraint(1));
+      if (config.grab(nP)) {
+        n = nP.intValue();
+      }
+
+      DoubleParameter probP = new DoubleParameter(PROB_ID);
+      probP.addConstraint(new GreaterEqualConstraint(0.));
+      probP.addConstraint(new LessEqualConstraint(1.));
+      if (config.grab(probP)) {
+        p = probP.doubleValue();
+      }
+    }
+
+    @Override
+    protected PoissonDistribution makeInstance() {
+      return new PoissonDistribution(n, p, rnd);
+    }
   }
 }
