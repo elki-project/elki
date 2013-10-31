@@ -2,7 +2,8 @@ de.lmu.ifi.dbs.elki.datasource.filter.NoOpFilter
 de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ByLabelFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFromPatternFilter
-de.lmu.ifi.dbs.elki.datasource.filter.NaNFilter
+de.lmu.ifi.dbs.elki.datasource.filter.DropNaNFilter
+de.lmu.ifi.dbs.elki.datasource.filter.ReplaceNaNWithRandomFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoMissingValuesFilter
 de.lmu.ifi.dbs.elki.datasource.filter.RandomSamplingStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.HistogramJitterFilter
