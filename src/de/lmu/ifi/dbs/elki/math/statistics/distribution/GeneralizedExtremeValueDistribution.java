@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
-import java.util.Random;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,6 +23,12 @@ import java.util.Random;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Generalized Extreme Value (GEV) distribution, also known as Fisher–Tippett
  * distribution.
@@ -37,16 +41,11 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class GeneralizedExtremeValueDistribution implements Distribution {
+public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
   /**
    * Parameters (location, scale, shape)
    */
   final double mu, sigma, k;
-
-  /**
-   * Random number generator.
-   */
-  Random random;
 
   /**
    * Constructor.
@@ -56,7 +55,22 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
    * @param k Shape parameter k
    */
   public GeneralizedExtremeValueDistribution(double mu, double sigma, double k) {
-    this(mu, sigma, k, null);
+    this(mu, sigma, k, (Random) null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param mu Location parameter mu
+   * @param sigma Scale parameter sigma
+   * @param k Shape parameter k
+   * @param random Random number generator
+   */
+  public GeneralizedExtremeValueDistribution(double mu, double sigma, double k, RandomFactory random) {
+    super(random);
+    this.mu = mu;
+    this.sigma = sigma;
+    this.k = k;
   }
 
   /**
@@ -68,11 +82,10 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
    * @param random Random number generator
    */
   public GeneralizedExtremeValueDistribution(double mu, double sigma, double k, Random random) {
-    super();
+    super(random);
     this.mu = mu;
     this.sigma = sigma;
     this.k = k;
-    this.random = random;
   }
 
   /**
@@ -156,12 +169,44 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
   }
 
   @Override
-  public double nextRandom() {
-    return quantile(random.nextDouble());
-  }
-
-  @Override
   public String toString() {
     return "GeneralizedExtremeValueDistribution(sigma=" + sigma + ", mu=" + mu + ", k=" + k + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double mu, sigma, k;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter muP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(muP)) {
+        mu = muP.doubleValue();
+      }
+
+      DoubleParameter sigmaP = new DoubleParameter(SCALE_ID);
+      if (config.grab(sigmaP)) {
+        sigma = sigmaP.doubleValue();
+      }
+
+      DoubleParameter kP = new DoubleParameter(SHAPE_ID);
+      if (config.grab(kP)) {
+        k = kP.doubleValue();
+      }
+    }
+
+    @Override
+    protected GeneralizedExtremeValueDistribution makeInstance() {
+      return new GeneralizedExtremeValueDistribution(mu, sigma, k, rnd);
+    }
   }
 }

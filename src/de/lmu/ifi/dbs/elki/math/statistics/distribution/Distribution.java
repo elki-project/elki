@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -28,7 +30,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  * 
  * @author Erich Schubert
  */
-public interface Distribution {
+public interface Distribution extends Parameterizable {
   /**
    * Return the density of an existing value
    * 

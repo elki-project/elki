@@ -27,14 +27,18 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Gamma Distribution, with random generation and density functions.
  * 
  * @author Erich Schubert
  */
-public class GammaDistribution implements Distribution {
+public class GammaDistribution extends AbstractDistribution {
   /**
    * Euler–Mascheroni constant
    */
@@ -77,9 +81,21 @@ public class GammaDistribution implements Distribution {
   private final double theta;
 
   /**
-   * The random generator.
+   * Constructor for Gamma distribution.
+   * 
+   * @param k k, alpha aka. "shape" parameter
+   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @param random Random generator
    */
-  private Random random;
+  public GammaDistribution(double k, double theta, Random random) {
+    super(random);
+    if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
+    }
+
+    this.k = k;
+    this.theta = theta;
+  }
 
   /**
    * Constructor for Gamma distribution.
@@ -88,15 +104,14 @@ public class GammaDistribution implements Distribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @param random Random generator
    */
-  public GammaDistribution(double k, double theta, Random random) {
-    super();
+  public GammaDistribution(double k, double theta, RandomFactory random) {
+    super(random);
     if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
     }
 
     this.k = k;
     this.theta = theta;
-    this.random = random;
   }
 
   /**
@@ -106,7 +121,7 @@ public class GammaDistribution implements Distribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    */
   public GammaDistribution(double k, double theta) {
-    this(k, theta, new Random());
+    this(k, theta, (Random) null);
   }
 
   @Override
@@ -888,6 +903,50 @@ public class GammaDistribution implements Distribution {
     } else {
       // Stirling expansion
       return trigamma(x + 1.) - 1. / (x * x);
+    }
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * TODO: allow alternate parameterization, with alpha+beta?
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * K parameter.
+     */
+    public static final OptionID K_ID = new OptionID("distribution.gamma.k", "Gamma distribution k = alpha parameter.");
+
+    /**
+     * Theta parameter.
+     */
+    public static final OptionID THETA_ID = new OptionID("distribution.gamma.theta", "Gamma distribution theta = 1/beta parameter.");
+
+    /** Parameters. */
+    double k, theta;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter kP = new DoubleParameter(K_ID);
+      if (config.grab(kP)) {
+        k = kP.doubleValue();
+      }
+
+      DoubleParameter thetaP = new DoubleParameter(THETA_ID);
+      if (config.grab(thetaP)) {
+        theta = thetaP.doubleValue();
+      }
+    }
+
+    @Override
+    protected GammaDistribution makeInstance() {
+      return new GammaDistribution(k, theta, rnd);
     }
   }
 }

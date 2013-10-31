@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,6 +22,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Chi-Squared distribution (a specialization of the Gamma distribution).
@@ -37,7 +42,27 @@ public class ChiSquaredDistribution extends GammaDistribution {
    * @param dof Degrees of freedom.
    */
   public ChiSquaredDistribution(double dof) {
-    super(.5 * dof, .5);
+    this(dof, (Random) null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param dof Degrees of freedom.
+   * @param random Random generator.
+   */
+  public ChiSquaredDistribution(double dof, Random random) {
+    super(.5 * dof, .5, random);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param dof Degrees of freedom.
+   * @param random Random generator.
+   */
+  public ChiSquaredDistribution(double dof, RandomFactory random) {
+    super(.5 * dof, .5, random);
   }
 
   /**
@@ -94,5 +119,37 @@ public class ChiSquaredDistribution extends GammaDistribution {
   @Override
   public String toString() {
     return "ChiSquaredDistribution(dof=" + (2 * getK()) + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Degrees of freedom parameter.
+     */
+    public static final OptionID DOF_ID = new OptionID("distribution.chi.dof", "Chi distribution degrees of freedom parameter.");
+
+    /** Parameters. */
+    double dof;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter dofP = new DoubleParameter(DOF_ID);
+      if (config.grab(dofP)) {
+        dof = dofP.doubleValue();
+      }
+    }
+
+    @Override
+    protected ChiSquaredDistribution makeInstance() {
+      return new ChiSquaredDistribution(dof, rnd);
+    }
   }
 }

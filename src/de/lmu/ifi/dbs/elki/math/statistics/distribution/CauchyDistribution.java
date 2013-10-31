@@ -25,12 +25,17 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Cauchy distribution.
  * 
  * @author Erich Schubert
  */
-public class CauchyDistribution implements Distribution {
+public class CauchyDistribution extends AbstractDistribution {
   /**
    * The location (x0) parameter.
    */
@@ -42,18 +47,13 @@ public class CauchyDistribution implements Distribution {
   final double shape;
 
   /**
-   * The random generator.
-   */
-  private Random random;
-
-  /**
    * Constructor with default random.
    * 
    * @param location Location (x0)
    * @param shape Shape (gamma)
    */
   public CauchyDistribution(double location, double shape) {
-    this(location, shape, new Random());
+    this(location, shape, (Random) null);
   }
 
   /**
@@ -64,10 +64,22 @@ public class CauchyDistribution implements Distribution {
    * @param random Random generator
    */
   public CauchyDistribution(double location, double shape, Random random) {
-    super();
+    super(random);
     this.location = location;
     this.shape = shape;
-    this.random = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param location Location (x0)
+   * @param shape Shape (gamma)
+   * @param random Random generator
+   */
+  public CauchyDistribution(double location, double shape, RandomFactory random) {
+    super(random);
+    this.location = location;
+    this.shape = shape;
   }
 
   @Override
@@ -131,5 +143,42 @@ public class CauchyDistribution implements Distribution {
   @Override
   public String toString() {
     return "CauchyDistribution(location=" + location + ", shape=" + shape + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Shape parameter gamma.
+     */
+    public static final OptionID SHAPE_ID = new OptionID("distribution.cauchy.shape", "Cauchy distribution gamma/shape parameter.");
+
+    /** Parameters. */
+    double location, shape;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter locP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(locP)) {
+        location = locP.doubleValue();
+      }
+
+      DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
+      if (config.grab(shapeP)) {
+        shape = shapeP.doubleValue();
+      }
+    }
+
+    @Override
+    protected CauchyDistribution makeInstance() {
+      return new CauchyDistribution(location, shape, rnd);
+    }
   }
 }

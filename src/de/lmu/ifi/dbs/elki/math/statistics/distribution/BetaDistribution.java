@@ -2,7 +2,11 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /*
  This file is part of ELKI:
@@ -34,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Jan Brusis
  * @author Erich Schubert
  */
-public class BetaDistribution implements Distribution {
+public class BetaDistribution extends AbstractDistribution {
   /**
    * Numerical precision to use
    */
@@ -66,11 +70,6 @@ public class BetaDistribution implements Distribution {
   private final double beta;
 
   /**
-   * For random number generation
-   */
-  private Random random;
-
-  /**
    * Log beta(a, b) cache
    */
   private double logbab;
@@ -82,7 +81,7 @@ public class BetaDistribution implements Distribution {
    * @param b shape Parameter b
    */
   public BetaDistribution(double a, double b) {
-    this(a, b, new Random());
+    this(a, b, (Random) null);
   }
 
   /**
@@ -93,7 +92,7 @@ public class BetaDistribution implements Distribution {
    * @param random Random generator
    */
   public BetaDistribution(double a, double b, Random random) {
-    super();
+    super(random);
     if (a <= 0.0 || b <= 0.0) {
       throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
     }
@@ -101,7 +100,24 @@ public class BetaDistribution implements Distribution {
     this.alpha = a;
     this.beta = b;
     this.logbab = logBeta(a, b);
-    this.random = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param a shape Parameter a
+   * @param b shape Parameter b
+   * @param random Random generator
+   */
+  public BetaDistribution(double a, double b, RandomFactory random) {
+    super(random);
+    if (a <= 0.0 || b <= 0.0) {
+      throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
+    }
+
+    this.alpha = a;
+    this.beta = b;
+    this.logbab = logBeta(a, b);
   }
 
   @Override
@@ -524,5 +540,47 @@ public class BetaDistribution implements Distribution {
     }
     // Not converged in Newton-Raphson
     throw new AbortException("Beta quantile computation did not converge.");
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Alpha parameter.
+     */
+    public static final OptionID ALPHA_ID = new OptionID("distribution.beta.alpha", "Beta distribution alpha parameter");
+
+    /**
+     * Beta parameter.
+     */
+    public static final OptionID BETA_ID = new OptionID("distribution.beta.beta", "Beta distribution beta parameter");
+
+    /** Parameters. */
+    double alpha, beta;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID);
+      if (config.grab(alphaP)) {
+        alpha = alphaP.doubleValue();
+      }
+
+      DoubleParameter betaP = new DoubleParameter(BETA_ID);
+      if (config.grab(betaP)) {
+        beta = betaP.doubleValue();
+      }
+    }
+
+    @Override
+    protected BetaDistribution makeInstance() {
+      return new BetaDistribution(alpha, beta, rnd);
+    }
   }
 }
