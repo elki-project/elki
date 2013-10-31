@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -400,6 +401,7 @@ public class NormalDistribution extends AbstractDistribution {
       }
 
       DoubleParameter sigmaP = new DoubleParameter(SCALE_ID);
+      sigmaP.addConstraint(new GreaterConstraint(0.));
       if (config.grab(sigmaP)) {
         sigma = sigmaP.doubleValue();
       }

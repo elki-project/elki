@@ -25,22 +25,22 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Logistic distribution.
  * 
  * @author Erich Schubert
  */
-public class LogisticDistribution implements Distribution {
+@Alias({ "log" })
+public class LogisticDistribution extends AbstractDistribution {
   /**
    * Parameters: location and scale
    */
   double location, scale;
-
-  /**
-   * Random number generator
-   */
-  Random random;
 
   /**
    * Constructor.
@@ -49,7 +49,7 @@ public class LogisticDistribution implements Distribution {
    * @param scale Scale
    */
   public LogisticDistribution(double location, double scale) {
-    this(location, scale, null);
+    this(location, scale, (Random) null);
   }
 
   /**
@@ -60,10 +60,22 @@ public class LogisticDistribution implements Distribution {
    * @param random Random number generator
    */
   public LogisticDistribution(double location, double scale, Random random) {
-    super();
+    super(random);
     this.location = location;
     this.scale = scale;
-    this.random = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param location Location
+   * @param scale Scale
+   * @param random Random number generator
+   */
+  public LogisticDistribution(double location, double scale, RandomFactory random) {
+    super(random);
+    this.location = location;
+    this.scale = scale;
   }
 
   /**
@@ -182,5 +194,37 @@ public class LogisticDistribution implements Distribution {
   @Override
   public String toString() {
     return "LogisticDistribution(location=" + location + ", scale=" + scale + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double location, scale;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
+      if (config.grab(scaleP)) {
+        scale = scaleP.doubleValue();
+      }
+
+      DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(locationP)) {
+        location = locationP.doubleValue();
+      }
+    }
+
+    @Override
+    protected LogisticDistribution makeInstance() {
+      return new LogisticDistribution(location, scale, rnd);
+    }
   }
 }

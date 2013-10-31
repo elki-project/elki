@@ -26,6 +26,11 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Log-Normal distribution.
@@ -40,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @author Erich Schubert
  */
 @Alias({ "lognormal" })
-public class LogNormalDistribution implements Distribution {
+public class LogNormalDistribution extends AbstractDistribution {
   /**
    * Mean value for the generator
    */
@@ -57,9 +62,19 @@ public class LogNormalDistribution implements Distribution {
   private double shift = 0.;
 
   /**
-   * The random generator.
+   * Constructor for Log-Normal distribution
+   * 
+   * @param logmean Mean
+   * @param logstddev Standard Deviation
+   * @param shift Shifting offset
+   * @param random Random generator
    */
-  private Random random;
+  public LogNormalDistribution(double logmean, double logstddev, double shift, Random random) {
+    super(random);
+    this.logmean = logmean;
+    this.logstddev = logstddev;
+    this.shift = shift;
+  }
 
   /**
    * Constructor for Log-Normal distribution
@@ -69,12 +84,11 @@ public class LogNormalDistribution implements Distribution {
    * @param shift Shifting offset
    * @param random Random generator
    */
-  public LogNormalDistribution(double logmean, double logstddev, double shift, Random random) {
-    super();
+  public LogNormalDistribution(double logmean, double logstddev, double shift, RandomFactory random) {
+    super(random);
     this.logmean = logmean;
     this.logstddev = logstddev;
     this.shift = shift;
-    this.random = random;
   }
 
   /**
@@ -85,7 +99,7 @@ public class LogNormalDistribution implements Distribution {
    * @param shift Shifting offset
    */
   public LogNormalDistribution(double logmean, double logstddev, double shift) {
-    this(logmean, logstddev, shift, null);
+    this(logmean, logstddev, shift, (Random) null);
   }
 
   @Override
@@ -161,5 +175,58 @@ public class LogNormalDistribution implements Distribution {
   @Override
   public String toString() {
     return "LogNormalDistribution(logmean=" + logmean + ", logstddev=" + logstddev + ", shift=" + shift + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * LogMean parameter
+     */
+    public static final OptionID LOGMEAN_ID = new OptionID("distribution.lognormal.logmean", "Mean of the distribution before logscaling.");
+
+    /**
+     * LogScale parameter
+     */
+    public static final OptionID LOGSTDDEV_ID = new OptionID("distribution.lognormal.logstddev", "Standard deviation of the distribution before logscaling.");
+
+    /**
+     * Shift parameter
+     */
+    public static final OptionID SHIFT_ID = new OptionID("distribution.lognormal.shift", "Shifting offset, so the distribution does not begin at 0.");
+
+    /** Parameters. */
+    double shift, logmean, logsigma;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter logmeanP = new DoubleParameter(LOGMEAN_ID);
+      if (config.grab(logmeanP)) {
+        logmean = logmeanP.doubleValue();
+      }
+
+      DoubleParameter logsigmaP = new DoubleParameter(LOGSTDDEV_ID);
+      logsigmaP.addConstraint(new GreaterConstraint(0.));
+      if (config.grab(logsigmaP)) {
+        logsigma = logsigmaP.doubleValue();
+      }
+
+      DoubleParameter shiftP = new DoubleParameter(SHIFT_ID, 0.);
+      if (config.grab(shiftP)) {
+        shift = shiftP.doubleValue();
+      }
+    }
+
+    @Override
+    protected LogNormalDistribution makeInstance() {
+      return new LogNormalDistribution(logmean, logsigma, shift, rnd);
+    }
   }
 }
