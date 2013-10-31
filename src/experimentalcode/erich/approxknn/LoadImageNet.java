@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.filter.NaNFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.DropNaNFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization;
 import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
@@ -127,7 +127,7 @@ public class LoadImageNet {
           }
         }
       }
-      bundle = (new NaNFilter()).filter(bundle);
+      bundle = (new DropNaNFilter()).filter(bundle);
       bundle = (new AttributeWiseVarianceNormalization<>()).filter(bundle);
       return bundle;
     }
