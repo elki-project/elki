@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,6 +23,14 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Chi distribution.
  * 
@@ -33,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * 
  * @apiviz.composedOf ChiSquaredDistribution
  */
-public class ChiDistribution implements Distribution {
+public class ChiDistribution extends AbstractDistribution {
   /**
    * Degrees of freedom. Usually integer.
    */
@@ -50,9 +55,31 @@ public class ChiDistribution implements Distribution {
    * @param dof Degrees of freedom. Usually integer.
    */
   public ChiDistribution(double dof) {
-    super();
+    this(dof, (Random) null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param dof Degrees of freedom. Usually integer.
+   * @param random Random number generator.
+   */
+  public ChiDistribution(double dof, Random random) {
+    super(random);
     this.dof = dof;
-    this.chisq = new ChiSquaredDistribution(dof);
+    this.chisq = new ChiSquaredDistribution(dof, random);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param dof Degrees of freedom. Usually integer.
+   * @param random Random number generator.
+   */
+  public ChiDistribution(double dof, RandomFactory random) {
+    super(random);
+    this.dof = dof;
+    this.chisq = new ChiSquaredDistribution(dof, random);
   }
 
   @Override
@@ -73,7 +100,7 @@ public class ChiDistribution implements Distribution {
    * @return Pdf value
    */
   public static double pdf(double val, double dof) {
-    if(val < 0) {
+    if (val < 0) {
       return 0.0;
     }
     return Math.sqrt(ChiSquaredDistribution.pdf(val, dof));
@@ -104,5 +131,32 @@ public class ChiDistribution implements Distribution {
   @Override
   public String toString() {
     return "ChiDistribution(dof=" + dof + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double dof;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter dofP = new DoubleParameter(ChiSquaredDistribution.Parameterizer.DOF_ID);
+      if (config.grab(dofP)) {
+        dof = dofP.doubleValue();
+      }
+    }
+
+    @Override
+    protected ChiDistribution makeInstance() {
+      return new ChiDistribution(dof, rnd);
+    }
   }
 }

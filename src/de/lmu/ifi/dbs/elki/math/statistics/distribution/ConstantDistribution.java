@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -56,11 +61,43 @@ public class ConstantDistribution implements Distribution {
 
   @Override
   public double cdf(double val) {
-    return (val >= c) ? 1.0 : 0.0;
+    return (c < val) ? 0. : (c > val) ? 1. : .5;
   }
 
   @Override
   public double quantile(double val) {
     return c;
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Constant value parameter
+     */
+    public static final OptionID CONSTANT_ID = new OptionID("distribution.constant", "Constant value.");
+
+    /** Parameters. */
+    double constant;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter constP = new DoubleParameter(CONSTANT_ID);
+      if (config.grab(constP)) {
+        constant = constP.doubleValue();
+      }
+    }
+
+    @Override
+    protected ConstantDistribution makeInstance() {
+      return new ConstantDistribution(constant);
+    }
   }
 }

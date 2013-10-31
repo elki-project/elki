@@ -26,8 +26,11 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Exponentially modified Gaussian (EMG) distribution (ExGaussian distribution)
@@ -36,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * @author Erich Schubert
  */
 @Alias({ "exgaussian" })
-public class ExponentiallyModifiedGaussianDistribution implements Distribution {
+public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribution {
   /**
    * Mean value for the generator
    */
@@ -53,9 +56,19 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
   private double lambda;
 
   /**
-   * Random generator.
+   * Constructor for ExGaussian distribution
+   * 
+   * @param mean Mean
+   * @param stddev Standard Deviation
+   * @param lambda Rate
+   * @param random Random
    */
-  private Random rnd;
+  public ExponentiallyModifiedGaussianDistribution(double mean, double stddev, double lambda, Random random) {
+    super(random);
+    this.mean = mean;
+    this.stddev = stddev;
+    this.lambda = lambda;
+  }
 
   /**
    * Constructor for ExGaussian distribution
@@ -63,14 +76,13 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
    * @param mean Mean
    * @param stddev Standard Deviation
    * @param lambda Rate
-   * @param rnd Random
+   * @param random Random
    */
-  public ExponentiallyModifiedGaussianDistribution(double mean, double stddev, double lambda, Random rnd) {
-    super();
+  public ExponentiallyModifiedGaussianDistribution(double mean, double stddev, double lambda, RandomFactory random) {
+    super(random);
     this.mean = mean;
     this.stddev = stddev;
     this.lambda = lambda;
-    this.rnd = rnd;
   }
 
   /**
@@ -81,7 +93,7 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
    * @param lambda Rate
    */
   public ExponentiallyModifiedGaussianDistribution(double mean, double stddev, double lambda) {
-    this(mean, stddev, lambda, null);
+    this(mean, stddev, lambda, (Random) null);
   }
 
   @Override
@@ -105,8 +117,8 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
 
   @Override
   public double nextRandom() {
-    double no = mean + rnd.nextGaussian() * stddev;
-    double ex = -Math.log(rnd.nextDouble()) / lambda;
+    double no = mean + random.nextGaussian() * stddev;
+    double ex = -Math.log(random.nextDouble()) / lambda;
     return no + ex;
   }
 
@@ -184,5 +196,42 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
   public static double quantile(double x, double mu, double sigma, double lambda) {
     // FIXME: implement!
     throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double mean, stddev, lambda;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter locP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(locP)) {
+        mean = locP.doubleValue();
+      }
+
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
+      if (config.grab(scaleP)) {
+        stddev = scaleP.doubleValue();
+      }
+
+      DoubleParameter rateP = new DoubleParameter(ExponentialDistribution.Parameterizer.RATE_ID);
+      if (config.grab(rateP)) {
+        lambda = rateP.doubleValue();
+      }
+    }
+
+    @Override
+    protected ExponentiallyModifiedGaussianDistribution makeInstance() {
+      return new ExponentiallyModifiedGaussianDistribution(mean, stddev, lambda, rnd);
+    }
   }
 }

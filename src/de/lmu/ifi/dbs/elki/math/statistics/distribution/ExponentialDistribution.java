@@ -25,17 +25,17 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 /**
  * Exponential distribution.
  * 
  * @author Erich Schubert
  */
-public class ExponentialDistribution implements Distribution {
-  /**
-   * Random generator.
-   */
-  Random rnd;
-
+public class ExponentialDistribution extends AbstractDistribution {
   /**
    * Rate, inverse of mean
    */
@@ -52,7 +52,7 @@ public class ExponentialDistribution implements Distribution {
    * @param rate Rate parameter (1/scale)
    */
   public ExponentialDistribution(double rate) {
-    this(rate, 0.0, null);
+    this(rate, 0.0, (Random) null);
   }
 
   /**
@@ -62,7 +62,7 @@ public class ExponentialDistribution implements Distribution {
    * @param location Location parameter
    */
   public ExponentialDistribution(double rate, double location) {
-    this(rate, location, null);
+    this(rate, location, (Random) null);
   }
 
   /**
@@ -83,10 +83,22 @@ public class ExponentialDistribution implements Distribution {
    * @param random Random generator
    */
   public ExponentialDistribution(double rate, double location, Random random) {
-    super();
+    super(random);
     this.rate = rate;
     this.location = location;
-    this.rnd = random;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param rate Rate parameter (1/scale)
+   * @param location Location parameter
+   * @param random Random generator
+   */
+  public ExponentialDistribution(double rate, double location, RandomFactory random) {
+    super(random);
+    this.rate = rate;
+    this.location = location;
   }
 
   @Override
@@ -160,11 +172,48 @@ public class ExponentialDistribution implements Distribution {
    */
   @Override
   public double nextRandom() {
-    return -Math.log(rnd.nextDouble()) / rate + location;
+    return -Math.log(random.nextDouble()) / rate + location;
   }
 
   @Override
   public String toString() {
     return "ExponentialDistribution(rate=" + rate + ", location=" + location + ")";
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /**
+     * Shape parameter gamma.
+     */
+    public static final OptionID RATE_ID = new OptionID("distribution.exponential.rate", "Exponential distribution rate (lambda) parameter (inverse of scale).");
+
+    /** Parameters. */
+    double location, rate;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter locP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(locP)) {
+        location = locP.doubleValue();
+      }
+
+      DoubleParameter rateP = new DoubleParameter(RATE_ID);
+      if (config.grab(rateP)) {
+        rate = rateP.doubleValue();
+      }
+    }
+
+    @Override
+    protected ExponentialDistribution makeInstance() {
+      return new ExponentialDistribution(location, rate, rnd);
+    }
   }
 }

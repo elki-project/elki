@@ -27,6 +27,9 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Gaussian distribution aka normal distribution
@@ -34,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @author Erich Schubert
  */
 @Alias({ "GaussianDistribution", "normal", "gauss" })
-public class NormalDistribution implements Distribution {
+public class NormalDistribution extends AbstractDistribution {
   /**
    * Coefficients for erf approximation.
    * 
@@ -123,9 +126,17 @@ public class NormalDistribution implements Distribution {
   private double stddev;
 
   /**
-   * The random generator.
+   * Constructor for Gaussian distribution
+   * 
+   * @param mean Mean
+   * @param stddev Standard Deviation
+   * @param random Random generator
    */
-  private Random random;
+  public NormalDistribution(double mean, double stddev, RandomFactory random) {
+    super(random);
+    this.mean = mean;
+    this.stddev = stddev;
+  }
 
   /**
    * Constructor for Gaussian distribution
@@ -135,10 +146,9 @@ public class NormalDistribution implements Distribution {
    * @param random Random generator
    */
   public NormalDistribution(double mean, double stddev, Random random) {
-    super();
+    super(random);
     this.mean = mean;
     this.stddev = stddev;
-    this.random = random;
   }
 
   /**
@@ -148,7 +158,7 @@ public class NormalDistribution implements Distribution {
    * @param stddev Standard Deviation
    */
   public NormalDistribution(double mean, double stddev) {
-    this(mean, stddev, new Random());
+    this(mean, stddev, (Random) null);
   }
 
   @Override
@@ -366,6 +376,38 @@ public class NormalDistribution implements Distribution {
       double q = d - 0.5D;
       double r = q * q;
       return (((((ERFINV_A[0] * r + ERFINV_A[1]) * r + ERFINV_A[2]) * r + ERFINV_A[3]) * r + ERFINV_A[4]) * r + ERFINV_A[5]) * q / (((((ERFINV_B[0] * r + ERFINV_B[1]) * r + ERFINV_B[2]) * r + ERFINV_B[3]) * r + ERFINV_B[4]) * r + 1);
+    }
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractDistribution.Parameterizer {
+    /** Parameters. */
+    double mu, sigma;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      DoubleParameter muP = new DoubleParameter(LOCATION_ID);
+      if (config.grab(muP)) {
+        mu = muP.doubleValue();
+      }
+
+      DoubleParameter sigmaP = new DoubleParameter(SCALE_ID);
+      if (config.grab(sigmaP)) {
+        sigma = sigmaP.doubleValue();
+      }
+    }
+
+    @Override
+    protected NormalDistribution makeInstance() {
+      return new NormalDistribution(mu, sigma, rnd);
     }
   }
 }
