@@ -110,42 +110,34 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
     List<String> entries = tokenize(line);
     int cardinality = Integer.parseInt(entries.get(0));
 
-    TIntDoubleHashMap values = new TIntDoubleHashMap(cardinality, 1);
+    TIntDoubleHashMap values = new TIntDoubleHashMap(cardinality);
     LabelList labels = null;
     int thismax = 0;
-    
-    for (int i = 1; i < entries.size() - 1; i++) {
-      if (labelIndices == null || !labelIndices.get(i)) {
+
+    for (int i = 1; i < entries.size();) {
+      // TODO: support for labelIndices?
+      if (values.size() < cardinality) {
         try {
           int index = Integer.parseInt(entries.get(i));
-          if (index >= maxdim) {
-            maxdim = index + 1;
-          }
-          thismax = Math.max(thismax, index);
-          double attribute = parseDouble(entries.get(i));
+          double attribute = parseDouble(entries.get(i + 1));
+
+          thismax = Math.max(thismax, index + 1);
           values.put(index, attribute);
-          i++;
-        } catch (NumberFormatException e) {
-          if (labels == null) {
-            labels = new LabelList(1);
-          }
-          labels.add(entries.get(i));
+          i += 2; // only increment if successful
           continue;
+        } catch (NumberFormatException e) {
+          // continue with fallback below.
         }
-      } else {
-        if (labels == null) {
-          labels = new LabelList(1);
-        }
-        labels.add(entries.get(i));
       }
+      // Fallback: treat as label
+      if (labels == null) {
+        labels = new LabelList(1);
+        labelcolumns.set(0); // FIXME: ugly hack, to not use the labels
+      }
+      labels.add(entries.get(i));
+      i++;
     }
-    if (values.size() > maxdim) {
-      throw new AbortException("Invalid sparse vector seen: " + line);
-    }
-    if (thismax < mindim) {
-      mindim = thismax;
-    }
-    curvec = sparsefactory.newNumberVector(values, maxdim);
+    curvec = sparsefactory.newNumberVector(values, thismax);
     curlbl = labels;
   }
 
