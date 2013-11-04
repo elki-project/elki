@@ -219,7 +219,6 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
           continue;
         }
         final int curdim = curvec.getDimensionality();
-        LOG.warning(curdim + " " + mindim + " " + maxdim + " " + curlbl);
         if (curdim > maxdim || mindim > curdim) {
           mindim = Math.min(mindim, curdim);
           maxdim = Math.max(maxdim, curdim);
