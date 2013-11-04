@@ -138,6 +138,11 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   protected BitSet labelcolumns = null;
 
   /**
+   * Whether or not the data set has labels.
+   */
+  protected boolean haslabels = false;
+
+  /**
    * Current vector.
    */
   protected V curvec = null;
@@ -183,6 +188,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     mindim = Integer.MAX_VALUE;
     maxdim = 0;
     columnnames = null;
+    haslabels = false;
     labelcolumns = new BitSet();
     if (labelIndices != null) {
       labelcolumns.or(labelIndices);
@@ -213,7 +219,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
           continue;
         }
         final int curdim = curvec.getDimensionality();
-        LOG.warning(curdim+" "+mindim+" "+maxdim+" "+curlbl);
+        LOG.warning(curdim + " " + mindim + " " + maxdim + " " + curlbl);
         if (curdim > maxdim || mindim > curdim) {
           mindim = Math.min(mindim, curdim);
           maxdim = Math.max(maxdim, curdim);
@@ -239,7 +245,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * Update the meta element.
    */
   protected void buildMeta() {
-    if (labelcolumns.cardinality() > 0 || (labelIndices != null && labelIndices.cardinality() > 0)) {
+    if (haslabels) {
       meta = new BundleMeta(2);
       meta.add(getTypeInformation(mindim, maxdim));
       meta.add(TypeUtil.LABELLIST);
@@ -289,6 +295,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
       // Else: labels.
       if (labels == null) {
         labels = new LabelList(1);
+        haslabels = true;
       }
       // Make a new string, to not keep the whole file in memory!
       labels.add(new String(ent));
@@ -302,6 +309,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
       }
       curvec = null;
       curlbl = null;
+      haslabels = false;
       return;
     }
     // Pass outside via class variables
