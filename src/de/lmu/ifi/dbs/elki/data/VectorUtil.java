@@ -359,6 +359,18 @@ public final class VectorUtil {
      * Constructor.
      * 
      * @param data Vector data source
+     * @param dim Dimension to sort by
+     */
+    public SortDBIDsBySingleDimension(Relation<? extends NumberVector<?>> data, int dim) {
+      super();
+      this.data = data;
+      this.d = dim;
+    };
+
+    /**
+     * Constructor.
+     * 
+     * @param data Vector data source
      */
     public SortDBIDsBySingleDimension(Relation<? extends NumberVector<?>> data) {
       super();
@@ -401,6 +413,16 @@ public final class VectorUtil {
      * Dimension to sort with.
      */
     private int d;
+
+    /**
+     * Constructor.
+     * 
+     * @param dim Dimension to sort by.
+     */
+    public SortVectorsBySingleDimension(int dim) {
+      super();
+      this.d = dim;
+    };
 
     /**
      * Constructor.
