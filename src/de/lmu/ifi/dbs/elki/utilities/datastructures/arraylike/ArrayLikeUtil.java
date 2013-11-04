@@ -66,6 +66,11 @@ public final class ArrayLikeUtil {
   public static final NumberVectorAdapter<?> NUMBERVECTORADAPTER = new NumberVectorAdapter<Double>();
 
   /**
+   * Adapter for matrixes, reinterpreted as flat arrays.
+   */
+  public static final FlatMatrixAdapter FLATMATRIXADAPTER = new FlatMatrixAdapter();
+
+  /**
    * Use a double array in the array API.
    */
   public static final NumberArrayAdapter<Double, double[]> DOUBLEARRAYADAPTER = new DoubleArrayAdapter();
