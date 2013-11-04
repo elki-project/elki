@@ -26,6 +26,8 @@ package de.lmu.ifi.dbs.elki.database.relation;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 
 /**
  * Utility functions for handling database relation.
@@ -84,6 +86,32 @@ public final class RelationUtil {
     } catch (Exception e) {
       return -1;
     }
+  }
+
+  /**
+   * <em>Copy</em> a relation into a double matrix.
+   * 
+   * This is <em>not recommended</em> unless you need to modify the data
+   * temporarily.
+   * 
+   * @param relation Relation
+   * @param ids IDs, with well-defined order (i.e. array)
+   * @return Data matrix
+   */
+  public static double[][] relationAsMatrix(final Relation<? extends NumberVector<?>> relation, ArrayDBIDs ids) {
+    final int rowdim = ids.size();
+    final int coldim = dimensionality(relation);
+    double[][] mat = new double[rowdim][coldim];
+    int r = 0;
+    for (DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance(), r++) {
+      NumberVector<?> vec = relation.get(iter);
+      double[] row = mat[r];
+      for (int c = 0; c < coldim; c++) {
+        row[c] = vec.doubleValue(c);
+      }
+    }
+    assert (r == rowdim);
+    return mat;
   }
 
   /**

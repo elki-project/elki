@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.TLongDoubleMap;
-
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -41,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
@@ -80,7 +77,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   /**
    * The row ids corresponding to the currently set {@link #relation}.
    */
-  private ArrayDBIDs rowIDs;
+  protected ArrayDBIDs rowIDs;
 
   /**
    * Column dimensionality.
@@ -215,191 +212,6 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   @Deprecated
   protected DBID getRowDBID(int row) {
     return rowIDs.get(row);
-  }
-
-  /**
-   * Update the row means and column means.
-   * 
-   * @param rows Masked rows
-   * @param cols Masked columns
-   * @param rowmeans Output array for row means
-   * @param colmeans Output array for column means
-   * @param mask Mask with substitution values
-   * @return overall mean
-   */
-  protected double updateRowAndColumnMeans(long[] rows, long[] cols, double[] rowmeans, double[] colmeans, TLongDoubleMap mask) {
-    Mean overall = new Mean(), rowmean = new Mean();
-    Mean[] colmean = Mean.newArray(colmeans.length);
-    // For efficiency, we manually iterate over the rows and column bitmasks.
-    // This saves repeated shifting needed by the manual bit access.
-    DBIDArrayIter iter = rowIDs.iter();
-    outer: for (int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
-      long rlong = rows[rlpos];
-      // Fast skip blocks of 64 masked values.
-      if (rlong == 0L) {
-        rpos += Long.SIZE;
-        iter.advance(Long.SIZE);
-        continue;
-      }
-      for (int i = 0; i < Long.SIZE; ++i, ++rpos, rlong >>>= 1, iter.advance()) {
-        if (!iter.valid()) {
-          break outer;
-        }
-        if ((rlong & 1L) == 1L) {
-          rowmean.reset();
-          V vec = relation.get(iter);
-          for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
-            long clong = cols[clpos];
-            if (clong == 0L) {
-              cpos += Long.SIZE;
-              continue;
-            }
-            for (int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
-              if ((clong & 1L) == 1L) {
-                double v = getMaskedValue(vec, cpos, mask, rpos);
-                rowmean.put(v);
-                colmean[cpos].put(v);
-                overall.put(v);
-              }
-            }
-          }
-          rowmeans[rpos] = rowmean.getMean();
-        }
-      }
-    }
-    for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
-      long clong = cols[clpos];
-      if (clong == 0L) {
-        cpos += Long.SIZE;
-        continue;
-      }
-      for (int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
-        if ((clong & 1L) == 1L) {
-          colmeans[cpos] = colmean[cpos].getMean();
-        }
-      }
-    }
-    return overall.getMean();
-  }
-
-  /**
-   * Update all row means and column means, only partially ignoring masks.
-   * 
-   * @param rows Masked rows
-   * @param cols Masked columns
-   * @param rowmeans Output array for row means
-   * @param colmeans Output array for column means
-   * @param mask Mask with substitution values
-   * @return overall mean
-   */
-  protected double updateAllRowAndColumnMeans(long[] rows, long[] cols, double[] rowmeans, double[] colmeans, TLongDoubleMap mask) {
-    Mean overall = new Mean(), rowmean = new Mean();
-    Mean[] colmean = Mean.newArray(colmeans.length);
-    // For efficiency, we manually iterate over the rows and column bitmasks.
-    // This saves repeated shifting needed by the manual bit access.
-    DBIDArrayIter iter = rowIDs.iter();
-    outer: for (int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
-      long rlong = rows[rlpos];
-      // Fast skip blocks of 64 masked values.
-      for (int i = 0; i < Long.SIZE && rpos < rowmeans.length; ++i, ++rpos, rlong >>>= 1, iter.advance()) {
-        if (!iter.valid()) {
-          break outer;
-        }
-        boolean rselected = ((rlong & 1L) == 1L);
-        rowmean.reset();
-        V vec = relation.get(iter);
-        for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
-          long clong = cols[clpos];
-          for (int j = 0; j < Long.SIZE && cpos < colmeans.length; ++j, ++cpos, clong >>>= 1) {
-            boolean cselected = ((clong & 1L) == 1L);
-            double v = getMaskedValue(vec, cpos, mask, rpos);
-            if (cselected) {
-              rowmean.put(v);
-            }
-            if (rselected) {
-              colmean[cpos].put(v);
-            }
-            if (rselected && cselected) {
-              overall.put(v);
-            }
-          }
-          rowmeans[rpos] = rowmean.getMean();
-        }
-      }
-    }
-    for (int cpos = 0; cpos < colmean.length; ++cpos) {
-      colmeans[cpos] = colmean[cpos].getMean();
-    }
-    return overall.getMean();
-  }
-
-  /**
-   * Compute the mean square residue.
-   * 
-   * @param rows Masked rows
-   * @param cols Masked columns
-   * @param rowmeans Output array for row means
-   * @param colmeans Output array for column means
-   * @param allmean overall mean
-   * @param mask Mask with substitution values
-   * @return mean squared residue
-   */
-  protected double computeMeanSquaredDeviation(long[] rows, long[] cols, double[] rowmeans, double[] colmeans, double allmean, TLongDoubleMap mask) {
-    Mean msr = new Mean();
-    // For efficiency, we manually iterate over the rows and column bitmasks.
-    // This saves repeated shifting needed by the manual bit access.
-    DBIDArrayIter iter = rowIDs.iter();
-    outer: for (int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
-      long rlong = rows[rlpos];
-      // Fast skip blocks of 64 masked values.
-      if (rlong == 0L) {
-        rpos += Long.SIZE;
-        iter.advance(Long.SIZE);
-        continue;
-      }
-      for (int i = 0; i < Long.SIZE; ++i, ++rpos, rlong >>>= 1, iter.advance()) {
-        if (!iter.valid()) {
-          break outer;
-        }
-        if ((rlong & 1L) == 1L) {
-          V vec = relation.get(iter);
-          for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
-            long clong = cols[clpos];
-            if (clong == 0L) {
-              cpos += Long.SIZE;
-              continue;
-            }
-            for (int j = 0; j < Long.SIZE; ++j, ++cpos, clong >>>= 1) {
-              if ((clong & 1L) == 1L) {
-                double v = getMaskedValue(vec, cpos, mask, rpos);
-                v = v - rowmeans[rpos] - colmeans[cpos] + allmean;
-                msr.put(v * v);
-              }
-            }
-          }
-        }
-      }
-    }
-    return msr.getMean();
-  }
-
-  /**
-   * Get masked values instead of actual scores.
-   * 
-   * @param vec Vector from database
-   * @param cpos Column position
-   * @param mask Mask
-   * @param rpos Row position
-   * @return Value from mask or vector.
-   */
-  protected double getMaskedValue(V vec, int cpos, TLongDoubleMap mask, int rpos) {
-    if (mask != null) {
-      double v = mask.get((((long)rpos) << 32) | cpos);
-      if (v == v) { // NOT TRUE for NaN values.
-        return v;
-      }
-    }
-    return vec.doubleValue(cpos);
   }
 
   /**
