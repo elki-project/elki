@@ -18,6 +18,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi
 de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS
 de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.ChengAndChurch
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC
@@ -25,6 +26,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.HiCO
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.LMCLUS
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS
+de.lmu.ifi.dbs.elki.algorithm.clustering.onedimensional.KNNKernelDensityMinimaClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC
