@@ -115,15 +115,18 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
     int thismax = 0;
 
     for (int i = 1; i < entries.size();) {
-      // TODO: support for labelIndices?
       if (values.size() < cardinality) {
         try {
           int index = Integer.parseInt(entries.get(i));
-          double attribute = parseDouble(entries.get(i + 1));
-
-          thismax = Math.max(thismax, index + 1);
-          values.put(index, attribute);
-          i += 2; // only increment if successful
+          // Respect labelIndices.
+          if (labelIndices == null || !labelIndices.get(index)) {
+            double attribute = parseDouble(entries.get(i + 1));
+            thismax = Math.max(thismax, index + 1);
+            values.put(index, attribute);
+            i += 2; // only increment if successful
+          } else {
+            i++; // And continue below with label handling.
+          }
           continue;
         } catch (NumberFormatException e) {
           // continue with fallback below.
@@ -132,7 +135,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
       // Fallback: treat as label
       if (labels == null) {
         labels = new LabelList(1);
-        labelcolumns.set(0); // FIXME: ugly hack, to not use the labels
+        haslabels = true;
       }
       labels.add(entries.get(i));
       i++;
