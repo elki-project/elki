@@ -1,0 +1,71 @@
+<project name="ELKI-libsvm" default="jar">
+	<property name="elkiroot" location="../.." />
+	<property name="libsvm" location="${elkiroot}/addons/libsvm" />
+	<property name="elkisrc" location="${elkiroot}/src" />
+	<property name="elkibuild" location="${elkiroot}/build" />
+	<property name="src" location="${libsvm}/src/main/java" />
+	<property name="resources" location="${libsvm}/src/main/resources" />
+	<property name="build" location="${libsvm}/build" />
+	<property name="dist" location="." />
+	<property name="elki" value="de.lmu.ifi.dbs.elki" />
+	<property name="title" value="libsvm Addon for ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures" />
+	<property name="url" value="http://elki.dbs.ifi.lmu.de/wiki/libSVM" />
+	<property name="version" value="0.6.0~beta2" />
+
+	<target name="init">
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" includes="" includeantruntime="false" deprecation="false" debug="true" debuglevel="lines,vars,source" optimize="true" source="1.7" target="1.7">
+			<compilerarg value="-Xlint:all" />
+			<classpath>
+				<pathelement path="${src}" />
+				<pathelement path="${elkiroot}/elki.jar" />
+				<!-- YOU MAY NEED TO INSTALL THESE FOR BUILDING -->
+				<pathelement path="${elkiroot}/lib/libsvm3.jar" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="install" depends="init">
+		<!-- Install resources. -->
+		<copy todir="${build}">
+			<fileset dir="${resources}">
+				<include name="*.CMD" />
+				<include name="*.txt" />
+				<include name="META-INF/elki/*" />
+			</fileset>
+		</copy>
+		<fixcrlf srcDir="${build}" includes="*.CMD" eol="dos" />
+		<!-- Include source code: -->
+		<mkdir dir="${build}/src" />
+		<copy todir="${build}/src">
+			<fileset dir="${libsvm}/src">
+				<include name="**/*.java" />
+				<include name="**/*.txt" />
+				<include name="**/*build.xml" />
+				<include name="**/META-INF/elki/*" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" depends="compile, install">
+		<!-- build precompiled jar -->
+		<jar jarfile="${dist}/elki-libsvm.jar" basedir="${build}">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Implementation-Title" value="${title}" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Implementation-URL" value="${url}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}" />
+		<delete dir="${dist}/elki-libsvm.jar" />
+	</target>
+</project>
