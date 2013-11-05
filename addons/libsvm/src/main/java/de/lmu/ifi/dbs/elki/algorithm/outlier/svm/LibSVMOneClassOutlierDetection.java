@@ -43,9 +43,13 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -55,10 +59,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 /**
  * Outlier-detection using one-class support vector machines.
  * 
+ * Important note: from literature, the one-class SVM is trained as if 0 was the
+ * only counterexample. Outliers will only be detected when they are close to
+ * the origin!
+ * 
+ * <p>
+ * Reference:<br />
+ * B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson<br />
+ * Estimating the support of a high-dimensional distribution<br />
+ * Neural computation 13.7
+ * </p>
+ * 
  * @author Erich Schubert
  * 
  * @param V vector type
  */
+@Reference(authors = "B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson", title = "Estimating the support of a high-dimensional distribution", booktitle = "Neural computation 13.7")
 public class LibSVMOneClassOutlierDetection<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
@@ -131,18 +147,18 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector<?>> extends A
       throw new AbortException("Invalid kernel parameter: " + kernel);
     }
     // TODO: expose additional parameters to the end user!
-    param.nu = 0.02;
+    param.nu = 0.05;
     param.coef0 = 0.;
     param.cache_size = 100;
-    param.C = 1e0;
-    param.eps = 1e-3;
-    param.p = 0.1;
+    param.C = 1e2;
+    param.eps = 1e-4; // not used by one-class?
+    param.p = 0.1; // not used by one-class?
     param.shrinking = 0;
     param.probability = 0;
     param.nr_weight = 0;
     param.weight_label = new int[0];
     param.weight = new double[0];
-    param.gamma = 1e-1 / dim;
+    param.gamma = 1e-4 / dim;
 
     // Transform data:
     svm_problem prob = new svm_problem();
@@ -178,8 +194,10 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector<?>> extends A
       LOG.verbose("Predicting...");
     }
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
+    DoubleMinMax mm = new DoubleMinMax();
     {
       DBIDIter iter = ids.iter();
+      double[] buf = new double[svm.svm_get_nr_class(model)];
       for (int i = 0; i < prob.l && iter.valid(); iter.advance(), i++) {
         V vec = relation.get(iter);
         svm_node[] x = new svm_node[dim];
@@ -188,13 +206,15 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector<?>> extends A
           x[d].index = d + 1;
           x[d].value = vec.doubleValue(d);
         }
+        svm.svm_predict_values(model, x, buf);
+        double score = -buf[0] / param.gamma; // Heuristic rescaling, sorry.
         // Unfortunately, libsvm one-class currently yields a binary decision.
-        double out = (svm.svm_predict(model, x) < 0) ? 1. : 0.;
-        scores.putDouble(iter, out);
+        scores.putDouble(iter, score);
+        mm.put(score);
       }
     }
-    Relation<Double> scoreResult = new MaterializedRelation<>("One-Class SVM Probabilities", "svm-prob", TypeUtil.DOUBLE, scores, ids);
-    OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
+    Relation<Double> scoreResult = new MaterializedRelation<>("One-Class SVM Decision", "svm-outlier", TypeUtil.DOUBLE, scores, ids);
+    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
@@ -244,7 +264,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector<?>> extends A
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      EnumParameter<SVMKernel> kernelP = new EnumParameter<>(KERNEL_ID, SVMKernel.class);
+      EnumParameter<SVMKernel> kernelP = new EnumParameter<>(KERNEL_ID, SVMKernel.class, SVMKernel.RBF);
       if (config.grab(kernelP)) {
         kernel = kernelP.getValue();
       }
