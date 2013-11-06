@@ -181,24 +181,27 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
    * @return the mean vectors of the given clusters in the given database
    */
   protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?>> means, Relation<V> database) {
+    // TODO: use Kahan summation for better numerical precision?
     List<Vector> newMeans = new ArrayList<>(k);
     for (int i = 0; i < k; i++) {
       ModifiableDBIDs list = clusters.get(i);
       Vector mean = null;
       if (list.size() > 0) {
-        double s = 1.0 / list.size();
         DBIDIter iter = list.iter();
-        assert (iter.valid());
-        mean = database.get(iter).getColumnVector().timesEquals(s);
+        // Initialize with first.
+        mean = database.get(iter).getColumnVector();
         double[] raw = mean.getArrayRef();
         iter.advance();
+        // Update with remaining instances
         for (; iter.valid(); iter.advance()) {
           NumberVector<?> vec = database.get(iter);
           for (int j = 0; j < mean.getDimensionality(); j++) {
-            raw[j] += s * vec.doubleValue(j);
+            raw[j] += vec.doubleValue(j);
           }
         }
+        mean.timesEquals(1.0 / list.size());
       } else {
+        // Keep degenerated means as-is for now.
         mean = means.get(i).getColumnVector();
       }
       newMeans.add(mean);
@@ -247,11 +250,8 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
     if (newsize == 0) {
       return; // Keep old mean
     }
-    Vector delta = vec.getColumnVector();
-    // Compute difference from mean
-    delta.minusEquals(mean);
-    delta.timesEquals(op / newsize);
-    mean.plusEquals(delta);
+    Vector delta = vec.getColumnVector().minusEquals(mean);
+    mean.plusTimesEquals(delta, op / newsize);
   }
 
   /**
@@ -282,19 +282,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
             mindist = dist;
           }
         }
-        // Update the cluster mean incrementally:
-        for (int i = 0; i < k; i++) {
-          ModifiableDBIDs ci = clusters.get(i);
-          if (i == minIndex) {
-            if (ci.add(iditer)) {
-              incrementalUpdateMean(means.get(i), fv, ci.size(), +1);
-              changed = true;
-            }
-          } else if (ci.remove(iditer)) {
-            incrementalUpdateMean(means.get(i), fv, ci.size() + 1, -1);
-            changed = true;
-          }
-        }
+        changed |= updateMeanAndAssignment(clusters, means, minIndex, fv, iditer);
       }
     } else {
       // Raw distance function
@@ -312,22 +300,36 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
             mindist = dist;
           }
         }
-        // Update the cluster mean incrementally:
-        for (int i = 0; i < k; i++) {
-          ModifiableDBIDs ci = clusters.get(i);
-          if (i == minIndex) {
-            if (ci.add(iditer)) {
-              incrementalUpdateMean(means.get(i), fv, ci.size(), +1);
-              changed = true;
-            }
-          } else if (ci.remove(iditer)) {
-            incrementalUpdateMean(means.get(i), fv, ci.size() + 1, -1);
-            changed = true;
-          }
-        }
+        changed |= updateMeanAndAssignment(clusters, means, minIndex, fv, iditer);
       }
     }
     return changed;
+  }
+
+  /**
+   * Try to update the cluster assignment.
+   * 
+   * @param clusters Current clusters
+   * @param means Means to update
+   * @param minIndex Cluster to assign to
+   * @param fv Vector
+   * @param iditer Object ID
+   * @return {@code true} when assignment changed
+   */
+  private boolean updateMeanAndAssignment(List<ModifiableDBIDs> clusters, List<Vector> means, int minIndex, V fv, DBIDIter iditer) {
+    final ModifiableDBIDs curclus = clusters.get(minIndex);
+    if (curclus.add(iditer)) {
+      incrementalUpdateMean(means.get(minIndex), fv, curclus.size(), +1);
+      for (int i = 0; i < k; i++) {
+        ModifiableDBIDs ci = clusters.get(i);
+        if (i != minIndex && ci.remove(iditer)) {
+          incrementalUpdateMean(means.get(i), fv, ci.size() + 1, -1);
+          break;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   @Override

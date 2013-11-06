@@ -95,11 +95,8 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
     // Initialize cluster and assign objects
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet(relation.size() / k));
+      clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
-    assignToNearestCluster(relation, means, clusters);
-    // Initial recomputation of the means.
-    means = means(clusters, means, relation);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     // Refine result
