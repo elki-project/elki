@@ -84,6 +84,7 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
       for (int i = 0; i < range.len; i++) {
         store[i] = range.start + i;
       }
+      size = range.len;
     } else {
       this.addDBIDs(existing);
     }
