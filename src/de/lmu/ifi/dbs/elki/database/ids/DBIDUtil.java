@@ -685,7 +685,7 @@ public final class DBIDUtil {
   /**
    * Randomly split IDs into {@code p} partitions of almost-equal size.
    * 
-   * @param ids Original DBIDs (<b>will be modified</b>)
+   * @param ids Original DBIDs
    * @param p Desired number of partitions.
    * @param random Random generator
    */
@@ -697,10 +697,11 @@ public final class DBIDUtil {
     for (int i = 1; i < size; i++) {
       ids.swap(i - 1, i + random.nextInt(size - i));
     }
-    final int minsize = (int) Math.floor(ids.size() / p);
+    final int minsize = size / p; // Floor.
+    final int extra = size % p; // Remainder
     for (int beg = 0, part = 0; part < p; part++) {
       // First partitions are smaller, last partitions are larger.
-      final int psize = (p * minsize + part >= ids.size()) ? minsize : minsize + 1;
+      final int psize = minsize + ((part < extra) ? 1 : 0);
       split[part] = ids.slice(beg, beg + psize);
       beg += psize;
     }
