@@ -850,4 +850,25 @@ public final class MathUtil {
   public static double log1mexp(double x) {
     return (x > -LOG2) ? Math.log(-Math.expm1(x)) : Math.log1p(-Math.exp(x));
   }
+
+  /**
+   * Fast loop for computing {@code Math.pow(x, p)} for p >= 0 integer.
+   * 
+   * @param x Base
+   * @param p Exponent
+   * @return {@code Math.pow(x, p)}
+   */
+  public static double powi(double x, int p) {
+    if (p < 0) { // Fallback for negative integers.
+      return Math.pow(x, p);
+    }
+    double ret = 1.;
+    for (; p > 0; p >>= 1) {
+      if ((p & 1) == 1) {
+        ret *= x;
+      }
+      x *= x;
+    }
+    return ret;
+  }
 }
