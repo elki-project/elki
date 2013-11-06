@@ -43,7 +43,7 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
   /**
    * The actual storage.
    */
-  protected int[] ids;
+  protected int[] store;
 
   /**
    * Constructor.
@@ -52,12 +52,58 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
    */
   public ArrayStaticIntegerDBIDs(int... ids) {
     super();
-    this.ids = ids;
+    this.store = ids;
+  }
+
+  @Override
+  public int size() {
+    return store.length;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return store.length == 0;
+  }
+
+  @Override
+  public boolean contains(DBIDRef o) {
+    final int oid = DBIDUtil.asInteger(o);
+    for (int i = 0; i < store.length; i++) {
+      if (store[i] == oid) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public DBID get(int i) {
+    return DBIDFactory.FACTORY.importInteger(store[i]);
+  }
+
+  @Override
+  public void assignVar(int i, DBIDVar var) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar) var).internalSetIndex(store[i]);
+    } else {
+      // Much less efficient:
+      var.set(get(i));
+    }
+  }
+
+  @Override
+  public int binarySearch(DBIDRef key) {
+    return Arrays.binarySearch(store, DBIDUtil.asInteger(key));
   }
 
   @Override
   public IntegerDBIDArrayIter iter() {
     return new DBIDItr();
+  }
+
+  @Override
+  public IntegerArrayDBIDs slice(int begin, int end) {
+    return new Slice(begin, end);
   }
 
   /**
@@ -75,7 +121,7 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
     @Override
     public boolean valid() {
-      return pos < ids.length && pos >= 0;
+      return pos < store.length && pos >= 0;
     }
 
     @Override
@@ -105,12 +151,12 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
     @Override
     public int internalGetIndex() {
-      return ids[pos];
+      return store[pos];
     }
 
     @Override
     public boolean equals(Object other) {
-      if(other instanceof DBID) {
+      if (other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
@@ -122,44 +168,130 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
     }
   }
 
-  @Override
-  public int size() {
-    return ids.length;
-  }
+  /**
+   * Slice of an array.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private class Slice implements IntegerArrayDBIDs {
+    /**
+     * Slice positions.
+     */
+    final int begin, end;
 
-  @Override
-  public boolean isEmpty() {
-    return ids.length == 0;
-  }
+    /**
+     * Constructor.
+     * 
+     * @param begin Begin, inclusive
+     * @param end End, exclusive
+     */
+    public Slice(int begin, int end) {
+      super();
+      this.begin = begin;
+      this.end = end;
+    }
 
-  @Override
-  public boolean contains(DBIDRef o) {
-    final int oid = DBIDUtil.asInteger(o);
-    for(int i = 0; i < ids.length; i++) {
-      if(ids[i] == oid) {
-        return true;
+    @Override
+    public int size() {
+      return end - begin;
+    }
+
+    @Override
+    public boolean contains(DBIDRef o) {
+      // TODO: recognize sorted arrays, then use binary search?
+      int oid = o.internalGetIndex();
+      for (int i = begin; i < end; i++) {
+        if (store[i] == oid) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return begin == end;
+    }
+
+    @Override
+    public DBID get(int i) {
+      return ArrayStaticIntegerDBIDs.this.get(begin + i);
+    }
+
+    @Override
+    public void assignVar(int index, DBIDVar var) {
+      ArrayStaticIntegerDBIDs.this.assignVar(begin + index, var);
+    }
+
+    @Override
+    public int binarySearch(DBIDRef key) {
+      return Arrays.binarySearch(store, begin, end, key.internalGetIndex()) - begin;
+    }
+
+    @Override
+    public IntegerDBIDArrayIter iter() {
+      return new Itr();
+    }
+
+    @Override
+    public IntegerArrayDBIDs slice(int begin, int end) {
+      return new Slice(begin + begin, begin + end);
+    }
+
+    /**
+     * Iterator class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    private class Itr implements IntegerDBIDArrayIter {
+      /**
+       * Iterator position.
+       */
+      int pos = begin;
+
+      @Override
+      public int internalGetIndex() {
+        return store[pos];
+      }
+
+      @Override
+      public boolean valid() {
+        return pos < end && pos >= begin;
+      }
+
+      @Override
+      public void advance() {
+        ++pos;
+      }
+
+      @Override
+      public int getOffset() {
+        return pos;
+      }
+
+      @Override
+      public void advance(int count) {
+        pos += count;
+      }
+
+      @Override
+      public void retract() {
+        --pos;
+      }
+
+      @Override
+      public void seek(int off) {
+        pos = begin + off;
+      }
+
+      @Override
+      public String toString() {
+        return Integer.toString(internalGetIndex()) + "@" + pos;
       }
     }
-    return false;
-  }
-
-  @Override
-  public DBID get(int i) {
-    return DBIDFactory.FACTORY.importInteger(ids[i]);
-  }
-
-  @Override
-  public void assignVar(int i, DBIDVar var) {
-    if (var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar)var).internalSetIndex(ids[i]);
-    } else {
-      // Much less efficient:
-      var.set(get(i));
-    }
-  }
-
-  @Override
-  public int binarySearch(DBIDRef key) {
-    return Arrays.binarySearch(ids, DBIDUtil.asInteger(key));
   }
 }

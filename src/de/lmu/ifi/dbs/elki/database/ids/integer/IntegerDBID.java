@@ -25,9 +25,11 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 import java.nio.ByteBuffer;
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -85,6 +87,16 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   @Override
   public int internalGetIndex() {
     return this.id;
+  }
+
+  @Override
+  public int size() {
+    return 1;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
   }
 
   @Override
@@ -146,14 +158,18 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   }
 
   @Override
-  public int size() {
-    return 1;
-  }
-
-  @Override
   public int binarySearch(DBIDRef key) {
     final int other = key.internalGetIndex();
     return (other == id) ? 0 : (other < id) ? -1 : -2;
+  }
+
+  @Override
+  public ArrayDBIDs slice(int begin, int end) {
+    if (begin == 0 && end == 1) {
+      return this;
+    } else {
+      return DBIDUtil.EMPTYDBIDS;
+    }
   }
 
   /**
@@ -222,11 +238,6 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     public String toString() {
       return Integer.toString(internalGetIndex());
     }
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return false;
   }
 
   /**

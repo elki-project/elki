@@ -68,7 +68,7 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   @Override
   public DBIDArrayIter iter() {
     DBIDArrayIter it = inner.iter();
-    if(it instanceof DBIDMIter) {
+    if (it instanceof DBIDMIter) {
       return new UnmodifiableDBIDArrayIter(it);
     }
     return it;
@@ -97,6 +97,11 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   @Override
   public int binarySearch(DBIDRef key) {
     return inner.binarySearch(key);
+  }
+
+  @Override
+  public ArrayDBIDs slice(int begin, int end) {
+    return new UnmodifiableArrayDBIDs(inner.slice(begin, end));
   }
 
   /**

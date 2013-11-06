@@ -96,6 +96,11 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
     return inner.binarySearch(key);
   }
 
+  @Override
+  public IntegerArrayDBIDs slice(int begin, int end) {
+    return new UnmodifiableIntegerArrayDBIDs(inner.slice(begin, end));
+  }
+
   /**
    * Make an existing DBIDMIter unmodifiable.
    * 
@@ -151,7 +156,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
     public int internalGetIndex() {
       return it.internalGetIndex();
     }
-    
+
     @Override
     public String toString() {
       return it.toString();

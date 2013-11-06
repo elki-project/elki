@@ -76,4 +76,13 @@ public interface ArrayDBIDs extends DBIDs {
    * @return Offset of key
    */
   public int binarySearch(DBIDRef key);
+
+  /**
+   * Slice a subarray (as view, not copy!)
+   * 
+   * @param begin Begin
+   * @param end End
+   * @return Array slice.
+   */
+  public ArrayDBIDs slice(int begin, int end);
 }

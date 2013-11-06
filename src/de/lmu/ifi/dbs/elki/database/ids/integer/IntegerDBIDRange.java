@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -72,6 +73,75 @@ class IntegerDBIDRange implements DBIDRange {
   }
 
   @Override
+  public boolean contains(DBIDRef o) {
+    int oid = DBIDUtil.asInteger(o);
+    if (oid < start) {
+      return false;
+    }
+    if (oid >= start + len) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public DBID get(int i) {
+    if (i > len || i < 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    return DBIDFactory.FACTORY.importInteger(start + i);
+  }
+
+  /**
+   * For storage array offsets.
+   * 
+   * @param dbid ID reference
+   * @return array offset
+   */
+  @Override
+  public int getOffset(DBIDRef dbid) {
+    return dbid.internalGetIndex() - start;
+  }
+
+  @Override
+  public void assignVar(int index, DBIDVar var) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar) var).internalSetIndex(start + index);
+    } else {
+      // Much less efficient:
+      var.set(get(index));
+    }
+  }
+
+  @Override
+  public int binarySearch(DBIDRef key) {
+    int keyid = DBIDUtil.asInteger(key);
+    if (keyid < start) {
+      return -1;
+    }
+    final int off = keyid - start;
+    if (off < len) {
+      return off;
+    }
+    return -(len + 1);
+  }
+
+  @Override
+  public String toString() {
+    return "[" + start + " to " + (start + len - 1) + "]";
+  }
+
+  @Override
+  public int mapDBIDToOffset(DBIDRef dbid) {
+    return dbid.internalGetIndex() - start;
+  }
+
+  @Override
+  public ArrayDBIDs slice(int begin, int end) {
+    return new IntegerDBIDRange(start + begin, end - begin);
+  }
+
+  @Override
   public DBIDArrayIter iter() {
     return new DBIDItr(start, len);
   }
@@ -88,7 +158,7 @@ class IntegerDBIDRange implements DBIDRange {
      * Current position.
      */
     int pos = 0;
-    
+
     /**
      * Interval length.
      */
@@ -98,10 +168,10 @@ class IntegerDBIDRange implements DBIDRange {
      * Interval start.
      */
     final int start;
-    
+
     /**
      * Constructor.
-     *
+     * 
      * @param start Interval start
      * @param len Interval length
      */
@@ -155,69 +225,5 @@ class IntegerDBIDRange implements DBIDRange {
     public String toString() {
       return Integer.toString(internalGetIndex());
     }
-  }
-
-  @Override
-  public boolean contains(DBIDRef o) {
-    int oid = DBIDUtil.asInteger(o);
-    if(oid < start) {
-      return false;
-    }
-    if(oid >= start + len) {
-      return false;
-    }
-    return true;
-  }
-
-  @Override
-  public DBID get(int i) {
-    if(i > len || i < 0) {
-      throw new ArrayIndexOutOfBoundsException();
-    }
-    return DBIDFactory.FACTORY.importInteger(start + i);
-  }
-
-  /**
-   * For storage array offsets.
-   * 
-   * @param dbid ID reference
-   * @return array offset
-   */
-  @Override
-  public int getOffset(DBIDRef dbid) {
-    return dbid.internalGetIndex() - start;
-  }
-
-  @Override
-  public void assignVar(int index, DBIDVar var) {
-    if (var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar)var).internalSetIndex(start + index);
-    } else {
-      // Much less efficient:
-      var.set(get(index));
-    }
-  }
-
-  @Override
-  public int binarySearch(DBIDRef key) {
-    int keyid = DBIDUtil.asInteger(key);
-    if(keyid < start) {
-      return -1;
-    }
-    final int off = keyid - start;
-    if(off < len) {
-      return off;
-    }
-    return -(len + 1);
-  }
-
-  @Override
-  public String toString() {
-    return "[" + start + " to " + (start + len - 1) + "]";
-  }
-
-  @Override
-  public int mapDBIDToOffset(DBIDRef dbid) {
-    return dbid.internalGetIndex() - start;
   }
 }

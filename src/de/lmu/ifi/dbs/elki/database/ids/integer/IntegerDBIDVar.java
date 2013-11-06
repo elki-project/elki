@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
@@ -87,13 +89,13 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   }
 
   @Override
-  public IntegerDBIDArrayIter iter() {
-    return new DBIDItr();
+  public int size() {
+    return 1;
   }
 
   @Override
-  public int size() {
-    return 1;
+  public boolean isEmpty() {
+    return false;
   }
 
   @Override
@@ -105,6 +107,35 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   @Override
   public boolean contains(DBIDRef o) {
     return id == o.internalGetIndex();
+  }
+
+  @Override
+  public void assignVar(int i, DBIDVar var) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar) var).internalSetIndex(i);
+    } else {
+      // Much less efficient:
+      var.set(get(i));
+    }
+  }
+
+  @Override
+  public ArrayDBIDs slice(int begin, int end) {
+    if (begin == 0 && end == 1) {
+      return this;
+    } else {
+      return DBIDUtil.EMPTYDBIDS;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return Integer.toString(id);
+  }
+
+  @Override
+  public IntegerDBIDArrayIter iter() {
+    return new DBIDItr();
   }
 
   /**
@@ -119,48 +150,48 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
      * Iterator position: We use an integer so we can support retract().
      */
     int pos = 0;
-
+  
     @Override
     public void advance() {
       pos++;
     }
-
+  
     @Override
     public void advance(int count) {
       pos += count;
     }
-
+  
     @Override
     public void retract() {
       pos--;
     }
-
+  
     @Override
     public void seek(int off) {
       pos = off;
     }
-
+  
     @Override
     public int getOffset() {
       return pos;
     }
-
+  
     @Override
     public int internalGetIndex() {
       return IntegerDBIDVar.this.id;
     }
-
+  
     @Override
     public boolean valid() {
       return (pos == 0);
     }
-
+  
     @Override
     public int hashCode() {
       // Override, because we also are overriding equals.
       return super.hashCode();
     }
-
+  
     @Override
     public boolean equals(Object other) {
       if (other instanceof DBID) {
@@ -168,30 +199,10 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
       }
       return super.equals(other);
     }
-
+  
     @Override
     public String toString() {
       return Integer.toString(internalGetIndex());
     }
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return false;
-  }
-
-  @Override
-  public void assignVar(int i, DBIDVar var) {
-    if (var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar) var).internalSetIndex(i);
-    } else {
-      // Much less efficient:
-      var.set(get(i));
-    }
-  }
-
-  @Override
-  public String toString() {
-    return Integer.toString(id);
   }
 }

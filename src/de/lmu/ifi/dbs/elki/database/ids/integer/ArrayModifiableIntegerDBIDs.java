@@ -247,6 +247,11 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   }
 
   @Override
+  public IntegerArrayDBIDs slice(int begin, int end) {
+    return new Slice(begin, end);
+  }
+
+  @Override
   public IntegerDBIDArrayMIter iter() {
     return new Itr();
   }
@@ -307,6 +312,133 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
     @Override
     public String toString() {
       return Integer.toString(internalGetIndex()) + "@" + pos;
+    }
+  }
+
+  /**
+   * Slice of an array.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private class Slice implements IntegerArrayDBIDs {
+    /**
+     * Slice positions.
+     */
+    final int begin, end;
+
+    /**
+     * Constructor.
+     * 
+     * @param begin Begin, inclusive
+     * @param end End, exclusive
+     */
+    public Slice(int begin, int end) {
+      super();
+      this.begin = begin;
+      this.end = end;
+    }
+
+    @Override
+    public int size() {
+      return end - begin;
+    }
+
+    @Override
+    public boolean contains(DBIDRef o) {
+      // TODO: recognize sorted arrays, then use binary search?
+      int oid = o.internalGetIndex();
+      for (int i = begin; i < end; i++) {
+        if (store[i] == oid) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return begin == end;
+    }
+
+    @Override
+    public DBID get(int i) {
+      return ArrayModifiableIntegerDBIDs.this.get(begin + i);
+    }
+
+    @Override
+    public void assignVar(int index, DBIDVar var) {
+      ArrayModifiableIntegerDBIDs.this.assignVar(begin + index, var);
+    }
+
+    @Override
+    public int binarySearch(DBIDRef key) {
+      return Arrays.binarySearch(store, begin, end, key.internalGetIndex()) - begin;
+    }
+
+    @Override
+    public IntegerDBIDArrayIter iter() {
+      return new Itr();
+    }
+
+    @Override
+    public IntegerArrayDBIDs slice(int begin, int end) {
+      return new Slice(begin + begin, begin + end);
+    }
+
+    /**
+     * Iterator class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    private class Itr implements IntegerDBIDArrayIter {
+      /**
+       * Iterator position.
+       */
+      int pos = begin;
+
+      @Override
+      public int internalGetIndex() {
+        return store[pos];
+      }
+
+      @Override
+      public boolean valid() {
+        return pos < end && pos >= begin;
+      }
+
+      @Override
+      public void advance() {
+        ++pos;
+      }
+
+      @Override
+      public int getOffset() {
+        return pos;
+      }
+
+      @Override
+      public void advance(int count) {
+        pos += count;
+      }
+
+      @Override
+      public void retract() {
+        --pos;
+      }
+
+      @Override
+      public void seek(int off) {
+        pos = off;
+      }
+
+      @Override
+      public String toString() {
+        return Integer.toString(internalGetIndex()) + "@" + pos;
+      }
     }
   }
 }

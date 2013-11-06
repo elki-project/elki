@@ -33,4 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 public interface IntegerArrayDBIDs extends IntegerDBIDs, ArrayDBIDs {
   @Override
   IntegerDBIDArrayIter iter();
+  
+  @Override
+  IntegerArrayDBIDs slice(int begin, int end);
 }
