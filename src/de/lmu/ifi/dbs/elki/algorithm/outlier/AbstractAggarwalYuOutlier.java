@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -161,7 +162,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?>> exten
   protected static double sparsity(final int setsize, final int dbsize, final int k, final double phi) {
     // calculate sparsity c
     final double f = 1. / phi;
-    final double fK = Math.pow(f, k);
+    final double fK = MathUtil.powi(f, k);
     final double sC = (setsize - (dbsize * fK)) / Math.sqrt(dbsize * fK * (1 - fK));
     return sC;
   }

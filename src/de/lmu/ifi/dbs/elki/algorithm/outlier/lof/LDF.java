@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -178,7 +179,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           final double nkdist = ((DoubleDistanceKNNList) knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
           if (nkdist > 0.) {
             final double v = Math.max(nkdist, neighbor.doubleDistance()) / (h * nkdist);
-            sum += kernel.density(v) / Math.pow(h * nkdist, dim);
+            sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
             count++;
           } else {
             sum = Double.POSITIVE_INFINITY;
@@ -194,7 +195,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           final double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
           if (nkdist > 0.) {
             final double v = Math.max(nkdist, neighbor.getDistance().doubleValue()) / (h * nkdist);
-            sum += kernel.density(v) / Math.pow(h * nkdist, dim);
+            sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
             count++;
           } else {
             sum = Double.POSITIVE_INFINITY;

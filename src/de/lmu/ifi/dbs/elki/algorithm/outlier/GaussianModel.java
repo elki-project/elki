@@ -112,7 +112,7 @@ public class GaussianModel<V extends NumberVector<?>> extends AbstractAlgorithm<
     Matrix covarianceTransposed = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
 
     // Normalization factors for Gaussian PDF
-    final double fakt = (1.0 / (Math.sqrt(Math.pow(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * covarianceMatrix.det())));
+    final double fakt = (1.0 / (Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * covarianceMatrix.det())));
 
     // for each object compute Mahalanobis distance
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

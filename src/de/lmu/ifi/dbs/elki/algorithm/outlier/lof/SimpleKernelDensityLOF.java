@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -151,7 +152,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
           }
           double max = ((DoubleDistanceKNNList)knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
           final double v = neighbor.doubleDistance() / max;
-          sum += kernel.density(v) / Math.pow(max, dim);
+          sum += kernel.density(v) / MathUtil.powi(max, dim);
           count++;
         }
       } else {
@@ -161,7 +162,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
           }
           double max = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
           final double v = neighbor.getDistance().doubleValue() / max;
-          sum += kernel.density(v) / Math.pow(max, dim);
+          sum += kernel.density(v) / MathUtil.powi(max, dim);
           count++;
         }
       }

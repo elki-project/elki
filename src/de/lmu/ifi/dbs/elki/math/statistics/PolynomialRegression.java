@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
@@ -67,7 +68,7 @@ public class PolynomialRegression extends MultipleLinearRegression {
     Matrix result = new Matrix(n, p + 1);
     for(int i = 0; i < n; i++) {
       for(int j = 0; j < p + 1; j++) {
-        result.set(i, j, Math.pow(x.get(i), j));
+        result.set(i, j, MathUtil.powi(x.get(i), j));
       }
     }
     return result;

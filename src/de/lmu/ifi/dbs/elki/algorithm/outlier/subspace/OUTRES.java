@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
@@ -368,7 +369,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
      */
     protected double optimalBandwidth(int dim) {
       // Pi in the publication is redundant and cancels out!
-      double hopt = 8 * GammaDistribution.gamma(dim / 2.0 + 1) * (dim + 4) * Math.pow(2, dim);
+      double hopt = 8 * GammaDistribution.gamma(dim / 2.0 + 1) * (dim + 4) * MathUtil.powi(2, dim);
       return hopt * Math.pow(relation.size(), (-1. / (dim + 4)));
     }
 

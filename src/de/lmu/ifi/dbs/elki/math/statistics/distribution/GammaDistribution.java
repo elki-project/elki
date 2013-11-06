@@ -646,12 +646,13 @@ public class GammaDistribution extends AbstractDistribution {
       // (Math.log(alpha) + g);
       // return Math.exp((lgam1pa + logp) / alpha + MathUtil.LOG2);
       // This is literal AS 91, above is the GNU R variant.
-      return Math.pow(p * k * Math.exp(g + k * MathUtil.LOG2), 1 / k);
+      return Math.pow(p * k * Math.exp(g + k * MathUtil.LOG2), 1. / k);
     } else if (nu > 0.32) {
       // Wilson and Hilferty estimate: - AS 91 at 3
       final double x = NormalDistribution.quantile(p, 0, 1);
       final double p1 = 2. / (9. * nu);
-      double ch = nu * Math.pow(x * Math.sqrt(p1) + 1 - p1, 3);
+      final double a = x * Math.sqrt(p1) + 1 - p1;
+      double ch = nu * a * a * a;
 
       // Better approximation for p tending to 1:
       if (ch > 2.2 * nu + 6) {

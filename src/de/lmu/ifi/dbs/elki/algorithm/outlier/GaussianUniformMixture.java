@@ -219,7 +219,7 @@ public class GaussianUniformMixture<V extends NumberVector<?>> extends AbstractA
     Matrix covInv = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
 
     double covarianceDet = covarianceMatrix.det();
-    double fakt = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, RelationUtil.dimensionality(database)) * covarianceDet);
+    double fakt = 1.0 / Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(database)) * covarianceDet);
     // for each object compute probability and sum
     double prob = 0;
     for (DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {

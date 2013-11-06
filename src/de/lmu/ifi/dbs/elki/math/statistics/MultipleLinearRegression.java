@@ -123,7 +123,8 @@ public class MultipleLinearRegression {
     // sum of square totals: sst
     sum = 0;
     for(int i = 0; i < y.getDimensionality(); i++) {
-      sum += Math.pow((y.get(i) - y_mean), 2);
+      final double diff = y.get(i) - y_mean;
+      sum += diff * diff;
     }
     sst = sum;
 

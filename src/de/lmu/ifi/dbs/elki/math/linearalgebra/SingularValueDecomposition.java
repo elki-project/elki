@@ -42,6 +42,8 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @apiviz.uses Matrix - - transforms
  */
 public class SingularValueDecomposition {
+  private static final double EPS = Math.pow(2.0, -52.0);
+
   /**
    * Arrays for internal storage of U and V.
    * 
@@ -268,7 +270,7 @@ public class SingularValueDecomposition {
 
     int pp = p - 1;
     int iter = 0;
-    double eps = Math.pow(2.0, -52.0);
+    double eps = EPS;
     while(p > 0) {
       int k, kase;
 
@@ -545,7 +547,7 @@ public class SingularValueDecomposition {
    * @return Number of non-negligible singular values.
    */
   public int rank() {
-    double eps = Math.pow(2.0, -52.0);
+    double eps = EPS;
     double tol = Math.max(m, n) * s[0] * eps;
     int r = 0;
     for(int i = 0; i < s.length; i++) {
