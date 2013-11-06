@@ -100,7 +100,7 @@ public class AlgorithmStep implements WorkflowStep {
         duration.end();
         LOG.statistics(duration);
       }
-      if (LOG.isStatistics()) {
+      if (LOG.isStatistics() && database.getIndexes().size() > 0) {
         LOG.statistics("Index statistics after running algorithms:");
         for (Index idx : database.getIndexes()) {
           idx.logStatistics();
