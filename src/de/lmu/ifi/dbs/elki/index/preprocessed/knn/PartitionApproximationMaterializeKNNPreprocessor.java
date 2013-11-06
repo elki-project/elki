@@ -27,8 +27,7 @@ import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -104,27 +103,12 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
     }
 
     // Produce a random shuffling of the IDs:
-    ArrayModifiableDBIDs aids = DBIDUtil.newArray(relation.getDBIDs());
-    DBIDUtil.randomShuffle(aids, rnd);
-    int minsize = (int) Math.floor(aids.size() / partitions);
+    ArrayDBIDs[] parts = DBIDUtil.randomSplit(relation.getDBIDs(), partitions, rnd);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, LOG) : null;
     for (int part = 0; part < partitions; part++) {
-      int size = (partitions * minsize + part >= aids.size()) ? minsize : minsize + 1;
-      // Collect the ids in this node.
-      ArrayModifiableDBIDs ids = DBIDUtil.newArray(size);
-      { // TODO: this is a bit overly complicated. The code dates back to when
-        // we were not shuffling the array beforehand. Right now, we could just
-        // compute the proper partition sizes and split it directly. But
-        // ArrayDBIDs does not have a "sublist" function yet, anyway.
-        DBIDArrayIter iter = aids.iter();
-        // Offset - really cheap on array iterators.
-        iter.seek(part);
-        // Seek in steps of "partitions". Also just a += instead of ++ op!
-        for (; iter.valid(); iter.advance(partitions)) {
-          ids.add(iter);
-        }
-      }
+      final ArrayDBIDs ids = parts[part];
+      final int size = ids.size();
       HashMap<DBIDPair, D> cache = new HashMap<>((size * size * 3) >> 3);
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         KNNHeap<D> kNN = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
