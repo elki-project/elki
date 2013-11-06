@@ -871,4 +871,26 @@ public final class MathUtil {
     }
     return ret;
   }
+
+  /**
+   * Fast loop for computing {@code Math.pow(x, p)} for p >= 0 integer and x
+   * integer.
+   * 
+   * @param x Base
+   * @param p Exponent
+   * @return {@code Math.pow(x, p)}
+   */
+  public static int ipowi(int x, int p) {
+    if (p < 0) { // Fallback for negative integers.
+      return (int) Math.pow(x, p);
+    }
+    int ret = 1;
+    for (; p > 0; p >>= 1) {
+      if ((p & 1) == 1) {
+        ret *= x;
+      }
+      x *= x;
+    }
+    return ret;
+  }
 }

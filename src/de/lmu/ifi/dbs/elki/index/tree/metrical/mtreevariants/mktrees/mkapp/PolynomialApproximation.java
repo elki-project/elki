@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -91,18 +92,19 @@ public class PolynomialApproximation implements Externalizable {
   }
 
   /**
-   * Returns the function value of the polynoial approximation
+   * Returns the function value of the polynomial approximation
    * at the specified k.
    *
-   * @param k the value for which the polynoial approximation should be returned
-   * @return the function value of the polynoial approximation
+   * @param k the value for which the polynomial approximation should be returned
+   * @return the function value of the polynomial approximation
    *         at the specified k
    */
   public double getValueAt(int k) {
-    double result = 0;
-    double log_k = Math.log(k);
+    double result = 0.;
+    double log_k = Math.log(k), acc = 1.;
     for (int p = 0; p < b.length; p++) {
-      result += b[p] * Math.pow(log_k, p);
+      result += b[p] * acc;
+      acc *= log_k;
     }
     return result;
   }

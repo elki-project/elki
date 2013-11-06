@@ -29,6 +29,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -101,7 +102,7 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
       mean[d] = (minmax.first.doubleValue(d) + minmax.second.doubleValue(d)) * .5;
     }
 
-    int gridpoints = Math.max(1, (int) Math.pow(gridres + 1, dim));
+    int gridpoints = Math.max(1, MathUtil.ipowi(gridres + 1, dim));
     ArrayList<V> result = new ArrayList<>(gridpoints);
     double[] delta = new double[dim];
     if (gridres > 0) {

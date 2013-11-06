@@ -190,12 +190,13 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
     final int dimensionality = means.get(0).getDimensionality();
+    final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
     for (int i = 0; i < k; i++) {
       Matrix m = Matrix.identity(dimensionality, dimensionality);
       covarianceMatrices.add(m);
       final double det = m.det();
       if (det > 0.) {
-        normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * det);
+        normDistrFactor[i] = 1.0 / Math.sqrt(norm * det);
       } else {
         LOG.warning("Encountered matrix with 0 determinant - degenerated.");
         normDistrFactor[i] = 1.0; // Not really well defined
@@ -268,7 +269,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       for (int i = 0; i < k; i++) {
         final double det = covarianceMatrices.get(i).det();
         if (det > 0.) {
-          normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * det);
+          normDistrFactor[i] = 1.0 / Math.sqrt(norm * det);
         } else {
           LOG.warning("Encountered matrix with 0 determinant - degenerated.");
           normDistrFactor[i] = 1.0; // Not really well defined

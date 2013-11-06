@@ -166,7 +166,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
    * @return Contrast
    */
   private double calculateContrast(Relation<? extends NumberVector<?>> relation, DBIDs subset, ArrayDBIDs subspaceIndex1, ArrayDBIDs subspaceIndex2, int dim1, int dim2, Random random) {
-    final double alpha1 = Math.pow(alpha, .5);
+    final double alpha1 = Math.sqrt(alpha);
     final int windowsize = (int) (relation.size() * alpha1);
 
     // TODO: speed up by keeping marginal distributions prepared.

@@ -473,7 +473,8 @@ public class BetaDistribution extends AbstractDistribution {
       } else {
         double r = beta + beta;
         double t = 1. / (9. * beta);
-        t = r * Math.pow(1. - t + y * Math.sqrt(t), 3.0);
+        final double a = 1. - t + y * Math.sqrt(t);
+        t = r * a * a * a;
         if (t <= 0.) {
           x = 1. - Math.exp((Math.log1p(-p) + Math.log(beta) + logbeta) / beta);
         } else {

@@ -44,6 +44,11 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  */
 public class EigenvalueDecomposition implements java.io.Serializable {
   /**
+   * Epsilon.
+   */
+  private static final double EPS = Math.pow(2.0, -52.0);
+
+  /**
    * Serial version
    */
   private static final long serialVersionUID = 1L;
@@ -215,7 +220,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
 
     double f = 0.0;
     double tst1 = 0.0;
-    double eps = Math.pow(2.0, -52.0);
+    double eps = EPS;
     for (int l = 0; l < n; l++) {
       // Find small subdiagonal element
       tst1 = Math.max(tst1, Math.abs(d[l]) + Math.abs(e[l]));
@@ -442,7 +447,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
     int n = nn - 1;
     int low = 0;
     int high = nn - 1;
-    double eps = Math.pow(2.0, -52.0);
+    double eps = EPS;
     double exshift = 0.0;
     double p = 0, q = 0, r = 0, s = 0, z = 0, t, w, x, y;
 
