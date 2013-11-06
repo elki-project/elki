@@ -31,6 +31,9 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -97,6 +100,7 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
     for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     // Refine result
@@ -104,7 +108,7 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
       if (prog != null) {
         prog.incrementProcessed(LOG);
       }
-      boolean changed = macQueenIterate(relation, means, clusters);
+      boolean changed = macQueenIterate(relation, means, clusters, assignment);
       if (!changed) {
         break;
       }
