@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -260,9 +261,10 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
    * @param relation Relation
    * @param means Means
    * @param clusters Clusters
+   * @param assignment Current cluster assignment
    * @return true when the means have changed
    */
-  protected boolean macQueenIterate(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters) {
+  protected boolean macQueenIterate(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
     boolean changed = false;
 
     if (getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
@@ -282,7 +284,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
             mindist = dist;
           }
         }
-        changed |= updateMeanAndAssignment(clusters, means, minIndex, fv, iditer);
+        changed |= updateMeanAndAssignment(clusters, means, minIndex, fv, iditer, assignment);
       }
     } else {
       // Raw distance function
@@ -300,7 +302,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
             mindist = dist;
           }
         }
-        changed |= updateMeanAndAssignment(clusters, means, minIndex, fv, iditer);
+        changed |= updateMeanAndAssignment(clusters, means, minIndex, fv, iditer, assignment);
       }
     }
     return changed;
@@ -314,22 +316,26 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
    * @param minIndex Cluster to assign to
    * @param fv Vector
    * @param iditer Object ID
+   * @param assignment Current cluster assignment
    * @return {@code true} when assignment changed
    */
-  private boolean updateMeanAndAssignment(List<ModifiableDBIDs> clusters, List<Vector> means, int minIndex, V fv, DBIDIter iditer) {
-    final ModifiableDBIDs curclus = clusters.get(minIndex);
-    if (curclus.add(iditer)) {
-      incrementalUpdateMean(means.get(minIndex), fv, curclus.size(), +1);
-      for (int i = 0; i < k; i++) {
-        ModifiableDBIDs ci = clusters.get(i);
-        if (i != minIndex && ci.remove(iditer)) {
-          incrementalUpdateMean(means.get(i), fv, ci.size() + 1, -1);
-          break;
-        }
-      }
-      return true;
+  private boolean updateMeanAndAssignment(List<ModifiableDBIDs> clusters, List<Vector> means, int minIndex, V fv, DBIDIter iditer, WritableIntegerDataStore assignment) {
+    int cur = assignment.intValue(iditer);
+    if (cur == minIndex) {
+      return false;
     }
-    return false;
+    final ModifiableDBIDs curclus = clusters.get(minIndex);
+    curclus.add(iditer);
+    incrementalUpdateMean(means.get(minIndex), fv, curclus.size(), +1);
+
+    if (cur >= 0) {
+      ModifiableDBIDs ci = clusters.get(cur);
+      ci.remove(iditer);
+      incrementalUpdateMean(means.get(cur), fv, ci.size() + 1, -1);
+    }
+
+    assignment.putInt(iditer, minIndex);
+    return true;
   }
 
   @Override
