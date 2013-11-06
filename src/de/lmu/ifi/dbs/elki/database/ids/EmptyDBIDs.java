@@ -82,6 +82,11 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     return -1; // Not found
   }
 
+  @Override
+  public ArrayDBIDs slice(int begin, int end) {
+    return this;
+  }
+
   /**
    * Iterator for empty DBIDs-
    * 
