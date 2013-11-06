@@ -138,7 +138,7 @@ class IntegerDBIDRange implements DBIDRange {
 
   @Override
   public ArrayDBIDs slice(int begin, int end) {
-    return new IntegerDBIDRange(start + begin, end - begin);
+    return new IntegerDBIDRange(begin + start, end - begin);
   }
 
   @Override
