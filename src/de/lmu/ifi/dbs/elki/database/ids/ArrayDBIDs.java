@@ -80,8 +80,8 @@ public interface ArrayDBIDs extends DBIDs {
   /**
    * Slice a subarray (as view, not copy!)
    * 
-   * @param begin Begin
-   * @param end End
+   * @param begin Begin (inclusive)
+   * @param end End (exclusive)
    * @return Array slice.
    */
   public ArrayDBIDs slice(int begin, int end);

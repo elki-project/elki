@@ -560,18 +560,6 @@ public final class DBIDUtil {
   }
 
   /**
-   * Produce a random sample of the given DBIDs.
-   * 
-   * @param source Original DBIDs
-   * @param k k Parameter
-   * @param rnd Random generator
-   * @return new DBIDs
-   */
-  public static ModifiableDBIDs randomSample(DBIDs source, int k, RandomFactory rnd) {
-    return randomSample(source, k, rnd.getRandom());
-  }
-
-  /**
    * Produce a random shuffling of the given DBID array.
    * 
    * @param ids Original DBIDs
@@ -639,6 +627,18 @@ public final class DBIDUtil {
    * 
    * @param source Original DBIDs
    * @param k k Parameter
+   * @param rnd Random generator
+   * @return new DBIDs
+   */
+  public static ModifiableDBIDs randomSample(DBIDs source, int k, RandomFactory rnd) {
+    return randomSample(source, k, rnd.getRandom());
+  }
+
+  /**
+   * Produce a random sample of the given DBIDs.
+   * 
+   * @param source Original DBIDs
+   * @param k k Parameter
    * @param random Random generator
    * @return new DBIDs
    */
@@ -669,6 +669,42 @@ public final class DBIDUtil {
       }
       return sample;
     }
+  }
+
+  /**
+   * Randomly split IDs into {@code p} partitions of almost-equal size.
+   * 
+   * @param ids Original DBIDs
+   * @param p Desired number of partitions.
+   * @param rnd Random generator
+   */
+  public static ArrayDBIDs[] randomSplit(DBIDs ids, int p, RandomFactory rnd) {
+    return randomSplit(ids, p, rnd.getRandom());
+  }
+
+  /**
+   * Randomly split IDs into {@code p} partitions of almost-equal size.
+   * 
+   * @param ids Original DBIDs (<b>will be modified</b>)
+   * @param p Desired number of partitions.
+   * @param random Random generator
+   */
+  public static ArrayDBIDs[] randomSplit(DBIDs oids, int p, Random random) {
+    ArrayModifiableDBIDs ids = newArray(oids);
+    final int size = ids.size();
+    ArrayDBIDs[] split = new ArrayDBIDs[p];
+    // Shuffle
+    for (int i = 1; i < size; i++) {
+      ids.swap(i - 1, i + random.nextInt(size - i));
+    }
+    final int minsize = (int) Math.floor(ids.size() / p);
+    for (int beg = 0, part = 0; part < p; part++) {
+      // First partitions are smaller, last partitions are larger.
+      final int psize = (p * minsize + part >= ids.size()) ? minsize : minsize + 1;
+      split[part] = ids.slice(beg, beg + psize);
+      beg += psize;
+    }
+    return split;
   }
 
   /**
