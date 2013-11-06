@@ -93,7 +93,7 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet(relation.size() / k));
+      clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
