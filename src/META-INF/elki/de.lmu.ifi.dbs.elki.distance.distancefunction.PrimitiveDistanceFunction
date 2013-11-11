@@ -16,6 +16,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.LorentzianDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedManhattanDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedMaximumDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseManhattanDistanceFunction
@@ -45,6 +46,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanc
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DTWDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.EDRDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.ERPDistanceFunction
