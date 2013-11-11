@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 
 /**
  * Representing a DBID range allocation.
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * 
  * @apiviz.has IntegerDBID
  */
-class IntegerDBIDRange implements DBIDRange {
+class IntegerDBIDRange implements DBIDRange, SetDBIDs {
   /**
    * Start value.
    */
@@ -74,7 +75,7 @@ class IntegerDBIDRange implements DBIDRange {
 
   @Override
   public boolean contains(DBIDRef o) {
-    int oid = DBIDUtil.asInteger(o);
+    int oid = o.internalGetIndex();
     if (oid < start) {
       return false;
     }
