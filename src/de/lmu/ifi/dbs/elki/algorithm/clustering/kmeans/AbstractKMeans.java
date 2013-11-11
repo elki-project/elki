@@ -106,9 +106,10 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
    * @param relation the database to cluster
    * @param means a list of k means
    * @param clusters cluster assignment
+   * @param assignment Current cluster assignment
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<V> relation, List<? extends NumberVector<?>> means, List<? extends ModifiableDBIDs> clusters) {
+  protected boolean assignToNearestCluster(Relation<V> relation, List<? extends NumberVector<?>> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
     boolean changed = false;
 
     if (getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
@@ -125,18 +126,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
             mindist = dist;
           }
         }
-        if (clusters.get(minIndex).add(iditer)) {
-          changed = true;
-          // Remove from previous cluster
-          // TODO: keep a list of cluster assignments to save this search?
-          for (int i = 0; i < k; i++) {
-            if (i != minIndex) {
-              if (clusters.get(i).remove(iditer)) {
-                break;
-              }
-            }
-          }
-        }
+        changed |= updateAssignment(iditer, clusters, assignment, minIndex);
       }
     } else {
       final PrimitiveDistanceFunction<? super NumberVector<?>, D> df = getDistanceFunction();
@@ -151,21 +141,23 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
             mindist = dist;
           }
         }
-        if (clusters.get(minIndex).add(iditer)) {
-          changed = true;
-          // Remove from previous cluster
-          // TODO: keep a list of cluster assignments to save this search?
-          for (int i = 0; i < k; i++) {
-            if (i != minIndex) {
-              if (clusters.get(i).remove(iditer)) {
-                break;
-              }
-            }
-          }
-        }
+        changed |= updateAssignment(iditer, clusters, assignment, minIndex);
       }
     }
     return changed;
+  }
+
+  protected boolean updateAssignment(DBIDIter iditer, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, int newA) {
+    final int oldA = assignment.intValue(iditer);
+    if (oldA == newA) {
+      return false;
+    }
+    clusters.get(newA).add(iditer);
+    assignment.putInt(iditer, newA);
+    if (oldA >= 0) {
+      clusters.get(oldA).remove(iditer);
+    }
+    return true;
   }
 
   @Override
