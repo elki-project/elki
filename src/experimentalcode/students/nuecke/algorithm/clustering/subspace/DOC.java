@@ -7,8 +7,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SubspaceClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
@@ -16,17 +14,17 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -90,12 +88,12 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   private double w;
 
   /**
-   * Holds the value of {@link #HEURISTICS_ID}.
+   * Holds the value of {@link Parameterizer#HEURISTICS_ID}.
    */
   private boolean heuristics;
 
   /**
-   * Holds the value of {@link #D_ZERO_ID}.
+   * Holds the value of {@link Parameterizer#D_ZERO_ID}.
    */
   private int d_zero;
 
@@ -131,6 +129,9 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * anymore / the database size has shrunk below the threshold for minimum
    * cluster size.
    * </p>
+   * 
+   * @param database Database
+   * @param relation Data relation
    */
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     // Dimensionality of our set.
@@ -140,11 +141,11 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     ArrayModifiableDBIDs S = DBIDUtil.newArray(relation.getDBIDs());
 
     // Precompute values as described in Figure 2.
-    double r = Math.abs(Math.log10(d + d) / Math.log10(beta * .5));
+    double r = Math.abs(Math.log(d + d) / Math.log(beta * .5));
     // Outer loop count.
-    int n = (int) (2 / alpha);
+    int n = (int) (2. / alpha);
     // Inner loop count.
-    int m = (int) (Math.pow(2 / alpha, r) * Math.log(4));
+    int m = (int) (Math.pow(2. / alpha, r) * Math.log(4));
     if (heuristics) {
       m = Math.min(m, Math.min(1000000, d * d));
     }
@@ -170,18 +171,16 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
       if (C == null) {
         // Stop trying if we couldn't find a cluster.
-        // TODO not explicitly mentioned in the paper!
         break;
-      } else {
-        // Found a cluster, remember it, remove its points from the set.
-        result.addToplevelCluster(C);
+      }
+      // Found a cluster, remember it, remove its points from the set.
+      result.addToplevelCluster(C);
 
-        if (cprogress != null) {
-          cprogress.setProcessed(result.getAllClusters().size(), LOG);
-        }
+      // Remove all points of the cluster from the set and continue.
+      S.removeDBIDs(C.getIDs());
 
-        // Remove all points of the cluster from the set and continue.
-        S.removeDBIDs(C.getIDs());
+      if (cprogress != null) {
+        cprogress.setProcessed(result.getAllClusters().size(), LOG);
       }
     }
 
@@ -211,7 +210,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param minClusterSize Minimum size a cluster must have to be accepted.
    * @return a cluster, if one is found, else <code>null</code>.
    */
-  private Cluster<SubspaceModel<V>> runDOC(Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r, int minClusterSize) {
+  private Cluster<SubspaceModel<V>> runDOC(Relation<V> relation, ArrayModifiableDBIDs S, final int d, int n, int m, int r, int minClusterSize) {
+    final DoubleDistance wd = new DoubleDistance(w);
     // Best cluster for the current run.
     DBIDs C = null;
     // Relevant attributes for the best cluster.
@@ -220,17 +220,23 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     double quality = Double.NEGATIVE_INFINITY;
 
     // Bounds for our cluster.
-    ModifiableHyperBoundingBox bounds = new ModifiableHyperBoundingBox(new double[d], new double[d]);
+    // ModifiableHyperBoundingBox bounds = new ModifiableHyperBoundingBox(new
+    // double[d], new double[d]);
+
+    // Weights for distance (= rectangle query)
+    SubspaceMaximumDistanceFunction df = new SubspaceMaximumDistanceFunction(new BitSet(d));
+    DistanceQuery<V, DoubleDistance> dq = relation.getDatabase().getDistanceQuery(relation, df);
+    RangeQuery<V, DoubleDistance> rq = relation.getDatabase().getRangeQuery(dq);
 
     // Inform the user about the progress in the current iteration.
     FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
 
     Random random = rnd.getRandom();
+    DBIDArrayIter iter = S.iter();
 
     for (int i = 0; i < n; ++i) {
       // Pick a random seed point.
-      DBID p = S.get(random.nextInt(S.size()));
-      V pV = relation.get(p);
+      iter.seek(random.nextInt(S.size()));
 
       for (int j = 0; j < m; ++j) {
         // Choose a set of random points.
@@ -243,40 +249,23 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         for (int k = 0; k < d; ++k) {
           if (dimensionIsRelevant(k, relation, randomSet)) {
             nD.set(k);
-            bounds.setMin(k, pV.doubleValue(k) - w);
-            bounds.setMax(k, pV.doubleValue(k) + w);
-          } else {
-            bounds.setMin(k, Double.NEGATIVE_INFINITY);
-            bounds.setMax(k, Double.POSITIVE_INFINITY);
           }
         }
+        if (nD.cardinality() > 0) {
+          // Get all points in the box.
+          df.setSelectedDimensions(nD);
+          // TODO: add filtering capabilities into query API!
+          DBIDs nC = DBIDUtil.intersection(S, rq.getRangeForDBID(iter, wd));
 
-        // Get all points in the box.
-        // TODO: add a window query API to ELKI, or intersect one dimensional
-        // "indexes" similar to HiCS (ideally: make that a simple index to
-        // automatically add to the database)
-        ArrayModifiableDBIDs nC = DBIDUtil.newArray();
-        for (DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
-          if (isPointInBounds(relation.get(iter), bounds)) {
-            nC.add(iter);
-          }
-        }
-
-        if (LOG.isDebuggingFiner()) {
-          LOG.finer("Found a cluster, |C| = " + nC.size() + ", |D| = " + nD.cardinality());
-        }
-
-        // Is the cluster large enough?
-        if (nC.size() < minClusterSize) {
-          // Too small.
           if (LOG.isDebuggingFiner()) {
-            LOG.finer("... but it's too small.");
+            LOG.finer("Testing a cluster candidate, |C| = " + nC.size() + ", |D| = " + nD.cardinality());
           }
-        } else {
-          // TODO not explicitly mentioned in the paper!
-          if (nD.cardinality() == 0) {
+
+          // Is the cluster large enough?
+          if (nC.size() < minClusterSize) {
+            // Too small.
             if (LOG.isDebuggingFiner()) {
-              LOG.finer("... but it has no relevant attributes.");
+              LOG.finer("... but it's too small.");
             }
           } else {
             // Better cluster than before?
@@ -285,7 +274,6 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
               if (LOG.isDebuggingFiner()) {
                 LOG.finer("... and it's the best so far: " + nQuality + " vs. " + quality);
               }
-
               C = nC;
               D = nD;
               quality = nQuality;
@@ -329,17 +317,17 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Relevant attributes of highest cardinality.
     BitSet D = null;
     // The seed point for the best dimensions.
-    V dV = null;
+    DBIDVar dV = DBIDUtil.newVar();
 
     // Inform the user about the progress in the current iteration.
     FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
 
     Random random = rnd.getRandom();
 
+    DBIDArrayIter iter = S.iter();
     outer: for (int i = 0; i < n; ++i) {
       // Pick a random seed point.
-      DBID p = S.get(random.nextInt(S.size()));
-      V pV = relation.get(p);
+      iter.seek(random.nextInt(S.size()));
 
       for (int j = 0; j < m; ++j) {
         // Choose a set of random points.
@@ -357,7 +345,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
         if (D == null || nD.cardinality() > D.cardinality()) {
           D = nD;
-          dV = pV;
+          dV.set(iter);
 
           if (D.cardinality() >= d_zero) {
             if (iprogress != null) {
@@ -383,55 +371,12 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     // Get all points in the box.
-    
-    /*
-    // Bounds for our cluster.
-    double[] min = new double[d];
-    double[] max = new double[d];
-    for (int k = 0; k < d; ++k) {
-      if (D.get(k)) {
-        min[k] = dV.doubleValue(k) - w;
-        max[k] = dV.doubleValue(k) + w;
-      } else {
-        min[k] = Double.NEGATIVE_INFINITY;
-        max[k] = Double.POSITIVE_INFINITY;
-      }
-    }
+    SubspaceMaximumDistanceFunction df = new SubspaceMaximumDistanceFunction(D);
+    DistanceQuery<V, DoubleDistance> dq = relation.getDatabase().getDistanceQuery(relation, df);
+    RangeQuery<V, DoubleDistance> rq = relation.getDatabase().getRangeQuery(dq, DatabaseQuery.HINT_SINGLE);
 
-    // The index query is a weighted Manhattan-distance (1) based query, where
-    // the weights correspond to the inverse of the size of the query along a
-    // particular axis, and the actual distance passed is one.
-    // (1) Which is wrong, it should be a maximum-distance.
-    Centroid centroid = Centroid.make(relation, S);
-    double[] weights = new double[d];
-    for (int k = 0; k < d; ++k) {
-      weights[k] = 1.0 / ((max[k] - min[k]) / 2.0);
-    }
-    DistanceQuery<V, DoubleDistance> distanceQuery = relation.getDatabase().getDistanceQuery(relation, new WeightedLPNormDistanceFunction(1.0, weights));
-    RangeQuery<V, DoubleDistance> rangeQuery = relation.getDatabase().getRangeQuery(distanceQuery);
-    DistanceDBIDList<DoubleDistance> C = rangeQuery.getRangeForObject(centroid.toVector(relation), new DoubleDistance(1.0));
-    /*/
-    // Bounds for our cluster.
-    ModifiableHyperBoundingBox bounds = new ModifiableHyperBoundingBox(new double[d], new double[d]);
-
-    // Test each dimension and build bounding box.
-    for (int k = 0; k < d; ++k) {
-      if (D.get(k)) {
-        bounds.setMin(k, dV.doubleValue(k) - w);
-        bounds.setMax(k, dV.doubleValue(k) + w);
-      } else {
-        bounds.setMin(k, Double.NEGATIVE_INFINITY);
-        bounds.setMax(k, Double.POSITIVE_INFINITY);
-      }
-    }
-
-    ArrayModifiableDBIDs C = DBIDUtil.newArray();
-    for (DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
-      if (isPointInBounds(relation.get(iter), bounds)) {
-        C.add(iter);
-      }
-    }
-    //*/
+    // TODO: add filtering capabilities into query API!
+    DBIDs C = DBIDUtil.intersection(S, rq.getRangeForDBID(dV, new DoubleDistance(w)));
 
     // If we have a non-empty cluster, return it.
     if (C.size() > 0) {
@@ -466,23 +411,6 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   }
 
   /**
-   * Utility method to test if a point is in a given hypercube.
-   * 
-   * @param v the point to test for.
-   * @param bounds the hypercube to use as the bounds.
-   * 
-   * @return <code>true</code> if the point is inside the cube.
-   */
-  private boolean isPointInBounds(V v, HyperBoundingBox bounds) {
-    for (int i = 0; i < v.getDimensionality(); i++) {
-      if (v.doubleValue(i) < bounds.getMin(i) || v.doubleValue(i) > bounds.getMax(i)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * Utility method to create a subspace cluster from a list of DBIDs and the
    * relevant attributes.
    * 
@@ -492,7 +420,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @return an object representing the subspace cluster.
    */
   private Cluster<SubspaceModel<V>> makeCluster(Relation<V> relation, DBIDs C, BitSet D) {
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(C);
+    DBIDs ids = DBIDUtil.newHashSet(C); // copy, also to lose distance values!
     Cluster<SubspaceModel<V>> cluster = new Cluster<>(ids);
     cluster.setModel(new SubspaceModel<>(new Subspace(D), Centroid.make(relation, ids).toVector(relation)));
     return cluster;
@@ -509,7 +437,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    *         other clusters).
    */
   private double computeClusterQuality(int clusterSize, int numRelevantDimensions) {
-    return clusterSize * Math.pow(1 / beta, numRelevantDimensions);
+    return clusterSize * Math.pow(1. / beta, numRelevantDimensions);
   }
 
   // ---------------------------------------------------------------------- //

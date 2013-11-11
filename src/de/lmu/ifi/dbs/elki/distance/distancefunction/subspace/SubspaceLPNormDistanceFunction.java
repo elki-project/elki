@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DoubleNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Elke Achtert
  */
-public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?>> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>>, DoubleNorm<NumberVector<?>> {
+public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?>> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>>, DoubleNorm<NumberVector<?>>, NumberVectorDistanceFunction<DoubleDistance> {
   /**
    * Value of p
    */
