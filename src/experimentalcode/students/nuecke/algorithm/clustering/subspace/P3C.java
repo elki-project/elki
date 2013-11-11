@@ -42,13 +42,12 @@ import experimentalcode.students.nuecke.utilities.datastructures.histogram.Histo
 import experimentalcode.students.nuecke.utilities.datastructures.histogram.SupportHistogram;
 
 /**
- * HARP: Hierarchical approach with Automatic Relevant dimension selection for
- * Projected clustering
+ * P3C: A Robust Projected Clustering Algorithm.
  * 
  * <p>
  * Reference: <br/>
  * Gabriela Moise, Jörg Sander, Martin Ester<br />
- * P3C: A Robust Projected Clustering Algorithm. <br/>
+ * P3C: A Robust Projected Clustering Algorithm.<br/>
  * In: Proc. Sixth International Conference on Data Mining (ICDM '06)
  * </p>
  * 
@@ -58,7 +57,7 @@ import experimentalcode.students.nuecke.utilities.datastructures.histogram.Suppo
  * 
  * @param <V> the type of NumberVector handled by this Algorithm.
  */
-@Title("HARP: Hierarchical approach with Automatic Relevant dimension selection for Projected clustering")
+@Title("P3C: A Robust Projected Clustering Algorithm.")
 @Reference(authors = "Gabriela Moise, Jörg Sander, Martin Ester", title = "P3C: A Robust Projected Clustering Algorithm", booktitle = "Proc. Sixth International Conference on Data Mining (ICDM '06)", url = "http://dx.doi.org/10.1109/ICDM.2006.123")
 public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> {
   /**
@@ -72,7 +71,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   private static final double MIN_LOGLIKELIHOOD = -100000;
 
   /**
-   * Parameter for the poisson test threshold.
+   * Parameter for the Poisson test threshold.
    */
   protected double poissonThreshold;
 
@@ -87,7 +86,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   protected double emDelta;
 
   /**
-   * Minimum cluster size for noise flagging. (Not existant in the original
+   * Minimum cluster size for noise flagging. (Not existing in the original
    * publication).
    */
   protected int minClusterSize;
@@ -96,15 +95,12 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * Sets up a new instance of the algorithm's environment.
    */
   public P3C(double poissonThreshold, int maxEmIterations, double emDelta, int minClusterSize) {
+    super();
     this.poissonThreshold = poissonThreshold;
     this.maxEmIterations = maxEmIterations;
     this.emDelta = emDelta;
     this.minClusterSize = minClusterSize;
   }
-
-  // ---------------------------------------------------------------------- //
-  // Run methods.
-  // ---------------------------------------------------------------------- //
 
   /**
    * Performs the P3C algorithm on the given Database.
@@ -257,7 +253,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         }
       }
     }
-    
+
     if (clusterCores.size() == 0) {
       stepProgress.setCompleted(LOG);
       return null;
@@ -323,7 +319,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     if (stepProgress != null) {
       stepProgress.ensureCompleted(LOG);
     }
-    
+
     return result;
   }
 
@@ -344,10 +340,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
     return sum;
   }
-
-  // ---------------------------------------------------------------------- //
-  // Auxiliary algorithm methods.
-  // ---------------------------------------------------------------------- //
 
   /**
    * Performs a ChiSquared test to determine whether an attribute has a uniform
@@ -496,7 +488,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     for (int cluster = 0; cluster < k; ++cluster) {
       clusterWeights[cluster] = 1.0 / k;
     }
-    
+
     FiniteProgress emIterProgress = LOG.isVerbose() ? new FiniteProgress("EM iteration", maxEmIterations, LOG) : null;
 
     // Iterate until maximum number of iteration hits or computation converges.
@@ -586,7 +578,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         emIterProgress.incrementProcessed(LOG);
       }
     }
-    
+
     if (emIterProgress != null) {
       emIterProgress.ensureCompleted(LOG);
     }
@@ -652,6 +644,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       final CovarianceMatrix cvm = CovarianceMatrix.make(relation, candidate.data);
       final Vector mean = cvm.getMeanVector();
       final Matrix inverseCovariance = cvm.destroyToNaiveMatrix().cheatToAvoidSingularity(10e-9).inverse();
+      // FIXME: use an array iterator, instead of "get" - more efficient!
       for (int point = candidate.data.size() - 1; point >= 0; --point) {
         final Vector value = relation.get(candidate.data.get(point)).getColumnVector();
         final Vector delta = mean.minus(value);
@@ -666,10 +659,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       }
     }
   }
-
-  // ---------------------------------------------------------------------- //
-  // Helper class representing p-signatures.
-  // ---------------------------------------------------------------------- //
 
   /**
    * Class representing a p-signature (where p is the size of the vector).
@@ -839,25 +828,27 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
      */
     private double poisson(int v, double E) {
       /*
-      // This is precise but - as you would expect - very very slow.
-      final BigDecimal exp = BigDecimal.valueOf(Math.exp(-E));
-      final BigDecimal pow = BigDecimal.valueOf(E).pow(v);
-      final BigDecimal dividend = exp.multiply(pow);
-      final BigDecimal divisor = new BigDecimal(MathUtil.factorial(BigInteger.valueOf(v)));
-      final double result = dividend.divide(divisor, 40, RoundingMode.HALF_DOWN).doubleValue();
-      return result;
-      /*/
+       * // This is precise but - as you would expect - very very slow. final
+       * BigDecimal exp = BigDecimal.valueOf(Math.exp(-E)); final BigDecimal pow
+       * = BigDecimal.valueOf(E).pow(v); final BigDecimal dividend =
+       * exp.multiply(pow); final BigDecimal divisor = new
+       * BigDecimal(MathUtil.factorial(BigInteger.valueOf(v))); final double
+       * result = dividend.divide(divisor, 40,
+       * RoundingMode.HALF_DOWN).doubleValue(); return result; /
+       */
       // This is fast but tends to become inaccurate.
-      //return Math.exp(-E) * Math.pow(E, v) / MathUtil.approximateFactorial(v);
+      // return Math.exp(-E) * Math.pow(E, v) /
+      // MathUtil.approximateFactorial(v);
       // So we move to log space which allows a fast approximation of the
       // factorial (using the natural logarithm) via `v! = sum[i=1-v](log(i))`.
-      // e^-E * e^v / v! = e^(log(e^-E * E^v / v!)) = e^(log(e^-E) + log(E^v) - log(v!)) = e^(E + log(E^v) - sum[i=1-v](log(i)))
+      // e^-E * e^v / v! = e^(log(e^-E * E^v / v!)) = e^(log(e^-E) + log(E^v) -
+      // log(v!)) = e^(E + log(E^v) - sum[i=1-v](log(i)))
       double sum = 0;
       for (int i = 1; i <= v; ++i) {
         sum += Math.log(sum);
       }
       return Math.exp(E + Math.log(Math.pow(E, v)) - sum);
-      //*/
+      // */
     }
   }
 
