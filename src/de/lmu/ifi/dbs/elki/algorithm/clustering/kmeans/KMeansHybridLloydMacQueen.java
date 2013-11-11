@@ -29,7 +29,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -42,32 +42,25 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
- * Provides the k-medians clustering algorithm, using Lloyd-style bulk
- * iterations.
- * 
- * Reference:
- * <p>
- * Clustering via Concave Minimization<br />
- * P. S. Bradley, O. L. Mangasarian, W. N. Street<br />
- * in: Advances in neural information processing systems
- * </p>
+ * Provides the k-means algorithm, alternating between MacQueen-style
+ * incremental processing and Lloyd-Style batch steps.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.has KMeansModel
  * 
  * @param <V> vector datatype
  * @param <D> distance value type
  */
-@Title("K-Medians")
-@Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url = "http://nips.djvuzone.org/djvu/nips09/0368.djvu")
-public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, MeanModel<V>> {
+public class KMeansHybridLloydMacQueen<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, KMeansModel<V>> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMediansLloyd.class);
+  private static final Logging LOG = Logging.getLogger(KMeansHybridLloydMacQueen.class);
 
   /**
    * Constructor.
@@ -77,17 +70,20 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMediansLloyd(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMeansHybridLloydMacQueen(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   @Override
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
     if (relation.size() <= 0) {
-      return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
+      return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
-    // Choose initial medians
-    List<? extends NumberVector<?>> medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    // Choose initial means
+    List<Vector> means = new ArrayList<>(k);
+    for (NumberVector<?> nv : initializer.chooseInitialMeans(database, relation, k, getDistanceFunction())) {
+      means.add(nv.getColumnVector());
+    }
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {
@@ -95,27 +91,39 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
 
-    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medians iteration", LOG) : null;
-    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
+    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
+    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration += 2) {
+      { // MacQueen
+        if (prog != null) {
+          prog.incrementProcessed(LOG);
+        }
+        boolean changed = macQueenIterate(relation, means, clusters, assignment);
+        if (!changed) {
+          break;
+        }
       }
-      boolean changed = assignToNearestCluster(relation, medians, clusters, assignment);
-      // Stop if no cluster assignment changed.
-      if (!changed) {
-        break;
+      { // Lloyd
+        if (prog != null) {
+          prog.incrementProcessed(LOG);
+        }
+        boolean changed = assignToNearestCluster(relation, means, clusters, assignment);
+        // Stop if no cluster assignment changed.
+        if (!changed) {
+          break;
+        }
+        // Recompute means.
+        means = means(clusters, means, relation);
       }
-      // Recompute medians.
-      medians = medians(clusters, medians, relation);
     }
     if (prog != null) {
       prog.setCompleted(LOG);
     }
+
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<MeanModel<V>> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
+    Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for (int i = 0; i < clusters.size(); i++) {
-      MeanModel<V> model = new MeanModel<>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
+      KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;
@@ -140,8 +148,8 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
     }
 
     @Override
-    protected KMediansLloyd<V, D> makeInstance() {
-      return new KMediansLloyd<>(distanceFunction, k, maxiter, initializer);
+    protected KMeansHybridLloydMacQueen<V, D> makeInstance() {
+      return new KMeansHybridLloydMacQueen<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }
