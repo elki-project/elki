@@ -3,4 +3,6 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.BestOfMultipleKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBisecting
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBatchedLloyd
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
 tutorial.clustering.SameSizeKMeansAlgorithm

@@ -2,4 +2,6 @@ de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBatchedLloyd
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
 tutorial.clustering.SameSizeKMeansAlgorithm
