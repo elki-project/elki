@@ -1,10 +1,9 @@
-package experimentalcode.students.nuecke.algorithm.clustering.subspace;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import java.util.BitSet;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SubspaceClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
