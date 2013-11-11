@@ -26,60 +26,37 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.PrimitiveSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Provides a polynomial Kernel function that computes a similarity between the
- * two feature vectors V1 and V2 defined by (V1^T*V2)^degree.
+ * Sigmoid kernel function.
  * 
- * @author Simon Paradies
+ * @author Erich Schubert
  */
-public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?>, DoubleDistance> implements PrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> {
+public class SigmoidKernelFunction implements PrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> {
   /**
-   * The default degree.
+   * Scaling factor c, bias theta
    */
-  public static final int DEFAULT_DEGREE = 2;
-
-  /**
-   * Degree of the polynomial kernel function.
-   */
-  private final int degree;
-
-  /**
-   * Bias of the similarity function.
-   */
-  private final double bias;
+  private final double c, theta;
 
   /**
    * Constructor.
    * 
-   * @param degree Kernel degree
-   * @param bias Bias offset
+   * @param c Scaling factor c.
+   * @param theta Bias parameter theta.
    */
-  public PolynomialKernelFunction(int degree, double bias) {
+  public SigmoidKernelFunction(double c, double theta) {
     super();
-    this.degree = degree;
-    this.bias = bias;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param degree Kernel degree
-   */
-  public PolynomialKernelFunction(int degree) {
-    this(degree, 0.);
+    this.c = c;
+    this.theta = theta;
   }
 
   /**
@@ -97,9 +74,10 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
 
     double sim = 0;
     for (int i = 0; i < o1.getDimensionality(); i++) {
-      sim += o1.doubleValue(i) * o2.doubleValue(i);
+      final double v = o1.doubleValue(i) - o2.doubleValue(i);
+      sim += v * v;
     }
-    return MathUtil.powi(sim + bias, degree);
+    return Math.tanh(c * sim + theta);
   }
 
   @Override
@@ -108,8 +86,8 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
   }
 
   @Override
-  public DoubleDistance distance(final NumberVector<?> fv1, final NumberVector<?> fv2) {
-    return new DoubleDistance(Math.sqrt(doubleSimilarity(fv1, fv1) + doubleSimilarity(fv2, fv2) - 2 * doubleSimilarity(fv1, fv2)));
+  public boolean isSymmetric() {
+    return true;
   }
 
   @Override
@@ -123,8 +101,8 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
   }
 
   @Override
-  public <T extends NumberVector<?>> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new PrimitiveDistanceSimilarityQuery<>(database, this, this);
+  public <T extends NumberVector<?>> SimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
+    return new PrimitiveSimilarityQuery<>(database, this);
   }
 
   /**
@@ -136,42 +114,36 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Degree parameter.
+     * C parameter: scaling
      */
-    public static final OptionID DEGREE_ID = new OptionID("kernel.polynomial.degree", "The degree of the polynomial kernel function. Default: " + DEFAULT_DEGREE);
+    public static final OptionID C_ID = new OptionID("kernel.sigmoid.c", "Sigmoid c parameter (scaling).");
 
     /**
-     * Bias parameter.
+     * Theta parameter: bias
      */
-    public static final OptionID BIAS_ID = new OptionID("kernel.polynomial.bias", "The bias of the polynomial kernel, a constant that is added to the scalar product.");
+    public static final OptionID THETA_ID = new OptionID("kernel.sigmoid.theta", "Sigmoid theta parameter (bias).");
 
     /**
-     * Degree of the polynomial kernel function.
+     * C parameter, theta parameter
      */
-    protected int degree = 0;
-
-    /**
-     * Bias parameter.
-     */
-    protected double bias = 0.;
+    protected double c = 1., theta = 0.;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter degreeP = new IntParameter(DEGREE_ID, DEFAULT_DEGREE);
-      if (config.grab(degreeP)) {
-        degree = degreeP.intValue();
+      final DoubleParameter cP = new DoubleParameter(C_ID, 1.);
+      if (config.grab(cP)) {
+        c = cP.doubleValue();
       }
-      final DoubleParameter biasP = new DoubleParameter(BIAS_ID);
-      biasP.setOptional(true);
-      if (config.grab(biasP)) {
-        bias = biasP.doubleValue();
+      final DoubleParameter thetaP = new DoubleParameter(THETA_ID, 0.);
+      if (config.grab(thetaP)) {
+        theta = thetaP.doubleValue();
       }
     }
 
     @Override
-    protected PolynomialKernelFunction makeInstance() {
-      return new PolynomialKernelFunction(degree, bias);
+    protected SigmoidKernelFunction makeInstance() {
+      return new SigmoidKernelFunction(c, theta);
     }
   }
 }
