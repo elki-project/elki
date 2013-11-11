@@ -66,7 +66,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDista
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedFloatDistanceFunction
-# de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.FooKernelFunction
 # de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction
 # de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction
 # tutorial.distancefunction.MultiLPNorm
