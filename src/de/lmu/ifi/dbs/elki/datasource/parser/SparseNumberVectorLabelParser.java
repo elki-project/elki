@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -120,7 +121,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
           int index = Integer.parseInt(entries.get(i));
           // Respect labelIndices.
           if (labelIndices == null || !labelIndices.get(index)) {
-            double attribute = parseDouble(entries.get(i + 1));
+            double attribute = FormatUtil.parseDouble(entries.get(i + 1));
             thismax = Math.max(thismax, index + 1);
             values.put(index, attribute);
             i += 2; // only increment if successful

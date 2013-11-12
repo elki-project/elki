@@ -32,6 +32,7 @@ import java.util.Properties;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.ListBasedColorLibrary;
@@ -249,7 +250,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
     Double lw = getCached(key, LINE_WIDTH, Double.class);
     if (lw == null) {
       try {
-        lw = Double.valueOf(Double.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE);
+        lw = Double.valueOf(FormatUtil.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE);
       } catch (NullPointerException e) {
         throw new AbortException("Missing/invalid value in style library: " + key + '.' + LINE_WIDTH);
       }
@@ -262,7 +263,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
     Double lw = getCached(key, TEXT_SIZE, Double.class);
     if (lw == null) {
       try {
-        lw = Double.valueOf(Double.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE);
+        lw = Double.valueOf(FormatUtil.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE);
       } catch (NullPointerException e) {
         throw new AbortException("Missing/invalid value in style library: " + key + '.' + TEXT_SIZE);
       }
@@ -280,7 +281,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
     Double lw = getCached(key, GENERIC_SIZE, Double.class);
     if (lw == null) {
       try {
-        lw = Double.valueOf(Double.parseDouble(getPropertyValue(key, GENERIC_SIZE)) * SCALE);
+        lw = Double.valueOf(FormatUtil.parseDouble(getPropertyValue(key, GENERIC_SIZE)) * SCALE);
       } catch (NullPointerException e) {
         throw new AbortException("Missing/invalid value in style library: " + key + '.' + GENERIC_SIZE);
       }
@@ -293,7 +294,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
     Double lw = getCached(key, OPACITY, Double.class);
     if (lw == null) {
       try {
-        lw = Double.valueOf(Double.parseDouble(getPropertyValue(key, OPACITY)));
+        lw = Double.valueOf(FormatUtil.parseDouble(getPropertyValue(key, OPACITY)));
       } catch (NullPointerException e) {
         throw new AbortException("Missing/invalid value in style library: " + key + '.' + OPACITY);
       }

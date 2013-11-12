@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.math.BigInteger;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+
 /**
  * RationalNumber represents rational numbers in arbitrary precision. Note that
  * the best possible precision is the primary objective of this class. Since
@@ -128,15 +130,15 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
    */
   public RationalNumber(final String doubleString) throws IllegalArgumentException {
     try {
-      Double number = Double.parseDouble(doubleString);
-      if(number.isInfinite()) {
+      double number = FormatUtil.parseDouble(doubleString);
+      if(Double.isInfinite(number)) {
         throw new IllegalArgumentException("given number is infinite");
       }
-      if(number.isNaN()) {
+      if(Double.isNaN(number)) {
         throw new IllegalArgumentException("given number is NotANumber");
       }
       // ensure standard encoding of the double argument
-      String standardDoubleString = number.toString();
+      String standardDoubleString = Double.toString(number);
       // index of decimal point '.'
       int pointIndex = standardDoubleString.indexOf('\u002E');
       // read integer part

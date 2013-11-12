@@ -29,6 +29,8 @@ import java.io.ObjectOutput;
 import java.util.BitSet;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+
 /**
  * A PreferenceVectorBasedCorrelationDistance holds additionally to the
  * CorrelationDistance the common preference vector of the two objects defining
@@ -181,7 +183,7 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
     }
     if(testInputPattern(pattern)) {
       String[] values = SEPARATOR.split(pattern);
-      return new PreferenceVectorBasedCorrelationDistance(-1, Integer.parseInt(values[0]), Double.parseDouble(values[1]), new BitSet());
+      return new PreferenceVectorBasedCorrelationDistance(-1, Integer.parseInt(values[0]), FormatUtil.parseDouble(values[1]), new BitSet());
     }
     else {
       throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");

@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.HaltonUniformDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -341,7 +342,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     String dcostr = ((Element) cur).getAttribute(ATTR_DENSITY);
     if (dcostr != null && dcostr.length() > 0) {
-      overweight = Double.parseDouble(dcostr);
+      overweight = FormatUtil.parseDouble(dcostr);
     }
 
     if (size < 0) {
@@ -394,11 +395,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     String minstr = ((Element) cur).getAttribute(ATTR_MIN);
     if (minstr != null && minstr.length() > 0) {
-      min = Double.parseDouble(minstr);
+      min = FormatUtil.parseDouble(minstr);
     }
     String maxstr = ((Element) cur).getAttribute(ATTR_MAX);
     if (maxstr != null && maxstr.length() > 0) {
-      max = Double.parseDouble(maxstr);
+      max = FormatUtil.parseDouble(maxstr);
     }
 
     // *** new uniform generator
@@ -428,11 +429,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double stddev = 1.0;
     String meanstr = ((Element) cur).getAttribute(ATTR_MEAN);
     if (meanstr != null && meanstr.length() > 0) {
-      mean = Double.parseDouble(meanstr);
+      mean = FormatUtil.parseDouble(meanstr);
     }
     String stddevstr = ((Element) cur).getAttribute(ATTR_STDDEV);
     if (stddevstr != null && stddevstr.length() > 0) {
-      stddev = Double.parseDouble(stddevstr);
+      stddev = FormatUtil.parseDouble(stddevstr);
     }
 
     // *** New normal distribution generator
@@ -462,11 +463,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double theta = 1.0;
     String kstr = ((Element) cur).getAttribute(ATTR_K);
     if (kstr != null && kstr.length() > 0) {
-      k = Double.parseDouble(kstr);
+      k = FormatUtil.parseDouble(kstr);
     }
     String thetastr = ((Element) cur).getAttribute(ATTR_THETA);
     if (thetastr != null && thetastr.length() > 0) {
-      theta = Double.parseDouble(thetastr);
+      theta = FormatUtil.parseDouble(thetastr);
     }
 
     // *** New normal distribution generator
@@ -497,11 +498,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     String minstr = ((Element) cur).getAttribute(ATTR_MIN);
     if (minstr != null && minstr.length() > 0) {
-      min = Double.parseDouble(minstr);
+      min = FormatUtil.parseDouble(minstr);
     }
     String maxstr = ((Element) cur).getAttribute(ATTR_MAX);
     if (maxstr != null && maxstr.length() > 0) {
-      max = Double.parseDouble(maxstr);
+      max = FormatUtil.parseDouble(maxstr);
     }
 
     // *** new uniform generator
@@ -541,7 +542,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     }
     String anstr = ((Element) cur).getAttribute(ATTR_ANGLE);
     if (anstr != null && anstr.length() > 0) {
-      angle = Double.parseDouble(anstr);
+      angle = FormatUtil.parseDouble(anstr);
     }
     if (axis1 <= 0 || axis1 > cluster.getDim()) {
       throw new UnableToComplyException("Invalid axis1 number given in specification file.");
@@ -709,7 +710,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double[] d = new double[entries.length];
     for (int i = 0; i < entries.length; i++) {
       try {
-        d[i] = Double.parseDouble(entries[i]);
+        d[i] = FormatUtil.parseDouble(entries[i]);
       } catch (NumberFormatException e) {
         throw new UnableToComplyException("Could not parse vector.");
       }

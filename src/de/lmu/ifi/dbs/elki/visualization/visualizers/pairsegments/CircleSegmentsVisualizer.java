@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -319,7 +320,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
       // Add ring:clustering info
       Element clrInfo = drawClusteringInfo();
-      Element c = checkbox.renderCheckBox(svgp, 1, 5 + Double.parseDouble(clrInfo.getAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE)), 11);
+      Element c = checkbox.renderCheckBox(svgp, 1., 5. + FormatUtil.parseDouble(clrInfo.getAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE)), 11);
       ctrlLayer.appendChild(clrInfo);
       ctrlLayer.appendChild(c);
 

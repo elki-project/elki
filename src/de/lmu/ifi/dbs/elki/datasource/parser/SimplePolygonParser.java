@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.StringLengthConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
@@ -144,10 +145,10 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       Matcher m = COORD.matcher(cur);
       if (m.find()) {
         try {
-          double c1 = Double.parseDouble(m.group(1));
-          double c2 = Double.parseDouble(m.group(2));
+          double c1 = FormatUtil.parseDouble(m.group(1));
+          double c2 = FormatUtil.parseDouble(m.group(2));
           if (m.group(3) != null) {
-            double c3 = Double.parseDouble(m.group(3));
+            double c3 = FormatUtil.parseDouble(m.group(3));
             coords.add(new Vector(new double[] { c1, c2, c3 }));
           } else {
             coords.add(new Vector(new double[] { c1, c2 }));

@@ -1467,7 +1467,7 @@ public class Matrix {
       throw new java.io.IOException("Unexpected EOF on matrix read.");
     }
     do {
-      v.add(Double.parseDouble(tokenizer.sval)); // Read & store 1st
+      v.add(FormatUtil.parseDouble(tokenizer.sval)); // Read & store 1st
       // row.
     }
     while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
@@ -1484,7 +1484,7 @@ public class Matrix {
         if (j >= n) {
           throw new java.io.IOException("Row " + v.size() + " is too long.");
         }
-        row[j++] = Double.parseDouble(tokenizer.sval);
+        row[j++] = FormatUtil.parseDouble(tokenizer.sval);
       }
       while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
       if (j < n) {

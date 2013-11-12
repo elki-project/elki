@@ -28,6 +28,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+
 /**
  * The subspace distance is a special distance that indicates the dissimilarity
  * between subspaces of equal dimensionality. The subspace distance between two
@@ -215,7 +217,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
     }
     if (testInputPattern(val)) {
       String[] values = SEPARATOR.split(val);
-      return new SubspaceDistance(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
+      return new SubspaceDistance(FormatUtil.parseDouble(values[0]), FormatUtil.parseDouble(values[1]));
     } else {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }

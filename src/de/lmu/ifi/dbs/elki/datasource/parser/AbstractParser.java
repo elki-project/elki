@@ -183,43 +183,6 @@ public abstract class AbstractParser {
   }
 
   /**
-   * Utility function, which is a bit more robust wrt. parsing double values. In
-   * particular: infinite values, and creates fewer objects.
-   * 
-   * @param s String s
-   * @return parsed value
-   * @throws NumberFormatException
-   */
-  public static double parseDouble(String s) throws NumberFormatException {
-    try {
-      return Double.parseDouble(s);
-    } catch (NumberFormatException e) {
-      int len = s.length();
-      if (len > 0) {
-        int p = 0;
-        char cur = s.charAt(p);
-        boolean isNegative = cur == '-';
-        if (isNegative && ++p < len) {
-          cur = s.charAt(p);
-        }
-        if (cur == '∞') {
-          return isNegative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
-        }
-        if (len - p == 3 && "Inf".regionMatches(true, 0, s, p, 3)) {
-          return isNegative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
-        }
-        if (len - p == 8 && "Infinity".regionMatches(true, 0, s, p, 8)) {
-          return isNegative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
-        }
-        if (len == 3 && "NaN".equalsIgnoreCase(s)) {
-          return Double.NaN;
-        }
-      }
-      throw e;
-    }
-  }
-
-  /**
    * Parameterization class.
    * 
    * @author Erich Schubert
