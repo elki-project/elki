@@ -42,15 +42,23 @@ public final class BitsUtil {
    */
   private static final int LONG_LOG2_SIZE = 6;
 
-  /**
-   * Masking for long shifts.
-   */
+  /** Masking for long shifts. */
   private static final int LONG_LOG2_MASK = 0x3f; // 6 bits
 
-  /**
-   * Long with all bits set
-   */
+  /** Long with all bits set */
   private static final long LONG_ALL_BITS = -1L;
+
+  /** Long, with 63 bits set */
+  private static final long LONG_63_BITS = 0x7FFFFFFFFFFFFFFFL;
+
+  /** Masking 32 bit **/
+  private static final long LONG_32_BITS = 0xFFFFFFFFL;
+
+  /** Precomputed powers of 5 for pow5, pow10 on the bit representation. */
+  private static final int[] POW5_INT = { //
+  1, 5, 25, 125, 625,//
+  3125, 15625, 78125, 390625, 1953125,//
+  9765625, 48828125, 244140625, 1220703125 };
 
   /**
    * Allocate a new long[].
@@ -1176,5 +1184,162 @@ public final class BitsUtil {
       }
     }
     return 0;
+  }
+
+  public static double lpow2(long m, int n) {
+    if (m == 0) {
+      return 0.0;
+    }
+    if (m == Long.MIN_VALUE) {
+      return lpow2(Long.MIN_VALUE >> 1, n + 1);
+    }
+    if (m < 0) {
+      return -lpow2(-m, n);
+    }
+    assert(m >= 0);
+    int bitLength = magnitude(m);
+    int shift = bitLength - 53;
+    long exp = 1023L + 52 + n + shift; // Use long to avoid overflow.
+    if (exp >= 0x7FF) {
+      return Double.POSITIVE_INFINITY;
+    }
+    if (exp <= 0) { // Degenerated number (subnormal, assume 0 for bit 52)
+      if (exp <= -54) {
+        return 0.0;
+      }
+      return lpow2(m, n + 54) / 18014398509481984L; // 2^54 Exact.
+    }
+    // Normal number.
+    long bits = (shift > 0) ? (m >> shift) + ((m >> (shift - 1)) & 1) : // Rounding.
+    m << -shift;
+    if (((bits >> 52) != 1) && (++exp >= 0x7FF)) {
+      return Double.POSITIVE_INFINITY;
+    }
+    bits &= 0x000fffffffffffffL; // Clears MSB (bit 52)
+    bits |= exp << 52;
+    return Double.longBitsToDouble(bits);
+  }
+
+  /**
+   * Compute {@code m * Math.pow(10,e)} on the bit representation, for
+   * assembling a floating point decimal value.
+   * 
+   * @param m Mantisse
+   * @param n Exponent to base 10.
+   * @return Double value.
+   */
+  public static double lpow10(long m, int n) {
+    if (m == 0) {
+      return 0.0;
+    }
+    if (m == Long.MIN_VALUE) {
+      return lpow10(Long.MIN_VALUE / 10, n + 1);
+    }
+    if (m < 0) {
+      return -lpow10(-m, n);
+    }
+    if (n >= 0) { // Positive power.
+      if (n > 308) {
+        return Double.POSITIVE_INFINITY;
+      }
+      // Works with 4 x 32 bits registers (x3:x2:x1:x0)
+      long x0 = 0; // 32 bits.
+      long x1 = 0; // 32 bits.
+      long x2 = m & LONG_32_BITS; // 32 bits.
+      long x3 = m >>> 32; // 32 bits.
+      int pow2 = 0;
+      while (n != 0) {
+        int i = (n >= POW5_INT.length) ? POW5_INT.length - 1 : n;
+        int coef = POW5_INT[i]; // 31 bits max.
+
+        if (((int) x0) != 0) {
+          x0 *= coef; // 63 bits max.
+        }
+        if (((int) x1) != 0) {
+          x1 *= coef; // 63 bits max.
+        }
+        x2 *= coef; // 63 bits max.
+        x3 *= coef; // 63 bits max.
+
+        x1 += x0 >>> 32;
+        x0 &= LONG_32_BITS;
+
+        x2 += x1 >>> 32;
+        x1 &= LONG_32_BITS;
+
+        x3 += x2 >>> 32;
+        x2 &= LONG_32_BITS;
+
+        // Adjusts powers.
+        pow2 += i;
+        n -= i;
+
+        // Normalizes (x3 should be 32 bits max).
+        long carry = x3 >>> 32;
+        if (carry != 0) { // Shift.
+          x0 = x1;
+          x1 = x2;
+          x2 = x3 & LONG_32_BITS;
+          x3 = carry;
+          pow2 += 32;
+        }
+      }
+
+      // Merges registers to a 63 bits mantissa.
+      assert(x3 >= 0);
+      int shift = 31 - magnitude(x3); // -1..30
+      pow2 -= shift;
+      long mantissa = (shift < 0) ? (x3 << 31) | (x2 >>> 1) : // x3 is 32 bits.
+      (((x3 << 32) | x2) << shift) | (x1 >>> (32 - shift));
+      return lpow2(mantissa, pow2);
+    } else { // n < 0
+      if (n < -324 - 20) {
+        return 0.;
+      }
+
+      // Works with x1:x0 126 bits register.
+      long x1 = m; // 63 bits.
+      long x0 = 0; // 63 bits.
+      int pow2 = 0;
+      while (true) {
+        // Normalizes x1:x0
+        assert(x1 >= 0);
+        int shift = 63 - magnitude(x1);
+        x1 <<= shift;
+        x1 |= x0 >>> (63 - shift);
+        x0 = (x0 << shift) & LONG_63_BITS;
+        pow2 -= shift;
+
+        // Checks if division has to be performed.
+        if (n == 0) {
+          break; // Done.
+        }
+
+        // Retrieves power of 5 divisor.
+        int i = (-n >= POW5_INT.length) ? POW5_INT.length - 1 : -n;
+        int divisor = POW5_INT[i];
+
+        // Performs the division (126 bits by 31 bits).
+        long wh = (x1 >>> 32);
+        long qh = wh / divisor;
+        long r = wh - qh * divisor;
+        long wl = (r << 32) | (x1 & LONG_32_BITS);
+        long ql = wl / divisor;
+        r = wl - ql * divisor;
+        x1 = (qh << 32) | ql;
+
+        wh = (r << 31) | (x0 >>> 32);
+        qh = wh / divisor;
+        r = wh - qh * divisor;
+        wl = (r << 32) | (x0 & LONG_32_BITS);
+        ql = wl / divisor;
+        x0 = (qh << 32) | ql;
+
+        // Adjusts powers.
+        n += i;
+        pow2 -= i;
+      }
+      return lpow2(x1, pow2);
+    }
   }
 }

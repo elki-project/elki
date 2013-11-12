@@ -164,7 +164,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
       return infiniteDistance();
     }
     if (testInputPattern(val)) {
-      return new DoubleDistance(Double.parseDouble(val));
+      return new DoubleDistance(FormatUtil.parseDouble(val));
     } else {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }

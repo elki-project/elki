@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -283,7 +284,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
       String ent = itr.next();
       if (labelIndices == null || !labelIndices.get(i)) {
         try {
-          double attribute = parseDouble(ent);
+          double attribute = FormatUtil.parseDouble(ent);
           attributes.add(attribute);
           continue;
         } catch (NumberFormatException e) {

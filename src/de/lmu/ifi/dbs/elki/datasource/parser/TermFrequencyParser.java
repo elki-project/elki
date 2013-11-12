@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -113,7 +114,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
         curterm = entries.get(i);
       } else {
         try {
-          double attribute = parseDouble(entries.get(i));
+          double attribute = FormatUtil.parseDouble(entries.get(i));
           int curdim = keymap.get(curterm);
           if (curdim < 0) {
             curdim = numterms;

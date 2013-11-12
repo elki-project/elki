@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.distance.distancevalue;
 
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+
 
 /**
  * The correlation distance is a special Distance that indicates the
@@ -83,7 +85,7 @@ public class PCACorrelationDistance extends CorrelationDistance<PCACorrelationDi
     }
     if(testInputPattern(val)) {
       String[] values = SEPARATOR.split(val);
-      return new PCACorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
+      return new PCACorrelationDistance(Integer.parseInt(values[0]), FormatUtil.parseDouble(values[1]));
     }
     else {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");

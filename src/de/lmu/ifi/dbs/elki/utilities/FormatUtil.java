@@ -1005,4 +1005,213 @@ public final class FormatUtil {
     }
     return buffer.toString();
   }
+
+  /**
+   * Parse a double from a character sequence.
+   * 
+   * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
+   * create an object and thus is expected to put less load on the garbage
+   * collector. It will accept some more spellings of NaN and infinity, thus
+   * removing the need for checking for these independently.
+   * 
+   * @param str String
+   * @return Double value
+   */
+  public static double parseDouble(final CharSequence str) {
+    return parseDouble(str, 0, str.length());
+  }
+
+  /**
+   * Parse a double from a character sequence.
+   * 
+   * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
+   * create an object and thus is expected to put less load on the garbage
+   * collector. It will accept some more spellings of NaN and infinity, thus
+   * removing the need for checking for these independently.
+   * 
+   * @param str String
+   * @param start Begin
+   * @param end End
+   * @return Double value
+   */
+  public static double parseDouble(final CharSequence str, final int start, final int end) {
+    // Current position and character.
+    int pos = start;
+    char cur = str.charAt(pos);
+
+    // Match for NaN spellings
+    if (matchNaN(str, cur, pos, end)) {
+      return Double.NaN;
+    }
+    // Match sign
+    boolean isNegative = (cur == '-');
+    // Carefully consume the - character, update c and i:
+    if ((isNegative || (cur == '+')) && (++pos < end)) {
+      cur = str.charAt(pos);
+    }
+    if (matchInf(str, cur, pos, end)) {
+      return isNegative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+    }
+
+    // Begin parsing real numbers!
+    if (((cur < '0') || (cur > '9')) && (cur != '.')) {
+      throw new NumberFormatException("Number must start with a digit or dot.");
+    }
+
+    // Parse digits into a long, remember offset of decimal point.
+    long decimal = 0;
+    int decimalPoint = -1;
+    while (true) {
+      final int digit = cur - '0';
+      if ((digit >= 0) && (digit <= 9)) {
+        final long tmp = (decimal << 3) + (decimal << 1) + digit;
+        if ((decimal > MAX_LONG_OVERFLOW) || (tmp < decimal)) {
+          throw new NumberFormatException("Precision overflow for double values.");
+        }
+        decimal = tmp;
+      } else if ((cur == '.') && (decimalPoint < 0)) {
+        decimalPoint = pos;
+      } else { // No more digits, or a second dot.
+        break;
+      }
+      if (++pos < end) {
+        cur = str.charAt(pos);
+      } else {
+        break;
+      }
+    }
+    // We need the offset from the back for adjusting the exponent:
+    // Note that we need the current value of i!
+    decimalPoint = (decimalPoint >= 0) ? pos - decimalPoint - 1 : 0;
+
+    // Reads exponent.
+    int exp = 0;
+    if ((pos < end) && ((cur == 'E') || (cur == 'e'))) {
+      cur = str.charAt(++pos);
+      final boolean isNegativeExp = (cur == '-');
+      if ((isNegativeExp || (cur == '+')) && (++pos < end)) {
+        cur = str.charAt(pos);
+      }
+      if ((cur < '0') || (cur > '9')) { // At least one digit required.
+        throw new NumberFormatException("Invalid exponent");
+      }
+      while (true) {
+        final int digit = cur - '0';
+        if ((digit >= 0) && (digit < 10)) {
+          final int tmp = (exp << 3) + (exp << 1) + digit;
+          // Actually, double can only handle Double.MAX_EXPONENT? How about
+          // subnormal?
+          if ((exp > MAX_INT_OVERFLOW) || (tmp < exp)) {
+            throw new NumberFormatException("Precision overflow for double exponent.");
+          }
+          exp = tmp;
+        } else {
+          break;
+        }
+        if (++pos < end) {
+          cur = str.charAt(pos);
+        } else {
+          break;
+        }
+      }
+      if (isNegativeExp) {
+        exp = -exp;
+      }
+    }
+    // Adjust exponent by the offset of the dot in our long.
+    if (decimalPoint >= 0) {
+      exp = exp - decimalPoint;
+    }
+    if (pos != end) {
+      throw new NumberFormatException("String sequence was not completely consumed.");
+    }
+
+    return BitsUtil.lpow10(isNegative ? -decimal : decimal, exp);
+  }
+
+  /**
+   * Match "NaN" in a number of different capitalizations.
+   * 
+   * @param str String to match
+   * @param firstchar First character
+   * @param start Interval begin
+   * @param end Interval end
+   * @return {@code true} when NaN was recognized.
+   */
+  private static boolean matchNaN(CharSequence str, char firstchar, int start, int end) {
+    final int len = end - start;
+    if (len < 2 || len > 3) {
+      return false;
+    }
+    if (firstchar != 'N' && firstchar != 'n') {
+      return false;
+    }
+    final char c1 = str.charAt(start + 1);
+    if (c1 != 'a' && c1 != 'A') {
+      return false;
+    }
+    // Accept just "NA", too:
+    if (len == 2) {
+      return true;
+    }
+    final char c2 = str.charAt(start + 2);
+    if (c2 != 'N' && c2 != 'n') {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Maximum long that we can process without overflowing.
+   */
+  private static final long MAX_LONG_OVERFLOW = Long.MAX_VALUE / 10;
+
+  /**
+   * Maximum integer that we can process without overflowing.
+   */
+  private static final int MAX_INT_OVERFLOW = Integer.MAX_VALUE / 10;
+
+  /**
+   * Infinity pattern, with any capitalization
+   */
+  private static final char[] INFINITY_PATTERN = { //
+  'I', 'n', 'f', 'i', 'n', 'i', 't', 'y', //
+  'i', 'N', 'F', 'I', 'N', 'I', 'T', 'Y' };
+
+  /** Length of pattern */
+  private static final int INFINITY_LENGTH = INFINITY_PATTERN.length >> 1;
+
+  /**
+   * Match "inf", "infinity" in a number of different capitalizations.
+   * 
+   * @param str String to match
+   * @param firstchar First character
+   * @param start Interval begin
+   * @param end Interval end
+   * @return {@code true} when infinity was recognized.
+   */
+  private static boolean matchInf(CharSequence str, char firstchar, int start, int end) {
+    final int len = end - start;
+    // The wonders of unicode. This is more than one byte on UTF-8
+    if (len == 1 && firstchar == '∞') {
+      return true;
+    }
+    if (len != 3 && len != INFINITY_LENGTH) {
+      return false;
+    }
+    // Test beginning: "inf"
+    if (firstchar != 'I' && firstchar != 'i') {
+      return false;
+    }
+    for (int i = 1, j = INFINITY_LENGTH + 1; i < INFINITY_LENGTH; i++, j++) {
+      final char c = str.charAt(start + i);
+      if (c != INFINITY_PATTERN[i] && c != INFINITY_PATTERN[j]) {
+        return false;
+      }
+      if (i == 2 && len == 3) {
+        return true;
+      }
+    }
+    return true;
+  }
 }
