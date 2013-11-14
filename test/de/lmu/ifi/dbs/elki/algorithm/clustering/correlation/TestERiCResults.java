@@ -66,8 +66,8 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     // ERiC
     ListParameterization params = new ListParameterization();
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
-    params.addParameter(DBSCAN.MINPTS_ID, 30);
-    params.addParameter(DBSCAN.EPSILON_ID, 0);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 30);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0);
     // ERiC Distance function in DBSCAN:
     params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
     params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.20);
@@ -104,8 +104,8 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     ListParameterization params = new ListParameterization();
     // ERiC
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
-    params.addParameter(DBSCAN.MINPTS_ID, 15);
-    params.addParameter(DBSCAN.EPSILON_ID, 0);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 15);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0);
     // ERiC Distance function in DBSCAN:
     params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
     params.addParameter(ERiCDistanceFunction.DELTA_ID, 1.0);

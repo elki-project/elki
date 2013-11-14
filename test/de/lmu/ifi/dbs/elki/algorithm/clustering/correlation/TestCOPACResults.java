@@ -66,8 +66,8 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
     // these parameters are not picked too smartly - room for improvement.
     ListParameterization params = new ListParameterization();
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
-    params.addParameter(DBSCAN.EPSILON_ID, 0.02);
-    params.addParameter(DBSCAN.MINPTS_ID, 50);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.02);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 50);
     params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
     params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 15);
 
@@ -94,8 +94,8 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
-    params.addParameter(DBSCAN.EPSILON_ID, 0.5);
-    params.addParameter(DBSCAN.MINPTS_ID, 20);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.5);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
     params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
     params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 45);
     // PCA
