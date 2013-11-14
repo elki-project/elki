@@ -154,6 +154,11 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   protected LabelList curlbl = null;
 
   /**
+   * Current numerical attributes.
+   */
+  TDoubleArrayList attributes = new TDoubleArrayList();
+
+  /**
    * Event to report next.
    */
   Event nextevent = null;
@@ -276,7 +281,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   protected void parseLineInternal(String line) {
     List<String> entries = tokenize(line);
     // Split into numerical attributes and labels
-    TDoubleArrayList attributes = new TDoubleArrayList(entries.size());
+    attributes.reset();
     LabelList labels = null;
 
     Iterator<String> itr = entries.iterator();
@@ -294,7 +299,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
       }
       // Else: labels.
       if (labels == null) {
-        labels = new LabelList(1);
+        labels = new LabelList(Math.max(1, labelcolumns.size()));
         haslabels = true;
       }
       // Make a new string, to not keep the whole file in memory!

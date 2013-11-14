@@ -93,6 +93,11 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
   private SparseNumberVector.Factory<V, ?> sparsefactory;
 
   /**
+   * (Reused) set of values for the number vector.
+   */
+  TIntDoubleHashMap values = new TIntDoubleHashMap();
+
+  /**
    * Constructor.
    * 
    * @param colSep Column separator
@@ -111,7 +116,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
     List<String> entries = tokenize(line);
     int cardinality = Integer.parseInt(entries.get(0));
 
-    TIntDoubleHashMap values = new TIntDoubleHashMap(cardinality);
+    values.clear();
     LabelList labels = null;
     int thismax = 0;
 
@@ -135,7 +140,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
       }
       // Fallback: treat as label
       if (labels == null) {
-        labels = new LabelList(1);
+        labels = new LabelList(Math.max(1, labelcolumns.size()));
         haslabels = true;
       }
       labels.add(entries.get(i));

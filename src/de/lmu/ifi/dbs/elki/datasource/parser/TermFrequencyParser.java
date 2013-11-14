@@ -85,6 +85,11 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
   private SparseNumberVector.Factory<V, ?> sparsefactory;
 
   /**
+   * (Reused) set of values for the number vector.
+   */
+  TIntDoubleHashMap values = new TIntDoubleHashMap();
+
+  /**
    * Constructor.
    * 
    * @param normalize Normalize
@@ -105,7 +110,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
     List<String> entries = tokenize(line);
 
     double len = 0;
-    TIntDoubleHashMap values = new TIntDoubleHashMap();
+    values.clear();
     LabelList labels = null;
 
     String curterm = null;
