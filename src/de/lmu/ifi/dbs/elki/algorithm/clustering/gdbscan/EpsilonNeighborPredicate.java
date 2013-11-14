@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -67,12 +68,12 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
   /**
    * Range to query with
    */
-  D epsilon;
+  protected D epsilon;
 
   /**
    * Distance function to use
    */
-  DistanceFunction<O, D> distFunc;
+  protected DistanceFunction<O, D> distFunc;
 
   /**
    * Full constructor.
@@ -184,7 +185,7 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
         distanceFactory = distfun.getDistanceFactory();
       }
       // Get the epsilon parameter
-      DistanceParameter<D> epsilonP = new DistanceParameter<>(de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN.EPSILON_ID, distanceFactory);
+      DistanceParameter<D> epsilonP = new DistanceParameter<>(DBSCAN.Parameterizer.EPSILON_ID, distanceFactory);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }

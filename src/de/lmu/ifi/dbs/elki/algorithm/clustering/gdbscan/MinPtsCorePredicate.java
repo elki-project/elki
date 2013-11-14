@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -54,7 +55,7 @@ public class MinPtsCorePredicate implements CorePredicate {
   /**
    * The minpts parameter.
    */
-  int minpts;
+  protected int minpts;
 
   /**
    * Default constructor.
@@ -127,7 +128,7 @@ public class MinPtsCorePredicate implements CorePredicate {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get the minpts parameter
-      IntParameter minptsP = new IntParameter(de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN.MINPTS_ID);
+      IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID);
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }

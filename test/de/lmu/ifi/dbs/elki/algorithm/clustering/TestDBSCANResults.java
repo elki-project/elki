@@ -60,8 +60,8 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
 
     // setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.EPSILON_ID, 0.04);
-    params.addParameter(DBSCAN.MINPTS_ID, 20);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.04);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
     DBSCAN<DoubleVector, DoubleDistance> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
     testParameterizationOk(params);
 
@@ -84,8 +84,8 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.EPSILON_ID, 11.5);
-    params.addParameter(DBSCAN.MINPTS_ID, 120);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 11.5);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 120);
     DBSCAN<DoubleVector, DoubleDistance> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
     testParameterizationOk(params);
 
@@ -107,8 +107,8 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
 
     // setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.EPSILON_ID, 0.04);
-    params.addParameter(DBSCAN.MINPTS_ID, 20);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.04);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
     GeneralizedDBSCAN dbscan = ClassGenericsUtil.parameterizeOrAbort(GeneralizedDBSCAN.class, params);
     testParameterizationOk(params);
 
@@ -131,8 +131,8 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.EPSILON_ID, 11.5);
-    params.addParameter(DBSCAN.MINPTS_ID, 120);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 11.5);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 120);
     GeneralizedDBSCAN dbscan = ClassGenericsUtil.parameterizeOrAbort(GeneralizedDBSCAN.class, params);
     testParameterizationOk(params);
 
