@@ -54,18 +54,16 @@ public class PairCounting {
     long inBoth = 0, in1 = 0, in2 = 0, total = 0;
     // Process first clustering:
     {
-      for(int i1 = 0; i1 < table.size1; i1++) {
+      for (int i1 = 0; i1 < table.size1; i1++) {
         final int size = table.contingency[i1][table.size2 + 1];
-        if(table.breakNoiseClusters && table.noise1.get(i1)) {
-          if(table.selfPairing) {
+        if (table.breakNoiseClusters && table.noise1.get(i1)) {
+          if (table.selfPairing) {
             in1 += size;
           } // else: 0
-        }
-        else {
-          if(table.selfPairing) {
+        } else {
+          if (table.selfPairing) {
             in1 += size * size;
-          }
-          else {
+          } else {
             in1 += size * (size - 1);
           }
         }
@@ -73,37 +71,33 @@ public class PairCounting {
     }
     // Process second clustering:
     {
-      for(int i2 = 0; i2 < table.size2; i2++) {
+      for (int i2 = 0; i2 < table.size2; i2++) {
         final int size = table.contingency[table.size1 + 1][i2];
-        if(table.breakNoiseClusters && table.noise2.get(i2)) {
-          if(table.selfPairing) {
+        if (table.breakNoiseClusters && table.noise2.get(i2)) {
+          if (table.selfPairing) {
             in2 += size;
           } // else: 0
-        }
-        else {
-          if(table.selfPairing) {
+        } else {
+          if (table.selfPairing) {
             in2 += size * size;
-          }
-          else {
+          } else {
             in2 += size * (size - 1);
           }
         }
       }
     }
     // Process combinations
-    for(int i1 = 0; i1 < table.size1; i1++) {
-      for(int i2 = 0; i2 < table.size2; i2++) {
+    for (int i1 = 0; i1 < table.size1; i1++) {
+      for (int i2 = 0; i2 < table.size2; i2++) {
         final int size = table.contingency[i1][i2];
-        if(table.breakNoiseClusters && (table.noise1.get(i1) || table.noise2.get(i2))) {
-          if(table.selfPairing) {
+        if (table.breakNoiseClusters && (table.noise1.get(i1) || table.noise2.get(i2))) {
+          if (table.selfPairing) {
             inBoth += size;
           } // else: 0
-        }
-        else {
-          if(table.selfPairing) {
+        } else {
+          if (table.selfPairing) {
             inBoth += size * size;
-          }
-          else {
+          } else {
             inBoth += size * (size - 1);
           }
         }
@@ -111,16 +105,15 @@ public class PairCounting {
     }
     // The official sum
     int tsize = table.contingency[table.size1][table.size2];
-    if(table.contingency[table.size1][table.size2 + 1] != tsize || table.contingency[table.size1 + 1][table.size2] != tsize) {
+    if (table.contingency[table.size1][table.size2 + 1] != tsize || table.contingency[table.size1 + 1][table.size2] != tsize) {
       LoggingUtil.warning("PairCounting F-Measure is not well defined for overlapping and incomplete clusterings. The number of elements are: " + table.contingency[table.size1][table.size2 + 1] + " != " + table.contingency[table.size1 + 1][table.size2] + " elements.");
     }
-    if(tsize < 0 || tsize >= MAX_SIZE) {
+    if (tsize < 0 || tsize >= MAX_SIZE) {
       LoggingUtil.warning("Your data set size probably is too big for this implementation, which uses only long precision.");
     }
-    if(table.selfPairing) {
+    if (table.selfPairing) {
       total = tsize * tsize;
-    }
-    else {
+    } else {
       total = tsize * (tsize - 1);
     }
     long inFirst = in1 - inBoth, inSecond = in2 - inBoth;
@@ -210,7 +203,11 @@ public class PairCounting {
     final double nom = pairconfuse[0] * pairconfuse[3] - pairconfuse[1] * pairconfuse[2];
     final long d1 = (pairconfuse[0] + pairconfuse[1]) * (pairconfuse[1] + pairconfuse[3]);
     final long d2 = (pairconfuse[0] + pairconfuse[2]) * (pairconfuse[2] + pairconfuse[3]);
-    return 2 * nom / (d1 + d2);
+    if (d1 + d2 > 0) {
+      return 2 * nom / (d1 + d2);
+    } else {
+      return 1.;
+    }
   }
 
   /**
