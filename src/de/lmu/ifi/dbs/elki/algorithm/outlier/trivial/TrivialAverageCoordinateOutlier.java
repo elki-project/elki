@@ -80,13 +80,13 @@ public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierRe
       m.reset();
       NumberVector<?> nv = relation.get(iditer);
       for (int i = 0; i < nv.getDimensionality(); i++) {
-        m.put(nv.doubleValue(i + 1));
+        m.put(nv.doubleValue(i));
       }
       final double score = m.getMean();
       scores.putDouble(iditer, score);
       minmax.put(score);
     }
-    Relation<Double> scoreres = new MaterializedRelation<Double>("Trivial mean score", "mean-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<>("Trivial mean score", "mean-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     return new OutlierResult(meta, scoreres);
   }
