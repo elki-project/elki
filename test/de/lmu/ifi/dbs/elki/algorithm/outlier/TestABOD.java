@@ -55,6 +55,6 @@ public class TestABOD extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     OutlierResult result = abod.run(db);
 
     testSingleScore(result, 945, 3.7108897864090475E-4);
-    testAUC(db, "Noise", result, 0.9638148148148148);
+    testAUC(db, "Noise", result, 0.974240740407407);
   }
 }

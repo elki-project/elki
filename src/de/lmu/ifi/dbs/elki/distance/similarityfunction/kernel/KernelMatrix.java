@@ -23,16 +23,18 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -43,52 +45,143 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * 
  * @author Simon Paradies
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction
+ * @apiviz.uses SimilarityFunction
  */
 public class KernelMatrix {
   /**
    * The kernel matrix
    */
   Matrix kernel;
-  
+
+  DBIDMap idmap;
+
   /**
-   * Wraps the matrixArray in a KernelMatrix
+   * Map a DBID to its offset
    * 
-   * @param matrixArray two dimensional double array
+   * TODO: move to shared code.
+   * 
+   * @author Erich Schubert
+   * @apiviz.exclude
    */
-  public KernelMatrix(final double[][] matrixArray) {
-    kernel = new Matrix(matrixArray);
+  private static interface DBIDMap {
+    /**
+     * Get the offset of the DBID in the range.
+     * 
+     * @param id ID
+     * @return Offset
+     */
+    int getOffset(DBIDRef id);
+
+    /**
+     * Get an array iterator, for scanning.
+     * 
+     * @return Array iterator
+     */
+    DBIDArrayIter iter();
+  }
+
+  /**
+   * Map a DBID to an integer offset, DBIDRange version.
+   * 
+   * @author Erich Schubert
+   * @apiviz.exclude
+   */
+  private static class RangeMap implements DBIDMap {
+    DBIDRange range;
+
+    public RangeMap(DBIDRange range) {
+      super();
+      this.range = range;
+    }
+
+    @Override
+    public int getOffset(DBIDRef id) {
+      return range.getOffset(id);
+    }
+
+    @Override
+    public DBIDArrayIter iter() {
+      return range.iter();
+    }
+  }
+
+  /**
+   * Map a DBID to an integer offset, Version to support arbitrary DBIDs.
+   * 
+   * @author Erich Schubert
+   * @apiviz.exclude
+   */
+  private static class SortedArrayMap implements DBIDMap {
+    ArrayModifiableDBIDs ids;
+
+    public SortedArrayMap(DBIDs ids) {
+      super();
+      this.ids = DBIDUtil.newArray(ids);
+      this.ids.sort();
+    }
+
+    @Override
+    public int getOffset(DBIDRef id) {
+      return ids.binarySearch(id);
+    }
+
+    @Override
+    public DBIDArrayIter iter() {
+      return ids.iter();
+    }
   }
 
   /**
    * Provides a new kernel matrix.
    * 
    * @param kernelFunction the kernel function used to compute the kernel matrix
-   * @param database the database for which the kernel matrix is computed
-   * 
-   * @deprecated ID mapping is not reliable!
-   */
-  @Deprecated
-  public <O extends FeatureVector<?>> KernelMatrix(final PrimitiveSimilarityFunction<? super O, DoubleDistance> kernelFunction, final Relation<? extends O> database) {
-    this(kernelFunction, database, DBIDUtil.ensureArray(database.getDBIDs()));
-  }
-
-  /**
-   * Provides a new kernel matrix.
-   * 
-   * @param kernelFunction the kernel function used to compute the kernel matrix
-   * @param database the database that holds the objects
+   * @param relation the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public <O extends FeatureVector<?>> KernelMatrix(final PrimitiveSimilarityFunction<? super O, DoubleDistance> kernelFunction, final Relation<? extends O> database, final ArrayDBIDs ids) {
+  public <O, D extends NumberDistance<?, ?>> KernelMatrix(PrimitiveSimilarityFunction<? super O, D> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
+    LoggingUtil.logExpensive(Level.FINER, "Computing kernel matrix");
+    this.kernel = new Matrix(ids.size(), ids.size());
+    if(ids instanceof DBIDRange) {
+      this.idmap = new RangeMap((DBIDRange) ids);
+    }
+    else {
+      this.idmap = new SortedArrayMap(ids);
+    }
+
+    DBIDArrayIter i1 = this.idmap.iter(), i2 = this.idmap.iter();
+    for(i1.seek(0); i1.valid(); i1.advance()) {
+      O o1 = relation.get(i1);
+      for(i2.seek(i1.getOffset()); i2.valid(); i2.advance()) {
+        double value = kernelFunction.similarity(o1, relation.get(i2)).doubleValue();
+        kernel.set(i1.getOffset(), i2.getOffset(), value);
+        kernel.set(i2.getOffset(), i1.getOffset(), value);
+      }
+    }
+  }
+
+  /**
+   * Provides a new kernel matrix.
+   * 
+   * @param kernelFunction the kernel function used to compute the kernel matrix
+   * @param relation the database that holds the objects
+   * @param ids the IDs of those objects for which the kernel matrix is computed
+   */
+  public <O, D extends NumberDistance<?, ?>> KernelMatrix(SimilarityQuery<? super O, D> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
     LoggingUtil.logExpensive(Level.FINER, "Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
-    double value;
-    for(int idx = 0; idx < ids.size(); idx++) {
-      for(int idy = idx; idy < ids.size(); idy++) {
-        value = kernelFunction.similarity(database.get(ids.get(idx)), database.get(ids.get(idy))).doubleValue();
-        kernel.set(idx, idy, value);
-        kernel.set(idy, idx, value);
+    if(ids instanceof DBIDRange) {
+      this.idmap = new RangeMap((DBIDRange) ids);
+    }
+    else {
+      this.idmap = new SortedArrayMap(ids);
+    }
+    DBIDArrayIter i1 = idmap.iter(), i2 = idmap.iter();
+    for(i1.seek(0); i1.valid(); i1.advance()) {
+      O o1 = relation.get(i1);
+      for(i2.seek(i1.getOffset()); i2.valid(); i2.advance()) {
+        double value = kernelFunction.similarity(o1, i2).doubleValue();
+        kernel.set(i1.getOffset(), i2.getOffset(), value);
+        kernel.set(i2.getOffset(), i1.getOffset(), value);
       }
     }
   }
@@ -109,8 +202,7 @@ public class KernelMatrix {
    * @param o2 second ObjectID
    * @return the distance between the two objects
    */
-  // FIXME: really use objectids!
-  public double getDistance(final int o1, final int o2) {
+  public double getDistance(final DBIDRef o1, final DBIDRef o2) {
     return Math.sqrt(getSquaredDistance(o1, o2));
   }
 
@@ -124,25 +216,16 @@ public class KernelMatrix {
   }
 
   /**
-   * Returns the kernel value of object o1 and object o2
-   * 
-   * @param o1 ID of first object
-   * @param o2 ID of second object
-   * @return the kernel value of object o1 and object o2
-   */
-  public double getSimilarity(final int o1, final int o2) {
-    return kernel.get(o1 - 1, o2 - 1); // correct index shifts.
-  }
-
-  /**
    * Returns the squared kernel distance between the two specified objects.
    * 
-   * @param o1 first ObjectID
-   * @param o2 second ObjectID
+   * @param id1 first ObjectID
+   * @param id2 second ObjectID
    * @return the distance between the two objects
    */
-  public double getSquaredDistance(final int o1, final int o2) {
-    return getSimilarity(o1, o1) + getSimilarity(o2, o2) - 2 * getSimilarity(o1, o2);
+  public double getSquaredDistance(final DBIDRef id1, final DBIDRef id2) {
+    final int o1 = idmap.getOffset(id1), o2 = idmap.getOffset(id2);
+    // FIXME: isn't this implicit to Euclidean kernels?
+    return kernel.get(o1, o1) + kernel.get(o2, o2) - 2 * kernel.get(o1, o2);
   }
 
   /**
@@ -152,12 +235,14 @@ public class KernelMatrix {
    * @param ids the objects
    * @return the ith kernel matrix column for all objects in ids
    */
-  public Matrix getSubColumn(final int i, final List<Integer> ids) {
+  @Deprecated
+  public Matrix getSubColumn(final DBIDRef i1, final DBIDs ids) {
     final int[] ID = new int[1];
-    ID[0] = i - 1; // correct index shift
+    ID[0] = idmap.getOffset(i1);
     final int[] IDs = new int[ids.size()];
-    for(int x = 0; x < IDs.length; x++) {
-      IDs[x] = ids.get(x) - 1; // correct index shift
+    int i = 0;
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance(), i++) {
+      IDs[i] = idmap.getOffset(it);
     }
     return kernel.getMatrix(IDs, ID);
   }
@@ -168,17 +253,17 @@ public class KernelMatrix {
    * @param ids the objects
    * @return a sub kernel matrix for all objects in ids.
    */
-  public Matrix getSubMatrix(final Collection<Integer> ids) {
+  public Matrix getSubMatrix(DBIDs ids) {
     final int[] IDs = new int[ids.size()];
     int i = 0;
-    for(Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
-      IDs[i] = it.next() - 1; // correct index shift
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance(), i++) {
+      IDs[i] = idmap.getOffset(it);
     }
     return kernel.getMatrix(IDs, IDs);
   }
 
   /**
-   * Centers the matrix in feature space according to Smola et. Schoelkopf,
+   * Centers the matrix in feature space according to Smola et Schoelkopf,
    * Learning with Kernels p. 431 Alters the input matrix. If you still need the
    * original matrix, use
    * <code>centeredMatrix = centerKernelMatrix(uncenteredMatrix.copy()) {</code>
@@ -187,6 +272,7 @@ public class KernelMatrix {
    * @return centered matrix (for convenience)
    */
   public static Matrix centerMatrix(final Matrix matrix) {
+    // FIXME: implement more efficiently. Maybe in matrix class itself?
     final Matrix normalizingMatrix = new Matrix(matrix.getRowDimensionality(), matrix.getColumnDimensionality(), 1.0 / matrix.getColumnDimensionality());
     return matrix.minusEquals(normalizingMatrix.times(matrix)).minusEquals(matrix.times(normalizingMatrix)).plusEquals(normalizingMatrix.times(matrix).times(normalizingMatrix));
   }
@@ -207,5 +293,16 @@ public class KernelMatrix {
    */
   public static Matrix centerKernelMatrix(final KernelMatrix kernelMatrix) {
     return centerMatrix(kernelMatrix.getKernel());
+  }
+
+  /**
+   * Get the kernel similarity for the given objects.
+   * 
+   * @param id1 First object
+   * @param id2 Second object
+   * @return Similarity.
+   */
+  public double getSimilarity(DBIDRef id1, DBIDRef id2) {
+    return kernel.get(idmap.getOffset(id1), idmap.getOffset(id2));
   }
 }

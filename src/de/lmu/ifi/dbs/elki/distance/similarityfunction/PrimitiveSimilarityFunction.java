@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> object type
  * @param <D> distance type
  */
-public interface PrimitiveSimilarityFunction<O, D extends Distance<D>> extends SimilarityFunction<O, D> {
+public interface PrimitiveSimilarityFunction<O, D extends Distance<?>> extends SimilarityFunction<O, D> {
   /**
    * Computes the similarity between two given DatabaseObjects according to this
    * similarity function.
