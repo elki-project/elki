@@ -29,11 +29,12 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -41,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -60,6 +62,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -94,31 +97,6 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(ABOD.class);
-
-  /**
-   * Parameter for k, the number of neighbors used in kNN queries.
-   */
-  public static final OptionID K_ID = new OptionID("abod.k", "Parameter k for kNN queries.");
-
-  /**
-   * Parameter for sample size to be used in fast mode.
-   */
-  public static final OptionID FAST_SAMPLE_ID = new OptionID("abod.samplesize", "Sample size to enable fast mode.");
-
-  /**
-   * Parameter for the kernel function.
-   */
-  public static final OptionID KERNEL_FUNCTION_ID = new OptionID("abod.kernelfunction", "Kernel function to use.");
-
-  /**
-   * The preprocessor used to materialize the kNN neighborhoods.
-   */
-  public static final OptionID PREPROCESSOR_ID = new OptionID("abod.knnquery", "Processor to compute the kNN neighborhoods.");
-
-  /**
-   * use alternate code below.
-   */
-  private static final boolean USE_RND_SAMPLE = false;
 
   /**
    * k parameter.
@@ -167,51 +145,62 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   /**
    * Main part of the algorithm. Exact version.
    * 
+   * @param db Database
    * @param relation Relation to query
    * @return result
    */
-  public OutlierResult getRanking(Relation<V> relation) {
+  public OutlierResult getRanking(Database db, Relation<V> relation) {
     // Fix a static set of IDs
     DBIDs ids = relation.getDBIDs();
-    SimilarityQuery<V, DoubleDistance> sq = relation.getDatabase().getSimilarityQuery(relation, kernelFunction);
+    SimilarityQuery<V, DoubleDistance> sq = db.getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
-    ComparableMaxHeap<DoubleDBIDPair> pq = new ComparableMaxHeap<>(relation.size());
 
-    // preprocess kNN neighborhoods
-    KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
+    // Get kNN Query
+    DistanceQuery<V, DoubleDistance> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<V, DoubleDistance> knnQuery = db.getKNNQuery(dq, k);
+
+    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
+    DoubleMinMax minmaxabod = new DoubleMinMax();
 
     MeanVariance s = new MeanVariance();
-    for(DBIDIter objKey = relation.iterDBIDs(); objKey.valid(); objKey.advance()) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       s.reset();
+      // Length of vector.
+      double dAA = kernelMatrix.getSquaredDistance(it, it);
 
-      KNNList<DoubleDistance> neighbors = knnQuery.getKNNForDBID(objKey, k);
-      for(DBIDIter key1 = neighbors.iter(); key1.valid(); key1.advance()) {
-        for(DBIDIter key2 = neighbors.iter(); key2.valid(); key2.advance()) {
-          if(DBIDUtil.equal(key2, key1) || DBIDUtil.equal(key1, objKey) || DBIDUtil.equal(key2, objKey)) {
+      KNNList<DoubleDistance> neighbors = knnQuery.getKNNForDBID(it, k);
+      DBIDArrayIter n1 = neighbors.iter(), n2 = neighbors.iter();
+      for(; n1.valid(); n1.advance()) {
+        if(DBIDUtil.equal(n1, it)) {
+          continue;
+        }
+        double dAB = kernelMatrix.getSquaredDistance(it, n1);
+        if(!(dAB > 0.)) {
+          continue;
+        }
+        for(n2.seek(n1.getOffset() + 1); n2.valid(); n2.advance()) {
+          if(DBIDUtil.equal(n2, it)) {
             continue;
           }
-          double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);
-
-          if(nenner != 0) {
-            double sqrtnenner = Math.sqrt(nenner);
-            double tmp = calcNumerator(kernelMatrix, objKey, key1, key2) / nenner;
-            s.put(tmp, 1 / sqrtnenner);
+          double dAC = kernelMatrix.getSquaredDistance(it, n2);
+          if(dAC > 0.) {
+            // Exploit bilinearity:
+            // <B-A, C-A> = <B, C-A> - <A,C-A>
+            // = <B,C> - <B,A> - <A,C> + <A,A>
+            double numerator = kernelMatrix.getSimilarity(n1, n2) - dAB - dAC + dAA;
+            double val = numerator / (dAB * dAC);
+            double weight = 1. / Math.sqrt(dAB * dAC);
+            s.put(val, weight);
           }
-
         }
       }
-      // Sample variance probably would be correct, however the numerical
-      // instabilities can actually break ABOD here.
-      pq.add(DBIDUtil.newPair(s.getNaiveVariance(), objKey));
+      // Sample variance probably would be correct, but the ABOD publication
+      // uses the naive variance.
+      double abof = s.getNaiveVariance();
+      minmaxabod.put(abof);
+      abodvalues.putDouble(it, abof);
     }
 
-    DoubleMinMax minmaxabod = new DoubleMinMax();
-    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    while(!pq.isEmpty()) {
-      DoubleDBIDPair pair = pq.poll();
-      abodvalues.putDouble(pair, pair.doubleValue());
-      minmaxabod.put(pair.doubleValue());
-    }
     // Build result representation.
     Relation<Double> scoreResult = new MaterializedRelation<>("Angle-based Outlier Degree", "abod-outlier", TypeUtil.DOUBLE, abodvalues, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
@@ -221,79 +210,91 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   /**
    * Main part of the algorithm. Fast version.
    * 
+   * @param db Database
    * @param relation Relation to use
    * @return result
    */
-  public OutlierResult getFastRanking(Relation<V> relation) {
+  public OutlierResult getFastRanking(Database db, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
     SimilarityQuery<V, DoubleDistance> sq = relation.getDatabase().getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
+    // Output storage.
+    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
+    DoubleMinMax minmaxabod = new DoubleMinMax();
+
     ComparableMaxHeap<DoubleDBIDPair> pq = new ComparableMaxHeap<>(relation.size());
     // get Candidate Ranking
-    for(DBIDIter aKey = relation.iterDBIDs(); aKey.valid(); aKey.advance()) {
-      WritableDoubleDataStore dists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
-      // determine kNearestNeighbors and pairwise distances
-      ComparableMinHeap<DoubleDBIDPair> nn;
-      if(!USE_RND_SAMPLE) {
-        nn = calcDistsandNN(relation, kernelMatrix, sampleSize, aKey, dists);
-      }
-      else {
-        // alternative:
-        nn = calcDistsandRNDSample(relation, kernelMatrix, sampleSize, aKey, dists);
-      }
+    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      // Storage for squared distances
+      WritableDoubleDataStore sqDists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
+      // Compute distances and nearest neighbors
+      ComparableMinHeap<DoubleDBIDPair> nn = calcDistsandNN(relation, kernelMatrix, sampleSize, it, sqDists);
 
       // get normalization
-      double[] counter = calcFastNormalization(aKey, dists, ids);
+      double[] counter = calcFastNormalization(it, sqDists, ids);
       // umsetzen von Pq zu list
       ModifiableDBIDs neighbors = DBIDUtil.newArray(nn.size());
       while(!nn.isEmpty()) {
         neighbors.add(nn.poll());
       }
       // getFilter
-      double var = getAbofFilter(kernelMatrix, aKey, dists, counter[1], counter[0], neighbors);
-      pq.add(DBIDUtil.newPair(var, aKey));
+      double var = getAbofFilter(kernelMatrix, it, sqDists, counter[1], counter[0], neighbors);
+      pq.add(DBIDUtil.newPair(var, it));
     }
     // refine Candidates
-    ComparableMinHeap<DoubleDBIDPair> resqueue = new ComparableMinHeap<>(k);
+    DoubleMinHeap topscores = new DoubleMinHeap(k);
     MeanVariance s = new MeanVariance();
     while(!pq.isEmpty()) {
-      if(resqueue.size() == k && pq.peek().doubleValue() > resqueue.peek().doubleValue()) {
+      // Stop refining
+      if(topscores.size() >= k && pq.peek().doubleValue() > topscores.peek()) {
         break;
       }
       // double approx = pq.peek().getFirst();
-      DBIDRef aKey = pq.poll();
+      DBIDRef pA = pq.poll();
       s.reset();
-      for(DBIDIter bKey = relation.iterDBIDs(); bKey.valid(); bKey.advance()) {
-        if(DBIDUtil.equal(bKey, aKey)) {
+      double dAA = kernelMatrix.getSquaredDistance(pA, pA);
+      for(DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
+        if(DBIDUtil.equal(nB, pA)) {
           continue;
         }
-        for(DBIDIter cKey = relation.iterDBIDs(); cKey.valid(); cKey.advance()) {
-          if(DBIDUtil.equal(cKey, aKey)) {
+        double dAB = kernelMatrix.getSquaredDistance(pA, nB);
+        if(!(dAB > 0.)) {
+          continue;
+        }
+        for(DBIDIter nC = relation.iterDBIDs(); nC.valid(); nC.advance()) {
+          if(DBIDUtil.equal(nC, pA) || DBIDUtil.compare(nC, nB) < 0) {
             continue;
           }
-          // double nenner = dists[y]*dists[z];
-          double nenner = calcDenominator(kernelMatrix, aKey, bKey, cKey);
-          if(nenner != 0) {
-            double tmp = calcNumerator(kernelMatrix, aKey, bKey, cKey) / nenner;
-            double sqrtNenner = Math.sqrt(nenner);
-            s.put(tmp, 1 / sqrtNenner);
+          double dAC = kernelMatrix.getSquaredDistance(pA, nC);
+          if(dAC > 0.) {
+            // Exploit bilinearity:
+            // <B-A, C-A> = <B, C-A> - <A,C-A>
+            // = <B,C> - <B,A> - <A,C> + <A,A>
+            double numerator = kernelMatrix.getSimilarity(nB, nC) - dAB - dAC + dAA;
+            double val = numerator / (dAB * dAC);
+            double weight = 1. / Math.sqrt(dAB * dAC);
+            s.put(val, weight);
           }
         }
       }
-      double var = s.getSampleVariance();
-      if(resqueue.size() < k) {
-        resqueue.add(DBIDUtil.newPair(var, aKey));
+      // Sample variance probably would be correct, but the ABOD publication
+      // uses the naive variance.
+      double var = s.getNaiveVariance();
+      // Store refined score:
+      abodvalues.putDouble(pA, var);
+      minmaxabod.put(var);
+      // Update the heap tracking the top scores.
+      if(topscores.size() < k) {
+        topscores.add(var);
       }
       else {
-        if(resqueue.peek().doubleValue() > var) {
-          resqueue.replaceTopElement(DBIDUtil.newPair(var, aKey));
+        if(topscores.peek() > var) {
+          topscores.replaceTopElement(var);
         }
       }
-
     }
-    DoubleMinMax minmaxabod = new DoubleMinMax();
-    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
+    // Poll remaining candidates to transfer scores into output
     while(!pq.isEmpty()) {
       DoubleDBIDPair pair = pq.poll();
       abodvalues.putDouble(pair, pair.doubleValue());
@@ -305,36 +306,39 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  private double[] calcFastNormalization(DBIDRef x, WritableDoubleDataStore dists, DBIDs ids) {
+  private double[] calcFastNormalization(DBIDRef x, WritableDoubleDataStore sqdists, DBIDs ids) {
     double[] result = new double[2];
 
     double sum = 0;
     double sumF = 0;
     for(DBIDIter yKey = ids.iter(); yKey.valid(); yKey.advance()) {
-      if(dists.doubleValue(yKey) != 0) {
-        double tmp = 1 / Math.sqrt(dists.doubleValue(yKey));
+      double sqdist = sqdists.doubleValue(yKey);
+      if(sqdist > 0) {
+        double tmp = 1 / Math.sqrt(sqdist);
         sum += tmp;
-        sumF += (1 / dists.doubleValue(yKey)) * tmp;
+        sumF += (1 / sqdist) * tmp;
       }
     }
     double sofar = 0;
     double sofarF = 0;
     for(DBIDIter zKey = ids.iter(); zKey.valid(); zKey.advance()) {
-      if(dists.doubleValue(zKey) != 0) {
-        double tmp = 1 / Math.sqrt(dists.doubleValue(zKey));
+      double sqdist = sqdists.doubleValue(zKey);
+      if(sqdist > 0) {
+        double tmp = 1 / Math.sqrt(sqdist);
         sofar += tmp;
         double rest = sum - sofar;
         result[0] += tmp * rest;
 
-        sofarF += (1 / dists.doubleValue(zKey)) * tmp;
+        sofarF += (1 / sqdist) * tmp;
         double restF = sumF - sofarF;
-        result[1] += (1 / dists.doubleValue(zKey)) * tmp * restF;
+        result[1] += (1 / sqdist) * tmp * restF;
       }
     }
     return result;
   }
 
-  private double getAbofFilter(KernelMatrix kernelMatrix, DBIDRef aKey, WritableDoubleDataStore dists, double fulCounter, double counter, DBIDs neighbors) {
+  private double getAbofFilter(KernelMatrix kernelMatrix, DBIDRef aKey, WritableDoubleDataStore dists, double fulCounter, double norm, DBIDs neighbors) {
+    double dAA = kernelMatrix.getSimilarity(aKey, aKey);
     double sum = 0.0;
     double sqrSum = 0.0;
     double partCounter = 0;
@@ -342,75 +346,60 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       if(DBIDUtil.equal(bKey, aKey)) {
         continue;
       }
+      double dAB = dists.doubleValue(bKey);
+      if(!(dAB > 0.)) {
+        continue;
+      }
       for(DBIDIter cKey = neighbors.iter(); cKey.valid(); cKey.advance()) {
-        if(DBIDUtil.equal(cKey, aKey)) {
+        if(DBIDUtil.equal(cKey, aKey) || DBIDUtil.compare(bKey, cKey) < 0) {
           continue;
         }
-        if(DBIDUtil.compare(bKey, cKey) > 0) {
-          double nenner = dists.doubleValue(bKey) * dists.doubleValue(cKey);
-          if(nenner != 0) {
-            double tmp = calcNumerator(kernelMatrix, aKey, bKey, cKey) / nenner;
-            double sqrtNenner = Math.sqrt(nenner);
-            sum += tmp * (1 / sqrtNenner);
-            sqrSum += tmp * tmp * (1 / sqrtNenner);
-            partCounter += (1 / (sqrtNenner * nenner));
-          }
+        double dAC = dists.doubleValue(cKey);
+        if(dAC > 0.) {
+          continue;
         }
+        double div = dAB * dAC;
+        double val = (dAA + kernelMatrix.getSimilarity(bKey, cKey) - dAC - dAB) / div;
+        double sqrtNenner = Math.sqrt(div);
+        sum += val * (1 / sqrtNenner);
+        sqrSum += val * val * (1 / sqrtNenner);
+        partCounter += (1 / (sqrtNenner * div));
       }
     }
     // TODO: Document the meaning / use of fulCounter, partCounter.
-    double mu = (sum + (fulCounter - partCounter)) / counter;
-    return (sqrSum / counter) - (mu * mu);
-  }
-
-  /**
-   * Compute the cosinus value between vectors aKey and bKey.
-   * 
-   * @param kernelMatrix
-   * @param aKey
-   * @param bKey
-   * @return cosinus value
-   */
-  private double calcCos(KernelMatrix kernelMatrix, DBIDRef aKey, DBIDRef bKey) {
-    return kernelMatrix.getSimilarity(aKey, aKey) + kernelMatrix.getSimilarity(bKey, bKey) - 2 * kernelMatrix.getSimilarity(aKey, bKey);
-  }
-
-  private double calcDenominator(KernelMatrix kernelMatrix, DBIDRef aKey, DBIDRef bKey, DBIDRef cKey) {
-    return calcCos(kernelMatrix, aKey, bKey) * calcCos(kernelMatrix, aKey, cKey);
+    double mu = (sum + (fulCounter - partCounter)) / norm;
+    return (sqrSum / norm) - (mu * mu);
   }
 
   private double calcNumerator(KernelMatrix kernelMatrix, DBIDRef aKey, DBIDRef bKey, DBIDRef cKey) {
     return (kernelMatrix.getSimilarity(aKey, aKey) + kernelMatrix.getSimilarity(bKey, cKey) - kernelMatrix.getSimilarity(aKey, cKey) - kernelMatrix.getSimilarity(aKey, bKey));
   }
 
+  /**
+   * Compute distances to A and find the k nearest neighbors.
+   * 
+   * @param data Data relation
+   * @param kernelMatrix Kernel matrix
+   * @param sampleSize Sample size
+   * @param aKey Query object
+   * @param dists Distance output array
+   * @return Heap of the nearest neighbors.
+   */
   private ComparableMinHeap<DoubleDBIDPair> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBIDRef aKey, WritableDoubleDataStore dists) {
+    double asim = kernelMatrix.getSimilarity(aKey, aKey);
     ComparableMinHeap<DoubleDBIDPair> nn = new ComparableMinHeap<>(sampleSize);
     for(DBIDIter bKey = data.iterDBIDs(); bKey.valid(); bKey.advance()) {
-      double val = calcCos(kernelMatrix, aKey, bKey);
-      dists.putDouble(bKey, val);
+      double sqDist = asim + kernelMatrix.getSimilarity(bKey, bKey) - kernelMatrix.getSimilarity(aKey, bKey);
+      dists.putDouble(bKey, sqDist);
+      // Update heap
       if(nn.size() < sampleSize) {
-        nn.add(DBIDUtil.newPair(val, bKey));
+        nn.add(DBIDUtil.newPair(sqDist, bKey));
       }
       else {
-        if(val < nn.peek().doubleValue()) {
-          nn.replaceTopElement(DBIDUtil.newPair(val, bKey));
+        if(sqDist < nn.peek().doubleValue()) {
+          nn.replaceTopElement(DBIDUtil.newPair(sqDist, bKey));
         }
       }
-    }
-    return nn;
-  }
-
-  private ComparableMinHeap<DoubleDBIDPair> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBIDRef aKey, WritableDoubleDataStore dists) {
-    ComparableMinHeap<DoubleDBIDPair> nn = new ComparableMinHeap<>(sampleSize);
-    int step = (int) ((double) data.size() / (double) sampleSize);
-    int counter = 0;
-    for(DBIDIter bKey = data.iterDBIDs(); bKey.valid(); bKey.advance()) {
-      double val = calcCos(kernelMatrix, aKey, bKey);
-      dists.putDouble(bKey, val);
-      if(counter % step == 0) {
-        nn.add(DBIDUtil.newPair(val, bKey));
-      }
-      counter++;
     }
     return nn;
   }
@@ -446,7 +435,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
           if(DBIDUtil.equal(key2, key1) || DBIDUtil.equal(objKey, key2)) {
             continue;
           }
-          double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);
+          double nenner = kernelMatrix.getSquaredDistance(objKey, key1) * kernelMatrix.getSquaredDistance(objKey, key2);
           if(nenner != 0) {
             double tmp = calcNumerator(kernelMatrix, objKey, key1, key2) / nenner;
             double sqr = Math.sqrt(nenner);
@@ -471,7 +460,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
           if(DBIDUtil.equal(exp, objKey) || DBIDUtil.equal(nextKey, exp)) {
             continue;
           }
-          double nenner = Math.sqrt(calcCos(kernelMatrix, objKey, nextKey)) * Math.sqrt(calcCos(kernelMatrix, objKey, exp));
+          double nenner = Math.sqrt(kernelMatrix.getSquaredDistance(objKey, nextKey)) * Math.sqrt(kernelMatrix.getSquaredDistance(objKey, exp));
           double angle = calcNumerator(kernelMatrix, objKey, nextKey, exp) / nenner;
           max = Math.max(angle, max);
         }
@@ -517,12 +506,12 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
    * @param relation Relation to process
    * @return Outlier detection result
    */
-  public OutlierResult run(Relation<V> relation) {
+  public OutlierResult run(Database db, Relation<V> relation) {
     if(sampleSize > 0) {
-      return getFastRanking(relation);
+      return getFastRanking(db, relation);
     }
     else {
-      return getRanking(relation);
+      return getRanking(db, relation);
     }
   }
 
@@ -544,6 +533,26 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, DoubleDistance> {
+    /**
+     * Parameter for k, the number of neighbors used in kNN queries.
+     */
+    public static final OptionID K_ID = new OptionID("abod.k", "Parameter k for kNN queries.");
+
+    /**
+     * Parameter for sample size to be used in fast mode.
+     */
+    public static final OptionID FAST_SAMPLE_ID = new OptionID("abod.samplesize", "Sample size to enable fast mode.");
+
+    /**
+     * Parameter for the kernel function.
+     */
+    public static final OptionID KERNEL_FUNCTION_ID = new OptionID("abod.kernelfunction", "Kernel function to use.");
+
+    /**
+     * The preprocessor used to materialize the kNN neighborhoods.
+     */
+    public static final OptionID PREPROCESSOR_ID = new OptionID("abod.knnquery", "Processor to compute the kNN neighborhoods.");
+
     /**
      * k Parameter.
      */
