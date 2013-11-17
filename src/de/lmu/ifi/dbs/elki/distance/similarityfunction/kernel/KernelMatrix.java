@@ -224,7 +224,6 @@ public class KernelMatrix {
    */
   public double getSquaredDistance(final DBIDRef id1, final DBIDRef id2) {
     final int o1 = idmap.getOffset(id1), o2 = idmap.getOffset(id2);
-    // FIXME: isn't this implicit to Euclidean kernels?
     return kernel.get(o1, o1) + kernel.get(o2, o2) - 2 * kernel.get(o1, o2);
   }
 

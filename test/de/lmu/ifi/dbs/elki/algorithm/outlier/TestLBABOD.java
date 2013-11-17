@@ -33,28 +33,30 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the ABOD algorithm.
+ * Tests the LB-ABOD algorithm.
  * 
  * Note: we don't implement JUnit4Test, as this test is slow.
  * 
  * @author Lucia Cichella
  */
-public class TestABOD extends AbstractSimpleAlgorithmTest {
+public class TestLBABOD extends AbstractSimpleAlgorithmTest {
   @Test
-  public void testABOD() {
+  public void testLBABOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
+    params.addParameter(FastABOD.Parameterizer.K_ID, 150);
+    params.addParameter(LBABOD.Parameterizer.L_ID, 10);
 
     // setup Algorithm
-    ABOD<DoubleVector> abod = ClassGenericsUtil.parameterizeOrAbort(ABOD.class, params);
+    LBABOD<DoubleVector> abod = ClassGenericsUtil.parameterizeOrAbort(LBABOD.class, params);
     testParameterizationOk(params);
 
     // run ABOD on database
     OutlierResult result = abod.run(db);
 
-    testAUC(db, "Noise", result, 0.94887037037037);
+    testAUC(db, "Noise", result, 0.928999999999);
     testSingleScore(result, 945, 1.88108120738508E-4);
   }
 }
