@@ -39,6 +39,7 @@ import javax.swing.SwingUtilities;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -159,6 +160,10 @@ public class LogPanel extends JPanel {
         pbar.setIndeterminate(true);
         pbar.setStringPainted(true);
       }
+      else if(prog instanceof MutableProgress) {
+        pbar = new JProgressBar(0, ((MutableProgress) prog).getTotal());
+        pbar.setStringPainted(true);
+      }
       else {
         throw new RuntimeException("Unsupported progress record");
       }
@@ -188,6 +193,11 @@ public class LogPanel extends JPanel {
     else if(prog instanceof IndefiniteProgress) {
       pbar.setValue(((IndefiniteProgress) prog).getProcessed());
       pbar.setString(((IndefiniteProgress) prog).toString());
+    }
+    else if(prog instanceof MutableProgress) {
+      pbar.setValue(((MutableProgress) prog).getProcessed());
+      pbar.setMaximum(((MutableProgress) prog).getProcessed());
+      pbar.setString(((MutableProgress) prog).toString());
     }
     else {
       throw new RuntimeException("Unsupported progress record");
