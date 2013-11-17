@@ -33,30 +33,29 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Sigmoid kernel function (aka: hyperbolic tangent kernel, multilayer perceptron MLP kernel).
+ * Provides the laplace / exponential radial basis function kernel.
  * 
  * @author Erich Schubert
  */
-public class SigmoidKernelFunction implements PrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> {
+public class LaplaceKernelFunction implements PrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> {
   /**
-   * Scaling factor c, bias theta
+   * Scaling factor mgamma. (= - 1/sigma)
    */
-  private final double c, theta;
+  private final double mgamma;
 
   /**
    * Constructor.
    * 
-   * @param c Scaling factor c.
-   * @param theta Bias parameter theta.
+   * @param sigma Scaling parameter sigma (as in laplace kernel)
    */
-  public SigmoidKernelFunction(double c, double theta) {
+  public LaplaceKernelFunction(double sigma) {
     super();
-    this.c = c;
-    this.theta = theta;
+    this.mgamma = -.5 / (sigma * sigma);
   }
 
   /**
@@ -68,16 +67,16 @@ public class SigmoidKernelFunction implements PrimitiveSimilarityFunction<Number
    *         instance of {@link DoubleDistance DoubleDistance}.
    */
   public double doubleSimilarity(NumberVector<?> o1, NumberVector<?> o2) {
-    if (o1.getDimensionality() != o2.getDimensionality()) {
+    if(o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of Feature-Vectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }
 
     double sim = 0;
-    for (int i = 0; i < o1.getDimensionality(); i++) {
-      final double v = o1.doubleValue(i) * o2.doubleValue(i);
-      sim += v;
+    for(int i = 0; i < o1.getDimensionality(); i++) {
+      final double v = o1.doubleValue(i) - o2.doubleValue(i);
+      sim += v * v;
     }
-    return Math.tanh(c * sim + theta);
+    return Math.exp(mgamma * Math.sqrt(sim));
   }
 
   @Override
@@ -114,36 +113,28 @@ public class SigmoidKernelFunction implements PrimitiveSimilarityFunction<Number
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * C parameter: scaling
+     * Sigma parameter: standard deviation.
      */
-    public static final OptionID C_ID = new OptionID("kernel.sigmoid.c", "Sigmoid c parameter (scaling).");
+    public static final OptionID SIGMA_ID = new OptionID("kernel.laplace.sigma", "Standard deviation of the laplace RBF kernel.");
 
     /**
-     * Theta parameter: bias
+     * Sigma parameter
      */
-    public static final OptionID THETA_ID = new OptionID("kernel.sigmoid.theta", "Sigmoid theta parameter (bias).");
-
-    /**
-     * C parameter, theta parameter
-     */
-    protected double c = 1., theta = 0.;
+    protected double sigma = 1.;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter cP = new DoubleParameter(C_ID, 1.);
-      if (config.grab(cP)) {
-        c = cP.doubleValue();
-      }
-      final DoubleParameter thetaP = new DoubleParameter(THETA_ID, 0.);
-      if (config.grab(thetaP)) {
-        theta = thetaP.doubleValue();
+      final DoubleParameter sigmaP = new DoubleParameter(SIGMA_ID, 1.);
+      sigmaP.addConstraint(new GreaterConstraint(0.));
+      if(config.grab(sigmaP)) {
+        sigma = sigmaP.doubleValue();
       }
     }
 
     @Override
-    protected SigmoidKernelFunction makeInstance() {
-      return new SigmoidKernelFunction(c, theta);
+    protected LaplaceKernelFunction makeInstance() {
+      return new LaplaceKernelFunction(sigma);
     }
   }
 }
