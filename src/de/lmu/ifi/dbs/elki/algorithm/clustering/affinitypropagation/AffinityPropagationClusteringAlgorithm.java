@@ -178,7 +178,6 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
       if(aprog != null) {
         aprog.setProcessed(size - changed, LOG);
       }
-      maxiter -= 1;
     }
     if(aprog != null) {
       aprog.setProcessed(aprog.getTotal(), LOG);
