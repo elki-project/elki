@@ -5,3 +5,5 @@ de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.SigmoidKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.InvertedDistanceSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski1SimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski2SimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LaplaceKernelFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.RationalQuadraticKernelFunction
