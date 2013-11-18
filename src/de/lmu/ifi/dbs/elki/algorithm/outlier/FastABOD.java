@@ -111,45 +111,44 @@ public class FastABOD<V extends NumberVector<?>> extends ABOD<V> {
     DoubleMinMax minmaxabod = new DoubleMinMax();
 
     MeanVariance s = new MeanVariance();
-    for(DBIDIter pA = ids.iter(); pA.valid(); pA.advance()) {
+    for (DBIDIter pA = ids.iter(); pA.valid(); pA.advance()) {
       s.reset();
       final double simAA = kernelMatrix.getSimilarity(pA, pA);
 
       // Choose the k-min nearest
-      ComparableMaxHeap<DoubleDBIDPair> nn = new ComparableMaxHeap<DoubleDBIDPair>(k);
-      for(DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
-        if(DBIDUtil.equal(nB, pA)) {
+      ComparableMaxHeap<DoubleDBIDPair> nn = new ComparableMaxHeap<>(k);
+      for (DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
+        if (DBIDUtil.equal(nB, pA)) {
           continue;
         }
         double simBB = kernelMatrix.getSimilarity(nB, nB);
         double simAB = kernelMatrix.getSimilarity(pA, nB);
         double sqdAB = simAA + simBB - simAB - simAB;
-        if(!(sqdAB > 0.)) {
+        if (!(sqdAB > 0.)) {
           continue;
         }
-        if(nn.size() < k) {
+        if (nn.size() < k) {
           nn.add(DBIDUtil.newPair(sqdAB, nB));
-        }
-        else if(sqdAB < nn.peek().doubleValue()) {
+        } else if (sqdAB < nn.peek().doubleValue()) {
           nn.replaceTopElement(DBIDUtil.newPair(sqdAB, nB));
         }
       }
 
-      for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iB = nn.unsortedIter(); iB.valid(); iB.advance()) {
+      for (ObjectHeap.UnsortedIter<DoubleDBIDPair> iB = nn.unsortedIter(); iB.valid(); iB.advance()) {
         DoubleDBIDPair nB = iB.get();
         double sqdAB = nB.doubleValue();
         double simAB = kernelMatrix.getSimilarity(pA, nB);
-        if(!(sqdAB > 0.)) {
+        if (!(sqdAB > 0.)) {
           continue;
         }
-        for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iC = nn.unsortedIter(); iC.valid(); iC.advance()) {
+        for (ObjectHeap.UnsortedIter<DoubleDBIDPair> iC = nn.unsortedIter(); iC.valid(); iC.advance()) {
           DoubleDBIDPair nC = iC.get();
-          if(DBIDUtil.compare(nC, nB) < 0) {
+          if (DBIDUtil.compare(nC, nB) < 0) {
             continue;
           }
           double sqdAC = nC.doubleValue();
           double simAC = kernelMatrix.getSimilarity(pA, nC);
-          if(!(sqdAC > 0.)) {
+          if (!(sqdAC > 0.)) {
             continue;
           }
           // Exploit bilinearity of scalar product:
@@ -207,7 +206,7 @@ public class FastABOD<V extends NumberVector<?>> extends ABOD<V> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID);
-      if(config.grab(kP)) {
+      if (config.grab(kP)) {
         k = kP.intValue();
       }
     }

@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * Outlier detection using variance analysis on angles, especially for high
  * dimensional data sets. Exact version, which has cubic runtime (see also
- * {@link FastABOD} for a faster version).
+ * {@link FastABOD} and {@link LBABOD} for faster versions).
  * 
  * H.-P. Kriegel, M. Schubert, and A. Zimek: Angle-Based Outlier Detection in
  * High-dimensional Data. In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge
@@ -113,7 +113,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     DoubleMinMax minmaxabod = new DoubleMinMax();
 
     MeanVariance s = new MeanVariance();
-    for(DBIDIter pA = ids.iter(); pA.valid(); pA.advance()) {
+    for (DBIDIter pA = ids.iter(); pA.valid(); pA.advance()) {
       final double abof = computeABOF(relation, kernelMatrix, pA, s);
       minmaxabod.put(abof);
       abodvalues.putDouble(pA, abof);
@@ -138,24 +138,24 @@ public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     s.reset(); // Reused
     double simAA = kernelMatrix.getSimilarity(pA, pA);
 
-    for(DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
-      if(DBIDUtil.equal(nB, pA)) {
+    for (DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
+      if (DBIDUtil.equal(nB, pA)) {
         continue;
       }
       double simBB = kernelMatrix.getSimilarity(nB, nB);
       double simAB = kernelMatrix.getSimilarity(pA, nB);
       double sqdAB = simAA + simBB - simAB - simAB;
-      if(!(sqdAB > 0.)) {
+      if (!(sqdAB > 0.)) {
         continue;
       }
-      for(DBIDIter nC = relation.iterDBIDs(); nC.valid(); nC.advance()) {
-        if(DBIDUtil.equal(nC, pA) || DBIDUtil.compare(nC, nB) < 0) {
+      for (DBIDIter nC = relation.iterDBIDs(); nC.valid(); nC.advance()) {
+        if (DBIDUtil.equal(nC, pA) || DBIDUtil.compare(nC, nB) < 0) {
           continue;
         }
         double simCC = kernelMatrix.getSimilarity(nC, nC);
         double simAC = kernelMatrix.getSimilarity(pA, nC);
         double sqdAC = simAA + simCC - simAC;
-        if(!(sqdAC > 0.)) {
+        if (!(sqdAC > 0.)) {
           continue;
         }
         // Exploit bilinearity of scalar product:
@@ -206,7 +206,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final ObjectParameter<SimilarityFunction<V, DoubleDistance>> param = new ObjectParameter<>(KERNEL_FUNCTION_ID, SimilarityFunction.class, PolynomialKernelFunction.class);
-      if(config.grab(param)) {
+      if (config.grab(param)) {
         kernelFunction = param.instantiateClass(config);
       }
     }
