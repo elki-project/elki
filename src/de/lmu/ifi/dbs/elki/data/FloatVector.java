@@ -139,7 +139,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
   @Override
   public Float getValue(int dimension) {
     try {
-      return values[dimension - 1];
+      return values[dimension];
     } catch (ArrayIndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
@@ -148,7 +148,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
   @Override
   public double doubleValue(int dimension) {
     try {
-      return values[dimension - 1];
+      return values[dimension];
     } catch (ArrayIndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
@@ -157,7 +157,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
   @Override
   public long longValue(int dimension) {
     try {
-      return (long) values[dimension - 1];
+      return (long) values[dimension];
     } catch (ArrayIndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
