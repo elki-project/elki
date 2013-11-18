@@ -1,4 +1,26 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation;
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -53,7 +75,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
   private static final Logging LOG = Logging.getLogger(AffinityPropagationClusteringAlgorithm.class);
 
   /**
-   * Similarity intialization
+   * Similarity initialization
    */
   AffinityPropagationInitialization<O> initialization;
 
@@ -108,108 +130,107 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
     MutableProgress aprog = LOG.isVerbose() ? new MutableProgress("Stable assignments", size + 1, LOG) : null;
 
     int inactive = 0;
-    for(int iteration = 0; iteration < maxiter && inactive < convergence; iteration++) {
+    for (int iteration = 0; iteration < maxiter && inactive < convergence; iteration++) {
       // Update responsibility matrix:
-      for(int i = 0; i < size; i++) {
+      for (int i = 0; i < size; i++) {
         double[] ai = a[i], ri = r[i], si = s[i];
         // Find the two largest values (as initially maxk == i)
         double max1 = Double.NEGATIVE_INFINITY, max2 = Double.NEGATIVE_INFINITY;
         int maxk = -1;
-        for(int k = 0; k < size; k++) {
+        for (int k = 0; k < size; k++) {
           double val = ai[k] + si[k];
-          if(val > max1) {
+          if (val > max1) {
             max2 = max1;
             max1 = val;
             maxk = k;
-          }
-          else if(val > max2) {
+          } else if (val > max2) {
             max2 = val;
           }
         }
         // With the maximum value known, update r:
-        for(int k = 0; k < size; k++) {
+        for (int k = 0; k < size; k++) {
           double val = si[k] - ((k != maxk) ? max1 : max2);
           ri[k] = ri[k] * lambda + val * (1. - lambda);
         }
       }
       // Update availability matrix
-      for(int k = 0; k < size; k++) {
+      for (int k = 0; k < size; k++) {
         // Compute sum of max(0, r_ik) for all i.
         // For r_kk, don't apply the max.
         double colposum = 0.;
-        for(int i = 0; i < size; i++) {
-          if(i == k || r[i][k] > 0.) {
+        for (int i = 0; i < size; i++) {
+          if (i == k || r[i][k] > 0.) {
             colposum += r[i][k];
           }
         }
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
           double val = colposum;
           // Adjust column sum by the one extra term.
-          if(i == k || r[i][k] > 0.) {
+          if (i == k || r[i][k] > 0.) {
             val -= r[i][k];
           }
-          if(i != k && val > 0.) { // min
+          if (i != k && val > 0.) { // min
             val = 0.;
           }
           a[i][k] = a[i][k] * lambda + val * (1 - lambda);
         }
       }
       int changed = 0;
-      for(int i = 0; i < size; i++) {
+      for (int i = 0; i < size; i++) {
         double[] ai = a[i], ri = r[i];
         double max = Double.NEGATIVE_INFINITY;
         int maxj = -1;
-        for(int j = 0; j < size; j++) {
+        for (int j = 0; j < size; j++) {
           double v = ai[j] + ri[j];
-          if(v > max || (i == j && v >= max)) {
+          if (v > max || (i == j && v >= max)) {
             max = v;
             maxj = j;
           }
         }
-        if(assignment[i] != maxj) {
+        if (assignment[i] != maxj) {
           changed += 1;
           assignment[i] = maxj;
         }
       }
       inactive = (changed > 0) ? 0 : (inactive + 1);
-      if(prog != null) {
+      if (prog != null) {
         prog.incrementProcessed(LOG);
       }
-      if(aprog != null) {
+      if (aprog != null) {
         aprog.setProcessed(size - changed, LOG);
       }
     }
-    if(aprog != null) {
+    if (aprog != null) {
       aprog.setProcessed(aprog.getTotal(), LOG);
     }
-    if(prog != null) {
+    if (prog != null) {
       prog.setCompleted(LOG);
     }
     // Cluster map, by lead object
     TIntObjectHashMap<ModifiableDBIDs> map = new TIntObjectHashMap<>();
     DBIDArrayIter i1 = ids.iter();
-    for(int i = 0; i1.valid(); i1.advance(), i++) {
+    for (int i = 0; i1.valid(); i1.advance(), i++) {
       int c = assignment[i];
       // Add to cluster members:
       ModifiableDBIDs cids = map.get(c);
-      if(cids == null) {
+      if (cids == null) {
         cids = DBIDUtil.newArray();
         map.put(c, cids);
       }
       cids.add(i1);
     }
     // If we stopped early, the cluster lead might be in a different cluster.
-    for(TIntObjectIterator<ModifiableDBIDs> iter = map.iterator(); iter.hasNext();) {
+    for (TIntObjectIterator<ModifiableDBIDs> iter = map.iterator(); iter.hasNext();) {
       iter.advance(); // Trove iterator; advance first!
       final int key = iter.key();
       int targetkey = key;
       ModifiableDBIDs tids = null;
       // Chase arrows:
-      while(ids == null && assignment[targetkey] != targetkey) {
+      while (ids == null && assignment[targetkey] != targetkey) {
         targetkey = assignment[targetkey];
         tids = map.get(targetkey);
       }
-      if(tids != null && targetkey != key) {
+      if (tids != null && targetkey != key) {
         tids.addDBIDs(iter.value());
         iter.remove();
       }
@@ -217,20 +238,19 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
 
     Clustering<MedoidModel> clustering = new Clustering<>("Affinity Propagation Clustering", "ap-clustering");
     ModifiableDBIDs noise = DBIDUtil.newArray();
-    for(TIntObjectIterator<ModifiableDBIDs> iter = map.iterator(); iter.hasNext();) {
+    for (TIntObjectIterator<ModifiableDBIDs> iter = map.iterator(); iter.hasNext();) {
       iter.advance(); // Trove iterator; advance first!
       i1.seek(iter.key());
-      if(iter.value().size() > 1) {
+      if (iter.value().size() > 1) {
         MedoidModel mod = new MedoidModel(DBIDUtil.deref(i1));
         clustering.addToplevelCluster(new Cluster<>(iter.value(), mod));
-      }
-      else {
+      } else {
         noise.add(i1);
       }
     }
-    if(noise.size() > 0) {
+    if (noise.size() > 0) {
       MedoidModel mod = new MedoidModel(DBIDUtil.deref(noise.iter()));
-      clustering.addToplevelCluster(new Cluster<MedoidModel>(noise, true, mod));
+      clustering.addToplevelCluster(new Cluster<>(noise, true, mod));
     }
     return clustering;
   }
@@ -256,7 +276,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**
-     * Parameter for the similarity matrix intialization
+     * Parameter for the similarity matrix initialization
      */
     public static final OptionID INITIALIZATION_ID = new OptionID("ap.initialization", "Similarity matrix initialization..");
 
@@ -299,22 +319,22 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final ObjectParameter<AffinityPropagationInitialization<O>> param = new ObjectParameter<>(INITIALIZATION_ID, AffinityPropagationInitialization.class, DistanceBasedInitializationWithMedian.class);
-      if(config.grab(param)) {
+      if (config.grab(param)) {
         initialization = param.instantiateClass(config);
       }
       final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, .5);
       lambdaP.addConstraint(new GreaterConstraint(0.));
       lambdaP.addConstraint(new LessConstraint(1.));
-      if(config.grab(lambdaP)) {
+      if (config.grab(lambdaP)) {
         lambda = lambdaP.doubleValue();
       }
       final IntParameter convergenceP = new IntParameter(CONVERGENCE_ID, 15);
       convergenceP.addConstraint(new GreaterEqualConstraint(1));
-      if(config.grab(convergenceP)) {
+      if (config.grab(convergenceP)) {
         convergence = convergenceP.intValue();
       }
       final IntParameter maxiterP = new IntParameter(MAXITER_ID, 1000);
-      if(config.grab(maxiterP)) {
+      if (config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }
     }
