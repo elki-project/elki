@@ -61,4 +61,9 @@ public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> exten
 
   @Override
   abstract public DistanceDBIDList<D> getRangeForObject(O obj, D range);
+
+  @Override
+  public D getDistanceFactory() {
+    return distanceQuery.getDistanceFactory();
+  }
 }

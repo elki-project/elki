@@ -57,4 +57,11 @@ public interface RangeQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @return neighbors
    */
   public DistanceDBIDList<D> getRangeForObject(O obj, D range);
+
+  /**
+   * Get the distance factory for the given distance type.
+   * 
+   * @return Distance factory.
+   */
+  public D getDistanceFactory();
 }
