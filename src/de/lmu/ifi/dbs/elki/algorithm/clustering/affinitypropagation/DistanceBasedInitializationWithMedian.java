@@ -1,4 +1,26 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation;
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -55,10 +77,10 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
     double[] flat = new double[(size * (size - 1)) >> 1];
     // TODO: optimize for double valued primitive distances.
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();
-    for(int i = 0, j = 0; i < size; i++, i1.advance()) {
+    for (int i = 0, j = 0; i < size; i++, i1.advance()) {
       double[] mati = mat[i];
       i2.seek(i + 1);
-      for(int k = i + 1; k < size; k++, i2.advance()) {
+      for (int k = i + 1; k < size; k++, i2.advance()) {
         mati[k] = -dq.distance(i1, i2).doubleValue();
         mat[k][i] = mati[k]; // symmetry.
         flat[j] = mati[k];
@@ -67,7 +89,7 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
     }
     double median = QuickSelect.quantile(flat, quantile);
     // On the diagonal, we place the median
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
       mat[i][i] = median;
     }
     return mat;
@@ -108,12 +130,12 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<DistanceFunction<? super O, D>> param = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
-      if(config.grab(param)) {
+      if (config.grab(param)) {
         distance = param.instantiateClass(config);
       }
 
       DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, .5);
-      if(config.grab(quantileP)) {
+      if (config.grab(quantileP)) {
         quantile = quantileP.doubleValue();
       }
     }
