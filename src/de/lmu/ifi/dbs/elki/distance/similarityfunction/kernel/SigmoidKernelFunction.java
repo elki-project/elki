@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Sigmoid kernel function (aka: hyperbolic tangent kernel, multilayer perceptron MLP kernel).
+ * Sigmoid kernel function (aka: hyperbolic tangent kernel, multilayer
+ * perceptron MLP kernel).
  * 
  * @author Erich Schubert
  */
