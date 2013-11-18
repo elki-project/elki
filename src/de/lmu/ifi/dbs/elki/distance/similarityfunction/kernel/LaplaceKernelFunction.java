@@ -67,12 +67,12 @@ public class LaplaceKernelFunction implements PrimitiveSimilarityFunction<Number
    *         instance of {@link DoubleDistance DoubleDistance}.
    */
   public double doubleSimilarity(NumberVector<?> o1, NumberVector<?> o2) {
-    if(o1.getDimensionality() != o2.getDimensionality()) {
+    if (o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of Feature-Vectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }
 
     double sim = 0;
-    for(int i = 0; i < o1.getDimensionality(); i++) {
+    for (int i = 0; i < o1.getDimensionality(); i++) {
       final double v = o1.doubleValue(i) - o2.doubleValue(i);
       sim += v * v;
     }
@@ -127,7 +127,7 @@ public class LaplaceKernelFunction implements PrimitiveSimilarityFunction<Number
       super.makeOptions(config);
       final DoubleParameter sigmaP = new DoubleParameter(SIGMA_ID, 1.);
       sigmaP.addConstraint(new GreaterConstraint(0.));
-      if(config.grab(sigmaP)) {
+      if (config.grab(sigmaP)) {
         sigma = sigmaP.doubleValue();
       }
     }
