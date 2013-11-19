@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * A FloatVector is to store real values with lower memory requirements by using float values.
+ * A FloatVector is to store real values with lower memory requirements by using
+ * float values.
  * 
  * @author Elke Achtert
  */
@@ -138,29 +139,17 @@ public class FloatVector extends AbstractNumberVector<Float> {
   @Deprecated
   @Override
   public Float getValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (ArrayIndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public double doubleValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (ArrayIndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public long longValue(int dimension) {
-    try {
-      return (long) values[dimension];
-    } catch (ArrayIndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return (long) values[dimension];
   }
 
   @Override
@@ -212,7 +201,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
     public ByteBufferSerializer<FloatVector> getDefaultSerializer() {
       return VARIABLE_SERIALIZER;
     }
-    
+
     @Override
     public Class<? super FloatVector> getRestrictionClass() {
       return FloatVector.class;

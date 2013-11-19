@@ -108,38 +108,22 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
   @Override
   @Deprecated
   public Integer getValue(int dimension) {
-    try {
-      return Integer.valueOf(values[dimension]);
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return Integer.valueOf(values[dimension]);
   }
 
   @Override
   public double doubleValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public long longValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public int intValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   /**
@@ -206,7 +190,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
     public ByteBufferSerializer<IntegerVector> getDefaultSerializer() {
       return VARIABLE_SERIALIZER;
     }
-    
+
     @Override
     public Class<? super IntegerVector> getRestrictionClass() {
       return IntegerVector.class;
