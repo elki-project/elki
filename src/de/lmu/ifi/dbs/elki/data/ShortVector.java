@@ -103,47 +103,27 @@ public class ShortVector extends AbstractNumberVector<Short> {
   @Override
   @Deprecated
   public Short getValue(int dimension) {
-    try {
-      return Short.valueOf(values[dimension]);
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return Short.valueOf(values[dimension]);
   }
 
   @Override
   public double doubleValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public long longValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public int intValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public short shortValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   /**

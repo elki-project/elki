@@ -90,52 +90,25 @@ public class ByteVector extends AbstractNumberVector<Byte> {
     return values.length;
   }
 
-  /**
-   * Returns the value of the specified attribute.
-   * 
-   * @param dimension the selected attribute. Attributes are counted starting
-   *        with 0.
-   * 
-   * @throws IllegalArgumentException if the specified dimension is out of range
-   *         of the possible attributes
-   * 
-   *         {@inheritDoc}
-   */
   @Override
   @Deprecated
   public Byte getValue(int dimension) {
-    try {
-      return Byte.valueOf(values[dimension]);
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return Byte.valueOf(values[dimension]);
   }
 
   @Override
   public double doubleValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public long longValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public byte byteValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   /**
