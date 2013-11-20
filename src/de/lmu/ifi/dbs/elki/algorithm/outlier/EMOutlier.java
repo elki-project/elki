@@ -38,10 +38,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -91,15 +93,27 @@ public class EMOutlier<V extends NumberVector<?>> extends AbstractAlgorithm<Outl
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<V> relation) {
+    emClustering.setSoft(true);
     Clustering<EMModel<V>> emresult = emClustering.run(database, relation);
+    Relation<double[]> soft = null;
+    for (Iter<Result> iter = emresult.getHierarchy().iterChildren(emresult); iter.valid(); iter.advance()) {
+      if (!(iter.get() instanceof Relation)) {
+        continue;
+      }
+      if (((Relation<?>) iter.get()).getDataTypeInformation() == EM.SOFT_TYPE) {
+        @SuppressWarnings("unchecked")
+        Relation<double[]> rel = (Relation<double[]>) iter.get();
+        soft = rel;
+      }
+    }
 
     double globmax = 0.0;
     WritableDoubleDataStore emo_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double maxProb = Double.POSITIVE_INFINITY;
-      double[] probs = emClustering.getProbClusterIGivenX(iditer);
-      for(double prob : probs) {
-        maxProb = Math.min(1 - prob, maxProb);
+      double[] probs = soft.get(iditer);
+      for (double prob : probs) {
+        maxProb = Math.min(1. - prob, maxProb);
       }
       emo_score.putDouble(iditer, maxProb);
       globmax = Math.max(maxProb, globmax);

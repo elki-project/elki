@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -43,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -72,8 +74,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * zero-covariance and variance=1 in covariance matrices.
  * </p>
  * <p>
- * Reference: A. P. Dempster, N. M. Laird, D. B. Rubin: Maximum Likelihood from
- * Incomplete Data via the EM algorithm. <br>
+ * Reference: A. P. Dempster, N. M. Laird, D. B. Rubin:<br />
+ * Maximum Likelihood from Incomplete Data via the EM algorithm.<br>
  * In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31
  * </p>
  * 
@@ -110,11 +112,6 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
   private double delta;
 
   /**
-   * Store the individual probabilities, for use by EMOutlierDetection etc.
-   */
-  private WritableDataStore<double[]> probClusterIGivenX;
-
-  /**
    * Class to choose the initial means
    */
   private KMeansInitialization<V> initializer;
@@ -124,7 +121,17 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    */
   private int maxiter;
 
+  /**
+   * Retain soft assignments.
+   */
+  private boolean soft;
+
   private static final double MIN_LOGLIKELIHOOD = -100000;
+
+  /**
+   * Soft assignment result type.
+   */
+  public static final SimpleTypeInformation<double[]> SOFT_TYPE = new SimpleTypeInformation<>(double[].class);
 
   /**
    * Constructor.
@@ -133,13 +140,15 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * @param delta delta parameter
    * @param initializer Class to choose the initial means
    * @param maxiter Maximum number of iterations
+   * @param soft Include soft assignments
    */
-  public EM(int k, double delta, KMeansInitialization<V> initializer, int maxiter) {
+  public EM(int k, double delta, KMeansInitialization<V> initializer, int maxiter, boolean soft) {
     super();
     this.k = k;
     this.delta = delta;
     this.initializer = initializer;
     this.maxiter = maxiter;
+    this.setSoft(soft);
   }
 
   /**
@@ -176,7 +185,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     double[] normDistrFactor = new double[k];
     Matrix[] invCovMatr = new Matrix[k];
     double[] clusterWeights = new double[k];
-    probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
+    WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
     final int dimensionality = means[0].getDimensionality();
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
@@ -244,6 +253,11 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       // label.init(result.canonicalClusterLabel(i));
       Cluster<EMModel<V>> model = new Cluster<>(hardClusters.get(i), new EMModel<>(factory.newNumberVector(means[i].getArrayRef()), covarianceMatrices[i]));
       result.addToplevelCluster(model);
+    }
+    if (isSoft()) {
+      result.addChildResult(new MaterializedRelation<>("cluster assignments", "em-soft-score", SOFT_TYPE, probClusterIGivenX, relation.getDBIDs()));
+    } else {
+      probClusterIGivenX.destroy();
     }
     return result;
   }
@@ -362,16 +376,6 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     return emSum;
   }
 
-  /**
-   * Get the cluster membership probabilities.
-   * 
-   * @param id Object reference
-   * @return Probabilities
-   */
-  public double[] getProbClusterIGivenX(DBIDIter id) {
-    return probClusterIGivenX.get(id);
-  }
-
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
@@ -380,6 +384,20 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  /**
+   * @return the soft
+   */
+  public boolean isSoft() {
+    return soft;
+  }
+
+  /**
+   * @param soft the soft to set
+   */
+  public void setSoft(boolean soft) {
+    this.soft = soft;
   }
 
   /**
@@ -460,7 +478,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
 
     @Override
     protected EM<V> makeInstance() {
-      return new EM<>(k, delta, initializer, maxiter);
+      return new EM<>(k, delta, initializer, maxiter, false);
     }
   }
 }
