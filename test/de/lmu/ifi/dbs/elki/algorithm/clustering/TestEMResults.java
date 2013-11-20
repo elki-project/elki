@@ -57,14 +57,14 @@ public class TestEMResults extends AbstractSimpleAlgorithmTest implements JUnit4
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.SEED_ID, 1);
-    params.addParameter(EM.K_ID, 5);
+    params.addParameter(KMeans.SEED_ID, 0);
+    params.addParameter(EM.Parameterizer.K_ID, 6);
     EM<DoubleVector> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
     testParameterizationOk(params);
 
     // run EM on database
     Clustering<EMModel<DoubleVector>> result = em.run(db);
-    testFMeasure(db, result, 0.961587);
-    testClusterSizes(result, new int[] { 5, 91, 98, 200, 316 });
+    testFMeasure(db, result, 0.7551098);
+    testClusterSizes(result, new int[] { 50, 99, 102, 120, 141, 198 });
   }
 }
