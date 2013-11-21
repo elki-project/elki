@@ -125,7 +125,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   public Clustering<Model> run(Relation<O> relation) {
     RangeQuery<O, D> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     final int size = relation.size();
-
+    
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
     IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
     resultList = new ArrayList<>();
@@ -134,7 +134,9 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     if(size < minpts) {
       // The can't be any clusters
       noise.addDBIDs(relation.getDBIDs());
-      objprog.setProcessed(noise.size(), LOG);
+      if (objprog != null) {
+        objprog.setProcessed(noise.size(), LOG);
+      }
     }
     else {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
