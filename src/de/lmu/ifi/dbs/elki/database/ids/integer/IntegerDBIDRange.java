@@ -154,7 +154,7 @@ class IntegerDBIDRange implements DBIDRange, SetDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
+  protected static class DBIDItr implements IntegerDBIDArrayIter {
     /**
      * Current position.
      */
