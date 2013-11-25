@@ -1347,7 +1347,7 @@ public class QuickSelect {
       pivot.seek(end - 1);
 
       // Begin partitioning
-      int i = start, j = end - 3;
+      int i = start, j = end - 2;
       refi.seek(i);
       refj.seek(j);
       // This is classic quicksort stuff
