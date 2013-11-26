@@ -214,7 +214,7 @@ public final class VMath {
    * 
    * @param v1 first vector
    * @param v2 another vector
-   * @param s2 scalar vor v2
+   * @param s2 scalar factor for v2
    * @return v1 = v1 + v2 * s2
    */
   public static final double[] plusTimesEquals(final double[] v1, final double[] v2, final double s2) {
@@ -229,7 +229,7 @@ public final class VMath {
    * Computes v1 = v1 * s1 + v2, overwriting v1
    * 
    * @param v1 first vector
-   * @param s1 scalar for v1
+   * @param s1 scalar factor for v1
    * @param v2 another vector
    * @return v1 = v1 * s1 + v2
    */
