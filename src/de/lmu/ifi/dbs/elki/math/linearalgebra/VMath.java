@@ -460,7 +460,7 @@ public final class VMath {
   }
 
   /**
-   * Computes v1 = v1 * s1, overwritings v1
+   * Computes v1 = v1 * s1, overwriting v1
    * 
    * @param v1 original vector
    * @param s scalar
