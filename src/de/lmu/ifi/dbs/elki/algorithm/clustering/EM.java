@@ -307,8 +307,13 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       }
     }
     for (int i = 0; i < k; i++) {
-      means[i] = cms[i].getMeanVector();
-      covarianceMatrices[i] = cms[i].destroyToSampleMatrix().cheatToAvoidSingularity(SINGULARITY_CHEAT);
+      if (cms[i].getWeight() <= 0.) {
+        means[i] = new Vector(dimensionality);
+        covarianceMatrices[i] = Matrix.identity(dimensionality, dimensionality);
+      } else {
+        means[i] = cms[i].getMeanVector();
+        covarianceMatrices[i] = cms[i].destroyToNaiveMatrix().cheatToAvoidSingularity(SINGULARITY_CHEAT);
+      }
     }
   }
 
