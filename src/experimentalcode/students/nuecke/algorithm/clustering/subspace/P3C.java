@@ -3,12 +3,13 @@ package experimentalcode.students.nuecke.algorithm.clustering.subspace;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
@@ -17,6 +18,9 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -33,9 +37,9 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution;
@@ -101,6 +105,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   protected int minClusterSize;
 
   /**
+   * Maximum number of EM iterations.
+   */
+  protected int maxiter = 100;
+
+  /**
    * Sets up a new instance of the algorithm's environment.
    */
   public P3C(double poissonThreshold, int maxEmIterations, double emDelta, int minClusterSize) {
@@ -143,15 +152,17 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       double delta = (relation.get(iter).doubleValue(d) - min) / binCount;
       if (delta > 0.) {
         partition(relation, d, min, delta, ids, iter, 0, ids.size(), 0, binCount, partitions[d]);
-        StringBuilder buf = new StringBuilder();
-        buf.append("Partition sizes of dim ").append(d).append(": ");
-        int sum = 0;
-        for (DBIDs p : partitions[d]) {
-          buf.append(p.size()).append(' ');
-          sum += p.size();
+        if (LOG.isDebugging()) {
+          StringBuilder buf = new StringBuilder();
+          buf.append("Partition sizes of dim ").append(d).append(": ");
+          int sum = 0;
+          for (DBIDs p : partitions[d]) {
+            buf.append(p.size()).append(' ');
+            sum += p.size();
+          }
+          LOG.debug(buf.toString());
+          assert (sum == ids.size());
         }
-        LOG.warning(buf.toString());
-        assert (sum == ids.size());
       } else {
         partitions[d] = null; // Flag whole dimension as bad
       }
@@ -163,6 +174,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Set markers for each attribute until they're all deemed uniform.
     final long[][] markers = new long[dim][];
+    int numuniform = 0;
     for (int d = 0; d < dim; d++) {
       final DBIDs[] parts = partitions[d];
       if (parts == null) {
@@ -175,12 +187,15 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         // previously marked.
         int bestBin = chiSquaredUniformTest(parts, marked, card);
         if (bestBin < 0) {
+          numuniform++;
           break; // Uniform
         }
         BitsUtil.setI(marked, bestBin);
         card++;
       }
-      LOG.verbose("Marked bins in dim " + d + ": " + BitsUtil.toString(marked, dim));
+      if (LOG.isDebugging()) {
+        LOG.debug("Marked bins in dim " + d + ": " + BitsUtil.toString(marked, dim));
+      }
     }
 
     if (stepProgress != null) {
@@ -188,7 +203,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     // Generate projected p-signature intervals.
-    ArrayList<Sig> signatures = new ArrayList<>();
+    ArrayList<Signature> signatures = new ArrayList<>();
     for (int d = 0; d < dim; d++) {
       final DBIDs[] parts = partitions[d];
       if (parts == null) {
@@ -206,8 +221,10 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         signature[d << 1] = start;
         signature[(d << 1) + 1] = end - 1; // inclusive
         HashSetModifiableDBIDs sids = unionDBIDs(parts, start, end /* exclusive */);
-        LOG.verbose("1-signature: " + d + " " + start + "-" + end);
-        signatures.add(new Sig(signature, sids));
+        if (LOG.isDebugging()) {
+          LOG.debug("1-signature: " + d + " " + start + "-" + end);
+        }
+        signatures.add(new Signature(signature, sids));
         start = (end < dim) ? BitsUtil.nextSetBit(marked, end + 1) : -1;
       }
     }
@@ -219,18 +236,18 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     FiniteProgress mergeProgress = LOG.isVerbose() ? new FiniteProgress("1-signatures merges", signatures.size(), LOG) : null;
 
     // Merge to (p+1)-signatures (cluster cores).
-    ArrayList<Sig> clusterCores = new ArrayList<>(signatures);
+    ArrayList<Signature> clusterCores = new ArrayList<>(signatures);
     // Try adding merge 1-signature with each cluster core.
     for (int i = 0; i < signatures.size(); ++i) {
-      final Sig signature = signatures.get(i);
+      final Signature signature = signatures.get(i);
       // Don't merge with future signatures:
       final int end = clusterCores.size();
       // Skip previous 1-signatures: merges are symmetrical. But include newly
       // created cluster cores (i.e. those resulting from previous merges).
       FiniteProgress submergeProgress = LOG.isVerbose() ? new FiniteProgress("p-signatures merges", end - (i + 1), LOG) : null;
       for (int j = i + 1; j < end; ++j) {
-        final Sig first = clusterCores.get(j);
-        final Sig merge = mergeSignatures(first, signature, binCount);
+        final Signature first = clusterCores.get(j);
+        final Signature merge = mergeSignatures(first, signature, binCount);
         if (merge != null) {
           // We add each potential core to the list to allow remaining
           // 1-signatures to try merging with this p-signature as well.
@@ -259,8 +276,8 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     // Prune cluster cores based on Definition 3, Condition 2.
-    ArrayList<Sig> retain = new ArrayList<>(clusterCores.size());
-    for (Sig clusterCore : clusterCores) {
+    ArrayList<Signature> retain = new ArrayList<>(clusterCores.size());
+    for (Signature clusterCore : clusterCores) {
       if (!clusterCore.prune) {
         retain.add(clusterCore);
       }
@@ -280,12 +297,40 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       stepProgress.beginStep(5, "Refining cluster cores to clusters via EM.", LOG);
     }
 
-    // Refine cluster cores into projected clusters (matrix row->DBID).
-    ArrayModifiableDBIDs assigned = DBIDUtil.newArray(relation.size());
+    // Track objects not assigned to any cluster:
     ModifiableDBIDs noise = DBIDUtil.newHashSet();
-    Matrix M = computeFuzzyMembership(relation, clusterCores, assigned, noise);
-    assignUnassigned(relation, M, clusterCores, assigned, noise);
-    M = expectationMaximization(relation, dim, M, assigned);
+    WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
+    int k = clusterCores.size();
+    double[] clusterWeights = new double[k];
+    computeFuzzyMembership(relation, clusterCores, noise, probClusterIGivenX, clusterWeights);
+
+    // Initial estimate of covariances, to assign noise objects
+    Vector[] means = new Vector[k];
+    Matrix[] covarianceMatrices = new Matrix[k], invCovMatr = new Matrix[k];
+    final double norm = MathUtil.powi(MathUtil.TWOPI, dim);
+    double[] normDistrFactor = new double[k];
+    Arrays.fill(normDistrFactor, 1. / Math.sqrt(norm));
+    EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, means, covarianceMatrices, dim);
+    EM.computeInverseMatrixes(covarianceMatrices, invCovMatr, normDistrFactor, norm);
+    assignUnassigned(relation, probClusterIGivenX, means, invCovMatr, clusterWeights, noise);
+
+    double emNew = EM.assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+    for (int it = 1; it <= maxiter || maxiter < 0; it++) {
+      final double emOld = emNew;
+      EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, means, covarianceMatrices, dim);
+      EM.computeInverseMatrixes(covarianceMatrices, invCovMatr, normDistrFactor, norm);
+      // reassign probabilities
+      emNew = EM.assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+
+      if (LOG.isVerbose()) {
+        LOG.verbose("iteration " + it + " - expectation value: " + emNew);
+      }
+      if (Math.abs(emOld - emNew) <= emDelta) {
+        break;
+      }
+    }
+
+    // Perform EM clustering.
 
     if (stepProgress != null) {
       stepProgress.beginStep(6, "Generating hard clustering.", LOG);
@@ -293,7 +338,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Create a hard clustering, making sure each data point only is part of one
     // cluster, based on the best match from the membership matrix.
-    ArrayList<ClusterCandidate> clusterCandidates = hardClustering(M, clusterCores, assigned);
+    ArrayList<ClusterCandidate> clusterCandidates = hardClustering(probClusterIGivenX, clusterCores, ids);
 
     if (stepProgress != null) {
       stepProgress.beginStep(7, "Looking for outliers and moving them to the noise set.", LOG);
@@ -301,17 +346,19 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Outlier detection. Remove points from clusters that have a Mahalanobis
     // distance larger than the critical value of the ChiSquare distribution.
-    findOutliers(relation, clusterCandidates, dim - countUniformAttributes(markers), noise);
+    findOutliers(relation, means, invCovMatr, clusterCandidates, dim - numuniform, noise);
 
     if (stepProgress != null) {
       stepProgress.beginStep(8, "Removing empty clusters.", LOG);
     }
 
-    // Remove empty clusters.
-    for (int cluster = clusterCandidates.size() - 1; cluster >= 0; --cluster) {
-      final int size = clusterCandidates.get(cluster).ids.size();
+    // Remove near-empty clusters.
+    for (Iterator<ClusterCandidate> it = clusterCandidates.iterator(); it.hasNext();) {
+      ClusterCandidate cand = it.next();
+      final int size = cand.ids.size();
       if (size < minClusterSize) {
-        noise.addDBIDs(clusterCandidates.remove(cluster).ids);
+        noise.addDBIDs(cand.ids);
+        it.remove();
       }
     }
 
@@ -326,7 +373,9 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Generate final output.
     Clustering<SubspaceModel<V>> result = new Clustering<>("P3C", "P3C");
-    result.addToplevelCluster(new Cluster<SubspaceModel<V>>(noise, true));
+    if (noise.size() > 0) {
+      result.addToplevelCluster(new Cluster<SubspaceModel<V>>(noise, true));
+    }
     for (int cluster = 0; cluster < clusterCandidates.size(); ++cluster) {
       ClusterCandidate candidate = clusterCandidates.get(cluster);
       CovarianceMatrix cvm = CovarianceMatrix.make(relation, candidate.ids);
@@ -383,7 +432,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     while (ss < se) {
       final int sh = (ss + se) >>> 1;
       iter.seek(sh);
-      // LOG.warning("sh: " + sh);
+      // LOG.debugFinest("sh: " + sh);
       final double v = relation.get(iter).doubleValue(d);
       if (split < v) {
         if (ss < sh - 1) {
@@ -401,7 +450,8 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         }
       }
     }
-    // LOG.warning("ss: " + ss + " se: " + se + " start: " + start + " end: " +
+    // LOG.debugFinest("ss: " + ss + " se: " + se + " start: " + start +
+    // " end: " +
     // end);
     // start to ss (inclusive) are left,
     // ss + 1 to end (exclusive) are right.
@@ -427,24 +477,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     } else {
       partition(relation, d, min, delta, ids, iter, ss + 1, end, ph, pe, partitions);
     }
-  }
-
-  /**
-   * Counts how many attributes are globally uniform, meaning they do not are
-   * not relevant to any cluster.
-   * 
-   * @param markers the markers used to tag intervals as non-uniform per
-   *        dimension.
-   * @return Number of dimensions that are irrelevant to the clustering.
-   */
-  private int countUniformAttributes(long[][] markers) {
-    int sum = 0;
-    for (int dimension = 0; dimension < markers.length; ++dimension) {
-      if (markers[dimension] == null || BitsUtil.cardinality(markers[dimension]) == 0) {
-        ++sum;
-      }
-    }
-    return sum;
   }
 
   /**
@@ -480,7 +512,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // ChiSquare statistic is the naive variance of the sizes!
     double chiSquare = mv.getNaiveVariance();
 
-    LOG.warning(mv.toString());
     if ((1 - 0.001) < ChiSquaredDistribution.cdf(chiSquare, Math.max(1, binCount - card - 1))) {
       return maxpos;
     }
@@ -493,41 +524,35 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * 
    * @param relation Data relation
    * @param clusterCores the cluster cores.
-   * @param assigned mapping of matrix row to DBID.
    * @param unassigned set to which to add unassigned points.
-   * @return the fuzzy membership matrix.
+   * @param probClusterIGivenX Membership probabilities.
+   * @param clusterWeights Cluster weights
    */
-  private Matrix computeFuzzyMembership(Relation<V> relation, ArrayList<Sig> clusterCores, ModifiableDBIDs assigned, ModifiableDBIDs unassigned) {
+  private void computeFuzzyMembership(Relation<V> relation, ArrayList<Signature> clusterCores, ModifiableDBIDs unassigned, WritableDataStore<double[]> probClusterIGivenX, double[] clusterWeights) {
     final int n = relation.size();
     final int k = clusterCores.size();
 
-    Matrix membership = new Matrix(n, k);
-
     for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      // Count in how many cores the object is present.
       int count = 0;
-      for (Sig core : clusterCores) {
-        if (core.ids.contains(iter)) {
+      double[] weights = new double[k];
+      for (int cluster = 0; cluster < k; ++cluster) {
+        if (clusterCores.get(cluster).ids.contains(iter)) {
+          weights[cluster] = 1.;
           ++count;
         }
       }
 
       // Set value(s) in membership matrix.
       if (count > 0) {
-        final double fraction = 1.0 / count;
-        for (int cluster = 0; cluster < k; ++cluster) {
-          if (clusterCores.get(cluster).ids.contains(iter)) {
-            membership.set(assigned.size(), cluster, fraction);
-          }
-        }
-        assigned.add(iter);
+        // Rescale.
+        VMath.timesEquals(weights, 1. / count);
+        VMath.plusTimesEquals(clusterWeights, weights, 1. / n);
       } else {
         // Does not match any cluster, mark it.
         unassigned.add(iter);
       }
+      probClusterIGivenX.put(iter, weights);
     }
-
-    return membership;
   }
 
   /**
@@ -535,22 +560,19 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * distance.
    * 
    * @param relation Data relation
-   * @param M fuzzy membership matrix.
-   * @param clusterCores the cluster cores.
+   * @param probClusterIGivenX fuzzy membership matrix.
+   * @param means Cluster means.
+   * @param invCovMatr Cluster covariance matrices.
+   * @param clusterWeights
    * @param assigned mapping of matrix row to DBID.
    * @param unassigned the list of points not yet assigned.
    */
-  private void assignUnassigned(Relation<V> relation, Matrix M, ArrayList<Sig> clusterCores, ArrayModifiableDBIDs assigned, ModifiableDBIDs unassigned) {
+  private void assignUnassigned(Relation<V> relation, WritableDataStore<double[]> probClusterIGivenX, Vector[] means, Matrix[] invCovMatr, double[] clusterWeights, ModifiableDBIDs unassigned) {
     if (unassigned.size() == 0) {
       return;
     }
-    final int k = clusterCores.size();
-
-    // Compute centroids and covariance matrixes.
-    for (Sig sig : clusterCores) {
-      sig.centroid = Centroid.make(relation, sig.ids);
-      sig.inverseCovarianceMatrix = CovarianceMatrix.make(relation, sig.ids).destroyToNaiveMatrix().inverse();
-    }
+    final int k = means.length;
+    double pweight = 1. / relation.size();
 
     for (DBIDIter iter = unassigned.iter(); iter.valid(); iter.advance()) {
       // Find the best matching known cluster core using the Mahalanobis
@@ -558,17 +580,18 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       Vector v = relation.get(iter).getColumnVector();
       int bestCluster = -1;
       double minDistance = Double.POSITIVE_INFINITY;
-      for (int cluster = 0; cluster < k; ++cluster) {
-        Sig c = clusterCores.get(cluster);
-        final double distance = MathUtil.mahalanobisDistance(c.inverseCovarianceMatrix, v.minus(c.centroid));
+      for (int c = 0; c < k; ++c) {
+        final double distance = MathUtil.mahalanobisDistance(invCovMatr[c], v.minus(means[c]));
         if (distance < minDistance) {
           minDistance = distance;
-          bestCluster = cluster;
+          bestCluster = c;
         }
       }
       // Assign to best core.
-      M.set(assigned.size(), bestCluster, 1);
-      assigned.add(iter);
+      double[] weights = new double[k];
+      weights[bestCluster] = 1.0;
+      clusterWeights[bestCluster] += pweight;
+      probClusterIGivenX.put(iter, weights);
     }
 
     // Clear the list of unassigned objects.
@@ -576,163 +599,33 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   }
 
   /**
-   * Performs an expectation maximization for data points and cluster cores, to
-   * determine the probabilities of a data point belonging to a specific
-   * cluster.
-   * 
-   * @see de.lmu.ifi.dbs.elki.algorithm.clustering.EM
-   * 
-   * @param relation Data relation
-   * @param dim Dimensionality
-   * @param M the initial membership matrix.
-   * @param dbids mapping of matrix row to DBID.
-   */
-  private Matrix expectationMaximization(Relation<V> relation, int dim, Matrix M, ArrayModifiableDBIDs dbids) {
-    final int n = dbids.size();
-    final int k = M.getColumnDimensionality();
-
-    Matrix probabilities = new Matrix(M);
-    double[] clusterWeights = new double[k];
-    double[] normalDistributionFactor = new double[k];
-
-    CovarianceMatrix[] cvms = new CovarianceMatrix[k];
-    Vector[] means = new Vector[k];
-    Matrix[] covariances = new Matrix[k];
-    Matrix[] inverseCovariances = new Matrix[k];
-
-    // Initialize cluster weights to be evenly distributed.
-    for (int cluster = 0; cluster < k; ++cluster) {
-      clusterWeights[cluster] = 1.0 / k;
-    }
-
-    FiniteProgress emIterProgress = LOG.isVerbose() ? new FiniteProgress("EM iteration", maxEmIterations, LOG) : null;
-
-    // Iterate until maximum number of iteration hits or computation converges.
-    double em = Double.NEGATIVE_INFINITY;
-    for (int iteration = 0; iteration < maxEmIterations; ++iteration) {
-      // Reset weights and covariance matrices.
-      for (int cluster = 0; cluster < k; ++cluster) {
-        clusterWeights[cluster] = 0.0;
-        cvms[cluster] = new CovarianceMatrix(dim);
-      }
-
-      // Compute covariance matrices.
-      for (int point = 0; point < n; ++point) {
-        final Vector value = relation.get(dbids.get(point)).getColumnVector();
-        for (int cluster = 0; cluster < k; ++cluster) {
-          final double pointInClusterProbability = probabilities.get(point, cluster);
-          clusterWeights[cluster] += pointInClusterProbability;
-          if (pointInClusterProbability > 0) {
-            cvms[cluster].put(value, pointInClusterProbability);
-          }
-        }
-      }
-      for (int cluster = 0; cluster < k; ++cluster) {
-        means[cluster] = cvms[cluster].getMeanVector();
-        covariances[cluster] = cvms[cluster].destroyToNaiveMatrix().cheatToAvoidSingularity(1e-9);
-        inverseCovariances[cluster] = covariances[cluster].inverse();
-      }
-
-      // Normalize weights.
-      for (int cluster = 0; cluster < k; ++cluster) {
-        clusterWeights[cluster] /= n;
-      }
-      // Compute normal distribution factor used for computing probabilities.
-      final double twopidim = Math.pow(MathUtil.TWOPI, dim);
-      for (int cluster = 0; cluster < k; ++cluster) {
-        normalDistributionFactor[cluster] = 1.0 / Math.sqrt(twopidim * covariances[cluster].det());
-      }
-
-      FiniteProgress emProbProgress = LOG.isVerbose() ? new FiniteProgress("Computing probabilities for points", n, LOG) : null;
-
-      // Recompute probabilities.
-      double emNew = 0.0;
-      for (int point = 0; point < n; ++point) {
-        final Vector value = relation.get(dbids.get(point)).getColumnVector();
-        final double[] newProbabilities = new double[k];
-        double priorProbability = 0.0;
-
-        for (int cluster = 0; cluster < k; ++cluster) {
-          final Vector delta = value.minus(means[cluster]);
-          final double squaredMahalanobisDistance = delta.transposeTimesTimes(inverseCovariances[cluster], delta);
-          final double probability = normalDistributionFactor[cluster] * Math.exp(-0.5 * squaredMahalanobisDistance);
-          newProbabilities[cluster] = probability;
-          priorProbability += probability * clusterWeights[cluster];
-        }
-
-        final double logProbability = Math.max(Math.log(priorProbability), MIN_LOGLIKELIHOOD);
-        assert (!Double.isNaN(logProbability));
-        emNew += logProbability;
-
-        for (int cluster = 0; cluster < k; ++cluster) {
-          if (priorProbability == 0) {
-            probabilities.set(point, cluster, 0);
-          } else {
-            probabilities.set(point, cluster, newProbabilities[cluster] / priorProbability * clusterWeights[cluster]);
-          }
-        }
-
-        if (emProbProgress != null) {
-          emProbProgress.incrementProcessed(LOG);
-        }
-      }
-
-      if (emProbProgress != null) {
-        emProbProgress.ensureCompleted(LOG);
-      }
-
-      // See if the delta is very small, if so we can stop.
-      if (Math.abs(em - emNew) < emDelta) {
-        if (emIterProgress != null) {
-          emIterProgress.setProcessed(maxEmIterations, LOG);
-        }
-        break;
-      }
-      em = emNew;
-
-      if (emIterProgress != null) {
-        emIterProgress.incrementProcessed(LOG);
-      }
-    }
-
-    if (emIterProgress != null) {
-      emIterProgress.ensureCompleted(LOG);
-    }
-
-    return probabilities;
-  }
-
-  /**
    * Creates a hard clustering from the specified soft membership matrix.
    * 
-   * @param M the membership matrix.
+   * @param probClusterIGivenX the membership matrix.
    * @param dbids mapping matrix row to DBID.
    * @return a hard clustering based on the matrix.
    */
-  private ArrayList<ClusterCandidate> hardClustering(Matrix M, List<Sig> clusterCores, ArrayModifiableDBIDs dbids) {
-    final int n = dbids.size();
-    final int k = M.getColumnDimensionality();
+  private ArrayList<ClusterCandidate> hardClustering(WritableDataStore<double[]> probClusterIGivenX, List<Signature> clusterCores, ArrayModifiableDBIDs dbids) {
+    final int k = clusterCores.size();
 
     // Initialize cluster sets.
     ArrayList<ClusterCandidate> candidates = new ArrayList<>();
-    for (Sig sig : clusterCores) {
+    for (Signature sig : clusterCores) {
       candidates.add(new ClusterCandidate(sig));
     }
 
-    DBIDArrayIter iter = dbids.iter();
     // Perform hard partitioning, assigning each data point only to one cluster,
     // namely that one it is most likely to belong to.
-    for (int point = 0; point < n; ++point) {
+    for (DBIDIter iter = dbids.iter(); iter.valid(); iter.advance()) {
+      final double[] probs = probClusterIGivenX.get(iter);
       int bestCluster = 0;
-      double bestProbability = M.get(point, 0);
-      for (int cluster = 1; cluster < k; ++cluster) {
-        double probability = M.get(point, cluster);
-        if (probability > bestProbability) {
-          bestCluster = cluster;
-          bestProbability = probability;
+      double bestProbability = probs[0];
+      for (int c = 1; c < k; ++c) {
+        if (probs[c] > bestProbability) {
+          bestCluster = c;
+          bestProbability = probs[c];
         }
       }
-      iter.seek(point);
       candidates.get(bestCluster).ids.add(iter);
     }
 
@@ -746,30 +639,27 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * attributes.
    * 
    * @param relation Data relation
+   * @param means Cluster means
+   * @param invCovMatr Inverse covariance matrixes
    * @param clusterCandidates the list of clusters to check.
    * @param nonUniformDimensionCount the number of dimensions to consider when
    *        testing.
    * @param noise the set to which to add points deemed outliers.
    */
-  private void findOutliers(Relation<V> relation, ArrayList<ClusterCandidate> clusterCandidates, int nonUniformDimensionCount, ModifiableDBIDs noise) {
+  private void findOutliers(Relation<V> relation, Vector[] means, Matrix[] invCovMatr, ArrayList<ClusterCandidate> clusterCandidates, int nonUniformDimensionCount, ModifiableDBIDs noise) {
     final int k = clusterCandidates.size();
 
-    for (int cluster = 0; cluster < k; ++cluster) {
-      final ClusterCandidate candidate = clusterCandidates.get(cluster);
+    for (int c = 0; c < k; ++c) {
+      final ClusterCandidate candidate = clusterCandidates.get(c);
       if (candidate.ids.size() < 2) {
         continue;
       }
-      final CovarianceMatrix cvm = CovarianceMatrix.make(relation, candidate.ids);
-      final Vector mean = cvm.getMeanVector();
-      final Matrix inverseCovariance = cvm.destroyToNaiveMatrix().cheatToAvoidSingularity(10e-9).inverse();
-      // FIXME: use an array iterator, instead of "get" - more efficient!
       for (DBIDMIter iter = candidate.ids.iter(); iter.valid(); iter.advance()) {
-        final Vector value = relation.get(iter).getColumnVector();
-        final Vector delta = mean.minus(value);
-        final double distance = MathUtil.mahalanobisDistance(inverseCovariance, delta);
+        final Vector mean = means[c];
+        final Vector delta = relation.get(iter).getColumnVector().minusEquals(mean);
+        final Matrix invCov = invCovMatr[c];
+        final double distance = MathUtil.mahalanobisDistance(invCov, delta);
         final int dof = candidate.dimensions.cardinality() - 1;
-        // final double distance = candidate.clusterCore.computeDistance(value);
-        // final int dof = nonUniformDimensionCount - 1;
         if ((1 - 0.001) <= ChiSquaredDistribution.cdf(distance, dof)) {
           // Outlier, remove it and add it to the outlier set.
           noise.add(iter);
@@ -788,7 +678,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param numBins Number of bins per dimension.
    * @return the merged signature, or null if the merge failed.
    */
-  protected Sig mergeSignatures(Sig first, Sig second, int numBins) {
+  protected Signature mergeSignatures(Signature first, Signature second, int numBins) {
     int d2 = -1;
     for (int i = 0; i < second.spec.length; i += 2) {
       if (second.spec[i] >= 0) {
@@ -821,10 +711,10 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     int[] spec = first.spec.clone();
     spec[d2] = second.spec[d2];
     spec[d2 + 1] = second.spec[d2];
-    return new Sig(spec, intersection);
+    return new Signature(spec, intersection);
   }
 
-  private static class Sig implements Cloneable {
+  private static class Signature implements Cloneable {
     /**
      * Subspace specification
      */
@@ -841,225 +731,23 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     boolean prune = false;
 
     /**
-     * Cached centroid, initialized as necessary.
-     */
-    Centroid centroid = null;
-
-    /**
-     * Cached covariance matrix, initialized as necessary.
-     */
-    Matrix inverseCovarianceMatrix = null;
-
-    /**
      * Constructor.
      * 
      * @param spec Subspace specification
      * @param ids IDs.
      */
-    private Sig(int[] spec, DBIDs ids) {
+    private Signature(int[] spec, DBIDs ids) {
       super();
       this.spec = spec;
       this.ids = ids;
     }
 
     @Override
-    protected Sig clone() throws CloneNotSupportedException {
-      Sig c = (Sig) super.clone();
+    protected Signature clone() throws CloneNotSupportedException {
+      Signature c = (Signature) super.clone();
       c.spec = this.spec.clone();
       c.ids = null;
       return c;
-    }
-  }
-
-  /**
-   * Class representing a p-signature (where p is the size of the vector).
-   * 
-   * <p>
-   * Important: this only overrides the methods used in this algorithm!
-   * </p>
-   */
-  private static class Signature {
-    /**
-     * The intervals contributing to this signature.
-     */
-    private final ArrayList<Interval> intervals = new ArrayList<>();
-
-    /**
-     * The dimensions this signature spans.
-     */
-    private final BitSet dimensions = new BitSet();
-
-    /**
-     * The data points contained in the hyper-cube spanned by this signature.
-     */
-    private final DBIDs supportSet;
-
-    /**
-     * Cached centroid, initialized as necessary.
-     */
-    private Centroid centroid;
-
-    /**
-     * Cached covariance matrix, initialized as necessary.
-     */
-    private Matrix inverseCovarianceMatrix;
-
-    /**
-     * Creates a new 1-signature for the specified interval.
-     * 
-     * @param relation the relation to get the support set.
-     * @param interval the interval.
-     */
-    public Signature(Relation<? extends NumberVector<?>> relation, Interval interval) {
-      intervals.add(interval);
-      dimensions.set(interval.getDimension());
-      // TODO Replace with DB query? Only runs once, so probably not so
-      // important.
-      ModifiableDBIDs support = DBIDUtil.newHashSet();
-      for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-        double value = relation.get(iter).doubleValue(interval.getDimension());
-        if (interval.getMin() <= value && interval.getMax() >= value) {
-          support.add(iter);
-        }
-      }
-      this.supportSet = support;
-    }
-
-    /**
-     * Creates a merged signature of two other signatures.
-     * 
-     * @param a the one signature.
-     * @param b the other signature.
-     */
-    private Signature(Signature a, Signature b) {
-      intervals.addAll(a.intervals);
-      intervals.addAll(b.intervals);
-      dimensions.or(a.dimensions);
-      dimensions.or(b.dimensions);
-      supportSet = DBIDUtil.intersection(a.supportSet, b.supportSet);
-    }
-
-    /**
-     * The support for this signature (<code>Supp(S)</code>).
-     */
-    public int getSupport() {
-      return supportSet.size();
-    }
-
-    /**
-     * Generates a merged signature of this and another one, where the other
-     * signature must be a 1-signature.
-     * 
-     * @param other the other signature to create a merge with.
-     * @return the merged signature, or null if the merge failed.
-     */
-    public Signature tryMerge(Signature other, double poissonThreshold) {
-      // Validate input.
-      if (other.intervals.size() != 1) {
-        throw new IllegalArgumentException("Other signature must be 1-signature.");
-      }
-
-      // Skip the merge if the interval is already part of the signature.
-      if (intervals.contains(other.intervals.get(0))) {
-        return null;
-      }
-
-      // Create merged signature.
-      Signature merged = new Signature(this, other);
-
-      // Definition 3, Condition 1:
-      int v = merged.getSupport();
-      double E = expectedSupport(other.intervals.get(0));
-      if (v > E && poisson(v, E) < poissonThreshold) {
-        // Condition is fulfilled, allow the merge.
-        return merged;
-      } else {
-        // Does not qualify for a merge.
-        return null;
-      }
-    }
-
-    /**
-     * Validates a cluster core against a 1-signature based on Definition 3,
-     * Condition 2, for pruning of cluster cores after the merge step.
-     * 
-     * @param other the interval to validate against.
-     * @return true if the cluster core holds, else false.
-     */
-    public boolean validate(Signature other, double poissonThreshold) {
-      if (intervals.contains(other.intervals.get(0))) {
-        // Interval is contained, don't check.
-        return true;
-      }
-
-      // Interval is not in cluster core, validate.
-      Signature merge = new Signature(this, other);
-
-      // Definition 3, Condition 2:
-      int v = merge.getSupport();
-      double E = expectedSupport(other.intervals.get(0));
-      return v <= E || poisson(v, E) >= poissonThreshold;
-    }
-
-    /**
-     * Computes the Mahalanobis distance for the specified vector to the
-     * centroid of the cluster core represented by this signature.
-     * 
-     * @param relation Data relation
-     * @param v the vector to compute the distance for.
-     * @return Mahalanobis distance.
-     */
-    public double computeDistance(Relation<? extends NumberVector<?>> relation, Vector v) {
-      // Lazy initialization.
-      if (centroid == null) {
-        centroid = Centroid.make(relation, supportSet);
-        inverseCovarianceMatrix = CovarianceMatrix.make(relation, supportSet).destroyToNaiveMatrix().inverse();
-      }
-      return MathUtil.mahalanobisDistance(inverseCovarianceMatrix, centroid.minus(v));
-    }
-
-    /**
-     * Computes the expected support of the (p+1)-signature resulting from
-     * adding the specified interval to this signature.
-     * 
-     * @param interval the interval to compute for.
-     * @return the expected support.
-     */
-    private double expectedSupport(Interval interval) {
-      return getSupport() * (interval.getMax() - interval.getMin());
-    }
-
-    /**
-     * Computes the value of the Poisson probability density function as defined
-     * in the paper (page 4).
-     * 
-     * @param v the number of observed occurrences.
-     * @param E the number of expected occurrences.
-     * @return the probability of observing the observation.
-     */
-    private double poisson(int v, double E) {
-      /*
-       * // This is precise but - as you would expect - very very slow. final
-       * BigDecimal exp = BigDecimal.valueOf(Math.exp(-E)); final BigDecimal pow
-       * = BigDecimal.valueOf(E).pow(v); final BigDecimal dividend =
-       * exp.multiply(pow); final BigDecimal divisor = new
-       * BigDecimal(MathUtil.factorial(BigInteger.valueOf(v))); final double
-       * result = dividend.divide(divisor, 40,
-       * RoundingMode.HALF_DOWN).doubleValue(); return result; /
-       */
-      // This is fast but tends to become inaccurate.
-      // return Math.exp(-E) * Math.pow(E, v) /
-      // MathUtil.approximateFactorial(v);
-      // So we move to log space which allows a fast approximation of the
-      // factorial (using the natural logarithm) via `v! = sum[i=1-v](log(i))`.
-      // e^-E * e^v / v! = e^(log(e^-E * E^v / v!)) = e^(log(e^-E) + log(E^v) -
-      // log(v!)) = e^(E + log(E^v) - sum[i=1-v](log(i)))
-      double sum = 0;
-      for (int i = 1; i <= v; ++i) {
-        sum += Math.log(sum);
-      }
-      return Math.exp(E + Math.log(Math.pow(E, v)) - sum);
-      // */
     }
   }
 
@@ -1071,12 +759,9 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   private static class ClusterCandidate {
     public final BitSet dimensions;
 
-    public final Sig clusterCore;
-
     public final ModifiableDBIDs ids;
 
-    public ClusterCandidate(Sig clusterCore) {
-      this.clusterCore = clusterCore;
+    public ClusterCandidate(Signature clusterCore) {
       this.dimensions = new BitSet(clusterCore.spec.length >> 1);
       for (int i = 0; i < clusterCore.spec.length; i += 2) {
         this.dimensions.set(i >> 1);

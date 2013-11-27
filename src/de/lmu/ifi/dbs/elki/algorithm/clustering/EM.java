@@ -303,7 +303,9 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       double[] clusterProbabilities = probClusterIGivenX.get(iditer);
       Vector instance = relation.get(iditer).getColumnVector();
       for (int i = 0; i < k; i++) {
-        cms[i].put(instance, clusterProbabilities[i]);
+        if (clusterProbabilities[i] > 0.) {
+          cms[i].put(instance, clusterProbabilities[i]);
+        }
       }
     }
     for (int i = 0; i < k; i++) {
@@ -353,6 +355,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
         }
         if (!(prob >= 0.)) {
           LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor[i]);
+          prob = 0.;
         }
         probabilities[i] = prob;
       }
