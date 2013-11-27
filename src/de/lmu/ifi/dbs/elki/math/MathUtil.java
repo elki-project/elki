@@ -227,7 +227,6 @@ public final class MathUtil {
    */
   public static double mahalanobisDistance(Matrix weightMatrix, Vector o1_minus_o2) {
     double sqrDist = o1_minus_o2.transposeTimesTimes(weightMatrix, o1_minus_o2);
-
     if (sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
       sqrDist = Math.abs(sqrDist);
     }
@@ -243,7 +242,6 @@ public final class MathUtil {
    */
   public static double mahalanobisDistance(double[][] weightMatrix, double[] o1_minus_o2) {
     double sqrDist = VMath.transposeTimesTimes(o1_minus_o2, weightMatrix, o1_minus_o2);
-
     if (sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
       sqrDist = Math.abs(sqrDist);
     }
