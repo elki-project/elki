@@ -151,72 +151,53 @@ public class PoissonDistribution extends AbstractDistribution {
   }
 
   /**
-   * Poisson PMF for integer values.
+   * Poisson probability mass function (PMF) for integer values.
+   * 
+   * @param x integer values
+   * @return Probability
+   */
+  public double pmf(int x) {
+    return pmf(x, n, p);
+  }
+
+  @Override
+  public double pdf(double x) {
+    // FIXME: return 0 for non-integer x?
+    return pmf(x, n, p);
+  }
+
+  /**
+   * Poisson probability mass function (PMF) for integer values.
    * 
    * @param x integer values
    * @return Probability
    */
   @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
-  public double pmf(int x) {
+  public static double pmf(double x, int n, double p) {
     // Invalid values
     if (x < 0 || x > n) {
-      return 0.0;
+      return 0.;
     }
     // Extreme probabilities
-    if (p <= 0d) {
-      return x == 0 ? 1.0 : 0.0;
+    if (p <= 0.) {
+      return x == 0 ? 1. : 0.;
     }
-    if (p >= 1d) {
-      return x == n ? 1.0 : 0.0;
-    }
-    // Extreme values of x
-    if (x == 0) {
-      if (p < 0.1) {
-        return Math.exp(-devianceTerm(n, n * (1.0 - p)) - n * p);
-      } else {
-        return Math.exp(n * Math.log(1.0 - p));
-      }
-    }
-    if (x == n) {
-      if (p > 0.9) {
-        return Math.exp(-devianceTerm(n, n * p) - n * (1 - p));
-      } else {
-        return Math.exp(n * Math.log(p));
-      }
-    }
-
-    final double lc = stirlingError(n) - stirlingError(x) - stirlingError(n - x) - devianceTerm(x, n * p) - devianceTerm(n - x, n * (1.0 - p));
-    final double f = (MathUtil.TWOPI * x * (n - x)) / n;
-    return Math.exp(lc) / Math.sqrt(f);
-  }
-
-  @Override
-  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
-  public double pdf(double x) {
-    // Invalid values
-    if (x < 0 || x > n) {
-      return 0.0;
-    }
-    // Extreme probabilities
-    if (p <= 0d) {
-      return x == 0 ? 1.0 : 0.0;
-    }
-    if (p >= 1d) {
-      return x == n ? 1.0 : 0.0;
+    if (p >= 1.) {
+      return x == n ? 1. : 0.;
     }
     final double q = 1 - p;
     // FIXME: check for x to be integer, return 0 otherwise?
 
     // Extreme values of x
     if (x == 0) {
-      if (p < 0.1) {
+      if (p < .1) {
         return Math.exp(-devianceTerm(n, n * q) - n * p);
       } else {
         return Math.exp(n * Math.log(q));
       }
     }
     if (x == n) {
-      if (p > 0.9) {
+      if (p > .9) {
         return Math.exp(-devianceTerm(n, n * p) - n * q);
       } else {
         return Math.exp(n * Math.log(p));
