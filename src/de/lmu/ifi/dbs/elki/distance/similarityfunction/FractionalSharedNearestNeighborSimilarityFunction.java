@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <O> object type
  */
-public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, ArrayDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {
+public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, ArrayDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O> {
   /**
    * Constructor.
    * 

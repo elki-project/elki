@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Marker interface to signal that the similarity function is normalized to
@@ -31,9 +31,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @author Erich Schubert
  * @param <O> object type
- * @param <D> distance type
  * 
  */
-public interface NormalizedSimilarityFunction<O, D extends Distance<?>> extends SimilarityFunction<O, D> {
+public interface NormalizedSimilarityFunction<O> extends SimilarityFunction<O, DoubleDistance> {
   // Empty - marker interface.
 }

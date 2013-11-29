@@ -70,14 +70,14 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
   /**
    * Holds the similarity function.
    */
-  protected NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction;
+  protected NormalizedSimilarityFunction<? super O> similarityFunction;
 
   /**
    * Constructor.
    * 
    * @param similarityFunction Similarity function to use.
    */
-  public AbstractSimilarityAdapter(NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction) {
+  public AbstractSimilarityAdapter(NormalizedSimilarityFunction<? super O> similarityFunction) {
     super();
     this.similarityFunction = similarityFunction;
   }
@@ -102,11 +102,11 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
     // Same subclass
-    if(!this.getClass().equals(obj.getClass())) {
+    if (!this.getClass().equals(obj.getClass())) {
       return false;
     }
     // Same similarity function
@@ -170,13 +170,13 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     /**
      * Holds the similarity function.
      */
-    protected NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction = null;
+    protected NormalizedSimilarityFunction<? super O> similarityFunction = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>>> param = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
-      if(config.grab(param)) {
+      final ObjectParameter<NormalizedSimilarityFunction<? super O>> param = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
+      if (config.grab(param)) {
         similarityFunction = param.instantiateClass(config);
       }
     }

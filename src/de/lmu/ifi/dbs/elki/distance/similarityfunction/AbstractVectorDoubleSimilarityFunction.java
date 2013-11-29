@@ -22,45 +22,29 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.database.query.similarity.PrimitiveSimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
- * Base implementation of a similarity function.
+ * Abstract base class for double-valued primitive similarity functions.
  * 
- * @author Arthur Zimek
- * 
- * @apiviz.excludeSubtypes
- * 
- * @param <O> object type
- * @param <D> distance type
+ * @author Erich Schubert
  */
-public abstract class AbstractPrimitiveSimilarityFunction<O, D extends Distance<D>> implements PrimitiveSimilarityFunction<O, D> {
-  /**
-   * Constructor.
-   */
-  protected AbstractPrimitiveSimilarityFunction() {
-    super();
+public abstract class AbstractVectorDoubleSimilarityFunction extends AbstractPrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> implements PrimitiveDoubleSimilarityFunction<NumberVector<?>> {
+  @Override
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 
   @Override
-  public boolean isSymmetric() {
-    // Assume symmetric by default!
-    return true;
+  public DoubleDistance similarity(NumberVector<?> o1, NumberVector<?> o2) {
+    return new DoubleDistance(doubleSimilarity(o1, o2));
   }
 
   @Override
-  abstract public SimpleTypeInformation<? super O> getInputTypeRestriction();
-
-  @Override
-  abstract public D similarity(O o1, O o2);
-
-  @Override
-  public <T extends O> SimilarityQuery<T, D> instantiate(Relation<T> relation) {
-    return new PrimitiveSimilarityQuery<>(relation, this);
+  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 }

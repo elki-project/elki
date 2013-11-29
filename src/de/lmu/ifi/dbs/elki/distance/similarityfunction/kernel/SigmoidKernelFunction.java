@@ -24,13 +24,8 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.query.similarity.PrimitiveSimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorDoubleSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -42,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  */
-public class SigmoidKernelFunction implements PrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> {
+public class SigmoidKernelFunction extends AbstractVectorDoubleSimilarityFunction {
   /**
    * Scaling factor c, bias theta
    */
@@ -60,50 +55,15 @@ public class SigmoidKernelFunction implements PrimitiveSimilarityFunction<Number
     this.theta = theta;
   }
 
-  /**
-   * Provides the linear kernel similarity between the given two vectors.
-   * 
-   * @param o1 first vector
-   * @param o2 second vector
-   * @return the linear kernel similarity between the given two vectors as an
-   *         instance of {@link DoubleDistance DoubleDistance}.
-   */
+  @Override
   public double doubleSimilarity(NumberVector<?> o1, NumberVector<?> o2) {
-    if (o1.getDimensionality() != o2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of Feature-Vectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
-    }
-
-    double sim = 0;
-    for (int i = 0; i < o1.getDimensionality(); i++) {
+    final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(o1, o2);
+    double sim = 0.;
+    for (int i = 0; i < dim; i++) {
       final double v = o1.doubleValue(i) * o2.doubleValue(i);
       sim += v;
     }
     return Math.tanh(c * sim + theta);
-  }
-
-  @Override
-  public DoubleDistance similarity(NumberVector<?> o1, NumberVector<?> o2) {
-    return new DoubleDistance(doubleSimilarity(o1, o2));
-  }
-
-  @Override
-  public boolean isSymmetric() {
-    return true;
-  }
-
-  @Override
-  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
-
-  @Override
-  public <T extends NumberVector<?>> SimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new PrimitiveSimilarityQuery<>(database, this);
   }
 
   /**
