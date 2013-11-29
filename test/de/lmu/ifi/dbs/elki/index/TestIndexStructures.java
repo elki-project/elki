@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
@@ -98,7 +98,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testExact() {
     ListParameterization params = new ListParameterization();
-    testFileBasedDatabaseConnection(params, LinearScanKNNQuery.class, LinearScanRangeQuery.class);
+    testFileBasedDatabaseConnection(params, LinearScanDistanceKNNQuery.class, LinearScanDistanceRangeQuery.class);
   }
 
   /**

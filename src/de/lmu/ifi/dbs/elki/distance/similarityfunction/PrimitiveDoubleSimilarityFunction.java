@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.distance;
+package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 /*
  This file is part of ELKI:
@@ -23,46 +23,27 @@ package de.lmu.ifi.dbs.elki.database.ids.distance;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
- * An object containing Double-DBID-Pairs.
+ * Interface for similarity functions that can provide a raw double value.
+ * 
+ * This is for use in performance-critical situations that need to avoid the
+ * boxing/unboxing cost of regular distance API.
  * 
  * @author Erich Schubert
+ * 
+ * @param <O> Object type
  */
-public interface ModifiableDoubleDistanceDBIDList extends DoubleDistanceDBIDList, ModifiableDistanceDBIDList<DoubleDistance> {
+public interface PrimitiveDoubleSimilarityFunction<O> extends PrimitiveSimilarityFunction<O, DoubleDistance> {
   /**
-   * Add an element.
+   * Computes the similarity between two given Objects according to this
+   * similarity function.
    * 
-   * @deprecated Pass a double value instead.
-   * 
-   * @param dist Distance
-   * @param id ID
+   * @param o1 first Object
+   * @param o2 second Object
+   * @return the similarity between two given Objects according to this
+   *         similarity function
    */
-  @Override
-  @Deprecated
-  void add(DoubleDistance dist, DBIDRef id);
-
-  /**
-   * Add an element.
-   * 
-   * @param dist Distance
-   * @param id ID
-   */
-  void add(double dist, DBIDRef id);
-
-  /**
-   * Add an element.
-   * 
-   * @param pair Pair to add
-   */
-  void add(DoubleDistanceDBIDPair pair);
-
-  /**
-   * Clear the list contents.
-   */
-  void clear();
+  double doubleSimilarity(O o1, O o2);
 }

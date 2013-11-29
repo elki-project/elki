@@ -245,7 +245,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
 
     @Override
     public KNNList<DoubleDistance> getKNNForObject(O obj, int k) {
-      final DoubleDistanceKNNHeap knns = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k);
+      final DoubleDistanceKNNHeap knns = DBIDUtil.newDoubleDistanceHeap(k);
       kdKNNSearch(0, sorted.size(), 0, obj, knns, sorted.iter(), Double.POSITIVE_INFINITY);
       return knns.toKNNList();
     }

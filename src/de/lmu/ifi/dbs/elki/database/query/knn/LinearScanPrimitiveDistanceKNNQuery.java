@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.uses PrimitiveDistanceQuery
  */
-public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> extends LinearScanKNNQuery<O, D> {
+public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> extends LinearScanDistanceKNNQuery<O, D> {
   /**
    * Constructor.
    * 

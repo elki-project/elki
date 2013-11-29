@@ -40,7 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
+ * @apiviz.has 
+ *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
+ *             .Factory
  * @apiviz.has Instance oneway - - «create»
  * 
  * @param <O> object type
@@ -59,7 +61,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
   @Override
   public <T extends O> Instance<T> instantiate(Relation<T> database) {
     SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Relation<O>) database);
-    return (Instance<T>) new Instance<>((Relation<O>) database, indexi);
+    return (Instance<T>) new Instance<>((Relation<O>) database, indexi, this);
   }
 
   /**
@@ -73,13 +75,19 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
    */
   public static class Instance<T> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>, ArrayDBIDs, DoubleDistance> {
     /**
+     * Similarity function.
+     */
+    private FractionalSharedNearestNeighborSimilarityFunction<? super T> similarityFunction;
+
+    /**
      * Constructor.
      * 
      * @param database Database
      * @param preprocessor Preprocessor
      */
-    public Instance(Relation<T> database, SharedNearestNeighborIndex<T> preprocessor) {
+    public Instance(Relation<T> database, SharedNearestNeighborIndex<T> preprocessor, FractionalSharedNearestNeighborSimilarityFunction<? super T> similarityFunction) {
       super(database, preprocessor);
+      this.similarityFunction = similarityFunction;
     }
 
     /**
@@ -115,6 +123,11 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
       DBIDs neighbors2 = index.getNearestNeighborSet(id2);
       int intersection = countSharedNeighbors(neighbors1, neighbors2);
       return new DoubleDistance((double) intersection / index.getNumberOfNeighbors());
+    }
+
+    @Override
+    public SimilarityFunction<? super T, DoubleDistance> getSimilarityFunction() {
+      return similarityFunction;
     }
 
     @Override

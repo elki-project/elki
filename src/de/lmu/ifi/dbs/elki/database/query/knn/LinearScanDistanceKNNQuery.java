@@ -45,13 +45,13 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.landmark
  * @apiviz.has DistanceQuery
  */
-public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> implements LinearScanQuery {
+public class LinearScanDistanceKNNQuery<O, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> implements LinearScanQuery {
   /**
    * Constructor.
    * 
    * @param distanceQuery Distance function to use
    */
-  public LinearScanKNNQuery(DistanceQuery<O, D> distanceQuery) {
+  public LinearScanDistanceKNNQuery(DistanceQuery<O, D> distanceQuery) {
     super(distanceQuery);
   }
 

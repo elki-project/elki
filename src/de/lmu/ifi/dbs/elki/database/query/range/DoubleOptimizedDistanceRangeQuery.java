@@ -27,9 +27,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDPairList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
@@ -42,7 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @param <O> Database object type
  */
-public class DoubleOptimizedRangeQuery<O> extends LinearScanRangeQuery<O, DoubleDistance> implements LinearScanQuery {
+public class DoubleOptimizedDistanceRangeQuery<O> extends LinearScanDistanceRangeQuery<O, DoubleDistance> implements LinearScanQuery {
   /**
    * Raw distance function.
    */
@@ -54,7 +55,7 @@ public class DoubleOptimizedRangeQuery<O> extends LinearScanRangeQuery<O, Double
    * @param distanceQuery Distance function to use
    */
   @SuppressWarnings("unchecked")
-  public DoubleOptimizedRangeQuery(DistanceQuery<O, DoubleDistance> distanceQuery) {
+  public DoubleOptimizedDistanceRangeQuery(DistanceQuery<O, DoubleDistance> distanceQuery) {
     super(distanceQuery);
     if (!(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction)) {
       throw new UnsupportedOperationException("DoubleOptimizedRangeQuery instantiated for non-PrimitiveDoubleDistanceFunction!");
@@ -64,27 +65,19 @@ public class DoubleOptimizedRangeQuery<O> extends LinearScanRangeQuery<O, Double
 
   @Override
   public DistanceDBIDList<DoubleDistance> getRangeForDBID(DBIDRef id, DoubleDistance range) {
-    double epsilon = range.doubleValue();
-
-    O qo = relation.get(id);
-    ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDKNNList();
-    for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      double doubleDistance = rawdist.doubleDistance(qo, relation.get(iter));
-      if (doubleDistance <= epsilon) {
-        result.add(doubleDistance, iter);
-      }
-    }
-    result.sort();
-    return result;
+    return getRangeForObject(relation.get(id), range);
   }
 
   @Override
   public DistanceDBIDList<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
-    double epsilon = range.doubleValue();
+    // Avoid getfield in hot loop:
+    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
+    final Relation<? extends O> relation = this.relation;
+    final double epsilon = range.doubleValue();
 
-    ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDKNNList();
-    for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
+    ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDPairList();
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
       if (doubleDistance <= epsilon) {
         result.add(doubleDistance, iter);
       }

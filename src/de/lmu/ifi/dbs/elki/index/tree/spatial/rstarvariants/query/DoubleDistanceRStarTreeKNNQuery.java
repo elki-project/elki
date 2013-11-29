@@ -269,7 +269,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
-    final DoubleDistanceKNNHeap knnList = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k);
+    final DoubleDistanceKNNHeap knnList = DBIDUtil.newDoubleDistanceHeap(k);
     doKNNQuery(obj, knnList);
     return knnList.toKNNList();
   }
@@ -281,10 +281,11 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     }
 
     // While this works, it seems to be slow at least for large sets!
+    // TODO: use a DataStore instead of a map.
     final Map<DBID, DoubleDistanceKNNHeap> knnLists = new HashMap<>(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
-      knnLists.put(id, (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k));
+      knnLists.put(id, DBIDUtil.newDoubleDistanceHeap(k));
     }
 
     batchNN(tree.getRoot(), knnLists);

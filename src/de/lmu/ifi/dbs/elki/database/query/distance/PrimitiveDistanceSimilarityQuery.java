@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction
+ * @apiviz.uses PrimitiveSimilarityFunction
  * 
  * @param <O> Object type
  * @param <D> Distance type
@@ -82,5 +82,10 @@ public class PrimitiveDistanceSimilarityQuery<O, D extends Distance<D>> extends 
   @Override
   public D similarity(O o1, O o2) {
     return this.similarityFunction.similarity(o1, o2);
+  }
+
+  @Override
+  public PrimitiveSimilarityFunction<? super O, D> getSimilarityFunction() {
+    return similarityFunction;
   }
 }

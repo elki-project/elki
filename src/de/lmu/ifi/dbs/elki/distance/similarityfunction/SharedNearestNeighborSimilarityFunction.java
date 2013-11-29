@@ -40,7 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
+ * @apiviz.has 
+ *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
+ *             .Factory
  * @apiviz.has Instance oneway - - «create»
  * 
  * @param <O> object type
@@ -72,17 +74,15 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
     int intersection = 0;
     DBIDIter iter1 = neighbors1.iter();
     DBIDIter iter2 = neighbors2.iter();
-    while(iter1.valid() && iter2.valid()) {
+    while (iter1.valid() && iter2.valid()) {
       final int comp = DBIDUtil.compare(iter1, iter2);
-      if(comp == 0) {
+      if (comp == 0) {
         intersection++;
         iter1.advance();
         iter2.advance();
-      }
-      else if(comp < 0) {
+      } else if (comp < 0) {
         iter1.advance();
-      }
-      else // iter2 < iter1
+      } else // iter2 < iter1
       {
         iter2.advance();
       }
@@ -94,7 +94,7 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
   @Override
   public <T extends O> Instance<T> instantiate(Relation<T> database) {
     SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Relation<O>) database);
-    return (Instance<T>) new Instance<>((Relation<O>) database, indexi);
+    return (Instance<T>) new Instance<>((Relation<O>) database, indexi, this);
   }
 
   /**
@@ -108,13 +108,19 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
    */
   public static class Instance<O> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
     /**
+     * Similarity function.
+     */
+    private SharedNearestNeighborSimilarityFunction<? super O> similarityFunction;
+
+    /**
      * Constructor.
-     *
+     * 
      * @param database Database
      * @param preprocessor Index
      */
-    public Instance(Relation<O> database, SharedNearestNeighborIndex<O> preprocessor) {
+    public Instance(Relation<O> database, SharedNearestNeighborIndex<O> preprocessor, SharedNearestNeighborSimilarityFunction<? super O> similarityFunction) {
       super(database, preprocessor);
+      this.similarityFunction = similarityFunction;
     }
 
     @Override
@@ -127,6 +133,11 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
     @Override
     public IntegerDistance getDistanceFactory() {
       return IntegerDistance.FACTORY;
+    }
+
+    @Override
+    public SimilarityFunction<? super O, IntegerDistance> getSimilarityFunction() {
+      return similarityFunction;
     }
   }
 

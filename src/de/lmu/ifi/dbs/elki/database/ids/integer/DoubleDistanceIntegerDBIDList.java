@@ -27,8 +27,7 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -38,11 +37,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @apiviz.uses DoubleIntegerArrayQuickSort
  */
-public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHeap, DoubleDistanceKNNList, IntegerDBIDs {
+public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDBIDList, IntegerDBIDs {
   /**
-   * The k value this list was generated for.
+   * Initial size allocation.
    */
-  int k;
+  private static final int INITIAL_SIZE = 21;
 
   /**
    * The size
@@ -61,15 +60,24 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
 
   /**
    * Constructor.
-   * 
-   * @param k K parameter
    */
-  public DoubleDistanceIntegerDBIDKNNListHeap(int k) {
+  public DoubleDistanceIntegerDBIDList() {
+    this(INITIAL_SIZE);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param size Initial size
+   */
+  public DoubleDistanceIntegerDBIDList(int size) {
     super();
-    this.k = k;
-    this.size = 0;
-    this.dists = new double[k + 1];
-    this.ids = new int[k + 1];
+    if (size <= 1) {
+      size = INITIAL_SIZE;
+    }
+    this.dists = new double[size];
+    this.ids = new int[size];
+    this.size = 0; // not filled yet.
   }
 
   @Override
@@ -80,8 +88,8 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
   @Override
   public boolean contains(DBIDRef o) {
     final int q = o.internalGetIndex();
-    for(int i = 0; i < size; i++) {
-      if(q == ids[i]) {
+    for (int i = 0; i < size; i++) {
+      if (q == ids[i]) {
         return true;
       }
     }
@@ -99,27 +107,8 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
   }
 
   @Override
-  public int getK() {
-    return k;
-  }
-
-  @Override
   public DoubleDistanceIntegerDBIDPair get(int index) {
     return new DoubleDistanceIntegerDBIDPair(dists[index], ids[index]);
-  }
-
-  @Override
-  @Deprecated
-  public DoubleDistance getKNNDistance() {
-    return new DoubleDistance(doubleKNNDistance());
-  }
-
-  @Override
-  public double doubleKNNDistance() {
-    if(size < k) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return dists[k - 1];
   }
 
   /**
@@ -128,90 +117,32 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
    * @param dist Distance
    * @param id Internal index
    */
-  protected void append(double dist, int id) {
-    ensureSize(size + 1);
+  protected void addInternal(double dist, int id) {
+    final int len = dists.length;
+    if (size == len) {
+      final int newlength = len + (len >>> 1);
+      dists = Arrays.copyOf(dists, newlength);
+      ids = Arrays.copyOf(ids, newlength);
+    }
     dists[size] = dist;
     ids[size] = id;
     ++size;
   }
 
-  /**
-   * Add a new element to the heap/list.
-   * 
-   * @param dist Distance
-   * @param id Object ID
-   */
-  protected void add(double dist, int id) {
-    if(size < k) {
-      dists[size] = dist;
-      ids[size] = id;
-      ++size;
-      if(size == k) {
-        sort();
-      }
-      return;
-    }
-    if (dist > dists[size - 1]) {
-      return;
-    }
-    // Ensure we have enough space.
-    ensureSize(size + 1);
-    // Insertion sort:
-    int pos = size;
-    while(pos > 0 && dists[pos - 1] > dist) {
-      dists[pos] = dists[pos - 1];
-      ids[pos] = ids[pos - 1];
-      --pos;
-    }
-    dists[pos] = dist;
-    ids[pos] = id;
-    ++size;
-    // Truncate if necessary:
-    if(dists[k] > dists[k - 1]) {
-      size = k;
-    }
-  }
-
-  /**
-   * Ensure we have enough space.
-   * 
-   * @param size Desired size
-   */
-  private void ensureSize(int size) {
-    if(size > dists.length) {
-      final int newlength = Math.max(size, (dists.length << 1) + 1);
-      dists = Arrays.copyOf(dists, newlength);
-      ids = Arrays.copyOf(ids, newlength);
-    }
-  }
-
   @Override
   @Deprecated
   public void add(DoubleDistance dist, DBIDRef id) {
-    add(dist.doubleValue(), id);
-  }
-
-  @Override
-  @Deprecated
-  public void add(Double dist, DBIDRef id) {
-    add(dist.doubleValue(), id);
+    addInternal(dist.doubleValue(), id.internalGetIndex());
   }
 
   @Override
   public void add(double dist, DBIDRef id) {
-    add(dist, id.internalGetIndex());
+    addInternal(dist, id.internalGetIndex());
   }
 
   @Override
   public void add(DoubleDistanceDBIDPair pair) {
-    add(pair.doubleDistance(), pair.internalGetIndex());
-  }
-
-  /**
-   * Sort the current contents of the list.
-   */
-  protected void sort() {
-    DoubleIntegerArrayQuickSort.sort(dists, ids, 0, size);
+    addInternal(pair.doubleDistance(), pair.internalGetIndex());
   }
 
   @Override
@@ -222,28 +153,58 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
   }
 
   @Override
-  public DoubleDistanceIntegerDBIDPair poll() {
-    return new DoubleDistanceIntegerDBIDPair(dists[k], ids[k]);
+  public void sort() {
+    DoubleIntegerArrayQuickSort.sort(dists, ids, 0, size);
   }
 
-  @Override
-  public DoubleDistanceIntegerDBIDPair peek() {
-    return new DoubleDistanceIntegerDBIDPair(dists[k], ids[k]);
+  /**
+   * Reverse the list.
+   */
+  protected void reverse() {
+    for (int i = 0, j = size - 1; i < j; i++, j--) {
+      double tmpd = dists[j];
+      dists[j] = dists[i];
+      dists[i] = tmpd;
+      int tmpi = ids[j];
+      ids[j] = ids[i];
+      ids[i] = tmpi;
+    }
   }
 
-  @Override
-  public DoubleDistanceKNNList toKNNList() {
-    return this;
+  /**
+   * Truncate the list to the given size.
+   * 
+   * @param newsize New size
+   */
+  public void truncate(int newsize) {
+    if (newsize < size) {
+      ids = Arrays.copyOf(ids, newsize);
+      dists = Arrays.copyOf(dists, newsize);
+      size = newsize;
+    }
+  }
+
+  /**
+   * Get the distance of the object at position pos.
+   * 
+   * Usually, you should be using an iterator instead. This part of the API is
+   * not stable.
+   * 
+   * @param pos Position
+   * @return Double distance.
+   */
+  public double getDoubleDistance(int pos) {
+    return dists[pos];
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append("kNNListHeap[");
-    for(DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
+    buf.append("DistanceDBIDList[");
+    for (DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleDistance()).append(':').append(iter.internalGetIndex());
       iter.advance();
-      if(iter.valid()) {
+      if (iter.valid()) {
         buf.append(',');
       }
     }
@@ -283,7 +244,7 @@ public class DoubleDistanceIntegerDBIDKNNListHeap implements DoubleDistanceKNNHe
 
     @Override
     public void retract() {
-      offset--;
+      --offset;
     }
 
     @Override
