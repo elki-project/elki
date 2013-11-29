@@ -23,28 +23,15 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Comparator;
-
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
  * Optimized linear scan query for {@link PrimitiveDoubleDistanceFunction}s.
@@ -92,7 +79,7 @@ public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQue
    * @param k Desired number of neighbors
    * @return kNN result
    */
-  DoubleDistanceKNNList getKNNForObjectKNNHeap(O obj, int k) {
+  private final DoubleDistanceKNNList getKNNForObjectKNNHeap(O obj, int k) {
     // Avoid getfield in hot loop:
     final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
     final Relation<? extends O> relation = this.relation;
@@ -102,80 +89,5 @@ public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQue
       heap.add(dist, iter);
     }
     return heap.toKNNList();
-  }
-
-  /**
-   * In-memory kNN search by materializing a full distance column.
-   * 
-   * @param obj Query object
-   * @param k Desired number of neighbors
-   * @return kNN result
-   */
-  DoubleDistanceKNNList getKNNForObjectInMemoryQuickSelect(O obj, int k) {
-    // Avoid getfield in hot loop:
-    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
-    final Relation<? extends O> relation = this.relation;
-
-    DBIDs ids = relation.getDBIDs();
-    final WritableDoubleDataStore data = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
-    ArrayModifiableDBIDs aids = DBIDUtil.newArray(ids);
-    for (DBIDIter iter = aids.iter(); iter.valid(); iter.advance()) {
-      data.putDouble(iter, rawdist.doubleDistance(obj, relation.get(iter)));
-    }
-    final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
-      @Override
-      public int compare(DBIDRef o1, DBIDRef o2) {
-        return Double.compare(data.doubleValue(o1), data.doubleValue(o2));
-      }
-    };
-    // Partially sort pivot.
-    QuickSelect.quickSelect(aids, comp, 0, ids.size(), k - 1);
-    // Sort the first k completely.
-    aids.sort(0, k, comp);
-    // Convert to a kNN list
-    ArrayList<DoubleDistanceDBIDPair> list = new ArrayList<>(k + 10);
-    DBIDArrayIter iter = aids.iter();
-    double kdist = 0.;
-    for (int i = 0; i < k && iter.valid(); i++, iter.advance()) {
-      final double dist = data.doubleValue(iter);
-      list.add(DBIDUtil.newDistancePair(dist, iter));
-      kdist = dist; // Track maximum
-    }
-    // Add ties: Note that we can't stop early, as the remainder is not fully
-    // sorted (and QuickSelect doesn't tell us the previous pivot position.)
-    for (; iter.valid(); iter.advance()) {
-      final double dist = data.doubleValue(iter);
-      if (dist > kdist) {
-        break;
-      }
-      list.add(DBIDUtil.newDistancePair(dist, iter));
-    }
-    data.destroy();
-    return new DoubleDistanceDBIDPairKNNList(list, k);
-  }
-
-  /**
-   * In-memory kNN search by materializing a full distance column.
-   * 
-   * @param obj Query object
-   * @param k Desired number of neighbors
-   * @return kNN result
-   */
-  DoubleDistanceKNNList getKNNForObjectInMemoryQuickSort(O obj, int k) {
-    // Avoid getfield in hot loop:
-    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
-    final Relation<? extends O> relation = this.relation;
-
-    DoubleDistanceIntegerDBIDKNNList list = new DoubleDistanceIntegerDBIDKNNList(k, relation.size());
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      list.add(rawdist.doubleDistance(obj, relation.get(iter)), iter);
-    }
-    list.sort();
-    double kdist = list.doubleKNNDistance();
-    while (list.getDoubleDistance(k) <= kdist) {
-      k++;
-    }
-    list.truncate(k);
-    return list;
   }
 }
