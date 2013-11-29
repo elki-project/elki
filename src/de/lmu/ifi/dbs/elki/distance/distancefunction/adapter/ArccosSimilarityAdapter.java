@@ -47,7 +47,7 @@ public class ArccosSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
    * 
    * @param similarityFunction Similarity function
    */
-  public ArccosSimilarityAdapter(NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction) {
+  public ArccosSimilarityAdapter(NormalizedSimilarityFunction<? super O> similarityFunction) {
     super(similarityFunction);
   }
 

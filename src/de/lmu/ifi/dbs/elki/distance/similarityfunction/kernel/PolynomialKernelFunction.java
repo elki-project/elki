@@ -24,17 +24,17 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorDoubleSimilarityFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Simon Paradies
  */
-public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?>, DoubleDistance> implements PrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> {
+public class PolynomialKernelFunction extends AbstractVectorDoubleSimilarityFunction implements PrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * The default degree.
    */
@@ -82,44 +82,29 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
     this(degree, 0.);
   }
 
-  /**
-   * Provides the linear kernel similarity between the given two vectors.
-   * 
-   * @param o1 first vector
-   * @param o2 second vector
-   * @return the linear kernel similarity between the given two vectors as an
-   *         instance of {@link DoubleDistance DoubleDistance}.
-   */
+  @Override
   public double doubleSimilarity(NumberVector<?> o1, NumberVector<?> o2) {
-    if (o1.getDimensionality() != o2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of Feature-Vectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
-    }
-
-    double sim = 0;
-    for (int i = 0; i < o1.getDimensionality(); i++) {
+    final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(o1, o2);
+    double sim = 0.;
+    for (int i = 0; i < dim; i++) {
       sim += o1.doubleValue(i) * o2.doubleValue(i);
     }
     return MathUtil.powi(sim + bias, degree);
   }
 
   @Override
-  public DoubleDistance similarity(NumberVector<?> o1, NumberVector<?> o2) {
-    return new DoubleDistance(doubleSimilarity(o1, o2));
-  }
-
-  @Override
   public DoubleDistance distance(final NumberVector<?> fv1, final NumberVector<?> fv2) {
-    return new DoubleDistance(Math.sqrt(doubleSimilarity(fv1, fv1) + doubleSimilarity(fv2, fv2) - 2 * doubleSimilarity(fv1, fv2)));
+    return new DoubleDistance(doubleDistance(fv1, fv2));
   }
 
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public boolean isMetric() {
+    return true;
   }
 
   @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
+  public double doubleDistance(NumberVector<?> fv1, NumberVector<?> fv2) {
+    return Math.sqrt(doubleSimilarity(fv1, fv1) + doubleSimilarity(fv2, fv2) - 2 * doubleSimilarity(fv1, fv2));
   }
 
   @Override
@@ -159,6 +144,7 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter degreeP = new IntParameter(DEGREE_ID, DEFAULT_DEGREE);
+      degreeP.addConstraint(new GreaterConstraint(1));
       if (config.grab(degreeP)) {
         degree = degreeP.intValue();
       }
@@ -171,6 +157,9 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
 
     @Override
     protected PolynomialKernelFunction makeInstance() {
+      if (degree == 1 && (bias == 0.)) {
+        return LinearKernelFunction.STATIC;
+      }
       return new PolynomialKernelFunction(degree, bias);
     }
   }

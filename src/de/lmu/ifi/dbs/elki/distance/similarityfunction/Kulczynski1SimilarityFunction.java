@@ -24,9 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -38,11 +36,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * M.-M. Deza and E. Deza<br />
  * Dictionary of distances
  * </p>
- *
+ * 
  * @author Erich Schubert
  */
 @Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
-public class Kulczynski1SimilarityFunction extends AbstractPrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> {
+public class Kulczynski1SimilarityFunction extends AbstractVectorDoubleSimilarityFunction {
   /**
    * Static instance.
    */
@@ -59,34 +57,10 @@ public class Kulczynski1SimilarityFunction extends AbstractPrimitiveSimilarityFu
   }
 
   @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
-
-  @Override
-  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
-  public DoubleDistance similarity(NumberVector<?> o1, NumberVector<?> o2) {
-    return new DoubleDistance(doubleSimilarity(o1, o2));
-  }
-
-  /**
-   * Compute the similarity.
-   * 
-   * @param v1 First vector
-   * @param v2 Second vector
-   * @return Similarity
-   */
   public double doubleSimilarity(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim1 = v1.getDimensionality();
-    if (dim1 != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
-    }
+    final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(v1, v2);
     double sumdiff = 0., summin = 0.;
-    for (int i = 0; i < dim1; i++) {
+    for (int i = 0; i < dim; i++) {
       double xi = v1.doubleValue(i), yi = v2.doubleValue(i);
       sumdiff += Math.abs(xi - yi);
       summin += Math.min(xi, yi);

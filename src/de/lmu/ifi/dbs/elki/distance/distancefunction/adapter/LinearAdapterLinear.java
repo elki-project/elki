@@ -47,7 +47,7 @@ public class LinearAdapterLinear<O> extends AbstractSimilarityAdapter<O> {
    * 
    * @param similarityFunction Similarity function
    */
-  public LinearAdapterLinear(NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction) {
+  public LinearAdapterLinear(NormalizedSimilarityFunction<? super O> similarityFunction) {
     super(similarityFunction);
   }
 

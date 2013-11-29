@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.FloatVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -59,7 +60,7 @@ public final class TypeUtil {
   private TypeUtil() {
     // Do not instantiate.
   }
-  
+
   /**
    * Input type for algorithms that accept anything.
    */
@@ -103,7 +104,8 @@ public final class TypeUtil {
   /**
    * Either class label, object labels or a string - anything that will be
    * accepted by
-   * {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil#guessObjectLabelRepresentation}.
+   * {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil#guessObjectLabelRepresentation}
+   * .
    */
   public static final TypeInformation GUESSED_LABEL = new AlternativeTypeInformation(LABELLIST, CLASSLABEL, STRING);
 
@@ -194,6 +196,11 @@ public final class TypeUtil {
    * Cluster model type.
    */
   public static final SimpleTypeInformation<Model> MODEL = new SimpleTypeInformation<>(Model.class);
+
+  /**
+   * Any feature vector type.
+   */
+  public static final SimpleTypeInformation<FeatureVector<?>> FEATURE_VECTORS = new SimpleTypeInformation<>(FeatureVector.class);
 
   /**
    * Make a type array easily.

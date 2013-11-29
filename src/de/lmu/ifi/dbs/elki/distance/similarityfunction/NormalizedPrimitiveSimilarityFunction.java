@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-
 /**
  * Marker interface for similarity functions working on primitive objects, and
  * limited to the 0-1 value range.
@@ -32,8 +30,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public interface NormalizedPrimitiveSimilarityFunction<O, D extends Distance<D>> extends PrimitiveSimilarityFunction<O, D>, NormalizedSimilarityFunction<O, D> {
+public interface NormalizedPrimitiveSimilarityFunction<O> extends PrimitiveDoubleSimilarityFunction<O>, NormalizedSimilarityFunction<O> {
   // empty marker interface
 }

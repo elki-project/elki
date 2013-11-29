@@ -1,9 +1,10 @@
+de.lmu.ifi.dbs.elki.distance.similarityfunction.InvertedDistanceSimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardPrimitiveSimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski1SimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski2SimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.RadialBasisFunctionKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.SigmoidKernelFunction
-de.lmu.ifi.dbs.elki.distance.similarityfunction.InvertedDistanceSimilarityFunction
-de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski1SimilarityFunction
-de.lmu.ifi.dbs.elki.distance.similarityfunction.Kulczynski2SimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LaplaceKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.RationalQuadraticKernelFunction

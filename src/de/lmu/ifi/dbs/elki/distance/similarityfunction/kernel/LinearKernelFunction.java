@@ -24,74 +24,51 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Provides a linear Kernel function that computes a similarity between the two
  * feature vectors V1 and V2 defined by V1^T*V2.
  * 
+ * Note: this is effectively equivalent to using
+ * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
+ * 
  * @author Simon Paradies
- * @param <O> vector type
  */
-public class LinearKernelFunction<O extends NumberVector<?>> extends AbstractPrimitiveSimilarityFunction<O, DoubleDistance> implements PrimitiveDoubleDistanceFunction<O> {
+public class LinearKernelFunction extends PolynomialKernelFunction {
   /**
-   * Provides a linear Kernel function that computes a similarity between the
-   * two vectors V1 and V2 defined by V1^T*V2.
+   * Static instance.
    */
+  public static final LinearKernelFunction STATIC = new LinearKernelFunction();
+
+  /**
+   * Linear kernel. Use static instance {@link #STATIC}!
+   */
+  @Deprecated
   public LinearKernelFunction() {
-    super();
+    super(1, 0.);
   }
 
   @Override
-  public DoubleDistance similarity(final O o1, final O o2) {
-    return new DoubleDistance(doubleSimilarity(o1, o2));
-  }
-
-  protected double doubleSimilarity(final O o1, final O o2) {
-    if (o1.getDimensionality() != o2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of Feature-Vectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
-    }
-    double sim = 0;
-    for (int i = 0; i < o1.getDimensionality(); i++) {
+  public double doubleSimilarity(final NumberVector<?> o1, final NumberVector<?> o2) {
+    final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(o1, o2);
+    double sim = 0.;
+    for (int i = 0; i < dim; i++) {
       sim += o1.doubleValue(i) * o2.doubleValue(i);
     }
     return sim;
   }
 
   @Override
-  public double doubleDistance(final O fv1, final O fv2) {
+  public double doubleDistance(final NumberVector<?> fv1, final NumberVector<?> fv2) {
     return Math.sqrt(doubleSimilarity(fv1, fv1) + doubleSimilarity(fv2, fv2) - 2 * doubleSimilarity(fv1, fv2));
   }
 
-  @Override
-  public DoubleDistance distance(final O fv1, final O fv2) {
-    return new DoubleDistance(doubleDistance(fv1, fv2));
-  }
-
-  @Override
-  public VectorFieldTypeInformation<? super O> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
-
-  @Override
-  public boolean isMetric() {
-    return false;
-  }
-
-  @Override
-  public <T extends O> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new PrimitiveDistanceSimilarityQuery<>(database, this, this);
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected LinearKernelFunction makeInstance() {
+      return LinearKernelFunction.STATIC;
+    }
   }
 }

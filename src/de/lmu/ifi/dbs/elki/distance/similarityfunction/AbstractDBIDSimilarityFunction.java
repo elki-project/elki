@@ -49,9 +49,4 @@ public abstract class AbstractDBIDSimilarityFunction<D extends Distance<D>> exte
     super();
     this.database = database;
   }
-
-  @Override
-  public boolean isSymmetric() {
-    return true;
-  }
 }
