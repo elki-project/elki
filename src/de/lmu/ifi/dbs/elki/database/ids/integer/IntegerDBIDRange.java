@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
  * 
  * @apiviz.has IntegerDBID
  */
-class IntegerDBIDRange implements DBIDRange, SetDBIDs {
+final class IntegerDBIDRange implements DBIDRange, SetDBIDs {
   /**
    * Start value.
    */
@@ -154,21 +154,21 @@ class IntegerDBIDRange implements DBIDRange, SetDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr implements IntegerDBIDArrayIter {
+  private final static class DBIDItr implements IntegerDBIDArrayIter {
     /**
      * Current position.
      */
-    int pos = 0;
+    private int pos = 0;
 
     /**
      * Interval length.
      */
-    final int len;
+    final private int len;
 
     /**
      * Interval start.
      */
-    final int start;
+    final private int start;
 
     /**
      * Constructor.
@@ -176,7 +176,7 @@ class IntegerDBIDRange implements DBIDRange, SetDBIDs {
      * @param start Interval start
      * @param len Interval length
      */
-    DBIDItr(int start, int len) {
+    private DBIDItr(int start, int len) {
       super();
       this.start = start;
       this.len = len;
@@ -189,7 +189,7 @@ class IntegerDBIDRange implements DBIDRange, SetDBIDs {
 
     @Override
     public void advance() {
-      pos++;
+      ++pos;
     }
 
     @Override
@@ -199,7 +199,7 @@ class IntegerDBIDRange implements DBIDRange, SetDBIDs {
 
     @Override
     public void retract() {
-      pos--;
+      --pos;
     }
 
     @Override

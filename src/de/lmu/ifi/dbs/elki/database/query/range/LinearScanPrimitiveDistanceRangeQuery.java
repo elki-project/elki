@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> extends LinearScanRangeQuery<O, D> {
+public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> extends LinearScanDistanceRangeQuery<O, D> {
   /**
    * Constructor.
    * 

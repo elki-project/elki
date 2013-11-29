@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -110,7 +110,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     assertEquals("Data set size doesn't match parameters.", shoulds, rep.size());
 
     // get linear queries
-    LinearScanKNNQuery<DoubleVector, DoubleDistance> lin_knn_query = new LinearScanKNNQuery<>(distanceQuery);
+    LinearScanDistanceKNNQuery<DoubleVector, DoubleDistance> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
     LinearScanRKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query = new LinearScanRKNNQuery<>(distanceQuery, lin_knn_query, k);
 
     // get preprocessed queries
@@ -122,8 +122,8 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
     db.addIndex(preproc);
-    assertTrue("Preprocessor knn query class incorrect.", !(preproc_knn_query instanceof LinearScanKNNQuery));
-    assertTrue("Preprocessor rknn query class incorrect.", !(preproc_rknn_query instanceof LinearScanKNNQuery));
+    assertTrue("Preprocessor knn query class incorrect.", !(preproc_knn_query instanceof LinearScanDistanceKNNQuery));
+    assertTrue("Preprocessor rknn query class incorrect.", !(preproc_rknn_query instanceof LinearScanDistanceKNNQuery));
 
     // test queries
     testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);

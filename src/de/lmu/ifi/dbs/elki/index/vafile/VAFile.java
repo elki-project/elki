@@ -398,7 +398,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       Collections.sort(candidates);
 
       // refinement step
-      DoubleDistanceKNNHeap result = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k);
+      DoubleDistanceKNNHeap result = DBIDUtil.newDoubleDistanceHeap(k);
 
       // log.fine("candidates size " + candidates.size());
       // retrieve accurate distances

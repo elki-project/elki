@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory;
@@ -215,6 +216,14 @@ public interface DBIDFactory {
    * @return New heap
    */
   <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist);
+
+  /**
+   * Create an appropriate heap for double distances.
+   * 
+   * @param k K value
+   * @return New heap of size k, appropriate for this distance type.
+   */
+  DoubleDistanceKNNHeap newDoubleDistanceHeap(int k);
 
   /**
    * Get a serializer for DBIDs.

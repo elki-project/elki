@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -46,14 +47,19 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
   /**
    * Actual storage.
    */
-  final ArrayList<DistanceDBIDPair<D>> storage;
+  Object[] storage;
+
+  /**
+   * Current size.
+   */
+  int size = 0;
 
   /**
    * Constructor.
    */
   public GenericDistanceDBIDList() {
     super();
-    storage = new ArrayList<>();
+    storage = new Object[21];
   }
 
   /**
@@ -63,12 +69,14 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
    */
   public GenericDistanceDBIDList(int initialCapacity) {
     super();
-    storage = new ArrayList<>(initialCapacity);
+    storage = new Object[initialCapacity];
   }
 
   @Override
   public void add(D dist, DBIDRef id) {
-    storage.add(DBIDFactory.FACTORY.newDistancePair(dist, id));
+    ensureSize(size + 1);
+    storage[size] = DBIDFactory.FACTORY.newDistancePair(dist, id);
+    ++size;
   }
 
   /**
@@ -77,22 +85,34 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
    * @param pair Pair to add
    */
   public void add(DistanceDBIDPair<D> pair) {
-    storage.add(pair);
+    ensureSize(size + 1);
+    storage[size] = pair;
+    ++size;
+  }
+
+  private void ensureSize(int size) {
+    if (size < storage.length) {
+      storage = Arrays.copyOf(storage, (size << 1) + 1);
+    }
   }
 
   @Override
   public void sort() {
-    DistanceDBIDResultUtil.sortByDistance(storage);
+    @SuppressWarnings("unchecked")
+    final Comparator<Object> comp = (Comparator<Object>) DistanceDBIDResultUtil.distanceComparator();
+    Arrays.sort(storage, 0, size, comp);
+    // DistanceDBIDResultUtil.sortByDistance(storage);
   }
 
   @Override
   public int size() {
-    return storage.size();
+    return size;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public DistanceDBIDPair<D> get(int off) {
-    return storage.get(off);
+    return (DistanceDBIDPair<D>) storage[off];
   }
 
   @Override
@@ -102,8 +122,8 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
 
   @Override
   public boolean contains(DBIDRef o) {
-    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if(DBIDUtil.equal(iter, o)) {
+    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if (DBIDUtil.equal(iter, o)) {
         return true;
       }
     }
@@ -157,7 +177,7 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
     public DistanceDBIDPair<D> getDistancePair() {
       return get(pos);
     }
-    
+
     @Override
     public String toString() {
       return valid() ? getDistancePair().toString() : "null";

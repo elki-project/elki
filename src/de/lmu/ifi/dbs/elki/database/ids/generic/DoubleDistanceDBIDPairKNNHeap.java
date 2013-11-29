@@ -36,9 +36,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * See also: {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap}!
  * 
- * Experiments have shown that it <em>can</em> be much more performant to track the
- * knndistance <em>outside</em> of the heap, and do comparisons on the stack:
- * <blockquote>
+ * Experiments have shown that it <em>can</em> be much more performant to track
+ * the knndistance <em>outside</em> of the heap, and do comparisons on the
+ * stack: <blockquote>
  * 
  * <pre>
  * {@code
@@ -67,8 +67,13 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
   /**
    * Comparator class.
    */
-  public static final Comparator<DoubleDistanceDBIDPair> COMPARATOR = new Comp(); 
-  
+  public static final Comparator<DoubleDistanceDBIDPair> COMPARATOR = new Comp();
+
+  /**
+   * Reverse comparator.
+   */
+  public static final Comparator<DoubleDistanceDBIDPair> REVERSE_COMPARATOR = new RComp();
+
   /**
    * Cached distance to k nearest neighbor (to avoid going through {@link #peek}
    * too often).
@@ -87,7 +92,8 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
   }
 
   /**
-   * Serialize to a {@link DoubleDistanceDBIDPairKNNList}. This empties the heap!
+   * Serialize to a {@link DoubleDistanceDBIDPairKNNList}. This empties the
+   * heap!
    * 
    * @return KNNList with the heaps contents.
    */
@@ -191,6 +197,20 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
     @Override
     public int compare(DoubleDistanceDBIDPair o1, DoubleDistanceDBIDPair o2) {
       return -Double.compare(o1.doubleDistance(), o2.doubleDistance());
+    }
+  }
+
+  /**
+   * Comparator to use.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected static class RComp implements Comparator<DoubleDistanceDBIDPair> {
+    @Override
+    public int compare(DoubleDistanceDBIDPair o1, DoubleDistanceDBIDPair o2) {
+      return Double.compare(o1.doubleDistance(), o2.doubleDistance());
     }
   }
 }

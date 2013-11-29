@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * Run a database query in a database context.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Database object type.
  * @param <D> Distance result type.
  */
@@ -41,7 +41,7 @@ public class PrimitiveSimilarityQuery<O, D extends Distance<D>> extends Abstract
    * The distance function we use.
    */
   final protected PrimitiveSimilarityFunction<? super O, D> similarityFunction;
-  
+
   /**
    * Constructor.
    * 
@@ -86,5 +86,10 @@ public class PrimitiveSimilarityQuery<O, D extends Distance<D>> extends Abstract
   @Override
   public D getDistanceFactory() {
     return similarityFunction.getDistanceFactory();
+  }
+
+  @Override
+  public PrimitiveSimilarityFunction<? super O, D> getSimilarityFunction() {
+    return similarityFunction;
   }
 }

@@ -27,6 +27,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
@@ -546,6 +547,16 @@ public final class DBIDUtil {
    */
   public static <D extends Distance<D>> KNNHeap<D> newHeap(D distancetype, int k) {
     return DBIDFactory.FACTORY.newHeap(distancetype, k);
+  }
+
+  /**
+   * Create an appropriate heap for double distances.
+   * 
+   * @param k K value
+   * @return New heap of size k, appropriate for this distance type.
+   */
+  public static DoubleDistanceKNNHeap newDoubleDistanceHeap(int k) {
+    return DBIDFactory.FACTORY.newDoubleDistanceHeap(k);
   }
 
   /**

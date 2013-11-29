@@ -78,7 +78,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
     }
     index.statistics.countKNNQuery();
 
-    DoubleDistanceKNNHeap knnList = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k);
+    DoubleDistanceKNNHeap knnList = DBIDUtil.newDoubleDistanceHeap(k);
     double d_k = Double.POSITIVE_INFINITY;
 
     final ComparableMinHeap<DoubleMTreeDistanceSearchCandidate> pq = new ComparableMinHeap<>();

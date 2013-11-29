@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 
 /**
  * A similarity query serves as adapter layer for database and primitive
@@ -50,7 +51,7 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * @return the similarity between the two objects specified by their object
    *         ids
    */
-  public abstract D similarity(DBIDRef id1, DBIDRef id2);
+  D similarity(DBIDRef id1, DBIDRef id2);
 
   /**
    * Returns the similarity between the two objects specified by their object
@@ -61,7 +62,7 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * @return the similarity between the two objects specified by their object
    *         ids
    */
-  public abstract D similarity(O o1, DBIDRef id2);
+  D similarity(O o1, DBIDRef id2);
 
   /**
    * Returns the similarity between the two objects specified by their object
@@ -72,7 +73,7 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * @return the similarity between the two objects specified by their object
    *         ids
    */
-  public abstract D similarity(DBIDRef id1, O o2);
+  D similarity(DBIDRef id1, O o2);
 
   /**
    * Returns the similarity between the two objects specified by their object
@@ -83,19 +84,26 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * @return the similarity between the two objects specified by their object
    *         ids
    */
-  public abstract D similarity(O o1, O o2);
+  D similarity(O o1, O o2);
 
   /**
    * Method to get the distance functions factory.
    * 
    * @return Factory for distance objects
    */
-  public abstract D getDistanceFactory();
-  
+  D getDistanceFactory();
+
   /**
    * Access the underlying data query.
    * 
    * @return data query in use
    */
-  public abstract Relation<? extends O> getRelation();
+  Relation<? extends O> getRelation();
+
+  /**
+   * Get the inner similarity function.
+   * 
+   * @return Similarity function
+   */
+  SimilarityFunction<? super O, D> getSimilarityFunction();
 }

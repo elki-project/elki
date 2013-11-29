@@ -769,7 +769,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     }
 
     protected DoubleDistanceKNNList retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
-      DoubleDistanceKNNHeap result = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k);
+      DoubleDistanceKNNHeap result = DBIDUtil.newDoubleDistanceHeap(k);
       for(PartialVACandidate va : sortedCandidates) {
         double stopdist = result.doubleKNNDistance();
         DBID currentID = va.getId();

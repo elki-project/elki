@@ -73,8 +73,7 @@ public abstract class AbstractVectorDoubleDistanceFunction extends AbstractPrimi
    * @throws IllegalArgumentException when dimensionalities are not the same.
    */
   public static final int dimensionality(SpatialComparable o1, SpatialComparable o2) {
-    final int dim1 = o1.getDimensionality();
-    final int dim2 = o2.getDimensionality();
+    final int dim1 = o1.getDimensionality(), dim2 = o2.getDimensionality();
     if (dim1 != dim2) {
       throw new IllegalArgumentException("Objects do not have the same dimensionality.");
     }
@@ -92,8 +91,42 @@ public abstract class AbstractVectorDoubleDistanceFunction extends AbstractPrimi
    * @throws IllegalArgumentException when dimensionalities are not the same.
    */
   public static final int dimensionality(SpatialComparable o1, SpatialComparable o2, int expect) {
-    final int dim1 = o1.getDimensionality();
-    final int dim2 = o2.getDimensionality();
+    final int dim1 = o1.getDimensionality(), dim2 = o2.getDimensionality();
+    if (dim1 != dim2 || dim1 != expect) {
+      throw new IllegalArgumentException("Objects do not have the expected dimensionality of " + expect);
+    }
+    return expect;
+  }
+
+  /**
+   * Get the common dimensionality of the two objects. Throw an
+   * {@link IllegalArgumentException} otherwise.
+   * 
+   * @param o1 First vector / MBR
+   * @param o2 Second vector / MBR
+   * @return Common dimensionality
+   * @throws IllegalArgumentException when dimensionalities are not the same.
+   */
+  public static final int dimensionality(NumberVector<?> o1, NumberVector<?> o2) {
+    final int dim1 = o1.getDimensionality(), dim2 = o2.getDimensionality();
+    if (dim1 != dim2) {
+      throw new IllegalArgumentException("Objects do not have the same dimensionality.");
+    }
+    return dim1;
+  }
+
+  /**
+   * Get the common dimensionality of the two objects. Throw an
+   * {@link IllegalArgumentException} otherwise.
+   * 
+   * @param o1 First vector / MBR
+   * @param o2 Second vector / MBR
+   * @param expect Expected dimensionality
+   * @return Common dimensionality
+   * @throws IllegalArgumentException when dimensionalities are not the same.
+   */
+  public static final int dimensionality(NumberVector<?> o1, NumberVector<?> o2, int expect) {
+    final int dim1 = o1.getDimensionality(), dim2 = o2.getDimensionality();
     if (dim1 != dim2 || dim1 != expect) {
       throw new IllegalArgumentException("Objects do not have the expected dimensionality of " + expect);
     }

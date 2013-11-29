@@ -307,7 +307,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       KNNList<D> ilist = inner.getKNNForObject(pobj, (int) Math.ceil(k * kmulti));
       if (distq.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         PrimitiveDoubleDistanceFunction<? super O> df = (PrimitiveDoubleDistanceFunction<? super O>) distq.getDistanceFunction();
-        DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.FACTORY, k);
+        DoubleDistanceKNNHeap heap = DBIDUtil.newDoubleDistanceHeap(k);
         for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
           heap.add(df.doubleDistance(obj, distq.getRelation().get(iter)), iter);
           countRefinement();

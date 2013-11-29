@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -141,7 +141,7 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     // Approximate query:
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    if (knnQuery == null || knnQuery instanceof LinearScanKNNQuery) {
+    if (knnQuery == null || knnQuery instanceof LinearScanDistanceKNNQuery) {
       throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
     }
     // Exact query:

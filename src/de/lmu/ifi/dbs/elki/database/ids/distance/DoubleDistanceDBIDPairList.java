@@ -101,6 +101,11 @@ public class DoubleDistanceDBIDPairList implements ModifiableDoubleDistanceDBIDL
   }
 
   @Override
+  public void clear() {
+    storage.clear();
+  }
+
+  @Override
   public void sort() {
     Collections.sort(storage, DistanceDBIDResultUtil.distanceComparator());
   }

@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
  * Abstract base class for DBID factories.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.uses IntegerDBID oneway - - «create»
  * @apiviz.uses IntegerDBIDPair oneway - - «create»
  * @apiviz.uses IntegerDBIDRange oneway - - «create»
@@ -68,7 +68,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   @Override
   public void assignVar(DBIDVar var, int val) {
     if (var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar)var).internalSetIndex(val);
+      ((IntegerDBIDVar) var).internalSetIndex(val);
     } else {
       var.set(new IntegerDBID(val));
     }
@@ -149,12 +149,12 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   public DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id) {
     return new DoubleDistanceIntegerDBIDPair(val, id.internalGetIndex());
   }
-  
+
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> KNNHeap<D> newHeap(D factory, int k) {
     if (factory instanceof DoubleDistance) {
-      return (KNNHeap<D>) new DoubleDistanceIntegerDBIDKNNListHeap(k);
+      return (KNNHeap<D>) newDoubleDistanceHeap(k);
     }
     return new DistanceDBIDPairKNNHeap<>(k);
   }
@@ -163,7 +163,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   @Override
   public <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist) {
     if (exist instanceof DoubleDistanceKNNList) {
-      DoubleDistanceKNNHeap heap = new DoubleDistanceIntegerDBIDKNNListHeap(exist.getK());
+      DoubleDistanceKNNHeap heap = new DoubleDistanceIntegerDBIDSortedKNNList(exist.getK());
       // Insert backwards, as this will produce a proper heap
       for (int i = exist.size() - 1; i >= 0; i--) {
         heap.add((DoubleDistanceDBIDPair) exist.get(i));
@@ -177,6 +177,15 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
       }
       return heap;
     }
+  }
+
+  @Override
+  public DoubleDistanceKNNHeap newDoubleDistanceHeap(int k) {
+    // TODO: benchmark threshold!
+    if (k > 1000) {
+      return new DoubleDistanceIntegerDBIDKNNHeap(k);
+    }
+    return new DoubleDistanceIntegerDBIDSortedKNNList(k);
   }
 
   @Override
