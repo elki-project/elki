@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
-import java.util.BitSet;
-
-import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,6 +22,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Maximum distance function. Optimized for sparse vectors.
@@ -37,7 +35,7 @@ public class SparseMaximumDistanceFunction extends SparseLPNormDistanceFunction 
    * Static instance
    */
   public static final SparseMaximumDistanceFunction STATIC = new SparseMaximumDistanceFunction();
-  
+
   /**
    * Constructor.
    * 
@@ -51,46 +49,65 @@ public class SparseMaximumDistanceFunction extends SparseLPNormDistanceFunction 
   @Override
   public double doubleDistance(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
     // Get the bit masks
-    BitSet b1 = v1.getNotNullMask();
-    BitSet b2 = v2.getNotNullMask();
-    double accu = 0;
-    int i1 = b1.nextSetBit(0);
-    int i2 = b2.nextSetBit(0);
-    while (true) {
-      if (i1 == i2) {
-        if (i1 < 0) {
-          break;
-        }
-        // Both vectors have a value.
-        double val = Math.abs(v1.doubleValue(i1) - v2.doubleValue(i2));
-        accu = Math.max(accu, val);
-        i1 = b1.nextSetBit(i1 + 1);
-        i2 = b2.nextSetBit(i2 + 1);
-      } else if (i2 < 0 || (i1 < i2 && i1 >= 0)) {
+    double accu = 0.;
+    int i1 = v1.iter(), i2 = v2.iter();
+    while(v1.iterValid(i1) && v2.iterValid(i2)) {
+      final int d1 = v1.iterDim(i1), d2 = v2.iterDim(i2);
+      if(d1 < d2) {
         // In first only
-        double val = Math.abs(v1.doubleValue(i1));
-        accu = Math.max(accu, val);
-        i1 = b1.nextSetBit(i1 + 1);
-      } else {
-        // In second only
-        double val = Math.abs(v2.doubleValue(i2));
-        accu = Math.max(accu, val);
-        i2 = b2.nextSetBit(i2 + 1);
+        final double val = Math.abs(v1.iterDoubleValue(i1));
+        if(val > accu) {
+          accu = val;
+        }
+        i1 = v1.iterAdvance(i1);
       }
+      else if(d2 < d1) {
+        // In second only
+        final double val = Math.abs(v2.iterDoubleValue(i2));
+        if(val > accu) {
+          accu = val;
+        }
+        i2 = v2.iterAdvance(i2);
+      }
+      else {
+        // Both vectors have a value.
+        final double val = Math.abs(v1.iterDoubleValue(i1) - v2.iterDoubleValue(i2));
+        if(val > accu) {
+          accu = val;
+        }
+        i1 = v1.iterAdvance(i1);
+        i2 = v2.iterAdvance(i2);
+      }
+    }
+    while(v1.iterValid(i1)) {
+      // In first only
+      final double val = Math.abs(v1.iterDoubleValue(i1));
+      if(val > accu) {
+        accu = val;
+      }
+      i1 = v1.iterAdvance(i1);
+    }
+    while(v2.iterValid(i2)) {
+      // In second only
+      final double val = Math.abs(v2.iterDoubleValue(i2));
+      if(val > accu) {
+        accu = val;
+      }
+      i2 = v2.iterAdvance(i2);
     }
     return accu;
   }
 
   @Override
   public double doubleNorm(SparseNumberVector<?> v1) {
-    double sqrDist = 0;
-    // Get the bit masks
-    BitSet b1 = v1.getNotNullMask();
-    // Set in first only
-    for(int i = b1.nextSetBit(0); i >= 0; i = b1.nextSetBit(i + 1)) {
-      sqrDist = Math.max(sqrDist, Math.abs(v1.doubleValue(i)));
+    double accu = 0.;
+    for(int it = v1.iter(); v1.iterValid(it); it = v1.iterAdvance(it)) {
+      final double val = Math.abs(v1.iterDoubleValue(it));
+      if(val > accu) {
+        accu = val;
+      }
     }
-    return sqrDist;
+    return accu;
   }
 
   /**

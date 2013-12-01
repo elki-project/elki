@@ -23,20 +23,61 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 /**
  * Extended interface for sparse feature vector types.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <D> Data type
  */
 public interface SparseFeatureVector<D> extends FeatureVector<D> {
   /**
-   * Bit set of non-null features.
+   * Iterator over non-zero features only, <em>ascendingly</em>.
    * 
-   * @return Bit set
+   * Note: depending on the underlying implementation, this may or may not be
+   * the dimension. Use {@link #iterDim} to get the actual dimension. In fact,
+   * usually this will be the ith non-zero value, assuming an array
+   * representation.
+   * 
+   * Think of this number as an iterator. For efficiency, it has a primitive
+   * type!
+   * 
+   * Intended usage:
+   * 
+   * <pre>
+   * {@code
+   * for (int iter = v.iter(); v.iterValid(iter); iter = v.iterAdvance(iter)) {
+   *   final int dim = v.iterDim(iter);
+   *   // Do something.
+   * }
+   * </pre>
+   * 
+   * @return Identifier for the first non-zero dimension, <b>not necessarily the
+   *         dimension!</b>
    */
-  public BitSet getNotNullMask();
+  int iter();
+
+  /**
+   * Get the dimension an iterator points to.
+   * 
+   * @param iter Iterator position
+   * @return Dimension the iterator refers to
+   */
+  int iterDim(int iter);
+
+  /**
+   * Advance the iterator to the next position.
+   * 
+   * @param iter Previous iterator position
+   * @return Next iterator position
+   */
+  int iterAdvance(int iter);
+
+  /**
+   * Test the iterator position for validity.
+   * 
+   * @param iter Iterator position
+   * @return {@code true} when it refers to a valid position.
+   */
+  boolean iterValid(int iter);
 }

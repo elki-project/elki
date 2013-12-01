@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,8 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -37,7 +36,7 @@ public class SparseManhattanDistanceFunction extends SparseLPNormDistanceFunctio
    * Static instance
    */
   public static final SparseManhattanDistanceFunction STATIC = new SparseManhattanDistanceFunction();
-  
+
   /**
    * Constructor.
    * 
@@ -45,52 +44,59 @@ public class SparseManhattanDistanceFunction extends SparseLPNormDistanceFunctio
    */
   @Deprecated
   public SparseManhattanDistanceFunction() {
-    super(1.0);
+    super(1.);
   }
 
   @Override
   public double doubleDistance(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
     // Get the bit masks
-    BitSet b1 = v1.getNotNullMask();
-    BitSet b2 = v2.getNotNullMask();
-    double accu = 0;
-    int i1 = b1.nextSetBit(0);
-    int i2 = b2.nextSetBit(0);
-    while (true) {
-      if (i1 == i2) {
-        if (i1 < 0) {
-          break;
-        }
-        // Both vectors have a value.
-        double val = Math.abs(v1.doubleValue(i1) - v2.doubleValue(i2));
-        accu += val;
-        i1 = b1.nextSetBit(i1 + 1);
-        i2 = b2.nextSetBit(i2 + 1);
-      } else if (i2 < 0 || (i1 < i2 && i1 >= 0)) {
+    double accu = 0.;
+    int i1 = v1.iter(), i2 = v2.iter();
+    while(v1.iterValid(i1) && v2.iterValid(i2)) {
+      final int d1 = v1.iterDim(i1), d2 = v2.iterDim(i2);
+      if(d1 < d2) {
         // In first only
-        double val = Math.abs(v1.doubleValue(i1));
+        final double val = Math.abs(v1.iterDoubleValue(i1));
         accu += val;
-        i1 = b1.nextSetBit(i1 + 1);
-      } else {
-        // In second only
-        double val = Math.abs(v2.doubleValue(i2));
-        accu += val;
-        i2 = b2.nextSetBit(i2 + 1);
+        i1 = v1.iterAdvance(i1);
       }
+      else if(d2 < d1) {
+        // In second only
+        final double val = Math.abs(v2.iterDoubleValue(i2));
+        accu += val;
+        i2 = v2.iterAdvance(i2);
+      }
+      else {
+        // Both vectors have a value.
+        final double val = Math.abs(v1.iterDoubleValue(i1) - v2.iterDoubleValue(i2));
+        accu += val;
+        i1 = v1.iterAdvance(i1);
+        i2 = v2.iterAdvance(i2);
+      }
+    }
+    while(v1.iterValid(i1)) {
+      // In first only
+      final double val = Math.abs(v1.iterDoubleValue(i1));
+      accu += val;
+      i1 = v1.iterAdvance(i1);
+    }
+    while(v2.iterValid(i2)) {
+      // In second only
+      final double val = Math.abs(v2.iterDoubleValue(i2));
+      accu += val;
+      i2 = v2.iterAdvance(i2);
     }
     return accu;
   }
 
   @Override
   public double doubleNorm(SparseNumberVector<?> v1) {
-    double sqrDist = 0;
-    // Get the bit masks
-    BitSet b1 = v1.getNotNullMask();
-    // Set in first only
-    for(int i = b1.nextSetBit(0); i >= 0; i = b1.nextSetBit(i + 1)) {
-      sqrDist += Math.abs(v1.doubleValue(i));
+    double accu = 0.;
+    for(int it = v1.iter(); v1.iterValid(it); it = v1.iterAdvance(it)) {
+      final double val = Math.abs(v1.iterDoubleValue(it));
+      accu += val;
     }
-    return sqrDist;
+    return accu;
   }
 
   /**

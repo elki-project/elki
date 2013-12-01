@@ -26,9 +26,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
-
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -78,10 +75,10 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<
 
   @Override
   protected void prepareProcessInstance(V featureVector) {
-    BitSet b = featureVector.getNotNullMask();
-    for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
-      if(featureVector.doubleValue(i) >= 0.0) {
-        idf.put(i, idf.get(i) + 1);
+    for(int it = featureVector.iter(); featureVector.iterValid(it); it = featureVector.iterAdvance(it)) {
+      if(featureVector.iterDoubleValue(it) >= 0.) {
+        final int dim = featureVector.iterDim(it);
+        idf.put(dim, idf.get(dim) + 1);
       }
     }
     objcnt += 1;
@@ -100,20 +97,20 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    BitSet b = featureVector.getNotNullMask();
     TIntDoubleHashMap vals = new TIntDoubleHashMap();
-    for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
-      vals.put(i, (float) (featureVector.doubleValue(i) * idf.get(i)));
+    for(int it = featureVector.iter(); featureVector.iterValid(it); it = featureVector.iterAdvance(it)) {
+      final int dim = featureVector.iterDim(it);
+      vals.put(dim, featureVector.iterDoubleValue(it) * idf.get(dim));
     }
     return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override
   public V restore(V featureVector) {
-    BitSet b = featureVector.getNotNullMask();
     TIntDoubleHashMap vals = new TIntDoubleHashMap();
-    for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
-      vals.put(i, (float) (featureVector.doubleValue(i) / idf.get(i)));
+    for(int it = featureVector.iter(); featureVector.iterValid(it); it = featureVector.iterAdvance(it)) {
+      final int dim = featureVector.iterDim(it);
+      vals.put(dim, featureVector.iterDoubleValue(it) / idf.get(dim));
     }
     return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
