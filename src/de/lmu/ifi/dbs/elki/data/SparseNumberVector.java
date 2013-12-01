@@ -41,6 +41,54 @@ public interface SparseNumberVector<N extends Number> extends NumberVector<N>, S
   void setDimensionality(int maxdim);
 
   /**
+   * Get the value of the iterators' current dimension.
+   * 
+   * @param iter Iterator
+   * @return Value at the current position
+   */
+  double iterDoubleValue(int iter);
+
+  /**
+   * Get the value of the iterators' current dimension.
+   * 
+   * @param iter Iterator
+   * @return Value at the current position
+   */
+  float iterFloatValue(int iter);
+
+  /**
+   * Get the value of the iterators' current dimension.
+   * 
+   * @param iter Iterator
+   * @return Value at the current position
+   */
+  int iterIntegerValue(int iter);
+
+  /**
+   * Get the value of the iterators' current dimension.
+   * 
+   * @param iter Iterator
+   * @return Value at the current position
+   */
+  short iterShortValue(int iter);
+
+  /**
+   * Get the value of the iterators' current dimension.
+   * 
+   * @param iter Iterator
+   * @return Value at the current position
+   */
+  long iterLongValue(int iter);
+
+  /**
+   * Get the value of the iterators' current dimension.
+   * 
+   * @param iter Iterator
+   * @return Value at the current position
+   */
+  byte iterByteValue(int iter);
+
+  /**
    * Factory for sparse number vectors: make from a dim-value map.
    * 
    * @author Erich Schubert

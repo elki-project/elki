@@ -109,34 +109,44 @@ public final class VectorUtil {
    * @return angle
    */
   public static double angleSparse(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
-    BitSet b1 = v1.getNotNullMask();
-    BitSet b2 = v2.getNotNullMask();
-    BitSet both = (BitSet) b1.clone();
-    both.and(b2);
-
-    // TODO: add precomputed length to data type!
+    // TODO: exploit precomputed length, when available?
     // Length of first vector
-    double l1 = 0.;
-    for(int i = b1.nextSetBit(0); i >= 0; i = b1.nextSetBit(i + 1)) {
-      final double val = v1.doubleValue(i);
+    double l1 = 0., l2 = 0., cross = 0.;
+    int i1 = v1.iter(), i2 = v2.iter();
+    while(v1.iterValid(i1) && v2.iterValid(i2)) {
+      final int d1 = v1.iterDim(i1), d2 = v2.iterDim(i2);
+      if(d1 < d2) {
+        final double val = v1.iterDoubleValue(i1);
+        l1 += val * val;
+        i1 = v1.iterAdvance(i1);
+      }
+      else if(d2 < d1) {
+        final double val = v2.iterDoubleValue(i2);
+        l2 += val * val;
+        i2 = v2.iterAdvance(i2);
+      }
+      else { // d1 == d2
+        final double val1 = v1.iterDoubleValue(i1);
+        final double val2 = v2.iterDoubleValue(i2);
+        l1 += val1 * val1;
+        l2 += val2 * val2;
+        cross += val1 * val2;
+        i1 = v1.iterAdvance(i1);
+        i2 = v2.iterAdvance(i2);
+      }
+    }
+    while(v1.iterValid(i1)) {
+      final double val = v1.iterDoubleValue(i1);
       l1 += val * val;
+      i1 = v1.iterAdvance(i1);
     }
-    l1 = Math.sqrt(l1);
-
-    // Length of second vector
-    double l2 = 0.;
-    for(int i = b2.nextSetBit(0); i >= 0; i = b2.nextSetBit(i + 1)) {
-      final double val = v2.doubleValue(i);
+    while(v2.iterValid(i2)) {
+      final double val = v2.iterDoubleValue(i2);
       l2 += val * val;
+      i2 = v2.iterAdvance(i2);
     }
-    l2 = Math.sqrt(l2);
 
-    // Cross product
-    double cross = 0.;
-    for(int i = both.nextSetBit(0); i >= 0; i = both.nextSetBit(i + 1)) {
-      cross += v1.doubleValue(i) * v2.doubleValue(i);
-    }
-    final double a = cross / (l1 * l2);
+    final double a = cross / (Math.sqrt(l1) * Math.sqrt(l2));
     return (a > 1.) ? 1. : a;
   }
 

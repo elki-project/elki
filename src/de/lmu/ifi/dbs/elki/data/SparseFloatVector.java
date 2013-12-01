@@ -33,7 +33,6 @@ import gnu.trove.map.hash.TIntFloatHashMap;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -103,7 +102,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
    *         zero is bigger than the given dimensionality)
    */
   public SparseFloatVector(TIntFloatMap values, int dimensionality) throws IllegalArgumentException {
-    if (values.size() > dimensionality) {
+    if(values.size() > dimensionality) {
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
 
@@ -112,7 +111,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     // Import and sort the indexes
     {
       TIntFloatIterator iter = values.iterator();
-      for (int i = 0; iter.hasNext(); i++) {
+      for(int i = 0; iter.hasNext(); i++) {
         iter.advance();
         this.indexes[i] = iter.key();
       }
@@ -120,13 +119,13 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     }
     // Import the values accordingly
     {
-      for (int i = 0; i < values.size(); i++) {
+      for(int i = 0; i < values.size(); i++) {
         this.values[i] = values.get(this.indexes[i]);
       }
     }
     this.dimensionality = dimensionality;
     final int maxdim = getMaxDim();
-    if (maxdim > dimensionality) {
+    if(maxdim > dimensionality) {
       throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maxdim + ").");
     }
   }
@@ -137,9 +136,10 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
    * @return the maximum dimensionality seen
    */
   private int getMaxDim() {
-    if (this.indexes.length == 0) {
+    if(this.indexes.length == 0) {
       return 0;
-    } else {
+    }
+    else {
       return this.indexes[this.indexes.length - 1];
     }
   }
@@ -159,8 +159,8 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     // Count the number of non-zero entries
     int size = 0;
     {
-      for (int i = 0; i < values.length; i++) {
-        if (values[i] != 0.0f) {
+      for(int i = 0; i < values.length; i++) {
+        if(values[i] != 0.0f) {
           size++;
         }
       }
@@ -171,9 +171,9 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     // Copy the values
     {
       int pos = 0;
-      for (int i = 0; i < values.length; i++) {
+      for(int i = 0; i < values.length; i++) {
         float value = values[i];
-        if (value != 0.0f) {
+        if(value != 0.0f) {
           this.indexes[pos] = i;
           this.values[pos] = value;
           pos++;
@@ -199,7 +199,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   @Override
   public void setDimensionality(int dimensionality) throws IllegalArgumentException {
     final int maxdim = getMaxDim();
-    if (maxdim > dimensionality) {
+    if(maxdim > dimensionality) {
       throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maxdim + ").");
     }
     this.dimensionality = dimensionality;
@@ -209,9 +209,10 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   @Deprecated
   public Float getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if (pos >= 0) {
+    if(pos >= 0) {
       return values[pos];
-    } else {
+    }
+    else {
       return 0.0f;
     }
   }
@@ -219,9 +220,10 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   @Override
   public double doubleValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if (pos >= 0) {
+    if(pos >= 0) {
       return values[pos];
-    } else {
+    }
+    else {
       return 0.0;
     }
   }
@@ -229,9 +231,10 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   @Override
   public long longValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if (pos >= 0) {
+    if(pos >= 0) {
       return (long) values[pos];
-    } else {
+    }
+    else {
       return 0;
     }
   }
@@ -267,7 +270,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
     featureLine.append(this.indexes.length);
-    for (int i = 0; i < this.indexes.length; i++) {
+    for(int i = 0; i < this.indexes.length; i++) {
       featureLine.append(ATTRIBUTE_SEPARATOR);
       featureLine.append(this.indexes[i]);
       featureLine.append(ATTRIBUTE_SEPARATOR);
@@ -284,10 +287,60 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
    */
   private double[] getValues() {
     double[] vals = new double[dimensionality];
-    for (int i = 0; i < indexes.length; i++) {
+    for(int i = 0; i < indexes.length; i++) {
       vals[this.indexes[i]] = this.values[i];
     }
     return vals;
+  }
+
+  @Override
+  public int iter() {
+    return 0;
+  }
+
+  @Override
+  public int iterDim(int iter) {
+    return indexes[iter];
+  }
+
+  @Override
+  public int iterAdvance(int iter) {
+    return iter + 1;
+  }
+
+  @Override
+  public boolean iterValid(int iter) {
+    return iter < indexes.length;
+  }
+
+  @Override
+  public double iterDoubleValue(int iter) {
+    return (double) values[iter];
+  }
+
+  @Override
+  public float iterFloatValue(int iter) {
+    return values[iter];
+  }
+
+  @Override
+  public int iterIntegerValue(int iter) {
+    return (int) values[iter];
+  }
+
+  @Override
+  public short iterShortValue(int iter) {
+    return (short) values[iter];
+  }
+
+  @Override
+  public long iterLongValue(int iter) {
+    return (long) values[iter];
+  }
+
+  @Override
+  public byte iterByteValue(int iter) {
+    return (byte) values[iter];
   }
 
   /**
@@ -302,7 +355,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
       int dim = adapter.size(array);
       float[] values = new float[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i);
       }
       // TODO: inefficient
@@ -313,7 +366,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     public <A> SparseFloatVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       float[] values = new float[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.getFloat(array, i);
       }
       // TODO: inefficient
@@ -326,13 +379,13 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
       float[] values = new float[dvalues.size()];
       // Import and sort the indexes
       TIntDoubleIterator iter = dvalues.iterator();
-      for (int i = 0; iter.hasNext(); i++) {
+      for(int i = 0; iter.hasNext(); i++) {
         iter.advance();
         indexes[i] = iter.key();
       }
       Arrays.sort(indexes);
       // Import the values accordingly
-      for (int i = 0; i < dvalues.size(); i++) {
+      for(int i = 0; i < dvalues.size(); i++) {
         values[i] = (float) dvalues.get(indexes[i]);
       }
       return new SparseFloatVector(indexes, values, maxdim);
@@ -363,15 +416,6 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     }
   }
 
-  @Override
-  public BitSet getNotNullMask() {
-    BitSet b = new BitSet();
-    for (int key : indexes) {
-      b.set(key);
-    }
-    return b;
-  }
-
   /**
    * Empty map.
    */
@@ -391,7 +435,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
       final int nonzero = ByteArrayUtil.readUnsignedVarint(buffer);
       final int[] dims = new int[nonzero];
       final float[] values = new float[nonzero];
-      for (int i = 0; i < nonzero; i++) {
+      for(int i = 0; i < nonzero; i++) {
         dims[i] = ByteArrayUtil.readUnsignedVarint(buffer);
         values[i] = buffer.getFloat();
       }
@@ -402,7 +446,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     public void toByteBuffer(ByteBuffer buffer, SparseFloatVector vec) throws IOException {
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.dimensionality);
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         ByteArrayUtil.writeUnsignedVarint(buffer, vec.indexes[i]);
         buffer.putFloat(vec.values[i]);
       }
@@ -413,7 +457,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
       int sum = 0;
       sum += ByteArrayUtil.getUnsignedVarintSize(vec.dimensionality);
       sum += ByteArrayUtil.getUnsignedVarintSize(vec.values.length);
-      for (int d : vec.indexes) {
+      for(int d : vec.indexes) {
         sum += ByteArrayUtil.getUnsignedVarintSize(d);
       }
       sum += vec.values.length * ByteArrayUtil.SIZE_FLOAT;
