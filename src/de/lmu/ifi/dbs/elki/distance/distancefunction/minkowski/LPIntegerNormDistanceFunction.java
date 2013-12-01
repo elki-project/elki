@@ -25,127 +25,97 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Maximum distance function to compute the Maximum distance for a pair of
- * FeatureVectors.
+ * Provides a LP-Norm for number vectors. Optimized version for integer values
+ * of p. This will likely not have huge impact, but YMMV.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
-@Alias({ "maximum", "max", "chebyshev", "de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction" })
-public class MaximumDistanceFunction extends LPNormDistanceFunction {
+public class LPIntegerNormDistanceFunction extends LPNormDistanceFunction {
   /**
-   * Static instance.
+   * Integer value of p.
    */
-  public static final MaximumDistanceFunction STATIC = new MaximumDistanceFunction();
+  int intp;
 
   /**
-   * Provides a Maximum distance function that can compute the Manhattan
-   * distance (that is a DoubleDistance) for FeatureVectors.
+   * Constructor, internal version.
    * 
-   * @deprecated Use static instance!
+   * @param p Parameter p
    */
-  @Deprecated
-  public MaximumDistanceFunction() {
-    super(Double.POSITIVE_INFINITY);
+  public LPIntegerNormDistanceFunction(int p) {
+    super(p);
+    this.intp = p;
   }
 
   @Override
-  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, int start, int end, double agg) {
+  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = (xd >= yd) ? xd - yd : yd - xd;
-      if (delta > agg) {
-        agg = delta;
-      }
+      agg += MathUtil.powi(delta, intp);
     }
     return agg;
   }
 
   @Override
-  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, int start, int end, double agg) {
+  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
       if (delta < 0.) {
         delta = value - mbr.getMax(d);
       }
-      if (delta > agg) {
-        agg = delta;
+      if (delta > 0.) {
+        agg += MathUtil.powi(delta, intp);
       }
     }
     return agg;
   }
 
   @Override
-  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end, double agg) {
+  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
       if (delta < 0.) {
         delta = mbr1.getMin(d) - mbr2.getMax(d);
       }
-      if (delta > agg) {
-        agg = delta;
+      if (delta > 0.) {
+        agg += MathUtil.powi(delta, intp);
       }
     }
     return agg;
   }
 
   @Override
-  protected double doublePreNorm(NumberVector<?> v, int start, int end, double agg) {
+  protected double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
-      final double delta = (xd >= 0.) ? xd : -xd;
-      if (delta > agg) {
-        agg = delta;
-      }
+      final double delta = xd >= 0. ? xd : -xd;
+      agg += MathUtil.powi(delta, intp);
     }
     return agg;
   }
 
   @Override
-  protected double doublePreNormMBR(SpatialComparable mbr, int start, int end, double agg) {
+  protected double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
       if (delta < 0.) {
         delta = -mbr.getMax(d);
       }
-      if (delta > agg) {
-        agg = delta;
+      if (delta > 0.) {
+        agg += MathUtil.powi(delta, intp);
       }
     }
     return agg;
-  }
-
-  @Override
-  protected double finalScale(double agg) {
-    return agg;
-  }
-
-  @Override
-  public boolean isMetric() {
-    return true;
-  }
-
-  @Override
-  public String toString() {
-    return "MaximumDistance";
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (obj == this) {
-      return true;
-    }
-    if (this.getClass().equals(obj.getClass())) {
-      return true;
-    }
-    return super.equals(obj);
   }
 
   /**
@@ -156,9 +126,30 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The value of p.
+     */
+    protected int p;
+
     @Override
-    protected MaximumDistanceFunction makeInstance() {
-      return MaximumDistanceFunction.STATIC;
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter paramP = new IntParameter(P_ID);
+      paramP.addConstraint(new GreaterConstraint(0.));
+      if (config.grab(paramP)) {
+        p = paramP.getValue();
+      }
+    }
+
+    @Override
+    protected LPIntegerNormDistanceFunction makeInstance() {
+      if (p == 1) {
+        return ManhattanDistanceFunction.STATIC;
+      }
+      if (p == 2) {
+        return EuclideanDistanceFunction.STATIC;
+      }
+      return new LPIntegerNormDistanceFunction(p);
     }
   }
 }

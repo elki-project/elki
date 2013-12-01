@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  */
 @Alias({ "taxicab", "cityblock", "l1", "ManhattanDistanceFunction", "de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction" })
-public class ManhattanDistanceFunction extends LPNormDistanceFunction {
+public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
   /**
    * The static instance to use.
    */
@@ -49,75 +49,74 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction {
    */
   @Deprecated
   public ManhattanDistanceFunction() {
-    super(1.);
+    super(1);
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = dimensionality(v1, v2);
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      final double val = (xd >= yd) ? xd - yd : yd - xd;
-      agg += val;
+      final double delta = (xd >= yd) ? xd - yd : yd - xd;
+      agg += delta;
     }
     return agg;
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> v) {
-    final int dim = v.getDimensionality();
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double xd = v.doubleValue(d);
-      agg += (xd >= 0.) ? xd : -xd;
-    }
-    return agg;
-  }
-
-  protected double doubleMinDistObject(NumberVector<?> v, SpatialComparable mbr) {
-    final int dim = dimensionality(mbr, v);
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
-      if (value < min) {
-        agg += min - value;
-      } else {
-        final double max = mbr.getMax(d);
-        if (value > max) {
-          agg += value - max;
-        }
+      double delta = min - value;
+      if (delta < 0.) {
+        delta = value - mbr.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += delta;
       }
     }
     return agg;
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    // Some optimizations for simpler cases.
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
-      } else {
-        return doubleMinDistObject((NumberVector<?>) mbr1, mbr2);
+  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr2.getMin(d) - mbr1.getMax(d);
+      if (delta < 0.) {
+        delta = mbr1.getMin(d) - mbr2.getMax(d);
       }
-    } else if (mbr2 instanceof NumberVector) {
-      return doubleMinDistObject((NumberVector<?>) mbr2, mbr1);
+      if (delta > 0.) {
+        agg += delta;
+      }
     }
-    final int dim = dimensionality(mbr1, mbr2);
+    return agg;
+  }
 
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
-      if (d1 > 0.) {
-        agg += d1;
-      } else {
-        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
-        if (d2 > 0.) {
-          agg += d2;
-        }
+  @Override
+  protected double doublePreNorm(NumberVector<?> v, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double xd = v.doubleValue(d);
+      final double delta = (xd >= 0.) ? xd : -xd;
+      agg += delta;
+    }
+    return agg;
+  }
+
+  @Override
+  protected double doublePreNormMBR(SpatialComparable mbr, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr.getMin(d);
+      if (delta < 0.) {
+        delta = -mbr.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += delta;
       }
     }
+    return agg;
+  }
+
+  @Override
+  protected double finalScale(double agg) {
     return agg;
   }
 
