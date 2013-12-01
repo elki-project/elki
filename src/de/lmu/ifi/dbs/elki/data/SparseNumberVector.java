@@ -34,6 +34,34 @@ import gnu.trove.map.TIntDoubleMap;
  */
 public interface SparseNumberVector<N extends Number> extends NumberVector<N>, SparseFeatureVector<N> {
   /**
+   * Iterator over non-zero features only, <em>ascendingly</em>.
+   * 
+   * Note: depending on the underlying implementation, this may or may not be
+   * the dimension. Use {@link #iterDim} to get the actual dimension. In fact,
+   * usually this will be the ith non-zero value, assuming an array
+   * representation.
+   * 
+   * Think of this number as an iterator. For efficiency, it has a primitive
+   * type!
+   * 
+   * Intended usage:
+   * 
+   * <pre>
+   * {@code
+   * for (int iter = v.iter(); v.iterValid(iter); iter = v.iterAdvance(iter)) {
+   *   final int dim = v.iterDim(iter);
+   *   final double val = v.iterDoubleValue(iter);
+   *   // Do something.
+   * }
+   * </pre>
+   * 
+   * @return Identifier for the first non-zero dimension, <b>not necessarily the
+   *         dimension!</b>
+   */
+  @Override
+  int iter();
+
+  /**
    * Update the vector space dimensionality.
    * 
    * @param maxdim New dimensionality
@@ -62,7 +90,7 @@ public interface SparseNumberVector<N extends Number> extends NumberVector<N>, S
    * @param iter Iterator
    * @return Value at the current position
    */
-  int iterIntegerValue(int iter);
+  int iterIntValue(int iter);
 
   /**
    * Get the value of the iterators' current dimension.
@@ -87,6 +115,54 @@ public interface SparseNumberVector<N extends Number> extends NumberVector<N>, S
    * @return Value at the current position
    */
   byte iterByteValue(int iter);
+
+  /**
+   * @deprecated As the vectors are sparse, try to iterate over the sparse
+   *             dimensions only, see {@link #iterDoubleValue}.
+   */
+  @Override
+  @Deprecated
+  double doubleValue(int dimension);
+
+  /**
+   * @deprecated As the vectors are sparse, try to iterate over the sparse
+   *             dimensions only, see {@link #iterFloatValue}.
+   */
+  @Override
+  @Deprecated
+  float floatValue(int dimension);
+
+  /**
+   * @deprecated As the vectors are sparse, try to iterate over the sparse
+   *             dimensions only, see {@link #iterIntValue}.
+   */
+  @Override
+  @Deprecated
+  int intValue(int dimension);
+
+  /**
+   * @deprecated As the vectors are sparse, try to iterate over the sparse
+   *             dimensions only, see {@link #iterLongValue}.
+   */
+  @Override
+  @Deprecated
+  long longValue(int dimension);
+
+  /**
+   * @deprecated As the vectors are sparse, try to iterate over the sparse
+   *             dimensions only, see {@link #iterShortValue}.
+   */
+  @Override
+  @Deprecated
+  short shortValue(int dimension);
+
+  /**
+   * @deprecated As the vectors are sparse, try to iterate over the sparse
+   *             dimensions only, see {@link #iterByteValue}.
+   */
+  @Override
+  @Deprecated
+  byte byteValue(int dimension);
 
   /**
    * Factory for sparse number vectors: make from a dim-value map.

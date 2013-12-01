@@ -324,7 +324,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   }
 
   @Override
-  public int iterIntegerValue(int iter) {
+  public int iterIntValue(int iter) {
     return (int) values[iter];
   }
 

@@ -322,7 +322,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   }
 
   @Override
-  public int iterIntegerValue(int iter) {
+  public int iterIntValue(int iter) {
     return (int) values[iter];
   }
 
