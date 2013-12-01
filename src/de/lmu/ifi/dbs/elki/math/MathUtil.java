@@ -544,15 +544,24 @@ public final class MathUtil {
    * @return Angle
    */
   public static double angle(double[] v1, double[] v2) {
+    final int mindim = (v1.length >= v2.length) ? v1.length : v2.length;
     // Essentially, we want to compute this:
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
     // We can just compute all three in parallel.
     double s = 0, e1 = 0, e2 = 0;
-    for (int k = 0; k < v1.length; k++) {
+    for (int k = 0; k < mindim; k++) {
       final double r1 = v1[k];
       final double r2 = v2[k];
       s += r1 * r2;
       e1 += r1 * r1;
+      e2 += r2 * r2;
+    }
+    for (int k = mindim; k < v1.length; k++) {
+      final double r1 = v1[k];
+      e1 += r1 * r1;
+    }
+    for (int k = mindim; k < v2.length; k++) {
+      final double r2 = v2[k];
       e2 += r2 * r2;
     }
     return Math.sqrt((s / e1) * (s / e2));
@@ -579,16 +588,28 @@ public final class MathUtil {
    * @return Angle
    */
   public static double angle(double[] v1, double[] v2, double[] o) {
+    final int mindim = (v1.length >= v2.length) ? v1.length : v2.length;
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
     // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
     // We can just compute all three in parallel.
     double s = 0, e1 = 0, e2 = 0;
-    for (int k = 0; k < v1.length; k++) {
-      final double r1 = v1[k] - o[k];
-      final double r2 = v2[k] - o[k];
+    for (int k = 0; k < mindim; k++) {
+      final double ok = (k < o.length) ? o[k] : 0;
+      final double r1 = v1[k] - ok;
+      final double r2 = v2[k] - ok;
       s += r1 * r2;
       e1 += r1 * r1;
+      e2 += r2 * r2;
+    }
+    for (int k = mindim; k < v1.length; k++) {
+      final double ok = (k < o.length) ? o[k] : 0;
+      final double r1 = v1[k] - ok;
+      e1 += r1 * r1;
+    }
+    for (int k = mindim; k < v2.length; k++) {
+      final double ok = (k < o.length) ? o[k] : 0;
+      final double r2 = v2[k] - ok;
       e2 += r2 * r2;
     }
     return Math.sqrt((s / e1) * (s / e2));
