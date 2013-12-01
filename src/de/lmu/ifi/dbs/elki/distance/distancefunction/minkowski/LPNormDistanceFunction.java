@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceNorm;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -63,62 +65,180 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     this.invp = 1. / p;
   }
 
-  @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = dimensionality(v1, v2);
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+  /**
+   * Initial value for aggregation. Usually 0.
+   * 
+   * @return Initial value
+   */
+  protected double initialAggregateValue() {
+    return 0.;
+  }
+
+  /**
+   * Compute unscaled distance in a range of dimensions.
+   * 
+   * @param v1 First object
+   * @param v2 Second object
+   * @param start First dimension
+   * @param end Exclusive last dimension
+   * @param agg Current aggregate value
+   * @return Aggregated values.
+   */
+  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = (xd >= yd) ? xd - yd : yd - xd;
       agg += Math.pow(delta, p);
     }
+    return agg;
+  }
+
+  /**
+   * Compute unscaled distance in a range of dimensions.
+   * 
+   * @param v1 First vector
+   * @param mbr Second MBR
+   * @param start First dimension
+   * @param end Exclusive last dimension
+   * @param agg Current aggregate value
+   * @return Aggregated values.
+   */
+  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double value = v.doubleValue(d), min = mbr.getMin(d);
+      double delta = min - value;
+      if (delta < 0.) {
+        delta = value - mbr.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += Math.pow(delta, p);
+      }
+    }
+    return agg;
+  }
+
+  /**
+   * Compute unscaled distance in a range of dimensions.
+   * 
+   * @param mbr1 First MBR
+   * @param mbr2 Second MBR
+   * @param start First dimension
+   * @param end Exclusive last dimension
+   * @param agg Current aggregate value
+   * @return Aggregated values.
+   */
+  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr2.getMin(d) - mbr1.getMax(d);
+      if (delta < 0.) {
+        delta = mbr1.getMin(d) - mbr2.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += Math.pow(delta, p);
+      }
+    }
+    return agg;
+  }
+
+  /**
+   * Compute unscaled norm in a range of dimensions.
+   * 
+   * @param v Data object
+   * @param start First dimension
+   * @param end Exclusive last dimension
+   * @param agg Current aggregate value
+   * @return Aggregated values.
+   */
+  protected double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double xd = v.doubleValue(d);
+      final double delta = xd >= 0. ? xd : -xd;
+      agg += Math.pow(delta, p);
+    }
+    return agg;
+  }
+
+  /**
+   * Compute unscaled norm in a range of dimensions.
+   * 
+   * @param v Data object
+   * @param start First dimension
+   * @param end Exclusive last dimension
+   * @param agg Current aggregate value
+   * @return Aggregated values.
+   */
+  protected double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr.getMin(d);
+      if (delta < 0.) {
+        delta = -mbr.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += Math.pow(delta, p);
+      }
+    }
+    return agg;
+  }
+
+  /**
+   * Apply final scaling.
+   * 
+   * @param agg Aggregate value
+   * @return Scaled value
+   */
+  protected double finalScale(double agg) {
     return Math.pow(agg, invp);
+  }
+
+  @Override
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    double agg = doublePreDistance(v1, v2, 0, mindim, initialAggregateValue());
+    agg = doublePreNorm(v1, mindim, dim1, agg);
+    agg = doublePreNorm(v2, mindim, dim2, agg);
+    return finalScale(agg);
   }
 
   @Override
   public double doubleNorm(NumberVector<?> v) {
-    final int dim = v.getDimensionality();
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double xd = v.doubleValue(d);
-      agg += Math.pow(xd >= 0. ? xd : -xd, p);
-    }
-    return Math.pow(agg, invp);
+    return Math.pow(doublePreNorm(v, 0, v.getDimensionality(), initialAggregateValue()), invp);
   }
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    // Optimization for the simplest case
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
-      }
-    }
-    // TODO: optimize for more simpler cases: obj vs. rect?
-    final int dim = dimensionality(mbr1, mbr2);
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
 
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double diff;
-      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
-      if (d1 > 0.) {
-        diff = d1;
+    final NumberVector<?> v1 = (mbr1 instanceof NumberVector) ? (NumberVector<?>) mbr1 : null;
+    final NumberVector<?> v2 = (mbr2 instanceof NumberVector) ? (NumberVector<?>) mbr2 : null;
+
+    double agg = initialAggregateValue();
+    if (v1 != null) {
+      if (v2 != null) {
+        agg = doublePreDistance(v1, v2, 0, mindim, agg);
+        agg = doublePreNorm(v2, mindim, dim1, agg);
       } else {
-        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
-        if (d2 > 0.) {
-          diff = d2;
-        } else { // The mbrs intersect!
-          continue;
-        }
+        agg = doublePreDistanceVM(v1, mbr2, 0, mindim, agg);
+        agg = doublePreNormMBR(mbr2, mindim, dim1, agg);
       }
-      agg += Math.pow(diff, p);
+      agg = doublePreNorm(v1, mindim, dim1, agg);
+    } else {
+      if (v2 != null) {
+        agg = doublePreDistanceVM(v2, mbr1, 0, mindim, agg);
+        agg = doublePreNorm(v2, mindim, dim2, agg);
+      } else {
+        agg = doublePreDistanceMBR(mbr1, mbr2, 0, mindim, agg);
+        agg = doublePreNormMBR(mbr2, mindim, dim2, agg);
+      }
+      agg = doublePreNormMBR(v1, mindim, dim1, agg);
     }
-    return Math.pow(agg, invp);
+    return finalScale(agg);
   }
 
   @Override
   public boolean isMetric() {
-    return (p >= 1);
+    return (p >= 1.);
   }
 
   @Override
@@ -146,6 +266,11 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     return false;
   }
 
+  @Override
+  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
+  }
+
   /**
    * Parameterization class.
    * 
@@ -171,14 +296,17 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
 
     @Override
     protected LPNormDistanceFunction makeInstance() {
-      if (p == 1.0) {
+      if (p == 1.) {
         return ManhattanDistanceFunction.STATIC;
       }
-      if (p == 2.0) {
+      if (p == 2.) {
         return EuclideanDistanceFunction.STATIC;
       }
       if (p == Double.POSITIVE_INFINITY) {
         return MaximumDistanceFunction.STATIC;
+      }
+      if (p == Math.round(p)) {
+        return new LPIntegerNormDistanceFunction((int) p);
       }
       return new LPNormDistanceFunction(p);
     }

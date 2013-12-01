@@ -27,13 +27,14 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 
 /**
  * Weighted version of the Minkowski L_p metrics distance function.
  * 
  * @author Erich Schubert
  */
-// TODO: make parameterizable; add optimized variants
 public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   /**
    * Weight array
@@ -52,50 +53,66 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = dimensionality(v1, v2, weights.length);
-    double agg = 0;
-    for (int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
+  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double delta = (xd >= yd) ? xd - yd : yd - xd;
       agg += Math.pow(delta, p) * weights[d];
     }
-    return Math.pow(agg, invp);
+    return agg;
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> v) {
-    final int dim = v.getDimensionality();
-    double agg = 0;
-    for (int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v.doubleValue(d));
-      agg += Math.pow(delta, p) * weights[d];
+  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double value = v.doubleValue(d), min = mbr.getMin(d);
+      double delta = min - value;
+      if (delta < 0.) {
+        delta = value - mbr.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += Math.pow(delta, p) * weights[d];
+      }
     }
-    return Math.pow(agg, invp);
+    return agg;
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    // Optimization for the simplest case
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr2.getMin(d) - mbr1.getMax(d);
+      if (delta < 0.) {
+        delta = mbr1.getMin(d) - mbr2.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += Math.pow(delta, p) * weights[d];
       }
     }
-    // TODO: optimize for more simpler cases: obj vs. rect?
-    final int dim = dimensionality(mbr1, mbr2, weights.length);
-    double agg = 0;
-    for (int d = 0; d < dim; d++) {
-      final double diff;
-      if (mbr1.getMax(d) < mbr2.getMin(d)) {
-        diff = mbr2.getMin(d) - mbr1.getMax(d);
-      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
-        diff = mbr1.getMin(d) - mbr2.getMax(d);
-      } else { // The mbrs intersect!
-        continue;
-      }
-      agg += Math.pow(diff, p) * weights[d];
+    return agg;
+  }
+
+  @Override
+  protected double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double xd = v.doubleValue(d);
+      final double delta = xd >= 0. ? xd : -xd;
+      agg += Math.pow(delta, p) * weights[d];
     }
-    return Math.pow(agg, invp);
+    return agg;
+  }
+
+  @Override
+  protected double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr.getMin(d);
+      if (delta < 0.) {
+        delta = -mbr.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += Math.pow(delta, p) * weights[d];
+      }
+    }
+    return agg;
   }
 
   @Override
@@ -109,7 +126,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     if (!(obj instanceof WeightedLPNormDistanceFunction)) {
       if (obj instanceof LPNormDistanceFunction && super.equals(obj)) {
         for (double d : weights) {
-          if (d != 1.0) {
+          if (d != 1.) {
             return false;
           }
         }
@@ -119,5 +136,10 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     }
     WeightedLPNormDistanceFunction other = (WeightedLPNormDistanceFunction) obj;
     return Arrays.equals(this.weights, other.weights);
+  }
+
+  @Override
+  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+    return new VectorFieldTypeInformation<>(NumberVector.class, 0, weights.length);
   }
 }

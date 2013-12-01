@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  */
 @Alias({ "euclidean", "euclid", "l2", "EuclideanDistanceFunction", "de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
-public class EuclideanDistanceFunction extends LPNormDistanceFunction {
+public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -48,82 +48,73 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction {
    */
   @Deprecated
   public EuclideanDistanceFunction() {
-    super(2.);
+    super(2);
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = dimensionality(v1, v2);
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double delta = v1.doubleValue(d) - v2.doubleValue(d);
+  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double delta = xd - yd;
       agg += delta * delta;
     }
-    return Math.sqrt(agg);
+    return agg;
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> v) {
-    final int dim = v.getDimensionality();
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double val = v.doubleValue(d);
-      agg += val * val;
-    }
-    return Math.sqrt(agg);
-  }
-
-  protected double doubleMinDistObject(NumberVector<?> v, SpatialComparable mbr) {
-    final int dim = dimensionality(mbr, v);
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
-      final double diff;
-      if (value < min) {
-        diff = min - value;
-      } else {
-        final double max = mbr.getMax(d);
-        if (value > max) {
-          diff = value - max;
-        } else {
-          continue;
-        }
+      double delta = min - value;
+      if (delta < 0.) {
+        delta = value - mbr.getMax(d);
       }
-      agg += diff * diff;
+      if (delta > 0.) {
+        agg += delta * delta;
+      }
     }
-    return Math.sqrt(agg);
+    return agg;
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    // Some optimizations for simpler cases.
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
-      } else {
-        return doubleMinDistObject((NumberVector<?>) mbr1, mbr2);
+  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr2.getMin(d) - mbr1.getMax(d);
+      if (delta < 0.) {
+        delta = mbr1.getMin(d) - mbr2.getMax(d);
       }
-    } else if (mbr2 instanceof NumberVector) {
-      return doubleMinDistObject((NumberVector<?>) mbr2, mbr1);
+      if (delta > 0.) {
+        agg += delta * delta;
+      }
     }
-    final int dim = dimensionality(mbr1, mbr2);
+    return agg;
+  }
 
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double diff;
-      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
-      if (d1 > 0.) {
-        diff = d1;
-      } else {
-        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
-        if (d2 > 0.) {
-          diff = d2;
-        } else {
-          continue;
-        }
-      }
-      agg += diff * diff;
+  @Override
+  protected double doublePreNorm(NumberVector<?> v, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double xd = v.doubleValue(d);
+      agg += xd * xd;
     }
+    return agg;
+  }
+
+  @Override
+  protected double doublePreNormMBR(SpatialComparable mbr, int start, int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr.getMin(d);
+      if (delta < 0.) {
+        delta = -mbr.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += delta * delta;
+      }
+    }
+    return agg;
+  }
+
+  @Override
+  protected double finalScale(double agg) {
     return Math.sqrt(agg);
   }
 

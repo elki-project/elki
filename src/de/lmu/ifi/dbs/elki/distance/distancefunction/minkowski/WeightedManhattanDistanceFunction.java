@@ -40,52 +40,68 @@ public class WeightedManhattanDistanceFunction extends WeightedLPNormDistanceFun
    * @param weights Weight vector
    */
   public WeightedManhattanDistanceFunction(double[] weights) {
-    super(1.0, weights);
+    super(1., weights);
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = dimensionality(v1, v2, weights.length);
-    double agg = 0;
-    for (int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
+  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double delta = (xd >= yd) ? xd - yd : yd - xd;
       agg += delta * weights[d];
     }
     return agg;
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> v) {
-    final int dim = v.getDimensionality();
-    double agg = 0;
-    for (int d = 0; d < dim; d++) {
-      final double delta = Math.abs(v.doubleValue(d));
+  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double value = v.doubleValue(d), min = mbr.getMin(d);
+      double delta = min - value;
+      if (delta < 0.) {
+        delta = value - mbr.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += delta * weights[d];
+      }
+    }
+    return agg;
+  }
+
+  @Override
+  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr2.getMin(d) - mbr1.getMax(d);
+      if (delta < 0.) {
+        delta = mbr1.getMin(d) - mbr2.getMax(d);
+      }
+      if (delta > 0.) {
+        agg += delta * weights[d];
+      }
+    }
+    return agg;
+  }
+
+  @Override
+  protected double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      final double xd = v.doubleValue(d);
+      final double delta = xd >= 0. ? xd : -xd;
       agg += delta * weights[d];
     }
     return agg;
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    // Optimization for the simplest case
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+  protected double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
+    for (int d = start; d < end; d++) {
+      double delta = mbr.getMin(d);
+      if (delta < 0.) {
+        delta = -mbr.getMax(d);
       }
-    }
-    // TODO: optimize for more simpler cases: obj vs. rect?
-    final int dim = dimensionality(mbr1, mbr2, weights.length);
-    double agg = 0;
-    for (int d = 0; d < dim; d++) {
-      final double diff;
-      if (mbr1.getMax(d) < mbr2.getMin(d)) {
-        diff = mbr2.getMin(d) - mbr1.getMax(d);
-      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
-        diff = mbr1.getMin(d) - mbr2.getMax(d);
-      } else { // The mbrs intersect!
-        continue;
+      if (delta > 0.) {
+        agg += delta * weights[d];
       }
-      agg += diff * weights[d];
     }
     return agg;
   }
