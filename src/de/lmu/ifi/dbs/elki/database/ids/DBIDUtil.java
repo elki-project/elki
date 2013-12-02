@@ -654,7 +654,7 @@ public final class DBIDUtil {
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Random random) {
-    if (k <= 0 || k > source.size()) {
+    if (k < 0 || k > source.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
     if (random == null) {
