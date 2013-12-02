@@ -50,6 +50,11 @@ public abstract class AbstractDoubleMapper implements Mapper {
   @Override
   public abstract Mapper.Instance instantiate(MapExecutor exectutor);
 
+  @Override
+  public void cleanup(Mapper.Instance inst) {
+    // Do nothing by default.
+  }
+
   /**
    * Mapper instance.
    * 
@@ -73,10 +78,5 @@ public abstract class AbstractDoubleMapper implements Mapper {
 
     @Override
     public abstract void map(DBIDRef id);
-
-    @Override
-    public void cleanup() {
-      // Nothing to do.
-    }
   }
 }

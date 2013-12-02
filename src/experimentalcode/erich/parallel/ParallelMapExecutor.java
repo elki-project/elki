@@ -50,7 +50,7 @@ public class ParallelMapExecutor {
    * @param ids IDs to process
    * @param mapper Mappers to run
    */
-  public final void run(DBIDs ids, Mapper... mapper) {
+  public static final void run(DBIDs ids, Mapper... mapper) {
     // TODO: try different strategies anyway!
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // TODO: use more segments than processors for better handling differences
@@ -63,7 +63,9 @@ public class ParallelMapExecutor {
     final int blocksize = (size + (numparts - 1)) / numparts;
     List<Future<ArrayDBIDs>> parts = new ArrayList<>(numparts);
     for (int i = 0; i < numparts; i++) {
-      Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, i * blocksize, Math.min((i + 1) * blocksize, size), mapper);
+      final int start = i * blocksize;
+      final int end = (start + blocksize < size) ? start + blocksize : size;
+      Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, start, end, mapper);
       parts.add(core.submit(run));
     }
 
@@ -87,7 +89,7 @@ public class ParallelMapExecutor {
    * 
    * @apiviz.uses Mapper
    */
-  protected class BlockArrayRunner implements Callable<ArrayDBIDs>, MapExecutor {
+  protected static class BlockArrayRunner implements Callable<ArrayDBIDs>, MapExecutor {
     /**
      * Array IDs to process
      */
@@ -104,9 +106,14 @@ public class ParallelMapExecutor {
     private int end;
 
     /**
+     * The mapper masters that own the instances.
+     */
+    private Mapper[] mapper;
+
+    /**
      * Mapper
      */
-    private Mapper.Instance[] mapper;
+    private Mapper.Instance[] instances;
 
     /**
      * Channel map
@@ -119,16 +126,17 @@ public class ParallelMapExecutor {
      * @param ids IDs to process
      * @param start Starting position
      * @param end End position
-     * @param done Counter to decrement when done.
+     * @param mapper Mapper functions to run
      */
     protected BlockArrayRunner(ArrayDBIDs ids, int start, int end, Mapper[] mapper) {
       super();
       this.ids = ids;
       this.start = start;
       this.end = end;
-      this.mapper = new Mapper.Instance[mapper.length];
+      this.mapper = mapper;
+      this.instances = new Mapper.Instance[mapper.length];
       for (int i = 0; i < mapper.length; i++) {
-        this.mapper[i] = mapper[i].instantiate(this);
+        this.instances[i] = mapper[i].instantiate(this);
       }
     }
 
@@ -137,14 +145,12 @@ public class ParallelMapExecutor {
       DBIDArrayIter iter = ids.iter();
       iter.seek(start);
       for (int c = end - start; iter.valid() && c >= 0; iter.advance(), c--) {
-        for (int i = 0; i < mapper.length; i++) {
-          mapper[i].map(iter);
+        for (int i = 0; i < instances.length; i++) {
+          instances[i].map(iter);
         }
-        // This is a good moment for multitasking
-        Thread.yield();
       }
-      for (int i = 0; i < mapper.length; i++) {
-        mapper[i].cleanup();
+      for (int i = 0; i < instances.length; i++) {
+        mapper[i].cleanup(instances[i]);
       }
       return ids;
     }
