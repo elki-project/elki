@@ -124,8 +124,8 @@ public class ParallelCore {
     int c = this.connected.decrementAndGet();
     if (c == 0) {
       synchronized (this) {
-        // executor.allowCoreThreadTimeOut(true);
-        // executor.setCorePoolSize(0);
+        executor.allowCoreThreadTimeOut(true);
+        executor.setCorePoolSize(0);
       }
     }
   }
