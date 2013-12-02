@@ -86,6 +86,11 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
     return new Instance<>(k, input.instantiate(mapper), out.instantiate(mapper));
   }
 
+  @Override
+  public void cleanup(Mapper.Instance inst) {
+    // Nothing to do.
+  }
+
   /**
    * Mapper instance for precomputing the kNN.
    * 
@@ -124,11 +129,6 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
     @Override
     public void map(DBIDRef id) {
       store.set(input.get().get(k - 1).getDistance());
-    }
-
-    @Override
-    public void cleanup() {
-      // Nothing to do.
     }
   }
 }

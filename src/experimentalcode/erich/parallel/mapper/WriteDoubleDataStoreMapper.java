@@ -68,6 +68,11 @@ public class WriteDoubleDataStoreMapper implements Mapper {
     return new Instance(input.instantiate(mapper));
   }
 
+  @Override
+  public void cleanup(Mapper.Instance inst) {
+    // Nothing to do.
+  }
+
   /**
    * Instance for a sub-channel.
    * 
@@ -91,12 +96,7 @@ public class WriteDoubleDataStoreMapper implements Mapper {
 
     @Override
     public void map(DBIDRef id) {
-      store.put(id, input.doubleValue());
-    }
-
-    @Override
-    public void cleanup() {
-      // Nothing to do
+      store.putDouble(id, input.doubleValue());
     }
   }
 }

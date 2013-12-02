@@ -114,7 +114,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
       kdistm.connectOutput(kdistv);
       storem.connectInput(kdistv);
 
-      new ParallelMapExecutor().run(ids, knnm, storek, kdistm, storem);
+      ParallelMapExecutor.run(ids, knnm, storek, kdistm, storem);
     }
 
     // Phase two: lrd
@@ -126,7 +126,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
 
       lrdm.connectOutput(lrdv);
       storelrd.connectInput(lrdv);
-      new ParallelMapExecutor().run(ids, lrdm, storelrd);
+      ParallelMapExecutor.run(ids, lrdm, storelrd);
     }
     kdists.destroy(); // No longer needed.
     kdists = null;
@@ -143,7 +143,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
       lofm.connectOutput(lofv);
       mmm.connectInput(lofv);
       storelof.connectInput(lofv);
-      new ParallelMapExecutor().run(ids, lofm, storelof, mmm);
+      ParallelMapExecutor.run(ids, lofm, storelof, mmm);
 
       minmax = mmm.getMinMax();
     }

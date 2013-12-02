@@ -79,6 +79,11 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
     return new Instance<>(k, knnq, out.instantiate(mapper));
   }
 
+  @Override
+  public void cleanup(Mapper.Instance inst) {
+    // Nothing to do.
+  }
+
   /**
    * Mapper instance for precomputing the kNN.
    * 
@@ -117,11 +122,6 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
     @Override
     public void map(DBIDRef id) {
       out.set(knnq.getKNNForDBID(id, k));
-    }
-
-    @Override
-    public void cleanup() {
-      // Nothing to do.
     }
   }
 }

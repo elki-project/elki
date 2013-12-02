@@ -104,7 +104,7 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
 
-      new ParallelMapExecutor().run(ids, knnm, storek);
+      ParallelMapExecutor.run(ids, knnm, storek);
     }
 
     // Phase two: simplified-lrd
@@ -116,7 +116,7 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
 
       lrdm.connectOutput(lrdv);
       storelrd.connectInput(lrdv);
-      new ParallelMapExecutor().run(ids, lrdm, storelrd);
+      ParallelMapExecutor.run(ids, lrdm, storelrd);
     }
 
     // Phase three: Simplified-LOF
@@ -131,7 +131,7 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
       lofm.connectOutput(lofv);
       mmm.connectInput(lofv);
       storelof.connectInput(lofv);
-      new ParallelMapExecutor().run(ids, lofm, storelof, mmm);
+      ParallelMapExecutor.run(ids, lofm, storelof, mmm);
 
       minmax = mmm.getMinMax();
     }

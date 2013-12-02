@@ -105,7 +105,7 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
     storem.connectInput(kdistv);
     mmm.connectInput(kdistv);
 
-    new ParallelMapExecutor().run(ids, knnm, kdistm, storem, mmm);
+    ParallelMapExecutor.run(ids, knnm, kdistm, storem, mmm);
 
     DoubleMinMax minmax = mmm.getMinMax();
     Relation<Double> scoreres = new MaterializedRelation<>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, store, ids);

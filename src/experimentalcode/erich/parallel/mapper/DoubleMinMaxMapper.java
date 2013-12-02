@@ -65,6 +65,11 @@ public class DoubleMinMaxMapper implements Mapper {
     return new Instance(input.instantiate(mapper));
   }
 
+  @Override
+  public void cleanup(Mapper.Instance inst) {
+    merge(((Instance) inst).minmax);
+  }
+
   /**
    * Merge the result of a mapper thread.
    * 
@@ -89,7 +94,7 @@ public class DoubleMinMaxMapper implements Mapper {
    * 
    * @author Erich Schubert
    */
-  private class Instance implements Mapper.Instance {
+  private static class Instance implements Mapper.Instance {
     /**
      * The central data store.
      */
@@ -113,11 +118,6 @@ public class DoubleMinMaxMapper implements Mapper {
     @Override
     public void map(DBIDRef id) {
       minmax.put(input.doubleValue());
-    }
-
-    @Override
-    public void cleanup() {
-      merge(minmax);
     }
   }
 }

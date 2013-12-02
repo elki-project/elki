@@ -42,6 +42,13 @@ public interface Mapper {
   public Instance instantiate(MapExecutor exectutor);
 
   /**
+   * Invoke cleanup.
+   * 
+   * @param inst Instance to cleanup.
+   */
+  public void cleanup(Instance inst);
+
+  /**
    * Mapper instance.
    * 
    * @author Erich Schubert
@@ -55,10 +62,5 @@ public interface Mapper {
      * @return Mapping result
      */
     public void map(DBIDRef id);
-
-    /**
-     * Invoke cleanup.
-     */
-    public void cleanup();
   }
 }
