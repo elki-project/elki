@@ -56,20 +56,20 @@ public class ParallelMapExecutor {
     // TODO: use more segments than processors for better handling differences
     // in the runtime of individual segments?
     ParallelCore core = ParallelCore.getCore();
-    core.connect();
-    final int numparts = core.getParallelism();
-
-    final int size = aids.size();
-    final int blocksize = (size + (numparts - 1)) / numparts;
-    List<Future<ArrayDBIDs>> parts = new ArrayList<>(numparts);
-    for (int i = 0; i < numparts; i++) {
-      final int start = i * blocksize;
-      final int end = (start + blocksize < size) ? start + blocksize : size;
-      Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, start, end, mapper);
-      parts.add(core.submit(run));
-    }
-
     try {
+      core.connect();
+      final int numparts = core.getParallelism();
+
+      final int size = aids.size();
+      final int blocksize = (size + (numparts - 1)) / numparts;
+      List<Future<ArrayDBIDs>> parts = new ArrayList<>(numparts);
+      for (int i = 0; i < numparts; i++) {
+        final int start = i * blocksize;
+        final int end = (start + blocksize < size) ? start + blocksize : size;
+        Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, start, end, mapper);
+        parts.add(core.submit(run));
+      }
+
       for (Future<ArrayDBIDs> fut : parts) {
         fut.get();
       }

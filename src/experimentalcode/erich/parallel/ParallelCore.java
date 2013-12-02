@@ -106,14 +106,14 @@ public class ParallelCore {
       synchronized (this) {
         if (executor == null) {
           executor = new ThreadPoolExecutor(0, processors, 10L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
-          // executor.allowCoreThreadTimeOut(true);
+          executor.allowCoreThreadTimeOut(true);
         }
       }
     }
     int c = this.connected.incrementAndGet();
     if (c == 1) {
-      // executor.allowCoreThreadTimeOut(false);
-      // executor.setCorePoolSize(executor.getMaximumPoolSize());
+      executor.allowCoreThreadTimeOut(false);
+      executor.setCorePoolSize(executor.getMaximumPoolSize());
     }
   }
 
@@ -124,8 +124,8 @@ public class ParallelCore {
     int c = this.connected.decrementAndGet();
     if (c == 0) {
       synchronized (this) {
-        //executor.allowCoreThreadTimeOut(true);
-        //executor.setCorePoolSize(0);
+        // executor.allowCoreThreadTimeOut(true);
+        // executor.setCorePoolSize(0);
       }
     }
   }

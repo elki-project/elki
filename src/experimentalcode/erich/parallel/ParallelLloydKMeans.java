@@ -114,6 +114,7 @@ public class ParallelLloydKMeans<V extends NumberVector<?>, D extends NumberDist
     // Wrap result
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {
+      // TODO: use cluster sizes from kmm!
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
