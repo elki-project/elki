@@ -51,11 +51,10 @@ public class ParallelMapExecutor {
    * @param mapper Mappers to run
    */
   public final void run(DBIDs ids, Mapper... mapper) {
-    // FIXME: use different strategies, depending on the ids type?
     // TODO: try different strategies anyway!
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
-    // TODO: use more segments than processors for better handling runtime
-    // differences?
+    // TODO: use more segments than processors for better handling differences
+    // in the runtime of individual segments?
     ParallelCore core = ParallelCore.getCore();
     core.connect();
     final int numparts = core.getParallelism();
@@ -78,99 +77,6 @@ public class ParallelMapExecutor {
       throw new RuntimeException("Parallel execution interrupted.");
     } finally {
       core.disconnect();
-    }
-  }
-
-  /**
-   * Run for an array, with step size.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.uses Mapper
-   */
-  protected class InterleavedArrayRunner implements Callable<ArrayDBIDs>, MapExecutor {
-    /**
-     * Array IDs to process
-     */
-    private ArrayDBIDs ids;
-
-    /**
-     * Start position
-     */
-    private int start;
-
-    /**
-     * End position
-     */
-    private int end;
-
-    /**
-     * Step size
-     */
-    private int step;
-
-    /**
-     * Mapper
-     */
-    private Mapper.Instance[] mapper;
-
-    /**
-     * Channel map
-     */
-    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<>();
-
-    /**
-     * Constructor.
-     * 
-     * @param ids IDs to process
-     * @param start Starting position
-     * @param end End position
-     * @param step Step size
-     * @param done Counter to decrement when done.
-     */
-    protected InterleavedArrayRunner(ArrayDBIDs ids, int start, int end, int step, Mapper[] mapper) {
-      super();
-      this.ids = ids;
-      this.start = start;
-      this.end = end;
-      this.step = step;
-      this.mapper = new Mapper.Instance[mapper.length];
-      for (int i = 0; i < mapper.length; i++) {
-        this.mapper[i] = mapper[i].instantiate(this);
-      }
-    }
-
-    @Override
-    public ArrayDBIDs call() {
-      DBIDArrayIter iter = ids.iter();
-      iter.seek(start);
-      for (; iter.valid() && iter.getOffset() < end; iter.advance(step)) {
-        for (int i = 0; i < mapper.length; i++) {
-          mapper[i].map(iter);
-        }
-        // This is a good moment for multitasking
-        Thread.yield();
-      }
-      for (int i = 0; i < mapper.length; i++) {
-        mapper[i].cleanup();
-      }
-      return ids;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls) {
-      SharedVariable.Instance<?> inst = channels.get(parent);
-      if (inst == null) {
-        return null;
-      } else {
-        return (I) cls.cast(inst);
-      }
-    }
-
-    @Override
-    public void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst) {
-      channels.put(chan, inst);
     }
   }
 
