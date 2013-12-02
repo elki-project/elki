@@ -23,12 +23,10 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.impl.unmodifiable.TUnmodifiableIntFloatMap;
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.iterator.TIntFloatIterator;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.TIntFloatMap;
-import gnu.trove.map.hash.TIntFloatHashMap;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -415,11 +413,6 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
       }
     }
   }
-
-  /**
-   * Empty map.
-   */
-  public static final TIntFloatMap EMPTYMAP = new TUnmodifiableIntFloatMap(new TIntFloatHashMap());
 
   /**
    * Serialization class using VarInt encodings.

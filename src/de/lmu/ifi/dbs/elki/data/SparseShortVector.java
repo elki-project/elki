@@ -39,24 +39,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * <p>
- * A SparseDoubleVector is to store real values as double values.
+ * A SparseShortVector is to store real values as double values.
  * </p>
  * 
- * A SparseDoubleVector only requires storage for those attribute values that
- * are non-zero.
+ * A SparseShortVector only requires storage for those attribute values that are
+ * non-zero.
  * 
  * @author Arthur Zimek
  */
-public class SparseDoubleVector extends AbstractNumberVector<Double> implements SparseNumberVector<Double> {
+public class SparseShortVector extends AbstractNumberVector<Short> implements SparseNumberVector<Short> {
   /**
    * Static instance.
    */
-  public static final SparseDoubleVector.Factory FACTORY = new SparseDoubleVector.Factory();
+  public static final SparseShortVector.Factory FACTORY = new SparseShortVector.Factory();
 
   /**
    * Serializer using varint encoding.
    */
-  public static final ByteBufferSerializer<SparseDoubleVector> VARIABLE_SERIALIZER = new VariableSerializer();
+  public static final ByteBufferSerializer<SparseShortVector> VARIABLE_SERIALIZER = new VariableSerializer();
 
   /**
    * Indexes of values.
@@ -66,7 +66,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   /**
    * Stored values.
    */
-  private final double[] values;
+  private final short[] values;
 
   /**
    * The dimensionality of this feature vector.
@@ -80,7 +80,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * @param values Associated value.
    * @param dimensionality "true" dimensionality
    */
-  public SparseDoubleVector(int[] indexes, double[] values, int dimensionality) {
+  public SparseShortVector(int[] indexes, short[] values, int dimensionality) {
     super();
     this.indexes = indexes;
     this.values = values;
@@ -88,7 +88,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   }
 
   /**
-   * Provides a SparseDoubleVector consisting of double values according to the
+   * Provides a SparseShortVector consisting of double values according to the
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
@@ -97,13 +97,13 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
-  public SparseDoubleVector(TIntDoubleMap values, int dimensionality) throws IllegalArgumentException {
+  public SparseShortVector(TIntDoubleMap values, int dimensionality) throws IllegalArgumentException {
     if(values.size() > dimensionality) {
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
 
     this.indexes = new int[values.size()];
-    this.values = new double[values.size()];
+    this.values = new short[values.size()];
     // Import and sort the indexes
     {
       TIntDoubleIterator iter = values.iterator();
@@ -116,7 +116,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
     // Import the values accordingly
     {
       for(int i = 0; i < values.size(); i++) {
-        this.values[i] = values.get(this.indexes[i]);
+        this.values[i] = (short) values.get(this.indexes[i]);
       }
     }
     this.dimensionality = dimensionality;
@@ -141,7 +141,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   }
 
   /**
-   * Provides a SparseDoubleVector consisting of double values according to the
+   * Provides a SparseShortVector consisting of double values according to the
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
@@ -149,27 +149,27 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
-  public SparseDoubleVector(double[] values) throws IllegalArgumentException {
+  public SparseShortVector(short[] values) throws IllegalArgumentException {
     this.dimensionality = values.length;
 
     // Count the number of non-zero entries
     int size = 0;
     {
       for(int i = 0; i < values.length; i++) {
-        if(values[i] != 0.0f) {
+        if(values[i] != 0) {
           size++;
         }
       }
     }
     this.indexes = new int[size];
-    this.values = new double[size];
+    this.values = new short[size];
 
     // Copy the values
     {
       int pos = 0;
       for(int i = 0; i < values.length; i++) {
-        double value = values[i];
-        if(value != 0.0f) {
+        short value = values[i];
+        if(value != 0) {
           this.indexes[pos] = i;
           this.values[pos] = value;
           pos++;
@@ -203,13 +203,13 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
 
   @Override
   @Deprecated
-  public Double getValue(int dimension) {
+  public Short getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
       return values[pos];
     }
     else {
-      return 0.0;
+      return 0;
     }
   }
 
@@ -236,13 +236,24 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   }
 
   @Override
+  public short shortValue(int dimension) {
+    int pos = Arrays.binarySearch(this.indexes, dimension);
+    if(pos >= 0) {
+      return values[pos];
+    }
+    else {
+      return 0;
+    }
+  }
+
+  @Override
   public Vector getColumnVector() {
     return new Vector(getValues());
   }
 
   /**
    * <p>
-   * Provides a String representation of this SparseDoubleVector as suitable for
+   * Provides a String representation of this SparseShortVector as suitable for
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}
    * .
    * </p>
@@ -250,9 +261,9 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * <p>
    * The returned String is a single line with entries separated by
    * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
-   * number of values actually not zero. Following entries are pairs of Integer
-   * and Double where the Integer gives the index of the dimensionality and the
-   * Double gives the corresponding value.
+   * number of values actually not zero. Following entries are pairs of Short
+   * and Short where the Short gives the index of the dimensionality and the
+   * Short gives the corresponding value.
    * </p>
    * 
    * <p>
@@ -260,7 +271,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * <code>2 2 1.2 3 1.3</code><br>
    * </p>
    * 
-   * @return a String representation of this SparseDoubleVector
+   * @return a String representation of this SparseShortVector
    */
   @Override
   public String toString() {
@@ -311,7 +322,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
 
   @Override
   public double iterDoubleValue(int iter) {
-    return values[iter];
+    return (double) values[iter];
   }
 
   @Override
@@ -326,7 +337,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
 
   @Override
   public short iterShortValue(int iter) {
-    return (short) values[iter];
+    return values[iter];
   }
 
   @Override
@@ -344,44 +355,44 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has SparseDoubleVector
+   * @apiviz.has SparseShortVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<SparseDoubleVector, Double> implements SparseNumberVector.Factory<SparseDoubleVector, Double> {
+  public static class Factory extends AbstractNumberVector.Factory<SparseShortVector, Short> implements SparseNumberVector.Factory<SparseShortVector, Short> {
     @Override
-    public <A> SparseDoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
+    public <A> SparseShortVector newFeatureVector(A array, ArrayAdapter<Short, A> adapter) {
       int dim = adapter.size(array);
-      double[] values = new double[dim];
+      short[] values = new short[dim];
       for(int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i);
       }
       // TODO: improve efficiency
-      return new SparseDoubleVector(values);
+      return new SparseShortVector(values);
     }
 
     @Override
-    public <A> SparseDoubleVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
+    public <A> SparseShortVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
-      double[] values = new double[dim];
+      short[] values = new short[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.getDouble(array, i);
+        values[i] = adapter.getShort(array, i);
       }
       // TODO: improve efficiency
-      return new SparseDoubleVector(values);
+      return new SparseShortVector(values);
     }
 
     @Override
-    public SparseDoubleVector newNumberVector(TIntDoubleMap values, int maxdim) {
-      return new SparseDoubleVector(values, maxdim);
+    public SparseShortVector newNumberVector(TIntDoubleMap values, int maxdim) {
+      return new SparseShortVector(values, maxdim);
     }
 
     @Override
-    public ByteBufferSerializer<SparseDoubleVector> getDefaultSerializer() {
+    public ByteBufferSerializer<SparseShortVector> getDefaultSerializer() {
       return VARIABLE_SERIALIZER;
     }
 
     @Override
-    public Class<? super SparseDoubleVector> getRestrictionClass() {
-      return SparseDoubleVector.class;
+    public Class<? super SparseShortVector> getRestrictionClass() {
+      return SparseShortVector.class;
     }
 
     /**
@@ -393,7 +404,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
-      protected SparseDoubleVector.Factory makeInstance() {
+      protected SparseShortVector.Factory makeInstance() {
         return FACTORY;
       }
     }
@@ -404,41 +415,41 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses SparseDoubleVector - - «serializes»
+   * @apiviz.uses SparseShortVector - - «serializes»
    */
-  public static class VariableSerializer implements ByteBufferSerializer<SparseDoubleVector> {
+  public static class VariableSerializer implements ByteBufferSerializer<SparseShortVector> {
     @Override
-    public SparseDoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+    public SparseShortVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
       final int nonzero = ByteArrayUtil.readUnsignedVarint(buffer);
       final int[] dims = new int[nonzero];
-      final double[] values = new double[nonzero];
+      final short[] values = new short[nonzero];
       for(int i = 0; i < nonzero; i++) {
         dims[i] = ByteArrayUtil.readUnsignedVarint(buffer);
-        values[i] = buffer.getDouble();
+        values[i] = (short) ByteArrayUtil.readSignedVarint(buffer);
       }
-      return new SparseDoubleVector(dims, values, dimensionality);
+      return new SparseShortVector(dims, values, dimensionality);
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, SparseDoubleVector vec) throws IOException {
+    public void toByteBuffer(ByteBuffer buffer, SparseShortVector vec) throws IOException {
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.dimensionality);
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
         ByteArrayUtil.writeUnsignedVarint(buffer, vec.indexes[i]);
-        buffer.putDouble(vec.values[i]);
+        ByteArrayUtil.writeSignedVarint(buffer, vec.values[i]);
       }
     }
 
     @Override
-    public int getByteSize(SparseDoubleVector vec) {
+    public int getByteSize(SparseShortVector vec) {
       int sum = 0;
       sum += ByteArrayUtil.getUnsignedVarintSize(vec.dimensionality);
       sum += ByteArrayUtil.getUnsignedVarintSize(vec.values.length);
-      for(int d : vec.indexes) {
-        sum += ByteArrayUtil.getUnsignedVarintSize(d);
+      for(int i = 0; i < vec.values.length; i++) {
+        sum += ByteArrayUtil.getUnsignedVarintSize(vec.indexes[i]);
+        sum += ByteArrayUtil.getSignedVarintSize(vec.values[i]);
       }
-      sum += vec.values.length * ByteArrayUtil.SIZE_DOUBLE;
       return sum;
     }
   }

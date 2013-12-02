@@ -39,24 +39,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * <p>
- * A SparseDoubleVector is to store real values as double values.
+ * A SparseByteVector is to store real values as double values.
  * </p>
  * 
- * A SparseDoubleVector only requires storage for those attribute values that
+ * A SparseByteVector only requires storage for those attribute values that
  * are non-zero.
  * 
  * @author Arthur Zimek
  */
-public class SparseDoubleVector extends AbstractNumberVector<Double> implements SparseNumberVector<Double> {
+public class SparseByteVector extends AbstractNumberVector<Byte> implements SparseNumberVector<Byte> {
   /**
    * Static instance.
    */
-  public static final SparseDoubleVector.Factory FACTORY = new SparseDoubleVector.Factory();
+  public static final SparseByteVector.Factory FACTORY = new SparseByteVector.Factory();
 
   /**
    * Serializer using varint encoding.
    */
-  public static final ByteBufferSerializer<SparseDoubleVector> VARIABLE_SERIALIZER = new VariableSerializer();
+  public static final ByteBufferSerializer<SparseByteVector> VARIABLE_SERIALIZER = new VariableSerializer();
 
   /**
    * Indexes of values.
@@ -66,7 +66,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   /**
    * Stored values.
    */
-  private final double[] values;
+  private final byte[] values;
 
   /**
    * The dimensionality of this feature vector.
@@ -80,7 +80,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * @param values Associated value.
    * @param dimensionality "true" dimensionality
    */
-  public SparseDoubleVector(int[] indexes, double[] values, int dimensionality) {
+  public SparseByteVector(int[] indexes, byte[] values, int dimensionality) {
     super();
     this.indexes = indexes;
     this.values = values;
@@ -88,7 +88,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   }
 
   /**
-   * Provides a SparseDoubleVector consisting of double values according to the
+   * Provides a SparseByteVector consisting of double values according to the
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
@@ -97,13 +97,13 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
-  public SparseDoubleVector(TIntDoubleMap values, int dimensionality) throws IllegalArgumentException {
+  public SparseByteVector(TIntDoubleMap values, int dimensionality) throws IllegalArgumentException {
     if(values.size() > dimensionality) {
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
 
     this.indexes = new int[values.size()];
-    this.values = new double[values.size()];
+    this.values = new byte[values.size()];
     // Import and sort the indexes
     {
       TIntDoubleIterator iter = values.iterator();
@@ -116,7 +116,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
     // Import the values accordingly
     {
       for(int i = 0; i < values.size(); i++) {
-        this.values[i] = values.get(this.indexes[i]);
+        this.values[i] = (byte) values.get(this.indexes[i]);
       }
     }
     this.dimensionality = dimensionality;
@@ -141,7 +141,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   }
 
   /**
-   * Provides a SparseDoubleVector consisting of double values according to the
+   * Provides a SparseByteVector consisting of double values according to the
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
@@ -149,27 +149,27 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
-  public SparseDoubleVector(double[] values) throws IllegalArgumentException {
+  public SparseByteVector(byte[] values) throws IllegalArgumentException {
     this.dimensionality = values.length;
 
     // Count the number of non-zero entries
     int size = 0;
     {
       for(int i = 0; i < values.length; i++) {
-        if(values[i] != 0.0f) {
+        if(values[i] != 0) {
           size++;
         }
       }
     }
     this.indexes = new int[size];
-    this.values = new double[size];
+    this.values = new byte[size];
 
     // Copy the values
     {
       int pos = 0;
       for(int i = 0; i < values.length; i++) {
-        double value = values[i];
-        if(value != 0.0f) {
+        byte value = values[i];
+        if(value != 0) {
           this.indexes[pos] = i;
           this.values[pos] = value;
           pos++;
@@ -203,13 +203,13 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
 
   @Override
   @Deprecated
-  public Double getValue(int dimension) {
+  public Byte getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
       return values[pos];
     }
     else {
-      return 0.0;
+      return 0;
     }
   }
 
@@ -220,7 +220,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
       return values[pos];
     }
     else {
-      return 0.0;
+      return 0.;
     }
   }
 
@@ -236,13 +236,25 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   }
 
   @Override
+  public byte byteValue(int dimension) {
+    int pos = Arrays.binarySearch(this.indexes, dimension);
+    if(pos >= 0) {
+      return values[pos];
+    }
+    else {
+      return 0;
+    }
+  }
+
+  @Override
   public Vector getColumnVector() {
     return new Vector(getValues());
   }
 
   /**
    * <p>
-   * Provides a String representation of this SparseDoubleVector as suitable for
+   * Provides a String representation of this SparseByteVector as suitable
+   * for
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}
    * .
    * </p>
@@ -250,9 +262,9 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * <p>
    * The returned String is a single line with entries separated by
    * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
-   * number of values actually not zero. Following entries are pairs of Integer
-   * and Double where the Integer gives the index of the dimensionality and the
-   * Double gives the corresponding value.
+   * number of values actually not zero. Following entries are pairs of Byte
+   * and Byte where the Byte gives the index of the dimensionality and the
+   * Byte gives the corresponding value.
    * </p>
    * 
    * <p>
@@ -260,7 +272,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * <code>2 2 1.2 3 1.3</code><br>
    * </p>
    * 
-   * @return a String representation of this SparseDoubleVector
+   * @return a String representation of this SparseByteVector
    */
   @Override
   public String toString() {
@@ -311,7 +323,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
 
   @Override
   public double iterDoubleValue(int iter) {
-    return values[iter];
+    return (double) values[iter];
   }
 
   @Override
@@ -336,7 +348,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
 
   @Override
   public byte iterByteValue(int iter) {
-    return (byte) values[iter];
+    return values[iter];
   }
 
   /**
@@ -344,44 +356,44 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has SparseDoubleVector
+   * @apiviz.has SparseByteVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<SparseDoubleVector, Double> implements SparseNumberVector.Factory<SparseDoubleVector, Double> {
+  public static class Factory extends AbstractNumberVector.Factory<SparseByteVector, Byte> implements SparseNumberVector.Factory<SparseByteVector, Byte> {
     @Override
-    public <A> SparseDoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
+    public <A> SparseByteVector newFeatureVector(A array, ArrayAdapter<Byte, A> adapter) {
       int dim = adapter.size(array);
-      double[] values = new double[dim];
+      byte[] values = new byte[dim];
       for(int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i);
       }
       // TODO: improve efficiency
-      return new SparseDoubleVector(values);
+      return new SparseByteVector(values);
     }
 
     @Override
-    public <A> SparseDoubleVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
+    public <A> SparseByteVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
-      double[] values = new double[dim];
+      byte[] values = new byte[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.getDouble(array, i);
+        values[i] = adapter.getByte(array, i);
       }
       // TODO: improve efficiency
-      return new SparseDoubleVector(values);
+      return new SparseByteVector(values);
     }
 
     @Override
-    public SparseDoubleVector newNumberVector(TIntDoubleMap values, int maxdim) {
-      return new SparseDoubleVector(values, maxdim);
+    public SparseByteVector newNumberVector(TIntDoubleMap values, int maxdim) {
+      return new SparseByteVector(values, maxdim);
     }
 
     @Override
-    public ByteBufferSerializer<SparseDoubleVector> getDefaultSerializer() {
+    public ByteBufferSerializer<SparseByteVector> getDefaultSerializer() {
       return VARIABLE_SERIALIZER;
     }
 
     @Override
-    public Class<? super SparseDoubleVector> getRestrictionClass() {
-      return SparseDoubleVector.class;
+    public Class<? super SparseByteVector> getRestrictionClass() {
+      return SparseByteVector.class;
     }
 
     /**
@@ -393,7 +405,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
-      protected SparseDoubleVector.Factory makeInstance() {
+      protected SparseByteVector.Factory makeInstance() {
         return FACTORY;
       }
     }
@@ -404,41 +416,41 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses SparseDoubleVector - - «serializes»
+   * @apiviz.uses SparseByteVector - - «serializes»
    */
-  public static class VariableSerializer implements ByteBufferSerializer<SparseDoubleVector> {
+  public static class VariableSerializer implements ByteBufferSerializer<SparseByteVector> {
     @Override
-    public SparseDoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+    public SparseByteVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
       final int nonzero = ByteArrayUtil.readUnsignedVarint(buffer);
       final int[] dims = new int[nonzero];
-      final double[] values = new double[nonzero];
+      final byte[] values = new byte[nonzero];
       for(int i = 0; i < nonzero; i++) {
         dims[i] = ByteArrayUtil.readUnsignedVarint(buffer);
-        values[i] = buffer.getDouble();
+        values[i] = (byte) buffer.get();
       }
-      return new SparseDoubleVector(dims, values, dimensionality);
+      return new SparseByteVector(dims, values, dimensionality);
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, SparseDoubleVector vec) throws IOException {
+    public void toByteBuffer(ByteBuffer buffer, SparseByteVector vec) throws IOException {
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.dimensionality);
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
         ByteArrayUtil.writeUnsignedVarint(buffer, vec.indexes[i]);
-        buffer.putDouble(vec.values[i]);
+        buffer.put(vec.values[i]);
       }
     }
 
     @Override
-    public int getByteSize(SparseDoubleVector vec) {
+    public int getByteSize(SparseByteVector vec) {
       int sum = 0;
       sum += ByteArrayUtil.getUnsignedVarintSize(vec.dimensionality);
       sum += ByteArrayUtil.getUnsignedVarintSize(vec.values.length);
-      for(int d : vec.indexes) {
-        sum += ByteArrayUtil.getUnsignedVarintSize(d);
+      for(int i = 0; i < vec.values.length; i++) {
+        sum += ByteArrayUtil.getUnsignedVarintSize(vec.indexes[i]);
+        ++sum;
       }
-      sum += vec.values.length * ByteArrayUtil.SIZE_DOUBLE;
       return sum;
     }
   }
