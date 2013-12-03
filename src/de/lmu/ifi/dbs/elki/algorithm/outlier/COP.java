@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -194,6 +195,11 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   DistanceDist dist = DistanceDist.CHISQUARED;
 
   /**
+   * Include models in output.
+   */
+  boolean models;
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction distance function
@@ -201,13 +207,15 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @param pca PCA computation method
    * @param expect Expected fraction of outliers (for score normalization)
    * @param dist Distance distribution model (ChiSquared, Gamma)
+   * @param models Report models
    */
-  public COP(DistanceFunction<? super V, D> distanceFunction, int k, PCARunner<V> pca, double expect, DistanceDist dist) {
+  public COP(DistanceFunction<? super V, D> distanceFunction, int k, PCARunner<V> pca, double expect, DistanceDist dist, boolean models) {
     super(distanceFunction);
     this.k = k;
     this.pca = pca;
     this.expect = expect;
     this.dist = dist;
+    this.models = models;
   }
 
   /**
@@ -226,8 +234,12 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDataStore<Vector> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Vector.class);
-    WritableIntegerDataStore cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
+    WritableDataStore<Vector> cop_err_v = null;
+    WritableIntegerDataStore cop_dim = null;
+    if (models) {
+      cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Vector.class);
+      cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
+    }
     // compute neighbors of each db object
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
 
@@ -236,7 +248,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       ModifiableDBIDs nids = DBIDUtil.newHashSet(neighbors);
       nids.remove(id); // Do not use query object
 
-      Vector centroid = Centroid.make(relation, nids).toVector(relation).getColumnVector();
+      Vector centroid = Centroid.make(relation, nids);
       Vector relative = relation.get(id).getColumnVector().minusEquals(centroid);
 
       PCAResult pcares = pca.processIds(nids, relation);
@@ -307,8 +319,10 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       Vector ev = evecs.times(projected).timesEquals(-1 * prob);
 
       cop_score.putDouble(id, prob);
-      cop_err_v.put(id, ev);
-      cop_dim.putInt(id, dim + 1 - vdim);
+      if (models) {
+        cop_err_v.put(id, ev);
+        cop_dim.putInt(id, dim + 1 - vdim);
+      }
 
       if (prog != null) {
         prog.incrementProcessed(LOG);
@@ -322,8 +336,10 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     Relation<Double> scoreResult = new MaterializedRelation<>("Correlation Outlier Probabilities", COP_SCORES, TypeUtil.DOUBLE, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-    result.addChildResult(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
+    if (models) {
+      result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
+      result.addChildResult(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
+    }
     return result;
   }
 
@@ -382,6 +398,16 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     public static final OptionID EXPECT_ID = new OptionID("cop.expect", "Expected share of outliers. Only affect score normalization.");
 
     /**
+     * Include COP error vectors in output.
+     * <p>
+     * Key: {@code -cop.models}
+     * 
+     * Default: off
+     * </p>
+     */
+    public static final OptionID MODELS_ID = new OptionID("cop.models", "Include COP models (error vectors) in output. This needs more memory.");
+
+    /**
      * Number of neighbors to be considered.
      */
     int k;
@@ -400,6 +426,11 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
      * Expected amount of outliers.
      */
     double expect;
+
+    /**
+     * Include COP models
+     */
+    boolean models = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -423,11 +454,15 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       if (config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
       }
+      Flag modelsF = new Flag(MODELS_ID);
+      if (config.grab(modelsF)) {
+        models = modelsF.isTrue();
+      }
     }
 
     @Override
     protected COP<V, D> makeInstance() {
-      return new COP<>(distanceFunction, k, pca, expect, dist);
+      return new COP<>(distanceFunction, k, pca, expect, dist, models);
     }
   }
 }
