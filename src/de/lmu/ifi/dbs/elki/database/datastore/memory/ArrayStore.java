@@ -62,18 +62,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   @SuppressWarnings("unchecked")
   @Override
   public T get(DBIDRef id) {
-    try {
-      return (T) data[idmap.mapDBIDToOffset(id)];
-    }
-    catch(ArrayIndexOutOfBoundsException e) {
-      return null;
-    }
-    catch(NullPointerException e) {
-      return null;
-    }
-    catch(ClassCastException e) {
-      return null;
-    }
+    return (T) data[idmap.mapDBIDToOffset(id)];
   }
 
   @Override

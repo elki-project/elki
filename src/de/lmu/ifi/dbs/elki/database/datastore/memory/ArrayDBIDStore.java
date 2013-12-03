@@ -69,11 +69,7 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
   @Override
   @Deprecated
   public DBID get(DBIDRef id) {
-    try {
-      return data.get(idmap.mapDBIDToOffset(id));
-    } catch (ArrayIndexOutOfBoundsException e) {
-      return null;
-    }
+    return data.get(idmap.mapDBIDToOffset(id));
   }
 
   @Override

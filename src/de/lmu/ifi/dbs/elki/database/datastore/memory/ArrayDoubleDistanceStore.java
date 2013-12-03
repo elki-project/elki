@@ -68,7 +68,7 @@ public class ArrayDoubleDistanceStore implements WritableDoubleDistanceDataStore
   public ArrayDoubleDistanceStore(int size, DataStoreIDMap idmap, double def) {
     super();
     this.data = new double[size];
-    if(def != 0) {
+    if (def != 0) {
       Arrays.fill(this.data, def);
     }
     this.idmap = idmap;
@@ -77,12 +77,7 @@ public class ArrayDoubleDistanceStore implements WritableDoubleDistanceDataStore
   @Override
   @Deprecated
   public DoubleDistance get(DBIDRef id) {
-    try {
-      return new DoubleDistance(data[idmap.mapDBIDToOffset(id)]);
-    }
-    catch(ArrayIndexOutOfBoundsException e) {
-      return null;
-    }
+    return new DoubleDistance(data[idmap.mapDBIDToOffset(id)]);
   }
 
   @Override

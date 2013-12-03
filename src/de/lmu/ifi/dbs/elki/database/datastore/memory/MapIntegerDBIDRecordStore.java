@@ -97,18 +97,10 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T get(DBIDRef id, int index) {
     Object[] d = data.get(DBIDUtil.asInteger(id));
-    if(d == null) {
+    if (d == null) {
       return null;
     }
-    try {
-      return (T) d[index];
-    }
-    catch(ClassCastException e) {
-      return null;
-    }
-    catch(ArrayIndexOutOfBoundsException e) {
-      return null;
-    }
+    return (T) d[index];
   }
 
   /**
@@ -123,7 +115,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T set(DBIDRef id, int index, T value) {
     Object[] d = data.get(DBIDUtil.asInteger(id));
-    if(d == null) {
+    if (d == null) {
       d = new Object[rlen];
       data.put(DBIDUtil.asInteger(id), d);
     }
