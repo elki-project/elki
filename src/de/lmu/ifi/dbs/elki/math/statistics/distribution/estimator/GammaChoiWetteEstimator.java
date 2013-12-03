@@ -72,7 +72,7 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
       meanlogx += deltalogx / (i + 1.);
     }
     // Initial approximation
-    final double logmeanx = Math.log(meanx);
+    final double logmeanx = (meanx > 0) ? Math.log(meanx) : meanlogx;
     final double diff = logmeanx - meanlogx;
     double k = (3 - diff + Math.sqrt((diff - 3) * (diff - 3) + 24 * diff)) / (12 * diff);
 
