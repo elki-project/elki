@@ -55,7 +55,7 @@ public class Mean {
   /**
    * Mean of values - first moment.
    */
-  protected double m1 = 0.0;
+  protected double m1 = 0.;
 
   /**
    * Weight sum (number of samples).
@@ -147,7 +147,7 @@ public class Mean {
    */
   public static Mean[] newArray(int dimensionality) {
     Mean[] arr = new Mean[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
+    for (int i = 0; i < dimensionality; i++) {
       arr[i] = new Mean();
     }
     return arr;
@@ -164,5 +164,20 @@ public class Mean {
   public void reset() {
     m1 = 0;
     n = 0;
+  }
+
+  /**
+   * Static helper function.
+   * 
+   * @param data Data to compute the mean for.
+   * @return Mean
+   */
+  public static double of(double[] data) {
+    // FIXME: what is numerically best. Kahan summation?
+    double sum = 0.;
+    for (double v : data) {
+      sum += v;
+    }
+    return sum / data.length;
   }
 }
