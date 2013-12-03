@@ -47,7 +47,7 @@ public class TestSOD extends AbstractSimpleAlgorithmTest implements JUnit4Test {
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(SOD.KNN_ID, 25);
+    params.addParameter(SOD.Parameterizer.KNN_ID, 25);
     params.addParameter(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 19);
 
     // setup Algorithm

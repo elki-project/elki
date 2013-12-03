@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -68,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -102,37 +104,24 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   private static final Logging LOG = Logging.getLogger(SOD.class);
 
   /**
-   * Parameter to specify the number of shared nearest neighbors to be
-   * considered for learning the subspace properties., must be an integer
-   * greater than 0.
-   */
-  public static final OptionID KNN_ID = new OptionID("sod.knn", "The number of most snn-similar objects to use as reference set for learning the subspace properties.");
-
-  /**
-   * Parameter to indicate the multiplier for the discriminance value for
-   * discerning small from large variances.
-   */
-  public static final OptionID ALPHA_ID = new OptionID("sod.alpha", "The multiplier for the discriminance value for discerning small from large variances.");
-
-  /**
-   * Parameter for the similarity function.
-   */
-  public static final OptionID SIM_ID = new OptionID("sod.similarity", "The similarity function used for the neighborhood set.");
-
-  /**
-   * Holds the value of {@link #KNN_ID}.
+   * Neighborhood size.
    */
   private int knn;
 
   /**
-   * Holds the value of {@link #ALPHA_ID}.
+   * Alpha (discriminance value).
    */
   private double alpha;
 
   /**
-   * The similarity function {@link #SIM_ID}.
+   * Similarity function to use.
    */
   private SimilarityFunction<V, D> similarityFunction;
+
+  /**
+   * Report models.
+   */
+  private boolean models;
 
   /**
    * Constructor with parameters.
@@ -140,12 +129,14 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @param knn knn value
    * @param alpha Alpha parameter
    * @param similarityFunction Shared nearest neighbor similarity function
+   * @param models Report generated models
    */
-  public SOD(int knn, double alpha, SimilarityFunction<V, D> similarityFunction) {
+  public SOD(int knn, double alpha, SimilarityFunction<V, D> similarityFunction, boolean models) {
     super();
     this.knn = knn;
     this.alpha = alpha;
     this.similarityFunction = similarityFunction;
+    this.models = models;
   }
 
   /**
@@ -157,27 +148,47 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   public OutlierResult run(Relation<V> relation) {
     SimilarityQuery<V, D> snnInstance = similarityFunction.instantiate(relation);
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), LOG) : null;
-    WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
+    final WritableDoubleDataStore sod_scores;
+    final WritableDataStore<SODModel<?>> sod_models;
+    if (models) {
+      sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
+      sod_scores = null;
+    } else {
+      sod_models = null;
+      sod_scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    }
     DoubleMinMax minmax = new DoubleMinMax();
     for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       if (progress != null) {
         progress.incrementProcessed(LOG);
       }
       DBIDs knnList = getNearestNeighbors(relation, snnInstance, iter);
+      // TODO: it would be nicer if we would not produce these objects in the
+      // first place.
       SODModel<V> model = new SODModel<>(relation, knnList, alpha, relation.get(iter));
-      sod_models.put(iter, model);
+      if (sod_models != null) {
+        sod_models.put(iter, model);
+      } else {
+        sod_scores.putDouble(iter, model.getSod());
+      }
       minmax.put(model.getSod());
     }
     if (progress != null) {
       progress.ensureCompleted(LOG);
     }
     // combine results.
-    Relation<SODModel<?>> models = new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<SODModel<?>>(SODModel.class), sod_models, relation.getDBIDs());
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models, relation.getDBIDs()));
-    // also add the models.
-    sodResult.addChildResult(models);
-    return sodResult;
+    if (sod_models != null) {
+      Relation<SODModel<?>> models = new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<SODModel<?>>(SODModel.class), sod_models, relation.getDBIDs());
+      OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
+      OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models, relation.getDBIDs()));
+      // also add the models.
+      sodResult.addChildResult(models);
+      return sodResult;
+    } else {
+      OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
+      OutlierResult sodResult = new OutlierResult(meta, new MaterializedRelation<>("Subspace Outlier Degree", "sod-outlier", TypeUtil.DOUBLE, sod_scores, relation.getDBIDs()));
+      return sodResult;
+    }
   }
 
   /**
@@ -437,19 +448,47 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    */
   public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
     /**
-     * Holds the value of {@link #KNN_ID}.
+     * Parameter to specify the number of shared nearest neighbors to be
+     * considered for learning the subspace properties., must be an integer
+     * greater than 0.
+     */
+    public static final OptionID KNN_ID = new OptionID("sod.knn", "The number of most snn-similar objects to use as reference set for learning the subspace properties.");
+
+    /**
+     * Parameter to indicate the multiplier for the discriminance value for
+     * discerning small from large variances.
+     */
+    public static final OptionID ALPHA_ID = new OptionID("sod.alpha", "The multiplier for the discriminance value for discerning small from large variances.");
+
+    /**
+     * Parameter for the similarity function.
+     */
+    public static final OptionID SIM_ID = new OptionID("sod.similarity", "The similarity function used for the neighborhood set.");
+
+    /**
+     * Parameter for keeping the models.
+     */
+    public static final OptionID MODELS_ID = new OptionID("sod.models", "Report the models computed by SOD (default: report only scores).");
+
+    /**
+     * Neighborhood size
      */
     private int knn = 1;
 
     /**
-     * Holds the value of {@link #ALPHA_ID}.
+     * Alpha (discriminance value).
      */
     private double alpha = 1.1;
 
     /**
-     * The similarity function - {@link #SIM_ID}.
+     * The similarity function.
      */
     private SimilarityFunction<V, D> similarityFunction;
+
+    /**
+     * Track models.
+     */
+    private boolean models = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -470,11 +509,16 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       if (config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
+
+      final Flag modelsF = new Flag(MODELS_ID);
+      if (config.grab(modelsF)) {
+        models = modelsF.isTrue();
+      }
     }
 
     @Override
     protected SOD<V, D> makeInstance() {
-      return new SOD<>(knn, alpha, similarityFunction);
+      return new SOD<>(knn, alpha, similarityFunction, models);
     }
   }
 }
