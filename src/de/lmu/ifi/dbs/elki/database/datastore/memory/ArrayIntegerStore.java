@@ -56,7 +56,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   public ArrayIntegerStore(int size, DataStoreIDMap idmap) {
     this(size, idmap, 0);
   }
-  
+
   /**
    * Constructor.
    * 
@@ -76,12 +76,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   @Override
   @Deprecated
   public Integer get(DBIDRef id) {
-    try {
-      return Integer.valueOf(data[idmap.mapDBIDToOffset(id)]);
-    }
-    catch(ArrayIndexOutOfBoundsException e) {
-      return null;
-    }
+    return Integer.valueOf(data[idmap.mapDBIDToOffset(id)]);
   }
 
   @Override
@@ -92,7 +87,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
     data[off] = value.intValue();
     return Integer.valueOf(ret);
   }
-  
+
   @Override
   public int intValue(DBIDRef id) {
     return data[idmap.mapDBIDToOffset(id)];

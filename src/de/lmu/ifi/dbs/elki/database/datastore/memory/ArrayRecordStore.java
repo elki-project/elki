@@ -74,18 +74,7 @@ public class ArrayRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T get(DBIDRef id, int index) {
-    try {
-      return (T) data[idmap.mapDBIDToOffset(id)][index];
-    }
-    catch(ArrayIndexOutOfBoundsException e) {
-      return null;
-    }
-    catch(NullPointerException e) {
-      return null;
-    }
-    catch(ClassCastException e) {
-      return null;
-    }
+    return (T) data[idmap.mapDBIDToOffset(id)][index];
   }
 
   /**
