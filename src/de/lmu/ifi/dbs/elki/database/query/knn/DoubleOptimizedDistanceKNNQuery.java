@@ -64,41 +64,43 @@ public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQue
 
   @Override
   public DoubleDistanceKNNList getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObjectKNNHeap(relation.get(id), k);
+    // Avoid getfield in hot loop:
+    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
+    final Relation<? extends O> relation = this.relation;
+    final O obj = relation.get(id); // Query object
+
+    DoubleDistanceKNNHeap heap = DBIDUtil.newDoubleDistanceHeap(k);
+    DBIDIter iter = relation.iterDBIDs();
+    // The first k do not neeed checking.
+    double kdist = Double.POSITIVE_INFINITY;
+    for (int i = 0; iter.valid(); iter.advance(), ++i) {
+      final double dist = rawdist.doubleDistance(obj, relation.get(iter));
+      if (i <= k || dist <= kdist) {
+        heap.add(dist, iter);
+        if (dist < kdist) {
+          kdist = heap.doubleKNNDistance();
+        }
+      }
+    }
+    return heap.toKNNList();
   }
 
   @Override
   public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
-    return getKNNForObjectKNNHeap(obj, k);
-  }
-
-  /**
-   * Heap-based kNN search.
-   * 
-   * @param obj Query object
-   * @param k Desired number of neighbors
-   * @return kNN result
-   */
-  private final DoubleDistanceKNNList getKNNForObjectKNNHeap(O obj, int k) {
     // Avoid getfield in hot loop:
     final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
     final Relation<? extends O> relation = this.relation;
     DoubleDistanceKNNHeap heap = DBIDUtil.newDoubleDistanceHeap(k);
     DBIDIter iter = relation.iterDBIDs();
     // The first k do not neeed checking.
-    for (int i = 0; i < k && iter.valid(); iter.advance(), ++i) {
+    double kdist = Double.POSITIVE_INFINITY;
+    for (int i = 0; iter.valid(); iter.advance(), ++i) {
       final double dist = rawdist.doubleDistance(obj, relation.get(iter));
-      heap.add(dist, iter);
-    }
-    double kdist = heap.doubleKNNDistance();
-    for (; iter.valid(); iter.advance()) {
-      final double dist = rawdist.doubleDistance(obj, relation.get(iter));
-      if (dist > kdist) {
-        continue;
-      }
-      heap.add(dist, iter);
-      if (dist < kdist) {
-        kdist = heap.doubleKNNDistance();
+      if (i <= k || dist <= kdist) {
+        heap.add(dist, iter);
+        if (dist < kdist) {
+          kdist = heap.doubleKNNDistance();
+        }
       }
     }
     return heap.toKNNList();

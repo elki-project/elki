@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
@@ -53,41 +51,43 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
    */
   @Override
   protected void addInternal(final double dist, final int id) {
-    if (size >= k && dist > dists[size - 1]) {
-      return;
-    }
     // Ensure we have enough space.
-    ensureSize(size + 1);
-    // Local references may have a performance advantage.
-    double[] dists = this.dists;
-    int[] ids = this.ids;
-    // Insertion sort:
-    int pos = size;
-    for (; pos > 0 && dists[pos - 1] > dist; --pos) {
-      dists[pos] = dists[pos - 1];
-      ids[pos] = ids[pos - 1];
+    if (size >= dists.length) {
+      grow();
     }
-    dists[pos] = dist;
-    ids[pos] = id;
-    ++size;
+    // Increases size!
+    size = insertionSort(dists, ids, size, dist, id);
     // Truncate if necessary:
-    if (size > k && dists[k] > dists[k - 1]) {
+    if (size > k && dists[k] > dists[last]) {
       size = k;
     }
   }
 
   /**
-   * Ensure we have enough space.
+   * Insertion sort a single object.
    * 
-   * @param size Desired size
+   * @param dists Distances
+   * @param ids IDs
+   * @param size Current size
+   * @param dist New distance
+   * @param id New id
+   * @return New size
    */
-  private void ensureSize(int size) {
-    final int len = dists.length;
-    if (size > len) {
-      final int newlength = len + (len >> 1);
-      dists = Arrays.copyOf(dists, newlength);
-      ids = Arrays.copyOf(ids, newlength);
+  private static int insertionSort(final double[] dists, final int[] ids, final int size, final double dist, final int id) {
+    int pos = size;
+    while (pos > 0) {
+      final int pre = pos - 1;
+      final double predist = dists[pre];
+      if (predist <= dist) {
+        break;
+      }
+      dists[pos] = predist;
+      ids[pos] = ids[pre];
+      --pos;
     }
+    dists[pos] = dist;
+    ids[pos] = id;
+    return size + 1;
   }
 
   @Override
@@ -98,12 +98,12 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
 
   @Override
   public DoubleDistanceIntegerDBIDPair poll() {
-    return new DoubleDistanceIntegerDBIDPair(dists[k], ids[k]);
+    return new DoubleDistanceIntegerDBIDPair(dists[size - 1], ids[size - 1]);
   }
 
   @Override
   public DoubleDistanceIntegerDBIDPair peek() {
-    return new DoubleDistanceIntegerDBIDPair(dists[k], ids[k]);
+    return new DoubleDistanceIntegerDBIDPair(dists[size - 1], ids[size - 1]);
   }
 
   @Override
