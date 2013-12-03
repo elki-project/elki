@@ -195,8 +195,11 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = doublePreDistance(v1, v2, 0, mindim, initialAggregateValue());
-    agg = doublePreNorm(v1, mindim, dim1, agg);
-    agg = doublePreNorm(v2, mindim, dim2, agg);
+    if (dim1 > mindim) {
+      agg = doublePreNorm(v1, mindim, dim1, agg);
+    } else if (dim2 > mindim) {
+      agg = doublePreNorm(v2, mindim, dim2, agg);
+    }
     return finalScale(agg);
   }
 
@@ -217,21 +220,31 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     if (v1 != null) {
       if (v2 != null) {
         agg = doublePreDistance(v1, v2, 0, mindim, agg);
-        agg = doublePreNorm(v2, mindim, dim1, agg);
       } else {
         agg = doublePreDistanceVM(v1, mbr2, 0, mindim, agg);
-        agg = doublePreNormMBR(mbr2, mindim, dim1, agg);
       }
-      agg = doublePreNorm(v1, mindim, dim1, agg);
     } else {
       if (v2 != null) {
         agg = doublePreDistanceVM(v2, mbr1, 0, mindim, agg);
-        agg = doublePreNorm(v2, mindim, dim2, agg);
       } else {
         agg = doublePreDistanceMBR(mbr1, mbr2, 0, mindim, agg);
+      }
+    }
+    // first object has more dimensions.
+    if (dim1 > mindim) {
+      if (v1 != null) {
+        agg = doublePreNorm(v1, mindim, dim1, agg);
+      } else {
+        agg = doublePreNormMBR(v1, mindim, dim1, agg);
+      }
+    }
+    // second object has more dimensions.
+    if (dim2 > mindim) {
+      if (v2 != null) {
+        agg = doublePreNorm(v2, mindim, dim2, agg);
+      } else {
         agg = doublePreNormMBR(mbr2, mindim, dim2, agg);
       }
-      agg = doublePreNormMBR(v1, mindim, dim1, agg);
     }
     return finalScale(agg);
   }

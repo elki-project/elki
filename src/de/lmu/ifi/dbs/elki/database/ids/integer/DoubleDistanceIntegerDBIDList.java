@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
@@ -72,12 +71,9 @@ public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDB
    */
   public DoubleDistanceIntegerDBIDList(int size) {
     super();
-    if (size <= 1) {
-      size = INITIAL_SIZE;
-    }
     this.dists = new double[size];
     this.ids = new int[size];
-    this.size = 0; // not filled yet.
+    // This is default anyway: this.size = 0;
   }
 
   @Override
@@ -118,15 +114,26 @@ public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDB
    * @param id Internal index
    */
   protected void addInternal(double dist, int id) {
-    final int len = dists.length;
-    if (size == len) {
-      final int newlength = len + (len >>> 1);
-      dists = Arrays.copyOf(dists, newlength);
-      ids = Arrays.copyOf(ids, newlength);
+    if (size == dists.length) {
+      grow();
     }
     dists[size] = dist;
     ids[size] = id;
     ++size;
+  }
+
+  /**
+   * Grow the data storage.
+   */
+  protected void grow() {
+    final int len = dists.length;
+    final int newlength = len + (len >> 1);
+    double[] odists = dists;
+    dists = new double[newlength];
+    System.arraycopy(odists, 0, dists, 0, len);
+    int[] oids = ids;
+    ids = new int[newlength];
+    System.arraycopy(oids, 0, ids, 0, len);
   }
 
   @Override
@@ -148,8 +155,7 @@ public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDB
   @Override
   public void clear() {
     size = 0;
-    Arrays.fill(dists, Double.NaN);
-    Arrays.fill(ids, -1);
+    // TODO: put NaN/-1 everywhere, or don't care?
   }
 
   @Override
@@ -178,8 +184,12 @@ public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDB
    */
   public void truncate(int newsize) {
     if (newsize < size) {
-      ids = Arrays.copyOf(ids, newsize);
-      dists = Arrays.copyOf(dists, newsize);
+      double[] odists = dists;
+      dists = new double[newsize];
+      System.arraycopy(odists, 0, dists, 0, newsize);
+      int[] oids = ids;
+      ids = new int[newsize];
+      System.arraycopy(oids, 0, ids, 0, newsize);
       size = newsize;
     }
   }

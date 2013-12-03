@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -65,7 +65,21 @@ public class DoubleOptimizedDistanceRangeQuery<O> extends LinearScanDistanceRang
 
   @Override
   public DistanceDBIDList<DoubleDistance> getRangeForDBID(DBIDRef id, DoubleDistance range) {
-    return getRangeForObject(relation.get(id), range);
+    // Avoid getfield in hot loop:
+    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
+    final Relation<? extends O> relation = this.relation;
+    final O obj = relation.get(id); // Query object
+    final double epsilon = range.doubleValue();
+
+    ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDList();
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
+      if (doubleDistance <= epsilon) {
+        result.add(doubleDistance, iter);
+      }
+    }
+    result.sort();
+    return result;
   }
 
   @Override
@@ -75,7 +89,7 @@ public class DoubleOptimizedDistanceRangeQuery<O> extends LinearScanDistanceRang
     final Relation<? extends O> relation = this.relation;
     final double epsilon = range.doubleValue();
 
-    ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDPairList();
+    ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDList();
     for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
       if (doubleDistance <= epsilon) {
