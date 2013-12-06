@@ -27,8 +27,6 @@ import gnu.trove.list.TDoubleList;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -78,26 +76,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
    * @param nocopy Flag to not copy the array
    */
   private DoubleVector(double[] values, boolean nocopy) {
-    if (nocopy) {
-      this.values = values;
-    } else {
-      this.values = new double[values.length];
-      System.arraycopy(values, 0, this.values, 0, values.length);
-    }
-  }
-
-  /**
-   * Provides a feature vector consisting of double values according to the
-   * given Double values.
-   * 
-   * @param values the values to be set as values of the real vector
-   */
-  public DoubleVector(List<Double> values) {
-    int i = 0;
-    this.values = new double[values.size()];
-    for (Iterator<Double> iter = values.iterator(); iter.hasNext(); i++) {
-      this.values[i] = (iter.next());
-    }
+    this.values = nocopy ? values : values.clone();
   }
 
   /**
@@ -106,20 +85,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
    * @param values the values to be set as values of the DoubleVector
    */
   public DoubleVector(double[] values) {
-    this.values = new double[values.length];
-    System.arraycopy(values, 0, this.values, 0, values.length);
-  }
-
-  /**
-   * Provides a DoubleVector consisting of the given double values.
-   * 
-   * @param values the values to be set as values of the DoubleVector
-   */
-  public DoubleVector(Double[] values) {
-    this.values = new double[values.length];
-    for (int i = 0; i < values.length; i++) {
-      this.values[i] = values[i];
-    }
+    this.values = values.clone();
   }
 
   /**
@@ -128,10 +94,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
    * @param columnMatrix a matrix of one column
    */
   public DoubleVector(Vector columnMatrix) {
-    values = new double[columnMatrix.getDimensionality()];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = columnMatrix.get(i);
-    }
+    this.values = columnMatrix.getArrayCopy();
   }
 
   @Override
@@ -161,9 +124,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
    * @return copy of values array.
    */
   public double[] getValues() {
-    double[] copy = new double[values.length];
-    System.arraycopy(values, 0, copy, 0, values.length);
-    return copy;
+    return values.clone();
   }
 
   @Override
@@ -176,9 +137,9 @@ public class DoubleVector extends AbstractNumberVector<Double> {
   @Override
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
-    for (int i = 0; i < values.length; i++) {
+    for(int i = 0; i < values.length; i++) {
       featureLine.append(values[i]);
-      if (i + 1 < values.length) {
+      if(i + 1 < values.length) {
         featureLine.append(ATTRIBUTE_SEPARATOR);
       }
     }
@@ -202,7 +163,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
     public <A> DoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
       int dim = adapter.size(array);
       double[] values = new double[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i);
       }
       return new DoubleVector(values, true);
@@ -210,12 +171,12 @@ public class DoubleVector extends AbstractNumberVector<Double> {
 
     @Override
     public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
-      if (adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
+      if(adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
         return new DoubleVector(((TDoubleList) array).toArray(), true);
       }
       final int dim = adapter.size(array);
       double[] values = new double[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.getDouble(array, i);
       }
       return new DoubleVector(values, true);
@@ -260,7 +221,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
       final byte dimensionality = buffer.get();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
       final double[] values = new double[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getDouble();
       }
       return new DoubleVector(values, true);
@@ -271,7 +232,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length);
       buffer.put((byte) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);
       }
     }
@@ -298,7 +259,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
       final short dimensionality = buffer.getShort();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
       final double[] values = new double[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getDouble();
       }
       return new DoubleVector(values, true);
@@ -309,7 +270,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length);
       buffer.putShort((short) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);
       }
     }
@@ -334,7 +295,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
       final double[] values = new double[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getDouble();
       }
       return new DoubleVector(values, true);
@@ -344,7 +305,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length);
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);
       }
     }

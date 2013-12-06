@@ -25,8 +25,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -75,26 +73,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
    * @param nocopy Flag to re-use the values array
    */
   private FloatVector(float[] values, boolean nocopy) {
-    if (nocopy) {
-      this.values = values;
-    } else {
-      this.values = new float[values.length];
-      System.arraycopy(values, 0, this.values, 0, values.length);
-    }
-  }
-
-  /**
-   * Provides a FloatVector consisting of float values according to the given
-   * Float values.
-   * 
-   * @param values the values to be set as values of the float vector
-   */
-  public FloatVector(List<Float> values) {
-    int i = 0;
-    this.values = new float[values.size()];
-    for (Iterator<Float> iter = values.iterator(); iter.hasNext(); i++) {
-      this.values[i] = (iter.next());
-    }
+    this.values = nocopy ? values : values.clone();
   }
 
   /**
@@ -103,20 +82,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
    * @param values the values to be set as values of the float vector
    */
   public FloatVector(float[] values) {
-    this.values = new float[values.length];
-    System.arraycopy(values, 0, this.values, 0, values.length);
-  }
-
-  /**
-   * Provides a FloatVector consisting of the given float values.
-   * 
-   * @param values the values to be set as values of the float vector
-   */
-  public FloatVector(Float[] values) {
-    this.values = new float[values.length];
-    for (int i = 0; i < values.length; i++) {
-      this.values[i] = values[i];
-    }
+    this.values = values.clone();
   }
 
   /**
@@ -125,9 +91,10 @@ public class FloatVector extends AbstractNumberVector<Float> {
    * @param columnMatrix a matrix of one column
    */
   public FloatVector(Vector columnMatrix) {
-    values = new float[columnMatrix.getDimensionality()];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = (float) columnMatrix.get(i);
+    final double[] src = columnMatrix.getArrayRef();
+    values = new float[src.length];
+    for(int i = 0; i < src.length; i++) {
+      values[i] = (float) src[i];
     }
   }
 
@@ -160,9 +127,9 @@ public class FloatVector extends AbstractNumberVector<Float> {
   @Override
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
-    for (int i = 0; i < values.length; i++) {
+    for(int i = 0; i < values.length; i++) {
       featureLine.append(values[i]);
-      if (i + 1 < values.length) {
+      if(i + 1 < values.length) {
         featureLine.append(ATTRIBUTE_SEPARATOR);
       }
     }
@@ -181,7 +148,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
     public <A> FloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
       int dim = adapter.size(array);
       float[] values = new float[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i);
       }
       return new FloatVector(values, true);
@@ -191,7 +158,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
     public <A> FloatVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       float[] values = new float[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.getFloat(array, i);
       }
       return new FloatVector(values, true);
@@ -236,7 +203,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
       final byte dimensionality = buffer.get();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_FLOAT * dimensionality);
       final float[] values = new float[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getFloat();
       }
       return new FloatVector(values, true);
@@ -247,7 +214,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_FLOAT * vec.values.length);
       buffer.put((byte) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putFloat(vec.values[i]);
       }
     }
@@ -274,7 +241,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
       final short dimensionality = buffer.getShort();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_FLOAT * dimensionality);
       final float[] values = new float[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getFloat();
       }
       return new FloatVector(values, true);
@@ -285,7 +252,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_FLOAT * vec.values.length);
       buffer.putShort((short) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putFloat(vec.values[i]);
       }
     }
@@ -310,7 +277,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_FLOAT * dimensionality);
       final float[] values = new float[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getFloat();
       }
       return new FloatVector(values, true);
@@ -321,7 +288,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_FLOAT * vec.values.length);
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putFloat(vec.values[i]);
       }
     }
