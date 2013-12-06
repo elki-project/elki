@@ -36,7 +36,7 @@ public class DoubleDistanceIntegerDBIDKNNList extends DoubleDistanceIntegerDBIDL
   /**
    * The k value this list was generated for.
    */
-  final int k, last;
+  final int k, kminus1;
 
   /**
    * Constructor.
@@ -44,7 +44,7 @@ public class DoubleDistanceIntegerDBIDKNNList extends DoubleDistanceIntegerDBIDL
   public DoubleDistanceIntegerDBIDKNNList() {
     super();
     this.k = -1;
-    this.last = -1;
+    this.kminus1 = -1;
   }
 
   /**
@@ -56,7 +56,7 @@ public class DoubleDistanceIntegerDBIDKNNList extends DoubleDistanceIntegerDBIDL
   public DoubleDistanceIntegerDBIDKNNList(final int k, int size) {
     super(size);
     this.k = k;
-    this.last = k - 1;
+    this.kminus1 = k - 1;
   }
 
   /**
@@ -67,7 +67,8 @@ public class DoubleDistanceIntegerDBIDKNNList extends DoubleDistanceIntegerDBIDL
   public DoubleDistanceIntegerDBIDKNNList(DoubleDistanceIntegerDBIDKNNHeap heap) {
     super(heap.size());
     this.k = heap.getK();
-    this.last = k - 1;
+    this.kminus1 = k - 1;
+    this.size = heap.size();
     for (int i = size - 1; i >= 0; i--) {
       dists[i] = heap.peekDistance();
       ids[i] = heap.peekInternalDBID();
@@ -92,7 +93,7 @@ public class DoubleDistanceIntegerDBIDKNNList extends DoubleDistanceIntegerDBIDL
 
   @Override
   public double doubleKNNDistance() {
-    return (size >= k) ? dists[last] : Double.POSITIVE_INFINITY;
+    return (size >= k) ? dists[kminus1] : Double.POSITIVE_INFINITY;
   }
 
   @Override

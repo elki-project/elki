@@ -58,10 +58,21 @@ public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDB
   int[] ids;
 
   /**
+   * Empty.
+   */
+  private static final double[] EMPTY_DISTS = new double[0];
+
+  /**
+   * Empty.
+   */
+  private static final int[] EMPTY_IDS = new int[0];
+
+  /**
    * Constructor.
    */
   public DoubleDistanceIntegerDBIDList() {
-    this(INITIAL_SIZE);
+    dists = EMPTY_DISTS;
+    ids = EMPTY_IDS;
   }
 
   /**
@@ -70,14 +81,13 @@ public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDB
    * @param size Initial size
    */
   public DoubleDistanceIntegerDBIDList(int size) {
-    super();
     this.dists = new double[size];
     this.ids = new int[size];
     // This is default anyway: this.size = 0;
   }
 
   @Override
-  public DoubleDistanceIntegerDBIDListIter iter() {
+  public Itr iter() {
     return new Itr();
   }
 
@@ -126,14 +136,19 @@ public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDB
    * Grow the data storage.
    */
   protected void grow() {
+    if (dists == EMPTY_DISTS) {
+      dists = new double[INITIAL_SIZE];
+      ids = new int[INITIAL_SIZE];
+      return;
+    }
     final int len = dists.length;
     final int newlength = len + (len >> 1);
     double[] odists = dists;
     dists = new double[newlength];
-    System.arraycopy(odists, 0, dists, 0, len);
+    System.arraycopy(odists, 0, dists, 0, odists.length);
     int[] oids = ids;
     ids = new int[newlength];
-    System.arraycopy(oids, 0, ids, 0, len);
+    System.arraycopy(oids, 0, ids, 0, oids.length);
   }
 
   @Override
@@ -230,7 +245,17 @@ public class DoubleDistanceIntegerDBIDList implements ModifiableDoubleDistanceDB
    * @apiviz.exclude
    */
   private class Itr implements DoubleDistanceIntegerDBIDListIter {
+    /**
+     * Current offset.
+     */
     int offset = 0;
+
+    /**
+     * Constructor.
+     */
+    private Itr() {
+      super();
+    }
 
     @Override
     public boolean valid() {

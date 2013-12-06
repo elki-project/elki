@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -143,8 +142,8 @@ final class IntegerDBIDRange implements DBIDRange, SetDBIDs {
   }
 
   @Override
-  public DBIDArrayIter iter() {
-    return new DBIDItr(start, len);
+  public Itr iter() {
+    return new Itr(start, len);
   }
 
   /**
@@ -154,7 +153,7 @@ final class IntegerDBIDRange implements DBIDRange, SetDBIDs {
    * 
    * @apiviz.exclude
    */
-  private final static class DBIDItr implements IntegerDBIDArrayIter {
+  private final static class Itr implements IntegerDBIDArrayIter {
     /**
      * Current position.
      */
@@ -176,7 +175,7 @@ final class IntegerDBIDRange implements DBIDRange, SetDBIDs {
      * @param start Interval start
      * @param len Interval length
      */
-    private DBIDItr(int start, int len) {
+    private Itr(int start, int len) {
       super();
       this.start = start;
       this.len = len;

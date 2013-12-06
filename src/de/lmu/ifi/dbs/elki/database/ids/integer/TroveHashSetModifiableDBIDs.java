@@ -77,8 +77,8 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   }
 
   @Override
-  public IntegerDBIDMIter iter() {
-    return new DBIDItr(store);
+  public Itr iter() {
+    return new Itr(store);
   }
 
   @Override
@@ -163,7 +163,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr implements IntegerDBIDMIter {
+  protected static class Itr implements IntegerDBIDMIter {
     /**
      * The actual iterator. We don't have multi inheritance.
      */
@@ -174,7 +174,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
      * 
      * @param hash Trove hash
      */
-    public DBIDItr(TIntHash hash) {
+    public Itr(TIntHash hash) {
       super();
       this.it = new TIntHashItr(hash);
     }

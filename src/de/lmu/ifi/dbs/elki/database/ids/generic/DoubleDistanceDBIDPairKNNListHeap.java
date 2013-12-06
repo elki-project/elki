@@ -77,7 +77,7 @@ public class DoubleDistanceDBIDPairKNNListHeap implements DoubleDistanceKNNList,
 
   @Override
   public void add(double distance, DBIDRef id) {
-    if (size == 0 || distance < data[size - 1].doubleDistance()) {
+    if (size < k || distance <= data[k - 1].doubleDistance()) {
       add(DBIDUtil.newDistancePair(distance, id));
     }
   }
@@ -158,7 +158,7 @@ public class DoubleDistanceDBIDPairKNNListHeap implements DoubleDistanceKNNList,
   @Override
   @Deprecated
   public DoubleDistance getKNNDistance() {
-    if (size() < k) {
+    if (size < k) {
       return DoubleDistance.INFINITE_DISTANCE;
     }
     return get(k - 1).getDistance();
@@ -166,7 +166,7 @@ public class DoubleDistanceDBIDPairKNNListHeap implements DoubleDistanceKNNList,
 
   @Override
   public double doubleKNNDistance() {
-    if (size() < k) {
+    if (size < k) {
       return Double.POSITIVE_INFINITY;
     }
     return get(k - 1).doubleDistance();

@@ -47,7 +47,7 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   /**
    * Occupied size.
    */
-  private int size = 0;
+  private int size;
 
   /**
    * Initial size.
@@ -57,11 +57,12 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   /**
    * Constructor.
    * 
-   * @param size Initial size
+   * @param isize Initial size
    */
-  protected ArrayModifiableIntegerDBIDs(int size) {
+  protected ArrayModifiableIntegerDBIDs(int isize) {
     super();
-    this.store = new int[size];
+    this.store = new int[isize < 3 ? 3 : isize];
+    // default this.size = 0;
   }
 
   /**
@@ -70,6 +71,7 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   protected ArrayModifiableIntegerDBIDs() {
     super();
     this.store = new int[INITIAL_SIZE];
+    // default: this.size = 0;
   }
 
   /**
@@ -121,17 +123,26 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
    * @param minsize Desired size
    */
   private void ensureSize(int minsize) {
+    if (minsize <= store.length) {
+      return;
+    }
     int asize = store.length;
-    // Ensure a minimum size, to not run into an infinite loop below!
-    if (asize < 2) {
-      asize = 2;
-    }
     while (asize < minsize) {
-      asize = (asize >> 1) + asize;
+      asize = (asize >>> 1) + asize;
     }
-    if (asize > store.length) {
-      store = Arrays.copyOf(store, asize);
-    }
+    final int[] prev = store;
+    store = new int[asize];
+    System.arraycopy(prev, 0, store, 0, size);
+  }
+
+  /**
+   * Grow array by 50%.
+   */
+  private void grow() {
+    final int newsize = store.length + (store.length >>> 1);
+    final int[] prev = store;
+    store = new int[newsize];
+    System.arraycopy(prev, 0, store, 0, size);
   }
 
   @Override
@@ -165,7 +176,7 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   @Override
   public boolean add(DBIDRef e) {
     if (size == store.length) {
-      ensureSize(size + 1);
+      grow();
     }
     store[size] = e.internalGetIndex();
     ++size;
@@ -248,12 +259,12 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
   }
 
   @Override
-  public IntegerArrayDBIDs slice(int begin, int end) {
+  public Slice slice(int begin, int end) {
     return new Slice(begin, end);
   }
 
   @Override
-  public IntegerDBIDArrayMIter iter() {
+  public Itr iter() {
     return new Itr();
   }
 
@@ -379,12 +390,12 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
     }
 
     @Override
-    public IntegerDBIDArrayIter iter() {
-      return new Itr();
+    public SliceItr iter() {
+      return new SliceItr();
     }
 
     @Override
-    public IntegerArrayDBIDs slice(int begin, int end) {
+    public Slice slice(int begin, int end) {
       return new Slice(begin + begin, begin + end);
     }
 
@@ -395,7 +406,7 @@ public class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, Intege
      * 
      * @apiviz.exclude
      */
-    private class Itr implements IntegerDBIDArrayIter {
+    private class SliceItr implements IntegerDBIDArrayIter {
       /**
        * Iterator position.
        */

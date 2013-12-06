@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDLis
 import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
@@ -65,9 +64,6 @@ public class DoubleOptimizedDistanceRangeQuery<O> extends LinearScanDistanceRang
 
   @Override
   public DistanceDBIDList<DoubleDistance> getRangeForDBID(DBIDRef id, DoubleDistance range) {
-    // Avoid getfield in hot loop:
-    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
-    final Relation<? extends O> relation = this.relation;
     final O obj = relation.get(id); // Query object
     final double epsilon = range.doubleValue();
 
@@ -84,9 +80,6 @@ public class DoubleOptimizedDistanceRangeQuery<O> extends LinearScanDistanceRang
 
   @Override
   public DistanceDBIDList<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
-    // Avoid getfield in hot loop:
-    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
-    final Relation<? extends O> relation = this.relation;
     final double epsilon = range.doubleValue();
 
     ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDList();
