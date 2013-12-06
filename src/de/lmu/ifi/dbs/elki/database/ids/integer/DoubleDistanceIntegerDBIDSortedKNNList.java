@@ -51,15 +51,19 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
    */
   @Override
   protected void addInternal(final double dist, final int id) {
+    if (size >= k && dist > dists[kminus1]) {
+      return;
+    }
     // Ensure we have enough space.
-    if (size >= dists.length) {
+    if (size == dists.length) {
       grow();
     }
     // Increases size!
-    size = insertionSort(dists, ids, size, dist, id);
+    insertionSort(dists, ids, size, dist, id);
+    ++size;
     // Truncate if necessary:
-    if (size > k && dists[k] > dists[last]) {
-      size = k;
+    if (size > k && dists[k] > dists[kminus1]) {
+      size = k; // truncate
     }
   }
 
@@ -71,9 +75,8 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
    * @param size Current size
    * @param dist New distance
    * @param id New id
-   * @return New size
    */
-  private static int insertionSort(final double[] dists, final int[] ids, final int size, final double dist, final int id) {
+  private static void insertionSort(final double[] dists, final int[] ids, final int size, final double dist, final int id) {
     int pos = size;
     while (pos > 0) {
       final int pre = pos - 1;
@@ -87,7 +90,7 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
     }
     dists[pos] = dist;
     ids[pos] = id;
-    return size + 1;
+    return;
   }
 
   @Override
@@ -98,12 +101,14 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
 
   @Override
   public DoubleDistanceIntegerDBIDPair poll() {
-    return new DoubleDistanceIntegerDBIDPair(dists[size - 1], ids[size - 1]);
+    final int last = size - 1;
+    return new DoubleDistanceIntegerDBIDPair(dists[last], ids[last]);
   }
 
   @Override
   public DoubleDistanceIntegerDBIDPair peek() {
-    return new DoubleDistanceIntegerDBIDPair(dists[size - 1], ids[size - 1]);
+    final int last = size - 1;
+    return new DoubleDistanceIntegerDBIDPair(dists[last], ids[last]);
   }
 
   @Override

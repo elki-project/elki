@@ -69,17 +69,13 @@ public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQue
     final Relation<? extends O> relation = this.relation;
     final O obj = relation.get(id); // Query object
 
-    DoubleDistanceKNNHeap heap = DBIDUtil.newDoubleDistanceHeap(k);
-    DBIDIter iter = relation.iterDBIDs();
-    // The first k do not neeed checking.
     double kdist = Double.POSITIVE_INFINITY;
-    for (int i = 0; iter.valid(); iter.advance(), ++i) {
+    DoubleDistanceKNNHeap heap = DBIDUtil.newDoubleDistanceHeap(k);
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double dist = rawdist.doubleDistance(obj, relation.get(iter));
-      if (i <= k || dist <= kdist) {
+      if (dist <= kdist) {
         heap.add(dist, iter);
-        if (dist < kdist) {
-          kdist = heap.doubleKNNDistance();
-        }
+        kdist = heap.doubleKNNDistance();
       }
     }
     return heap.toKNNList();
@@ -91,16 +87,14 @@ public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQue
     final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
     final Relation<? extends O> relation = this.relation;
     DoubleDistanceKNNHeap heap = DBIDUtil.newDoubleDistanceHeap(k);
-    DBIDIter iter = relation.iterDBIDs();
+
     // The first k do not neeed checking.
     double kdist = Double.POSITIVE_INFINITY;
-    for (int i = 0; iter.valid(); iter.advance(), ++i) {
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double dist = rawdist.doubleDistance(obj, relation.get(iter));
-      if (i <= k || dist <= kdist) {
+      if (dist <= kdist) {
         heap.add(dist, iter);
-        if (dist < kdist) {
-          kdist = heap.doubleKNNDistance();
-        }
+        kdist = heap.doubleKNNDistance();
       }
     }
     return heap.toKNNList();

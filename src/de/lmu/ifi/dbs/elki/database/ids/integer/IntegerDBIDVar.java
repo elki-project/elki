@@ -134,8 +134,8 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   }
 
   @Override
-  public IntegerDBIDArrayIter iter() {
-    return new DBIDItr();
+  public Itr iter() {
+    return new Itr();
   }
 
   /**
@@ -145,7 +145,7 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements IntegerDBIDArrayIter, IntegerDBIDRef {
+  protected class Itr implements IntegerDBIDArrayIter, IntegerDBIDRef {
     /**
      * Iterator position: We use an integer so we can support retract().
      */

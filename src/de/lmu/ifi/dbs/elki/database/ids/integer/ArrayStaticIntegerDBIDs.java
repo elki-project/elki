@@ -97,12 +97,12 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
   }
 
   @Override
-  public IntegerDBIDArrayIter iter() {
-    return new DBIDItr();
+  public Itr iter() {
+    return new Itr();
   }
 
   @Override
-  public IntegerArrayDBIDs slice(int begin, int end) {
+  public Slice slice(int begin, int end) {
     return new Slice(begin, end);
   }
 
@@ -113,7 +113,7 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements IntegerDBIDArrayIter {
+  protected class Itr implements IntegerDBIDArrayIter {
     /**
      * Position within array.
      */
@@ -231,12 +231,12 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
     }
 
     @Override
-    public IntegerDBIDArrayIter iter() {
-      return new Itr();
+    public SliceItr iter() {
+      return new SliceItr();
     }
 
     @Override
-    public IntegerArrayDBIDs slice(int begin, int end) {
+    public Slice slice(int begin, int end) {
       return new Slice(begin + begin, begin + end);
     }
 
@@ -247,7 +247,7 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
      * 
      * @apiviz.exclude
      */
-    private class Itr implements IntegerDBIDArrayIter {
+    private class SliceItr implements IntegerDBIDArrayIter {
       /**
        * Iterator position.
        */

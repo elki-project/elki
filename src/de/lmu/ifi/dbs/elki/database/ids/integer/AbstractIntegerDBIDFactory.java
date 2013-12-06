@@ -163,7 +163,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   @Override
   public <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist) {
     if (exist instanceof DoubleDistanceKNNList) {
-      DoubleDistanceKNNHeap heap = new DoubleDistanceIntegerDBIDSortedKNNList(exist.getK());
+      DoubleDistanceKNNHeap heap = newDoubleDistanceHeap(exist.getK());
       // Insert backwards, as this will produce a proper heap
       for (int i = exist.size() - 1; i >= 0; i--) {
         heap.add((DoubleDistanceDBIDPair) exist.get(i));

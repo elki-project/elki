@@ -132,8 +132,8 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   }
 
   @Override
-  public DBIDArrayIter iter() {
-    return new DBIDItr();
+  public Itr iter() {
+    return new Itr();
   }
 
   @Override
@@ -179,7 +179,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
+  protected class Itr implements DBIDArrayIter, IntegerDBIDRef {
     /**
      * Iterator position: We use an integer so we can support retract().
      */

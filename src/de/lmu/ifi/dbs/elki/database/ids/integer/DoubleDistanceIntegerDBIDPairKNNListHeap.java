@@ -78,7 +78,7 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
 
   @Override
   public void add(double distance, DBIDRef id) {
-    if (size < k || distance <= data[size - 1].doubleDistance()) {
+    if (size < k || distance <= data[k - 1].doubleDistance()) {
       addInternal(new DoubleDistanceIntegerDBIDPair(distance, id.internalGetIndex()));
     }
   }
@@ -86,7 +86,7 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
   @Override
   @Deprecated
   public void add(Double distance, DBIDRef id) {
-    if (size < k || distance.doubleValue() <= data[size - 1].doubleDistance()) {
+    if (size < k || distance.doubleValue() <= data[k - 1].doubleDistance()) {
       addInternal(new DoubleDistanceIntegerDBIDPair(distance.doubleValue(), id.internalGetIndex()));
     }
   }
@@ -94,7 +94,7 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
   @Override
   @Deprecated
   public void add(DoubleDistance dist, DBIDRef id) {
-    if (size < k || dist.doubleValue() <= data[size - 1].doubleDistance()) {
+    if (size < k || dist.doubleValue() <= data[k - 1].doubleDistance()) {
       addInternal(new DoubleDistanceIntegerDBIDPair(dist.doubleValue(), id.internalGetIndex()));
     }
   }
@@ -102,7 +102,7 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
   @Override
   public void add(DoubleDistanceDBIDPair e) {
     double dist = e.doubleDistance();
-    if (size < k || dist <= data[size - 1].doubleDistance()) {
+    if (size < k || dist <= data[k - 1].doubleDistance()) {
       if (e instanceof DoubleDistanceIntegerDBIDPair) {
         addInternal((DoubleDistanceIntegerDBIDPair) e);
       } else {

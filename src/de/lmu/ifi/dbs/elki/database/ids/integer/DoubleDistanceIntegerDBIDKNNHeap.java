@@ -104,21 +104,37 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
   @Override
   @Deprecated
   public void add(DoubleDistance distance, DBIDRef id) {
-    add(distance.doubleValue(), id);
+    final double dist = distance.doubleValue();
+    if (dist <= kdist) {
+      addInternal(dist, id.internalGetIndex());
+    }
   }
 
   @Override
   @Deprecated
   public void add(Double distance, DBIDRef id) {
-    add(distance.doubleValue(), id);
+    final double dist = distance.doubleValue();
+    if (dist <= kdist) {
+      addInternal(dist, id.internalGetIndex());
+    }
   }
 
   @Override
   public final void add(final double distance, final DBIDRef id) {
-    if (distance > kdist) {
-      return;
+    if (distance <= kdist) {
+      addInternal(distance, id.internalGetIndex());
     }
-    final int iid = id.internalGetIndex();
+  }
+
+  @Override
+  public void add(final DoubleDistanceDBIDPair e) {
+    final double distance = e.doubleDistance();
+    if (distance <= kdist) {
+      addInternal(distance, e.internalGetIndex());
+    }
+  }
+
+  private final void addInternal(final double distance, final int iid) {
     if (heap.size() < k) {
       heap.add(distance, iid);
       if (heap.size() >= k) {
@@ -133,11 +149,6 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
     }
     // Old top element: (kdist, previd)
     updateHeap(distance, iid);
-  }
-
-  @Override
-  public void add(DoubleDistanceDBIDPair e) {
-    add(e.doubleDistance(), e);
   }
 
   /**
