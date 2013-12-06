@@ -38,9 +38,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -125,7 +124,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   public Clustering<Model> run(Relation<O> relation) {
     RangeQuery<O, D> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     final int size = relation.size();
-    
+
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
     IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
     resultList = new ArrayList<>();
@@ -134,7 +133,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     if(size < minpts) {
       // The can't be any clusters
       noise.addDBIDs(relation.getDBIDs());
-      if (objprog != null) {
+      if(objprog != null) {
         objprog.setProcessed(noise.size(), LOG);
       }
     }
@@ -183,7 +182,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * @param objprog the progress object for logging the current status
    */
   protected void expandCluster(Relation<O> relation, RangeQuery<O, D> rangeQuery, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    DistanceDBIDList<D> neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
+    DBIDs neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
 
     // startObject is no core-object
     if(neighbors.size() < minpts) {
@@ -197,7 +196,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     }
 
     // try to expand the cluster
-    HashSetModifiableDBIDs seeds = DBIDUtil.newHashSet();
+    ModifiableDBIDs seeds = DBIDUtil.newHashSet();
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
     for(DBIDIter seed = neighbors.iter(); seed.valid(); seed.advance()) {
       if(!processedIDs.contains(seed)) {
@@ -212,9 +211,9 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     }
     seeds.remove(startObjectID);
 
-    while(seeds.size() > 0) {
+    while(!seeds.isEmpty()) {
       DBIDMIter o = seeds.iter();
-      DistanceDBIDList<D> neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
+      DBIDs neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
       o.remove();
 
       if(neighborhood.size() >= minpts) {
