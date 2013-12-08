@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -44,7 +43,6 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -52,7 +50,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * <p>
@@ -290,17 +287,16 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @param line Line to process
    */
   protected void parseLineInternal(String line) {
-    List<IntIntPair> entries = tokenizeNoCopy(line);
+
     // Split into numerical attributes and labels
     attributes.reset();
     LabelList labels = null;
 
-    Iterator<IntIntPair> itr = entries.iterator();
-    for(int i = 0; itr.hasNext(); i++) {
-      IntIntPair ent = itr.next();
+    int i = 0;
+    for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance(), i++) {
       if(labelIndices == null || !labelIndices.get(i)) {
         try {
-          double attribute = FormatUtil.parseDouble(line, ent.first, ent.second);
+          double attribute = tokenizer.getDouble();
           attributes.add(attribute);
           continue;
         }
@@ -316,7 +312,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
       }
       // Note: for Java 6, make a new String here to save memory!
       // Java 7 will copy the bytes to a new string.
-      final String lbl = line.substring(ent.first, ent.second);
+      final String lbl = tokenizer.getSubstring();
       String u = unique.get(lbl);
       if(u == null) {
         u = lbl;

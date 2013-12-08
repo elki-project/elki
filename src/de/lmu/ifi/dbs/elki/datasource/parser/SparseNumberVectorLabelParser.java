@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
 import java.util.BitSet;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -36,7 +35,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -113,38 +111,38 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
 
   @Override
   protected void parseLineInternal(String line) {
-    List<String> entries = tokenize(line);
-    int cardinality = Integer.parseInt(entries.get(0));
+    tokenizer.initialize(line);
+    int cardinality = (int) tokenizer.getLongBase10();
 
     values.clear();
     LabelList labels = null;
     int thismax = 0;
 
-    for (int i = 1; i < entries.size();) {
-      if (values.size() < cardinality) {
+    while(tokenizer.valid()) {
+      if(values.size() < cardinality) {
         try {
-          int index = Integer.parseInt(entries.get(i));
+          int index = (int) tokenizer.getLongBase10();
+          tokenizer.advance();
           // Respect labelIndices.
-          if (labelIndices == null || !labelIndices.get(index)) {
-            double attribute = FormatUtil.parseDouble(entries.get(i + 1));
+          if(labelIndices == null || !labelIndices.get(index)) {
+            double attribute = tokenizer.getDouble();
             thismax = Math.max(thismax, index + 1);
             values.put(index, attribute);
-            i += 2; // only increment if successful
-          } else {
-            i++; // And continue below with label handling.
+            tokenizer.advance();
+            continue;
           }
-          continue;
-        } catch (NumberFormatException e) {
+        }
+        catch(NumberFormatException e) {
           // continue with fallback below.
         }
       }
       // Fallback: treat as label
-      if (labels == null) {
+      if(labels == null) {
         labels = new LabelList(Math.max(1, labelcolumns.size()));
         haslabels = true;
       }
-      labels.add(entries.get(i));
-      i++;
+      labels.add(tokenizer.getSubstring());
+      tokenizer.advance();
     }
     curvec = sparsefactory.newNumberVector(values, thismax);
     curlbl = labels;
@@ -152,9 +150,10 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
 
   @Override
   protected SimpleTypeInformation<V> getTypeInformation(int mindim, int maxdim) {
-    if (mindim == maxdim) {
+    if(mindim == maxdim) {
       return new VectorFieldTypeInformation<>(factory, mindim);
-    } else if (mindim < maxdim) {
+    }
+    else if(mindim < maxdim) {
       return new VectorTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer(), mindim, maxdim);
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
@@ -176,7 +175,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
     @Override
     protected void getFactory(Parameterization config) {
       ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
-      if (config.grab(factoryP)) {
+      if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
     }

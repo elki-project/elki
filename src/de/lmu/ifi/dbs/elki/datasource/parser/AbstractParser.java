@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -35,7 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.StringLengthCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * Abstract superclass for all parsers providing the option handler for handling
@@ -74,19 +70,14 @@ public abstract class AbstractParser {
   public static final String ATTRIBUTE_CONCATENATION = " ";
 
   /**
-   * Stores the column separator pattern
-   */
-  private Pattern colSep = null;
-
-  /**
-   * Stores the quotation character
-   */
-  protected char quoteChar = QUOTE_CHAR;
-
-  /**
    * Comment pattern.
    */
   protected Pattern comment = null;
+
+  /**
+   * String tokenizer.
+   */
+  protected Tokenizer tokenizer;
 
   /**
    * Constructor.
@@ -97,143 +88,8 @@ public abstract class AbstractParser {
    */
   public AbstractParser(Pattern colSep, char quoteChar, Pattern comment) {
     super();
-    this.colSep = colSep;
-    this.quoteChar = quoteChar;
+    this.tokenizer = new Tokenizer(colSep, quoteChar);
     this.comment = comment;
-  }
-
-  /**
-   * Tokenize a string. Works much like colSep.split() except it honors
-   * quotation characters.
-   * 
-   * @param input Input string
-   * @return Tokenized string
-   */
-  protected List<String> tokenize(String input) {
-    ArrayList<String> matchList = new ArrayList<>();
-    Matcher m = colSep.matcher(input);
-
-    int index = 0;
-    boolean inquote = (input.length() > 0) && (input.charAt(0) == quoteChar);
-    while(m.find()) {
-      // Quoted code path vs. regular code path
-      if(inquote && m.start() > 0) {
-        // Closing quote found?
-        if(m.start() > index + 1 && input.charAt(m.start() - 1) == quoteChar) {
-          // Strip quote characters
-          if(index + 1 < m.start() - 1) {
-            matchList.add(input.substring(index + 1, m.start() - 1));
-          }
-          // Seek past
-          index = m.end();
-          // new quote?
-          inquote = (index < input.length()) && (input.charAt(index) == quoteChar);
-        }
-      }
-      else {
-        // Add match before separator
-        if(index < m.start()) {
-          matchList.add(input.substring(index, m.start()));
-        }
-        // Seek past separator
-        index = m.end();
-        // new quote?
-        inquote = (index < input.length()) && (input.charAt(index) == quoteChar);
-      }
-    }
-    // Nothing found - return original string.
-    if(index == 0) {
-      matchList.add(input);
-      return matchList;
-    }
-    // Add tail after last separator.
-    if(inquote) {
-      if(input.charAt(input.length() - 1) == quoteChar) {
-        if(index + 1 < input.length() - 1) {
-          matchList.add(input.substring(index + 1, input.length() - 1));
-        }
-      }
-      else {
-        getLogger().warning("Invalid quoted line in input: no closing quote found in: " + input);
-        if(index < input.length()) {
-          matchList.add(input.substring(index, input.length()));
-        }
-      }
-    }
-    else {
-      if(index < input.length()) {
-        matchList.add(input.substring(index, input.length()));
-      }
-    }
-    // Return
-    return matchList;
-  }
-
-  /**
-   * Tokenize a string, without producing new strings. Works much like
-   * colSep.split() except it honors quotation characters, and uses less memory.
-   * 
-   * @param input Input string
-   * @return Tokenized string
-   */
-  protected List<IntIntPair> tokenizeNoCopy(String input) {
-    ArrayList<IntIntPair> matchList = new ArrayList<>();
-    Matcher m = colSep.matcher(input);
-
-    int index = 0;
-    boolean inquote = (input.length() > 0) && (input.charAt(0) == quoteChar);
-    while(m.find()) {
-      // Quoted code path vs. regular code path
-      if(inquote && m.start() > 0) {
-        // Closing quote found?
-        if(m.start() > index + 1 && input.charAt(m.start() - 1) == quoteChar) {
-          // Strip quote characters
-          if(index + 1 < m.start() - 1) {
-            matchList.add(new IntIntPair(index + 1, m.start() - 1));
-          }
-          // Seek past
-          index = m.end();
-          // new quote?
-          inquote = (index < input.length()) && (input.charAt(index) == quoteChar);
-        }
-      }
-      else {
-        // Add match before separator
-        if(index < m.start()) {
-          matchList.add(new IntIntPair(index, m.start()));
-        }
-        // Seek past separator
-        index = m.end();
-        // new quote?
-        inquote = (index < input.length()) && (input.charAt(index) == quoteChar);
-      }
-    }
-    // Nothing found - return original string.
-    if(index == 0) {
-      matchList.add(new IntIntPair(0, input.length()));
-      return matchList;
-    }
-    // Add tail after last separator.
-    if(inquote) {
-      if(input.charAt(input.length() - 1) == quoteChar) {
-        if(index + 1 < input.length() - 1) {
-          matchList.add(new IntIntPair(index + 1, input.length() - 1));
-        }
-      }
-      else {
-        getLogger().warning("Invalid quoted line in input: no closing quote found in: " + input);
-        if(index < input.length()) {
-          matchList.add(new IntIntPair(index, input.length()));
-        }
-      }
-    }
-    else {
-      if(index < input.length()) {
-        matchList.add(new IntIntPair(index, input.length()));
-      }
-    }
-    // Return
-    return matchList;
   }
 
   /**
