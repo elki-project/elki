@@ -82,22 +82,24 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
     try {
       List<BitSet> bitSets = new ArrayList<>();
       List<LabelList> allLabels = new ArrayList<>();
-      for (String line; (line = reader.readLine()) != null; lineNumber++) {
+      for(String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
-        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+        if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
         }
-        List<String> entries = tokenize(line);
         BitSet bitSet = new BitSet();
         LabelList labels = null;
 
-        for (String entry : entries) {
+        for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance()) {
+          // TODO: avoid substring.
+          String entry = tokenizer.getSubstring();
           try {
             int index = Integer.parseInt(entry);
             bitSet.set(index);
             dimensionality = Math.max(dimensionality, index);
-          } catch (NumberFormatException e) {
-            if (labels == null) {
+          }
+          catch(NumberFormatException e) {
+            if(labels == null) {
               labels = new LabelList(1);
             }
             labels.add(entry);
@@ -109,13 +111,14 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
       }
 
       dimensionality++;
-      for (int i = 0; i < bitSets.size(); i++) {
+      for(int i = 0; i < bitSets.size(); i++) {
         BitSet bitSet = bitSets.get(i);
         LabelList labels = allLabels.get(i);
         vectors.add(new BitVector(bitSet, dimensionality));
         lblc.add(labels);
       }
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
     return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, lblc);

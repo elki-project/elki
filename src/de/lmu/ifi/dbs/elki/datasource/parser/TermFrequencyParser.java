@@ -29,7 +29,6 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.BitSet;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -39,7 +38,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -107,21 +105,20 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
 
   @Override
   protected void parseLineInternal(String line) {
-    List<String> entries = tokenize(line);
-
     double len = 0;
     values.clear();
     LabelList labels = null;
 
     String curterm = null;
-    for (int i = 0; i < entries.size(); i++) {
-      if (curterm == null) {
-        curterm = entries.get(i);
-      } else {
+    for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance()) {
+      if(curterm == null) {
+        curterm = tokenizer.getSubstring();
+      }
+      else {
         try {
-          double attribute = FormatUtil.parseDouble(entries.get(i));
+          double attribute = tokenizer.getDouble();
           int curdim = keymap.get(curterm);
-          if (curdim < 0) {
+          if(curdim < 0) {
             curdim = numterms;
             keymap.put(curterm, curdim);
             ++numterms;
@@ -129,26 +126,27 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
           values.put(curdim, attribute);
           len += attribute;
           curterm = null;
-        } catch (NumberFormatException e) {
-          if (curterm != null) {
-            if (labels == null) {
+        }
+        catch(NumberFormatException e) {
+          if(curterm != null) {
+            if(labels == null) {
               labels = new LabelList(1);
             }
             labels.add(curterm);
           }
-          curterm = entries.get(i);
+          curterm = tokenizer.getSubstring();
         }
       }
     }
-    if (curterm != null) {
-      if (labels == null) {
+    if(curterm != null) {
+      if(labels == null) {
         labels = new LabelList(1);
       }
       labels.add(curterm);
     }
-    if (normalize) {
-      if (Math.abs(len - 1.0) > 1E-10 && len > 1E-10) {
-        for (TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
+    if(normalize) {
+      if(Math.abs(len - 1.0) > 1E-10 && len > 1E-10) {
+        for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
           iter.advance();
           iter.setValue(iter.value() / len);
         }
@@ -161,9 +159,10 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
 
   @Override
   protected SimpleTypeInformation<V> getTypeInformation(int mindim, int maxdim) {
-    if (mindim == maxdim) {
+    if(mindim == maxdim) {
       return new VectorFieldTypeInformation<>(factory, mindim);
-    } else if (mindim < maxdim) {
+    }
+    else if(mindim < maxdim) {
       return new VectorTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer(), mindim, maxdim);
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
@@ -196,7 +195,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag normF = new Flag(NORMALIZE_FLAG);
-      if (config.grab(normF)) {
+      if(config.grab(normF)) {
         normalize = normF.getValue().booleanValue();
       }
     }
@@ -204,7 +203,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
     @Override
     protected void getFactory(Parameterization config) {
       ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
-      if (config.grab(factoryP)) {
+      if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
     }

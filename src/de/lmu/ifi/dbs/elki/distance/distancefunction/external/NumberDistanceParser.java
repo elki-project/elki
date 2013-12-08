@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -96,56 +95,73 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
     Map<DBIDPair, D> distanceCache = new HashMap<>();
     try {
-      for (String line; (line = reader.readLine()) != null; lineNumber++) {
-        if (prog != null) {
+      for(String line; (line = reader.readLine()) != null; lineNumber++) {
+        if(prog != null) {
           prog.incrementProcessed(LOG);
         }
         // Skip empty lines and comments
-        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+        if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
         }
-        List<String> entries = tokenize(line);
-        if (entries.size() != 3) {
-          throw new IllegalArgumentException("Line " + lineNumber + " does not have the " + "required input format: id1 id2 distanceValue! " + line);
-        }
+        tokenizer.initialize(line);
 
+        if(!tokenizer.valid()) {
+          throw new IllegalArgumentException("Less than three values in line " + lineNumber);
+        }
         DBID id1, id2;
         try {
-          id1 = DBIDUtil.importInteger(Integer.parseInt(entries.get(0)));
-        } catch (NumberFormatException e) {
+          id1 = DBIDUtil.importInteger((int) tokenizer.getLongBase10());
+          tokenizer.advance();
+        }
+        catch(NumberFormatException e) {
           throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is no integer!");
         }
-
-        try {
-          id2 = DBIDUtil.importInteger(Integer.parseInt(entries.get(1)));
-        } catch (NumberFormatException e) {
-          throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is no integer!");
+        if(!tokenizer.valid()) {
+          throw new IllegalArgumentException("Less than three values in line " + lineNumber);
         }
 
         try {
-          D distance = distanceFactory.parseString(entries.get(2));
+          id2 = DBIDUtil.importInteger((int) tokenizer.getLongBase10());
+          tokenizer.advance();
+        }
+        catch(NumberFormatException e) {
+          throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is no integer!");
+        }
+        if(!tokenizer.valid()) {
+          throw new IllegalArgumentException("Less than three values in line " + lineNumber);
+        }
+
+        try {
+          // TODO: optimize for double distances.
+          D distance = distanceFactory.parseString(tokenizer.getSubstring());
+          tokenizer.advance();
           put(id1, id2, distance, distanceCache);
           ids.add(id1);
           ids.add(id2);
-        } catch (IllegalArgumentException e) {
+        }
+        catch(IllegalArgumentException e) {
           throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage(), e);
         }
+        if(tokenizer.valid()) {
+          throw new IllegalArgumentException("More than three values in line " + lineNumber);
+        }
       }
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    if (prog != null) {
+    if(prog != null) {
       prog.setCompleted(LOG);
     }
 
     // check if all distance values are specified
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-        if (DBIDUtil.compare(iter2, iter) <= 0) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+        if(DBIDUtil.compare(iter2, iter) <= 0) {
           continue;
         }
-        if (!containsKey(iter, iter2, distanceCache)) {
+        if(!containsKey(iter, iter2, distanceCache)) {
           throw new IllegalArgumentException("Distance value for " + DBIDUtil.toString(iter) + " - " + DBIDUtil.toString(iter2) + " is missing!");
         }
       }
@@ -163,14 +179,14 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    */
   private void put(DBID id1, DBID id2, D distance, Map<DBIDPair, D> cache) {
     // the smaller id is the first key
-    if (DBIDUtil.compare(id1, id2) > 0) {
+    if(DBIDUtil.compare(id1, id2) > 0) {
       put(id2, id1, distance, cache);
       return;
     }
 
     D oldDistance = cache.put(DBIDUtil.newPair(id1, id2), distance);
 
-    if (oldDistance != null) {
+    if(oldDistance != null) {
       throw new IllegalArgumentException("Distance value for specified ids is already assigned!");
     }
   }
@@ -186,7 +202,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    *         specified ids, false otherwise
    */
   public boolean containsKey(DBIDRef id1, DBIDRef id2, Map<DBIDPair, D> cache) {
-    if (DBIDUtil.compare(id1, id2) > 0) {
+    if(DBIDUtil.compare(id1, id2) > 0) {
       return containsKey(id2, id1, cache);
     }
 
@@ -215,7 +231,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<D> distFuncP = new ObjectParameter<>(DISTANCE_ID, Distance.class);
-      if (config.grab(distFuncP)) {
+      if(config.grab(distFuncP)) {
         distanceFactory = distFuncP.instantiateClass(config);
       }
     }

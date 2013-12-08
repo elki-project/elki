@@ -79,37 +79,41 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
     List<BitVector> vectors = new ArrayList<>();
     List<LabelList> labels = new ArrayList<>();
     try {
-      for (String line; (line = reader.readLine()) != null; lineNumber++) {
+      for(String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
-        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+        if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
         }
-        List<String> entries = tokenize(line);
         // FIXME: use more efficient storage right away?
         List<Bit> attributes = new ArrayList<>();
         LabelList ll = null;
-        for (String entry : entries) {
+        for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance()) {
+          // TODO: avoid substring when token is a typical truth value.
+          final String cur = tokenizer.getSubstring();
           try {
-            Bit attribute = Bit.valueOf(entry);
+            Bit attribute = Bit.valueOf(cur);
             attributes.add(attribute);
-          } catch (NumberFormatException e) {
-            if (ll == null) {
+          }
+          catch(NumberFormatException e) {
+            if(ll == null) {
               ll = new LabelList(1);
             }
-            ll.add(entry);
+            ll.add(cur);
           }
         }
 
-        if (dimensionality < 0) {
+        if(dimensionality < 0) {
           dimensionality = attributes.size();
-        } else if (dimensionality != attributes.size()) {
+        }
+        else if(dimensionality != attributes.size()) {
           throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
         }
 
         vectors.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
         labels.add(ll);
       }
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
     return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, labels);
