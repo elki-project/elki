@@ -52,8 +52,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     this.weights = weights;
   }
 
-  @Override
-  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
+  private final double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = (xd >= yd) ? xd - yd : yd - xd;
@@ -62,8 +61,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     return agg;
   }
 
-  @Override
-  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
+  private final double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
@@ -77,8 +75,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     return agg;
   }
 
-  @Override
-  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
+  private final double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
       if (delta < 0.) {
@@ -91,8 +88,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     return agg;
   }
 
-  @Override
-  protected double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
+  private final double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
       final double delta = xd >= 0. ? xd : -xd;
@@ -101,8 +97,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     return agg;
   }
 
-  @Override
-  protected double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
+  private final double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
       if (delta < 0.) {
@@ -113,6 +108,65 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
       }
     }
     return agg;
+  }
+
+  @Override
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    double agg = doublePreDistance(v1, v2, 0, mindim, 0.);
+    if (dim1 > mindim) {
+      agg = doublePreNorm(v1, mindim, dim1, agg);
+    } else if (dim2 > mindim) {
+      agg = doublePreNorm(v2, mindim, dim2, agg);
+    }
+    return Math.pow(agg, invp);
+  }
+
+  @Override
+  public double doubleNorm(NumberVector<?> v) {
+    return Math.pow(doublePreNorm(v, 0, v.getDimensionality(), 0.), invp);
+  }
+
+  @Override
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+
+    final NumberVector<?> v1 = (mbr1 instanceof NumberVector) ? (NumberVector<?>) mbr1 : null;
+    final NumberVector<?> v2 = (mbr2 instanceof NumberVector) ? (NumberVector<?>) mbr2 : null;
+
+    double agg = 0.;
+    if (v1 != null) {
+      if (v2 != null) {
+        agg = doublePreDistance(v1, v2, 0, mindim, agg);
+      } else {
+        agg = doublePreDistanceVM(v1, mbr2, 0, mindim, agg);
+      }
+    } else {
+      if (v2 != null) {
+        agg = doublePreDistanceVM(v2, mbr1, 0, mindim, agg);
+      } else {
+        agg = doublePreDistanceMBR(mbr1, mbr2, 0, mindim, agg);
+      }
+    }
+    // first object has more dimensions.
+    if (dim1 > mindim) {
+      if (v1 != null) {
+        agg = doublePreNorm(v1, mindim, dim1, agg);
+      } else {
+        agg = doublePreNormMBR(v1, mindim, dim1, agg);
+      }
+    }
+    // second object has more dimensions.
+    if (dim2 > mindim) {
+      if (v2 != null) {
+        agg = doublePreNorm(v2, mindim, dim2, agg);
+      } else {
+        agg = doublePreNormMBR(mbr2, mindim, dim2, agg);
+      }
+    }
+    return Math.pow(agg, invp);
   }
 
   @Override

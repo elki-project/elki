@@ -66,15 +66,6 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   }
 
   /**
-   * Initial value for aggregation. Usually 0.
-   * 
-   * @return Initial value
-   */
-  protected double initialAggregateValue() {
-    return 0.;
-  }
-
-  /**
    * Compute unscaled distance in a range of dimensions.
    * 
    * @param v1 First object
@@ -84,7 +75,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @param agg Current aggregate value
    * @return Aggregated values.
    */
-  protected double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
+  private final double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = (xd >= yd) ? xd - yd : yd - xd;
@@ -103,7 +94,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @param agg Current aggregate value
    * @return Aggregated values.
    */
-  protected double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
+  private final double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
@@ -127,7 +118,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @param agg Current aggregate value
    * @return Aggregated values.
    */
-  protected double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
+  private final double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
       if (delta < 0.) {
@@ -149,7 +140,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @param agg Current aggregate value
    * @return Aggregated values.
    */
-  protected double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
+  private final double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
       final double delta = xd >= 0. ? xd : -xd;
@@ -167,7 +158,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @param agg Current aggregate value
    * @return Aggregated values.
    */
-  protected double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
+  private final double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
     for (int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
       if (delta < 0.) {
@@ -180,32 +171,22 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     return agg;
   }
 
-  /**
-   * Apply final scaling.
-   * 
-   * @param agg Aggregate value
-   * @return Scaled value
-   */
-  protected double finalScale(double agg) {
-    return Math.pow(agg, invp);
-  }
-
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
-    double agg = doublePreDistance(v1, v2, 0, mindim, initialAggregateValue());
+    double agg = doublePreDistance(v1, v2, 0, mindim, 0.);
     if (dim1 > mindim) {
       agg = doublePreNorm(v1, mindim, dim1, agg);
     } else if (dim2 > mindim) {
       agg = doublePreNorm(v2, mindim, dim2, agg);
     }
-    return finalScale(agg);
+    return Math.pow(agg, invp);
   }
 
   @Override
   public double doubleNorm(NumberVector<?> v) {
-    return Math.pow(doublePreNorm(v, 0, v.getDimensionality(), initialAggregateValue()), invp);
+    return Math.pow(doublePreNorm(v, 0, v.getDimensionality(), 0.), invp);
   }
 
   @Override
@@ -216,7 +197,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     final NumberVector<?> v1 = (mbr1 instanceof NumberVector) ? (NumberVector<?>) mbr1 : null;
     final NumberVector<?> v2 = (mbr2 instanceof NumberVector) ? (NumberVector<?>) mbr2 : null;
 
-    double agg = initialAggregateValue();
+    double agg = 0.;
     if (v1 != null) {
       if (v2 != null) {
         agg = doublePreDistance(v1, v2, 0, mindim, agg);
@@ -246,7 +227,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
         agg = doublePreNormMBR(mbr2, mindim, dim2, agg);
       }
     }
-    return finalScale(agg);
+    return Math.pow(agg, invp);
   }
 
   @Override
