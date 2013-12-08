@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -51,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * <p>
@@ -159,6 +161,11 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   TDoubleArrayList attributes = new TDoubleArrayList();
 
   /**
+   * For String unification.
+   */
+  HashMap<String, String> unique = new HashMap<>();
+
+  /**
    * Event to report next.
    */
   Event nextevent = null;
@@ -196,7 +203,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     columnnames = null;
     haslabels = false;
     labelcolumns = new BitSet();
-    if (labelIndices != null) {
+    if(labelIndices != null) {
       labelcolumns.or(labelIndices);
     }
   }
@@ -208,30 +215,31 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
 
   @Override
   public Event nextEvent() {
-    if (nextevent != null) {
+    if(nextevent != null) {
       Event ret = nextevent;
       nextevent = null;
       return ret;
     }
     try {
-      for (String line; (line = reader.readLine()) != null; lineNumber++) {
+      for(String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
-        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+        if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
         }
         parseLineInternal(line);
         // Maybe a header column?
-        if (curvec == null) {
+        if(curvec == null) {
           continue;
         }
         final int curdim = curvec.getDimensionality();
-        if (curdim > maxdim || mindim > curdim) {
+        if(curdim > maxdim || mindim > curdim) {
           mindim = Math.min(mindim, curdim);
           maxdim = Math.max(maxdim, curdim);
           buildMeta();
           nextevent = Event.NEXT_OBJECT;
           return Event.META_CHANGED;
-        } else if (curlbl != null && meta != null && meta.size() == 1) {
+        }
+        else if(curlbl != null && meta != null && meta.size() == 1) {
           buildMeta();
           nextevent = Event.NEXT_OBJECT;
           return Event.META_CHANGED;
@@ -240,8 +248,10 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
       }
       reader.close();
       reader = null;
+      unique.clear();
       return Event.END_OF_STREAM;
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
   }
@@ -250,11 +260,12 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * Update the meta element.
    */
   protected void buildMeta() {
-    if (haslabels) {
+    if(haslabels) {
       meta = new BundleMeta(2);
       meta.add(getTypeInformation(mindim, maxdim));
       meta.add(TypeUtil.LABELLIST);
-    } else {
+    }
+    else {
       meta = new BundleMeta(1);
       meta.add(getTypeInformation(mindim, maxdim));
     }
@@ -262,10 +273,10 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
 
   @Override
   public Object data(int rnum) {
-    if (rnum == 0) {
+    if(rnum == 0) {
       return curvec;
     }
-    if (rnum == 1) {
+    if(rnum == 1) {
       return curlbl;
     }
     throw new ArrayIndexOutOfBoundsException();
@@ -279,37 +290,45 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @param line Line to process
    */
   protected void parseLineInternal(String line) {
-    List<String> entries = tokenize(line);
+    List<IntIntPair> entries = tokenizeNoCopy(line);
     // Split into numerical attributes and labels
     attributes.reset();
     LabelList labels = null;
 
-    Iterator<String> itr = entries.iterator();
-    for (int i = 0; itr.hasNext(); i++) {
-      String ent = itr.next();
-      if (labelIndices == null || !labelIndices.get(i)) {
+    Iterator<IntIntPair> itr = entries.iterator();
+    for(int i = 0; itr.hasNext(); i++) {
+      IntIntPair ent = itr.next();
+      if(labelIndices == null || !labelIndices.get(i)) {
         try {
-          double attribute = FormatUtil.parseDouble(ent);
+          double attribute = FormatUtil.parseDouble(line, ent.first, ent.second);
           attributes.add(attribute);
           continue;
-        } catch (NumberFormatException e) {
+        }
+        catch(NumberFormatException e) {
           // Ignore attempt, add to labels below.
           labelcolumns.set(i);
         }
       }
       // Else: labels.
-      if (labels == null) {
+      if(labels == null) {
         labels = new LabelList(Math.max(1, labelcolumns.size()));
         haslabels = true;
       }
-      // Make a new string, to not keep the whole file in memory!
-      labels.add(new String(ent));
+      // Note: for Java 6, make a new String here to save memory!
+      // Java 7 will copy the bytes to a new string.
+      final String lbl = line.substring(ent.first, ent.second);
+      String u = unique.get(lbl);
+      if(u == null) {
+        u = lbl;
+        unique.put(u, u);
+      }
+      labels.add(u);
     }
     // Maybe a label row?
-    if (lineNumber == 1 && attributes.size() == 0) {
+    if(lineNumber == 1 && attributes.size() == 0) {
       columnnames = labels;
       labelcolumns.clear();
-      if (labelIndices != null) {
+      if(labelIndices != null) {
         labelcolumns.or(labelIndices);
       }
       curvec = null;
@@ -342,13 +361,13 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @return Prototype object
    */
   SimpleTypeInformation<V> getTypeInformation(int mindim, int maxdim) {
-    if (mindim == maxdim) {
+    if(mindim == maxdim) {
       String[] colnames = null;
-      if (columnnames != null) {
-        if (columnnames.size() - labelcolumns.cardinality() == mindim) {
+      if(columnnames != null) {
+        if(columnnames.size() - labelcolumns.cardinality() == mindim) {
           colnames = new String[mindim];
-          for (int i = 0, j = 0; i < columnnames.size(); i++) {
-            if (!labelcolumns.get(i)) {
+          for(int i = 0, j = 0; i < columnnames.size(); i++) {
+            if(!labelcolumns.get(i)) {
               colnames[j] = columnnames.get(i);
               j++;
             }
@@ -356,10 +375,12 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
         }
       }
       return new VectorFieldTypeInformation<>(factory, mindim, colnames);
-    } else if (mindim < maxdim) {
+    }
+    else if(mindim < maxdim) {
       // Variable dimensionality - return non-vector field type
       return new VectorTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer(), mindim, maxdim);
-    } else {
+    }
+    else {
       throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
     }
   }
@@ -401,7 +422,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
      */
     protected void getFactory(Parameterization config) {
       ObjectParameter<NumberVector.Factory<V, ?>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
-      if (config.grab(factoryP)) {
+      if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
     }
@@ -414,10 +435,10 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     protected void getLabelIndices(Parameterization config) {
       IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID, true);
 
-      if (config.grab(labelIndicesP)) {
+      if(config.grab(labelIndicesP)) {
         labelIndices = new BitSet();
         List<Integer> labelcols = labelIndicesP.getValue();
-        for (Integer idx : labelcols) {
+        for(Integer idx : labelcols) {
           labelIndices.set(idx.intValue());
         }
       }
