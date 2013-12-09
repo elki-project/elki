@@ -137,7 +137,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     List<Polygon> polys = new ArrayList<>(1);
 
     List<Vector> coords = new ArrayList<>();
-    for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance()) {
+    for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
       // TODO: avoid substring.
       String cur = tokenizer.getSubstring();
       Matcher m = COORD.matcher(cur);

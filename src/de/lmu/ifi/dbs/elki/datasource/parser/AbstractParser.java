@@ -91,6 +91,18 @@ public abstract class AbstractParser {
     this.comment = comment;
   }
 
+  public static int lengthWithoutLinefeed(String line) {
+    int length = line.length();
+    while(length > 0) {
+      char last = line.charAt(length - 1);
+      if(last != '\n' && last != '\r') {
+        break;
+      }
+      --length;
+    }
+    return length;
+  }
+
   /**
    * Get the logger for this class.
    * 

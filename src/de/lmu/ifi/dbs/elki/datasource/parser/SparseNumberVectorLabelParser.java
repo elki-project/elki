@@ -111,7 +111,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
 
   @Override
   protected void parseLineInternal(String line) {
-    tokenizer.initialize(line);
+    tokenizer.initialize(line, 0, lengthWithoutLinefeed(line));
     int cardinality = (int) tokenizer.getLongBase10();
 
     values.clear();

@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * with multiple representations outside of any index structure.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.landmark
  */
 public class MultipleObjectsBundle implements ObjectBundle {
@@ -102,20 +102,12 @@ public class MultipleObjectsBundle implements ObjectBundle {
 
   @Override
   public Object data(int onum, int rnum) {
-    if(rnum < 0 || rnum >= meta.size()) {
-      throw new ArrayIndexOutOfBoundsException();
-    }
     return columns.get(rnum).get(onum);
   }
 
   @Override
   public int dataLength() {
-    try {
-      return columns.get(0).size();
-    }
-    catch(IndexOutOfBoundsException e) {
-      return 0;
-    }
+    return (columns.size() == 0) ? 0 : columns.get(0).size();
   }
 
   /**
@@ -220,7 +212,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
     boolean stop = false;
     while(!stop) {
       BundleStreamSource.Event ev = source.nextEvent();
-      switch(ev) {
+      switch(ev){
       case END_OF_STREAM:
         stop = true;
         break;
@@ -237,7 +229,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
         }
         continue;
       case NEXT_OBJECT:
-        for (int i = 0; i < bundle.metaLength(); i++) {
+        for(int i = 0; i < bundle.metaLength(); i++) {
           @SuppressWarnings("unchecked")
           final List<Object> col = (List<Object>) bundle.columns.get(i);
           col.add(source.data(i));
