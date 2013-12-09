@@ -110,7 +110,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
     LabelList labels = null;
 
     String curterm = null;
-    for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance()) {
+    for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
       if(curterm == null) {
         curterm = tokenizer.getSubstring();
       }

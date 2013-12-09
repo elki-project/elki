@@ -98,7 +98,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
     this.idrep = null;
 
     // Add indexes.
-    if (indexFactories != null) {
+    if(indexFactories != null) {
       this.indexFactories.addAll(indexFactories);
     }
   }
@@ -116,8 +116,8 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
    */
   @Override
   public void initialize() {
-    if (databaseConnection != null) {
-      if (LOG.isDebugging()) {
+    if(databaseConnection != null) {
+      if(LOG.isDebugging()) {
         LOG.debugFine("Loading data from database connection.");
       }
       MultipleObjectsBundle objpackages = databaseConnection.loadData();
@@ -127,11 +127,16 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
       // Find DBID column
       int idrepnr = findDBIDColumn(objpackages);
       // Build DBID array
-      if (idrepnr == -1) {
-        this.ids = DBIDUtil.generateStaticDBIDRange(objpackages.dataLength());
-      } else {
-        final ArrayModifiableDBIDs newids = DBIDUtil.newArray(objpackages.dataLength());
-        for (int j = 0; j < objpackages.dataLength(); j++) {
+      final int numObjects = objpackages.dataLength();
+      if(LOG.isDebugging()) {
+        LOG.debugFine("Importing " + numObjects + " instances.");
+      }
+      if(idrepnr == -1) {
+        this.ids = DBIDUtil.generateStaticDBIDRange(numObjects);
+      }
+      else {
+        final ArrayModifiableDBIDs newids = DBIDUtil.newArray(numObjects);
+        for(int j = 0; j < numObjects; j++) {
           DBID newid = (DBID) objpackages.data(j, idrepnr);
           newids.add(newid);
         }
@@ -147,11 +152,11 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
       Relation<?>[] targets = alignColumns(objpackages);
 
       DBIDIter newid = ids.iter();
-      for (int j = 0; j < objpackages.dataLength(); j++, newid.advance()) {
+      for(int j = 0; j < numObjects; j++, newid.advance()) {
         // insert object
-        for (int i = 0; i < targets.length; i++) {
+        for(int i = 0; i < targets.length; i++) {
           // DBIDs were handled above.
-          if (i == idrepnr) {
+          if(i == idrepnr) {
             continue;
           }
           @SuppressWarnings("unchecked")
@@ -160,22 +165,22 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
         }
       }
 
-      for (Relation<?> relation : relations) {
+      for(Relation<?> relation : relations) {
         SimpleTypeInformation<?> meta = relation.getDataTypeInformation();
         // Try to add indexes where appropriate
-        for (IndexFactory<?, ?> factory : indexFactories) {
-          if (factory.getInputTypeRestriction().isAssignableFromType(meta)) {
+        for(IndexFactory<?, ?> factory : indexFactories) {
+          if(factory.getInputTypeRestriction().isAssignableFromType(meta)) {
             @SuppressWarnings("unchecked")
             final IndexFactory<Object, ?> ofact = (IndexFactory<Object, ?>) factory;
             @SuppressWarnings("unchecked")
             final Relation<Object> orep = (Relation<Object>) relation;
             final Index index = ofact.instantiate(orep);
             Duration duration = LOG.isStatistics() ? LOG.newDuration(index.getClass().getName() + ".construction") : null;
-            if (duration != null) {
+            if(duration != null) {
               duration.begin();
             }
             index.initialize();
-            if (duration != null) {
+            if(duration != null) {
               duration.end();
               LOG.statistics(duration);
             }
@@ -191,7 +196,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
 
   @Override
   public void addIndex(Index index) {
-    if (LOG.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       LOG.debugFine("Adding index: " + index);
     }
     this.indexes.add(index);
@@ -206,9 +211,9 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
    * @return DBID column
    */
   protected int findDBIDColumn(ObjectBundle pack) {
-    for (int i = 0; i < pack.metaLength(); i++) {
+    for(int i = 0; i < pack.metaLength(); i++) {
       SimpleTypeInformation<?> meta = pack.meta(i);
-      if (TypeUtil.DBID.isAssignableFromType(meta)) {
+      if(TypeUtil.DBID.isAssignableFromType(meta)) {
         return i;
       }
     }
@@ -226,19 +231,19 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
     // align representations.
     Relation<?>[] targets = new Relation<?>[pack.metaLength()];
     BitSet used = new BitSet(relations.size());
-    for (int i = 0; i < targets.length; i++) {
+    for(int i = 0; i < targets.length; i++) {
       SimpleTypeInformation<?> meta = pack.meta(i);
       // TODO: aggressively try to match exact metas first?
       // Try to match unused representations only
-      for (int j = used.nextClearBit(0); j >= 0 && j < relations.size(); j = used.nextClearBit(j + 1)) {
+      for(int j = used.nextClearBit(0); j >= 0 && j < relations.size(); j = used.nextClearBit(j + 1)) {
         Relation<?> relation = relations.get(j);
-        if (relation.getDataTypeInformation().isAssignableFromType(meta)) {
+        if(relation.getDataTypeInformation().isAssignableFromType(meta)) {
           targets[i] = relation;
           used.set(j);
           break;
         }
       }
-      if (targets[i] == null) {
+      if(targets[i] == null) {
         targets[i] = addNewRelation(meta);
         used.set(relations.size() - 1);
       }
@@ -289,12 +294,12 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
       super.makeOptions(config);
       // Get database connection.
       final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(Database.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if (config.grab(dbcP)) {
+      if(config.grab(dbcP)) {
         databaseConnection = dbcP.instantiateClass(config);
       }
       // Get indexes.
       final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<>(INDEX_ID, IndexFactory.class, true);
-      if (config.grab(indexFactoryP)) {
+      if(config.grab(indexFactoryP)) {
         indexFactories = indexFactoryP.instantiateClasses(config);
       }
     }

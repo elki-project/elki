@@ -90,7 +90,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
         BitSet bitSet = new BitSet();
         LabelList labels = null;
 
-        for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance()) {
+        for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
           // TODO: avoid substring.
           String entry = tokenizer.getSubstring();
           try {

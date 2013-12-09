@@ -103,7 +103,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
         if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
         }
-        tokenizer.initialize(line);
+        tokenizer.initialize(line, 0, lengthWithoutLinefeed(line));
 
         if(!tokenizer.valid()) {
           throw new IllegalArgumentException("Less than three values in line " + lineNumber);

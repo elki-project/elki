@@ -287,13 +287,12 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @param line Line to process
    */
   protected void parseLineInternal(String line) {
-
     // Split into numerical attributes and labels
     attributes.reset();
     LabelList labels = null;
 
     int i = 0;
-    for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance(), i++) {
+    for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance(), i++) {
       if(labelIndices == null || !labelIndices.get(i)) {
         try {
           double attribute = tokenizer.getDouble();

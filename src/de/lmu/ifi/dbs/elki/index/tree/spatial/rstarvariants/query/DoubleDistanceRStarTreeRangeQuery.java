@@ -23,10 +23,12 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.PriorityQueue;
+
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
@@ -36,7 +38,6 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -89,8 +90,8 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    */
   protected DoubleDistanceDBIDList doRangeQuery(O object, double epsilon) {
     tree.statistics.countRangeQuery();
-    final DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
-    final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>();
+    final DoubleDistanceIntegerDBIDList result = new DoubleDistanceIntegerDBIDList();
+    final PriorityQueue<DoubleDistanceSearchCandidate> pq = new PriorityQueue<>();
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));

@@ -76,7 +76,12 @@ public class Tokenizer implements Iter {
   /**
    * Data currently processed.
    */
-  private String input;
+  private CharSequence input;
+
+  /**
+   * Substring to process.
+   */
+  private int send;
 
   /**
    * Current positions of result and iterator.
@@ -87,19 +92,20 @@ public class Tokenizer implements Iter {
    * Initialize parser with a new string.
    * 
    * @param input New string to parse.
+   * @param begin Begin
+   * @param end End
    */
-  public void initialize(String input) {
+  public void initialize(CharSequence input, int begin, int end) {
     this.input = input;
-    this.m = colSep.matcher(input);
-    this.index = 0;
-    this.start = 0;
-    this.end = input.length();
+    this.send = end;
+    this.m = colSep.matcher(input).region(begin, end);
+    this.index = begin;
     advance();
   }
 
   @Override
   public boolean valid() {
-    return start < input.length();
+    return start < send;
   }
 
   @Override
@@ -126,10 +132,10 @@ public class Tokenizer implements Iter {
     }
     // Add tail after last separator.
     this.start = index;
-    this.end = input.length();
+    this.end = send;
     this.index = end + 1;
     if(inquote != 0) {
-      final int last = input.length() - 1;
+      final int last = send - 1;
       if(input.charAt(last) == inquote) {
         ++this.start;
         --this.end;
@@ -148,7 +154,7 @@ public class Tokenizer implements Iter {
   public String getSubstring() {
     // TODO: detect Java <6 and make sure we only return the substring?
     // With java 7, String.substring will arraycopy the characters.
-    return input.substring(start, end);
+    return input.subSequence(start, end).toString();
   }
 
   /**
@@ -171,6 +177,15 @@ public class Tokenizer implements Iter {
    */
   public long getLongBase10() throws NumberFormatException {
     return FormatUtil.parseLongBase10(input, start, end);
+  }
+
+  /**
+   * Test for empty tokens; usually at end of line.
+   * 
+   * @return Empty
+   */
+  public boolean isEmpty() {
+    return end <= start;
   }
 
   /**

@@ -87,7 +87,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
         // FIXME: use more efficient storage right away?
         List<Bit> attributes = new ArrayList<>();
         LabelList ll = null;
-        for(tokenizer.initialize(line); tokenizer.valid(); tokenizer.advance()) {
+        for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
           // TODO: avoid substring when token is a typical truth value.
           final String cur = tokenizer.getSubstring();
           try {

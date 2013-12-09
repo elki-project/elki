@@ -41,31 +41,57 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * @author Erich Schubert
  */
 public class TestTokenizer implements JUnit4Test {
+  Tokenizer t = new Tokenizer(Pattern.compile("\\s"), "\"'");
+
   @Test
   public void testSimple() {
-    final String input = "1 -234 3.1415 - banana\n";
+    final String input = "1 -234 3.1415 - banana";
     final Object[] expect = { 1L, -234L, 3.1415, "-", "banana" };
-
-    tokenizerTest(new Tokenizer(Pattern.compile("\\s"), "\"'"), input, expect);
+    t.initialize(input, 0, input.length());
+    tokenizerTest(expect);
   }
 
   @Test
   public void testQuotes() {
-    final String input = "'this is' \"a test\" '123' '123 456' \"bana' na\"\n";
+    final String input = "'this is' \"a test\" '123' '123 456' \"bana' na\"";
     final Object[] expect = { "this is", "a test", 123L, "123 456", "bana' na" };
-    tokenizerTest(new Tokenizer(Pattern.compile("\\s"), "\"'"), input, expect);
+    t.initialize(input, 0, input.length());
+    tokenizerTest(expect);
   }
 
   @Test
   public void testSpecials() {
-    final String input = "nan inf -∞ NaN infinity NA\n";
+    final String input = "nan inf -∞ NaN infinity NA";
     final Object[] expect = { Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NaN, Double.POSITIVE_INFINITY, Double.NaN };
-    tokenizerTest(new Tokenizer(Pattern.compile("\\s"), "\"'"), input, expect);
+    t.initialize(input, 0, input.length());
+    tokenizerTest(expect);
   }
 
-  private void tokenizerTest(Tokenizer t, String input, Object[] expect) {
-    t.initialize(input); // Initializer.
+  @Test
+  public void testEmpty() {
+    final String input = "";
+    final Object[] expect = {};
+    t.initialize(input, 0, input.length());
+    tokenizerTest(expect);
+  }
 
+  @Test
+  public void testLineEnd() {
+    final String input = "1 ";
+    final Object[] expect = { 1L };
+    t.initialize(input, 0, input.length());
+    tokenizerTest(expect);
+  }
+
+  @Test
+  public void testPartial() {
+    final String input = "abc1def";
+    final Object[] expect = { 1L };
+    t.initialize(input, 3, 4);
+    tokenizerTest(expect);
+  }
+
+  private void tokenizerTest(Object[] expect) {
     for(int i = 0; i < expect.length; i++, t.advance()) {
       assertTrue("Tokenizer stopped early.", t.valid());
       Object e = expect[i];
@@ -88,6 +114,7 @@ public class TestTokenizer implements JUnit4Test {
           // pass. this is expected to fail.
         }
       }
+      System.err.println(t.getSubstring());
       // Positive tests:
       if(e instanceof Long) {
         assertEquals("Long parsing failed.", (long) e, t.getLongBase10());
@@ -100,6 +127,8 @@ public class TestTokenizer implements JUnit4Test {
         assertEquals("String parsing failed.", (String) e, t.getSubstring());
       }
     }
-    assertTrue("Spurious data after expected end: " + t.getSubstring(), !t.valid());
+    if(t.valid()) {
+      assertTrue("Spurous data after expected end: " + t.getSubstring(), !t.valid());
+    }
   }
 }
