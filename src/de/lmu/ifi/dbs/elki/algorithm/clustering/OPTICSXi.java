@@ -258,7 +258,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
                 }
               }
               // Case c)
-              if(sua.getMaximum() * ixi >= sda.getMaximum()) {
+              else if(sua.getMaximum() * ixi >= sda.getMaximum()) {
                 while(cend > sua.getStartIndex()) {
                   if(clusterOrder.get(cend - 1).getReachability().doubleValue() > sda.getMaximum()) {
                     cend--;
