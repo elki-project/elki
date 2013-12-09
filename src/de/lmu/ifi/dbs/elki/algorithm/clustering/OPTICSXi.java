@@ -240,6 +240,10 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
             // By default, clusters cover both the steep up and steep down area
             int cstart = sda.getStartIndex();
             int cend = sua.getEndIndex();
+            // Hotfix: never include infinity-reachable points at the end
+            while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).getReachability().doubleValue())) {
+              --cend;
+            }
             // However, we sometimes have to adjust this (Condition 4):
             {
               // Case b)
@@ -254,7 +258,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
                 }
               }
               // Case c)
-              else if(sua.getMaximum() * ixi >= sda.getMaximum()) {
+              if(sua.getMaximum() * ixi >= sda.getMaximum()) {
                 while(cend > sua.getStartIndex()) {
                   if(clusterOrder.get(cend - 1).getReachability().doubleValue() > sda.getMaximum()) {
                     cend--;
