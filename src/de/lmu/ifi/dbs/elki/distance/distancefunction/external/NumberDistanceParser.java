@@ -77,12 +77,12 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    * Constructor.
    * 
    * @param colSep Column separator pattern
-   * @param quoteChar Quote character
+   * @param quoteChars Quote characters
    * @param comment Comment pattern
    * @param distanceFactory Distance factory to use
    */
-  public NumberDistanceParser(Pattern colSep, char quoteChar, Pattern comment, D distanceFactory) {
-    super(colSep, quoteChar, comment);
+  public NumberDistanceParser(Pattern colSep, String quoteChars, Pattern comment, D distanceFactory) {
+    super(colSep, quoteChars, comment);
     this.distanceFactory = distanceFactory;
   }
 
@@ -238,7 +238,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
 
     @Override
     protected NumberDistanceParser<D> makeInstance() {
-      return new NumberDistanceParser<>(colSep, quoteChar, comment, distanceFactory);
+      return new NumberDistanceParser<>(colSep, quoteChars, comment, distanceFactory);
     }
   }
 }

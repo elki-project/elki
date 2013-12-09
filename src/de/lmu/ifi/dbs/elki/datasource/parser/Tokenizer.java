@@ -1,5 +1,28 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,28 +44,28 @@ public class Tokenizer implements Iter {
   /**
    * Separator pattern.
    */
-  Pattern colSep;
+  private Pattern colSep;
 
   /**
-   * A quote pattern
+   * Quote characters
    */
-  public static final char QUOTE_CHAR = '\"';
+  public static final String QUOTE_CHAR = "\"'";
 
   /**
    * Stores the quotation character
    */
-  protected char quoteChar = QUOTE_CHAR;
+  private char[] quoteChars = QUOTE_CHAR.toCharArray();
 
   /**
    * Constructor.
    * 
    * @param colSep Column separator pattern.
-   * @param quoteChar Quotation character.
+   * @param quoteChars Quotation character.
    */
-  public Tokenizer(Pattern colSep, char quoteChar) {
+  public Tokenizer(Pattern colSep, String quoteChars) {
     super();
     this.colSep = colSep;
-    this.quoteChar = quoteChar;
+    this.quoteChars = quoteChars.toCharArray();
   }
 
   /**
@@ -81,12 +104,12 @@ public class Tokenizer implements Iter {
 
   @Override
   public void advance() {
-    int inquote = isQuote(index);
+    char inquote = isQuote(index);
     while(m.find()) {
       // Quoted code path vs. regular code path
-      if(inquote == 1) {
-        // Closing quote found?
-        if(m.start() > index + 1 && input.charAt(m.start() - 1) == quoteChar) {
+      if(inquote != 0) {
+        // Matching closing quote found?
+        if(m.start() > index + 1 && input.charAt(m.start() - 1) == inquote) {
           this.start = index + 1;
           this.end = m.start() - 1;
           this.index = m.end();
@@ -105,9 +128,9 @@ public class Tokenizer implements Iter {
     this.start = index;
     this.end = input.length();
     this.index = end + 1;
-    if(inquote == 1) {
+    if(inquote != 0) {
       final int last = input.length() - 1;
-      if(isQuote(last) == 1) {
+      if(input.charAt(last) == inquote) {
         ++this.start;
         --this.end;
       }
@@ -159,7 +182,16 @@ public class Tokenizer implements Iter {
    * @param index Position
    * @return {@code 1} when a quote character, {@code 0} otherwise.
    */
-  private int isQuote(int index) {
-    return (index < input.length()) && (input.charAt(index) == quoteChar) ? 1 : 0;
+  private char isQuote(int index) {
+    if(index >= input.length()) {
+      return 0;
+    }
+    char c = input.charAt(index);
+    for(int i = 0; i < quoteChars.length; i++) {
+      if(c == quoteChars[i]) {
+        return c;
+      }
+    }
+    return 0;
   }
 }

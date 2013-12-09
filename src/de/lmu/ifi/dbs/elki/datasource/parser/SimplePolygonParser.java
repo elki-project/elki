@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.StringLengthConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
@@ -78,11 +77,11 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
    * Constructor.
    * 
    * @param colSep Column separator
-   * @param quoteChar Quotation character
+   * @param quoteChars Quotation character
    * @param comment Comment pattern
    */
-  public SimplePolygonParser(Pattern colSep, char quoteChar, Pattern comment) {
-    super(colSep, quoteChar, comment);
+  public SimplePolygonParser(Pattern colSep, String quoteChars, Pattern comment) {
+    super(colSep, quoteChars, comment);
   }
 
   @Override
@@ -205,10 +204,9 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       if(config.grab(colParam)) {
         colSep = colParam.getValue();
       }
-      StringParameter quoteParam = new StringParameter(QUOTE_ID, String.valueOf(QUOTE_CHAR));
-      quoteParam.addConstraint(new StringLengthConstraint(1, 1));
+      StringParameter quoteParam = new StringParameter(QUOTE_ID, QUOTE_CHARS);
       if(config.grab(quoteParam)) {
-        quoteChar = quoteParam.getValue().charAt(0);
+        quoteChars = quoteParam.getValue();
       }
 
       PatternParameter commentP = new PatternParameter(COMMENT_ID, COMMENT_PATTERN);
@@ -219,7 +217,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
 
     @Override
     protected SimplePolygonParser makeInstance() {
-      return new SimplePolygonParser(colSep, quoteChar, comment);
+      return new SimplePolygonParser(colSep, quoteChars, comment);
     }
   }
 }

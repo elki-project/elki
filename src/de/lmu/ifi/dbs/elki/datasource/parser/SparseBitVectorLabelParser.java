@@ -65,11 +65,11 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
    * Constructor.
    * 
    * @param colSep Column separator
-   * @param quoteChar Quotation character
+   * @param quoteChars Quotation character
    * @param comment Comment pattern
    */
-  public SparseBitVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment) {
-    super(colSep, quoteChar, comment);
+  public SparseBitVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment) {
+    super(colSep, quoteChars, comment);
   }
 
   @Override
@@ -143,7 +143,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
   public static class Parameterizer extends AbstractParser.Parameterizer {
     @Override
     protected SparseBitVectorLabelParser makeInstance() {
-      return new SparseBitVectorLabelParser(colSep, quoteChar, comment);
+      return new SparseBitVectorLabelParser(colSep, quoteChars, comment);
     }
   }
 }

@@ -38,11 +38,11 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
    * Constructor.
    * 
    * @param colSep Column separator pattern
-   * @param quoteChar Quote character
+   * @param quoteChars Quote characters
    * @param comment Comment pattern
    */
-  public AbstractStreamingParser(Pattern colSep, char quoteChar, Pattern comment) {
-    super(colSep, quoteChar, comment);
+  public AbstractStreamingParser(Pattern colSep, String quoteChars, Pattern comment) {
+    super(colSep, quoteChars, comment);
   }
 
   @Override
