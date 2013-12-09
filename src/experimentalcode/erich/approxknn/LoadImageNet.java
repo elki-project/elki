@@ -64,7 +64,7 @@ public class LoadImageNet {
     try {
       ListParameterization dbpar = new ListParameterization();
       // Index for full-dimensional query
-      if (index) {
+      if(index) {
         dbpar.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
         dbpar.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, "10000");
         dbpar.addParameter(AbstractRStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
@@ -74,7 +74,8 @@ public class LoadImageNet {
       Database db = ClassGenericsUtil.tryInstantiate(Database.class, StaticArrayDatabase.class, dbpar);
       db.initialize();
       return db;
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       throw new RuntimeException("Cannot load database." + e, e);
     }
   }
@@ -89,40 +90,43 @@ public class LoadImageNet {
     @Override
     public MultipleObjectsBundle loadData() {
       MultipleObjectsBundle bundle = null;
-      for (File child : new File(folder).listFiles()) {
-        if (child.getName().endsWith(".gz")) {
+      for(File child : new File(folder).listFiles()) {
+        if(child.getName().endsWith(".gz")) {
           try (InputStream in = FileUtil.tryGzipInput(new FileInputStream(child))) {
             LOG.debugFine("Loading file: " + child);
-            NumberVectorLabelParser<DoubleVector> parser = new NumberVectorLabelParser<>(Pattern.compile(" "), '"', null, null, DoubleVector.FACTORY);
+            NumberVectorLabelParser<DoubleVector> parser = new NumberVectorLabelParser<>(Pattern.compile(" "), "\"'", null, null, DoubleVector.FACTORY);
             MultipleObjectsBundle bun;
             try {
               bun = (new FileBasedDatabaseConnection(null, parser, in)).loadData();
-            } catch (AbortException e) {
+            }
+            catch(AbortException e) {
               // Some files are empty.
-              if (e.getMessage().contains("No vectors were read")) {
+              if(e.getMessage().contains("No vectors were read")) {
                 continue;
               }
               throw e;
             }
-            if (bundle == null) {
+            if(bundle == null) {
               bundle = bun;
-            } else {
-              if (bun.metaLength() != bundle.metaLength()) {
+            }
+            else {
+              if(bun.metaLength() != bundle.metaLength()) {
                 throw new AbortException("Different number of relations! " + child);
               }
-              for (int i = 0; i < bundle.metaLength(); i++) {
-                if (!bundle.meta(i).isAssignableFromType(bun.meta(i))) {
+              for(int i = 0; i < bundle.metaLength(); i++) {
+                if(!bundle.meta(i).isAssignableFromType(bun.meta(i))) {
                   throw new AbortException("Incompatible relations: " + bundle.meta(i) + " " + bun.meta(i));
                 }
               }
-              for (int i = 0; i < bundle.metaLength(); i++) {
+              for(int i = 0; i < bundle.metaLength(); i++) {
                 // Merge. Dangerous hack.
                 @SuppressWarnings("unchecked")
                 final ArrayList<Object> modifiable = (ArrayList<Object>) bundle.getColumn(i);
                 modifiable.addAll(bun.getColumn(i));
               }
             }
-          } catch (IOException e) {
+          }
+          catch(IOException e) {
             throw new AbortException("Error loading file " + child.getName(), e);
           }
         }
