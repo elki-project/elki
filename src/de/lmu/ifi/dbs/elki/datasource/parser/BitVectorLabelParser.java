@@ -28,10 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -84,32 +84,32 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
         if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
         }
-        // FIXME: use more efficient storage right away?
-        List<Bit> attributes = new ArrayList<>();
+        BitSet bitSet = new BitSet();
         LabelList ll = null;
+        int i = 0;
         for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
-          // TODO: avoid substring when token is a typical truth value.
-          final String cur = tokenizer.getSubstring();
           try {
-            Bit attribute = Bit.valueOf(cur);
-            attributes.add(attribute);
+            if(tokenizer.getLongBase10() > 0) {
+              bitSet.set(i);
+            }
+            ++i;
           }
           catch(NumberFormatException e) {
             if(ll == null) {
               ll = new LabelList(1);
             }
-            ll.add(cur);
+            ll.add(tokenizer.getSubstring());
           }
         }
 
         if(dimensionality < 0) {
-          dimensionality = attributes.size();
+          dimensionality = i;
         }
-        else if(dimensionality != attributes.size()) {
+        else if(dimensionality != i) {
           throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
         }
 
-        vectors.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
+        vectors.add(new BitVector(bitSet, dimensionality));
         labels.add(ll);
       }
     }

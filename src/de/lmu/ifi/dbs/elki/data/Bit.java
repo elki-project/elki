@@ -42,18 +42,39 @@ public class Bit extends Number {
   public static final Pattern BIT_PATTERN = Pattern.compile("^[01]$");
 
   /**
+   * True bit.
+   */
+  public static final Bit TRUE = new Bit(true);
+
+  /**
+   * False bit.
+   */
+  public static final Bit FALSE = new Bit(false);
+
+  /**
    * Method to construct a Bit for a given String expression.
    * 
    * @param bit a String expression defining a Bit
    * @return a Bit as defined by the given String expression
    * @throws NumberFormatException if the given String expression does not fit
-   *         to the Pattern {@link #BIT_PATTERN BIT_PATTERN}
+   *         the defined pattern.
    */
   public static Bit valueOf(String bit) throws NumberFormatException {
-    if(!BIT_PATTERN.matcher(bit).matches()) {
-      throw new NumberFormatException("Input \"" + bit + "\" does not fit required pattern: " + BIT_PATTERN.pattern());
+    final int i = Integer.parseInt(bit);
+    if(i != 0 && i != 1) {
+      throw new NumberFormatException("Input \"" + bit + "\" must be 0 or 1.");
     }
-    return new Bit(Integer.parseInt(bit));
+    return (i > 0) ? TRUE : FALSE;
+  }
+
+  /**
+   * Convert truth value to a bit.
+   * 
+   * @param b Truth value
+   * @return Bit
+   */
+  public static Bit valueOf(boolean b) {
+    return b ? TRUE : FALSE;
   }
 
   /**
@@ -65,7 +86,10 @@ public class Bit extends Number {
    * Provides a new bit according to the specified boolean value.
    * 
    * @param bit the boolean value of this bit
+   * 
+   * @deprecated Use {@link Bit#valueOf} to save memory.
    */
+  @Deprecated
   public Bit(boolean bit) {
     this.bit = bit;
   }
@@ -76,12 +100,14 @@ public class Bit extends Number {
    * 
    * @param bit 1 for true and 0 for false
    * @throws IllegalArgumentException if the specified value is neither 0 nor 1.
+   * @deprecated Use {@link Bit#valueOf} to save memory.
    */
+  @Deprecated
   public Bit(int bit) throws IllegalArgumentException {
     if(bit != 0 && bit != 1) {
       throw new IllegalArgumentException("Required: 0 or 1 - found: " + bit);
     }
-    this.bit = bit == 1;
+    this.bit = (bit == 1);
   }
 
   /**
