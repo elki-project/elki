@@ -138,9 +138,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
 
     List<Vector> coords = new ArrayList<>();
     for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
-      // TODO: avoid substring.
-      String cur = tokenizer.getSubstring();
-      Matcher m = COORD.matcher(cur);
+      Matcher m = COORD.matcher(line).region(tokenizer.getStart(), tokenizer.getEnd());
       if(m.find()) {
         try {
           double c1 = FormatUtil.parseDouble(m.group(1));
@@ -155,17 +153,20 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
           continue;
         }
         catch(NumberFormatException e) {
-          LOG.warning("Looked like a coordinate pair but didn't parse: " + cur);
+          LOG.warning("Looked like a coordinate pair but didn't parse: " + tokenizer.getSubstring());
         }
       }
-      // Polygon separator.
-      if(cur.equals(POLYGON_SEPARATOR)) {
+      // Match polygon separator:
+      final int len = tokenizer.getEnd() - tokenizer.getStart();
+      if(POLYGON_SEPARATOR.length() == len && //
+      POLYGON_SEPARATOR.regionMatches(0, line, tokenizer.getStart(), len)) {
         if(coords.size() > 0) {
           polys.add(new Polygon(coords));
           coords = new ArrayList<>();
         }
         continue;
       }
+      String cur = tokenizer.getSubstring();
       // First label will become the External ID
       if(eid == null) {
         eid = new ExternalID(cur);

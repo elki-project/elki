@@ -91,10 +91,8 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
         LabelList labels = null;
 
         for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
-          // TODO: avoid substring.
-          String entry = tokenizer.getSubstring();
           try {
-            int index = Integer.parseInt(entry);
+            int index = (int) tokenizer.getLongBase10();
             bitSet.set(index);
             dimensionality = Math.max(dimensionality, index);
           }
@@ -102,7 +100,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
             if(labels == null) {
               labels = new LabelList(1);
             }
-            labels.add(entry);
+            labels.add(tokenizer.getSubstring());
           }
         }
 

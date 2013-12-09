@@ -48,6 +48,16 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
   private boolean value;
 
   /**
+   * Distance 0.
+   */
+  public static final BitDistance ZERO = new BitDistance(false);
+
+  /**
+   * Distance 1.
+   */
+  public static final BitDistance ONE = new BitDistance(true);
+
+  /**
    * Generated serial version UID
    */
   private static final long serialVersionUID = 6514853467081717551L;
@@ -81,7 +91,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
   @Override
   public BitDistance fromDouble(double val) {
-    return new BitDistance(val > 0);
+    return (val > 0) ? ONE : ZERO;
   }
 
   /**
@@ -122,7 +132,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
   @Override
   public double doubleValue() {
-    return value ? 1.0 : 0.0;
+    return value ? 1. : 0.;
   }
 
   @Override
@@ -142,21 +152,24 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
   @Override
   public BitDistance parseString(String val) throws IllegalArgumentException {
-    if (testInputPattern(val)) {
-      return new BitDistance(Bit.valueOf(val).bitValue());
-    } else {
-      throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
+    int i = Integer.parseInt(val);
+    if(i == 0) {
+      return ZERO;
     }
+    if(i == 1) {
+      return ONE;
+    }
+    throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
   }
 
   @Override
   public BitDistance infiniteDistance() {
-    return new BitDistance(true);
+    return ONE;
   }
 
   @Override
   public BitDistance nullDistance() {
-    return new BitDistance(false);
+    return ZERO;
   }
 
   @Override
@@ -196,13 +209,13 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (!super.equals(obj)) {
+    if(!super.equals(obj)) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if(getClass() != obj.getClass()) {
       return false;
     }
     BitDistance other = (BitDistance) obj;

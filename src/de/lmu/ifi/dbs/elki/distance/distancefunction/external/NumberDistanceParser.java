@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -132,8 +133,15 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
         }
 
         try {
-          // TODO: optimize for double distances.
-          D distance = distanceFactory.parseString(tokenizer.getSubstring());
+          final D distance;
+          if(distanceFactory == DoubleDistance.FACTORY) {
+            @SuppressWarnings("unchecked")
+            D dist = (D) DoubleDistance.FACTORY.fromDouble(tokenizer.getDouble());
+            distance = dist;
+          }
+          else {
+            distance = distanceFactory.parseString(tokenizer.getSubstring());
+          }
           tokenizer.advance();
           put(id1, id2, distance, distanceCache);
           ids.add(id1);

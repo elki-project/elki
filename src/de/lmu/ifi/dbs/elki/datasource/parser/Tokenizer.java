@@ -209,4 +209,22 @@ public class Tokenizer implements Iter {
     }
     return 0;
   }
+
+  /**
+   * Get start of token.
+   * 
+   * @return Start
+   */
+  public int getStart() {
+    return start;
+  }
+
+  /**
+   * Get end of token.
+   * 
+   * @return End
+   */
+  public int getEnd() {
+    return end;
+  }
 }
