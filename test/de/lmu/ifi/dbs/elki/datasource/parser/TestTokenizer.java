@@ -114,7 +114,6 @@ public class TestTokenizer implements JUnit4Test {
           // pass. this is expected to fail.
         }
       }
-      System.err.println(t.getSubstring());
       // Positive tests:
       if(e instanceof Long) {
         assertEquals("Long parsing failed.", (long) e, t.getLongBase10());
