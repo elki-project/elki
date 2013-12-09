@@ -173,20 +173,20 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @param factory Vector factory
    */
   public NumberVectorLabelParser(NumberVector.Factory<V, ?> factory) {
-    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR, Pattern.compile(COMMENT_PATTERN), null, factory);
+    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHARS, Pattern.compile(COMMENT_PATTERN), null, factory);
   }
 
   /**
    * Constructor.
    * 
    * @param colSep Column separator
-   * @param quoteChar Quote character
+   * @param quoteChars Quote character
    * @param comment Comment pattern
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices, NumberVector.Factory<V, ?> factory) {
-    super(colSep, quoteChar, comment);
+  public NumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V, ?> factory) {
+    super(colSep, quoteChars, comment);
     this.labelIndices = labelIndices;
     this.factory = factory;
   }
@@ -442,7 +442,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
 
     @Override
     protected NumberVectorLabelParser<V> makeInstance() {
-      return new NumberVectorLabelParser<>(colSep, quoteChar, comment, labelIndices, factory);
+      return new NumberVectorLabelParser<>(colSep, quoteChars, comment, labelIndices, factory);
     }
   }
 }

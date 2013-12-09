@@ -65,7 +65,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * @deprecated Use {@link SparseNumberVectorLabelParser} instead!
  */
-// FIXME: Maxdim!
 @Title("Sparse Float Vector Label Parser")
 @Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored.")
 @Deprecated
@@ -74,12 +73,12 @@ public class SparseFloatVectorLabelParser extends SparseNumberVectorLabelParser<
    * Constructor.
    * 
    * @param colSep Column separator
-   * @param quoteChar Quotation character
+   * @param quoteChars Quotation character
    * @param comment Comment pattern
    * @param labelIndices Indices to use as labels
    */
-  public SparseFloatVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices) {
-    super(colSep, quoteChar, comment, labelIndices, SparseFloatVector.FACTORY);
+  public SparseFloatVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices) {
+    super(colSep, quoteChars, comment, labelIndices, SparseFloatVector.FACTORY);
   }
 
   /**
@@ -92,7 +91,7 @@ public class SparseFloatVectorLabelParser extends SparseNumberVectorLabelParser<
   public static class Parameterizer extends SparseNumberVectorLabelParser.Parameterizer<SparseFloatVector> {
     @Override
     protected SparseFloatVectorLabelParser makeInstance() {
-      return new SparseFloatVectorLabelParser(colSep, quoteChar, comment, labelIndices);
+      return new SparseFloatVectorLabelParser(colSep, quoteChars, comment, labelIndices);
     }
   }
 }

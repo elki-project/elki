@@ -64,11 +64,11 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
    * Constructor.
    * 
    * @param colSep Column separator
-   * @param quoteChar Quotation character
+   * @param quoteChars Quotation character
    * @param comment Comment pattern
    */
-  public BitVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment) {
-    super(colSep, quoteChar, comment);
+  public BitVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment) {
+    super(colSep, quoteChars, comment);
   }
 
   @Override
@@ -138,7 +138,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
   public static class Parameterizer extends AbstractParser.Parameterizer {
     @Override
     protected BitVectorLabelParser makeInstance() {
-      return new BitVectorLabelParser(colSep, quoteChar, comment);
+      return new BitVectorLabelParser(colSep, quoteChars, comment);
     }
   }
 }

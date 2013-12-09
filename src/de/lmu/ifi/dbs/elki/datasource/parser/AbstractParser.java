@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.StringLengthConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
@@ -48,7 +47,7 @@ public abstract class AbstractParser {
   /**
    * A quote pattern
    */
-  public static final char QUOTE_CHAR = '\"';
+  public static final String QUOTE_CHARS = "\"'";
 
   /**
    * A pattern catching most numbers that can be parsed using
@@ -83,12 +82,12 @@ public abstract class AbstractParser {
    * Constructor.
    * 
    * @param colSep Column separator
-   * @param quoteChar Quote character
+   * @param quoteChars Quote character
    * @param comment Comment pattern
    */
-  public AbstractParser(Pattern colSep, char quoteChar, Pattern comment) {
+  public AbstractParser(Pattern colSep, String quoteChars, Pattern comment) {
     super();
-    this.tokenizer = new Tokenizer(colSep, quoteChar);
+    this.tokenizer = new Tokenizer(colSep, quoteChars);
     this.comment = comment;
   }
 
@@ -125,9 +124,9 @@ public abstract class AbstractParser {
 
     /**
      * OptionID for the quote character parameter (defaults to a double
-     * quotation mark as in {@link #QUOTE_CHAR}.
+     * quotation mark as in {@link #QUOTE_CHARs}.
      */
-    public static final OptionID QUOTE_ID = new OptionID("parser.quote", "Quotation character. The default is to use a double quote.");
+    public static final OptionID QUOTE_ID = new OptionID("parser.quote", "Quotation characters. By default, both double and single ASCII quotes are accepted.");
 
     /**
      * Comment pattern.
@@ -142,7 +141,7 @@ public abstract class AbstractParser {
     /**
      * Stores the quotation character
      */
-    protected char quoteChar = QUOTE_CHAR;
+    protected String quoteChars = QUOTE_CHARS;
 
     /**
      * Comment pattern.
@@ -156,10 +155,9 @@ public abstract class AbstractParser {
       if(config.grab(colParam)) {
         colSep = colParam.getValue();
       }
-      StringParameter quoteParam = new StringParameter(QUOTE_ID, String.valueOf(QUOTE_CHAR));
-      quoteParam.addConstraint(new StringLengthConstraint(1, 1));
+      StringParameter quoteParam = new StringParameter(QUOTE_ID, QUOTE_CHARS);
       if(config.grab(quoteParam)) {
-        quoteChar = quoteParam.getValue().charAt(0);
+        quoteChars = quoteParam.getValue();
       }
       PatternParameter commentP = new PatternParameter(COMMENT_ID, COMMENT_PATTERN);
       if(config.grab(commentP)) {

@@ -65,12 +65,12 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
    * Constructor.
    * 
    * @param colSep Column separator
-   * @param quoteChar Quotation character
+   * @param quoteChars Quotation character
    * @param comment Comment pattern
    * @param labelIndices Indices to use as labels
    */
-  public FloatVectorLabelParser(Pattern colSep, char quoteChar, Pattern comment, BitSet labelIndices) {
-    super(colSep, quoteChar, comment, labelIndices, FloatVector.FACTORY);
+  public FloatVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices) {
+    super(colSep, quoteChars, comment, labelIndices, FloatVector.FACTORY);
   }
 
   @Override
@@ -93,7 +93,7 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
 
     @Override
     protected FloatVectorLabelParser makeInstance() {
-      return new FloatVectorLabelParser(colSep, quoteChar, comment, labelIndices);
+      return new FloatVectorLabelParser(colSep, quoteChars, comment, labelIndices);
     }
   }
 }
