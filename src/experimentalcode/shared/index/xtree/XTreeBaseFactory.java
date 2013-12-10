@@ -33,10 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
@@ -115,21 +112,21 @@ public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNod
       // Bulk loads are not supported yet:
       // super.configBulkLoad(config);
       final DoubleParameter MIN_FANOUT_PARAMETER = new DoubleParameter(MIN_FANOUT_ID, 0.3);
-      MIN_FANOUT_PARAMETER.addConstraint(new GreaterEqualConstraint(0));
-      MIN_FANOUT_PARAMETER.addConstraint(new LessEqualConstraint(1));
+      MIN_FANOUT_PARAMETER.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      MIN_FANOUT_PARAMETER.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if (config.grab(MIN_FANOUT_PARAMETER)) {
         settings.relativeMinFanout = MIN_FANOUT_PARAMETER.getValue();
       }
       final DoubleParameter REINSERT_PARAMETER = new DoubleParameter(REINSERT_ID, 0.3);
-      REINSERT_PARAMETER.addConstraint(new GreaterEqualConstraint(0));
-      REINSERT_PARAMETER.addConstraint(new LessConstraint(1));
+      REINSERT_PARAMETER.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      REINSERT_PARAMETER.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if (config.grab(REINSERT_PARAMETER)) {
         float reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
         settings.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(reinsert_fraction, SquaredEuclideanDistanceFunction.STATIC)));
       }
       final DoubleParameter MAX_OVERLAP_PARAMETER = new DoubleParameter(MAX_OVERLAP_ID, 0.2);
-      MAX_OVERLAP_PARAMETER.addConstraint(new GreaterConstraint(0));
-      MAX_OVERLAP_PARAMETER.addConstraint(new LessEqualConstraint(1));
+      MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.POSITIVE_DOUBLE);
+      MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if (config.grab(MAX_OVERLAP_PARAMETER)) {
         settings.max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
       }
