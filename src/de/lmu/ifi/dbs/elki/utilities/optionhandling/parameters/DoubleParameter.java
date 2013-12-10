@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
@@ -107,7 +108,7 @@ public class DoubleParameter extends NumberParameter<Double> {
       return (Double) obj;
     }
     try {
-      return Double.valueOf(obj.toString());
+      return FormatUtil.parseDouble(obj.toString());
     } catch (NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
     } catch (NumberFormatException e) {
