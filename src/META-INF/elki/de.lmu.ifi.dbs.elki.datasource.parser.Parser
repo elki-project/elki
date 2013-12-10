@@ -1,6 +1,7 @@
 de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser
 de.lmu.ifi.dbs.elki.datasource.parser.ArffParser
 de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser
+de.lmu.ifi.dbs.elki.datasource.parser.CategorialDataAsNumberVectorParser
 de.lmu.ifi.dbs.elki.datasource.parser.SparseBitVectorLabelParser
 de.lmu.ifi.dbs.elki.datasource.parser.TermFrequencyParser
 de.lmu.ifi.dbs.elki.datasource.parser.BitVectorLabelParser
