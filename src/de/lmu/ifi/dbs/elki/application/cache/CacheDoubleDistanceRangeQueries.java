@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -249,7 +249,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
         distance = dpar.instantiateClass(config);
       }
       final DoubleParameter kpar = new DoubleParameter(RADIUS_ID);
-      kpar.addConstraint(new GreaterEqualConstraint(0.));
+      kpar.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if (config.grab(kpar)) {
         radius = kpar.doubleValue();
       }

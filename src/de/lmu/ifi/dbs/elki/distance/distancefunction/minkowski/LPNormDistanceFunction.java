@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistan
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -76,7 +76,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @return Aggregated values.
    */
   private final double doublePreDistance(NumberVector<?> v1, NumberVector<?> v2, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = (xd >= yd) ? xd - yd : yd - xd;
       agg += Math.pow(delta, p);
@@ -95,13 +95,13 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @return Aggregated values.
    */
   private final double doublePreDistanceVM(NumberVector<?> v, SpatialComparable mbr, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = value - mbr.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += Math.pow(delta, p);
       }
     }
@@ -119,12 +119,12 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @return Aggregated values.
    */
   private final double doublePreDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = mbr1.getMin(d) - mbr2.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += Math.pow(delta, p);
       }
     }
@@ -141,7 +141,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @return Aggregated values.
    */
   private final double doublePreNorm(NumberVector<?> v, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
       final double delta = xd >= 0. ? xd : -xd;
       agg += Math.pow(delta, p);
@@ -159,12 +159,12 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
    * @return Aggregated values.
    */
   private final double doublePreNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = -mbr.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += Math.pow(delta, p);
       }
     }
@@ -176,9 +176,10 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = doublePreDistance(v1, v2, 0, mindim, 0.);
-    if (dim1 > mindim) {
+    if(dim1 > mindim) {
       agg = doublePreNorm(v1, mindim, dim1, agg);
-    } else if (dim2 > mindim) {
+    }
+    else if(dim2 > mindim) {
       agg = doublePreNorm(v2, mindim, dim2, agg);
     }
     return Math.pow(agg, invp);
@@ -198,32 +199,37 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     final NumberVector<?> v2 = (mbr2 instanceof NumberVector) ? (NumberVector<?>) mbr2 : null;
 
     double agg = 0.;
-    if (v1 != null) {
-      if (v2 != null) {
+    if(v1 != null) {
+      if(v2 != null) {
         agg = doublePreDistance(v1, v2, 0, mindim, agg);
-      } else {
+      }
+      else {
         agg = doublePreDistanceVM(v1, mbr2, 0, mindim, agg);
       }
-    } else {
-      if (v2 != null) {
+    }
+    else {
+      if(v2 != null) {
         agg = doublePreDistanceVM(v2, mbr1, 0, mindim, agg);
-      } else {
+      }
+      else {
         agg = doublePreDistanceMBR(mbr1, mbr2, 0, mindim, agg);
       }
     }
     // first object has more dimensions.
-    if (dim1 > mindim) {
-      if (v1 != null) {
+    if(dim1 > mindim) {
+      if(v1 != null) {
         agg = doublePreNorm(v1, mindim, dim1, agg);
-      } else {
+      }
+      else {
         agg = doublePreNormMBR(v1, mindim, dim1, agg);
       }
     }
     // second object has more dimensions.
-    if (dim2 > mindim) {
-      if (v2 != null) {
+    if(dim2 > mindim) {
+      if(v2 != null) {
         agg = doublePreNorm(v2, mindim, dim2, agg);
-      } else {
+      }
+      else {
         agg = doublePreNormMBR(mbr2, mindim, dim2, agg);
       }
     }
@@ -251,10 +257,10 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (obj instanceof LPNormDistanceFunction) {
+    if(obj instanceof LPNormDistanceFunction) {
       return this.p == ((LPNormDistanceFunction) obj).p;
     }
     return false;
@@ -282,24 +288,24 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter paramP = new DoubleParameter(P_ID);
-      paramP.addConstraint(new GreaterConstraint(0.));
-      if (config.grab(paramP)) {
+      paramP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(paramP)) {
         p = paramP.getValue();
       }
     }
 
     @Override
     protected LPNormDistanceFunction makeInstance() {
-      if (p == 1.) {
+      if(p == 1.) {
         return ManhattanDistanceFunction.STATIC;
       }
-      if (p == 2.) {
+      if(p == 2.) {
         return EuclideanDistanceFunction.STATIC;
       }
-      if (p == Double.POSITIVE_INFINITY) {
+      if(p == Double.POSITIVE_INFINITY) {
         return MaximumDistanceFunction.STATIC;
       }
-      if (p == Math.round(p)) {
+      if(p == Math.round(p)) {
         return new LPIntegerNormDistanceFunction((int) p);
       }
       return new LPNormDistanceFunction(p);

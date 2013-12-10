@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -86,7 +86,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
     this.k = k;
     // Sanity check:
     int dim = RelationUtil.dimensionality(relation);
-    if (dim > 0 && k <= dim) {
+    if(dim > 0 && k <= dim) {
       LOG.warning("PCA results with k < dim are meaningless. Choose k much larger than the dimensionality.");
     }
   }
@@ -178,8 +178,8 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         final IntParameter kP = new IntParameter(K_ID);
-        kP.addConstraint(new GreaterConstraint(0));
-        if (config.grab(kP)) {
+        kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(kP)) {
           k = kP.getValue();
         }
       }

@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -75,7 +74,7 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
     final int cut = ((int) (len * trim)) >> 1;
     // X positions of samples
     double[] x = new double[len];
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i);
       x[i] = val;
     }
@@ -136,14 +135,14 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<DistributionEstimator<D>> innerP = new ObjectParameter<>(INNER_ID, DistributionEstimator.class);
-      if (config.grab(innerP)) {
+      if(config.grab(innerP)) {
         inner = innerP.instantiateClass(config);
       }
 
       DoubleParameter trimP = new DoubleParameter(TRIM_ID);
-      trimP.addConstraint(new GreaterConstraint(0.));
-      trimP.addConstraint(new LessConstraint(0.5));
-      if (config.grab(trimP)) {
+      trimP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      trimP.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
+      if(config.grab(trimP)) {
         trim = trimP.doubleValue();
       }
     }

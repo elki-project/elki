@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorDoubleSimil
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -86,7 +86,7 @@ public class PolynomialKernelFunction extends AbstractVectorDoubleSimilarityFunc
   public double doubleSimilarity(NumberVector<?> o1, NumberVector<?> o2) {
     final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(o1, o2);
     double sim = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       sim += o1.doubleValue(i) * o2.doubleValue(i);
     }
     return MathUtil.powi(sim + bias, degree);
@@ -144,20 +144,20 @@ public class PolynomialKernelFunction extends AbstractVectorDoubleSimilarityFunc
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter degreeP = new IntParameter(DEGREE_ID, DEFAULT_DEGREE);
-      degreeP.addConstraint(new GreaterConstraint(1));
-      if (config.grab(degreeP)) {
+      degreeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(degreeP)) {
         degree = degreeP.intValue();
       }
       final DoubleParameter biasP = new DoubleParameter(BIAS_ID);
       biasP.setOptional(true);
-      if (config.grab(biasP)) {
+      if(config.grab(biasP)) {
         bias = biasP.doubleValue();
       }
     }
 
     @Override
     protected PolynomialKernelFunction makeInstance() {
-      if (degree == 1 && (bias == 0.)) {
+      if(degree == 1 && (bias == 0.)) {
         return LinearKernelFunction.STATIC;
       }
       return new PolynomialKernelFunction(degree, bias);

@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -224,7 +224,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
        */
       public static int getParameterSteps(Parameterization config) {
         final IntParameter param = new IntParameter(STEPS_ID);
-        param.addConstraint(new GreaterEqualConstraint(1));
+        param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(param)) {
           return param.getValue();
         }

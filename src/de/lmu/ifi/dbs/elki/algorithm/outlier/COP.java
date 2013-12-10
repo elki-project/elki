@@ -62,8 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
@@ -229,21 +229,21 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k + 1);
 
     final int dim = RelationUtil.dimensionality(relation);
-    if (k <= dim + 1) {
+    if(k <= dim + 1) {
       LOG.warning("PCA is underspecified with a too low k! k should be at much larger than " + dim);
     }
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDataStore<Vector> cop_err_v = null;
     WritableIntegerDataStore cop_dim = null;
-    if (models) {
+    if(models) {
       cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Vector.class);
       cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
     }
     // compute neighbors of each db object
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
 
-    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       KNNList<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
       ModifiableDBIDs nids = DBIDUtil.newHashSet(neighbors);
       nids.remove(id); // Do not use query object
@@ -258,17 +258,17 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
 
       double min = Double.POSITIVE_INFINITY;
       int vdim = dim;
-      switch(dist) {
+      switch(dist){
       case CHISQUARED: {
         double sqdevs = 0;
-        for (int d = 0; d < dim; d++) {
+        for(int d = 0; d < dim; d++) {
           // Scale with Stddev
           double dev = projected.get(d);
           // Accumulate
           sqdevs += dev * dev / evs[d];
           // Evaluate
           double score = 1 - ChiSquaredDistribution.cdf(sqdevs, d + 1);
-          if (score < min) {
+          if(score < min) {
             min = score;
             vdim = d + 1;
           }
@@ -279,21 +279,21 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
         double[][] dists = new double[dim][nids.size()];
         int j = 0;
         Vector srel = new Vector(dim);
-        for (DBIDIter s = nids.iter(); s.valid() && j < nids.size(); s.advance()) {
+        for(DBIDIter s = nids.iter(); s.valid() && j < nids.size(); s.advance()) {
           V vec = relation.get(s);
-          for (int d = 0; d < dim; d++) {
+          for(int d = 0; d < dim; d++) {
             srel.set(d, vec.doubleValue(d) - centroid.get(d));
           }
           Vector serr = evecs.transposeTimes(srel);
           double sqdist = 0.0;
-          for (int d = 0; d < dim; d++) {
+          for(int d = 0; d < dim; d++) {
             sqdist += serr.get(d) * serr.get(d) / evs[d];
             dists[d][j] = sqdist;
           }
           j++;
         }
         double sqdevs = 0;
-        for (int d = 0; d < dim; d++) {
+        for(int d = 0; d < dim; d++) {
           // Scale with Stddev
           final double dev = projected.get(d);
           // Accumulate
@@ -302,7 +302,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           Arrays.sort(dists[d]);
           // Evaluate
           double score = 1 - GammaChoiWetteEstimator.STATIC.estimate(dists[d], SHORTENED_ARRAY).cdf(sqdevs);
-          if (score < min) {
+          if(score < min) {
             min = score;
             vdim = d + 1;
           }
@@ -313,22 +313,22 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       // Normalize the value
       final double prob = expect * (1 - min) / (expect + min);
       // Construct the error vector:
-      for (int d = vdim; d < dim; d++) {
+      for(int d = vdim; d < dim; d++) {
         projected.set(d, 0.0);
       }
       Vector ev = evecs.times(projected).timesEquals(-1 * prob);
 
       cop_score.putDouble(id, prob);
-      if (models) {
+      if(models) {
         cop_err_v.put(id, ev);
         cop_dim.putInt(id, dim + 1 - vdim);
       }
 
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(LOG);
     }
 
@@ -336,7 +336,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     Relation<Double> scoreResult = new MaterializedRelation<>("Correlation Outlier Probabilities", COP_SCORES, TypeUtil.DOUBLE, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    if (models) {
+    if(models) {
       result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
       result.addChildResult(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
     }
@@ -437,25 +437,25 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(new GreaterConstraint(5));
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.intValue();
       }
       EnumParameter<DistanceDist> distP = new EnumParameter<>(DIST_ID, DistanceDist.class, DistanceDist.GAMMA);
-      if (config.grab(distP)) {
+      if(config.grab(distP)) {
         dist = distP.getValue();
       }
       DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.001);
-      expectP.addConstraint(new GreaterConstraint(0));
-      expectP.addConstraint(new LessConstraint(1.0));
-      if (config.grab(expectP)) {
+      expectP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      expectP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      if(config.grab(expectP)) {
         expect = expectP.doubleValue();
       }
       ObjectParameter<PCARunner<V>> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
-      if (config.grab(pcaP)) {
+      if(config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
       }
       Flag modelsF = new Flag(MODELS_ID);
-      if (config.grab(modelsF)) {
+      if(config.grab(modelsF)) {
         models = modelsF.isTrue();
       }
     }

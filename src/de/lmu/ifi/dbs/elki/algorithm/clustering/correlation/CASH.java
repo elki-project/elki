@@ -74,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -838,22 +838,22 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter minptsP = new IntParameter(MINPTS_ID);
-      minptsP.addConstraint(new GreaterConstraint(0));
+      minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if (config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }
       IntParameter maxlevelP = new IntParameter(MAXLEVEL_ID);
-      maxlevelP.addConstraint(new GreaterConstraint(0));
+      maxlevelP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if (config.grab(maxlevelP)) {
         maxlevel = maxlevelP.getValue();
       }
       IntParameter mindimP = new IntParameter(MINDIM_ID, 1);
-      mindimP.addConstraint(new GreaterConstraint(0));
+      mindimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if (config.grab(mindimP)) {
         mindim = mindimP.getValue();
       }
       DoubleParameter jitterP = new DoubleParameter(JITTER_ID);
-      jitterP.addConstraint(new GreaterConstraint(0));
+      jitterP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if (config.grab(jitterP)) {
         jitter = jitterP.getValue();
       }

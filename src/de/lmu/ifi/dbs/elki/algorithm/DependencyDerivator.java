@@ -51,8 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -68,7 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek: Deriving
  * Quantitative Dependencies for Correlation Clusters. <br>
  * In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06),
- * Philadelphia, PA 2006. </p>
+ * Philadelphia, PA 2006.
+ * </p>
  * 
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector handled by this Algorithm
@@ -303,20 +303,20 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      
+
       IntParameter outputAccuracyP = new IntParameter(OUTPUT_ACCURACY_ID, 4);
-      outputAccuracyP.addConstraint(new GreaterEqualConstraint(0));
+      outputAccuracyP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(outputAccuracyP)) {
         outputAccuracy = outputAccuracyP.getValue();
       }
-      
+
       IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID);
       sampleSizeP.setOptional(true);
-      sampleSizeP.addConstraint(new GreaterConstraint(0));
+      sampleSizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(sampleSizeP)) {
         sampleSize = sampleSizeP.getValue();
       }
-      
+
       Flag randomSampleF = new Flag(DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
       if(config.grab(randomSampleF)) {
         randomSample = randomSampleF.getValue();

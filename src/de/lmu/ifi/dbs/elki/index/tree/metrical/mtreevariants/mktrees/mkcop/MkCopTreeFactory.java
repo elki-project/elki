@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -84,8 +84,8 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter k_maxP = new IntParameter(K_ID);
-      k_maxP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(k_maxP)) {
+      k_maxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(k_maxP)) {
         settings.k_max = k_maxP.intValue();
       }
     }

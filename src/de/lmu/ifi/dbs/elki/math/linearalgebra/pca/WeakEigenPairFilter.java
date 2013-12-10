@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -85,25 +85,26 @@ public class WeakEigenPairFilter implements EigenPairFilter {
 
     // determine sum of eigenvalues
     double totalSum = 0;
-    for (int i = 0; i < eigenPairs.size(); i++) {
+    for(int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       totalSum += eigenPair.getEigenvalue();
     }
     double expectEigenvalue = totalSum / eigenPairs.size() * walpha;
 
     // determine strong and weak eigenpairs
-    for (int i = 0; i < eigenPairs.size(); i++) {
+    for(int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      if (eigenPair.getEigenvalue() > expectEigenvalue) {
+      if(eigenPair.getEigenvalue() > expectEigenvalue) {
         strongEigenPairs.add(eigenPair);
-      } else {
+      }
+      else {
         weakEigenPairs.add(eigenPair);
       }
     }
 
     // the code using this method doesn't expect an empty strong set,
     // if we didn't find any strong ones, we make all vectors strong
-    if (strongEigenPairs.size() == 0) {
+    if(strongEigenPairs.size() == 0) {
       return new FilteredEigenPairs(new ArrayList<EigenPair>(), weakEigenPairs);
     }
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
@@ -127,8 +128,8 @@ public class WeakEigenPairFilter implements EigenPairFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter walphaP = new DoubleParameter(EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
-      walphaP.addConstraint(new GreaterEqualConstraint(0.0));
-      if (config.grab(walphaP)) {
+      walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(walphaP)) {
         walpha = walphaP.getValue();
       }
     }

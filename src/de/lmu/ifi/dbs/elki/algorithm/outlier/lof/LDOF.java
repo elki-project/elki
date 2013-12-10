@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -80,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("LDOF: Local Distance-Based Outlier Factor")
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2_84")
-@Alias({"de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF"})
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF" })
 public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -141,12 +141,13 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       KNNList<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
       // skip the point itself
-      dxp.reset(); Dxp.reset();
+      dxp.reset();
+      Dxp.reset();
       // TODO: optimize for double distances
-      for (DistanceDBIDListIter<D> neighbor1 = neighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
+      for(DistanceDBIDListIter<D> neighbor1 = neighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
         if(!DBIDUtil.equal(neighbor1, iditer)) {
           dxp.put(neighbor1.getDistance().doubleValue());
-          for (DistanceDBIDListIter<D> neighbor2 = neighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
+          for(DistanceDBIDListIter<D> neighbor2 = neighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
             if(!DBIDUtil.equal(neighbor1, neighbor2) && !DBIDUtil.equal(neighbor2, iditer)) {
               Dxp.put(distFunc.distance(neighbor1, neighbor2).doubleValue());
             }
@@ -199,7 +200,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(1));
+      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }

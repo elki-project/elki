@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -216,7 +216,7 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
        */
       public static int getParameterSteps(Parameterization config) {
         final IntParameter param = new IntParameter(STEPS_ID);
-        param.addConstraint(new GreaterEqualConstraint(1));
+        param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(param)) {
           return param.getValue();
         }

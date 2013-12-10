@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -132,7 +132,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
      * KNN query instance
      */
     private KNNQuery<T, D> knnQuery;
-    
+
     /**
      * Value for k
      */
@@ -204,16 +204,16 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
   public TypeInformation getInputTypeRestriction() {
     return parentDistance.getInputTypeRestriction();
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if(obj == null) {
       return false;
     }
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
-    MinKDistance<?,?> other = (MinKDistance<?, ?>) obj;
+    MinKDistance<?, ?> other = (MinKDistance<?, ?>) obj;
     return this.parentDistance.equals(other.parentDistance) && this.k == other.k;
   }
 
@@ -239,16 +239,16 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(1));
+      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      
+
       final ObjectParameter<DistanceFunction<? super O, D>> parentDistanceP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-      if (config.grab(parentDistanceP)) {
+      if(config.grab(parentDistanceP)) {
         parentDistance = parentDistanceP.instantiateClass(config);
       }
-   }
+    }
 
     @Override
     protected MinKDistance<O, D> makeInstance() {

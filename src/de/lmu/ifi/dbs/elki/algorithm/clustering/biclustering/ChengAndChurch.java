@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -236,31 +236,31 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     protected void visitAll(double[][] mat, int mode, CellVisitor visitor) {
       // For efficiency, we manually iterate over the rows and column bitmasks.
       // This saves repeated shifting needed by the manual bit access.
-      for (int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
+      for(int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
         long rlong = rows[rlpos];
         // Fast skip blocks of 64 masked values.
-        if ((mode == CellVisitor.SELECTED && rlong == 0L) || (mode == CellVisitor.NOT_SELECTED && rlong == -1L)) {
+        if((mode == CellVisitor.SELECTED && rlong == 0L) || (mode == CellVisitor.NOT_SELECTED && rlong == -1L)) {
           rpos += Long.SIZE;
           continue;
         }
-        for (int i = 0; i < Long.SIZE && rpos < rowM.length; ++i, ++rpos, rlong >>>= 1) {
+        for(int i = 0; i < Long.SIZE && rpos < rowM.length; ++i, ++rpos, rlong >>>= 1) {
           boolean rselected = ((rlong & 1L) == 1L);
-          if ((mode == CellVisitor.SELECTED && !rselected) || (mode == CellVisitor.NOT_SELECTED && rselected)) {
+          if((mode == CellVisitor.SELECTED && !rselected) || (mode == CellVisitor.NOT_SELECTED && rselected)) {
             continue;
           }
-          for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
+          for(int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
             long clong = cols[clpos];
-            if ((mode == CellVisitor.SELECTED && clong == 0L) || (mode == CellVisitor.NOT_SELECTED && clong == -1L)) {
+            if((mode == CellVisitor.SELECTED && clong == 0L) || (mode == CellVisitor.NOT_SELECTED && clong == -1L)) {
               cpos += Long.SIZE;
               continue;
             }
-            for (int j = 0; j < Long.SIZE && cpos < colM.length; ++j, ++cpos, clong >>>= 1) {
+            for(int j = 0; j < Long.SIZE && cpos < colM.length; ++j, ++cpos, clong >>>= 1) {
               boolean cselected = ((clong & 1L) == 1L);
-              if ((mode == CellVisitor.SELECTED && !cselected) || (mode == CellVisitor.NOT_SELECTED && cselected)) {
+              if((mode == CellVisitor.SELECTED && !cselected) || (mode == CellVisitor.NOT_SELECTED && cselected)) {
                 continue;
               }
               boolean stop = visitor.visit(mat[rpos][cpos], rpos, cpos, rselected, cselected);
-              if (stop) {
+              if(stop) {
                 return;
               }
             }
@@ -281,27 +281,27 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       boolean cselected = BitsUtil.get(cols, col);
       // For efficiency, we manually iterate over the rows and column bitmasks.
       // This saves repeated shifting needed by the manual bit access.
-      for (int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
+      for(int rpos = 0, rlpos = 0; rlpos < rows.length; ++rlpos) {
         long rlong = rows[rlpos];
         // Fast skip blocks of 64 masked values.
-        if (mode == CellVisitor.SELECTED && rlong == 0L) {
+        if(mode == CellVisitor.SELECTED && rlong == 0L) {
           rpos += Long.SIZE;
           continue;
         }
-        if (mode == CellVisitor.NOT_SELECTED && rlong == -1L) {
+        if(mode == CellVisitor.NOT_SELECTED && rlong == -1L) {
           rpos += Long.SIZE;
           continue;
         }
-        for (int i = 0; i < Long.SIZE && rpos < rowM.length; ++i, ++rpos, rlong >>>= 1) {
+        for(int i = 0; i < Long.SIZE && rpos < rowM.length; ++i, ++rpos, rlong >>>= 1) {
           boolean rselected = ((rlong & 1L) == 1L);
-          if (mode == CellVisitor.SELECTED && !rselected) {
+          if(mode == CellVisitor.SELECTED && !rselected) {
             continue;
           }
-          if (mode == CellVisitor.NOT_SELECTED && rselected) {
+          if(mode == CellVisitor.NOT_SELECTED && rselected) {
             continue;
           }
           boolean stop = visitor.visit(mat[rpos][col], rpos, col, rselected, cselected);
-          if (stop) {
+          if(stop) {
             return;
           }
         }
@@ -318,27 +318,27 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     protected void visitRow(double[][] mat, int row, int mode, CellVisitor visitor) {
       boolean rselected = BitsUtil.get(rows, row);
       final double[] rowdata = mat[row];
-      for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
+      for(int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
         long clong = cols[clpos];
         // Fast skip blocks of 64 masked values.
-        if (mode == CellVisitor.SELECTED && clong == 0L) {
+        if(mode == CellVisitor.SELECTED && clong == 0L) {
           cpos += Long.SIZE;
           continue;
         }
-        if (mode == CellVisitor.NOT_SELECTED && clong == -1L) {
+        if(mode == CellVisitor.NOT_SELECTED && clong == -1L) {
           cpos += Long.SIZE;
           continue;
         }
-        for (int j = 0; j < Long.SIZE && cpos < colM.length; ++j, ++cpos, clong >>>= 1) {
+        for(int j = 0; j < Long.SIZE && cpos < colM.length; ++j, ++cpos, clong >>>= 1) {
           boolean cselected = ((clong & 1L) == 1L);
-          if (mode == CellVisitor.SELECTED && !cselected) {
+          if(mode == CellVisitor.SELECTED && !cselected) {
             continue;
           }
-          if (mode == CellVisitor.NOT_SELECTED && cselected) {
+          if(mode == CellVisitor.NOT_SELECTED && cselected) {
             continue;
           }
           boolean stop = visitor.visit(rowdata[cpos], row, cpos, rselected, cselected);
-          if (stop) {
+          if(stop) {
             return;
           }
         }
@@ -349,13 +349,13 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     private final CellVisitor MEANVISITOR = new CellVisitor() {
       @Override
       public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
-        if (selcol) {
+        if(selcol) {
           rowM[row] += val;
         }
-        if (selrow) {
+        if(selrow) {
           colM[col] += val;
         }
-        if (selcol && selrow) {
+        if(selcol && selrow) {
           allM += val;
         }
         return false;
@@ -499,10 +499,11 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
      * @param set Value to set
      */
     protected void selectColumn(int cnum, boolean set) {
-      if (set) {
+      if(set) {
         BitsUtil.setI(cols, cnum);
         colcard++;
-      } else {
+      }
+      else {
         BitsUtil.clearI(cols, cnum);
         colcard--;
       }
@@ -515,10 +516,11 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
      * @param set Value to set
      */
     protected void selectRow(int rnum, boolean set) {
-      if (set) {
+      if(set) {
         BitsUtil.setI(rows, rnum);
         rowcard++;
-      } else {
+      }
+      else {
         BitsUtil.clearI(rows, rnum);
         rowcard--;
       }
@@ -539,18 +541,18 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     ModifiableDBIDs noise = DBIDUtil.newHashSet(relation.getDBIDs());
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Extracting Cluster", n, LOG) : null;
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       cand.reset();
       multipleNodeDeletion(mat, cand);
-      if (LOG.isVeryVerbose()) {
+      if(LOG.isVeryVerbose()) {
         LOG.veryverbose("Residue after Alg 2: " + cand.residue + " " + cand.rowcard + "x" + cand.colcard);
       }
       singleNodeDeletion(mat, cand);
-      if (LOG.isVeryVerbose()) {
+      if(LOG.isVeryVerbose()) {
         LOG.veryverbose("Residue after Alg 1: " + cand.residue + " " + cand.rowcard + "x" + cand.colcard);
       }
       nodeAddition(mat, cand);
-      if (LOG.isVeryVerbose()) {
+      if(LOG.isVeryVerbose()) {
         LOG.veryverbose("Residue after Alg 3: " + cand.residue + " " + cand.rowcard + "x" + cand.colcard);
       }
       cand.maskMatrix(mat, dist);
@@ -559,24 +561,24 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       noise.removeDBIDs(cids);
       result.addToplevelCluster(new Cluster<>(cids, model));
 
-      if (LOG.isVerbose()) {
+      if(LOG.isVerbose()) {
         LOG.verbose("Score of bicluster " + (i + 1) + ": " + cand.residue + "\n");
         LOG.verbose("Number of rows: " + cand.rowcard + "\n");
         LOG.verbose("Number of columns: " + cand.colcard + "\n");
         // LOG.verbose("Total number of masked values: " + maskedVals.size() +
         // "\n");
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
     // Add a noise cluster, full-dimensional.
-    if (!noise.isEmpty()) {
+    if(!noise.isEmpty()) {
       long[] allcols = BitsUtil.ones(getColDim());
       BiclusterWithInversionsModel model = new BiclusterWithInversionsModel(colsBitsetToIDs(allcols), DBIDUtil.EMPTYDBIDS);
       result.addToplevelCluster(new Cluster<>(noise, true, model));
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(LOG);
     }
     return result;
@@ -594,19 +596,19 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    */
   private void singleNodeDeletion(final double[][] mat, final BiclusterCandidate cand) {
     // Assume that cand.residue is up to date!
-    while (cand.residue > delta && (cand.colcard > 2 || cand.rowcard > 2)) {
+    while(cand.residue > delta && (cand.colcard > 2 || cand.rowcard > 2)) {
       // Store current maximum. Need final mutable, so use arrays.
       final double[] max = { Double.NEGATIVE_INFINITY };
       final int[] best = { -1, -1 };
 
       // Test rows
-      if (cand.rowcard > 2) {
+      if(cand.rowcard > 2) {
         cand.visitColumn(mat, 0, CellVisitor.SELECTED, new CellVisitor() {
           @Override
           public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
             assert (selrow);
             double rowResidue = cand.computeRowResidue(mat, row, false);
-            if (max[0] < rowResidue) {
+            if(max[0] < rowResidue) {
               max[0] = rowResidue;
               best[0] = row;
             }
@@ -616,13 +618,13 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       }
 
       // Test columns:
-      if (cand.colcard > 2) {
+      if(cand.colcard > 2) {
         cand.visitRow(mat, 0, CellVisitor.SELECTED, new CellVisitor() {
           @Override
           public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
             assert (selcol);
             double colResidue = cand.computeColResidue(mat, col);
-            if (max[0] < colResidue) {
+            if(max[0] < colResidue) {
               max[0] = colResidue;
               best[1] = col;
             }
@@ -631,16 +633,17 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         });
       }
 
-      if (best[1] >= 0) { // then override bestrow!
+      if(best[1] >= 0) { // then override bestrow!
         cand.selectColumn(best[1], false);
-      } else {
+      }
+      else {
         assert (best[0] >= 0);
         cand.selectRow(best[0], false);
       }
       // TODO: incremental update could be much faster?
       cand.updateRowAndColumnMeans(mat, false);
       cand.computeMeanSquaredDeviation(mat);
-      if (LOG.isDebuggingFine()) {
+      if(LOG.isDebuggingFine()) {
         LOG.debugFine("Residue in Alg 1: " + cand.residue + " " + cand.rowcard + "x" + cand.colcard);
       }
     }
@@ -662,17 +665,17 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     cand.computeMeanSquaredDeviation(mat);
 
     // Note: assumes that cand.residue = H(I,J)
-    while (cand.residue > delta) {
+    while(cand.residue > delta) {
       final boolean[] modified = { false, false };
 
       // Step 2: remove rows above threshold
-      if (cand.rowcard > MIN_ROW_REMOVE_THRESHOLD) {
+      if(cand.rowcard > MIN_ROW_REMOVE_THRESHOLD) {
         final double alphaResidue = alpha * cand.residue;
         cand.visitColumn(mat, 0, CellVisitor.SELECTED, new CellVisitor() {
           @Override
           public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
             assert (selrow);
-            if (cand.computeRowResidue(mat, row, false) > alphaResidue) {
+            if(cand.computeRowResidue(mat, row, false) > alphaResidue) {
               cand.selectRow(row, false);
               modified[0] = true;
             }
@@ -681,37 +684,37 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         });
 
         // Step 3: update residue
-        if (modified[0]) {
+        if(modified[0]) {
           cand.updateRowAndColumnMeans(mat, false);
           cand.computeMeanSquaredDeviation(mat);
         }
       }
 
       // Step 4: remove columns above threshold
-      if (cand.colcard > MIN_COLUMN_REMOVE_THRESHOLD) {
+      if(cand.colcard > MIN_COLUMN_REMOVE_THRESHOLD) {
         final double alphaResidue = alpha * cand.residue;
         cand.visitRow(mat, 0, CellVisitor.SELECTED, new CellVisitor() {
           @Override
           public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
             assert (selcol);
-            if (cand.computeColResidue(mat, col) > alphaResidue) {
+            if(cand.computeColResidue(mat, col) > alphaResidue) {
               cand.selectColumn(col, false);
               modified[1] = true;
             }
             return (cand.colcard > MIN_COLUMN_REMOVE_THRESHOLD);
           }
         });
-        if (modified[1]) {
+        if(modified[1]) {
           cand.updateRowAndColumnMeans(mat, false);
           cand.computeMeanSquaredDeviation(mat);
         }
       }
 
-      if (LOG.isDebuggingFine()) {
+      if(LOG.isDebuggingFine()) {
         LOG.debugFine("Residue in Alg 2: " + cand.residue + " " + cand.rowcard + "x" + cand.colcard);
       }
       // Step 5: if nothing has been removed, try removing single nodes.
-      if (!modified[0] && !modified[1]) {
+      if(!modified[0] && !modified[1]) {
         break;
         // Will be executed next in main loop, as per algorithm 4.
         // singleNodeDeletion();
@@ -732,7 +735,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   private void nodeAddition(final double[][] mat, final BiclusterCandidate cand) {
     cand.updateRowAndColumnMeans(mat, true);
     cand.computeMeanSquaredDeviation(mat);
-    while (true) {
+    while(true) {
       // We need this to be final + mutable
       final boolean[] added = new boolean[] { false, false };
 
@@ -741,7 +744,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         @Override
         public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
           assert (!selcol);
-          if (cand.computeColResidue(mat, col) <= cand.residue) {
+          if(cand.computeColResidue(mat, col) <= cand.residue) {
             cand.selectColumn(col, true);
             added[0] = true;
           }
@@ -750,7 +753,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       });
 
       // Step 3: recompute values
-      if (added[0]) {
+      if(added[0]) {
         cand.updateRowAndColumnMeans(mat, true);
         cand.computeMeanSquaredDeviation(mat);
       }
@@ -760,7 +763,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         @Override
         public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
           assert (!selrow);
-          if (cand.computeRowResidue(mat, row, false) <= cand.residue) {
+          if(cand.computeRowResidue(mat, row, false) <= cand.residue) {
             cand.selectRow(row, true);
             added[1] = true;
           }
@@ -769,12 +772,12 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       });
 
       // Step 5: try adding inverted rows.
-      if (useinverted) {
+      if(useinverted) {
         cand.visitColumn(mat, 0, CellVisitor.NOT_SELECTED, new CellVisitor() {
           @Override
           public boolean visit(double val, int row, int col, boolean selrow, boolean selcol) {
             assert (!selrow);
-            if (cand.computeRowResidue(mat, row, true) <= cand.residue) {
+            if(cand.computeRowResidue(mat, row, true) <= cand.residue) {
               cand.selectRow(row, true);
               cand.invertRow(row, true);
               added[1] = true;
@@ -783,14 +786,14 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
           }
         });
       }
-      if (added[1]) {
+      if(added[1]) {
         cand.updateRowAndColumnMeans(mat, true);
         cand.computeMeanSquaredDeviation(mat);
-        if (LOG.isDebuggingFine()) {
+        if(LOG.isDebuggingFine()) {
           LOG.debugFine("Residue in Alg 3: " + cand.residue + " " + cand.rowcard + "x" + cand.colcard);
         }
       }
-      if (!added[0] && !added[1]) {
+      if(!added[0] && !added[1]) {
         break;
       }
     }
@@ -879,25 +882,25 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID);
-      if (config.grab(deltaP)) {
+      if(config.grab(deltaP)) {
         delta = deltaP.doubleValue();
       }
-      deltaP.addConstraint(new GreaterEqualConstraint(0.));
+      deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
 
       IntParameter nP = new IntParameter(N_ID, 1);
-      nP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(nP)) {
+      nP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(nP)) {
         n = nP.intValue();
       }
 
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.);
-      alphaP.addConstraint(new GreaterEqualConstraint(1.));
-      if (config.grab(alphaP)) {
+      alphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+      if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
 
       ObjectParameter<Distribution> distP = new ObjectParameter<>(DIST_ID, Distribution.class, UniformDistribution.class);
-      if (config.grab(distP)) {
+      if(config.grab(distP)) {
         dist = distP.instantiateClass(config);
       }
     }

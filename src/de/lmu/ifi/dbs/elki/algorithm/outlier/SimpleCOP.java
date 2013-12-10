@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -123,7 +123,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
     {// compute neighbors of each db object
       FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), LOG) : null;
       double sqrt2 = Math.sqrt(2.0);
-      for (DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
+      for(DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
         KNNList<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);
         nids.remove(id);
@@ -147,11 +147,11 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
 
         cop_sol.put(id, depsol);
 
-        if (progressLocalPCA != null) {
+        if(progressLocalPCA != null) {
           progressLocalPCA.incrementProcessed(LOG);
         }
       }
-      if (progressLocalPCA != null) {
+      if(progressLocalPCA != null) {
         progressLocalPCA.ensureCompleted(LOG);
       }
     }
@@ -218,12 +218,12 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(kP)) {
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
         k = kP.intValue();
       }
       ObjectParameter<PCAFilteredRunner<V>> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
-      if (config.grab(pcaP)) {
+      if(config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
       }
     }

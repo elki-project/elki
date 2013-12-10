@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -98,7 +98,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
     DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     MeanVariance ksize = new MeanVariance();
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("Approximating nearest neighbor lists to database objects");
     }
 
@@ -106,19 +106,20 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
     ArrayDBIDs[] parts = DBIDUtil.randomSplit(relation.getDBIDs(), partitions, rnd);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, LOG) : null;
-    for (int part = 0; part < partitions; part++) {
+    for(int part = 0; part < partitions; part++) {
       final ArrayDBIDs ids = parts[part];
       final int size = ids.size();
       HashMap<DBIDPair, D> cache = new HashMap<>((size * size * 3) >> 3);
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         KNNHeap<D> kNN = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
-        for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+        for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           DBIDPair key = DBIDUtil.newPair(iter, iter2);
           D d = cache.remove(key);
-          if (d != null) {
+          if(d != null) {
             // consume the previous result.
             kNN.add(d, iter2);
-          } else {
+          }
+          else {
             // compute new and store the previous result.
             d = distanceQuery.distance(iter, iter2);
             kNN.add(d, iter2);
@@ -130,19 +131,19 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
         ksize.put(kNN.size());
         storage.put(iter, kNN.toKNNList());
       }
-      if (LOG.isDebugging()) {
-        if (cache.size() > 0) {
+      if(LOG.isDebugging()) {
+        if(cache.size() > 0) {
           LOG.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
         }
       }
-      if (progress != null) {
+      if(progress != null) {
         progress.incrementProcessed(LOG);
       }
     }
-    if (progress != null) {
+    if(progress != null) {
       progress.ensureCompleted(LOG);
     }
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
     }
   }
@@ -249,12 +250,12 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         final IntParameter partitionsP = new IntParameter(PARTITIONS_ID);
-        partitionsP.addConstraint(new GreaterConstraint(1));
-        if (config.grab(partitionsP)) {
+        partitionsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+        if(config.grab(partitionsP)) {
           partitions = partitionsP.getValue();
         }
         RandomParameter rndP = new RandomParameter(SEED_ID);
-        if (config.grab(rndP)) {
+        if(config.grab(rndP)) {
           rnd = rndP.getValue();
         }
       }

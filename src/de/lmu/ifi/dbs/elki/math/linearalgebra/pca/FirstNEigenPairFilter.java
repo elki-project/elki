@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -122,7 +122,7 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter nP = new IntParameter(EIGENPAIR_FILTER_N);
-      nP.addConstraint(new GreaterEqualConstraint(0));
+      nP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(nP)) {
         n = nP.intValue();
       }

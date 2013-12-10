@@ -56,8 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -594,14 +593,14 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter xsiP = new IntParameter(XSI_ID);
-      xsiP.addConstraint(new GreaterConstraint(0));
+      xsiP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(xsiP)) {
         xsi = xsiP.intValue();
       }
 
       DoubleParameter tauP = new DoubleParameter(TAU_ID);
-      tauP.addConstraint(new GreaterConstraint(0));
-      tauP.addConstraint(new LessConstraint(1));
+      tauP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      tauP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(tauP)) {
         tau = tauP.doubleValue();
       }

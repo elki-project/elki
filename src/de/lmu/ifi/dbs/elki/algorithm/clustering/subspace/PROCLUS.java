@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -844,7 +844,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       configL(config);
 
       IntParameter m_iP = new IntParameter(M_I_ID, 10);
-      m_iP.addConstraint(new GreaterConstraint(0));
+      m_iP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if (config.grab(m_iP)) {
         m_i = m_iP.getValue();
       }

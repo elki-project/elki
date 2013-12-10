@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -119,9 +119,9 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation, subset, matrix);
 
     // compute two-element sets of subspaces
-    for (int x = 0; x < dim; x++) {
+    for(int x = 0; x < dim; x++) {
       final int i = matrix.dim(x);
-      for (int y = x + 1; y < dim; y++) {
+      for(int y = x + 1; y < dim; y++) {
         final int j = matrix.dim(y);
         matrix.set(x, y, calculateContrast(relation, subset, subspaceIndex.get(x), subspaceIndex.get(y), i, j, random));
       }
@@ -143,7 +143,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
     ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<>(dim);
 
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       ArrayModifiableDBIDs amDBIDs = DBIDUtil.newArray(ids);
       comp.setDimension(matrix.dim(i));
       amDBIDs.sort(comp);
@@ -172,15 +172,16 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
     // TODO: speed up by keeping marginal distributions prepared.
     // Instead of doing the random switch, do half-half.
     double deviationSum = 0.0;
-    for (int i = 0; i < m; i++) {
+    for(int i = 0; i < m; i++) {
       // Randomly switch dimensions
       final int cdim1;
       ArrayDBIDs cindex1, cindex2;
-      if (random.nextDouble() > .5) {
+      if(random.nextDouble() > .5) {
         cdim1 = dim1;
         cindex1 = subspaceIndex1;
         cindex2 = subspaceIndex2;
-      } else {
+      }
+      else {
         cdim1 = dim2;
         cindex1 = subspaceIndex2;
         cindex2 = subspaceIndex1;
@@ -189,7 +190,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
       DBIDArrayIter iter = cindex2.iter();
       HashSetModifiableDBIDs conditionalSample = DBIDUtil.newHashSet();
       iter.seek(random.nextInt(subset.size() - windowsize));
-      for (int k = 0; k < windowsize && iter.valid(); k++, iter.advance()) {
+      for(int k = 0; k < windowsize && iter.valid(); k++, iter.advance()) {
         conditionalSample.add(iter);
       }
       // Project the data
@@ -198,10 +199,10 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
       {
         int l = 0, s = 0;
         // Note: we use the sorted index sets.
-        for (DBIDIter id = cindex1.iter(); id.valid(); id.advance(), l++) {
+        for(DBIDIter id = cindex1.iter(); id.valid(); id.advance(), l++) {
           final double val = relation.get(id).doubleValue(cdim1);
           fullValues[l] = val;
-          if (conditionalSample.contains(id)) {
+          if(conditionalSample.contains(id)) {
             sampleValues[s] = val;
             s++;
           }
@@ -209,7 +210,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
         assert (s == conditionalSample.size());
       }
       double contrast = statTest.deviation(fullValues, sampleValues);
-      if (Double.isNaN(contrast)) {
+      if(Double.isNaN(contrast)) {
         i--;
         continue;
       }
@@ -254,24 +255,24 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter mP = new IntParameter(HiCS.Parameterizer.M_ID, 50);
-      mP.addConstraint(new GreaterConstraint(1));
-      if (config.grab(mP)) {
+      mP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(mP)) {
         m = mP.intValue();
       }
 
       final DoubleParameter alphaP = new DoubleParameter(HiCS.Parameterizer.ALPHA_ID, 0.1);
-      alphaP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(alphaP)) {
+      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
 
       final ObjectParameter<GoodnessOfFitTest> testP = new ObjectParameter<>(HiCS.Parameterizer.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
-      if (config.grab(testP)) {
+      if(config.grab(testP)) {
         statTest = testP.instantiateClass(config);
       }
 
       final RandomParameter rndP = new RandomParameter(HiCS.Parameterizer.SEED_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }

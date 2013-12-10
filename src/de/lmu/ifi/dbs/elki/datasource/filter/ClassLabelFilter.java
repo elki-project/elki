@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -94,10 +94,10 @@ public class ClassLabelFilter implements ObjectFilter {
     // Find a labellist column
     boolean done = false;
     boolean keeplabelcol = false;
-    for (int i = 0; i < objects.metaLength(); i++) {
+    for(int i = 0; i < objects.metaLength(); i++) {
       SimpleTypeInformation<?> meta = objects.meta(i);
       // Skip non-labellist columns - or if we already had a labellist
-      if (done || !LabelList.class.equals(meta.getRestrictionClass())) {
+      if(done || !LabelList.class.equals(meta.getRestrictionClass())) {
         bundle.appendColumn(meta, objects.getColumn(i));
         continue;
       }
@@ -108,27 +108,29 @@ public class ClassLabelFilter implements ObjectFilter {
       List<LabelList> lblcol = new ArrayList<>(objects.dataLength());
 
       // Split the column
-      for (Object obj : objects.getColumn(i)) {
-        if (obj != null) {
+      for(Object obj : objects.getColumn(i)) {
+        if(obj != null) {
           LabelList ll = (LabelList) obj;
           try {
             ClassLabel lbl = classLabelFactory.makeFromString(ll.remove(classLabelIndex));
             clscol.add(lbl);
-          } catch (Exception e) {
+          }
+          catch(Exception e) {
             throw new AbortException("Cannot initialize class labels: " + e.getMessage(), e);
           }
           lblcol.add(ll);
-          if (ll.size() > 0) {
+          if(ll.size() > 0) {
             keeplabelcol = true;
           }
-        } else {
+        }
+        else {
           clscol.add(null);
           lblcol.add(null);
         }
       }
       bundle.appendColumn(classLabelFactory.getTypeInformation(), clscol);
       // Only add the label column when it's not empty.
-      if (keeplabelcol) {
+      if(keeplabelcol) {
         bundle.appendColumn(meta, lblcol);
       }
     }
@@ -159,12 +161,12 @@ public class ClassLabelFilter implements ObjectFilter {
       super.makeOptions(config);
       // parameter class label index
       final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID);
-      classLabelIndexParam.addConstraint(new GreaterEqualConstraint(0));
+      classLabelIndexParam.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       final ObjectParameter<ClassLabel.Factory<?>> classlabelClassParam = new ObjectParameter<>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
 
       config.grab(classLabelIndexParam);
       config.grab(classlabelClassParam);
-      if (classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
+      if(classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
         classLabelIndex = classLabelIndexParam.intValue();
         classLabelFactory = classlabelClassParam.instantiateClass(config);
       }

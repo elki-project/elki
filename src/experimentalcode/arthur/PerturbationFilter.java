@@ -36,9 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -387,8 +386,8 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
         noisedistribution = noisedistributionP.getValue();
       }
       DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, .01);
-      percentageP.addConstraint(new GreaterConstraint(0));
-      percentageP.addConstraint(new LessEqualConstraint(1));
+      percentageP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      percentageP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if (config.grab(percentageP)) {
         percentage = percentageP.getValue();
       }

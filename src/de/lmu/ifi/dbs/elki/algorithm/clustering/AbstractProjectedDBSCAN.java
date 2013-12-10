@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -294,7 +294,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
     ModifiableDBIDs seeds = DBIDUtil.newHashSet();
-    for (DistanceDBIDListIter<DoubleDistance> seed = neighbors.iter(); seed.valid(); seed.advance()) {
+    for(DistanceDBIDListIter<DoubleDistance> seed = neighbors.iter(); seed.valid(); seed.advance()) {
       int nextID_corrDim = distFunc.getIndex().getLocalProjection(seed).getCorrelationDimension();
       // nextID is not reachable from start object
       if(nextID_corrDim > lambda) {
@@ -322,9 +322,9 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
 
       DistanceDBIDList<DoubleDistance> reachables = rangeQuery.getRangeForDBID(iter, epsilon);
       iter.remove();
-      
+
       if(reachables.size() > minpts) {
-        for (DistanceDBIDListIter<DoubleDistance> r = reachables.iter(); r.valid(); r.advance()) {
+        for(DistanceDBIDListIter<DoubleDistance> r = reachables.iter(); r.valid(); r.advance()) {
           int corrDim_r = distFunc.getIndex().getLocalProjection(r).getCorrelationDimension();
           // r is not reachable from q
           if(corrDim_r > lambda) {
@@ -351,9 +351,10 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
         }
       }
 
-      /* if(processedIDs.size() == relation.size() && noise.size() == 0) {
-        break;
-      } */
+      /*
+       * if(processedIDs.size() == relation.size() && noise.size() == 0) {
+       * break; }
+       */
     }
 
     if(currentCluster.size() >= minpts) {
@@ -375,7 +376,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(distanceFunction.getInputTypeRestriction());
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -411,7 +412,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
 
     protected void configMinPts(Parameterization config) {
       IntParameter minptsP = new IntParameter(MINPTS_ID);
-      minptsP.addConstraint(new GreaterConstraint(0));
+      minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }
@@ -435,7 +436,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
 
     protected void configLambda(Parameterization config) {
       IntParameter lambdaP = new IntParameter(LAMBDA_ID);
-      lambdaP.addConstraint(new GreaterConstraint(0));
+      lambdaP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(lambdaP)) {
         lambda = lambdaP.getValue();
       }

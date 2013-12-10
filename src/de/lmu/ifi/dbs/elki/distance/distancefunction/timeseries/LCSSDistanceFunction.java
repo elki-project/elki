@@ -34,8 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -219,15 +218,15 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, 0.1);
-      pDeltaP.addConstraint(new GreaterEqualConstraint(0));
-      pDeltaP.addConstraint(new LessEqualConstraint(1));
+      pDeltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      pDeltaP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if (config.grab(pDeltaP)) {
         pDelta = pDeltaP.doubleValue();
       }
 
       final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, 0.05);
-      pEpsilonP.addConstraint(new GreaterEqualConstraint(0));
-      pEpsilonP.addConstraint(new LessEqualConstraint(1));
+      pEpsilonP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      pEpsilonP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if (config.grab(pEpsilonP)) {
         pEpsilon = pEpsilonP.doubleValue();
       }

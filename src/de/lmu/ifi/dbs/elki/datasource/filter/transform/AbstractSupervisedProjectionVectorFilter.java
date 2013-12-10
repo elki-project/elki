@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -79,23 +79,23 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
     final int dataLength = objects.dataLength();
-    if (dataLength == 0) {
+    if(dataLength == 0) {
       return objects;
     }
 
     List<? extends ClassLabel> classcolumn = null;
     // First of all, identify a class label column.
-    for (int r = 0; r < objects.metaLength(); r++) {
+    for(int r = 0; r < objects.metaLength(); r++) {
       SimpleTypeInformation<?> type = objects.meta(r);
       List<?> column = objects.getColumn(r);
-      if (TypeUtil.CLASSLABEL.isAssignableFromType(type)) {
+      if(TypeUtil.CLASSLABEL.isAssignableFromType(type)) {
         @SuppressWarnings("unchecked")
         final List<? extends ClassLabel> castcolumn = (List<? extends ClassLabel>) column;
         classcolumn = castcolumn;
         break;
       }
     }
-    if (classcolumn == null) {
+    if(classcolumn == null) {
       getLogger().warning("No class label column found (try " + ClassLabelFilter.class.getSimpleName() + ") -- cannot run " + this.getClass().getSimpleName());
       return objects;
     }
@@ -103,10 +103,10 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
     boolean somesuccess = false;
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     // Secondly, look for columns to train the projection on.
-    for (int r = 0; r < objects.metaLength(); r++) {
+    for(int r = 0; r < objects.metaLength(); r++) {
       SimpleTypeInformation<?> type = objects.meta(r);
       List<?> column = objects.getColumn(r);
-      if (!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
         bundle.appendColumn(type, column);
         continue;
       }
@@ -117,8 +117,8 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
       NumberVector.Factory<V, ?> factory = (NumberVector.Factory<V, ?>) vtype.getFactory();
       int dim = vtype.getDimensionality();
 
-      if (tdim > dim) {
-        if (getLogger().isVerbose()) {
+      if(tdim > dim) {
+        if(getLogger().isVerbose()) {
           getLogger().verbose("Setting projection dimension to original dimension: projection dimension: " + tdim + " larger than original dimension: " + dim);
         }
         tdim = dim;
@@ -126,21 +126,22 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
 
       try {
         Matrix proj = computeProjectionMatrix(vectorcolumn, classcolumn, dim);
-        for (int i = 0; i < dataLength; i++) {
+        for(int i = 0; i < dataLength; i++) {
           final Vector pv = proj.times(vectorcolumn.get(i).getColumnVector());
           V filteredObj = factory.newNumberVector(pv, ArrayLikeUtil.VECTORADAPTER);
           vectorcolumn.set(i, filteredObj);
         }
         bundle.appendColumn(convertedType(type, factory), column);
         somesuccess = true;
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         getLogger().error("Projection failed -- continuing with unprojected data!", e);
         bundle.appendColumn(type, column);
         continue;
       }
     }
 
-    if (!somesuccess) {
+    if(!somesuccess) {
       getLogger().warning("No vector field of fixed dimensionality found.");
       return objects;
     }
@@ -184,10 +185,10 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
   protected <O> Map<O, TIntList> partition(List<? extends O> classcolumn) {
     Map<O, TIntList> classes = new HashMap<>();
     Iterator<? extends O> iter = classcolumn.iterator();
-    for (int i = 0; iter.hasNext(); i++) {
+    for(int i = 0; iter.hasNext(); i++) {
       O lbl = iter.next();
       TIntList ids = classes.get(lbl);
-      if (ids == null) {
+      if(ids == null) {
         ids = new TIntArrayList();
         classes.put(lbl, ids);
       }
@@ -220,9 +221,9 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter dimP = new IntParameter(P_ID, 2);
-      dimP.addConstraint(new GreaterConstraint(0));
+      dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
 
-      if (config.grab(dimP)) {
+      if(config.grab(dimP)) {
         tdim = dimP.getValue();
       }
     }

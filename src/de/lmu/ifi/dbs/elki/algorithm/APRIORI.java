@@ -44,8 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -296,7 +295,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
   }
-  
+
   @Override
   protected Logging getLogger() {
     return LOG;
@@ -325,15 +324,15 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       super.makeOptions(config);
       DoubleParameter minfreqP = new DoubleParameter(MINFREQ_ID);
       minfreqP.setOptional(true);
-      minfreqP.addConstraint(new GreaterEqualConstraint(0));
-      minfreqP.addConstraint(new LessEqualConstraint(1));
+      minfreqP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      minfreqP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(minfreqP)) {
         minfreq = minfreqP.getValue();
       }
 
       IntParameter minsuppP = new IntParameter(MINSUPP_ID);
       minsuppP.setOptional(true);
-      minsuppP.addConstraint(new GreaterEqualConstraint(0));
+      minsuppP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(minsuppP)) {
         minsupp = minsuppP.getValue();
       }

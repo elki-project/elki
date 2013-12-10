@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -142,7 +142,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // density
     WritableDoubleDataStore density = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // init knns and rnns
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       knns.put(iditer, DBIDUtil.newArray());
       rnns.put(iditer, DBIDUtil.newArray());
     }
@@ -150,10 +150,10 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // TODO: use kNN preprocessor?
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
 
-    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+    for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       // if not visited count=0
       int count = rnns.get(id).size();
-      if (!processedIDs.contains(id)) {
+      if(!processedIDs.contains(id)) {
         // TODO: use exactly k neighbors?
         KNNList<D> list = knnQuery.getKNNForDBID(id, k);
         knns.get(id).addDBIDs(list);
@@ -162,8 +162,8 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
 
       }
       ModifiableDBIDs s = knns.get(id);
-      for (DBIDIter q = knns.get(id).iter(); q.valid(); q.advance()) {
-        if (!processedIDs.contains(q)) {
+      for(DBIDIter q = knns.get(id).iter(); q.valid(); q.advance()) {
+        if(!processedIDs.contains(q)) {
           // TODO: use exactly k neighbors?
           KNNList<D> listQ = knnQuery.getKNNForDBID(q, k);
           knns.get(q).addDBIDs(listQ);
@@ -171,13 +171,13 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
           processedIDs.add(q);
         }
 
-        if (knns.get(q).contains(id)) {
+        if(knns.get(q).contains(id)) {
           rnns.get(q).add(id);
           rnns.get(id).add(q);
           count++;
         }
       }
-      if (count >= s.size() * m) {
+      if(count >= s.size() * m) {
         pruned.add(id);
       }
     }
@@ -186,15 +186,15 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // IF Object is pruned INFLO=1.0
     DoubleMinMax inflominmax = new DoubleMinMax();
     WritableDoubleDataStore inflos = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-      if (!pruned.contains(id)) {
+    for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+      if(!pruned.contains(id)) {
         ModifiableDBIDs knn = knns.get(id);
         ModifiableDBIDs rnn = rnns.get(id);
 
         double denP = density.doubleValue(id);
         knn.addDBIDs(rnn);
         Mean mean = new Mean();
-        for (DBIDIter iter = knn.iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = knn.iter(); iter.valid(); iter.advance()) {
           mean.put(density.doubleValue(iter));
         }
         double den = mean.getMean() / denP;
@@ -203,7 +203,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
         inflominmax.put(den);
 
       }
-      if (pruned.contains(id)) {
+      if(pruned.contains(id)) {
         inflos.putDouble(id, 1.0);
         inflominmax.put(1.0);
       }
@@ -241,14 +241,14 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter mP = new DoubleParameter(M_ID, 1.0);
-      mP.addConstraint(new GreaterConstraint(0.0));
-      if (config.grab(mP)) {
+      mP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(mP)) {
         m = mP.doubleValue();
       }
 
       final IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(1));
-      if (config.grab(kP)) {
+      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(kP)) {
         k = kP.intValue();
       }
     }

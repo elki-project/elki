@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -134,7 +134,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
       // The super class has the distance function parameter!
       super.makeOptions(config);
       IntParameter kParam = new IntParameter(K_ID);
-      kParam.addConstraint(new GreaterConstraint(1));
+      kParam.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kParam)) {
         k = kParam.getValue();
       }

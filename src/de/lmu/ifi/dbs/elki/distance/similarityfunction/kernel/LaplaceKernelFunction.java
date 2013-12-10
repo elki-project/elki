@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanc
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorDoubleSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -57,7 +57,7 @@ public class LaplaceKernelFunction extends AbstractVectorDoubleSimilarityFunctio
   public double doubleSimilarity(NumberVector<?> o1, NumberVector<?> o2) {
     final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(o1, o2);
     double sim = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double v = o1.doubleValue(i) - o2.doubleValue(i);
       sim += v * v;
     }
@@ -86,8 +86,8 @@ public class LaplaceKernelFunction extends AbstractVectorDoubleSimilarityFunctio
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter sigmaP = new DoubleParameter(SIGMA_ID, 1.);
-      sigmaP.addConstraint(new GreaterConstraint(0.));
-      if (config.grab(sigmaP)) {
+      sigmaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(sigmaP)) {
         sigma = sigmaP.doubleValue();
       }
     }

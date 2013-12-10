@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -135,13 +135,13 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
 
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing kNN", relation.size(), LOG) : null;
 
-      for (DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final KNNList<D> nn = knnQ.getKNNForDBID(it, k);
         final int nnsize = nn.size();
 
         // Grow the buffer when needed:
-        if (nnsize * 12 + 10 > bufsize) {
-          while (nnsize * 12 + 10 > bufsize) {
+        if(nnsize * 12 + 10 > bufsize) {
+          while(nnsize * 12 + 10 > bufsize) {
             bufsize <<= 1;
           }
           buffer = ByteBuffer.allocateDirect(bufsize);
@@ -151,32 +151,34 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
         ByteArrayUtil.writeUnsignedVarint(buffer, it.internalGetIndex());
         ByteArrayUtil.writeUnsignedVarint(buffer, nnsize);
         int c = 0;
-        if (nn instanceof DoubleDistanceDBIDList) {
-          for (DoubleDistanceDBIDListIter ni = ((DoubleDistanceDBIDList) nn).iter(); ni.valid(); ni.advance(), c++) {
+        if(nn instanceof DoubleDistanceDBIDList) {
+          for(DoubleDistanceDBIDListIter ni = ((DoubleDistanceDBIDList) nn).iter(); ni.valid(); ni.advance(), c++) {
             ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
             buffer.putDouble(ni.doubleDistance());
           }
-        } else {
-          for (DistanceDBIDListIter<D> ni = nn.iter(); ni.valid(); ni.advance(), c++) {
+        }
+        else {
+          for(DistanceDBIDListIter<D> ni = nn.iter(); ni.valid(); ni.advance(), c++) {
             ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
             buffer.putDouble(ni.getDistance().doubleValue());
           }
         }
-        if (c != nn.size()) {
+        if(c != nn.size()) {
           throw new AbortException("Sizes did not agree. Cache is invalid.");
         }
 
         buffer.flip();
         channel.write(buffer);
-        if (prog != null) {
+        if(prog != null) {
           prog.incrementProcessed(LOG);
         }
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.ensureCompleted(LOG);
       }
       lock.release();
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       LOG.exception(e);
     }
     // FIXME: close!
@@ -240,17 +242,17 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
       input = config.tryInstantiate(InputStep.class);
       // Distance function parameter
       final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
-      if (config.grab(dpar)) {
+      if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
       final IntParameter kpar = new IntParameter(K_ID);
-      kpar.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(kpar)) {
+      kpar.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kpar)) {
         k = kpar.intValue();
       }
       // Output file parameter
       final FileParameter cpar = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
-      if (config.grab(cpar)) {
+      if(config.grab(cpar)) {
         out = cpar.getValue();
       }
     }

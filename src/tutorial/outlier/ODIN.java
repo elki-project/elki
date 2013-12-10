@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -182,7 +182,7 @@ public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorit
       // Since in a database context, the 1 nearest neighbor
       // will usually be the query object itself, we require
       // this value to be at least 2.
-      param.addConstraint(new GreaterConstraint(1));
+      param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if (config.grab(param)) {
         k = param.intValue();
       }

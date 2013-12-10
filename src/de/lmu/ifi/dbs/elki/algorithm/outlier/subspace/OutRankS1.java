@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -186,7 +186,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
         algorithm = algP.instantiateClass(config);
       }
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.25);
-      alphaP.addConstraint(new GreaterConstraint(0));
+      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if (config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -132,29 +132,30 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
     // Priority queue for candidates
     ComparableMinHeap<DoubleDBIDPair> candidates = new ComparableMinHeap<>(relation.size());
     // get Candidate Ranking
-    for (DBIDIter pA = relation.iterDBIDs(); pA.valid(); pA.advance()) {
+    for(DBIDIter pA = relation.iterDBIDs(); pA.valid(); pA.advance()) {
       // Compute nearest neighbors and distances.
       nn.clear();
       double simAA = kernelMatrix.getSimilarity(pA, pA);
       // Sum of 1./(|AB|) and 1./(|AB|^2); for computing R2.
       double sumid = 0., sumisqd = 0.;
-      for (DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
-        if (DBIDUtil.equal(nB, pA)) {
+      for(DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
+        if(DBIDUtil.equal(nB, pA)) {
           continue;
         }
         double simBB = kernelMatrix.getSimilarity(nB, nB);
         double simAB = kernelMatrix.getSimilarity(pA, nB);
         double sqdAB = simAA + simBB - simAB - simAB;
         sqDists.putDouble(nB, sqdAB);
-        if (!(sqdAB > 0.)) {
+        if(!(sqdAB > 0.)) {
           continue;
         }
         sumid += 1. / Math.sqrt(sqdAB);
         sumisqd += 1. / sqdAB;
         // Update heap
-        if (nn.size() < k) {
+        if(nn.size() < k) {
           nn.add(DBIDUtil.newPair(sqdAB, nB));
-        } else if (sqdAB < nn.peek().doubleValue()) {
+        }
+        else if(sqdAB < nn.peek().doubleValue()) {
           nn.replaceTopElement(DBIDUtil.newPair(sqdAB, nB));
         }
       }
@@ -164,21 +165,21 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
       // Variance as E(X^2)-E(X)^2 suffers from catastrophic cancellation!
       // TODO: ensure numerical precision!
       double nnsum = 0., nnsumsq = 0., nnsumisqd = 0.;
-      for (ObjectHeap.UnsortedIter<DoubleDBIDPair> iB = nn.unsortedIter(); iB.valid(); iB.advance()) {
+      for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iB = nn.unsortedIter(); iB.valid(); iB.advance()) {
         DoubleDBIDPair nB = iB.get();
         double sqdAB = nB.doubleValue();
         double simAB = kernelMatrix.getSimilarity(pA, nB);
-        if (!(sqdAB > 0.)) {
+        if(!(sqdAB > 0.)) {
           continue;
         }
-        for (ObjectHeap.UnsortedIter<DoubleDBIDPair> iC = nn.unsortedIter(); iC.valid(); iC.advance()) {
+        for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iC = nn.unsortedIter(); iC.valid(); iC.advance()) {
           DoubleDBIDPair nC = iC.get();
-          if (DBIDUtil.compare(nC, nB) < 0) {
+          if(DBIDUtil.compare(nC, nB) < 0) {
             continue;
           }
           double sqdAC = nC.doubleValue();
           double simAC = kernelMatrix.getSimilarity(pA, nC);
-          if (!(sqdAC > 0.)) {
+          if(!(sqdAC > 0.)) {
             continue;
           }
           // Exploit bilinearity of scalar product:
@@ -200,7 +201,7 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
       double lbabof = 2. * nnsumsq / (sumid * sumid) - tmp * tmp;
 
       // Track maximum?
-      if (lbabof > max) {
+      if(lbabof > max) {
         max = lbabof;
       }
       abodvalues.putDouble(pA, lbabof);
@@ -212,9 +213,9 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
     int refinements = 0;
     DoubleMinHeap topscores = new DoubleMinHeap(l);
     MeanVariance s = new MeanVariance();
-    while (!candidates.isEmpty()) {
+    while(!candidates.isEmpty()) {
       // Stop refining
-      if (topscores.size() >= k && candidates.peek().doubleValue() > topscores.peek()) {
+      if(topscores.size() >= k && candidates.peek().doubleValue() > topscores.peek()) {
         break;
       }
       DoubleDBIDPair pA = candidates.poll();
@@ -223,16 +224,17 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
       abodvalues.putDouble(pA, abof);
       minmaxabod.put(abof);
       // Update the heap tracking the top scores.
-      if (topscores.size() < k) {
+      if(topscores.size() < k) {
         topscores.add(abof);
-      } else {
-        if (topscores.peek() > abof) {
+      }
+      else {
+        if(topscores.peek() > abof) {
           topscores.replaceTopElement(abof);
         }
       }
       refinements += 1;
     }
-    if (LOG.isStatistics()) {
+    if(LOG.isStatistics()) {
       LoggingConfiguration.setVerbose(Level.VERYVERBOSE);
       LOG.statistics(new LongStatistic("lb-abod.refinements", refinements));
     }
@@ -274,8 +276,8 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter lP = new IntParameter(L_ID);
-      lP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(lP)) {
+      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(lP)) {
         l = lP.getValue();
       }
     }

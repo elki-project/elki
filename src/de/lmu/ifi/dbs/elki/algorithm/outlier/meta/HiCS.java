@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -176,7 +176,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation);
     Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex, rnd.getRandom());
 
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("Number of high-contrast subspaces: " + subspaces.size());
     }
     List<Relation<Double>> results = new ArrayList<>();
@@ -185,8 +185,8 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     // run outlier detection and collect the result
     // TODO extend so that any outlierAlgorithm can be used (use materialized
     // relation instead of SubspaceEuclideanDistanceFunction?)
-    for (HiCSSubspace dimset : subspaces) {
-      if (LOG.isVerbose()) {
+    for(HiCSSubspace dimset : subspaces) {
+      if(LOG.isVerbose()) {
         LOG.verbose("Performing outlier detection in subspace " + dimset);
       }
 
@@ -196,22 +196,22 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       // run LOF and collect the result
       OutlierResult result = outlierAlgorithm.run(pdb);
       results.add(result.getScores());
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(LOG);
     }
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double sum = 0.0;
-      for (Relation<Double> r : results) {
+      for(Relation<Double> r : results) {
         final Double s = r.get(iditer);
-        if (s != null && !Double.isNaN(s)) {
+        if(s != null && !Double.isNaN(s)) {
           sum += s;
         }
       }
@@ -237,7 +237,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<>(dim + 1);
 
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       ArrayModifiableDBIDs amDBIDs = DBIDUtil.newArray(relation.getDBIDs());
       comp.setDimension(i);
       amDBIDs.sort(comp);
@@ -258,7 +258,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     final int dbdim = RelationUtil.dimensionality(relation);
 
     FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Subspace dimensionality", dbdim, LOG) : null;
-    if (dprog != null) {
+    if(dprog != null) {
       dprog.setProcessed(2, LOG);
     }
 
@@ -266,31 +266,31 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     TopBoundedHeap<HiCSSubspace> dDimensionalList = new TopBoundedHeap<>(cutoff, HiCSSubspace.SORT_BY_CONTRAST_ASC);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Generating two-element subsets", (dbdim * (dbdim - 1)) >> 1, LOG) : null;
     // compute two-element sets of subspaces
-    for (int i = 0; i < dbdim; i++) {
-      for (int j = i + 1; j < dbdim; j++) {
+    for(int i = 0; i < dbdim; i++) {
+      for(int j = i + 1; j < dbdim; j++) {
         HiCSSubspace ts = new HiCSSubspace();
         ts.set(i);
         ts.set(j);
         calculateContrast(relation, ts, subspaceIndex, random);
         dDimensionalList.add(ts);
-        if (prog != null) {
+        if(prog != null) {
           prog.incrementProcessed(LOG);
         }
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(LOG);
     }
 
     IndefiniteProgress qprog = LOG.isVerbose() ? new IndefiniteProgress("Testing subspace candidates", LOG) : null;
-    for (int d = 3; !dDimensionalList.isEmpty(); d++) {
-      if (dprog != null) {
+    for(int d = 3; !dDimensionalList.isEmpty(); d++) {
+      if(dprog != null) {
         dprog.setProcessed(d, LOG);
       }
       // result now contains all d-dimensional sets of subspaces
 
       ArrayList<HiCSSubspace> candidateList = new ArrayList<>(dDimensionalList.size());
-      for (Heap<HiCSSubspace>.UnorderedIter it = dDimensionalList.unorderedIter(); it.valid(); it.advance()) {
+      for(Heap<HiCSSubspace>.UnorderedIter it = dDimensionalList.unorderedIter(); it.valid(); it.advance()) {
         subspaceList.add(it.get());
         candidateList.add(it.get());
       }
@@ -299,39 +299,39 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       Collections.sort(candidateList, HiCSSubspace.SORT_BY_SUBSPACE);
 
       // TODO: optimize APRIORI style, by not even computing the bit set or?
-      for (int i = 0; i < candidateList.size() - 1; i++) {
-        for (int j = i + 1; j < candidateList.size(); j++) {
+      for(int i = 0; i < candidateList.size() - 1; i++) {
+        for(int j = i + 1; j < candidateList.size(); j++) {
           HiCSSubspace set1 = candidateList.get(i);
           HiCSSubspace set2 = candidateList.get(j);
 
           HiCSSubspace joinedSet = new HiCSSubspace();
           joinedSet.or(set1);
           joinedSet.or(set2);
-          if (joinedSet.cardinality() != d) {
+          if(joinedSet.cardinality() != d) {
             continue;
           }
 
           calculateContrast(relation, joinedSet, subspaceIndex, random);
           dDimensionalList.add(joinedSet);
-          if (qprog != null) {
+          if(qprog != null) {
             qprog.incrementProcessed(LOG);
           }
         }
       }
       // Prune
-      for (HiCSSubspace cand : candidateList) {
-        for (Heap<HiCSSubspace>.UnorderedIter it = dDimensionalList.unorderedIter(); it.valid(); it.advance()) {
-          if (it.get().contrast > cand.contrast) {
+      for(HiCSSubspace cand : candidateList) {
+        for(Heap<HiCSSubspace>.UnorderedIter it = dDimensionalList.unorderedIter(); it.valid(); it.advance()) {
+          if(it.get().contrast > cand.contrast) {
             subspaceList.remove(cand);
             break;
           }
         }
       }
     }
-    if (qprog != null) {
+    if(qprog != null) {
       qprog.setCompleted(LOG);
     }
-    if (dprog != null) {
+    if(dprog != null) {
       dprog.setProcessed(dbdim, LOG);
       dprog.ensureCompleted(LOG);
     }
@@ -353,17 +353,17 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
 
     int retries = 0;
     double deviationSum = 0.0;
-    for (int i = 0; i < m; i++) {
+    for(int i = 0; i < m; i++) {
       // Choose a random set bit.
       int chosen = -1;
-      for (int tmp = random.nextInt(card); tmp >= 0; tmp--) {
+      for(int tmp = random.nextInt(card); tmp >= 0; tmp--) {
         chosen = subspace.nextSetBit(chosen + 1);
       }
       // initialize sample
       DBIDs conditionalSample = relation.getDBIDs();
 
-      for (int j = subspace.nextSetBit(0); j >= 0; j = subspace.nextSetBit(j + 1)) {
-        if (j == chosen) {
+      for(int j = subspace.nextSetBit(0); j >= 0; j = subspace.nextSetBit(j + 1)) {
+        if(j == chosen) {
           continue;
         }
         ArrayDBIDs sortedIndices = subspaceIndex.get(j);
@@ -371,20 +371,21 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
         // initialize index block
         DBIDArrayIter iter = sortedIndices.iter();
         iter.seek(random.nextInt(relation.size() - windowsize));
-        for (int k = 0; k < windowsize; k++, iter.advance()) {
+        for(int k = 0; k < windowsize; k++, iter.advance()) {
           indexBlock.add(iter); // select index block
         }
 
         conditionalSample = DBIDUtil.intersection(conditionalSample, indexBlock);
       }
-      if (conditionalSample.size() < 10) {
+      if(conditionalSample.size() < 10) {
         retries++;
-        if (LOG.isDebugging()) {
+        if(LOG.isDebugging()) {
           LOG.debug("Sample size very small. Retry no. " + retries);
         }
-        if (retries >= MAX_RETRIES) {
+        if(retries >= MAX_RETRIES) {
           LOG.warning("Too many retries, for small samples: " + retries);
-        } else {
+        }
+        else {
           i--;
           continue;
         }
@@ -393,7 +394,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       double[] sampleValues = new double[conditionalSample.size()];
       {
         int l = 0;
-        for (DBIDIter iter = conditionalSample.iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = conditionalSample.iter(); iter.valid(); iter.advance()) {
           sampleValues[l] = relation.get(iter).doubleValue(chosen);
           l++;
         }
@@ -402,23 +403,23 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       double[] fullValues = new double[relation.size()];
       {
         int l = 0;
-        for (DBIDIter iter = subspaceIndex.get(chosen).iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = subspaceIndex.get(chosen).iter(); iter.valid(); iter.advance()) {
           fullValues[l] = relation.get(iter).doubleValue(chosen);
           l++;
         }
       }
       double contrast = statTest.deviation(fullValues, sampleValues);
-      if (Double.isNaN(contrast)) {
+      if(Double.isNaN(contrast)) {
         i--;
         LOG.warning("Contrast was NaN");
         continue;
       }
       deviationSum += contrast;
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(LOG);
     }
     subspace.contrast = deviationSum / m;
@@ -464,7 +465,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     public String toString() {
       StringBuilder buf = new StringBuilder();
       buf.append("[contrast=").append(contrast);
-      for (int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
+      for(int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
         buf.append(' ').append(i + 1);
       }
       buf.append(']');
@@ -477,7 +478,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     public static final Comparator<HiCSSubspace> SORT_BY_CONTRAST_ASC = new Comparator<HiCSSubspace>() {
       @Override
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
-        if (o1.contrast == o2.contrast) {
+        if(o1.contrast == o2.contrast) {
           return 0;
         }
         return o1.contrast > o2.contrast ? 1 : -1;
@@ -490,7 +491,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     public static final Comparator<HiCSSubspace> SORT_BY_CONTRAST_DESC = new Comparator<HiCSSubspace>() {
       @Override
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
-        if (o1.contrast == o2.contrast) {
+        if(o1.contrast == o2.contrast) {
           return 0;
         }
         return o1.contrast < o2.contrast ? 1 : -1;
@@ -505,10 +506,11 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
         int dim1 = o1.nextSetBit(0);
         int dim2 = o2.nextSetBit(0);
-        while (dim1 >= 0 && dim2 >= 0) {
-          if (dim1 < dim2) {
+        while(dim1 >= 0 && dim2 >= 0) {
+          if(dim1 < dim2) {
             return -1;
-          } else if (dim1 > dim2) {
+          }
+          else if(dim1 > dim2) {
             return 1;
           }
           dim1 = o1.nextSetBit(dim1 + 1);
@@ -597,35 +599,35 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter mP = new IntParameter(M_ID, 50);
-      mP.addConstraint(new GreaterConstraint(1));
-      if (config.grab(mP)) {
+      mP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(mP)) {
         m = mP.intValue();
       }
 
       final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.1);
-      alphaP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(alphaP)) {
+      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
 
       final ObjectParameter<OutlierAlgorithm> algoP = new ObjectParameter<>(ALGO_ID, OutlierAlgorithm.class, LOF.class);
-      if (config.grab(algoP)) {
+      if(config.grab(algoP)) {
         outlierAlgorithm = algoP.instantiateClass(config);
       }
 
       final ObjectParameter<GoodnessOfFitTest> testP = new ObjectParameter<>(TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
-      if (config.grab(testP)) {
+      if(config.grab(testP)) {
         statTest = testP.instantiateClass(config);
       }
 
       final IntParameter cutoffP = new IntParameter(LIMIT_ID, 100);
-      cutoffP.addConstraint(new GreaterConstraint(1));
-      if (config.grab(cutoffP)) {
+      cutoffP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(cutoffP)) {
         cutoff = cutoffP.intValue();
       }
 
       final RandomParameter rndP = new RandomParameter(SEED_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }

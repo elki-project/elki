@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -116,7 +116,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * Number of sampling rounds to find a good split
    */
   private final int samplingLevel;
-  
+
   /**
    * Random factory
    */
@@ -167,30 +167,30 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
     final int maxdim = Math.min(maxLMDim, RelationUtil.dimensionality(relation));
     int cnum = 0;
-    while (unclustered.size() > minsize) {
+    while(unclustered.size() > minsize) {
       DBIDs current = unclustered;
       int lmDim = 1;
-      for (int k = 1; k <= maxdim; k++) {
+      for(int k = 1; k <= maxdim; k++) {
         // Implementation note: this while loop is from the original publication
         // and the published LMCLUS source code. It doesn't make sense to me -
         // it is lacking a stop criterion other than "cluster is too small" and
         // "cluster is inseparable"! Additionally, there is good criterion for
         // stopping at the appropriate dimensionality either.
-        while (true) {
+        while(true) {
           Separation separation = findSeparation(relation, current, k, r);
           // logger.verbose("k: " + k + " goodness: " + separation.goodness +
           // " threshold: " + separation.threshold);
-          if (separation.goodness <= sensitivityThreshold) {
+          if(separation.goodness <= sensitivityThreshold) {
             break;
           }
           ModifiableDBIDs subset = DBIDUtil.newArray(current.size());
-          for (DBIDIter iter = current.iter(); iter.valid(); iter.advance()) {
-            if (deviation(relation.get(iter).getColumnVector().minusEquals(separation.originV), separation.basis) < separation.threshold) {
+          for(DBIDIter iter = current.iter(); iter.valid(); iter.advance()) {
+            if(deviation(relation.get(iter).getColumnVector().minusEquals(separation.originV), separation.basis) < separation.threshold) {
               subset.add(iter);
             }
           }
           // logger.verbose("size:"+subset.size());
-          if (subset.size() < minsize) {
+          if(subset.size() < minsize) {
             break;
           }
           current = subset;
@@ -199,7 +199,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         }
       }
       // No more clusters found
-      if (current.size() < minsize || current == unclustered) {
+      if(current.size() < minsize || current == unclustered) {
         break;
       }
       // New cluster found
@@ -210,22 +210,22 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       ret.addToplevelCluster(cluster);
       // Remove from main working set.
       unclustered.removeDBIDs(current);
-      if (progress != null) {
+      if(progress != null) {
         progress.setProcessed(relation.size() - unclustered.size(), LOG);
       }
-      if (cprogress != null) {
+      if(cprogress != null) {
         cprogress.setProcessed(cnum, LOG);
       }
     }
     // Remaining objects are noise
-    if (unclustered.size() > 0) {
+    if(unclustered.size() > 0) {
       ret.addToplevelCluster(new Cluster<>(unclustered, true));
     }
-    if (progress != null) {
+    if(progress != null) {
       progress.setProcessed(relation.size(), LOG);
       progress.ensureCompleted(LOG);
     }
-    if (cprogress != null) {
+    if(cprogress != null) {
       cprogress.setCompleted(LOG);
     }
     return ret;
@@ -272,7 +272,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     int samples = (int) Math.min(Math.log(NOT_FROM_ONE_CLUSTER_PROBABILITY) / (Math.log(1 - Math.pow((1.0d / samplingLevel), dimension))), (double) currentids.size());
     // System.out.println("Number of samples: " + samples);
     int remaining_retries = 100;
-    for (int i = 1; i <= samples; i++) {
+    for(int i = 1; i <= samples; i++) {
       DBIDs sample = DBIDUtil.randomSample(currentids, dimension + 1, r.nextLong());
       final DBIDIter iter = sample.iter();
       // Use first as origin
@@ -282,17 +282,17 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       Matrix basis;
       {
         List<Vector> vectors = new ArrayList<>(sample.size() - 1);
-        for (; iter.valid(); iter.advance()) {
+        for(; iter.valid(); iter.advance()) {
           Vector vec = relation.get(iter).getColumnVector();
           vectors.add(vec.minusEquals(originV));
         }
         // generate orthogonal basis
         basis = generateOrthonormalBasis(vectors);
-        if (basis == null) {
+        if(basis == null) {
           // new sample has to be taken.
           i--;
           remaining_retries--;
-          if (remaining_retries < 0) {
+          if(remaining_retries < 0) {
             throw new AbortException("Too many retries in sampling, and always a linear dependant data set.");
           }
           continue;
@@ -301,9 +301,9 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       // Generate and fill a histogram.
       DoubleDynamicHistogram histogram = new DoubleDynamicHistogram(BINS);
       double w = 1.0 / currentids.size();
-      for (DBIDIter iter2 = currentids.iter(); iter2.valid(); iter2.advance()) {
+      for(DBIDIter iter2 = currentids.iter(); iter2.valid(); iter2.advance()) {
         // Skip sampled points
-        if (sample.contains(iter2)) {
+        if(sample.contains(iter2)) {
           continue;
         }
         Vector vec = relation.get(iter2).getColumnVector().minusEquals(originV);
@@ -311,7 +311,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         histogram.increment(distance, w);
       }
       double[] th = findAndEvaluateThreshold(histogram); // evaluate threshold
-      if (th[1] > separation.goodness) {
+      if(th[1] > separation.goodness) {
         separation.goodness = th[1];
         separation.threshold = th[0];
         separation.originV = originV;
@@ -341,16 +341,16 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     first = first.times(1.0 / first.euclideanLength());
     Matrix ret = new Matrix(first.getDimensionality(), vectors.size());
     ret.setCol(0, first);
-    for (int i = 1; i < vectors.size(); i++) {
+    for(int i = 1; i < vectors.size(); i++) {
       // System.out.println("Matrix:" + ret);
       Vector v_i = vectors.get(i);
       Vector u_i = v_i.copy();
       // System.out.println("Vector " + i + ":" + partialSol);
-      for (int j = 0; j < i; j++) {
+      for(int j = 0; j < i; j++) {
         Vector v_j = ret.getCol(j);
         double f = v_i.transposeTimes(v_j) / v_j.transposeTimes(v_j);
-        if (Double.isNaN(f)) {
-          if (LOG.isDebuggingFine()) {
+        if(Double.isNaN(f)) {
+          if(LOG.isDebuggingFine()) {
             LOG.debugFine("Zero vector encountered? " + v_j);
           }
           return null;
@@ -359,8 +359,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       }
       // check if the vectors weren't independent
       final double len_u_i = u_i.euclideanLength();
-      if (len_u_i == 0.0) {
-        if (LOG.isDebuggingFine()) {
+      if(len_u_i == 0.0) {
+        if(LOG.isDebuggingFine()) {
           LOG.debugFine("Points not independent - no orthonormalization.");
         }
         return null;
@@ -391,7 +391,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     {
       MeanVariance mv = new MeanVariance();
       DoubleHistogram.Iter forward = histogram.iter();
-      for (int i = 0; forward.valid(); i++, forward.advance()) {
+      for(int i = 0; forward.valid(); i++, forward.advance()) {
         p1[i] = forward.getValue() + ((i > 0) ? p1[i - 1] : 0);
         mv.put(i, forward.getValue());
         mu1[i] = mv.getMean();
@@ -404,7 +404,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       DoubleHistogram.Iter backwards = histogram.iter();
       backwards.seek(histogram.getNumBins() - 1); // Seek to last
 
-      for (int j = n - 1; backwards.valid(); j--, backwards.retract()) {
+      for(int j = n - 1; backwards.valid(); j--, backwards.retract()) {
         p2[j] = backwards.getValue() + ((j + 1 < n) ? p2[j + 1] : 0);
         mv.put(j, backwards.getValue());
         mu2[j] = mv.getMean();
@@ -412,7 +412,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       }
     }
 
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       jt[i] = 1.0 + 2 * (p1[i] * (Math.log(sigma1[i]) - Math.log(p1[i])) + p2[i] * (Math.log(sigma2[i]) - Math.log(p2[i])));
     }
 
@@ -420,23 +420,23 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     double bestgoodness = Double.NEGATIVE_INFINITY;
 
     double devPrev = jt[1] - jt[0];
-    for (int i = 1; i < jt.length - 1; i++) {
+    for(int i = 1; i < jt.length - 1; i++) {
       double devCur = jt[i + 1] - jt[i];
       // System.out.println(p1[i]);
       // System.out.println(jt[i + 1]);
       // System.out.println(jt[i]);
       // System.out.println(devCur);
       // Local minimum found - calculate depth
-      if (devCur >= 0 && devPrev <= 0) {
+      if(devCur >= 0 && devPrev <= 0) {
         double lowestMaxima = Double.POSITIVE_INFINITY;
-        for (int j = i - 1; j > 0; j--) {
-          if (jt[j - 1] < jt[j]) {
+        for(int j = i - 1; j > 0; j--) {
+          if(jt[j - 1] < jt[j]) {
             lowestMaxima = Math.min(lowestMaxima, jt[j]);
             break;
           }
         }
-        for (int j = i + 1; j < n - 2; j++) {
-          if (jt[j + 1] < jt[j]) {
+        for(int j = i + 1; j < n - 2; j++) {
+          if(jt[j + 1] < jt[j]) {
             lowestMaxima = Math.min(lowestMaxima, jt[j]);
             break;
           }
@@ -445,11 +445,11 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
         final double mud = mu1[i] - mu2[i];
         double discriminability = mud * mud / (sigma1[i] * sigma1[i] + sigma2[i] * sigma2[i]);
-        if (Double.isNaN(discriminability)) {
+        if(Double.isNaN(discriminability)) {
           discriminability = -1;
         }
         double goodness = localDepth * discriminability;
-        if (goodness > bestgoodness) {
+        if(goodness > bestgoodness) {
           bestgoodness = goodness;
           bestpos = i;
         }
@@ -552,7 +552,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
      * Threshold
      */
     private double threshold;
-    
+
     /**
      * Random generator
      */
@@ -562,26 +562,26 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter maxLMDimP = new IntParameter(MAXDIM_ID);
-      maxLMDimP.addConstraint(new GreaterEqualConstraint(1));
+      maxLMDimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       maxLMDimP.setOptional(true);
-      if (config.grab(maxLMDimP)) {
+      if(config.grab(maxLMDimP)) {
         maxdim = maxLMDimP.getValue();
       }
       IntParameter minsizeP = new IntParameter(MINSIZE_ID);
-      minsizeP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(minsizeP)) {
+      minsizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(minsizeP)) {
         minsize = minsizeP.getValue();
       }
       IntParameter samplingLevelP = new IntParameter(SAMPLINGL_ID, 100);
-      if (config.grab(samplingLevelP)) {
+      if(config.grab(samplingLevelP)) {
         samplingLevel = samplingLevelP.getValue();
       }
       DoubleParameter sensivityThresholdP = new DoubleParameter(THRESHOLD_ID);
-      if (config.grab(sensivityThresholdP)) {
+      if(config.grab(sensivityThresholdP)) {
         threshold = sensivityThresholdP.getValue();
       }
       RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }

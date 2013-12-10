@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -68,10 +67,10 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
     return this.bandSize == ((AbstractEditDistanceFunction) obj).bandSize;
@@ -91,9 +90,9 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID, 0.1);
-      bandSizeP.addConstraint(new GreaterEqualConstraint(0));
-      bandSizeP.addConstraint(new LessEqualConstraint(1));
-      if (config.grab(bandSizeP)) {
+      bandSizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      bandSizeP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      if(config.grab(bandSizeP)) {
         bandSize = bandSizeP.doubleValue();
       }
     }

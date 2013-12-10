@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -87,32 +87,32 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
     double maxContrast = 0.0;
     // calc the eigenvalue sum.
     double eigenValueSum = 0.0;
-    for (int i = 0; i < eigenPairs.size(); i++) {
+    for(int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       eigenValueSum += eigenPair.getEigenvalue();
     }
     double weakEigenvalue = eigenValueSum / eigenPairs.size() * walpha;
     // now find the maximum contrast.
     double currSum = eigenPairs.getEigenPair(eigenPairs.size() - 1).getEigenvalue();
-    for (int i = eigenPairs.size() - 2; i >= 0; i--) {
+    for(int i = eigenPairs.size() - 2; i >= 0; i--) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       currSum += eigenPair.getEigenvalue();
       // weak?
-      if (eigenPair.getEigenvalue() < weakEigenvalue) {
+      if(eigenPair.getEigenvalue() < weakEigenvalue) {
         continue;
       }
       double contrast = eigenPair.getEigenvalue() / (currSum / (eigenPairs.size() - i));
-      if (contrast > maxContrast) {
+      if(contrast > maxContrast) {
         maxContrast = contrast;
         contrastMaximum = i;
       }
     }
 
-    for (int i = 0; i <= contrastMaximum /* && i < eigenPairs.size() */; i++) {
+    for(int i = 0; i <= contrastMaximum /* && i < eigenPairs.size() */; i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       strongEigenPairs.add(eigenPair);
     }
-    for (int i = contrastMaximum + 1; i < eigenPairs.size(); i++) {
+    for(int i = contrastMaximum + 1; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       weakEigenPairs.add(eigenPair);
     }
@@ -134,8 +134,8 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
-      walphaP.addConstraint(new GreaterEqualConstraint(0.0));
-      if (config.grab(walphaP)) {
+      walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(walphaP)) {
         walpha = walphaP.getValue();
       }
     }

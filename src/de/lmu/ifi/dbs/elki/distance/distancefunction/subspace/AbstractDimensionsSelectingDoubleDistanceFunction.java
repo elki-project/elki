@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunc
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
@@ -87,10 +86,10 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
     return this.dimensions.equals(((AbstractDimensionsSelectingDoubleDistanceFunction<?>) obj).dimensions);
@@ -111,10 +110,10 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
       super.makeOptions(config);
       dimensions = new BitSet();
       final IntListParameter dimsP = new IntListParameter(DIMS_ID);
-      dimsP.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(0)));
+      dimsP.addConstraint(CommonConstraints.NONNEGATIVE_INT_LIST);
       dimsP.setOptional(true);
-      if (config.grab(dimsP)) {
-        for (int d : dimsP.getValue()) {
+      if(config.grab(dimsP)) {
+        for(int d : dimsP.getValue()) {
           dimensions.set(d);
         }
       }

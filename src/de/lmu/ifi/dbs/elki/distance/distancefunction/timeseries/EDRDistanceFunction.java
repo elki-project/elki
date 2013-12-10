@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -82,7 +82,7 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
     // features2.length + ", band: " + band);
     final double deltaValue = delta;
 
-    for (int i = 0; i < v1.getDimensionality(); i++) {
+    for(int i = 0; i < v1.getDimensionality(); i++) {
       // Swap current and prev arrays. We'll just overwrite the new curr.
       {
         double[] temp = prev;
@@ -90,16 +90,16 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
         curr = temp;
       }
       int l = i - (band + 1);
-      if (l < 0) {
+      if(l < 0) {
         l = 0;
       }
       int r = i + (band + 1);
-      if (r > (v2.getDimensionality() - 1)) {
+      if(r > (v2.getDimensionality() - 1)) {
         r = (v2.getDimensionality() - 1);
       }
 
-      for (int j = l; j <= r; j++) {
-        if (Math.abs(i - j) <= band) {
+      for(int j = l; j <= r; j++) {
+        if(Math.abs(i - j) <= band) {
           // compute squared distance
           double val1 = v1.doubleValue(i);
           double val2 = v2.doubleValue(j);
@@ -110,23 +110,27 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
 
           final double subcost = (d <= deltaValue) ? 0 : 1;
 
-          if ((i + j) != 0) {
-            if ((i == 0) || ((j != 0) && (((prev[j - 1] + subcost) > (curr[j - 1] + 1)) && ((curr[j - 1] + 1) < (prev[j] + 1))))) {
+          if((i + j) != 0) {
+            if((i == 0) || ((j != 0) && (((prev[j - 1] + subcost) > (curr[j - 1] + 1)) && ((curr[j - 1] + 1) < (prev[j] + 1))))) {
               // del
               cost = curr[j - 1] + 1;
-            } else if ((j == 0) || ((i != 0) && (((prev[j - 1] + subcost) > (prev[j] + 1)) && ((prev[j] + 1) < (curr[j - 1] + 1))))) {
+            }
+            else if((j == 0) || ((i != 0) && (((prev[j - 1] + subcost) > (prev[j] + 1)) && ((prev[j] + 1) < (curr[j - 1] + 1))))) {
               // ins
               cost = prev[j] + 1;
-            } else {
+            }
+            else {
               // match
               cost = prev[j - 1] + subcost;
             }
-          } else {
+          }
+          else {
             cost = 0;
           }
 
           curr[j] = cost;
-        } else {
+        }
+        else {
           curr[j] = Double.POSITIVE_INFINITY; // outside band
         }
       }
@@ -137,7 +141,7 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if (!super.equals(obj)) {
+    if(!super.equals(obj)) {
       return false;
     }
     return this.delta == ((EDRDistanceFunction) obj).delta;
@@ -157,8 +161,8 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 1.0);
-      deltaP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(deltaP)) {
+      deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(deltaP)) {
         delta = deltaP.doubleValue();
       }
     }

@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.arthur.AssociationID;
@@ -77,7 +77,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
    * Key: {@code -knnclassifier.k}
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, 1, new GreaterConstraint(0));
+  private final IntParameter K_PARAM = new IntParameter(K_ID, 1, CommonConstraints.GREATER_EQUAL_ONE_INT);
 
   /**
    * Holds the value of @link #K_PARAM}.

@@ -30,8 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -175,31 +174,33 @@ public class PoissonDistribution extends AbstractDistribution {
   @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
   public static double pmf(double x, int n, double p) {
     // Invalid values
-    if (x < 0 || x > n) {
+    if(x < 0 || x > n) {
       return 0.;
     }
     // Extreme probabilities
-    if (p <= 0.) {
+    if(p <= 0.) {
       return x == 0 ? 1. : 0.;
     }
-    if (p >= 1.) {
+    if(p >= 1.) {
       return x == n ? 1. : 0.;
     }
     final double q = 1 - p;
     // FIXME: check for x to be integer, return 0 otherwise?
 
     // Extreme values of x
-    if (x == 0) {
-      if (p < .1) {
+    if(x == 0) {
+      if(p < .1) {
         return Math.exp(-devianceTerm(n, n * q) - n * p);
-      } else {
+      }
+      else {
         return Math.exp(n * Math.log(q));
       }
     }
-    if (x == n) {
-      if (p > .9) {
+    if(x == n) {
+      if(p > .9) {
         return Math.exp(-devianceTerm(n, n * p) - n * q);
-      } else {
+      }
+      else {
         return Math.exp(n * Math.log(p));
       }
     }
@@ -236,15 +237,16 @@ public class PoissonDistribution extends AbstractDistribution {
    * @return pdf
    */
   public static double poissonPDFm1(double x_plus_1, double lambda) {
-    if (Double.isInfinite(lambda)) {
+    if(Double.isInfinite(lambda)) {
       return 0.;
     }
-    if (x_plus_1 > 1) {
+    if(x_plus_1 > 1) {
       return rawProbability(x_plus_1 - 1, lambda);
     }
-    if (lambda > Math.abs(x_plus_1 - 1) * MathUtil.LOG2 * Double.MAX_EXPONENT / 1e-14) {
+    if(lambda > Math.abs(x_plus_1 - 1) * MathUtil.LOG2 * Double.MAX_EXPONENT / 1e-14) {
       return Math.exp(-lambda - GammaDistribution.logGamma(x_plus_1));
-    } else {
+    }
+    else {
       return rawProbability(x_plus_1, lambda) * (x_plus_1 / lambda);
     }
   }
@@ -259,15 +261,16 @@ public class PoissonDistribution extends AbstractDistribution {
    * @return pdf
    */
   public static double logpoissonPDFm1(double x_plus_1, double lambda) {
-    if (Double.isInfinite(lambda)) {
+    if(Double.isInfinite(lambda)) {
       return Double.NEGATIVE_INFINITY;
     }
-    if (x_plus_1 > 1) {
+    if(x_plus_1 > 1) {
       return rawLogProbability(x_plus_1 - 1, lambda);
     }
-    if (lambda > Math.abs(x_plus_1 - 1) * MathUtil.LOG2 * Double.MAX_EXPONENT / 1e-14) {
+    if(lambda > Math.abs(x_plus_1 - 1) * MathUtil.LOG2 * Double.MAX_EXPONENT / 1e-14) {
       return -lambda - GammaDistribution.logGamma(x_plus_1);
-    } else {
+    }
+    else {
       return rawLogProbability(x_plus_1, lambda) + Math.log(x_plus_1 / lambda);
     }
   }
@@ -283,18 +286,18 @@ public class PoissonDistribution extends AbstractDistribution {
   @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
   private static double stirlingError(int n) {
     // Try to use a table value:
-    if (n < 16) {
+    if(n < 16) {
       return STIRLING_EXACT_ERROR[n << 1];
     }
     final double nn = n * n;
     // Use the appropriate number of terms
-    if (n > 500) {
+    if(n > 500) {
       return (S0 - S1 / nn) / n;
     }
-    if (n > 80) {
+    if(n > 80) {
       return ((S0 - (S1 - S2 / nn)) / nn) / n;
     }
-    if (n > 35) {
+    if(n > 35) {
       return ((S0 - (S1 - (S2 - S3 / nn) / nn) / nn) / n);
     }
     return ((S0 - (S1 - (S2 - (S3 - S4 / nn) / nn) / nn) / nn) / n);
@@ -310,23 +313,24 @@ public class PoissonDistribution extends AbstractDistribution {
    */
   @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
   private static double stirlingError(double n) {
-    if (n < 16.0) {
+    if(n < 16.0) {
       // Our table has a step size of 0.5
       final double n2 = 2.0 * n;
-      if (Math.floor(n2) == n2) { // Exact match
+      if(Math.floor(n2) == n2) { // Exact match
         return STIRLING_EXACT_ERROR[(int) n2];
-      } else {
+      }
+      else {
         return GammaDistribution.logGamma(n + 1.0) - (n + 0.5) * Math.log(n) + n - MathUtil.LOGSQRTTWOPI;
       }
     }
     final double nn = n * n;
-    if (n > 500.0) {
+    if(n > 500.0) {
       return (S0 - S1 / nn) / n;
     }
-    if (n > 80.0) {
+    if(n > 80.0) {
       return ((S0 - (S1 - S2 / nn)) / nn) / n;
     }
-    if (n > 35.0) {
+    if(n > 35.0) {
       return ((S0 - (S1 - (S2 - S3 / nn) / nn) / nn) / n);
     }
     return ((S0 - (S1 - (S2 - (S3 - S4 / nn) / nn) / nn) / nn) / n);
@@ -343,15 +347,15 @@ public class PoissonDistribution extends AbstractDistribution {
    */
   @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
   private static double devianceTerm(double x, double np) {
-    if (Math.abs(x - np) < 0.1 * (x + np)) {
+    if(Math.abs(x - np) < 0.1 * (x + np)) {
       final double v = (x - np) / (x + np);
 
       double s = (x - np) * v;
       double ej = 2.0d * x * v;
-      for (int j = 1;; j++) {
+      for(int j = 1;; j++) {
         ej *= v * v;
         final double s1 = s + ej / (2 * j + 1);
-        if (s1 == s) {
+        if(s1 == s) {
           return s1;
         }
         s = s1;
@@ -371,17 +375,17 @@ public class PoissonDistribution extends AbstractDistribution {
    */
   public static double rawProbability(double x, double lambda) {
     // Extreme lambda
-    if (lambda == 0) {
+    if(lambda == 0) {
       return ((x == 0) ? 1. : 0.);
     }
     // Extreme values
-    if (Double.isInfinite(lambda) || x < 0) {
+    if(Double.isInfinite(lambda) || x < 0) {
       return 0.;
     }
-    if (x <= lambda * Double.MIN_NORMAL) {
+    if(x <= lambda * Double.MIN_NORMAL) {
       return Math.exp(-lambda);
     }
-    if (lambda < x * Double.MIN_NORMAL) {
+    if(lambda < x * Double.MIN_NORMAL) {
       double r = -lambda + x * Math.log(lambda) - GammaDistribution.logGamma(x + 1);
       return Math.exp(r);
     }
@@ -401,17 +405,17 @@ public class PoissonDistribution extends AbstractDistribution {
    */
   public static double rawLogProbability(double x, double lambda) {
     // Extreme lambda
-    if (lambda == 0) {
+    if(lambda == 0) {
       return ((x == 0) ? 1. : Double.NEGATIVE_INFINITY);
     }
     // Extreme values
-    if (Double.isInfinite(lambda) || x < 0) {
+    if(Double.isInfinite(lambda) || x < 0) {
       return Double.NEGATIVE_INFINITY;
     }
-    if (x <= lambda * Double.MIN_NORMAL) {
+    if(x <= lambda * Double.MIN_NORMAL) {
       return -lambda;
     }
-    if (lambda < x * Double.MIN_NORMAL) {
+    if(lambda < x * Double.MIN_NORMAL) {
       return -lambda + x * Math.log(lambda) - GammaDistribution.logGamma(x + 1);
     }
     final double f = MathUtil.TWOPI * x;
@@ -457,15 +461,15 @@ public class PoissonDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       IntParameter nP = new IntParameter(N_ID);
-      nP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(nP)) {
+      nP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(nP)) {
         n = nP.intValue();
       }
 
       DoubleParameter probP = new DoubleParameter(PROB_ID);
-      probP.addConstraint(new GreaterEqualConstraint(0.));
-      probP.addConstraint(new LessEqualConstraint(1.));
-      if (config.grab(probP)) {
+      probP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      probP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      if(config.grab(probP)) {
         p = probP.doubleValue();
       }
     }

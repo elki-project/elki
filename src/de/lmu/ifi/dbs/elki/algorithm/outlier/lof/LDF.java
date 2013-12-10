@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -150,8 +150,8 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     // "HEAVY" flag for KNN Query since it is used more than once
     KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
-    if (!(knnq instanceof PreprocessorKNNQuery)) {
-      if (stepprog != null) {
+    if(!(knnq instanceof PreprocessorKNNQuery)) {
+      if(stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
       }
       MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
@@ -161,43 +161,46 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     // Compute LDEs
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.beginStep(2, "Computing LDEs.", LOG);
     }
     WritableDoubleDataStore ldes = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
-    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
-      if (neighbors instanceof DoubleDistanceKNNList) {
+      if(neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
-        for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-          if (DBIDUtil.equal(neighbor, it)) {
+        for(DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+          if(DBIDUtil.equal(neighbor, it)) {
             continue;
           }
           final double nkdist = ((DoubleDistanceKNNList) knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
-          if (nkdist > 0.) {
+          if(nkdist > 0.) {
             final double v = Math.max(nkdist, neighbor.doubleDistance()) / (h * nkdist);
             sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
             count++;
-          } else {
+          }
+          else {
             sum = Double.POSITIVE_INFINITY;
             count++;
             break;
           }
         }
-      } else {
-        for (DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if (DBIDUtil.equal(neighbor, it)) {
+      }
+      else {
+        for(DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          if(DBIDUtil.equal(neighbor, it)) {
             continue;
           }
           final double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
-          if (nkdist > 0.) {
+          if(nkdist > 0.) {
             final double v = Math.max(nkdist, neighbor.getDistance().doubleValue()) / (h * nkdist);
             sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
             count++;
-          } else {
+          }
+          else {
             sum = Double.POSITIVE_INFINITY;
             count++;
             break;
@@ -205,16 +208,16 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
         }
       }
       ldes.putDouble(it, sum / count);
-      if (densProgress != null) {
+      if(densProgress != null) {
         densProgress.incrementProcessed(LOG);
       }
     }
-    if (densProgress != null) {
+    if(densProgress != null) {
       densProgress.ensureCompleted(LOG);
     }
 
     // Compute local density factors.
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.beginStep(3, "Computing LDFs.", LOG);
     }
     WritableDoubleDataStore ldfs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
@@ -222,14 +225,14 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Local Density Factors", ids.size(), LOG) : null;
-    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final double lrdp = ldes.doubleValue(it);
       final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
-      for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+      for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
         // skip the point itself
-        if (DBIDUtil.equal(neighbor, it)) {
+        if(DBIDUtil.equal(neighbor, it)) {
           continue;
         }
         sum += ldes.doubleValue(neighbor);
@@ -242,15 +245,15 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       // update minimum and maximum
       lofminmax.put(ldf);
 
-      if (progressLOFs != null) {
+      if(progressLOFs != null) {
         progressLOFs.incrementProcessed(LOG);
       }
     }
-    if (progressLOFs != null) {
+    if(progressLOFs != null) {
       progressLOFs.ensureCompleted(LOG);
     }
 
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.setCompleted(LOG);
     }
 
@@ -328,23 +331,23 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(K_ID);
-      pK.addConstraint(new GreaterConstraint(1));
-      if (config.grab(pK)) {
+      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(pK)) {
         k = pK.getValue();
       }
 
       ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class);
-      if (config.grab(kernelP)) {
+      if(config.grab(kernelP)) {
         kernel = kernelP.instantiateClass(config);
       }
 
       DoubleParameter hP = new DoubleParameter(H_ID);
-      if (config.grab(hP)) {
+      if(config.grab(hP)) {
         h = hP.doubleValue();
       }
 
       DoubleParameter cP = new DoubleParameter(C_ID, 0.1);
-      if (config.grab(cP)) {
+      if(config.grab(cP)) {
         c = cP.doubleValue();
       }
     }

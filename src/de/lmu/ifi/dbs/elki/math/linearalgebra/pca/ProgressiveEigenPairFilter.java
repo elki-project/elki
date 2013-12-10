@@ -32,9 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -133,7 +131,7 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
 
     // determine sum of eigenvalues
     double totalSum = 0;
-    for (int i = 0; i < eigenPairs.size(); i++) {
+    for(int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       totalSum += eigenPair.getEigenvalue();
     }
@@ -143,35 +141,35 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
     double currSum = 0;
     boolean found = false;
     int i;
-    for (i = 0; i < eigenPairs.size(); i++) {
+    for(i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       // weak Eigenvector?
-      if (eigenPair.getEigenvalue() < expectedVariance) {
+      if(eigenPair.getEigenvalue() < expectedVariance) {
         break;
       }
       currSum += eigenPair.getEigenvalue();
       // calculate progressive alpha level
       double alpha = 1.0 - (1.0 - palpha) * (1.0 - (i + 1) / eigenPairs.size());
-      if (currSum / totalSum >= alpha || i == eigenPairs.size() - 1) {
+      if(currSum / totalSum >= alpha || i == eigenPairs.size() - 1) {
         found = true;
         strongEigenPairs.add(eigenPair);
         break;
       }
     }
     // if we didn't hit our alpha level, we consider all vectors to be weak!
-    if (!found) {
+    if(!found) {
       assert (weakEigenPairs.size() == 0);
       weakEigenPairs = strongEigenPairs;
       strongEigenPairs = new ArrayList<>();
     }
-    for (; i < eigenPairs.size(); i++) {
+    for(; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       weakEigenPairs.add(eigenPair);
     }
 
     // the code using this method doesn't expect an empty strong set,
     // if we didn't find any strong ones, we make all vectors strong
-    if (strongEigenPairs.size() == 0) {
+    if(strongEigenPairs.size() == 0) {
       return new FilteredEigenPairs(new ArrayList<EigenPair>(), weakEigenPairs);
     }
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
@@ -200,15 +198,15 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter palphaP = new DoubleParameter(EIGENPAIR_FILTER_PALPHA, DEFAULT_PALPHA);
-      palphaP.addConstraint(new GreaterConstraint(0.0));
-      palphaP.addConstraint(new LessConstraint(1.0));
-      if (config.grab(palphaP)) {
+      palphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      palphaP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      if(config.grab(palphaP)) {
         palpha = palphaP.getValue();
       }
 
       DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
-      walphaP.addConstraint(new GreaterEqualConstraint(0.0));
-      if (config.grab(walphaP)) {
+      walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(walphaP)) {
         walpha = walphaP.getValue();
       }
     }

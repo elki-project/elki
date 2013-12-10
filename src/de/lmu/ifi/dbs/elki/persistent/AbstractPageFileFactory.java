@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.persistent;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -88,8 +88,8 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter pageSizeP = new IntParameter(PAGE_SIZE_ID, 4000);
-      pageSizeP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(pageSizeP)) {
+      pageSizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(pageSizeP)) {
         pageSize = pageSizeP.getValue();
       }
     }

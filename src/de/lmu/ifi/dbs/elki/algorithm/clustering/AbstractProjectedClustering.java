@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -152,8 +152,8 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      */
     protected void configK(Parameterization config) {
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(kP)) {
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
     }
@@ -165,8 +165,8 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      */
     protected void configKI(Parameterization config) {
       IntParameter k_iP = new IntParameter(K_I_ID, 30);
-      k_iP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(k_iP)) {
+      k_iP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(k_iP)) {
         k_i = k_iP.getValue();
       }
     }
@@ -178,8 +178,8 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      */
     protected void configL(Parameterization config) {
       IntParameter lP = new IntParameter(L_ID);
-      lP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(lP)) {
+      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(lP)) {
         l = lP.getValue();
       }
     }

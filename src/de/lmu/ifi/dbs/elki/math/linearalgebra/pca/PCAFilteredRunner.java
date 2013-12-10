@@ -32,8 +32,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -207,20 +206,20 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
-      if (config.grab(filterP)) {
+      if(config.grab(filterP)) {
         eigenPairFilter = filterP.instantiateClass(config);
       }
 
-      DoubleParameter bigP = new DoubleParameter(BIG_ID, 1.0);
-      bigP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(bigP)) {
+      DoubleParameter bigP = new DoubleParameter(BIG_ID, 1.);
+      bigP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(bigP)) {
         big = bigP.doubleValue();
 
       }
 
-      DoubleParameter smallP = new DoubleParameter(SMALL_ID, 0.0);
-      smallP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(smallP)) {
+      DoubleParameter smallP = new DoubleParameter(SMALL_ID, 0.);
+      smallP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(smallP)) {
         small = smallP.doubleValue();
       }
 

@@ -45,7 +45,7 @@ public class IntParameter extends NumberParameter<Integer> {
    * @deprecated Use {@link #addConstraint} instead.
    */
   @Deprecated
-  public IntParameter(OptionID optionID, int defaultValue, ParameterConstraint<Number> constraint) {
+  public IntParameter(OptionID optionID, int defaultValue, ParameterConstraint<? super Integer> constraint) {
     super(optionID, Integer.valueOf(defaultValue));
     addConstraint(constraint);
   }
@@ -60,7 +60,7 @@ public class IntParameter extends NumberParameter<Integer> {
    * @deprecated Use {@link #addConstraint} instead.
    */
   @Deprecated
-  public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, boolean optional) {
+  public IntParameter(OptionID optionID, ParameterConstraint<? super Integer> constraint, boolean optional) {
     super(optionID, optional);
     addConstraint(constraint);
   }
@@ -74,7 +74,7 @@ public class IntParameter extends NumberParameter<Integer> {
    * @deprecated Use {@link #addConstraint} instead.
    */
   @Deprecated
-  public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint) {
+  public IntParameter(OptionID optionID, ParameterConstraint<? super Integer> constraint) {
     super(optionID);
     addConstraint(constraint);
   }

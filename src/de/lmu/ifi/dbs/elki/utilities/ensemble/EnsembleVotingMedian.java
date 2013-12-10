@@ -26,8 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.ensemble;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -84,10 +83,10 @@ public class EnsembleVotingMedian implements EnsembleVoting {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, 0.5);
-      quantileP.addConstraint(new GreaterEqualConstraint(0.0));
-      quantileP.addConstraint(new LessEqualConstraint(1.0));
-      if (config.grab(quantileP)) {
+      DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, .5);
+      quantileP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      quantileP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      if(config.grab(quantileP)) {
         quantile = quantileP.getValue();
       }
     }

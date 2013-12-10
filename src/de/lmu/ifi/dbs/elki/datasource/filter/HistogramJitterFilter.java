@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -83,7 +83,7 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     final int dim = obj.getDimensionality();
     // Compute the total sum.
     double osum = 0;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       osum += obj.doubleValue(i);
     }
     // Actual maximum jitter amount:
@@ -91,13 +91,13 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     // Generate jitter vector
     double[] raw = new double[dim];
     double jsum = 0; // Sum of jitter
-    for (int i = 0; i < raw.length; i++) {
+    for(int i = 0; i < raw.length; i++) {
       raw[i] = rnd.nextRandom() * maxjitter;
       jsum += raw[i];
     }
     final double mix = jsum / osum;
     // Combine the two vector
-    for (int i = 0; i < raw.length; i++) {
+    for(int i = 0; i < raw.length; i++) {
       raw[i] = raw[i] + (1 - mix) * obj.doubleValue(i);
     }
     return factory.newNumberVector(raw);
@@ -146,12 +146,12 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter jitterP = new DoubleParameter(JITTER_ID);
-      jitterP.addConstraint(new GreaterEqualConstraint(0.));
-      if (config.grab(jitterP)) {
+      jitterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(jitterP)) {
         jitter = jitterP.getValue().doubleValue();
       }
       RandomParameter rndP = new RandomParameter(SEED_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }

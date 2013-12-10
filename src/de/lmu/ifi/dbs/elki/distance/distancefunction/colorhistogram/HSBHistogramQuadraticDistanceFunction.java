@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
@@ -113,12 +112,12 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
     if(obj == null) {
       return false;
     }
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
-    return this.weightMatrix.equals(((HSBHistogramQuadraticDistanceFunction)obj).weightMatrix);
+    return this.weightMatrix.equals(((HSBHistogramQuadraticDistanceFunction) obj).weightMatrix);
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -138,7 +137,7 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
       super.makeOptions(config);
       IntListParameter param = new IntListParameter(BPP_ID);
       param.addConstraint(new ListSizeConstraint(3));
-      param.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(1)));
+      param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT_LIST);
       if(config.grab(param)) {
         List<Integer> quant = param.getValue();
         assert (quant.size() == 3);

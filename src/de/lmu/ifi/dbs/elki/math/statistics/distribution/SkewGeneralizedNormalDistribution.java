@@ -28,7 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -116,7 +116,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   @Override
   public double nextRandom() {
     double y = random.nextGaussian();
-    if (Math.abs(skew) > 0.) {
+    if(Math.abs(skew) > 0.) {
       y = (1. - Math.exp(-skew * y)) / skew;
     }
     return mean + stddev * y;
@@ -138,7 +138,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    */
   public static double pdf(double x, double mu, double sigma, double skew) {
     x = (x - mu) / sigma;
-    if (Math.abs(skew) > 0.) {
+    if(Math.abs(skew) > 0.) {
       x = -Math.log(1. - skew * x) / skew;
     }
     return MathUtil.SQRTHALF * Math.exp(-.5 * x * x) / sigma / (1 - skew * x);
@@ -154,9 +154,9 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    */
   public static double cdf(double x, double mu, double sigma, double skew) {
     x = (x - mu) / sigma;
-    if (Math.abs(skew) > 0.) {
+    if(Math.abs(skew) > 0.) {
       double tmp = 1 - skew * x;
-      if (tmp < 1e-15) {
+      if(tmp < 1e-15) {
         return (skew < 0.) ? 0. : 1.;
       }
       x = -Math.log(tmp) / skew;
@@ -175,7 +175,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
    */
   public static double quantile(double x, double mu, double sigma, double skew) {
     x = NormalDistribution.standardNormalQuantile(x);
-    if (Math.abs(skew) > 0.) {
+    if(Math.abs(skew) > 0.) {
       x = (1. - Math.exp(-skew * x)) / skew;
     }
     return mu + sigma * x;
@@ -202,18 +202,18 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter meanP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(meanP)) {
+      if(config.grab(meanP)) {
         mean = meanP.doubleValue();
       }
 
       DoubleParameter sigmaP = new DoubleParameter(SCALE_ID);
-      sigmaP.addConstraint(new GreaterConstraint(0.));
-      if (config.grab(sigmaP)) {
+      sigmaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(sigmaP)) {
         sigma = sigmaP.doubleValue();
       }
 
       DoubleParameter skewP = new DoubleParameter(SKEW_ID);
-      if (config.grab(skewP)) {
+      if(config.grab(skewP)) {
         skew = skewP.doubleValue();
       }
     }

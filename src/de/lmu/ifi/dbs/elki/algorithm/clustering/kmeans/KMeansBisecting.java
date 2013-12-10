@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -205,7 +205,7 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
       super.makeOptions(config);
 
       IntParameter kP = new IntParameter(KMeans.K_ID);
-      kP.addConstraint(new GreaterConstraint(1));
+      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if (config.grab(kP)) {
         k = kP.intValue();
       }
