@@ -79,25 +79,6 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   private static final Logging LOG = Logging.getLogger(NumberVectorLabelParser.class);
 
   /**
-   * A comma separated list of the indices of labels (may be numeric), counting
-   * whitespace separated entries in a line starting with 0. The corresponding
-   * entries will be treated as a label.
-   * <p>
-   * Key: {@code -parser.labelIndices}
-   * </p>
-   */
-  public static final OptionID LABEL_INDICES_ID = new OptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
-
-  /**
-   * Parameter to specify the type of vectors to produce.
-   * <p>
-   * Key: {@code -parser.vector-type}<br />
-   * Default: DoubleVector
-   * </p>
-   */
-  public static final OptionID VECTOR_TYPE_ID = new OptionID("parser.vector-type", "The type of vectors to create for numerical attributes.");
-
-  /**
    * Keeps the indices of the attributes to be treated as a string label.
    */
   protected BitSet labelIndices;
@@ -393,6 +374,25 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParser.Parameterizer {
+    /**
+     * A comma separated list of the indices of labels (may be numeric), counting
+     * whitespace separated entries in a line starting with 0. The corresponding
+     * entries will be treated as a label.
+     * <p>
+     * Key: {@code -parser.labelIndices}
+     * </p>
+     */
+    public static final OptionID LABEL_INDICES_ID = new OptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
+
+    /**
+     * Parameter to specify the type of vectors to produce.
+     * <p>
+     * Key: {@code -parser.vector-type}<br />
+     * Default: DoubleVector
+     * </p>
+     */
+    public static final OptionID VECTOR_TYPE_ID = new OptionID("parser.vector-type", "The type of vectors to create for numerical attributes.");
+
     /**
      * Keeps the indices of the attributes to be treated as a string label.
      */
