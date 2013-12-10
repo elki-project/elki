@@ -157,6 +157,9 @@ public class COPVectorVisualization extends AbstractVisFactory {
           continue;
         }
         double[] v = proj.fastProjectDataToRenderSpace(vec);
+        if (v[0] != v[0] || v[1] != v[1]) {
+          continue; // NaN!
+        }
         Element arrow = svgp.svgLine(v[0], v[1], v[0] + ev[0], v[1] + ev[1]);
         SVGUtil.addCSSClass(arrow, VEC);
         layer.appendChild(arrow);

@@ -95,6 +95,9 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
 
     for(DBIDIter id = sample.getSample().iter(); id.valid(); id.advance()) {
       double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));
+      if(v[0] != v[0] || v[1] != v[1]) {
+        continue; // NaN!
+      }
       Element tooltip = makeTooltip(id, v[0], v[1], dotsize);
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 

@@ -31,6 +31,9 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -137,43 +140,75 @@ public class LineVisualization extends AbstractVisFactory {
       StylingPolicy sp = context.getStyleResult().getStylingPolicy();
       addCSSClasses(svgp, sp);
 
-      DBIDIter ids = sample.getSample().iter();
-      if(ids == null || !ids.valid()) {
-        ids = relation.iterDBIDs();
-      }
       if(sp instanceof ClassStylingPolicy) {
+        final DBIDs sam = DBIDUtil.ensureSet(sample.getSample());
         ClassStylingPolicy csp = (ClassStylingPolicy) sp;
         for(int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
           String key = DATALINE + "_" + c;
           for(DBIDIter iter = csp.iterateClass(c); iter.valid(); iter.advance()) {
-            if(!sample.getSample().contains(iter)) {
+            if(!sam.contains(iter)) {
               continue; // TODO: can we test more efficiently than this?
             }
-            SVGPath path = new SVGPath();
-            double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
-            for(int i = 0; i < yPos.length; i++) {
-              path.drawTo(getVisibleAxisX(i), yPos[i]);
+            Element line = drawLine(iter);
+            if(line != null) {
+              SVGUtil.addCSSClass(line, key);
+
+              layer.appendChild(line);
             }
-            Element line = path.makeElement(svgp);
-            SVGUtil.addCSSClass(line, key);
-            layer.appendChild(line);
           }
         }
       }
       else {
+        DBIDIter ids = sample.getSample().iter();
+        if(ids == null || !ids.valid()) {
+          ids = relation.iterDBIDs();
+        }
         for(; ids.valid(); ids.advance()) {
-          SVGPath path = new SVGPath();
-          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(ids));
-          for(int i = 0; i < yPos.length; i++) {
-            path.drawTo(getVisibleAxisX(i), yPos[i]);
+          Element line = drawLine(ids);
+          if(line != null) {
+            SVGUtil.addCSSClass(line, DATALINE);
+            // assign color
+            line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(ids)));
+            layer.appendChild(line);
           }
-          Element line = path.makeElement(svgp);
-          SVGUtil.addCSSClass(line, DATALINE);
-          // assign color
-          line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(ids)));
-          layer.appendChild(line);
         }
       }
+    }
+
+    /**
+     * Draw a single line.
+     * 
+     * @param iter Object reference
+     * @return
+     */
+    private Element drawLine(DBIDRef iter) {
+      SVGPath path = new SVGPath();
+      double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
+      boolean draw = false, drawprev = false, drawn = false;
+      for(int i = 0; i < yPos.length; i++) {
+        // NaN handling:
+        if(yPos[i] != yPos[i]) {
+          draw = false;
+          drawprev = false;
+          continue;
+        }
+        if(draw) {
+          if(drawprev) {
+            path.moveTo(getVisibleAxisX(i - 1), yPos[i - 1]);
+            drawprev = false;
+          }
+          path.lineTo(getVisibleAxisX(i), yPos[i]);
+          drawn = true;
+        }
+        else {
+          drawprev = true;
+        }
+        draw = true;
+      }
+      if(!drawn) {
+        return null; // Not enough data.
+      }
+      return path.makeElement(svgp);
     }
 
     /**

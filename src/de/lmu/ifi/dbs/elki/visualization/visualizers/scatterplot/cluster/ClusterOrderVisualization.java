@@ -136,10 +136,13 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
         double[] thisVec = proj.fastProjectDataToRenderSpace(rel.get(thisId));
         double[] prevVec = proj.fastProjectDataToRenderSpace(rel.get(prevId));
 
-        // FIXME: DO NOT COMMIT
-        thisVec[0] = thisVec[0] * 0.95 + prevVec[0] * 0.05;
-        thisVec[1] = thisVec[1] * 0.95 + prevVec[1] * 0.05;
-
+        if(thisVec[0] != thisVec[0] || thisVec[1] != thisVec[1]) {
+          continue; // NaN!
+        }
+        if(prevVec[0] != prevVec[0] || prevVec[1] != prevVec[1]) {
+          continue; // NaN!
+        }
+        // FIXME: add arrow decorations!
         Element arrow = svgp.svgLine(prevVec[0], prevVec[1], thisVec[0], thisVec[1]);
         SVGUtil.setCSSClass(arrow, cls.getName());
 

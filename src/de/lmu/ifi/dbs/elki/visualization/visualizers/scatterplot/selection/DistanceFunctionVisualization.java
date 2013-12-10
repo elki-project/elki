@@ -281,6 +281,9 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
           for(DistanceDBIDListIter<D> iter = knn.iter(); iter.valid(); iter.advance()) {
             try {
               double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
+              if (v[0] != v[0] || v[1] != v[1]) {
+                continue; // NaN!
+              }
               Element dot = svgp.svgCircle(v[0], v[1], size);
               SVGUtil.addCSSClass(dot, KNNMARKER);
               layer.appendChild(dot);
