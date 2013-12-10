@@ -750,7 +750,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
         specfile = cfgparam.getValue();
       }
       // Cluster size scaling
-      final DoubleParameter scalepar = new DoubleParameter(SIZE_SCALE_ID, Double.valueOf(1.0));
+      final DoubleParameter scalepar = new DoubleParameter(SIZE_SCALE_ID, 1.);
       if (config.grab(scalepar)) {
         sizescale = scalepar.getValue().doubleValue();
       }

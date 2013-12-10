@@ -1448,10 +1448,10 @@ public class Matrix {
     final StreamTokenizer tokenizer = new StreamTokenizer(input);
 
     // Although StreamTokenizer will parse numbers, it doesn't recognize
-    // scientific notation (E or D); however, Double.valueOf does.
+    // scientific notation (E or D); however, FormatUtil.parseDouble does.
     // The strategy here is to disable StreamTokenizer's number parsing.
     // We'll only get whitespace delimited words, EOL's and EOF's.
-    // These words should all be numbers, for Double.valueOf to parse.
+    // These words should all be numbers, for FormatUtil.parseDouble to parse.
 
     tokenizer.resetSyntax();
     tokenizer.wordChars(0, 255);

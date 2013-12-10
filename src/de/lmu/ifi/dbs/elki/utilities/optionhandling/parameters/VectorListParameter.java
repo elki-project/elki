@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -184,7 +185,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
         ArrayList<Double> vectorCoord = new ArrayList<>();
         for(String coordinate : coordinates) {
           try {
-            vectorCoord.add(Double.valueOf(coordinate));
+            vectorCoord.add(FormatUtil.parseDouble(coordinate));
           }
           catch(NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format! Coordinates of vector \"" + vector + "\" are not valid!");

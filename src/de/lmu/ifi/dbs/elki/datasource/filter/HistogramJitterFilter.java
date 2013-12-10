@@ -146,7 +146,7 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter jitterP = new DoubleParameter(JITTER_ID);
-      jitterP.addConstraint(new GreaterEqualConstraint(Double.valueOf(0.0)));
+      jitterP.addConstraint(new GreaterEqualConstraint(0.));
       if (config.grab(jitterP)) {
         jitter = jitterP.getValue().doubleValue();
       }

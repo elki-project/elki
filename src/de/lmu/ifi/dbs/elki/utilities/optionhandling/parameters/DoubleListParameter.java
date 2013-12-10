@@ -83,7 +83,7 @@ public class DoubleListParameter extends ListParameter<Double> {
       String[] values = SPLIT.split((String) obj);
       ArrayList<Double> doubleValue = new ArrayList<>(values.length);
       for(String val : values) {
-        doubleValue.add(Double.valueOf(val));
+        doubleValue.add(FormatUtil.parseDouble(val));
       }
       return doubleValue;
     }
