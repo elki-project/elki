@@ -52,8 +52,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -106,7 +105,8 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     try {
       Relation<?> relation = database.getRelation(TypeUtil.CLASSLABEL);
       return run(models, vecs, relation);
-    } catch (NoSupportedDataTypeException e) {
+    }
+    catch(NoSupportedDataTypeException e) {
       // Otherwise, try any labellike.
       return run(models, vecs, database.getRelation(TypeUtil.GUESSED_LABEL));
     }
@@ -124,56 +124,58 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(models.getDBIDs(), DataStoreFactory.HINT_HOT);
 
     HashSet<GeneratorSingleCluster> generators = new HashSet<>();
-    for (DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       Model model = models.get(iditer);
-      if (model instanceof GeneratorSingleCluster) {
+      if(model instanceof GeneratorSingleCluster) {
         generators.add((GeneratorSingleCluster) model);
       }
     }
-    if (generators.size() == 0) {
+    if(generators.size() == 0) {
       LOG.warning("No generator models found for dataset - all points will be considered outliers.");
     }
-    for (GeneratorSingleCluster gen : generators) {
-      for (int i = 0; i < gen.getDim(); i++) {
+    for(GeneratorSingleCluster gen : generators) {
+      for(int i = 0; i < gen.getDim(); i++) {
         Distribution dist = gen.getDistribution(i);
-        if (!(dist instanceof NormalDistribution)) {
+        if(!(dist instanceof NormalDistribution)) {
           throw new AbortException("TrivialGeneratedOutlier currently only supports normal distributions, got: " + dist);
         }
       }
     }
 
-    for (DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double score = 1.;
       // Convert to a math vector
       Vector v = vecs.get(iditer).getColumnVector();
-      for (GeneratorSingleCluster gen : generators) {
+      for(GeneratorSingleCluster gen : generators) {
         Vector tv = v;
         // Transform backwards
-        if (gen.getTransformation() != null) {
+        if(gen.getTransformation() != null) {
           tv = gen.getTransformation().applyInverse(v);
         }
         final int dim = tv.getDimensionality();
         double lensq = 0.0;
         int norm = 0;
-        for (int i = 0; i < dim; i++) {
+        for(int i = 0; i < dim; i++) {
           Distribution dist = gen.getDistribution(i);
-          if (dist instanceof NormalDistribution) {
+          if(dist instanceof NormalDistribution) {
             NormalDistribution d = (NormalDistribution) dist;
             double delta = (tv.get(i) - d.getMean()) / d.getStddev();
             lensq += delta * delta;
             norm += 1;
-          } else {
+          }
+          else {
             throw new AbortException("TrivialGeneratedOutlier currently only supports normal distributions, got: " + dist);
           }
         }
-        if (norm > 0.) {
+        if(norm > 0.) {
           // The squared distances are ChiSquared distributed
           score = Math.min(score, ChiSquaredDistribution.cdf(lensq, norm));
-        } else {
+        }
+        else {
           score = 0.;
         }
       }
-      if (expect < 1) {
+      if(expect < 1) {
         score = expect * score / (1 - score + expect);
       }
       scores.putDouble(iditer, score);
@@ -210,9 +212,9 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.01);
-      expectP.addConstraint(new GreaterConstraint(0.0));
-      expectP.addConstraint(new LessEqualConstraint(1.0));
-      if (config.grab(expectP)) {
+      expectP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      expectP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      if(config.grab(expectP)) {
         expect = expectP.getValue();
       }
     }

@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjection
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -90,7 +90,7 @@ public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHas
     int dim = RelationUtil.dimensionality(relation);
     ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(l);
     final Random rnd = random.getRandom();
-    for (int i = 0; i < l; i++) {
+    for(int i = 0; i < l; i++) {
       RandomProjectionFamily.Projection mat = proj.generateProjection(dim, k);
       ps.add(new MultipleProjectionsLocalitySensitiveHashFunction(mat, width, rnd));
     }
@@ -144,19 +144,19 @@ public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHas
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       RandomParameter randP = new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT);
-      if (config.grab(randP)) {
+      if(config.grab(randP)) {
         random = randP.getValue();
       }
 
       DoubleParameter widthP = new DoubleParameter(WIDTH_ID);
-      widthP.addConstraint(new GreaterConstraint(0.0));
-      if (config.grab(widthP)) {
+      widthP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(widthP)) {
         width = widthP.doubleValue();
       }
 
       IntParameter lP = new IntParameter(NUMPROJ_ID);
-      lP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(lP)) {
+      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(lP)) {
         k = lP.intValue();
       }
     }

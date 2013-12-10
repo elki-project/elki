@@ -36,9 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -162,33 +160,34 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
       super.makeOptions(config);
 
       IntParameter muP = new IntParameter(MU_ID);
-      muP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(muP)) {
+      muP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(muP)) {
         mu = muP.getValue();
       }
 
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(0));
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       kP.setOptional(true);
       final int k;
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.getValue();
-      } else {
+      }
+      else {
         k = mu;
       }
 
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID, DEFAULT_DELTA);
-      deltaP.addConstraint(new GreaterEqualConstraint(0));
+      deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       double delta = DEFAULT_DELTA;
-      if (config.grab(deltaP)) {
+      if(config.grab(deltaP)) {
         delta = deltaP.doubleValue();
       }
 
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA);
-      alphaP.addConstraint(new GreaterConstraint(0.0));
-      alphaP.addConstraint(new LessConstraint(1.0));
+      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      alphaP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       double alpha = DEFAULT_ALPHA;
-      if (config.grab(alphaP)) {
+      if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
 

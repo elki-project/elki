@@ -36,8 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
@@ -80,7 +79,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
     this.dimensionality = dims.length;
 
     int mind = 0;
-    for (int dim : dims) {
+    for(int dim : dims) {
       mind = Math.max(mind, dim + 1);
     }
     this.mindim = mind;
@@ -91,7 +90,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
   public void initialize(SimpleTypeInformation<V> in) {
     final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
     factory = (FeatureVector.Factory<V, F>) vin.getFactory();
-    if (vin.getDimensionality() < mindim) {
+    if(vin.getDimensionality() < mindim) {
       throw new AbortException("Data does not have enough dimensions for this projection!");
     }
   }
@@ -111,7 +110,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
    */
   @SuppressWarnings("unchecked")
   private static <V extends FeatureVector<F>, F> ArrayAdapter<F, ? super V> getAdapter(Factory<V, F> factory) {
-    if (factory instanceof NumberVector.Factory) {
+    if(factory instanceof NumberVector.Factory) {
       return (ArrayAdapter<F, ? super V>) ArrayLikeUtil.NUMBERVECTORADAPTER;
     }
     return (ArrayAdapter<F, ? super V>) ArrayLikeUtil.FEATUREVECTORADAPTER;
@@ -145,10 +144,10 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      
+
       IntListParameter selectedAttributesP = new IntListParameter(NumberVectorFeatureSelectionFilter.Parameterizer.SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(0)));
-      if (config.grab(selectedAttributesP)) {
+      selectedAttributesP.addConstraint(CommonConstraints.NONNEGATIVE_INT_LIST);
+      if(config.grab(selectedAttributesP)) {
         dims = ArrayLikeUtil.toPrimitiveIntegerArray(selectedAttributesP.getValue());
       }
     }

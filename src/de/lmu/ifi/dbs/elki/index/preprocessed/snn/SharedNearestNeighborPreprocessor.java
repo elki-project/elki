@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -114,7 +114,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       ArrayModifiableDBIDs neighbors = DBIDUtil.newArray(numberOfNeighbors);
       KNNList<D> kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
-      for (DBIDIter iter = kNN.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = kNN.iter(); iter.valid(); iter.advance()) {
         // if(!id.equals(nid)) {
         neighbors.add(iter);
         // }
@@ -248,7 +248,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     public TypeInformation getInputTypeRestriction() {
       return distanceFunction.getInputTypeRestriction();
     }
-    
+
     /**
      * Parameterization class.
      * 
@@ -271,7 +271,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         final IntParameter numberOfNeighborsP = new IntParameter(NUMBER_OF_NEIGHBORS_ID);
-        numberOfNeighborsP.addConstraint(new GreaterEqualConstraint(1));
+        numberOfNeighborsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(numberOfNeighborsP)) {
           numberOfNeighbors = numberOfNeighborsP.getValue();
         }

@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -384,13 +384,13 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       }
 
       final IntParameter knnP = new IntParameter(KNN_ID);
-      knnP.addConstraint(new GreaterConstraint(0));
+      knnP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if (config.grab(knnP)) {
         knn = knnP.getValue();
       }
 
       final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.1);
-      alphaP.addConstraint(new GreaterConstraint(0));
+      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if (config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

@@ -48,8 +48,7 @@ import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -658,8 +657,8 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter xiP = new DoubleParameter(XI_ID);
-      xiP.addConstraint(new GreaterEqualConstraint(0.0));
-      xiP.addConstraint(new LessConstraint(1.0));
+      xiP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      xiP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(xiP)) {
         xi = xiP.doubleValue();
       }

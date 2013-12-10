@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
@@ -136,7 +136,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
   @Override
   public void initialize() {
     setPartitions(relation);
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       vectorApprox.add(calculateApproximation(id, relation.get(id)));
     }
@@ -149,7 +149,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
    * @throws IllegalArgumentException
    */
   public void setPartitions(Relation<V> relation) throws IllegalArgumentException {
-    if ((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
+    if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
@@ -157,16 +157,16 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
     final int size = relation.size();
     splitPositions = new double[dimensions][partitions + 1];
 
-    for (int d = 0; d < dimensions; d++) {
+    for(int d = 0; d < dimensions; d++) {
       double[] tempdata = new double[size];
       int j = 0;
-      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         tempdata[j] = relation.get(iditer).doubleValue(d);
         j += 1;
       }
       Arrays.sort(tempdata);
 
-      for (int b = 0; b < partitions; b++) {
+      for(int b = 0; b < partitions; b++) {
         int start = (int) (b * size / (double) partitions);
         splitPositions[d][b] = tempdata[start];
       }
@@ -184,20 +184,20 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
    */
   public VectorApproximation calculateApproximation(DBID id, V dv) {
     int approximation[] = new int[dv.getDimensionality()];
-    for (int d = 0; d < splitPositions.length; d++) {
+    for(int d = 0; d < splitPositions.length; d++) {
       final double val = dv.doubleValue(d);
       final int lastBorderIndex = splitPositions[d].length - 1;
 
       // Value is below data grid
-      if (val < splitPositions[d][0]) {
+      if(val < splitPositions[d][0]) {
         approximation[d] = 0;
-        if (id != null) {
+        if(id != null) {
           LOG.warning("Vector outside of VAFile grid!");
         }
       } // Value is above data grid
-      else if (val > splitPositions[d][lastBorderIndex]) {
+      else if(val > splitPositions[d][lastBorderIndex]) {
         approximation[d] = lastBorderIndex - 1;
-        if (id != null) {
+        if(id != null) {
           LOG.warning("Vector outside of VAFile grid!");
         }
       } // normal case
@@ -247,14 +247,14 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_BULK) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_BULK) {
         // FIXME: support bulk?
         return null;
       }
     }
     DistanceFunction<? super V, ?> df = distanceQuery.getDistanceFunction();
-    if (df instanceof LPNormDistanceFunction) {
+    if(df instanceof LPNormDistanceFunction) {
       double p = ((LPNormDistanceFunction) df).getP();
       DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
       KNNQuery<V, ?> dq = new VAFileKNNQuery((DistanceQuery<V, DoubleDistance>) ddq, p);
@@ -268,7 +268,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
   @Override
   public <D extends Distance<D>> RangeQuery<V, D> getRangeQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
     DistanceFunction<? super V, ?> df = distanceQuery.getDistanceFunction();
-    if (df instanceof LPNormDistanceFunction) {
+    if(df instanceof LPNormDistanceFunction) {
       double p = ((LPNormDistanceFunction) df).getP();
       DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
       RangeQuery<V, ?> dq = new VAFileRangeQuery((DistanceQuery<V, DoubleDistance>) ddq, p);
@@ -315,11 +315,11 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
 
       DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
       // Approximation step
-      for (int i = 0; i < vectorApprox.size(); i++) {
+      for(int i = 0; i < vectorApprox.size(); i++) {
         VectorApproximation va = vectorApprox.get(i);
         double minDist = vadist.getMinDist(va);
 
-        if (minDist > eps) {
+        if(minDist > eps) {
           continue;
         }
 
@@ -328,7 +328,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
 
         // refine the next element
         final double dist = refine(va.id, query).doubleValue();
-        if (dist <= eps) {
+        if(dist <= eps) {
           result.add(dist, va.id);
         }
       }
@@ -377,20 +377,20 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       scans += 1;
 
       // Approximation step
-      for (int i = 0; i < vectorApprox.size(); i++) {
+      for(int i = 0; i < vectorApprox.size(); i++) {
         VectorApproximation va = vectorApprox.get(i);
         double minDist = vadist.getMinDist(va);
         double maxDist = vadist.getMaxDist(va);
 
         // Skip excess candidate generation:
-        if (minDist > minMaxDist) {
+        if(minDist > minMaxDist) {
           continue;
         }
         candidates.add(new DoubleObjPair<>(minDist, va.id));
 
         // Update candidate pruning heap
         minMaxHeap.add(maxDist, k);
-        if (minMaxHeap.size() >= k) {
+        if(minMaxHeap.size() >= k) {
           minMaxDist = minMaxHeap.peek();
         }
       }
@@ -402,11 +402,11 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
 
       // log.fine("candidates size " + candidates.size());
       // retrieve accurate distances
-      for (DoubleObjPair<DBID> va : candidates) {
+      for(DoubleObjPair<DBID> va : candidates) {
         // Stop when we are sure to have all elements
-        if (result.size() >= k) {
+        if(result.size() >= k) {
           double kDist = result.doubleKNNDistance();
-          if (va.first > kDist) {
+          if(va.first > kDist) {
             break;
           }
         }
@@ -415,7 +415,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
         final double dist = refine(va.second, query).doubleValue();
         result.add(dist, va.second);
       }
-      if (LOG.isDebuggingFinest()) {
+      if(LOG.isDebuggingFinest()) {
         LOG.finest("query = (" + query + ")");
         LOG.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
       }
@@ -498,13 +498,13 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         IntParameter pagesizeP = new IntParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1024);
-        pagesizeP.addConstraint(new GreaterConstraint(0));
-        if (config.grab(pagesizeP)) {
+        pagesizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(pagesizeP)) {
           pagesize = pagesizeP.getValue();
         }
         IntParameter partitionsP = new IntParameter(Factory.PARTITIONS_ID);
-        partitionsP.addConstraint(new GreaterConstraint(2));
-        if (config.grab(partitionsP)) {
+        partitionsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+        if(config.grab(partitionsP)) {
           numpart = partitionsP.getValue();
         }
       }

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistan
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -75,7 +75,7 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
    */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    if (dim >= v1.getDimensionality() || dim >= v2.getDimensionality() || dim < 0) {
+    if(dim >= v1.getDimensionality() || dim >= v2.getDimensionality() || dim < 0) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
 
@@ -85,18 +85,20 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if (dim >= mbr1.getDimensionality() || dim >= mbr2.getDimensionality() || dim < 0) {
+    if(dim >= mbr1.getDimensionality() || dim >= mbr2.getDimensionality() || dim < 0) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
 
     double m1, m2;
-    if (mbr1.getMax(dim) < mbr2.getMin(dim)) {
+    if(mbr1.getMax(dim) < mbr2.getMin(dim)) {
       m1 = mbr1.getMax(dim);
       m2 = mbr2.getMin(dim);
-    } else if (mbr1.getMin(dim) > mbr2.getMax(dim)) {
+    }
+    else if(mbr1.getMin(dim) > mbr2.getMax(dim)) {
       m1 = mbr1.getMin(dim);
       m2 = mbr2.getMax(dim);
-    } else { // The mbrs intersect!
+    }
+    else { // The mbrs intersect!
       m1 = 0;
       m2 = 0;
     }
@@ -130,10 +132,10 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
   @Override
   public void setSelectedDimensions(BitSet dimensions) {
     dim = dimensions.nextSetBit(0);
-    if (dim == -1) {
+    if(dim == -1) {
       throw new IllegalStateException("No dimension was set.");
     }
-    if (dimensions.nextSetBit(dim + 1) > 0) {
+    if(dimensions.nextSetBit(dim + 1) > 0) {
       throw new IllegalStateException("More than one dimension was set.");
     }
   }
@@ -150,10 +152,10 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
     return this.dim == ((DimensionSelectingDistanceFunction) obj).dim;
@@ -173,8 +175,8 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter dimP = new IntParameter(DIM_ID);
-      dimP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(dimP)) {
+      dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      if(config.grab(dimP)) {
         dim = dimP.getValue();
       }
     }

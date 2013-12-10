@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -91,7 +91,7 @@ public class HistogramFactory implements ProjectorFactory {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter maxdimP = new IntParameter(ScatterPlotFactory.Parameterizer.MAXDIM_ID, ScatterPlotFactory.MAX_DIMENSIONS_DEFAULT);
-      maxdimP.addConstraint(new GreaterEqualConstraint(1));
+      maxdimP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxdimP)) {
         maxdim = maxdimP.intValue();
       }

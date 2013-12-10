@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -159,15 +159,15 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
     public void initialize() {
       final int numhash = hashfunctions.size();
       hashtables = new ArrayList<>(numhash);
-      for (int i = 0; i < numhash; i++) {
+      for(int i = 0; i < numhash; i++) {
         hashtables.add(new TIntObjectHashMap<DBIDs>(numberOfBuckets));
       }
 
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Building LSH index.", relation.size(), LOG) : null;
       int expect = Math.max(2, (int) Math.ceil(relation.size() / (double) numberOfBuckets));
-      for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         V obj = relation.get(iter);
-        for (int i = 0; i < numhash; i++) {
+        for(int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
@@ -175,35 +175,37 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
           // Reduce to hash table size
           int bucket = hash % numberOfBuckets;
           DBIDs cur = table.get(bucket);
-          if (cur == null) {
+          if(cur == null) {
             table.put(bucket, DBIDUtil.deref(iter));
-          } else if (cur.size() > 1) {
+          }
+          else if(cur.size() > 1) {
             ((ModifiableDBIDs) cur).add(iter);
-          } else {
+          }
+          else {
             ModifiableDBIDs newbuck = DBIDUtil.newArray(expect);
             newbuck.addDBIDs(cur);
             newbuck.add(iter);
             table.put(bucket, newbuck);
           }
         }
-        if (progress != null) {
+        if(progress != null) {
           progress.incrementProcessed(LOG);
         }
       }
-      if (progress != null) {
+      if(progress != null) {
         progress.ensureCompleted(LOG);
       }
-      if (LOG.isStatistics()) {
+      if(LOG.isStatistics()) {
         int min = Integer.MAX_VALUE, max = 0;
-        for (int i = 0; i < numhash; i++) {
+        for(int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
-          for (TIntObjectIterator<DBIDs> iter = table.iterator(); iter.hasNext();) {
+          for(TIntObjectIterator<DBIDs> iter = table.iterator(); iter.hasNext();) {
             iter.advance();
             int size = iter.value().size();
-            if (size < min) {
+            if(size < min) {
               min = size;
             }
-            if (size > max) {
+            if(size > max) {
               max = size;
             }
           }
@@ -221,13 +223,13 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
     @Override
     public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
-      for (Object hint : hints) {
-        if (DatabaseQuery.HINT_EXACT.equals(hint)) {
+      for(Object hint : hints) {
+        if(DatabaseQuery.HINT_EXACT.equals(hint)) {
           return null;
         }
       }
       DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
-      if (!family.isCompatible(df)) {
+      if(!family.isCompatible(df)) {
         return null;
       }
       return (KNNQuery<V, D>) new LSHKNNQuery<>(distanceQuery);
@@ -235,13 +237,13 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
     @Override
     public <D extends Distance<D>> RangeQuery<V, D> getRangeQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
-      for (Object hint : hints) {
-        if (DatabaseQuery.HINT_EXACT.equals(hint)) {
+      for(Object hint : hints) {
+        if(DatabaseQuery.HINT_EXACT.equals(hint)) {
           return null;
         }
       }
       DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
-      if (!family.isCompatible(df)) {
+      if(!family.isCompatible(df)) {
         return null;
       }
       return (RangeQuery<V, D>) new LSHRangeQuery<>(distanceQuery);
@@ -270,7 +272,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       public KNNList<D> getKNNForObject(V obj, int k) {
         ModifiableDBIDs candidates = null;
         final int numhash = hashtables.size();
-        for (int i = 0; i < numhash; i++) {
+        for(int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
@@ -278,20 +280,20 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
           // Reduce to hash table size
           int bucket = hash % numberOfBuckets;
           DBIDs cur = table.get(bucket);
-          if (cur != null) {
-            if (candidates == null) {
+          if(cur != null) {
+            if(candidates == null) {
               candidates = DBIDUtil.newHashSet(cur.size() * numhash + k);
             }
             candidates.addDBIDs(cur);
           }
         }
-        if (candidates == null) {
+        if(candidates == null) {
           candidates = DBIDUtil.newArray();
         }
 
         // Refine.
         KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
-        for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
           final D dist = distanceQuery.distance(obj, iter);
           super.incRefinements(1);
           heap.add(dist, iter);
@@ -323,7 +325,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       public DistanceDBIDList<D> getRangeForObject(V obj, D range) {
         ModifiableDBIDs candidates = DBIDUtil.newHashSet();
         final int numhash = hashtables.size();
-        for (int i = 0; i < numhash; i++) {
+        for(int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
@@ -331,17 +333,17 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
           // Reduce to hash table size
           int bucket = hash % numberOfBuckets;
           DBIDs cur = table.get(bucket);
-          if (cur != null) {
+          if(cur != null) {
             candidates.addDBIDs(cur);
           }
         }
 
         // Refine.
         GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
-        for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
           final D dist = distanceQuery.distance(obj, iter);
           super.incRefinements(1);
-          if (range.compareTo(dist) >= 0) {
+          if(range.compareTo(dist) >= 0) {
             result.add(dist, iter);
           }
         }
@@ -392,20 +394,20 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<LocalitySensitiveHashFunctionFamily<? super V>> familyP = new ObjectParameter<>(FAMILY_ID, LocalitySensitiveHashFunctionFamily.class);
-      if (config.grab(familyP)) {
+      if(config.grab(familyP)) {
         family = familyP.instantiateClass(config);
       }
 
       IntParameter lP = new IntParameter(L_ID);
-      lP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(lP)) {
+      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(lP)) {
         l = lP.intValue();
       }
 
       IntParameter bucketsP = new IntParameter(BUCKETS_ID);
       bucketsP.setDefaultValue(7919); // Primes work best, apparently.
-      bucketsP.addConstraint(new GreaterConstraint(1));
-      if (config.grab(bucketsP)) {
+      bucketsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(bucketsP)) {
         numberOfBuckets = bucketsP.intValue();
       }
     }

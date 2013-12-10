@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -494,7 +494,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       }
 
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(1));
+      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if (config.grab(kP)) {
         k = kP.getValue();
       }

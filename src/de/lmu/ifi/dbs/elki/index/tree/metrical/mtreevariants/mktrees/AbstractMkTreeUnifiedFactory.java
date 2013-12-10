@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -80,9 +80,9 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends NumberDistance<D
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter k_maxP = new IntParameter(K_MAX_ID);
-      k_maxP.addConstraint(new GreaterConstraint(0));
+      k_maxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
 
-      if (config.grab(k_maxP)) {
+      if(config.grab(k_maxP)) {
         settings.k_max = k_maxP.getValue();
       }
     }

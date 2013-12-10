@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
@@ -155,7 +156,7 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter insertionCandidatesP = new IntParameter(INSERTION_CANDIDATES_ID, numCandidates);
-      insertionCandidatesP.addConstraint(new GreaterConstraint(0));
+      insertionCandidatesP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(insertionCandidatesP)) {
         numCandidates = insertionCandidatesP.getValue();
       }

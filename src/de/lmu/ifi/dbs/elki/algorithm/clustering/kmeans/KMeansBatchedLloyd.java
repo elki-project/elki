@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -323,7 +323,7 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter blocksP = new IntParameter(BLOCKS_ID, 10);
-      blocksP.addConstraint(new GreaterConstraint(1));
+      blocksP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if (config.grab(blocksP)) {
         blocks = blocksP.intValue();
       }

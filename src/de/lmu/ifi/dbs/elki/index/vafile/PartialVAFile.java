@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -877,7 +878,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         IntParameter pagesizeP = new IntParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1024);
-        pagesizeP.addConstraint(new GreaterConstraint(0));
+        pagesizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(pagesizeP)) {
           pagesize = pagesizeP.getValue();
         }

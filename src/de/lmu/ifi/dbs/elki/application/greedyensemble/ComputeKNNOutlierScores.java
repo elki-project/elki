@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -428,7 +428,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       }
       // k parameters
       IntParameter stepkP = new IntParameter(STEPK_ID);
-      stepkP.addConstraint(new GreaterConstraint(0));
+      stepkP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(stepkP)) {
         stepk = stepkP.getValue();
       }
@@ -441,7 +441,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
         startk = stepk;
       }
       IntParameter maxkP = new IntParameter(MAXK_ID);
-      maxkP.addConstraint(new GreaterConstraint(0));
+      maxkP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(maxkP)) {
         maxk = maxkP.getValue();
       }

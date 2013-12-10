@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -61,7 +61,7 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     super(random);
     this.sparsity = sparsity;
   }
-  
+
   @Override
   public Projection generateProjection(int idim, int odim) {
     final double pPos = .5 / sparsity;
@@ -69,15 +69,17 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     double baseValuePart = Math.sqrt(this.sparsity);
 
     Matrix projectionMatrix = new Matrix(odim, idim);
-    for (int i = 0; i < odim; ++i) {
-      for (int j = 0; j < idim; ++j) {
+    for(int i = 0; i < odim; ++i) {
+      for(int j = 0; j < idim; ++j) {
         final double r = random.nextDouble();
         final double value;
-        if (r < pPos) {
+        if(r < pPos) {
           value = baseValuePart;
-        } else if (r < pNeg) {
+        }
+        else if(r < pNeg) {
           value = -baseValuePart;
-        } else {
+        }
+        else {
           value = 0.;
         }
 
@@ -110,8 +112,8 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
       super.makeOptions(config);
       DoubleParameter sparsP = new DoubleParameter(SPARSITY_ID);
       sparsP.setDefaultValue(3.);
-      sparsP.addConstraint(new GreaterEqualConstraint(1.));
-      if (config.grab(sparsP)) {
+      sparsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+      if(config.grab(sparsP)) {
         sparsity = sparsP.doubleValue();
       }
     }

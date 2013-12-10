@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -90,34 +90,35 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
 
   @Override
   public Clustering<M> run(Database database, Relation<V> relation) {
-    if (!(innerkMeans.getDistanceFunction() instanceof PrimitiveDistanceFunction)) {
+    if(!(innerkMeans.getDistanceFunction() instanceof PrimitiveDistanceFunction)) {
       throw new AbortException("K-Means results can only be evaluated for primitive distance functions, got: " + innerkMeans.getDistanceFunction().getClass());
     }
     final PrimitiveDistanceFunction<? super V, D> df = (PrimitiveDistanceFunction<? super V, D>) innerkMeans.getDistanceFunction();
     Clustering<M> bestResult = null;
-    if (trials > 1) {
+    if(trials > 1) {
       double bestCost = Double.POSITIVE_INFINITY;
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("K-means iterations", trials, LOG) : null;
-      for (int i = 0; i < trials; i++) {
+      for(int i = 0; i < trials; i++) {
         Clustering<M> currentCandidate = innerkMeans.run(database, relation);
         double currentCost = qualityMeasure.calculateCost(currentCandidate, df, relation);
 
-        if (LOG.isVerbose()) {
+        if(LOG.isVerbose()) {
           LOG.verbose("Cost of candidate " + i + ": " + currentCost);
         }
 
-        if (currentCost < bestCost) {
+        if(currentCost < bestCost) {
           bestResult = currentCandidate;
           bestCost = currentCost;
         }
-        if (prog != null) {
+        if(prog != null) {
           prog.incrementProcessed(LOG);
         }
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.ensureCompleted(LOG);
       }
-    } else {
+    }
+    else {
       bestResult = innerkMeans.run(database);
     }
 
@@ -195,18 +196,18 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
     @Override
     protected void makeOptions(Parameterization config) {
       IntParameter trialsP = new IntParameter(TRIALS_ID);
-      trialsP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(trialsP)) {
+      trialsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(trialsP)) {
         trials = trialsP.intValue();
       }
 
       ObjectParameter<KMeans<V, D, M>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class);
-      if (config.grab(kMeansVariantP)) {
+      if(config.grab(kMeansVariantP)) {
         kMeansVariant = kMeansVariantP.instantiateClass(config);
       }
 
       ObjectParameter<KMeansQualityMeasure<V, ? super D>> qualityMeasureP = new ObjectParameter<>(QUALITYMEASURE_ID, KMeansQualityMeasure.class);
-      if (config.grab(qualityMeasureP)) {
+      if(config.grab(qualityMeasureP)) {
         qualityMeasure = qualityMeasureP.instantiateClass(config);
       }
     }

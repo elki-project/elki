@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.persistent;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -116,13 +116,13 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<PageFileFactory<Page>> pffP = new ObjectParameter<>(PAGEFILE_ID, PageFileFactory.class, PersistentPageFileFactory.class);
-      if (config.grab(pffP)) {
+      if(config.grab(pffP)) {
         pageFileFactory = pffP.instantiateClass(config);
       }
 
       IntParameter cacheSizeP = new IntParameter(CACHE_SIZE_ID);
-      cacheSizeP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(cacheSizeP)) {
+      cacheSizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      if(config.grab(cacheSizeP)) {
         cacheSize = cacheSizeP.getValue();
       }
     }

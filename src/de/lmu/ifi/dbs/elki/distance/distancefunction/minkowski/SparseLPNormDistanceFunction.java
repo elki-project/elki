@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFu
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DoubleNorm;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -149,7 +149,7 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter pP = new DoubleParameter(LPNormDistanceFunction.P_ID);
-      pP.addConstraint(new GreaterConstraint(0.));
+      pP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(pP)) {
         p = pP.getValue();
       }

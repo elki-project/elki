@@ -35,8 +35,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
@@ -150,11 +149,11 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(0)));
-      if (config.grab(selectedAttributesP)) {
+      selectedAttributesP.addConstraint(CommonConstraints.NONNEGATIVE_INT_LIST);
+      if(config.grab(selectedAttributesP)) {
         selectedAttributes = new BitSet();
         List<Integer> dimensionList = selectedAttributesP.getValue();
-        for (int d : dimensionList) {
+        for(int d : dimensionList) {
           selectedAttributes.set(d);
         }
       }

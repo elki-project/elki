@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -93,21 +93,21 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     // find the last eigenvector that is considered 'strong' by the weak rule
     // applied to the remaining vectors only
     double eigenValueSum = eigenPairs.getEigenPair(eigenPairs.size() - 1).getEigenvalue();
-    for (int i = eigenPairs.size() - 2; i >= 0; i--) {
+    for(int i = eigenPairs.size() - 2; i >= 0; i--) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       eigenValueSum += eigenPair.getEigenvalue();
       double needEigenvalue = eigenValueSum / (eigenPairs.size() - i) * ralpha;
-      if (eigenPair.getEigenvalue() >= needEigenvalue) {
+      if(eigenPair.getEigenvalue() >= needEigenvalue) {
         contrastAtMax = i;
         break;
       }
     }
 
-    for (int i = 0; i <= contrastAtMax /* && i < eigenPairs.size() */; i++) {
+    for(int i = 0; i <= contrastAtMax /* && i < eigenPairs.size() */; i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       strongEigenPairs.add(eigenPair);
     }
-    for (int i = contrastAtMax + 1; i < eigenPairs.size(); i++) {
+    for(int i = contrastAtMax + 1; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       weakEigenPairs.add(eigenPair);
     }
@@ -129,8 +129,8 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter ralphaP = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, DEFAULT_RALPHA);
-      ralphaP.addConstraint(new GreaterEqualConstraint(0.0));
-      if (config.grab(ralphaP)) {
+      ralphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(ralphaP)) {
         ralpha = ralphaP.getValue();
       }
     }

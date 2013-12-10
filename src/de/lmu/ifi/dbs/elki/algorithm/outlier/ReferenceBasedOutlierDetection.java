@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -319,7 +319,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?>, D extends
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter pK = new IntParameter(K_ID);
-      pK.addConstraint(new GreaterConstraint(1));
+      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(pK)) {
         k = pK.getValue();
       }

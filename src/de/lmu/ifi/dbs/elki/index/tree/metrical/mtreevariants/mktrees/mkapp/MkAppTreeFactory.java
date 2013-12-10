@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -94,19 +94,19 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(kP)) {
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
         settings.k_max = kP.getValue();
       }
 
       IntParameter pP = new IntParameter(P_ID);
-      pP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(pP)) {
+      pP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(pP)) {
         settings.p = pP.getValue();
       }
 
       Flag nologF = new Flag(NOLOG_ID);
-      if (config.grab(nologF)) {
+      if(config.grab(nologF)) {
         settings.log = !nologF.getValue();
       }
     }

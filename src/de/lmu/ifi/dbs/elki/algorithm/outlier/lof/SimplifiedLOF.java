@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -118,8 +118,8 @@ public class SimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDi
     // "HEAVY" flag for KNN Query since it is used more than once
     KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
-    if (!(knnq instanceof PreprocessorKNNQuery)) {
-      if (stepprog != null) {
+    if(!(knnq instanceof PreprocessorKNNQuery)) {
+      if(stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
       }
       MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
@@ -129,27 +129,28 @@ public class SimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDi
     }
 
     // Compute LRDs
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.beginStep(2, "Computing densities.", LOG);
     }
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
-    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
-      if (neighbors instanceof DoubleDistanceKNNList) {
+      if(neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
-        for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-          if (DBIDUtil.equal(neighbor, it)) {
+        for(DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+          if(DBIDUtil.equal(neighbor, it)) {
             continue;
           }
           sum += neighbor.doubleDistance();
           count++;
         }
-      } else {
-        for (DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if (DBIDUtil.equal(neighbor, it)) {
+      }
+      else {
+        for(DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          if(DBIDUtil.equal(neighbor, it)) {
             continue;
           }
           sum += neighbor.getDistance().doubleValue();
@@ -159,16 +160,16 @@ public class SimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDi
       // Avoid division by 0
       final double lrd = (sum > 0) ? (count / sum) : 0;
       dens.putDouble(it, lrd);
-      if (densProgress != null) {
+      if(densProgress != null) {
         densProgress.incrementProcessed(LOG);
       }
     }
-    if (densProgress != null) {
+    if(densProgress != null) {
       densProgress.ensureCompleted(LOG);
     }
 
     // compute LOF_SCORE of each db object
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.beginStep(3, "Computing SLOFs.", LOG);
     }
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
@@ -176,38 +177,39 @@ public class SimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDi
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Simple LOF scores.", ids.size(), LOG) : null;
-    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final double lrdp = dens.doubleValue(it);
       final double lof;
-      if (lrdp > 0) {
+      if(lrdp > 0) {
         final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
         double sum = 0.0;
         int count = 0;
-        for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
-          if (DBIDUtil.equal(neighbor, it)) {
+          if(DBIDUtil.equal(neighbor, it)) {
             continue;
           }
           sum += dens.doubleValue(neighbor);
           count++;
         }
         lof = sum / (count * lrdp);
-      } else {
+      }
+      else {
         lof = 1.0;
       }
       lofs.putDouble(it, lof);
       // update minimum and maximum
       lofminmax.put(lof);
 
-      if (progressLOFs != null) {
+      if(progressLOFs != null) {
         progressLOFs.incrementProcessed(LOG);
       }
     }
-    if (progressLOFs != null) {
+    if(progressLOFs != null) {
       progressLOFs.ensureCompleted(LOG);
     }
 
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.setCompleted(LOG);
     }
 
@@ -250,8 +252,8 @@ public class SimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDi
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID);
-      pK.addConstraint(new GreaterConstraint(1));
-      if (config.grab(pK)) {
+      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(pK)) {
         k = pK.getValue();
       }
     }

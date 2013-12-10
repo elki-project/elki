@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -97,15 +97,15 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<?>> implement
     // Compute mean from minmax.
     double[] mean = new double[dim];
     double[] delta = new double[dim];
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       mean[d] = (minmax.first.doubleValue(d + 1) + minmax.second.doubleValue(d + 1)) * .5;
       delta[d] = (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1));
     }
 
     ArrayList<V> result = new ArrayList<>(samplesize);
     double[] vec = new double[dim];
-    for (int i = 0; i < samplesize; i++) {
-      for (int d = 0; d < dim; d++) {
+    for(int i = 0; i < samplesize; i++) {
+      for(int d = 0; d < dim; d++) {
         vec[d] = mean[d] + (Math.random() - 0.5) * scale * delta[d];
       }
       V newp = factory.newNumberVector(vec);
@@ -139,14 +139,14 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<?>> implement
       super.makeOptions(config);
 
       IntParameter samplesizeP = new IntParameter(N_ID);
-      samplesizeP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(samplesizeP)) {
+      samplesizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(samplesizeP)) {
         samplesize = samplesizeP.getValue();
       }
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0);
-      scaleP.addConstraint(new GreaterConstraint(0.0));
-      if (config.grab(scaleP)) {
+      scaleP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(scaleP)) {
         scale = scaleP.getValue();
       }
     }

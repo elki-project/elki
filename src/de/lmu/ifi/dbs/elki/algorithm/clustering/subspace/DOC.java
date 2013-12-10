@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -56,10 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -167,7 +165,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     int n = (int) (2. / alpha);
     // Inner loop count.
     int m = (int) (Math.pow(2. / alpha, r) * Math.log(4));
-    if (heuristics) {
+    if(heuristics) {
       m = Math.min(m, Math.min(1000000, d * d));
     }
 
@@ -182,15 +180,16 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // To not only find a single cluster, we continue running until our set
     // of points is empty.
-    while (S.size() > minClusterSize) {
+    while(S.size() > minClusterSize) {
       Cluster<SubspaceModel<V>> C;
-      if (heuristics) {
+      if(heuristics) {
         C = runFastDOC(relation, S, d, n, m, (int) r);
-      } else {
+      }
+      else {
         C = runDOC(relation, S, d, n, m, (int) r, minClusterSize);
       }
 
-      if (C == null) {
+      if(C == null) {
         // Stop trying if we couldn't find a cluster.
         break;
       }
@@ -200,19 +199,19 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       // Remove all points of the cluster from the set and continue.
       S.removeDBIDs(C.getIDs());
 
-      if (cprogress != null) {
+      if(cprogress != null) {
         cprogress.setProcessed(result.getAllClusters().size(), LOG);
       }
     }
 
     // Add the remainder as noise.
-    if (S.size() > 0) {
+    if(S.size() > 0) {
       BitSet alldims = new BitSet();
       alldims.set(0, d);
       result.addToplevelCluster(new Cluster<>(S, true, new SubspaceModel<>(new Subspace(alldims), Centroid.make(relation, S).toVector(relation))));
     }
 
-    if (cprogress != null) {
+    if(cprogress != null) {
       cprogress.setCompleted(LOG);
     }
 
@@ -255,11 +254,11 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     Random random = rnd.getRandom();
     DBIDArrayIter iter = S.iter();
 
-    for (int i = 0; i < n; ++i) {
+    for(int i = 0; i < n; ++i) {
       // Pick a random seed point.
       iter.seek(random.nextInt(S.size()));
 
-      for (int j = 0; j < m; ++j) {
+      for(int j = 0; j < m; ++j) {
         // Choose a set of random points.
         DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), r), random);
 
@@ -267,58 +266,61 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         BitSet nD = new BitSet(d);
 
         // Test each dimension and build bounding box.
-        for (int k = 0; k < d; ++k) {
-          if (dimensionIsRelevant(k, relation, randomSet)) {
+        for(int k = 0; k < d; ++k) {
+          if(dimensionIsRelevant(k, relation, randomSet)) {
             nD.set(k);
           }
         }
-        if (nD.cardinality() > 0) {
+        if(nD.cardinality() > 0) {
           // Get all points in the box.
           df.setSelectedDimensions(nD);
           // TODO: add filtering capabilities into query API!
           DBIDs nC = DBIDUtil.intersection(S, rq.getRangeForDBID(iter, wd));
 
-          if (LOG.isDebuggingFiner()) {
+          if(LOG.isDebuggingFiner()) {
             LOG.finer("Testing a cluster candidate, |C| = " + nC.size() + ", |D| = " + nD.cardinality());
           }
 
           // Is the cluster large enough?
-          if (nC.size() < minClusterSize) {
+          if(nC.size() < minClusterSize) {
             // Too small.
-            if (LOG.isDebuggingFiner()) {
+            if(LOG.isDebuggingFiner()) {
               LOG.finer("... but it's too small.");
             }
-          } else {
+          }
+          else {
             // Better cluster than before?
             double nQuality = computeClusterQuality(nC.size(), nD.cardinality());
-            if (nQuality > quality) {
-              if (LOG.isDebuggingFiner()) {
+            if(nQuality > quality) {
+              if(LOG.isDebuggingFiner()) {
                 LOG.finer("... and it's the best so far: " + nQuality + " vs. " + quality);
               }
               C = nC;
               D = nD;
               quality = nQuality;
-            } else {
-              if (LOG.isDebuggingFiner()) {
+            }
+            else {
+              if(LOG.isDebuggingFiner()) {
                 LOG.finer("... but we already have a better one.");
               }
             }
           }
         }
 
-        if (iprogress != null) {
+        if(iprogress != null) {
           iprogress.incrementProcessed(LOG);
         }
       }
     }
 
-    if (iprogress != null) {
+    if(iprogress != null) {
       iprogress.ensureCompleted(LOG);
     }
 
-    if (C != null) {
+    if(C != null) {
       return makeCluster(relation, C, D);
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -346,11 +348,11 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     Random random = rnd.getRandom();
 
     DBIDArrayIter iter = S.iter();
-    outer: for (int i = 0; i < n; ++i) {
+    outer: for(int i = 0; i < n; ++i) {
       // Pick a random seed point.
       iter.seek(random.nextInt(S.size()));
 
-      for (int j = 0; j < m; ++j) {
+      for(int j = 0; j < m; ++j) {
         // Choose a set of random points.
         DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), r), random);
 
@@ -358,36 +360,36 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         BitSet nD = new BitSet(d);
 
         // Test each dimension.
-        for (int k = 0; k < d; ++k) {
-          if (dimensionIsRelevant(k, relation, randomSet)) {
+        for(int k = 0; k < d; ++k) {
+          if(dimensionIsRelevant(k, relation, randomSet)) {
             nD.set(k);
           }
         }
 
-        if (D == null || nD.cardinality() > D.cardinality()) {
+        if(D == null || nD.cardinality() > D.cardinality()) {
           D = nD;
           dV.set(iter);
 
-          if (D.cardinality() >= d_zero) {
-            if (iprogress != null) {
+          if(D.cardinality() >= d_zero) {
+            if(iprogress != null) {
               iprogress.setProcessed(iprogress.getTotal(), LOG);
             }
             break outer;
           }
         }
 
-        if (iprogress != null) {
+        if(iprogress != null) {
           iprogress.incrementProcessed(LOG);
         }
       }
     }
 
-    if (iprogress != null) {
+    if(iprogress != null) {
       iprogress.ensureCompleted(LOG);
     }
 
     // If no relevant dimensions were found, skip it.
-    if (D == null || D.cardinality() == 0) {
+    if(D == null || D.cardinality() == 0) {
       return null;
     }
 
@@ -400,9 +402,10 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     DBIDs C = DBIDUtil.intersection(S, rq.getRangeForDBID(dV, new DoubleDistance(w)));
 
     // If we have a non-empty cluster, return it.
-    if (C.size() > 0) {
+    if(C.size() > 0) {
       return makeCluster(relation, C, D);
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -420,11 +423,11 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   private boolean dimensionIsRelevant(int dimension, Relation<V> relation, DBIDs points) {
     double min = Double.POSITIVE_INFINITY;
     double max = Double.NEGATIVE_INFINITY;
-    for (DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
       V xV = relation.get(iter);
       min = Math.min(min, xV.doubleValue(dimension));
       max = Math.max(max, xV.doubleValue(dimension));
-      if (max - min > w) {
+      if(max - min > w) {
         return false;
       }
     }
@@ -547,48 +550,48 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
       {
         DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.2);
-        param.addConstraint(new GreaterEqualConstraint(0));
-        param.addConstraint(new LessEqualConstraint(1));
-        if (config.grab(param)) {
+        param.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+        param.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+        if(config.grab(param)) {
           alpha = param.getValue();
         }
       }
 
       {
         DoubleParameter param = new DoubleParameter(BETA_ID, 0.8);
-        param.addConstraint(new GreaterConstraint(0));
-        param.addConstraint(new LessConstraint(1));
-        if (config.grab(param)) {
+        param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+        param.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+        if(config.grab(param)) {
           beta = param.getValue();
         }
       }
 
       {
         DoubleParameter param = new DoubleParameter(W_ID, 0.05);
-        param.addConstraint(new GreaterEqualConstraint(0));
-        if (config.grab(param)) {
+        param.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+        if(config.grab(param)) {
           w = param.getValue();
         }
       }
 
       {
         Flag param = new Flag(HEURISTICS_ID);
-        if (config.grab(param)) {
+        if(config.grab(param)) {
           heuristics = param.getValue();
         }
       }
 
-      if (heuristics) {
+      if(heuristics) {
         IntParameter param = new IntParameter(D_ZERO_ID, 5);
-        param.addConstraint(new GreaterConstraint(0));
-        if (config.grab(param)) {
+        param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(param)) {
           d_zero = param.getValue();
         }
       }
 
       {
         RandomParameter param = new RandomParameter(RANDOM_ID);
-        if (config.grab(param)) {
+        if(config.grab(param)) {
           random = param.getValue();
         }
       }

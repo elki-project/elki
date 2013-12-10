@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -138,38 +138,39 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends
 
     StepProgress sprog = LOG.isVerbose() ? new StepProgress("Clustering steps", 2) : null;
 
-    if (sprog != null) {
+    if(sprog != null) {
       sprog.beginStep(1, "Kernel density estimation.", LOG);
     }
     {
       double[] scratch = new double[2 * k];
       iter.seek(0);
-      for (int i = 0; i < size; i++, iter.advance()) {
+      for(int i = 0; i < size; i++, iter.advance()) {
         // Current value.
         final double curv = relation.get(iter).doubleValue(dim);
 
         final int pre = Math.max(i - k, 0), prek = i - pre;
         final int pos = Math.min(i + k, size - 1), posk = pos - i;
         iter2.seek(pre);
-        for (int j = 0; j < prek; j++, iter2.advance()) {
+        for(int j = 0; j < prek; j++, iter2.advance()) {
           scratch[j] = curv - relation.get(iter2).doubleValue(dim);
         }
         assert (iter2.getOffset() == i);
         iter2.advance();
-        for (int j = 0; j < posk; j++, iter2.advance()) {
+        for(int j = 0; j < posk; j++, iter2.advance()) {
           scratch[prek + j] = relation.get(iter2).doubleValue(dim) - curv;
         }
 
         assert (prek + posk >= k);
         double kdist = QuickSelect.quickSelect(scratch, 0, prek + posk, k);
-        switch(mode) {
+        switch(mode){
         case BALLOON: {
           double dens = 0.;
-          if (kdist > 0.) {
-            for (int j = 0; j < prek + posk; j++) {
+          if(kdist > 0.) {
+            for(int j = 0; j < prek + posk; j++) {
               dens += kernel.density(scratch[j] / kdist);
             }
-          } else {
+          }
+          else {
             dens = Double.POSITIVE_INFINITY;
           }
           assert (iter.getOffset() == i);
@@ -177,31 +178,32 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends
           break;
         }
         case SAMPLE: {
-          if (kdist > 0.) {
+          if(kdist > 0.) {
             iter2.seek(pre);
-            for (int j = 0; j < prek; j++, iter2.advance()) {
+            for(int j = 0; j < prek; j++, iter2.advance()) {
               double delta = curv - relation.get(iter2).doubleValue(dim);
               density.putDouble(iter2, density.doubleValue(iter2) + kernel.density(delta / kdist));
             }
             assert (iter2.getOffset() == i);
             iter2.advance();
-            for (int j = 0; j < posk; j++, iter2.advance()) {
+            for(int j = 0; j < posk; j++, iter2.advance()) {
               double delta = relation.get(iter2).doubleValue(dim) - curv;
               density.putDouble(iter2, density.doubleValue(iter2) + kernel.density(delta / kdist));
             }
-          } else {
+          }
+          else {
             iter2.seek(pre);
-            for (int j = 0; j < prek; j++, iter2.advance()) {
+            for(int j = 0; j < prek; j++, iter2.advance()) {
               double delta = curv - relation.get(iter2).doubleValue(dim);
-              if (!(delta > 0.)) {
+              if(!(delta > 0.)) {
                 density.putDouble(iter2, Double.POSITIVE_INFINITY);
               }
             }
             assert (iter2.getOffset() == i);
             iter2.advance();
-            for (int j = 0; j < posk; j++, iter2.advance()) {
+            for(int j = 0; j < posk; j++, iter2.advance()) {
               double delta = relation.get(iter2).doubleValue(dim) - curv;
-              if (!(delta > 0.)) {
+              if(!(delta > 0.)) {
                 density.putDouble(iter2, Double.POSITIVE_INFINITY);
               }
             }
@@ -214,7 +216,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends
       }
     }
 
-    if (sprog != null) {
+    if(sprog != null) {
       sprog.beginStep(2, "Local minima detection.", LOG);
     }
     Clustering<ClusterModel> clustering = new Clustering<>("onedimensional-kde-clustering", "One-Dimensional clustering using kernel density estimation.");
@@ -224,18 +226,18 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends
       int halfw = (minwindow + 1) >> 1;
       iter.seek(0);
       // Fill initial buffer.
-      for (int i = 0; i < size; i++, iter.advance()) {
+      for(int i = 0; i < size; i++, iter.advance()) {
         final int m = i % scratch.length, t = (i - minwindow - 1) % scratch.length;
         scratch[m] = density.doubleValue(iter);
-        if (i > scratch.length) {
+        if(i > scratch.length) {
           double min = Double.POSITIVE_INFINITY;
-          for (int j = 0; j < scratch.length; j++) {
-            if (j != t && scratch[j] < min) {
+          for(int j = 0; j < scratch.length; j++) {
+            if(j != t && scratch[j] < min) {
               min = scratch[j];
             }
           }
           // Local minimum:
-          if (scratch[t] < min) {
+          if(scratch[t] < min) {
             int end = i - minwindow + 1;
             { // Test on which side the kNN is
               iter2.seek(end);
@@ -244,13 +246,13 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends
               double left = relation.get(iter2).doubleValue(dim) - curv;
               iter2.seek(end + halfw);
               double right = curv - relation.get(iter2).doubleValue(dim);
-              if (left < right) {
+              if(left < right) {
                 end++;
               }
             }
             iter2.seek(begin);
             ArrayModifiableDBIDs cids = DBIDUtil.newArray(end - begin);
-            for (int j = 0; j < end - begin; j++, iter2.advance()) {
+            for(int j = 0; j < end - begin; j++, iter2.advance()) {
               cids.add(iter2);
             }
             clustering.addToplevelCluster(new Cluster<>(cids, ClusterModel.CLUSTER));
@@ -262,13 +264,13 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends
       int end = size;
       iter2.seek(begin);
       ArrayModifiableDBIDs cids = DBIDUtil.newArray(end - begin);
-      for (int j = 0; j < end - begin; j++, iter2.advance()) {
+      for(int j = 0; j < end - begin; j++, iter2.advance()) {
         cids.add(iter2);
       }
       clustering.addToplevelCluster(new Cluster<>(cids, ClusterModel.CLUSTER));
     }
 
-    if (sprog != null) {
+    if(sprog != null) {
       sprog.setCompleted(LOG);
     }
     return clustering;
@@ -346,30 +348,30 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter dimP = new IntParameter(DIM_ID, 0);
-      dimP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(dimP)) {
+      dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      if(config.grab(dimP)) {
         dim = dimP.intValue();
       }
 
       ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
-      if (config.grab(kernelP)) {
+      if(config.grab(kernelP)) {
         kernel = kernelP.instantiateClass(config);
       }
 
       EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.BALLOON);
-      if (config.grab(modeP)) {
+      if(config.grab(modeP)) {
         mode = modeP.getValue();
       }
 
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(kP)) {
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
         k = kP.intValue();
       }
 
       IntParameter windowP = new IntParameter(WINDOW_ID);
-      windowP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(windowP)) {
+      windowP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(windowP)) {
         minwindow = windowP.intValue();
       }
     }

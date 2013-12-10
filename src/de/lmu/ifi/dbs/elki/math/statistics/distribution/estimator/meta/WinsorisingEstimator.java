@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -86,7 +85,7 @@ public class WinsorisingEstimator<D extends Distribution> implements Distributio
     final int cut = ((int) (len * winsorize)) >> 1;
     // X positions of samples
     double[] x = new double[len];
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i);
       x[i] = val;
     }
@@ -95,7 +94,7 @@ public class WinsorisingEstimator<D extends Distribution> implements Distributio
     double max = QuickSelect.quickSelect(x, cut, len, len - 1 - cut);
     // Winsorize by replacing the smallest and largest values.
     // QuickSelect ensured that these are correctly in place.
-    for (int i = 0, j = len - 1; i < cut; i++, j--) {
+    for(int i = 0, j = len - 1; i < cut; i++, j--) {
       x[i] = min;
       x[j] = max;
     }
@@ -146,14 +145,14 @@ public class WinsorisingEstimator<D extends Distribution> implements Distributio
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<DistributionEstimator<D>> innerP = new ObjectParameter<>(INNER_ID, DistributionEstimator.class);
-      if (config.grab(innerP)) {
+      if(config.grab(innerP)) {
         inner = innerP.instantiateClass(config);
       }
 
       DoubleParameter trimP = new DoubleParameter(WINSORIZE_ID);
-      trimP.addConstraint(new GreaterConstraint(0.));
-      trimP.addConstraint(new LessConstraint(0.5));
-      if (config.grab(trimP)) {
+      trimP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      trimP.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
+      if(config.grab(trimP)) {
         winsorize = trimP.doubleValue();
       }
     }

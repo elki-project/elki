@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -107,31 +107,31 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
     DBIDs best = DBIDUtil.EMPTYDBIDS;
     double tresh = ChiSquaredDistribution.quantile(0.85, dim);
 
-    for (int i = 0; i < iterations; i++) {
+    for(int i = 0; i < iterations; i++) {
       DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, rnd);
       CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
       Vector centroid = cv.getMeanVector();
       Matrix p = cv.destroyToSampleMatrix().inverse();
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();
-      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         Vector vec = relation.get(id).getColumnVector().minusEquals(centroid);
         double sqlen = vec.transposeTimesTimes(p, vec);
-        if (sqlen < tresh) {
+        if(sqlen < tresh) {
           support.add(id);
         }
       }
 
-      if (support.size() > best.size()) {
+      if(support.size() > best.size()) {
         best = support;
       }
-      if (support.size() >= ids.size()) {
+      if(support.size() >= ids.size()) {
         break; // Can't get better than this!
       }
     }
     // logger.warning("Consensus size: "+best.size()+" of "+ids.size());
     // Fall back to regular PCA
-    if (best.size() <= dim) {
+    if(best.size() <= dim) {
       return CovarianceMatrix.make(relation, ids).destroyToSampleMatrix();
     }
     // Return estimation based on consensus set.
@@ -172,12 +172,12 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter iterP = new IntParameter(ITER_ID, 1000);
-      iterP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(iterP)) {
+      iterP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(iterP)) {
         iterations = iterP.intValue();
       }
       RandomParameter rndP = new RandomParameter(SEED_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }

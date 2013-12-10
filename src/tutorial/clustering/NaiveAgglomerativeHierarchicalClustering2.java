@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -264,7 +264,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter numclustersP = new IntParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID);
-      numclustersP.addConstraint(new GreaterEqualConstraint(1));
+      numclustersP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if (config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
       }

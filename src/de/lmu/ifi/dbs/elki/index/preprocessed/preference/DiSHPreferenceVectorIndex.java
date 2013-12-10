@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
@@ -255,11 +255,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       boolean allFalse = true;
       for(int d = 0; d < dimensionality; d++) {
         if(neighborIDs[d].contains(it)) {
-          bits[d] = new Bit(true);
+          bits[d] = Bit.TRUE;
           allFalse = false;
         }
         else {
-          bits[d] = new Bit(false);
+          bits[d] = Bit.FALSE;
         }
       }
       if(!allFalse) {
@@ -576,7 +576,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         final IntParameter minptsP = new IntParameter(MINPTS_ID);
-        minptsP.addConstraint(new GreaterConstraint(0));
+        minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(minptsP)) {
           minpts = minptsP.getValue();
         }

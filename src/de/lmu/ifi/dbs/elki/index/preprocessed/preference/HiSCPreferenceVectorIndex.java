@@ -49,8 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -98,7 +97,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
   @Override
   public void initialize() {
-    if (relation == null || relation.size() <= 0) {
+    if(relation == null || relation.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
@@ -111,8 +110,8 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
     KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
 
-    for (DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      if (LOG.isDebugging()) {
+    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      if(LOG.isDebugging()) {
         msg.append("\n\nid = ").append(DBIDUtil.toString(it));
         // /msg.append(" ").append(database.getObjectLabelQuery().get(id));
         msg.append("\n knns: ");
@@ -122,21 +121,21 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       BitSet preferenceVector = determinePreferenceVector(relation, it, knns, msg);
       storage.put(it, preferenceVector);
 
-      if (progress != null) {
+      if(progress != null) {
         progress.incrementProcessed(LOG);
       }
     }
-    if (progress != null) {
+    if(progress != null) {
       progress.ensureCompleted(LOG);
     }
 
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debugFine(msg.toString());
     }
 
     long end = System.currentTimeMillis();
     // TODO: re-add timing code!
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       long elapsedTime = end - start;
       LOG.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
@@ -158,13 +157,13 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
     // preference vector
     BitSet preferenceVector = new BitSet(variances.length);
-    for (int d = 0; d < variances.length; d++) {
-      if (variances[d] < alpha) {
+    for(int d = 0; d < variances.length; d++) {
+      if(variances[d] < alpha) {
         preferenceVector.set(d);
       }
     }
 
-    if (msg != null && LOG.isDebugging()) {
+    if(msg != null && LOG.isDebugging()) {
       msg.append("\nalpha ").append(alpha);
       msg.append("\nvariances ");
       msg.append(FormatUtil.format(variances, ", ", 4));
@@ -261,9 +260,10 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     @Override
     public HiSCPreferenceVectorIndex<V> instantiate(Relation<V> relation) {
       final int usek;
-      if (k == null) {
+      if(k == null) {
         usek = 3 * RelationUtil.dimensionality(relation);
-      } else {
+      }
+      else {
         usek = k;
       }
       return new HiSCPreferenceVectorIndex<>(relation, alpha, usek);
@@ -291,16 +291,16 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA);
-        alphaP.addConstraint(new GreaterConstraint(0.0));
-        alphaP.addConstraint(new LessConstraint(1.0));
-        if (config.grab(alphaP)) {
+        alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+        alphaP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+        if(config.grab(alphaP)) {
           alpha = alphaP.doubleValue();
         }
 
         final IntParameter kP = new IntParameter(K_ID);
-        kP.addConstraint(new GreaterConstraint(0));
+        kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         kP.setOptional(true);
-        if (config.grab(kP)) {
+        if(config.grab(kP)) {
           k = kP.intValue();
         }
       }

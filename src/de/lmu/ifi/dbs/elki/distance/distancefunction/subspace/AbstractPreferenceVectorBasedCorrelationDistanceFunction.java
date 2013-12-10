@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelati
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.PreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -222,7 +222,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
 
     protected void configEpsilon(Parameterization config) {
       final DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, 0.001);
-      epsilonP.addConstraint(new GreaterEqualConstraint(0));
+      epsilonP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if (config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }

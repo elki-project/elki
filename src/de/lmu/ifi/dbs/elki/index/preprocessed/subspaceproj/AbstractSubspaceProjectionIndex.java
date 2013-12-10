@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -84,7 +84,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
 
   /**
    * Constructor.
-   *
+   * 
    * @param relation Relation
    * @param epsilon Maximum Epsilon
    * @param rangeQueryDistanceFunction range query
@@ -262,7 +262,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
 
       protected void configMinPts(Parameterization config) {
         IntParameter minptsP = new IntParameter(AbstractProjectedDBSCAN.MINPTS_ID);
-        minptsP.addConstraint(new GreaterConstraint(0));
+        minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(minptsP)) {
           minpts = minptsP.intValue();
         }

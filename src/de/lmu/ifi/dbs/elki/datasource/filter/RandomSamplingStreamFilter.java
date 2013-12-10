@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -75,15 +74,15 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
 
   @Override
   public Event nextEvent() {
-    while (true) {
+    while(true) {
       Event ev = source.nextEvent();
-      switch(ev) {
+      switch(ev){
       case END_OF_STREAM:
         return ev;
       case META_CHANGED:
         return ev;
       case NEXT_OBJECT:
-        if (random.nextDouble() < prob) {
+        if(random.nextDouble() < prob) {
           return ev;
         }
         continue;
@@ -123,13 +122,13 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter probP = new DoubleParameter(PROB_ID);
-      probP.addConstraint(new GreaterEqualConstraint(0.0));
-      probP.addConstraint(new LessEqualConstraint(1.0));
-      if (config.grab(probP)) {
+      probP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      probP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      if(config.grab(probP)) {
         prob = probP.getValue().doubleValue();
       }
       RandomParameter rndP = new RandomParameter(SEED_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }

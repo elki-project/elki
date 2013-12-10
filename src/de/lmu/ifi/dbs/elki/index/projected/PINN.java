@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -130,30 +130,30 @@ public class PINN<O extends NumberVector<?>> extends ProjectedIndex.Factory<O, O
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<IndexFactory<O, ?>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
-      if (config.grab(innerP)) {
+      if(config.grab(innerP)) {
         inner = innerP.instantiateClass(config);
       }
 
       IntParameter tP = new IntParameter(T_ID);
-      tP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(tP)) {
+      tP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(tP)) {
         t = tP.intValue();
       }
 
       DoubleParameter sP = new DoubleParameter(S_ID, 1.);
-      sP.addConstraint(new GreaterEqualConstraint(1.));
-      if (config.grab(sP)) {
+      sP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+      if(config.grab(sP)) {
         s = sP.doubleValue();
       }
 
       DoubleParameter hP = new DoubleParameter(H_ID, 3.);
-      hP.addConstraint(new GreaterEqualConstraint(1.));
-      if (config.grab(hP)) {
+      hP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+      if(config.grab(hP)) {
         h = hP.doubleValue();
       }
 
       RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if (config.grab(randomP)) {
+      if(config.grab(randomP)) {
         random = randomP.getValue();
       }
     }

@@ -59,8 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -164,11 +163,11 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * @return Result
    */
   public Clustering<EMModel<V>> run(Database database, Relation<V> relation) {
-    if (relation.size() == 0) {
+    if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
     // initial models
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("initializing " + k + " models");
     }
     final List<V> initialMeans = initializer.chooseInitialMeans(database, relation, k, EuclideanDistanceFunction.STATIC);
@@ -176,7 +175,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     Vector[] means = new Vector[k];
     {
       int i = 0;
-      for (NumberVector<?> nv : initialMeans) {
+      for(NumberVector<?> nv : initialMeans) {
         means[i] = nv.getColumnVector();
         i++;
       }
@@ -189,7 +188,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
 
     final int dimensionality = means[0].getDimensionality();
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       Matrix m = Matrix.identity(dimensionality, dimensionality);
       covarianceMatrices[i] = m;
       normDistrFactor[i] = 1.0 / Math.sqrt(norm);
@@ -199,45 +198,45 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     double emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
 
     // iteration unless no change
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("iterating EM");
     }
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("iteration " + 0 + " - expectation value: " + emNew);
     }
 
-    for (int it = 1; it <= maxiter || maxiter < 0; it++) {
+    for(int it = 1; it <= maxiter || maxiter < 0; it++) {
       final double emOld = emNew;
       recomputeCovarianceMatrices(relation, probClusterIGivenX, means, covarianceMatrices, dimensionality);
       computeInverseMatrixes(covarianceMatrices, invCovMatr, normDistrFactor, norm);
       // reassign probabilities
       emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
 
-      if (LOG.isVerbose()) {
+      if(LOG.isVerbose()) {
         LOG.verbose("iteration " + it + " - expectation value: " + emNew);
       }
-      if (Math.abs(emOld - emNew) <= delta) {
+      if(Math.abs(emOld - emNew) <= delta) {
         break;
       }
     }
 
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("assigning clusters");
     }
 
     // fill result with clusters and models
     List<ModifiableDBIDs> hardClusters = new ArrayList<>(k);
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       hardClusters.add(DBIDUtil.newHashSet());
     }
 
     // provide a hard clustering
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] clusterProbabilities = probClusterIGivenX.get(iditer);
       int maxIndex = 0;
       double currentMax = 0.0;
-      for (int i = 0; i < k; i++) {
-        if (clusterProbabilities[i] > currentMax) {
+      for(int i = 0; i < k; i++) {
+        if(clusterProbabilities[i] > currentMax) {
           maxIndex = i;
           currentMax = clusterProbabilities[i];
         }
@@ -247,16 +246,17 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<EMModel<V>> result = new Clustering<>("EM Clustering", "em-clustering");
     // provide models within the result
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       // TODO: re-do labeling.
       // SimpleClassLabel label = new SimpleClassLabel();
       // label.init(result.canonicalClusterLabel(i));
       Cluster<EMModel<V>> model = new Cluster<>(hardClusters.get(i), new EMModel<>(factory.newNumberVector(means[i].getArrayRef()), covarianceMatrices[i]));
       result.addToplevelCluster(model);
     }
-    if (isSoft()) {
+    if(isSoft()) {
       result.addChildResult(new MaterializedRelation<>("cluster assignments", "em-soft-score", SOFT_TYPE, probClusterIGivenX, relation.getDBIDs()));
-    } else {
+    }
+    else {
       probClusterIGivenX.destroy();
     }
     return result;
@@ -272,11 +272,12 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    */
   public static void computeInverseMatrixes(Matrix[] covarianceMatrices, Matrix[] invCovMatr, double[] normDistrFactor, final double norm) {
     int k = covarianceMatrices.length;
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       final double det = covarianceMatrices[i].det();
-      if (det > 0.) {
+      if(det > 0.) {
         normDistrFactor[i] = 1. / Math.sqrt(norm * det);
-      } else {
+      }
+      else {
         LOG.warning("Encountered matrix with 0 determinant - degenerated.");
         normDistrFactor[i] = 1.; // Not really well defined
       }
@@ -296,23 +297,24 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
   public static void recomputeCovarianceMatrices(Relation<? extends NumberVector<?>> relation, WritableDataStore<double[]> probClusterIGivenX, Vector[] means, Matrix[] covarianceMatrices, final int dimensionality) {
     final int k = means.length;
     CovarianceMatrix[] cms = new CovarianceMatrix[k];
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       cms[i] = new CovarianceMatrix(dimensionality);
     }
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] clusterProbabilities = probClusterIGivenX.get(iditer);
       Vector instance = relation.get(iditer).getColumnVector();
-      for (int i = 0; i < k; i++) {
-        if (clusterProbabilities[i] > 0.) {
+      for(int i = 0; i < k; i++) {
+        if(clusterProbabilities[i] > 0.) {
           cms[i].put(instance, clusterProbabilities[i]);
         }
       }
     }
-    for (int i = 0; i < k; i++) {
-      if (cms[i].getWeight() <= 0.) {
+    for(int i = 0; i < k; i++) {
+      if(cms[i].getWeight() <= 0.) {
         means[i] = new Vector(dimensionality);
         covarianceMatrices[i] = Matrix.identity(dimensionality, dimensionality);
-      } else {
+      }
+      else {
         means[i] = cms[i].getMeanVector();
         covarianceMatrices[i] = cms[i].destroyToNaiveMatrix().cheatToAvoidSingularity(SINGULARITY_CHEAT);
       }
@@ -338,43 +340,44 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     final int k = clusterWeights.length;
     double emSum = 0.0;
 
-    for (DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
       Vector x = database.get(iditer).getColumnVector();
       double[] probabilities = new double[k];
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         Vector difference = x.minus(means[i]);
         double rowTimesCovTimesCol = difference.transposeTimesTimes(invCovMatr[i], difference);
         double power = rowTimesCovTimesCol / 2.;
         double prob = normDistrFactor[i] * Math.exp(-power);
-        if (LOG.isDebuggingFinest()) {
+        if(LOG.isDebuggingFinest()) {
           LOG.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + //
           " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + //
           " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol + "\n" + //
           " power= " + power + "\n" + " prob=" + prob + "\n" + //
           " inv cov matrix: \n" + FormatUtil.format(invCovMatr[i], "     "));
         }
-        if (!(prob >= 0.)) {
+        if(!(prob >= 0.)) {
           LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor[i]);
           prob = 0.;
         }
         probabilities[i] = prob;
       }
       double priorProbability = 0.;
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         priorProbability += probabilities[i] * clusterWeights[i];
       }
       double logP = Math.max(Math.log(priorProbability), MIN_LOGLIKELIHOOD);
-      if (!Double.isNaN(logP)) {
+      if(!Double.isNaN(logP)) {
         emSum += logP;
       }
 
       double[] clusterProbabilities = new double[k];
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         assert (clusterWeights[i] >= 0.);
         // do not divide by zero!
-        if (priorProbability > 0.) {
+        if(priorProbability > 0.) {
           clusterProbabilities[i] = probabilities[i] / priorProbability * clusterWeights[i];
-        } else {
+        }
+        else {
           clusterProbabilities[i] = 0.;
         }
       }
@@ -460,26 +463,26 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(0));
-      if (config.grab(kP)) {
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
 
       ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
-      if (config.grab(initialP)) {
+      if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.0);
-      deltaP.addConstraint(new GreaterEqualConstraint(0.0));
-      if (config.grab(deltaP)) {
+      deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(deltaP)) {
         delta = deltaP.getValue();
       }
 
       IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID);
-      maxiterP.addConstraint(new GreaterEqualConstraint(0));
+      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       maxiterP.setOptional(true);
-      if (config.grab(maxiterP)) {
+      if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }
     }

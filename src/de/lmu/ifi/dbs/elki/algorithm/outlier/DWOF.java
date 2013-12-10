@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -148,7 +148,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     StepProgress stepProg = LOG.isVerbose() ? new StepProgress("DWOF", 2) : null;
     // DWOF output score storage.
     WritableDoubleDataStore dwofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT, 0.);
-    if (stepProg != null) {
+    if(stepProg != null) {
       stepProg.beginStep(1, "Initializing objects' Radii", LOG);
     }
     WritableDoubleDataStore radii = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
@@ -157,16 +157,16 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     WritableIntegerDataStore oldSizes = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT, 1);
     WritableIntegerDataStore newSizes = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT, 1);
     int countUnmerged = relation.size();
-    if (stepProg != null) {
+    if(stepProg != null) {
       stepProg.beginStep(2, "Clustering-Evaluating Cycles.", LOG);
     }
     IndefiniteProgress clusEvalProgress = LOG.isVerbose() ? new IndefiniteProgress("Evaluating DWOFs", LOG) : null;
-    while (countUnmerged > 0) {
-      if (clusEvalProgress != null) {
+    while(countUnmerged > 0) {
+      if(clusEvalProgress != null) {
         clusEvalProgress.incrementProcessed(LOG);
       }
       // Increase radii
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         radii.putDouble(iter, radii.doubleValue(iter) * delta);
       }
       // stores the clustering label for each object
@@ -182,20 +182,20 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       countUnmerged = updateSizes(ids, labels, newSizes);
       labels.destroy();
       // Update DWOF scores.
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double newScore = (newSizes.intValue(iter) > 0) ? ((double) (oldSizes.intValue(iter) - 1) / (double) newSizes.intValue(iter)) : 0.0;
         dwofs.putDouble(iter, dwofs.doubleValue(iter) + newScore);
       }
     }
-    if (clusEvalProgress != null) {
+    if(clusEvalProgress != null) {
       clusEvalProgress.setCompleted(LOG);
     }
-    if (stepProg != null) {
+    if(stepProg != null) {
       stepProg.setCompleted(LOG);
     }
     // Build result representation.
     DoubleMinMax minmax = new DoubleMinMax();
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       minmax.put(dwofs.doubleValue(iter));
     }
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
@@ -222,40 +222,40 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     // to get the mean for each object
     Mean mean = new Mean();
     // Iterate over all objects
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNList<D> iterNeighbors = knnq.getKNNForDBID(iter, k);
       // skip the point itself
       mean.reset();
-      for (DBIDIter neighbor1 = iterNeighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
-        if (DBIDUtil.equal(neighbor1, iter)) {
+      for(DBIDIter neighbor1 = iterNeighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
+        if(DBIDUtil.equal(neighbor1, iter)) {
           continue;
         }
-        for (DBIDIter neighbor2 = iterNeighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
-          if (DBIDUtil.equal(neighbor1, neighbor2) || DBIDUtil.equal(neighbor2, iter)) {
+        for(DBIDIter neighbor2 = iterNeighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
+          if(DBIDUtil.equal(neighbor1, neighbor2) || DBIDUtil.equal(neighbor2, iter)) {
             continue;
           }
           double distance = distFunc.distance(neighbor1, neighbor2).doubleValue();
           mean.put(distance);
-          if (distance > 0. && distance < absoluteMinDist) {
+          if(distance > 0. && distance < absoluteMinDist) {
             absoluteMinDist = distance;
           }
         }
       }
       double currentMean = mean.getMean();
       radii.putDouble(iter, currentMean);
-      if (currentMean < minAvgDist) {
+      if(currentMean < minAvgDist) {
         minAvgDist = currentMean;
       }
-      if (avgDistProgress != null) {
+      if(avgDistProgress != null) {
         avgDistProgress.incrementProcessed(LOG);
       }
     }
-    if (avgDistProgress != null) {
+    if(avgDistProgress != null) {
       avgDistProgress.ensureCompleted(LOG);
     }
 
     // Initializing the radii of all objects.
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       radii.putDouble(iter, (minAvgDist > 0) ? (absoluteMinDist * radii.doubleValue(iter) / minAvgDist) : Double.POSITIVE_INFINITY);
     }
   }
@@ -277,14 +277,14 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   private void clusterData(DBIDs ids, RangeQuery<O, D> rnnQuery, WritableDoubleDataStore radii, WritableDataStore<ModifiableDBIDs> labels) {
     FiniteProgress clustProg = LOG.isVerbose() ? new FiniteProgress("Density-Based Clustering", ids.size(), LOG) : null;
     // Iterate over all objects
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      if (labels.get(iter) != null) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      if(labels.get(iter) != null) {
         continue;
       }
       ModifiableDBIDs newCluster = DBIDUtil.newArray();
       newCluster.add(iter);
       labels.put(iter, newCluster);
-      if (clustProg != null) {
+      if(clustProg != null) {
         clustProg.incrementProcessed(LOG);
       }
       // container of the points to be added and their radii neighbors to the
@@ -292,24 +292,25 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       ModifiableDBIDs nChain = DBIDUtil.newArray();
       nChain.add(iter);
       // iterate over nChain
-      for (DBIDIter toGetNeighbors = nChain.iter(); toGetNeighbors.valid(); toGetNeighbors.advance()) {
+      for(DBIDIter toGetNeighbors = nChain.iter(); toGetNeighbors.valid(); toGetNeighbors.advance()) {
         D range = rnnQuery.getDistanceFactory().fromDouble(radii.doubleValue(toGetNeighbors));
         DistanceDBIDList<D> nNeighbors = rnnQuery.getRangeForDBID(toGetNeighbors, range);
-        for (DistanceDBIDListIter<D> iter2 = nNeighbors.iter(); iter2.valid(); iter2.advance()) {
-          if (DBIDUtil.equal(toGetNeighbors, iter2)) {
+        for(DistanceDBIDListIter<D> iter2 = nNeighbors.iter(); iter2.valid(); iter2.advance()) {
+          if(DBIDUtil.equal(toGetNeighbors, iter2)) {
             continue;
           }
-          if (labels.get(iter2) == null) {
+          if(labels.get(iter2) == null) {
             newCluster.add(iter2);
             labels.put(iter2, newCluster);
             nChain.add(iter2);
-            if (clustProg != null) {
+            if(clustProg != null) {
               clustProg.incrementProcessed(LOG);
             }
-          } else if (labels.get(iter2) != newCluster) {
+          }
+          else if(labels.get(iter2) != newCluster) {
             ModifiableDBIDs toBeDeleted = labels.get(iter2);
             newCluster.addDBIDs(toBeDeleted);
-            for (DBIDIter iter3 = toBeDeleted.iter(); iter3.valid(); iter3.advance()) {
+            for(DBIDIter iter3 = toBeDeleted.iter(); iter3.valid(); iter3.advance()) {
               labels.put(iter3, newCluster);
             }
             toBeDeleted.clear();
@@ -317,7 +318,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
         }
       }
     }
-    if (clustProg != null) {
+    if(clustProg != null) {
       clustProg.ensureCompleted(LOG);
     }
   }
@@ -333,12 +334,12 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   private int updateSizes(DBIDs ids, WritableDataStore<ModifiableDBIDs> labels, WritableIntegerDataStore newSizes) {
     // to count the unclustered all over
     int countUnmerged = 0;
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       // checking the point's new cluster size after the clustering step
       int newClusterSize = labels.get(iter).size();
       newSizes.putInt(iter, newClusterSize);
       // the point is alone in the cluster --> not merged with other points
-      if (newClusterSize == 1) {
+      if(newClusterSize == 1) {
         countUnmerged++;
       }
     }
@@ -388,14 +389,14 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       // The super class has the distance function parameter!
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(1));
-      if (config.grab(kP)) {
+      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID);
       deltaP.setDefaultValue(1.1);
-      deltaP.addConstraint(new GreaterConstraint(1.));
-      if (config.grab(deltaP)) {
+      deltaP.addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
+      if(config.grab(deltaP)) {
         delta = deltaP.getValue();
       }
     }

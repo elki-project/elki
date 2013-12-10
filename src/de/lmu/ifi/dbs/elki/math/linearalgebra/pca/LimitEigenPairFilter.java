@@ -34,9 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -98,26 +97,27 @@ public class LimitEigenPairFilter implements EigenPairFilter {
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuilder msg = new StringBuilder();
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("delta = ").append(delta);
     }
 
     // determine limit
     double limit;
-    if (absolute) {
+    if(absolute) {
       limit = delta;
-    } else {
+    }
+    else {
       double max = Double.NEGATIVE_INFINITY;
-      for (int i = 0; i < eigenPairs.size(); i++) {
+      for(int i = 0; i < eigenPairs.size(); i++) {
         EigenPair eigenPair = eigenPairs.getEigenPair(i);
         double eigenValue = Math.abs(eigenPair.getEigenvalue());
-        if (max < eigenValue) {
+        if(max < eigenValue) {
           max = eigenValue;
         }
       }
       limit = max * delta;
     }
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nlimit = ").append(limit);
     }
 
@@ -126,16 +126,17 @@ public class LimitEigenPairFilter implements EigenPairFilter {
     List<EigenPair> weakEigenPairs = new ArrayList<>();
 
     // determine strong and weak eigenpairs
-    for (int i = 0; i < eigenPairs.size(); i++) {
+    for(int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       double eigenValue = Math.abs(eigenPair.getEigenvalue());
-      if (eigenValue >= limit) {
+      if(eigenValue >= limit) {
         strongEigenPairs.add(eigenPair);
-      } else {
+      }
+      else {
         weakEigenPairs.add(eigenPair);
       }
     }
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       LOG.debugFine(msg.toString());
@@ -166,16 +167,16 @@ public class LimitEigenPairFilter implements EigenPairFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag absoluteF = new Flag(EIGENPAIR_FILTER_ABSOLUTE);
-      if (config.grab(absoluteF)) {
+      if(config.grab(absoluteF)) {
         absolute = absoluteF.isTrue();
       }
 
       DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA, DEFAULT_DELTA);
-      deltaP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(deltaP)) {
+      deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(deltaP)) {
         delta = deltaP.doubleValue();
         // TODO: make this a global constraint?
-        if (absolute && deltaP.tookDefaultValue()) {
+        if(absolute && deltaP.tookDefaultValue()) {
           config.reportError(new WrongParameterValueException("Illegal parameter setting: " + "Flag " + absoluteF.getName() + " is set, " + "but no value for " + deltaP.getName() + " is specified."));
         }
       }
@@ -187,10 +188,8 @@ public class LimitEigenPairFilter implements EigenPairFilter {
       List<ParameterConstraint<? super Double>> cons = new ArrayList<>();
       // TODO: Keep the constraint here - applies to non-conditional case as
       // well, and is set above.
-      ParameterConstraint<Number> aboveNull = new GreaterEqualConstraint(0.);
-      cons.add(aboveNull);
-      ParameterConstraint<Number> underOne = new LessEqualConstraint(1.);
-      cons.add(underOne);
+      cons.add(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      cons.add(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
 
       GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<>(deltaP, cons, absoluteF, false);
       config.checkConstraint(gpc);

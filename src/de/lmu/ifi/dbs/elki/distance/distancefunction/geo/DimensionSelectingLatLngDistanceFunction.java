@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.NoDuplicateValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -83,18 +83,21 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDou
   @Override
   @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
+    if(mbr1 instanceof NumberVector) {
+      if(mbr2 instanceof NumberVector) {
         return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
-      } else {
+      }
+      else {
         NumberVector<?> o1 = (NumberVector<?>) mbr1;
         return model.minDistDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), mbr2.getMin(dimlat), mbr2.getMin(dimlng), mbr2.getMax(dimlat), mbr2.getMax(dimlng));
       }
-    } else {
-      if (mbr2 instanceof NumberVector) {
+    }
+    else {
+      if(mbr2 instanceof NumberVector) {
         NumberVector<?> o2 = (NumberVector<?>) mbr2;
         return model.minDistDeg(o2.doubleValue(dimlat), o2.doubleValue(dimlng), mbr1.getMin(dimlat), mbr1.getMin(dimlng), mbr1.getMax(dimlat), mbr1.getMax(dimlng));
-      } else {
+      }
+      else {
         throw new NotImplementedException("This distance function cannot - yet - be used with this algorithm, as the lower bound rectangle to rectangle distances have not yet been formalized for geodetic data.");
       }
     }
@@ -117,27 +120,28 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDou
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if(getClass() != obj.getClass()) {
       return false;
     }
     DimensionSelectingLatLngDistanceFunction other = (DimensionSelectingLatLngDistanceFunction) obj;
-    if (dimlat != other.dimlat) {
+    if(dimlat != other.dimlat) {
       return false;
     }
-    if (dimlng != other.dimlng) {
+    if(dimlng != other.dimlng) {
       return false;
     }
-    if (model == null) {
-      if (other.model != null) {
+    if(model == null) {
+      if(other.model != null) {
         return false;
       }
-    } else if (!model.equals(other.model)) {
+    }
+    else if(!model.equals(other.model)) {
       return false;
     }
     return true;
@@ -180,18 +184,18 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDou
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter dimlatP = new IntParameter(LATDIM_ID);
-      dimlatP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(dimlatP)) {
+      dimlatP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      if(config.grab(dimlatP)) {
         dimlat = dimlatP.getValue();
       }
       final IntParameter dimlngP = new IntParameter(LNGDIM_ID);
-      dimlngP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(dimlngP)) {
+      dimlngP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      if(config.grab(dimlngP)) {
         dimlng = dimlngP.getValue();
       }
       config.checkConstraint(new NoDuplicateValueGlobalConstraint(dimlatP, dimlngP));
       ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-      if (config.grab(modelP)) {
+      if(config.grab(modelP)) {
         model = modelP.instantiateClass(config);
       }
     }

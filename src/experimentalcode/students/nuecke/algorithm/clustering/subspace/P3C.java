@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -836,7 +836,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
       {
         DoubleParameter param = new DoubleParameter(POISSON_THRESHOLD_ID, 1.e-20);
-        param.addConstraint(new GreaterConstraint(0.));
+        param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
         if (config.grab(param)) {
           poissonThreshold = param.getValue();
         }
@@ -844,7 +844,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
       {
         IntParameter param = new IntParameter(MAX_EM_ITERATIONS_ID, 10);
-        param.addConstraint(new GreaterConstraint(0));
+        param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if (config.grab(param)) {
           maxEmIterations = param.getValue();
         }
@@ -852,7 +852,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
       {
         DoubleParameter param = new DoubleParameter(EM_DELTA_ID, 1.e-9);
-        param.addConstraint(new GreaterConstraint(0.));
+        param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
         if (config.grab(param)) {
           emDelta = param.getValue();
         }
@@ -860,7 +860,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
       {
         IntParameter param = new IntParameter(MIN_CLUSTER_SIZE_ID, 1);
-        param.addConstraint(new GreaterConstraint(0));
+        param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if (config.grab(param)) {
           minClusterSize = param.getValue();
         }

@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -269,7 +269,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID);
-      pK.addConstraint(new GreaterConstraint(1));
+      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if (config.grab(pK)) {
         k = pK.getValue();
       }

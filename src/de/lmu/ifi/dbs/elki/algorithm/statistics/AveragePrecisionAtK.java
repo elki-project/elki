@@ -47,9 +47,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -124,34 +123,36 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     MeanVariance[] mvs = MeanVariance.newArray(k);
 
     final DBIDs ids;
-    if (sampling < 1.0) {
+    if(sampling < 1.0) {
       int size = Math.max(1, (int) (sampling * relation.size()));
       ids = DBIDUtil.randomSample(relation.getDBIDs(), size, seed);
-    } else {
+    }
+    else {
       ids = relation.getDBIDs();
     }
 
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("Processing points...");
     }
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), LOG) : null;
     // sort neighbors
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNList<D> knn = knnQuery.getKNNForDBID(iter, qk);
       Object label = lrelation.get(iter);
 
       int positive = 0, i = 0;
-      for (DBIDIter ri = knn.iter(); i < k && ri.valid(); ri.advance()) {
-        if (!includeSelf && DBIDUtil.equal(iter, ri)) {
+      for(DBIDIter ri = knn.iter(); i < k && ri.valid(); ri.advance()) {
+        if(!includeSelf && DBIDUtil.equal(iter, ri)) {
           continue;
         }
         Object olabel = lrelation.get(ri);
-        if (label == null) {
-          if (olabel == null) {
+        if(label == null) {
+          if(olabel == null) {
             positive += 1;
           }
-        } else {
-          if (label.equals(olabel)) {
+        }
+        else {
+          if(label.equals(olabel)) {
             positive += 1;
           }
         }
@@ -159,18 +160,18 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
         mvs[i].put(precision);
         i++;
       }
-      if (objloop != null) {
+      if(objloop != null) {
         objloop.incrementProcessed(LOG);
       }
     }
-    if (objloop != null) {
+    if(objloop != null) {
       objloop.ensureCompleted(LOG);
     }
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<>(k);
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       DoubleVector row = new DoubleVector(new double[] { mvs[i].getMean(), mvs[i].getSampleStddev() });
       res.add(row);
     }
@@ -240,23 +241,23 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(new GreaterEqualConstraint(2));
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
       final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID);
-      samplingP.addConstraint(new GreaterConstraint(0.0));
-      samplingP.addConstraint(new LessEqualConstraint(1.0));
+      samplingP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      samplingP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       samplingP.setOptional(true);
-      if (config.grab(samplingP)) {
+      if(config.grab(samplingP)) {
         sampling = samplingP.getValue();
       }
       final LongParameter rndP = new LongParameter(SEED_ID);
       rndP.setOptional(true);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         seed = rndP.getValue();
       }
       final Flag includeP = new Flag(INCLUDESELF_ID);
-      if (config.grab(includeP)) {
+      if(config.grab(includeP)) {
         includeSelf = includeP.isTrue();
       }
     }

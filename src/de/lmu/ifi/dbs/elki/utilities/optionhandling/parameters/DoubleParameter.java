@@ -45,7 +45,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @deprecated Use {@link #addConstraint} instead.
    */
   @Deprecated
-  public DoubleParameter(OptionID optionID, double defaultValue, ParameterConstraint<Number> constraint) {
+  public DoubleParameter(OptionID optionID, double defaultValue, ParameterConstraint<? super Double> constraint) {
     super(optionID, defaultValue);
     addConstraint(constraint);
   }
@@ -59,7 +59,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @deprecated Use {@link #addConstraint} instead.
    */
   @Deprecated
-  public DoubleParameter(OptionID optionID, ParameterConstraint<Number> constraint) {
+  public DoubleParameter(OptionID optionID, ParameterConstraint<? super Double> constraint) {
     super(optionID);
     addConstraint(constraint);
   }

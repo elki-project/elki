@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -110,19 +110,19 @@ public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorit
     double inc = 1. / (k - 1);
     double min = Double.POSITIVE_INFINITY, max = 0.0;
     // Process all objects
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       // Find the nearest neighbors (using an index, if available!)
       KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
       // For each neighbor, except ourselves, increase the in-degree:
-      for (DBIDIter nei = neighbors.iter(); nei.valid(); nei.advance()) {
-        if (DBIDUtil.equal(iter, nei)) {
+      for(DBIDIter nei = neighbors.iter(); nei.valid(); nei.advance()) {
+        if(DBIDUtil.equal(iter, nei)) {
           continue;
         }
         final double value = scores.doubleValue(nei) + inc;
-        if (value < min) {
+        if(value < min) {
           min = value;
         }
-        if (value > max) {
+        if(value > max) {
           max = value;
         }
         scores.put(nei, value);
@@ -178,8 +178,8 @@ public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorit
       // Since in a database context, the 1 nearest neighbor
       // will usually be the query object itself, we require
       // this value to be at least 2.
-      param.addConstraint(new GreaterConstraint(1));
-      if (config.grab(param)) {
+      param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(param)) {
         k = param.intValue();
       }
     }

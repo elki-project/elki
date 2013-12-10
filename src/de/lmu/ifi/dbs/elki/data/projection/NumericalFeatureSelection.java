@@ -33,8 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorFeatureSelectionFilter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
@@ -79,7 +78,7 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
     this.dimensionality = bits.cardinality();
 
     int mind = 0;
-    for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
+    for(int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
       mind = Math.max(mind, i + 1);
     }
     this.mindim = mind;
@@ -89,7 +88,7 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
   public void initialize(SimpleTypeInformation<V> in) {
     final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
     factory = (NumberVector.Factory<V, ?>) vin.getFactory();
-    if (vin.getDimensionality() < mindim) {
+    if(vin.getDimensionality() < mindim) {
       throw new AbortException("Data does not have enough dimensions for this projection!");
     }
   }
@@ -97,7 +96,7 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
   @Override
   public V project(V data) {
     double[] dbl = new double[dimensionality];
-    for (int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
+    for(int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
       dbl[j] = data.doubleValue(i);
     }
     return factory.newNumberVector(dbl);
@@ -129,12 +128,12 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      
+
       IntListParameter selectedAttributesP = new IntListParameter(NumberVectorFeatureSelectionFilter.Parameterizer.SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(0)));
-      if (config.grab(selectedAttributesP)) {
+      selectedAttributesP.addConstraint(CommonConstraints.NONNEGATIVE_INT_LIST);
+      if(config.grab(selectedAttributesP)) {
         dims.clear();
-        for (int in : selectedAttributesP.getValue()) {
+        for(int in : selectedAttributesP.getValue()) {
           dims.set(in);
         }
       }

@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -280,7 +280,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
         super.makeOptions(config);
         // number of neighbors
         final IntParameter kP = new IntParameter(K_ID);
-        kP.addConstraint(new GreaterConstraint(1));
+        kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
         if(config.grab(kP)) {
           k = kP.getValue();
         }

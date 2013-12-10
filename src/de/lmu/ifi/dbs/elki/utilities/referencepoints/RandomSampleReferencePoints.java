@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -151,7 +151,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<?>> implements R
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter samplesizeP = new IntParameter(N_ID);
-      samplesizeP.addConstraint(new GreaterConstraint(0));
+      samplesizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(samplesizeP)) {
         samplesize = samplesizeP.intValue();
       }

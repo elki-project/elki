@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -131,7 +131,7 @@ public class LogNormalDistribution extends AbstractDistribution {
    * @return PDF of the given normal distribution at x.
    */
   public static double pdf(double x, double mu, double sigma) {
-    if (x <= 0.) {
+    if(x <= 0.) {
       return 0.;
     }
     final double x_mu = Math.log(x) - mu;
@@ -148,7 +148,7 @@ public class LogNormalDistribution extends AbstractDistribution {
    * @return The CDF of the given normal distribution at x.
    */
   public static double cdf(double x, double mu, double sigma) {
-    if (x <= 0.) {
+    if(x <= 0.) {
       return 0.;
     }
     return .5 * (1 + NormalDistribution.erf((Math.log(x) - mu) / (MathUtil.SQRT2 * sigma)));
@@ -208,18 +208,18 @@ public class LogNormalDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter logmeanP = new DoubleParameter(LOGMEAN_ID);
-      if (config.grab(logmeanP)) {
+      if(config.grab(logmeanP)) {
         logmean = logmeanP.doubleValue();
       }
 
       DoubleParameter logsigmaP = new DoubleParameter(LOGSTDDEV_ID);
-      logsigmaP.addConstraint(new GreaterConstraint(0.));
-      if (config.grab(logsigmaP)) {
+      logsigmaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(logsigmaP)) {
         logsigma = logsigmaP.doubleValue();
       }
 
       DoubleParameter shiftP = new DoubleParameter(SHIFT_ID, 0.);
-      if (config.grab(shiftP)) {
+      if(config.grab(shiftP)) {
         shift = shiftP.doubleValue();
       }
     }
