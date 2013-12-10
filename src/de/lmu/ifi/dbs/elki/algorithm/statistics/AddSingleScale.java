@@ -94,7 +94,11 @@ public class AddSingleScale implements Algorithm {
       for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
         NumberVector<?> vec = rel.get(iditer);
         for(int d = 0; d < dim; d++) {
-          mm.put(vec.doubleValue(d));
+          final double val = vec.doubleValue(d);
+          if(val != val) {
+            continue; // NaN
+          }
+          mm.put(val);
         }
       }
       LinearScale scale = new LinearScale(mm.getMin(), mm.getMax());

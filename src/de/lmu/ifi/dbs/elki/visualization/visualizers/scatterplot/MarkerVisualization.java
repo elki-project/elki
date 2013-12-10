@@ -147,6 +147,9 @@ public class MarkerVisualization extends AbstractVisFactory {
             try {
               final NumberVector<?> vec = rel.get(iter);
               double[] v = proj.fastProjectDataToRenderSpace(vec);
+              if(v[0] != v[0] || v[1] != v[1]) {
+                continue; // NaN!
+              }
               ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
             }
             catch(ObjectNotFoundException e) {

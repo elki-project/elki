@@ -131,7 +131,11 @@ public class SelectionConvexHullVisualization extends AbstractVisFactory {
         GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
         for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
           try {
-            hull.add(new Vector(proj.fastProjectDataToRenderSpace(rel.get(iter))));
+            final double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
+            if (v[0] != v[0] || v[1] != v[1]) {
+              continue; // NaN!
+            }
+            hull.add(new Vector(v));
           }
           catch(ObjectNotFoundException e) {
             // ignore

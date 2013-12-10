@@ -272,7 +272,11 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
       GrahamScanConvexHull2D hull2 = coremodel ? new GrahamScanConvexHull2D() : null;
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        Vector projP = new Vector(proj.fastProjectDataToRenderSpace(rel.get(iter)));
+        final double[] projv = proj.fastProjectDataToRenderSpace(rel.get(iter));
+        if(projv[0] != projv[0] || projv[1] != projv[1]) {
+          continue; // NaN!
+        }
+        Vector projP = new Vector(projv);
         hull.add(projP);
         if (coremodel && cids.contains(iter)) {
           hull2.add(projP);
@@ -327,6 +331,9 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       double weight = ids.size();
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
+        if(projP[0] != projP[0] || projP[1] != projP[1]) {
+          continue; // NaN!
+        }
         hull.add(new Vector(projP));
       }
       for (Iter<Cluster<Model>> iter = hier.iterChildren(clus); iter.valid(); iter.advance()) {

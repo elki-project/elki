@@ -210,7 +210,8 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
     x += colx[vr.length];
     y += coly[vr.length];
     s += cols[vr.length];
-    assert (s > 0.0 || s < 0.0);
+    // Note: we may have NaN values here.
+    // assert (s > 0.0 || s < 0.0);
     return new double[] { x / s, y / s };
   }
 
