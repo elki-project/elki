@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -131,11 +131,12 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
 
   @Override
   public void initialize() {
-    if (positions == null) {
-      if (relation.size() > 0) {
+    if(positions == null) {
+      if(relation.size() > 0) {
         preprocess();
       }
-    } else {
+    }
+    else {
       throw new UnsupportedOperationException("Preprocessor already ran.");
     }
   }
@@ -147,54 +148,56 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
     final int odim = (projections > 0) ? projections : idim;
 
     projected = new ArrayList<>(odim);
-    for (int j = 0; j < odim; j++) {
+    for(int j = 0; j < odim; j++) {
       projected.add(new DoubleDistanceDBIDPairList(size));
     }
 
-    if (proj == null) {
+    if(proj == null) {
       // Generate permutation:
       final int[] permutation = range(0, idim);
-      if (odim < idim) {
+      if(odim < idim) {
         randomPermutation(permutation, random);
       }
 
-      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         final NumberVector<?> v = relation.get(iditer);
-        for (int j = 0; j < odim; j++) {
+        for(int j = 0; j < odim; j++) {
           projected.get(j).add(v.doubleValue(permutation[j]), iditer);
         }
       }
-    } else {
+    }
+    else {
       final RandomProjectionFamily.Projection mat = proj.generateProjection(idim, odim);
-      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double[] v = mat.project(relation.get(iditer));
-        for (int j = 0; j < odim; j++) {
+        for(int j = 0; j < odim; j++) {
           projected.get(j).add(v[j], iditer);
         }
       }
     }
     // Sort
-    for (int j = 0; j < odim; j++) {
+    for(int j = 0; j < odim; j++) {
       projected.get(j).sort();
     }
 
     // Build position index, DBID -> position in the three curves
     positions = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
-    for (int cnum = 0; cnum < odim; cnum++) {
+    for(int cnum = 0; cnum < odim; cnum++) {
       DoubleDistanceDBIDListIter it = projected.get(cnum).iter();
-      for (int i = 0; it.valid(); i++, it.advance()) {
+      for(int i = 0; it.valid(); i++, it.advance()) {
         final int[] data;
-        if (cnum == 0) {
+        if(cnum == 0) {
           data = new int[odim];
           positions.put(it, data);
-        } else {
+        }
+        else {
           data = positions.get(it);
         }
         data[cnum] = i;
       }
     }
     final long end = System.nanoTime();
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("SFC preprocessor took " + ((end - starttime) / 1.E6) + " milliseconds.");
     }
   }
@@ -208,7 +211,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
    */
   public static int[] range(int start, int end) {
     int[] out = new int[end - start];
-    for (int i = 0, j = start; j < end; i++, j++) {
+    for(int i = 0, j = start; j < end; i++, j++) {
       out[i] = j;
     }
     return out;
@@ -224,7 +227,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
    * @return Same array.
    */
   public static int[] randomPermutation(final int[] out, Random random) {
-    for (int i = out.length - 1; i > 0; i--) {
+    for(int i = out.length - 1; i > 0; i--) {
       // Swap with random preceeding element.
       int ri = random.nextInt(i + 1);
       int tmp = out[ri];
@@ -251,8 +254,8 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
 
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    for (Object hint : hints) {
-      if (DatabaseQuery.HINT_EXACT.equals(hint)) {
+    for(Object hint : hints) {
+      if(DatabaseQuery.HINT_EXACT.equals(hint)) {
         return null;
       }
     }
@@ -288,10 +291,10 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(2 * wsize * projected.size());
       final int[] posi = positions.get(id);
-      for (int i = 0; i < posi.length; i++) {
+      for(int i = 0; i < posi.length; i++) {
         DoubleDistanceDBIDListIter it = projected.get(i).iter();
         it.seek(Math.max(0, posi[i] - wsize));
-        for (int j = (wsize << 1); j >= 0 && it.valid(); j--, it.advance()) {
+        for(int j = (wsize << 1); j >= 0 && it.valid(); j--, it.advance()) {
           cands.add(it);
         }
       }
@@ -299,7 +302,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
       int distc = 0;
       KNNHeap<D> heap = DBIDUtil.newHeap(distq.getDistanceFactory(), k);
       final O vec = relation.get(id);
-      for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
         heap.add(distq.distance(vec, iter), iter);
         distc++;
       }
@@ -425,23 +428,23 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector<?>> extends Ab
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         DoubleParameter windowP = new DoubleParameter(WINDOW_ID, 10.0);
-        if (config.grab(windowP)) {
+        if(config.grab(windowP)) {
           window = windowP.getValue();
         }
         IntParameter projectionsP = new IntParameter(PROJECTIONS_ID);
         projectionsP.setOptional(true);
-        projectionsP.addConstraint(new GreaterEqualConstraint(1));
-        if (config.grab(projectionsP)) {
+        projectionsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(projectionsP)) {
           projections = projectionsP.getValue();
         }
 
         ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<>(PROJECTION_ID, RandomProjectionFamily.class);
         projP.setOptional(true);
-        if (config.grab(projP)) {
+        if(config.grab(projP)) {
           proj = projP.instantiateClass(config);
         }
         RandomParameter randomP = new RandomParameter(RANDOM_ID);
-        if (config.grab(randomP)) {
+        if(config.grab(randomP)) {
           random = randomP.getValue();
         }
       }

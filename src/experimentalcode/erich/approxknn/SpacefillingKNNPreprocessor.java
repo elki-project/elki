@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -148,11 +148,12 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
   @Override
   public void initialize() {
-    if (curves == null) {
-      if (relation.size() > 0) {
+    if(curves == null) {
+      if(relation.size() > 0) {
         preprocess();
       }
-    } else {
+    }
+    else {
       throw new UnsupportedOperationException("Preprocessor already ran.");
     }
   }
@@ -164,15 +165,15 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     final int numgen = curvegen.size();
     final int numcurves = variants; // numgen * variants;
     curves = new ArrayList<>(numcurves);
-    for (int i = 0; i < numcurves; i++) {
+    for(int i = 0; i < numcurves; i++) {
       curves.add(new ArrayList<SpatialRef>(size));
     }
 
-    if (proj == null) {
-      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    if(proj == null) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         final NumberVector<?> v = relation.get(iditer);
         SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
-        for (List<SpatialRef> curve : curves) {
+        for(List<SpatialRef> curve : curves) {
           curve.add(ref);
         }
       }
@@ -181,7 +182,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       final double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
       // Find maximum extend.
       double extend = 0;
-      for (int d2 = 0; d2 < mms.length; d2 += 2) {
+      for(int d2 = 0; d2 < mms.length; d2 += 2) {
         extend = Math.max(extend, mms[d2 + 1] - mms[d2]);
       }
       final double[] mmscratch = new double[mms.length];
@@ -189,11 +190,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       final int dim = (odim < 0) ? idim : Math.min(odim, idim);
       final int[] permutation = range(0, idim);
       final int[] apermutation = (dim != idim) ? new int[dim] : permutation;
-      for (int j = 0; j < numcurves; j++) {
+      for(int j = 0; j < numcurves; j++) {
         final int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
         // Scale all axes by the same factor:
         final double scale = 1. + random.nextDouble();
-        for (int d2 = 0; d2 < mms.length; d2 += 2) {
+        for(int d2 = 0; d2 < mms.length; d2 += 2) {
           // Note: use global extend, to be unbiased against different scales.
           mmscratch[d2] = mms[d2] - extend * random.nextDouble();
           mmscratch[d2 + 1] = mmscratch[d2] + extend * scale;
@@ -203,7 +204,8 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
         System.arraycopy(permutation, 0, apermutation, 0, dim);
         curvegen.get(ctype).sort(curves.get(j), 0, size, mmscratch, apermutation);
       }
-    } else {
+    }
+    else {
       // With projections, min/max management gets more tricky and expensive.
       final int idim = RelationUtil.dimensionality(relation);
       final int dim = (odim < 0) ? idim : odim;
@@ -211,33 +213,33 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       NumberVector.Factory<O, ?> factory = RelationUtil.getNumberVectorFactory(relation);
       final double[] mms = new double[odim << 1];
 
-      for (int j = 0; j < numcurves; j++) {
+      for(int j = 0; j < numcurves; j++) {
         final List<SpatialRef> curve = curves.get(j);
         final RandomProjectionFamily.Projection mat = proj.generateProjection(idim, dim);
         final int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
 
         // Initialize min/max:
-        for (int d2 = 0; d2 < mms.length; d2 += 2) {
+        for(int d2 = 0; d2 < mms.length; d2 += 2) {
           mms[d2] = Double.POSITIVE_INFINITY;
           mms[d2 + 1] = Double.NEGATIVE_INFINITY;
         }
         // Project data set:
-        for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
           double[] proj = mat.project(relation.get(iditer));
           curve.add(new SpatialRef(DBIDUtil.deref(iditer), factory.newNumberVector(proj)));
-          for (int d2 = 0, d = 0; d2 < mms.length; d2 += 2, d++) {
+          for(int d2 = 0, d = 0; d2 < mms.length; d2 += 2, d++) {
             mms[d2] = Math.min(mms[d2], proj[d]);
             mms[d2 + 1] = Math.max(mms[d2 + 1], proj[d]);
           }
         }
         // Find maximum extend.
         double extend = 0.;
-        for (int d2 = 0; d2 < mms.length; d2 += 2) {
+        for(int d2 = 0; d2 < mms.length; d2 += 2) {
           extend = Math.max(extend, mms[d2 + 1] - mms[d2]);
         }
         // Scale all axes by the same factor:
         final double scale = 1. + random.nextDouble();
-        for (int d2 = 0; d2 < mms.length; d2 += 2) {
+        for(int d2 = 0; d2 < mms.length; d2 += 2) {
           // Note: use global extend, to be unbiased against different scales.
           mms[d2] -= extend * random.nextDouble();
           mms[d2 + 1] = mms[d2] + extend * scale;
@@ -251,22 +253,23 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
     // Build position index, DBID -> position in the three curves
     positions = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
-    for (int cnum = 0; cnum < numcurves; cnum++) {
+    for(int cnum = 0; cnum < numcurves; cnum++) {
       Iterator<SpatialRef> it = curves.get(cnum).iterator();
-      for (int i = 0; it.hasNext(); i++) {
+      for(int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         final int[] data;
-        if (cnum == 0) {
+        if(cnum == 0) {
           data = new int[numcurves];
           positions.put(r.id, data);
-        } else {
+        }
+        else {
           data = positions.get(r.id);
         }
         data[cnum] = i;
       }
     }
     final long end = System.nanoTime();
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("SFC preprocessor took " + ((end - starttime) / 1.E6) + " milliseconds.");
     }
   }
@@ -280,7 +283,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
    */
   public static int[] range(int start, int end) {
     int[] out = new int[end - start];
-    for (int i = 0, j = start; j < end; i++, j++) {
+    for(int i = 0, j = start; j < end; i++, j++) {
       out[i] = j;
     }
     return out;
@@ -296,7 +299,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
    * @return Same array.
    */
   public static int[] randomPermutation(final int[] out, Random random) {
-    for (int i = out.length - 1; i > 0; i--) {
+    for(int i = out.length - 1; i > 0; i--) {
       // Swap with random preceeding element.
       int ri = random.nextInt(i + 1);
       int tmp = out[ri];
@@ -323,8 +326,8 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    for (Object hint : hints) {
-      if (DatabaseQuery.HINT_EXACT.equals(hint)) {
+    for(Object hint : hints) {
+      if(DatabaseQuery.HINT_EXACT.equals(hint)) {
         return null;
       }
     }
@@ -360,11 +363,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(2 * wsize * curves.size());
       final int[] posi = positions.get(id);
-      for (int i = 0; i < posi.length; i++) {
+      for(int i = 0; i < posi.length; i++) {
         List<SpatialRef> curve = curves.get(i);
         final int start = Math.max(0, posi[i] - wsize);
         final int end = Math.min(posi[i] + wsize + 1, curve.size());
-        for (int j = start; j < end; j++) {
+        for(int j = start; j < end; j++) {
           cands.add(curve.get(j).id);
         }
       }
@@ -372,7 +375,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       int distc = 0;
       KNNHeap<D> heap = DBIDUtil.newHeap(distq.getDistanceFactory(), k);
       final O vec = relation.get(id);
-      for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
         heap.add(distq.distance(vec, iter), iter);
         distc++;
       }
@@ -576,32 +579,32 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<>(CURVES_ID, SpatialSorter.class);
-        if (config.grab(curveP)) {
+        if(config.grab(curveP)) {
           curvegen = curveP.instantiateClasses(config);
         }
         DoubleParameter windowP = new DoubleParameter(WINDOW_ID, 10.0);
-        if (config.grab(windowP)) {
+        if(config.grab(windowP)) {
           window = windowP.getValue();
         }
         IntParameter variantsP = new IntParameter(VARIANTS_ID, 1);
-        variantsP.addConstraint(new GreaterEqualConstraint(1));
-        if (config.grab(variantsP)) {
+        variantsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(variantsP)) {
           variants = variantsP.getValue();
         }
         IntParameter dimP = new IntParameter(DIM_ID);
         dimP.setOptional(true);
-        dimP.addConstraint(new GreaterEqualConstraint(1));
-        if (config.grab(dimP)) {
+        dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(dimP)) {
           odim = dimP.intValue();
         }
 
         ObjectParameter<RandomProjectionFamily> projP = new ObjectParameter<>(PROJECTION_ID, RandomProjectionFamily.class);
         projP.setOptional(true);
-        if (config.grab(projP)) {
+        if(config.grab(projP)) {
           proj = projP.instantiateClass(config);
         }
         RandomParameter randomP = new RandomParameter(RANDOM_ID);
-        if (config.grab(randomP)) {
+        if(config.grab(randomP)) {
           random = randomP.getValue();
         }
       }
