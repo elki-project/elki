@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -130,17 +131,50 @@ public class SelectionLineVisualization extends AbstractVisFactory {
         DBIDs selection = selContext.getSelectedIds();
 
         for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
-          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
-
-          SVGPath path = new SVGPath();
-          for(int i = 0; i < proj.getVisibleDimensions(); i++) {
-            path.drawTo(getVisibleAxisX(i), yPos[i]);
+          Element marker = drawLine(iter);
+          if(marker == null) {
+            continue;
           }
-          Element marker = path.makeElement(svgp);
           SVGUtil.addCSSClass(marker, MARKER);
           layer.appendChild(marker);
         }
       }
+    }
+
+    /**
+     * Draw a single line.
+     * 
+     * @param iter Object reference
+     * @return
+     */
+    private Element drawLine(DBIDRef iter) {
+      SVGPath path = new SVGPath();
+      double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
+      boolean draw = false, drawprev = false, drawn = false;
+      for(int i = 0; i < yPos.length; i++) {
+        // NaN handling:
+        if(yPos[i] != yPos[i]) {
+          draw = false;
+          drawprev = false;
+          continue;
+        }
+        if(draw) {
+          if(drawprev) {
+            path.moveTo(getVisibleAxisX(i - 1), yPos[i - 1]);
+            drawprev = false;
+          }
+          path.lineTo(getVisibleAxisX(i), yPos[i]);
+          drawn = true;
+        }
+        else {
+          drawprev = true;
+        }
+        draw = true;
+      }
+      if(!drawn) {
+        return null; // Not enough data.
+      }
+      return path.makeElement(svgp);
     }
 
     /**
