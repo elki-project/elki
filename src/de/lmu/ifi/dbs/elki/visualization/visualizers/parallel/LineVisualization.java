@@ -150,11 +150,11 @@ public class LineVisualization extends AbstractVisFactory {
               continue; // TODO: can we test more efficiently than this?
             }
             Element line = drawLine(iter);
-            if(line != null) {
-              SVGUtil.addCSSClass(line, key);
-
-              layer.appendChild(line);
+            if(line == null) {
+              continue;
             }
+            SVGUtil.addCSSClass(line, key);
+            layer.appendChild(line);
           }
         }
       }
@@ -165,12 +165,13 @@ public class LineVisualization extends AbstractVisFactory {
         }
         for(; ids.valid(); ids.advance()) {
           Element line = drawLine(ids);
-          if(line != null) {
-            SVGUtil.addCSSClass(line, DATALINE);
-            // assign color
-            line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(ids)));
-            layer.appendChild(line);
+          if(line == null) {
+            continue;
           }
+          SVGUtil.addCSSClass(line, DATALINE);
+          // assign color
+          line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(ids)));
+          layer.appendChild(line);
         }
       }
     }
