@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import java.util.List;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,12 +23,19 @@ import java.util.List;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.List;
+
 /**
  * Class storing a number of very common constraints.
  * 
  * @author Erich Schubert
  */
 public final class CommonConstraints {
+  /**
+   * Integer constraint: >= -1
+   */
+  public static final ParameterConstraint<? super Integer> GREATER_EQUAL_MINUSONE_INT = new GreaterEqualConstraint(-1);
+
   /**
    * Not negative.
    */
@@ -57,6 +62,11 @@ public final class CommonConstraints {
   public static final ParameterConstraint<? super Double> GREATER_THAN_ZERO_DOUBLE = new GreaterConstraint(0.);
 
   /**
+   * Constraint: less than .5
+   */
+  public static final ParameterConstraint<? super Double> LESS_THAN_HALF_DOUBLE = new LessConstraint(.5);
+
+  /**
    * At least 1.
    */
   public static final ParameterConstraint<? super Double> GREATER_EQUAL_ONE_DOUBLE = new GreaterEqualConstraint(1.);
@@ -79,9 +89,10 @@ public final class CommonConstraints {
   /**
    * Constraint for the whole list.
    */
-  public static final ParameterConstraint<? super List<Integer>> NONNEGATIVE_INT_LIST = new ListEachConstraint<>(GREATER_EQUAL_ZERO_INT);
+  public static final ParameterConstraint<? super List<Integer>> GREATER_EQUAL_ZERO_INT_LIST = new ListEachConstraint<>(GREATER_EQUAL_ZERO_INT);
 
-  public static final ParameterConstraint<? super Double> LESS_THAN_HALF_DOUBLE = new LessConstraint(.5);
-
+  /**
+   * List constraint: >= 1
+   */
   public static final ParameterConstraint<? super List<Integer>> GREATER_EQUAL_ONE_INT_LIST = new ListEachConstraint<>(GREATER_EQUAL_ONE_INT);
 }

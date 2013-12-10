@@ -110,7 +110,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
       super.makeOptions(config);
       dimensions = new BitSet();
       final IntListParameter dimsP = new IntListParameter(DIMS_ID);
-      dimsP.addConstraint(CommonConstraints.NONNEGATIVE_INT_LIST);
+      dimsP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       dimsP.setOptional(true);
       if(config.grab(dimsP)) {
         for(int d : dimsP.getValue()) {

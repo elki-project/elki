@@ -149,7 +149,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(CommonConstraints.NONNEGATIVE_INT_LIST);
+      selectedAttributesP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       if(config.grab(selectedAttributesP)) {
         selectedAttributes = new BitSet();
         List<Integer> dimensionList = selectedAttributesP.getValue();

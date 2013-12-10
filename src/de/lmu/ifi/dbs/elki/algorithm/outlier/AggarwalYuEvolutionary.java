@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -135,21 +135,21 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
     Heap<Individuum>.UnorderedIter individuums = (new EvolutionarySearch(relation, ranges, m, rnd.getRandom())).run();
 
     WritableDoubleDataStore outlierScore = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    for (; individuums.valid(); individuums.advance()) {
+    for(; individuums.valid(); individuums.advance()) {
       DBIDs ids = computeSubspaceForGene(individuums.get().getGene(), ranges);
       double sparsityC = sparsity(ids.size(), dbsize, k, phi);
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double prev = outlierScore.doubleValue(iter);
-        if (Double.isNaN(prev) || sparsityC < prev) {
+        if(Double.isNaN(prev) || sparsityC < prev) {
           outlierScore.putDouble(iter, sparsityC);
         }
       }
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double val = outlierScore.doubleValue(iditer);
-      if (Double.isNaN(val)) {
+      if(Double.isNaN(val)) {
         outlierScore.putDouble(iditer, 0.0);
         val = 0.0;
       }
@@ -219,12 +219,12 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       ArrayList<Individuum> pop = initialPopulation(m);
       // best Population
       TopBoundedHeap<Individuum> bestSol = new TopBoundedHeap<>(m, Collections.reverseOrder());
-      for (Individuum ind : pop) {
+      for(Individuum ind : pop) {
         bestSol.add(ind);
       }
 
       int iterations = 0;
-      while (!checkConvergence(pop)) {
+      while(!checkConvergence(pop)) {
         Collections.sort(pop);
         pop = rouletteRankSelection(pop);
         // Crossover
@@ -232,28 +232,28 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
         // Mutation with probability 0.25 , 0.25
         pop = mutation(pop, 0.5, 0.5);
         // Avoid duplicates
-        ind: for (Individuum ind : pop) {
-          for (Heap<Individuum>.UnorderedIter it = bestSol.unorderedIter(); it.valid(); it.advance()) {
-            if (it.get().equals(ind)) {
+        ind: for(Individuum ind : pop) {
+          for(Heap<Individuum>.UnorderedIter it = bestSol.unorderedIter(); it.valid(); it.advance()) {
+            if(it.get().equals(ind)) {
               continue ind;
             }
           }
           bestSol.add(ind);
         }
-        if (LOG.isDebuggingFinest()) {
+        if(LOG.isDebuggingFinest()) {
           StringBuilder buf = new StringBuilder();
           buf.append("Top solutions:\n");
-          for (Heap<Individuum>.UnorderedIter it = bestSol.unorderedIter(); it.valid(); it.advance()) {
+          for(Heap<Individuum>.UnorderedIter it = bestSol.unorderedIter(); it.valid(); it.advance()) {
             buf.append(it.get().toString()).append('\n');
           }
           buf.append("Population:\n");
-          for (Individuum ind : pop) {
+          for(Individuum ind : pop) {
             buf.append(ind.toString()).append('\n');
           }
           LOG.debugFinest(buf.toString());
         }
         iterations++;
-        if (iterations > MAX_ITERATIONS) {
+        if(iterations > MAX_ITERATIONS) {
           LOG.warning("Maximum iterations reached.");
           break;
         }
@@ -268,18 +268,18 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
      * @return Convergence
      */
     private boolean checkConvergence(Collection<Individuum> pop) {
-      if (pop.size() == 0) {
+      if(pop.size() == 0) {
         return true;
       }
 
       // Gene occurrence counter
       int[][] occur = new int[dim][phi + 1];
       // Count gene occurrences
-      for (Individuum ind : pop) {
+      for(Individuum ind : pop) {
         int[] gene = ind.getGene();
-        for (int d = 0; d < dim; d++) {
+        for(int d = 0; d < dim; d++) {
           int val = gene[d] + DONT_CARE;
-          if (val < 0 || val >= phi + 1) {
+          if(val < 0 || val >= phi + 1) {
             LOG.warning("Invalid gene value encountered: " + val + " in " + ind.toString());
             continue;
           }
@@ -288,20 +288,20 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       }
 
       int conv = (int) (pop.size() * 0.95);
-      if (LOG.isDebuggingFine()) {
+      if(LOG.isDebuggingFine()) {
         LOG.debugFine("Convergence at " + conv + " of " + pop.size() + " individuums.");
       }
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         boolean converged = false;
 
-        for (int val = 0; val < phi + 1; val++) {
-          if (occur[d][val] >= conv) {
+        for(int val = 0; val < phi + 1; val++) {
+          if(occur[d][val] >= conv) {
             converged = true;
             break;
           }
         }
         // A single failure to converge is sufficient to continue.
-        if (!converged) {
+        if(!converged) {
           return false;
         }
       }
@@ -318,19 +318,19 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       // Initial Population
       ArrayList<Individuum> population = new ArrayList<>(popsize);
       // fill population
-      for (int i = 0; i < popsize; i++) {
+      for(int i = 0; i < popsize; i++) {
         // Random Individual
         int[] gene = new int[dim];
         // fill don't care ( any dimension == don't care)
-        for (int j = 0; j < dim; j++) {
+        for(int j = 0; j < dim; j++) {
           gene[j] = DONT_CARE;
         }
         // count of don't care positions
         int countDim = k;
         // fill non don't care positions of the Individual
-        while (countDim > 0) {
+        while(countDim > 0) {
           int z = random.nextInt(dim);
-          if (gene[z] == DONT_CARE) {
+          if(gene[z] == DONT_CARE) {
             gene[z] = random.nextInt(phi) + 1;
             countDim--;
           }
@@ -361,20 +361,21 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       ArrayList<Individuum> survivors = new ArrayList<>(popsize);
 
       // position of selection
-      for (int i = 0; i < popsize; i++) {
+      for(int i = 0; i < popsize; i++) {
         int z = random.nextInt(totalweight);
-        for (int j = 0; j < popsize; j++) {
-          if (z < popsize - j) {
+        for(int j = 0; j < popsize; j++) {
+          if(z < popsize - j) {
             // TODO: need clone?
             survivors.add(population.get(j));
             break;
-          } else {
+          }
+          else {
             // decrement
             z -= (popsize - j);
           }
         }
       }
-      if (survivors.size() != popsize) {
+      if(survivors.size() != popsize) {
         throw new AbortException("Selection step failed - implementation error?");
       }
       // Don't sort, to avoid biasing the crossover!
@@ -394,23 +395,24 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       TreeSet<Integer> R = new TreeSet<>();
 
       // for each individuum
-      for (int j = 0; j < population.size(); j++) {
+      for(int j = 0; j < population.size(); j++) {
         // clear the Sets
         Q.clear();
         R.clear();
         // Fill the Sets with the Positions
-        for (int i = 0; i < dim; i++) {
-          if (population.get(j).getGene()[i] == DONT_CARE) {
+        for(int i = 0; i < dim; i++) {
+          if(population.get(j).getGene()[i] == DONT_CARE) {
             Q.add(i);
-          } else {
+          }
+          else {
             R.add(i);
           }
         }
         //
         double r1 = random.nextDouble();
-        if (Q.size() != 0) {
+        if(Q.size() != 0) {
           // Mutation Variant 1
-          if (r1 <= perc1) {
+          if(r1 <= perc1) {
             // calc Mutation Spot
             Integer[] pos = new Integer[Q.size()];
             pos = Q.toArray(pos);
@@ -435,7 +437,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
         }
         r1 = random.nextDouble();
         // Mutation Variant 2
-        if (r1 <= perc2) {
+        if(r1 <= perc2) {
           // calc Mutation Spot
           Integer[] pos = new Integer[R.size()];
           pos = R.toArray(pos);
@@ -471,14 +473,14 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       // Crossover Set of population Set
       ArrayList<Individuum> crossover = new ArrayList<>();
 
-      for (int i = 0; i < population.size() - 1; i += 2) {
+      for(int i = 0; i < population.size() - 1; i += 2) {
         Pair<Individuum, Individuum> recombine = recombineOptimized(population.get(i), population.get(i + 1));
         // add the Solutions to the new Set
         crossover.add(recombine.getFirst());
         crossover.add(recombine.getSecond());
       }
       // if the set contains an odd number of Subspaces, retain the last one
-      if (population.size() % 2 == 1) {
+      if(population.size() % 2 == 1) {
         crossover.add(population.get(population.size() - 1));
       }
       // Collections.sort(crossover);
@@ -499,14 +501,14 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       // Set of Positions in which neither s1 or s2 is don't care
       ArrayList<Integer> R = new ArrayList<>(dim);
 
-      for (int i = 0; i < dim; i++) {
-        if ((parent1.getGene()[i] == DONT_CARE) && (parent2.getGene()[i] != DONT_CARE)) {
+      for(int i = 0; i < dim; i++) {
+        if((parent1.getGene()[i] == DONT_CARE) && (parent2.getGene()[i] != DONT_CARE)) {
           Q.add(i);
         }
-        if ((parent1.getGene()[i] != DONT_CARE) && (parent2.getGene()[i] == DONT_CARE)) {
+        if((parent1.getGene()[i] != DONT_CARE) && (parent2.getGene()[i] == DONT_CARE)) {
           Q.add(i);
         }
-        if ((parent1.getGene()[i] != DONT_CARE) && (parent2.getGene()[i] != DONT_CARE)) {
+        if((parent1.getGene()[i] != DONT_CARE) && (parent2.getGene()[i] != DONT_CARE)) {
           R.add(i);
         }
       }
@@ -518,11 +520,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       int count = k - R.size();
       Iterator<Integer> q = Q.iterator();
 
-      while (count > 0) {
+      while(count > 0) {
         int[] l1 = b.clone();
         int[] l2 = b.clone();
 
-        while (q.hasNext()) {
+        while(q.hasNext()) {
           int next = q.next();
           // pos = next;
 
@@ -536,14 +538,15 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
             final double sparsityL1 = sparsity(computeSubspaceForGene(l1, ranges).size(), dbsize, k, phi);
             final double sparsityL2 = sparsity(computeSubspaceForGene(l2, ranges).size(), dbsize, k, phi);
 
-            if (sparsityL1 <= sparsityL2) {
+            if(sparsityL1 <= sparsityL2) {
               b = l1.clone();
-              if (s1Null) {
+              if(s1Null) {
                 count--;
               }
-            } else {
+            }
+            else {
               b = l2.clone();
-              if (s2Null) {
+              if(s2Null) {
                 count--;
               }
             }
@@ -555,10 +558,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       // create the complementary String
       int[] comp = new int[dim];
 
-      for (int i = 0; i < dim; i++) {
-        if (b[i] == parent1.getGene()[i]) {
+      for(int i = 0; i < dim; i++) {
+        if(b[i] == parent1.getGene()[i]) {
           comp[i] = parent2.getGene()[i];
-        } else {
+        }
+        else {
           comp[i] = parent2.getGene()[i];
         }
       }
@@ -581,7 +585,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
      * @return best gene combination
      */
     private Individuum combineRecursive(ArrayList<Integer> r, int i, int[] current, Individuum parent1, Individuum parent2) {
-      if (i == r.size()) {
+      if(i == r.size()) {
         return makeIndividuum(current);
       }
       // Position to modify
@@ -594,9 +598,10 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       Individuum i1 = combineRecursive(r, i + 1, gene1, parent1, parent2);
       Individuum i2 = combineRecursive(r, i + 1, gene2, parent1, parent2);
       // Return the better result.
-      if (i1.getFitness() < i2.getFitness()) {
+      if(i1.getFitness() < i2.getFitness()) {
         return i1;
-      } else {
+      }
+      else {
         return i2;
       }
     }
@@ -657,15 +662,15 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof Individuum)) {
+      if(!(obj instanceof Individuum)) {
         return false;
       }
       Individuum other = (Individuum) obj;
-      if (other.second.length != this.second.length) {
+      if(other.second.length != this.second.length) {
         return false;
       }
-      for (int i = 0; i < this.second.length; i++) {
-        if (other.second[i] != this.second[i]) {
+      for(int i = 0; i < this.second.length; i++) {
+        if(other.second[i] != this.second[i]) {
           return false;
         }
       }
@@ -703,12 +708,12 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter mP = new IntParameter(M_ID);
-      mP.addConstraint(new GreaterEqualConstraint(2));
-      if (config.grab(mP)) {
+      mP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      if(config.grab(mP)) {
         m = mP.getValue();
       }
       final RandomParameter rndP = new RandomParameter(SEED_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }

@@ -58,7 +58,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -112,7 +111,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k + 2));
     }
 
@@ -128,7 +127,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     // Wrap result
     Clustering<MeanModel<V>> result = new Clustering<>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
-    for (int i = 0; i < clusters.size(); i++) {
+    for(int i = 0; i < clusters.size(); i++) {
       V mean = factory.newNumberVector(means.get(i).getColumnVector().getArrayRef());
       result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel<>(mean)));
     }
@@ -149,15 +148,16 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     // The actual storage
     final WritableDataStore<Meta> metas = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
     // Build the metadata, track the two nearest cluster centers.
-    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+    for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = new Meta(k);
       V fv = relation.get(id);
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         c.dists[i] = df.doubleDistance(fv, means.get(i));
-        if (i > 0) {
-          if (c.dists[i] < c.dists[c.primary]) {
+        if(i > 0) {
+          if(c.dists[i] < c.dists[c.primary]) {
             c.primary = i;
-          } else if (c.dists[i] > c.dists[c.secondary]) {
+          }
+          else if(c.dists[i] > c.dists[c.secondary]) {
             c.secondary = i;
           }
         }
@@ -184,9 +184,9 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     DBIDArrayIter id = tids.iter();
 
     // Initialization phase:
-    for (int start = 0; start < tids.size();) {
+    for(int start = 0; start < tids.size();) {
       tids.sort(start, tids.size(), comp);
-      for (id.seek(start); id.valid();) {
+      for(id.seek(start); id.valid();) {
         Meta c = metas.get(id);
         // Assigning to best cluster - which cannot be full yet!
         ModifiableDBIDs cluster = clusters.get(c.primary);
@@ -194,18 +194,18 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         start++;
         id.advance();
         // Now the cluster may have become completely filled:
-        if (cluster.size() == maxsize) {
+        if(cluster.size() == maxsize) {
           final int full = c.primary;
           // Refresh the not yet assigned objects where necessary:
-          for (; id.valid(); id.advance()) {
+          for(; id.valid(); id.advance()) {
             Meta ca = metas.get(id);
-            if (ca.primary == full) {
+            if(ca.primary == full) {
               // Update the best index:
-              for (int i = 0; i < k; i++) {
-                if (i == full || clusters.get(i).size() >= maxsize) {
+              for(int i = 0; i < k; i++) {
+                if(i == full || clusters.get(i).size() >= maxsize) {
                   continue;
                 }
-                if (ca.primary == full || ca.dists[i] < ca.dists[ca.primary]) {
+                if(ca.primary == full || ca.dists[i] < ca.dists[ca.primary]) {
                   ca.primary = i;
                 }
               }
@@ -232,15 +232,15 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
    * @param df Distance function
    */
   protected void updateDistances(Relation<V> relation, List<? extends NumberVector<?>> means, final WritableDataStore<Meta> metas, PrimitiveDoubleDistanceFunction<NumberVector<?>> df) {
-    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+    for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = metas.get(id);
       V fv = relation.get(id);
       // Update distances to means.
       c.secondary = -1;
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         c.dists[i] = df.doubleDistance(fv, means.get(i));
-        if (c.primary != i) {
-          if (c.secondary < 0 || c.dists[i] < c.dists[c.secondary]) {
+        if(c.primary != i) {
+          if(c.secondary < 0 || c.dists[i] < c.dists[c.secondary]) {
             c.secondary = i;
           }
         }
@@ -277,7 +277,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     };
     // List for sorting cluster preferences
     int[] preferences = new int[k];
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       preferences[i] = i;
     }
     // Comparator for this list.
@@ -285,28 +285,28 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
 
     // Initialize transfer lists:
     ArrayModifiableDBIDs[] transfers = new ArrayModifiableDBIDs[k];
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       transfers[i] = DBIDUtil.newArray();
     }
 
-    for (int iter = 0; maxiter < 0 || iter < maxiter; iter++) {
+    for(int iter = 0; maxiter < 0 || iter < maxiter; iter++) {
       updateDistances(relation, means, metas, df);
       tids.sort(comp);
       int active = 0; // Track if anything has changed
-      for (DBIDIter id = tids.iter(); id.valid(); id.advance()) {
+      for(DBIDIter id = tids.iter(); id.valid(); id.advance()) {
         Meta c = metas.get(id);
         ModifiableDBIDs source = clusters.get(c.primary);
         IntegerArrayQuickSort.sort(preferences, pcomp.select(c));
         boolean transferred = false;
-        for (int i : preferences) {
-          if (i == c.primary) {
+        for(int i : preferences) {
+          if(i == c.primary) {
             continue; // Cannot transfer to the same cluster!
           }
           ModifiableDBIDs dest = clusters.get(i);
           // Can we pair this transfer?
-          for (DBIDMIter other = transfers[i].iter(); other.valid(); other.advance()) {
+          for(DBIDMIter other = transfers[i].iter(); other.valid(); other.advance()) {
             Meta c2 = metas.get(other);
-            if (c.gain(i) + c2.gain(c.primary) > 0) {
+            if(c.gain(i) + c2.gain(c.primary) > 0) {
               transfer(metas, c2, dest, source, other, c.primary);
               transfer(metas, c, source, dest, id, i);
               active += 2;
@@ -316,7 +316,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
             }
           }
           // If cluster sizes allow, move a single object.
-          if (c.gain(i) > 0 && (dest.size() < maxsize && source.size() > minsize)) {
+          if(c.gain(i) > 0 && (dest.size() < maxsize && source.size() > minsize)) {
             transfer(metas, c, source, dest, id, i);
             active += 1;
             transferred = true;
@@ -325,7 +325,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         }
         // If the object would prefer a different cluster, put in outgoing
         // transfer list.
-        if (!transferred && (c.dists[c.primary] > c.dists[c.secondary])) {
+        if(!transferred && (c.dists[c.primary] > c.dists[c.secondary])) {
           transfers[c.primary].add(id);
         }
       }
@@ -333,14 +333,14 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       // considering more than one object?
       int pending = 0;
       // Clear transfer lists for next iteration.
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         pending += transfers[i].size();
         transfers[i].clear();
       }
-      if (LOG.isDebuggingFine()) {
+      if(LOG.isDebuggingFine()) {
         LOG.debugFine("Performed " + active + " transfers in iteration " + iter + " skipped " + pending);
       }
-      if (active <= 0) {
+      if(active <= 0) {
         break;
       }
       // Recompute means after reassignment
@@ -486,27 +486,27 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<PrimitiveDoubleDistanceFunction<? super NumberVector<?>>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDoubleDistanceFunction.class);
-      if (config.grab(distanceFunctionP)) {
+      if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
-        if (!(distanceFunction instanceof EuclideanDistanceFunction) && !(distanceFunction instanceof SquaredEuclideanDistanceFunction)) {
+        if(!(distanceFunction instanceof EuclideanDistanceFunction) && !(distanceFunction instanceof SquaredEuclideanDistanceFunction)) {
           LOG.warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }
 
       IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
 
       ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, KMeansPlusPlusInitialMeans.class);
-      if (config.grab(initialP)) {
+      if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 
       IntParameter maxiterP = new IntParameter(MAXITER_ID, -1);
-      maxiterP.addConstraint(new GreaterEqualConstraint(-1));
-      if (config.grab(maxiterP)) {
+      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
+      if(config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }
     }
