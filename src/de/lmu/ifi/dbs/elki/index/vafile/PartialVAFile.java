@@ -67,7 +67,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
@@ -883,7 +882,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
           pagesize = pagesizeP.getValue();
         }
         IntParameter partitionsP = new IntParameter(Factory.PARTITIONS_ID);
-        partitionsP.addConstraint(new GreaterConstraint(2));
+        partitionsP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
         if(config.grab(partitionsP)) {
           numpart = partitionsP.getValue();
         }

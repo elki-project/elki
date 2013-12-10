@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.AchlioptasRandom
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -94,7 +94,7 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
     int inputdim = vin.getDimensionality();
 
     projection = family.generateProjection(inputdim, dimensionality);
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debug(projection.toString());
     }
   }
@@ -147,13 +147,13 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
       super.makeOptions(config);
       ObjectParameter<RandomProjectionFamily> familyP = new ObjectParameter<>(FAMILY_ID, RandomProjectionFamily.class);
       familyP.setDefaultValue(AchlioptasRandomProjectionFamily.class);
-      if (config.grab(familyP)) {
+      if(config.grab(familyP)) {
         family = familyP.instantiateClass(config);
       }
 
       IntParameter dimP = new IntParameter(DIMENSIONALITY_ID);
-      dimP.addConstraint(new GreaterEqualConstraint(1));
-      if (config.grab(dimP)) {
+      dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(dimP)) {
         dimensionality = dimP.intValue();
       }
     }

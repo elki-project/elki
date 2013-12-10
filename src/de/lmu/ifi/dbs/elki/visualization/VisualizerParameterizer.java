@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -84,18 +84,18 @@ public class VisualizerParameterizer implements Parameterizable {
    * <p>
    * Key: -visualizer.stylesheet
    * 
-   * Default: default properties file
-   * <br>
+   * Default: default properties file <br>
    * included stylesheets:
    * <ul>
-   * 	<li>classic</li>
-   * 	<li>default</li>
-   * 	<li>greyscale</li>
-   * 	<li>neon</li>
-   * 	<li>presentation</li>
-   * 	<li>print</li>
+   * <li>classic</li>
+   * <li>default</li>
+   * <li>greyscale</li>
+   * <li>neon</li>
+   * <li>presentation</li>
+   * <li>print</li>
    * </ul>
-   * These are {@code *.properties} files in the package {@link de.lmu.ifi.dbs.elki.visualization.style}.
+   * These are {@code *.properties} files in the package
+   * {@link de.lmu.ifi.dbs.elki.visualization.style}.
    * </p>
    * 
    * 
@@ -178,14 +178,14 @@ public class VisualizerParameterizer implements Parameterizable {
    * @return New context
    */
   public VisualizerContext newContext(HierarchicalResult result) {
-    if (samplesize > 0) {
+    if(samplesize > 0) {
       Collection<Relation<?>> rels = ResultUtil.filterResults(result, Relation.class);
-      for (Relation<?> rel : rels) {
-        if (!ResultUtil.filterResults(rel, SamplingResult.class).isEmpty()) {
+      for(Relation<?> rel : rels) {
+        if(!ResultUtil.filterResults(rel, SamplingResult.class).isEmpty()) {
           continue;
         }
         int size = rel.size();
-        if (size > samplesize) {
+        if(size > samplesize) {
           SamplingResult sample = new SamplingResult(rel);
           sample.setSample(DBIDUtil.randomSample(sample.getSample(), samplesize, rnd));
           ResultUtil.addChildResult(rel, sample);
@@ -205,53 +205,53 @@ public class VisualizerParameterizer implements Parameterizable {
    */
   public static String getTitle(Database db, Result result) {
     List<Pair<Object, Parameter<?>>> settings = new ArrayList<>();
-    for (SettingsResult sr : ResultUtil.getSettingsResults(result)) {
+    for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
     String algorithm = null;
     String distance = null;
     String dataset = null;
 
-    for (Pair<Object, Parameter<?>> setting : settings) {
-      if (setting.second.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
+    for(Pair<Object, Parameter<?>> setting : settings) {
+      if(setting.second.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
         algorithm = setting.second.getValue().toString();
       }
-      if (setting.second.equals(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
+      if(setting.second.equals(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
         distance = setting.second.getValue().toString();
       }
-      if (setting.second.equals(FileBasedDatabaseConnection.INPUT_ID)) {
+      if(setting.second.equals(FileBasedDatabaseConnection.INPUT_ID)) {
         dataset = setting.second.getValue().toString();
       }
     }
     StringBuilder buf = new StringBuilder();
-    if (algorithm != null) {
+    if(algorithm != null) {
       // shorten the algorithm
-      if (algorithm.contains(".")) {
+      if(algorithm.contains(".")) {
         algorithm = algorithm.substring(algorithm.lastIndexOf('.') + 1);
       }
       buf.append(algorithm);
     }
-    if (distance != null) {
+    if(distance != null) {
       // shorten the distance
-      if (distance.contains(".")) {
+      if(distance.contains(".")) {
         distance = distance.substring(distance.lastIndexOf('.') + 1);
       }
-      if (buf.length() > 0) {
+      if(buf.length() > 0) {
         buf.append(" using ");
       }
       buf.append(distance);
     }
-    if (dataset != null) {
+    if(dataset != null) {
       // shorten the data set filename
-      if (dataset.contains(File.separator)) {
+      if(dataset.contains(File.separator)) {
         dataset = dataset.substring(dataset.lastIndexOf(File.separator) + 1);
       }
-      if (buf.length() > 0) {
+      if(buf.length() > 0) {
         buf.append(" on ");
       }
       buf.append(dataset);
     }
-    if (buf.length() > 0) {
+    if(buf.length() > 0) {
       return buf.toString();
     }
     return null;
@@ -279,22 +279,23 @@ public class VisualizerParameterizer implements Parameterizable {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter samplingP = new IntParameter(SAMPLING_ID, 10000);
-      samplingP.addConstraint(new GreaterEqualConstraint(-1));
-      if (config.grab(samplingP)) {
+      samplingP.addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
+      if(config.grab(samplingP)) {
         samplesize = samplingP.intValue();
       }
       StringParameter stylelibP = new StringParameter(STYLELIB_ID, PropertiesBasedStyleLibrary.DEFAULT_SCHEME_FILENAME);
-      if (config.grab(stylelibP)) {
+      if(config.grab(stylelibP)) {
         String filename = stylelibP.getValue();
         try {
           stylelib = new PropertiesBasedStyleLibrary(filename, "Command line style");
-        } catch (AbortException e) {
+        }
+        catch(AbortException e) {
           config.reportError(new WrongParameterValueException(stylelibP, filename, e));
         }
       }
       PatternParameter enablevisP = new PatternParameter(ENABLEVIS_ID, DEFAULT_ENABLEVIS);
-      if (config.grab(enablevisP)) {
-        if (!"all".equals(enablevisP.getValueAsString())) {
+      if(config.grab(enablevisP)) {
+        if(!"all".equals(enablevisP.getValueAsString())) {
           enableVisualizers = enablevisP.getValue();
         }
       }
@@ -312,18 +313,20 @@ public class VisualizerParameterizer implements Parameterizable {
      */
     private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<ProjectorFactory> factories = new ArrayList<>();
-      for (Class<?> c : InspectionUtil.cachedFindAllImplementations(ProjectorFactory.class)) {
-        if (filter != null && !filter.matcher(c.getCanonicalName()).find()) {
+      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(ProjectorFactory.class)) {
+        if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
         }
         try {
           config.rewind();
           ProjectorFactory a = ClassGenericsUtil.tryInstantiate(ProjectorFactory.class, c, config);
           factories.add(a);
-        } catch (Throwable e) {
-          if (LOG.isDebugging()) {
+        }
+        catch(Throwable e) {
+          if(LOG.isDebugging()) {
             LOG.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
-          } else {
+          }
+          else {
             LOG.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
           }
         }
@@ -340,18 +343,20 @@ public class VisualizerParameterizer implements Parameterizable {
      */
     private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<VisFactory> factories = new ArrayList<>();
-      for (Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
-        if (filter != null && !filter.matcher(c.getCanonicalName()).find()) {
+      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
+        if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
         }
         try {
           config.rewind();
           VisFactory a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
           factories.add(a);
-        } catch (Throwable e) {
-          if (LOG.isDebugging()) {
+        }
+        catch(Throwable e) {
+          if(LOG.isDebugging()) {
             LOG.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
-          } else {
+          }
+          else {
             LOG.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
           }
         }

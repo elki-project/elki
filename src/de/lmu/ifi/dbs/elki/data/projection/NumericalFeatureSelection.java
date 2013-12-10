@@ -130,7 +130,7 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
       super.makeOptions(config);
 
       IntListParameter selectedAttributesP = new IntListParameter(NumberVectorFeatureSelectionFilter.Parameterizer.SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(CommonConstraints.NONNEGATIVE_INT_LIST);
+      selectedAttributesP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       if(config.grab(selectedAttributesP)) {
         dims.clear();
         for(int in : selectedAttributesP.getValue()) {

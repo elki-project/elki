@@ -146,7 +146,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
       super.makeOptions(config);
 
       IntListParameter selectedAttributesP = new IntListParameter(NumberVectorFeatureSelectionFilter.Parameterizer.SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(CommonConstraints.NONNEGATIVE_INT_LIST);
+      selectedAttributesP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       if(config.grab(selectedAttributesP)) {
         dims = ArrayLikeUtil.toPrimitiveIntegerArray(selectedAttributesP.getValue());
       }
