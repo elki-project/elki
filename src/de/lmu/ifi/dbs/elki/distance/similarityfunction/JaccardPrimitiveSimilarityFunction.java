@@ -85,29 +85,35 @@ public class JaccardPrimitiveSimilarityFunction<O extends FeatureVector<?>> exte
 
   @Override
   public double doubleSimilarity(O o1, O o2) {
-    if (o1 instanceof NumberVector && o2 instanceof NumberVector) {
+    if(o1 instanceof NumberVector && o2 instanceof NumberVector) {
       return doubleSimilarityNumberVector((NumberVector<?>) o1, (NumberVector<?>) o2);
     }
     final int d1 = o1.getDimensionality(), d2 = o2.getDimensionality();
     int intersection = 0, union = 0;
     int d = 0;
-    for (; d < d1 && d < d2; d++) {
+    for(; d < d1 && d < d2; d++) {
       Object v1 = o1.getValue(d), v2 = o2.getValue(d);
       final boolean n1 = isNull(v1), n2 = isNull(v2);
-      if (!n1 || !n2) {
+      if(v1 instanceof Double && Double.isNaN((Double) v1)) {
+        continue;
+      }
+      if(v2 instanceof Double && Double.isNaN((Double) v2)) {
+        continue;
+      }
+      if(!n1 || !n2) {
         ++union;
-        if (!n1 && v1.equals(v2)) {
+        if(!n1 && v1.equals(v2)) {
           ++intersection;
         }
       }
     }
-    for (; d < d1; d++) {
-      if (!isNull(o1.getValue(d))) {
+    for(; d < d1; d++) {
+      if(!isNull(o1.getValue(d))) {
         ++union;
       }
     }
-    for (; d < d2; d++) {
-      if (!isNull(o2.getValue(d))) {
+    for(; d < d2; d++) {
+      if(!isNull(o2.getValue(d))) {
         ++union;
       }
     }
@@ -125,22 +131,25 @@ public class JaccardPrimitiveSimilarityFunction<O extends FeatureVector<?>> exte
     final int d1 = o1.getDimensionality(), d2 = o2.getDimensionality();
     int intersection = 0, union = 0;
     int d = 0;
-    for (; d < d1 && d < d2; d++) {
+    for(; d < d1 && d < d2; d++) {
       double v1 = o1.doubleValue(d), v2 = o2.doubleValue(d);
-      if (v1 != 0. || v2 != 0) {
+      if(v1 != v1 || v2 != v2) { // Skip NaNs.
+        continue;
+      }
+      if(v1 != 0. || v2 != 0) {
         ++union;
-        if (v1 == v2) {
+        if(v1 == v2) {
           ++intersection;
         }
       }
     }
-    for (; d < d1; d++) {
-      if (o1.doubleValue(d) != 0) {
+    for(; d < d1; d++) {
+      if(o1.doubleValue(d) != 0) {
         ++union;
       }
     }
-    for (; d < d2; d++) {
-      if (o2.doubleValue(d) != 0) {
+    for(; d < d2; d++) {
+      if(o2.doubleValue(d) != 0) {
         ++union;
       }
     }
