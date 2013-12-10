@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Elke Achtert
  * @author Erich Schubert
  */
-public class IntListParameter extends ListParameter<Integer> {
+public class IntListParameter extends ListParameter<IntListParameter, Integer> {
   /**
    * Constructs an integer list parameter
    * 

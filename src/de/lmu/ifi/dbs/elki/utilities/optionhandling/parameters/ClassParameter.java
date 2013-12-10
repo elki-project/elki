@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 // TODO: add additional constructors with parameter constraints.
 // TODO: turn restrictionClass into a constraint?
-public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
+public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Class<? extends C>> {
   /**
    * The restriction class for this class parameter.
    */
@@ -73,7 +73,7 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
     // * ClassParameter<Foo<Bar>>(optionID, (Class<Foo<Bar>>) Foo.class) is an
     // invalid cast.
     this.restrictionClass = (Class<C>) restrictionClass;
-    if (restrictionClass == null) {
+    if(restrictionClass == null) {
       LoggingUtil.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
     }
   }
@@ -96,7 +96,7 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
     // * ClassParameter<Foo<Bar>>(optionID, (Class<Foo<Bar>>) Foo.class) is an
     // invalid cast.
     this.restrictionClass = (Class<C>) restrictionClass;
-    if (restrictionClass == null) {
+    if(restrictionClass == null) {
       LoggingUtil.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
     }
   }
@@ -115,15 +115,15 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
   @SuppressWarnings("unchecked")
   @Override
   protected Class<? extends C> parseValue(Object obj) throws ParameterException {
-    if (obj == null) {
+    if(obj == null) {
       throw new UnspecifiedParameterException(this);
     }
-    if (obj instanceof Class<?>) {
+    if(obj instanceof Class<?>) {
       return (Class<? extends C>) obj;
     }
-    if (obj instanceof String) {
+    if(obj instanceof String) {
       Class<? extends C> clz = InspectionUtil.findImplementation(restrictionClass, (String) obj);
-      if (clz != null) {
+      if(clz != null) {
         return clz;
       }
     }
@@ -136,13 +136,13 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
    */
   @Override
   public boolean validate(Class<? extends C> obj) throws ParameterException {
-    if (obj == null) {
+    if(obj == null) {
       throw new UnspecifiedParameterException(this);
     }
-    if (!restrictionClass.isAssignableFrom(obj)) {
+    if(!restrictionClass.isAssignableFrom(obj)) {
       throw new WrongParameterValueException(this, obj.getName(), "Given class not a subclass / implementation of " + restrictionClass.getName());
     }
-    if (!super.validate(obj)) {
+    if(!super.validate(obj)) {
       return false;
     }
     return true;
@@ -175,7 +175,7 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
    */
   @Override
   public String getValuesDescription() {
-    if (restrictionClass != null && restrictionClass != Object.class) {
+    if(restrictionClass != null && restrictionClass != Object.class) {
       return restrictionString();
     }
     return "";
@@ -199,22 +199,26 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
    */
   public C instantiateClass(Parameterization config) {
     try {
-      if (getValue() == null /* && !optionalParameter */) {
+      if(getValue() == null /* && !optionalParameter */) {
         throw new UnusedParameterException("Value of parameter " + getName() + " has not been specified.");
       }
       C instance;
       try {
         config = config.descend(this);
         instance = ClassGenericsUtil.tryInstantiate(restrictionClass, getValue(), config);
-      } catch (InvocationTargetException e) {
+      }
+      catch(InvocationTargetException e) {
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
-      } catch (NoSuchMethodException e) {
+      }
+      catch(NoSuchMethodException e) {
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class - no usable public constructor.");
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
       }
       return instance;
-    } catch (ParameterException e) {
+    }
+    catch(ParameterException e) {
       config.reportError(e);
       return null;
     }
@@ -247,19 +251,20 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
    */
   public String restrictionString() {
     StringBuilder info = new StringBuilder();
-    if (restrictionClass.isInterface()) {
+    if(restrictionClass.isInterface()) {
       info.append("Implementing ");
-    } else {
+    }
+    else {
       info.append("Extending ");
     }
     info.append(restrictionClass.getName());
     info.append(FormatUtil.NEWLINE);
 
     List<Class<?>> known = getKnownImplementations();
-    if (!known.isEmpty()) {
+    if(!known.isEmpty()) {
       info.append("Known classes (default package " + restrictionClass.getPackage().getName() + "):");
       info.append(FormatUtil.NEWLINE);
-      for (Class<?> c : known) {
+      for(Class<?> c : known) {
         info.append("->" + FormatUtil.NONBREAKING_SPACE);
         info.append(canonicalClassName(c, getRestrictionClass()));
         info.append(FormatUtil.NEWLINE);
@@ -279,13 +284,13 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
    */
   public static String canonicalClassName(Class<?> c, Package pkg, String postfix) {
     String name = c.getName();
-    if (pkg != null) {
+    if(pkg != null) {
       String prefix = pkg.getName() + ".";
-      if (name.startsWith(prefix)) {
+      if(name.startsWith(prefix)) {
         name = name.substring(prefix.length());
       }
     }
-    if (postfix != null && name.endsWith(postfix)) {
+    if(postfix != null && name.endsWith(postfix)) {
       name = name.substring(0, name.length() - postfix.length());
     }
     return name;
@@ -299,7 +304,7 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
    * @return Simplified class name.
    */
   public static String canonicalClassName(Class<?> c, Class<?> parent) {
-    if (parent == null) {
+    if(parent == null) {
       return canonicalClassName(c, null, InspectionUtil.FACTORY_POSTFIX);
     }
     return canonicalClassName(c, parent.getPackage(), InspectionUtil.FACTORY_POSTFIX);

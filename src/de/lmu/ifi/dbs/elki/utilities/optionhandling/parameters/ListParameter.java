@@ -34,9 +34,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @author Steffi Wanka
  * @author Erich Schubert
  *
+ * @param <THIS> Type self-reference
  * @param <T> List type
  */
-public abstract class ListParameter<T> extends AbstractParameter<List<T>> {
+public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> extends AbstractParameter<THIS, List<T>> {
   /**
    * A pattern defining a &quot,&quot.
    */

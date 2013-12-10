@@ -39,31 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class VectorListParameter extends ListParameter<List<Double>> {
-  /**
-   * Constructs a vector list parameter with the given name and description.
-   * 
-   * @param optionID Option ID
-   * @param constraints Constraint
-   * @param defaultValue Default value
-   */
-  public VectorListParameter(OptionID optionID, List<ParameterConstraint<List<List<Double>>>> constraints, List<List<Double>> defaultValue) {
-    super(optionID, defaultValue);
-    addConstraints(constraints);
-  }
-
-  /**
-   * Constructs a vector list parameter with the given name and description.
-   * 
-   * @param optionID Option ID
-   * @param constraints Constraints
-   * @param optional Optional flag
-   */
-  public VectorListParameter(OptionID optionID, List<ParameterConstraint<List<List<Double>>>> constraints, boolean optional) {
-    super(optionID, optional);
-    addConstraints(constraints);
-  }
-
+public class VectorListParameter extends ListParameter<VectorListParameter, List<Double>> {
   /**
    * Constructs a vector list parameter with the given name and description.
    * 
@@ -140,12 +116,12 @@ public class VectorListParameter extends ListParameter<List<Double>> {
       Iterator<Double> veciter = vec.iterator();
       while(veciter.hasNext()) {
         buf.append(veciter.next().toString());
-        if (veciter.hasNext()) {
+        if(veciter.hasNext()) {
           buf.append(LIST_SEP);
         }
       }
       // Append separation character
-      if (valiter.hasNext()) {
+      if(valiter.hasNext()) {
         buf.append(VECTOR_SEP);
       }
     }

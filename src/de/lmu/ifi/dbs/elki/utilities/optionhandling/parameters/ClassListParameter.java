@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <C> Class type
  */
 // TODO: Add missing constructors. (ObjectListParameter also!)
-public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
+public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, Class<? extends C>> {
   /**
    * The restriction class for the list of class names.
    */

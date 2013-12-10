@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Parameter class for a parameter specifying a double value.
@@ -34,36 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class DoubleParameter extends NumberParameter<Double> {
-  /**
-   * Constructs a double parameter with the given optionID, parameter
-   * constraint, and default value.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param defaultValue the default value for this parameter
-   * @param constraint the constraint of this parameter
-   * @deprecated Use {@link #addConstraint} instead.
-   */
-  @Deprecated
-  public DoubleParameter(OptionID optionID, double defaultValue, ParameterConstraint<? super Double> constraint) {
-    super(optionID, defaultValue);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID, and parameter
-   * constraint.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter
-   * @deprecated Use {@link #addConstraint} instead.
-   */
-  @Deprecated
-  public DoubleParameter(OptionID optionID, ParameterConstraint<? super Double> constraint) {
-    super(optionID);
-    addConstraint(constraint);
-  }
-
+public class DoubleParameter extends NumberParameter<DoubleParameter, Double> {
   /**
    * Constructs a double parameter with the given optionID and default value.
    * 
@@ -72,20 +42,6 @@ public class DoubleParameter extends NumberParameter<Double> {
    */
   public DoubleParameter(OptionID optionID, double defaultValue) {
     super(optionID, defaultValue);
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID and default value.
-   * 
-   * @param optionID the unique optionID
-   * @param optional Flag to indicate that the parameter is optional
-   * 
-   * @deprecated Use {@link #setOptional} instead.
-   */
-  @Deprecated
-  public DoubleParameter(OptionID optionID, boolean optional) {
-    super(optionID);
-    setOptional(optional);
   }
 
   /**
@@ -104,14 +60,16 @@ public class DoubleParameter extends NumberParameter<Double> {
 
   @Override
   protected Double parseValue(Object obj) throws WrongParameterValueException {
-    if (obj instanceof Double) {
+    if(obj instanceof Double) {
       return (Double) obj;
     }
     try {
       return FormatUtil.parseDouble(obj.toString());
-    } catch (NullPointerException e) {
+    }
+    catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
-    } catch (NumberFormatException e) {
+    }
+    catch(NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
     }
   }

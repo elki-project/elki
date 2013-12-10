@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Parameter class for a parameter specifying an integer value.
@@ -34,51 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class IntParameter extends NumberParameter<Integer> {
-  /**
-   * Constructs an integer parameter with the given optionID, parameter
-   * constraint, and default value.
-   * 
-   * @param optionID optionID the unique id of the option
-   * @param defaultValue the default value
-   * @param constraint the constraint for this integer parameter
-   * @deprecated Use {@link #addConstraint} instead.
-   */
-  @Deprecated
-  public IntParameter(OptionID optionID, int defaultValue, ParameterConstraint<? super Integer> constraint) {
-    super(optionID, Integer.valueOf(defaultValue));
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs an integer parameter with the given optionID, parameter
-   * constraint, and optional flag.
-   * 
-   * @param optionID optionID the unique id of the option
-   * @param constraint the constraint for this integer parameter
-   * @param optional specifies if this parameter is an optional parameter
-   * @deprecated Use {@link #addConstraint} instead.
-   */
-  @Deprecated
-  public IntParameter(OptionID optionID, ParameterConstraint<? super Integer> constraint, boolean optional) {
-    super(optionID, optional);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs an integer parameter with the given optionID, and parameter
-   * constraint.
-   * 
-   * @param optionID optionID the unique id of the option
-   * @param constraint the constraint for this integer parameter
-   * @deprecated Use {@link #addConstraint} instead.
-   */
-  @Deprecated
-  public IntParameter(OptionID optionID, ParameterConstraint<? super Integer> constraint) {
-    super(optionID);
-    addConstraint(constraint);
-  }
-
+public class IntParameter extends NumberParameter<IntParameter, Integer> {
   /**
    * Constructs an integer parameter with the given optionID.
    * 
@@ -87,18 +43,6 @@ public class IntParameter extends NumberParameter<Integer> {
    */
   public IntParameter(OptionID optionID, int defaultValue) {
     super(optionID, Integer.valueOf(defaultValue));
-  }
-
-  /**
-   * Constructs an integer parameter with the given optionID.
-   * 
-   * @param optionID optionID the unique id of the option
-   * @param optional specifies if this parameter is an optional parameter
-   * @deprecated Use {@link #setOptional} instead.
-   */
-  @Deprecated
-  public IntParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
   }
 
   /**
@@ -117,14 +61,17 @@ public class IntParameter extends NumberParameter<Integer> {
 
   @Override
   protected Integer parseValue(Object obj) throws ParameterException {
-    if (obj instanceof Integer) {
+    if(obj instanceof Integer) {
       return (Integer) obj;
     }
     try {
-      return Integer.valueOf(obj.toString());
-    } catch (NullPointerException e) {
+      final String s = obj.toString();
+      return (int) FormatUtil.parseLongBase10(s, 0, s.length());
+    }
+    catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires an integer value, read: " + obj + "!\n");
-    } catch (NumberFormatException e) {
+    }
+    catch(NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires an integer value, read: " + obj + "!\n");
     }
   }

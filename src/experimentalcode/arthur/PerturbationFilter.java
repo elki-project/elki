@@ -23,7 +23,6 @@ package experimentalcode.arthur;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -42,16 +41,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * A filter to perturb the values by adding micro-noise.
  * 
  * The added noise is generated, attribute-wise, by a Gaussian with mean=0 and a
- * specified standard deviation or by a uniform distribution with a specified range.
- * The standard deviation or the range can be scaled, attribute-wise, to
+ * specified standard deviation or by a uniform distribution with a specified
+ * range. The standard deviation or the range can be scaled, attribute-wise, to
  * a given percentage of the original standard deviation in the data
  * distribution (assuming a Gaussian distribution there), or to a percentage of
  * the extension in each attribute ({@code maximumValue - minimumValue}).
@@ -74,15 +71,15 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
   public static enum ScalingReference {
     UNITCUBE, STDDEV, MINMAX
   }
-  
+
   /**
    * Nature of the noise distribution.
    * 
    * @author Arthur Zimek
-   *
+   * 
    * @apiviz.exclude
    */
-  public static enum NoiseDistribution{
+  public static enum NoiseDistribution {
     GAUSSIAN, UNIFORM
   }
 
@@ -95,15 +92,15 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
    * Nature of the noise distribution.
    */
   private NoiseDistribution noisedistribution;
-  
+
   /**
    * Random object to generate the attribute-wise seeds for the noise.
    */
   private final Random RANDOM;
 
   /**
-   * Percentage of the variance of the random noise generation, given
-   * the variance of the corresponding attribute in the data.
+   * Percentage of the variance of the random noise generation, given the
+   * variance of the corresponding attribute in the data.
    */
   private double percentage;
 
@@ -118,7 +115,8 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
   private double[] scalingreferencevalues = new double[0];
 
   /**
-   * The random objects to generate noise distributions independently for each attribute.
+   * The random objects to generate noise distributions independently for each
+   * attribute.
    */
   private Random[] randomPerAttribute = null;
 
@@ -159,20 +157,20 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
 
   @Override
   protected boolean prepareStart(SimpleTypeInformation<V> in) {
-    if (scalingreference == ScalingReference.MINMAX && minima.length != 0 && maxima.length != 0) {
+    if(scalingreference == ScalingReference.MINMAX && minima.length != 0 && maxima.length != 0) {
       dimensionality = minima.length;
       scalingreferencevalues = new double[dimensionality];
       randomPerAttribute = new Random[dimensionality];
-      for (int d = 0; d < dimensionality; d++) {
+      for(int d = 0; d < dimensionality; d++) {
         scalingreferencevalues[d] = (maxima[d] - minima[d]) * percentage;
-        if (scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
           scalingreferencevalues[d] = percentage;
         }
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
       }
       return false;
     }
-    if (scalingreference == ScalingReference.UNITCUBE) {
+    if(scalingreference == ScalingReference.UNITCUBE) {
       return false;
     }
     return (scalingreferencevalues.length == 0);
@@ -181,11 +179,11 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
   @Override
   protected void prepareProcessInstance(V featureVector) {
     // First object? Then init. (We didn't have a dimensionality before!)
-    if (mvs == null) {
+    if(mvs == null) {
       dimensionality = featureVector.getDimensionality();
       mvs = MeanVarianceMinMax.newArray(dimensionality);
     }
-    for (int d = 0; d < featureVector.getDimensionality(); d++) {
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
       mvs[d].put(featureVector.doubleValue(d));
     }
   }
@@ -195,37 +193,38 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     StringBuilder buf = LOG.isDebuggingFine() ? new StringBuilder() : null;
     scalingreferencevalues = new double[dimensionality];
     randomPerAttribute = new Random[dimensionality];
-    if (scalingreference == ScalingReference.STDDEV) {
-      if (buf != null) {
+    if(scalingreference == ScalingReference.STDDEV) {
+      if(buf != null) {
         buf.append("Standard deviation per attribute: ");
       }
-      for (int d = 0; d < dimensionality; d++) {
+      for(int d = 0; d < dimensionality; d++) {
         scalingreferencevalues[d] = mvs[d].getSampleStddev() * percentage;
-        if (scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
           scalingreferencevalues[d] = percentage;
         }
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
-        if (buf != null) {
+        if(buf != null) {
           buf.append(" ").append(d).append(": ").append(scalingreferencevalues[d] / percentage);
         }
       }
-    } else if (scalingreference == ScalingReference.MINMAX && minima.length == 0 && maxima.length == 0) {
-      if (buf != null) {
+    }
+    else if(scalingreference == ScalingReference.MINMAX && minima.length == 0 && maxima.length == 0) {
+      if(buf != null) {
         buf.append("extension per attribute: ");
       }
-      for (int d = 0; d < dimensionality; d++) {
+      for(int d = 0; d < dimensionality; d++) {
         scalingreferencevalues[d] = (mvs[d].getMax() - mvs[d].getMin()) * percentage;
-        if (scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
           scalingreferencevalues[d] = percentage;
         }
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
-        if (buf != null) {
+        if(buf != null) {
           buf.append(" ").append(d).append(": ").append(scalingreferencevalues[d] / percentage);
         }
       }
     }
     mvs = null;
-    if (buf != null) {
+    if(buf != null) {
       LOG.debugFine(buf.toString());
     }
   }
@@ -237,24 +236,24 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    if (scalingreference == ScalingReference.UNITCUBE && dimensionality == 0) {
+    if(scalingreference == ScalingReference.UNITCUBE && dimensionality == 0) {
       dimensionality = featureVector.getDimensionality();
       scalingreferencevalues = new double[dimensionality];
       randomPerAttribute = new Random[dimensionality];
-      for (int d = 0; d < dimensionality; d++) {
+      for(int d = 0; d < dimensionality; d++) {
         scalingreferencevalues[d] = percentage;
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
       }
     }
-    if (scalingreferencevalues.length != featureVector.getDimensionality()) {
+    if(scalingreferencevalues.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors and given Minima/Maxima differ in length.");
     }
     double[] values = new double[featureVector.getDimensionality()];
-    for (int d = 0; d < featureVector.getDimensionality(); d++) {
-      if(this.noisedistribution.equals(NoiseDistribution.GAUSSIAN)){
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+      if(this.noisedistribution.equals(NoiseDistribution.GAUSSIAN)) {
         values[d] = featureVector.doubleValue(d) + randomPerAttribute[d].nextGaussian() * scalingreferencevalues[d];
       }
-      else if (this.noisedistribution.equals(NoiseDistribution.UNIFORM)){
+      else if(this.noisedistribution.equals(NoiseDistribution.UNIFORM)) {
         values[d] = featureVector.doubleValue(d) + randomPerAttribute[d].nextDouble() * scalingreferencevalues[d];
       }
     }
@@ -356,11 +355,11 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
      * 
      */
     public static final OptionID NOISEDISTRIBUTION_ID = new OptionID("perturbationfilter.noisedistribution", "The nature of the noise distribution, default is " + NoiseDistribution.UNIFORM);
-    
+
     /**
-     * Percentage of the variance of the random Gaussian noise generation
-     * or of the range of the uniform distribution, given
-     * the variance of the corresponding attribute in the data.
+     * Percentage of the variance of the random Gaussian noise generation or of
+     * the range of the uniform distribution, given the variance of the
+     * corresponding attribute in the data.
      */
     protected double percentage;
 
@@ -373,49 +372,42 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
      * The option which nature of noise distribution to choose.
      */
     protected NoiseDistribution noisedistribution;
-    
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
-      if (config.grab(scalingReferenceP)) {
+      if(config.grab(scalingReferenceP)) {
         scalingreference = scalingReferenceP.getValue();
       }
       EnumParameter<NoiseDistribution> noisedistributionP = new EnumParameter<>(NOISEDISTRIBUTION_ID, NoiseDistribution.class, NoiseDistribution.UNIFORM);
-      if (config.grab(noisedistributionP)){
+      if(config.grab(noisedistributionP)) {
         noisedistribution = noisedistributionP.getValue();
       }
       DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, .01);
       percentageP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       percentageP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if (config.grab(percentageP)) {
+      if(config.grab(percentageP)) {
         percentage = percentageP.getValue();
       }
       LongParameter seedP = new LongParameter(SEED_ID);
       seedP.setOptional(true);
-      if (config.grab(seedP)) {
+      if(config.grab(seedP)) {
         seed = seedP.getValue();
       }
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID);
       minimaP.setOptional(true);
-      if (config.grab(minimaP)) {
+      if(config.grab(minimaP)) {
         minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID);
       maximaP.setOptional(true);
-      if (config.grab(maximaP)) {
+      if(config.grab(maximaP)) {
         maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
-      ArrayList<Parameter<?>> globalSetMinAndMax = new ArrayList<>();
-      globalSetMinAndMax.add(minimaP);
-      globalSetMinAndMax.add(maximaP);
-      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(globalSetMinAndMax));
-
-      ArrayList<ListParameter<?>> globalMinMaxEqualsize = new ArrayList<>();
-      globalMinMaxEqualsize.add(minimaP);
-      globalMinMaxEqualsize.add(maximaP);
-      config.checkConstraint(new EqualSizeGlobalConstraint(globalMinMaxEqualsize));
+      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(minimaP, maximaP));
+      config.checkConstraint(new EqualSizeGlobalConstraint(minimaP, maximaP));
     }
 
     @Override

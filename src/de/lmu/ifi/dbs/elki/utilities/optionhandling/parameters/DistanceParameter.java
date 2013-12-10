@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * 
  * @param <D> Distance type 
  */
-public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<D> {
+public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<DistanceParameter<D>, D> {
   /**
    * Distance type
    */

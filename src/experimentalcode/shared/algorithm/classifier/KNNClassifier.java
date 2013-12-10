@@ -77,7 +77,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
    * Key: {@code -knnclassifier.k}
    * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, 1, CommonConstraints.GREATER_EQUAL_ONE_INT);
+  private final IntParameter K_PARAM = new IntParameter(K_ID, 1).addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
 
   /**
    * Holds the value of @link #K_PARAM}.

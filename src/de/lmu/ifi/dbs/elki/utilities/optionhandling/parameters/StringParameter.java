@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Parameter class for a parameter specifying a string.
@@ -35,38 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class StringParameter extends AbstractParameter<String> {
-  /**
-   * Constructs a string parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   * @param defaultValue the default value of the parameter
-   * 
-   * @deprecated Use {@link #addConstraint} instead!
-   */
-  @Deprecated
-  public StringParameter(OptionID optionID, ParameterConstraint<String> constraint, String defaultValue) {
-    super(optionID, defaultValue);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs a string parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   * 
-   * @deprecated Use {@link #addConstraint} instead!
-   */
-  @Deprecated
-  public StringParameter(OptionID optionID, ParameterConstraint<String> constraint) {
-    super(optionID);
-    addConstraint(constraint);
-  }
-
+public class StringParameter extends AbstractParameter<StringParameter, String> {
   /**
    * Constructs a string parameter with the given optionID, and default value.
    * 

@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -40,8 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeS
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Class to perform and undo a normalization on real vectors with respect to
@@ -186,6 +182,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
 
   /**
    * Restore a single dimension.
+   * 
    * @param d Dimension
    * @param val Value
    * @return Normalized value
@@ -280,15 +277,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
         }
       }
 
-      ArrayList<Parameter<?>> global_1 = new ArrayList<>();
-      global_1.add(meanP);
-      global_1.add(stddevP);
-      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
-
-      ArrayList<ListParameter<?>> global = new ArrayList<>();
-      global.add(meanP);
-      global.add(stddevP);
-      config.checkConstraint(new EqualSizeGlobalConstraint(global));
+      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(meanP, stddevP));
+      config.checkConstraint(new EqualSizeGlobalConstraint(meanP, stddevP));
     }
 
     @Override

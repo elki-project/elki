@@ -39,12 +39,12 @@ public class LessGlobalConstraint<T extends Number> implements GlobalParameterCo
   /**
    * First number parameter.
    */
-  private NumberParameter<T> first;
+  private NumberParameter<?, T> first;
 
   /**
    * Second number parameter.
    */
-  private NumberParameter<T> second;
+  private NumberParameter<?, T> second;
 
   /**
    * Creates a Less-Than global parameter constraint. That is the value of the
@@ -54,7 +54,7 @@ public class LessGlobalConstraint<T extends Number> implements GlobalParameterCo
    * @param first first number parameter
    * @param second second number parameter
    */
-  public LessGlobalConstraint(NumberParameter<T> first, NumberParameter<T> second) {
+  public LessGlobalConstraint(NumberParameter<?, T> first, NumberParameter<?, T> second) {
     this.first = first;
     this.second = second;
   }
