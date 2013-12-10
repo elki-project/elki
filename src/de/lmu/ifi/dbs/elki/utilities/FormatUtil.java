@@ -1023,6 +1023,66 @@ public final class FormatUtil {
   }
 
   /**
+   * Preallocated exceptions.
+   */
+  private static final NumberFormatException EXPONENT_OVERFLOW = new NumberFormatException("Precision overflow for double exponent.") {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this;
+    }
+  };
+
+  /**
+   * Preallocated exceptions.
+   */
+  private static final NumberFormatException INVALID_EXPONENT = new NumberFormatException("Invalid exponent") {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this;
+    }
+  };
+
+  /**
+   * Preallocated exceptions.
+   */
+  private static final NumberFormatException TRAILING_CHARACTERS = new NumberFormatException("String sequence was not completely consumed.") {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this;
+    }
+  };
+
+  /**
+   * Preallocated exceptions.
+   */
+  private static final NumberFormatException PRECISION_OVERFLOW = new NumberFormatException("Precision overflow for long values.") {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this;
+    }
+  };
+
+  /**
+   * Preallocated exceptions.
+   */
+  private static final NumberFormatException NOT_A_NUMBER = new NumberFormatException("Number must start with a digit or dot.") {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this;
+    }
+  };
+
+  /**
    * Parse a double from a character sequence.
    * 
    * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
@@ -1071,7 +1131,7 @@ public final class FormatUtil {
 
     // Begin parsing real numbers!
     if(((cur < '0') || (cur > '9')) && (cur != '.')) {
-      throw new NumberFormatException("Number must start with a digit or dot.");
+      throw NOT_A_NUMBER;
     }
 
     // Parse digits into a long, remember offset of decimal point.
@@ -1082,7 +1142,7 @@ public final class FormatUtil {
       if((digit >= 0) && (digit <= 9)) {
         final long tmp = (decimal << 3) + (decimal << 1) + digit;
         if((decimal > MAX_LONG_OVERFLOW) || (tmp < decimal)) {
-          throw new NumberFormatException("Precision overflow for double values.");
+          throw PRECISION_OVERFLOW;
         }
         decimal = tmp;
       }
@@ -1112,7 +1172,7 @@ public final class FormatUtil {
         cur = str.charAt(pos);
       }
       if((cur < '0') || (cur > '9')) { // At least one digit required.
-        throw new NumberFormatException("Invalid exponent");
+        throw INVALID_EXPONENT;
       }
       while(true) {
         final int digit = cur - '0';
@@ -1121,7 +1181,7 @@ public final class FormatUtil {
           // Actually, double can only handle Double.MAX_EXPONENT? How about
           // subnormal?
           if((exp > MAX_INT_OVERFLOW) || (tmp < exp)) {
-            throw new NumberFormatException("Precision overflow for double exponent.");
+            throw EXPONENT_OVERFLOW;
           }
           exp = tmp;
         }
@@ -1144,7 +1204,7 @@ public final class FormatUtil {
       exp = exp - decimalPoint;
     }
     if(pos != end) {
-      throw new NumberFormatException("String sequence was not completely consumed.");
+      throw TRAILING_CHARACTERS;
     }
 
     return BitsUtil.lpow10(isNegative ? -decimal : decimal, exp);
@@ -1258,7 +1318,7 @@ public final class FormatUtil {
 
     // Begin parsing real numbers!
     if((cur < '0') || (cur > '9')) {
-      throw new NumberFormatException("Number must start with a digit or dot.");
+      throw NOT_A_NUMBER;
     }
 
     // Parse digits into a long, remember offset of decimal point.
@@ -1268,7 +1328,7 @@ public final class FormatUtil {
       if((digit >= 0) && (digit <= 9)) {
         final long tmp = (decimal << 3) + (decimal << 1) + digit;
         if(tmp < decimal) {
-          throw new NumberFormatException("Precision overflow for long values.");
+          throw PRECISION_OVERFLOW;
         }
         decimal = tmp;
       }
@@ -1283,7 +1343,7 @@ public final class FormatUtil {
       }
     }
     if(pos != end) {
-      throw new NumberFormatException("String sequence was not completely consumed.");
+      throw TRAILING_CHARACTERS;
     }
 
     return isNegative ? -decimal : decimal;
