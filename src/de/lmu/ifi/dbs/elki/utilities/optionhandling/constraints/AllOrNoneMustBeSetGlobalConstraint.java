@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  */
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -41,7 +40,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
   /**
    * List of parameters to be checked
    */
-  private List<Parameter<?>> parameterList;
+  private Parameter<?>[] parameterList;
 
   /**
    * Constructs a global parameter constraint for testing if either all elements
@@ -49,7 +48,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
    * 
    * @param parameters list of parameters to be checked
    */
-  public AllOrNoneMustBeSetGlobalConstraint(List<Parameter<?>> parameters) {
+  public AllOrNoneMustBeSetGlobalConstraint(Parameter<?>... parameters) {
     this.parameterList = parameters;
   }
 

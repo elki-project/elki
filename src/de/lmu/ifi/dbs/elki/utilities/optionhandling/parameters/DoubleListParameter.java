@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class DoubleListParameter extends ListParameter<Double> {
+public class DoubleListParameter extends ListParameter<DoubleListParameter, Double> {
   /**
    * Constructs a list parameter with the given optionID and optional flag.
    * 

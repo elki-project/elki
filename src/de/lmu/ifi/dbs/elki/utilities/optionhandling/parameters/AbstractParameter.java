@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -49,9 +48,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @apiviz.composedOf OptionID
  * @apiviz.uses ParameterConstraint
  * 
+ * @param <THIS> type self-reference
  * @param <T> the type of a possible value (i.e., the type of the option)
  */
-public abstract class AbstractParameter<T> implements Parameter<T> {
+public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>, T> implements Parameter<T> {
   /**
    * The default value of the parameter (may be null).
    */
@@ -152,20 +152,24 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
   @Override
   public boolean tryDefaultValue() throws UnspecifiedParameterException {
     // Assume default value instead.
-    if (hasDefaultValue()) {
+    if(hasDefaultValue()) {
       useDefaultValue();
       return true;
-    } else if (isOptional()) {
+    }
+    else if(isOptional()) {
       // Optional is fine, but not successful
       return false;
-    } else {
+    }
+    else {
       throw new UnspecifiedParameterException(this);
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setOptional(boolean opt) {
+  public THIS setOptional(boolean opt) {
     this.optionalParameter = opt;
+    return (THIS) this;
   }
 
   @Override
@@ -204,31 +208,32 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
     // description.append(getParameterType()).append(" ");
     description.append(shortDescription);
     description.append(FormatUtil.NEWLINE);
-    if (hasValuesDescription()) {
+    if(hasValuesDescription()) {
       final String valuesDescription = getValuesDescription();
       description.append(valuesDescription);
-      if (!valuesDescription.endsWith(FormatUtil.NEWLINE)) {
+      if(!valuesDescription.endsWith(FormatUtil.NEWLINE)) {
         description.append(FormatUtil.NEWLINE);
       }
     }
-    if (hasDefaultValue()) {
+    if(hasDefaultValue()) {
       description.append("Default: ");
       description.append(getDefaultValueAsString());
       description.append(FormatUtil.NEWLINE);
     }
-    if (constraints != null && !constraints.isEmpty()) {
-      if (constraints.size() == 1) {
+    if(constraints != null && !constraints.isEmpty()) {
+      if(constraints.size() == 1) {
         description.append("Constraint: ");
-      } else if (constraints.size() > 1) {
+      }
+      else if(constraints.size() > 1) {
         description.append("Constraints: ");
       }
-      for (int i = 0; i < constraints.size(); i++) {
+      for(int i = 0; i < constraints.size(); i++) {
         ParameterConstraint<? super T> constraint = constraints.get(i);
-        if (i > 0) {
+        if(i > 0) {
           description.append(", ");
         }
         description.append(constraint.getDescription(getName()));
-        if (i == constraints.size() - 1) {
+        if(i == constraints.size() - 1) {
           description.append('.');
         }
       }
@@ -245,8 +250,8 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
    * @throws ParameterException when the object is not valid.
    */
   protected boolean validate(T obj) throws ParameterException {
-    if (constraints != null) {
-      for (ParameterConstraint<? super T> cons : this.constraints) {
+    if(constraints != null) {
+      for(ParameterConstraint<? super T> cons : this.constraints) {
         cons.test(obj);
       }
     }
@@ -276,9 +281,10 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
   @Override
   public void setValue(Object obj) throws ParameterException {
     T val = parseValue(obj);
-    if (validate(val)) {
+    if(validate(val)) {
       setValueInternal(val);
-    } else {
+    }
+    else {
       throw new InvalidParameterException("Value for option \"" + getName() + "\" did not validate: " + obj.toString());
     }
   }
@@ -294,7 +300,7 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
 
   @Override
   public final T getValue() {
-    if (this.value == null) {
+    if(this.value == null) {
       LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter \"" + this.optionid.getName() + "\"", new Throwable());
     }
     return this.value;
@@ -331,23 +337,13 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
     return getDefaultValue().toString();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void addConstraint(ParameterConstraint<? super T> constraint) {
-    if (constraints == null) {
+  public THIS addConstraint(ParameterConstraint<? super T> constraint) {
+    if(constraints == null) {
       this.constraints = new ArrayList<>(1);
     }
     constraints.add(constraint);
-  }
-
-  /**
-   * Add a collection of constraints.
-   * 
-   * @param cs Constraints to add
-   */
-  public void addConstraints(Collection<? extends ParameterConstraint<? super T>> cs) {
-    if (constraints == null) {
-      this.constraints = new ArrayList<>(cs.size());
-    }
-    constraints.addAll(cs);
+    return (THIS) this;
   }
 }

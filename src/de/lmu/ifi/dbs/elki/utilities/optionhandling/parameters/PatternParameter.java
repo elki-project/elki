@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class PatternParameter extends AbstractParameter<Pattern> {
+public class PatternParameter extends AbstractParameter<PatternParameter, Pattern> {
   /**
    * Constructs a pattern parameter with the given optionID, and default value.
    * 

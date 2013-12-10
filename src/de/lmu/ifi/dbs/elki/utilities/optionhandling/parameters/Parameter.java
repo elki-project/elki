@@ -80,8 +80,9 @@ public interface Parameter<T> {
    * Specifies if this parameter is an optional parameter.
    * 
    * @param opt true if this parameter is optional, false otherwise
+   * @return the parameter itself, for chaining
    */
-  public abstract void setOptional(boolean opt);
+  public abstract Parameter<T> setOptional(boolean opt);
 
   /**
    * Checks if this parameter is an optional parameter.
@@ -232,6 +233,7 @@ public interface Parameter<T> {
    * Add an additional constraint.
    * 
    * @param constraint Constraint to add.
+   * @return the parameter itself, for chaining
    */
-  public abstract void addConstraint(ParameterConstraint<? super T> constraint);
+  public abstract Parameter<T> addConstraint(ParameterConstraint<? super T> constraint);
 }

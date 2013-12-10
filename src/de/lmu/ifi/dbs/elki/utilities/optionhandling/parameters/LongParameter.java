@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Parameter class for a parameter specifying a long value.
@@ -34,22 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class LongParameter extends NumberParameter<Long> {
-  /**
-   * Constructs a long parameter with the given optionID, parameter constraint
-   * and default value.
-   * 
-   * @param optionID the unique OptionID for this parameter
-   * @param constraint the parameter constraint for this long parameter
-   * @param defaultValue the default value
-   * @deprecated Use {@link #addConstraint} instead!
-   */
-  @Deprecated
-  public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint, long defaultValue) {
-    super(optionID, Long.valueOf(defaultValue));
-    addConstraint(constraint);
-  }
-
+public class LongParameter extends NumberParameter<LongParameter, Long> {
   /**
    * Constructs a long parameter with the given optionID and default value.
    * 
@@ -68,7 +52,7 @@ public class LongParameter extends NumberParameter<Long> {
   public LongParameter(OptionID optionID) {
     super(optionID);
   }
-  
+
   @Override
   public String getValueAsString() {
     return getValue().toString();
