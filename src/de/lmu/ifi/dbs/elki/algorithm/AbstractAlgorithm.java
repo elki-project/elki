@@ -85,72 +85,46 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
     }
 
     // Find appropriate run method.
-    Method runmethod1 = null;
-    Method runmethod2 = null;
     try {
-      runmethod1 = this.getClass().getMethod("run", signature1);
-      runmethod2 = null;
-    }
-    catch(SecurityException e) {
-      throw new APIViolationException("Security exception finding an appropriate 'run' method.", e);
+      Method runmethod1 = this.getClass().getMethod("run", signature1);
+      return (R) runmethod1.invoke(this, relations1);
     }
     catch(NoSuchMethodException e) {
-      runmethod1 = null;
-      // Try without "database" parameter.
-      try {
-        runmethod2 = this.getClass().getMethod("run", signature2);
+      // continue below.
+    }
+    catch(IllegalArgumentException | IllegalAccessException | SecurityException e) {
+      throw new APIViolationException("Invoking the real 'run' method failed.", e);
+    }
+    catch(InvocationTargetException e) {
+      if(e.getTargetException() instanceof RuntimeException) {
+        throw (RuntimeException) e.getTargetException();
       }
-      catch(NoSuchMethodException e2) {
-        runmethod2 = null;
+      if(e.getTargetException() instanceof AssertionError) {
+        throw (AssertionError) e.getTargetException();
       }
-      catch(SecurityException e2) {
-        throw new APIViolationException("Security exception finding an appropriate 'run' method.", e2);
-      }
+      throw new APIViolationException("Invoking the real 'run' method failed: " + e.getTargetException().toString(), e.getTargetException());
     }
 
-    if(runmethod1 != null) {
-      try {
-        return (R) runmethod1.invoke(this, relations1);
-      }
-      catch(IllegalArgumentException e) {
-        throw new APIViolationException("Invoking the real 'run' method failed.", e);
-      }
-      catch(IllegalAccessException e) {
-        throw new APIViolationException("Invoking the real 'run' method failed.", e);
-      }
-      catch(InvocationTargetException e) {
-        if(e.getTargetException() instanceof RuntimeException) {
-          throw (RuntimeException) e.getTargetException();
-        }
-        if(e.getTargetException() instanceof AssertionError) {
-          throw (AssertionError) e.getTargetException();
-        }
-        throw new APIViolationException("Invoking the real 'run' method failed: " + e.getTargetException().toString(), e.getTargetException());
-      }
+    try {
+      Method runmethod2 = this.getClass().getMethod("run", signature2);
+      return (R) runmethod2.invoke(this, relations2);
     }
-    else if(runmethod2 != null) {
-      try {
-        return (R) runmethod2.invoke(this, relations2);
-      }
-      catch(IllegalArgumentException e) {
-        throw new APIViolationException("Invoking the real 'run' method failed.", e);
-      }
-      catch(IllegalAccessException e) {
-        throw new APIViolationException("Invoking the real 'run' method failed.", e);
-      }
-      catch(InvocationTargetException e) {
-        if(e.getTargetException() instanceof RuntimeException) {
-          throw (RuntimeException) e.getTargetException();
-        }
-        if(e.getTargetException() instanceof AssertionError) {
-          throw (AssertionError) e.getTargetException();
-        }
-        throw new APIViolationException("Invoking the real 'run' method failed: " + e.getTargetException().toString(), e.getTargetException());
-      }
+    catch(NoSuchMethodException e) {
+      // continue below.
     }
-    else {
-      throw new APIViolationException("No appropriate 'run' method found.");
+    catch(IllegalArgumentException | IllegalAccessException | SecurityException e) {
+      throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
+    catch(InvocationTargetException e) {
+      if(e.getTargetException() instanceof RuntimeException) {
+        throw (RuntimeException) e.getTargetException();
+      }
+      if(e.getTargetException() instanceof AssertionError) {
+        throw (AssertionError) e.getTargetException();
+      }
+      throw new APIViolationException("Invoking the real 'run' method failed: " + e.getTargetException().toString(), e.getTargetException());
+    }
+    throw new APIViolationException("No appropriate 'run' method found.");
   }
 
   /**
