@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class AbstractDistributionTest {
   public void checkPDF(Distribution d, double[] x, double[] expected, double err) {
-    int maxerrlev = Integer.MIN_VALUE;
+    int maxerrlev = -15;
     for(int i = 0; i < x.length; i++) {
       double val = d.pdf(x[i]);
       if(val == expected[i]) {
@@ -18,6 +18,7 @@ public class AbstractDistributionTest {
       }
       double diff = Math.abs(val - expected[i]);
       final int errlev = (int) Math.ceil(Math.log10(diff / expected[i]));
+      System.err.println(errlev);
       maxerrlev = Math.max(errlev, maxerrlev);
       if(diff < err || diff / expected[i] < err) {
         continue;
@@ -25,14 +26,11 @@ public class AbstractDistributionTest {
       assertEquals("Error magnitude: 1e" + errlev + " at " + x[i], expected[i], val, err);
     }
     int given = (int) Math.floor(Math.log10(err * 1.1));
-    // if (given > maxerrlev) {
-    // System.err.println("PDF Error for "+d+" magnitude is not tight: expected "+maxerrlev+" got "+given);
-    // }
-    assertTrue("Error magnitude is not tight: expected " + maxerrlev + " got " + given, given <= maxerrlev);
+    assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
   }
 
   public void checkCDF(Distribution d, double[] x, double[] expected, double err) {
-    int maxerrlev = Integer.MIN_VALUE;
+    int maxerrlev = -15;
     for(int i = 0; i < x.length; i++) {
       double val = d.cdf(x[i]);
       if(val == expected[i]) {
@@ -54,9 +52,9 @@ public class AbstractDistributionTest {
   }
 
   public void checkQuantile(Distribution d, double[] x, double[] expected, double err) {
-    int maxerrlev = Integer.MIN_VALUE;
+    int maxerrlev = -15;
     for(int i = 0; i < x.length; i++) {
-      if (Double.isNaN(expected[i])) {
+      if(Double.isNaN(expected[i])) {
         continue;
       }
       double val = d.quantile(x[i]);
