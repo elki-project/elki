@@ -125,7 +125,7 @@ public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNod
         settings.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(reinsert_fraction, SquaredEuclideanDistanceFunction.STATIC)));
       }
       final DoubleParameter MAX_OVERLAP_PARAMETER = new DoubleParameter(MAX_OVERLAP_ID, 0.2);
-      MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.POSITIVE_DOUBLE);
+      MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       MAX_OVERLAP_PARAMETER.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if (config.grab(MAX_OVERLAP_PARAMETER)) {
         settings.max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
