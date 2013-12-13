@@ -190,10 +190,8 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       final long[] marked = markers[d];
       // Find sequences of 1s in marked.
       for(int start = BitsUtil.nextSetBit(marked, 0); start >= 0;) {
-        int end = BitsUtil.nextClearBit(marked, start + 1) - 1;
-        if(end == -1) {
-          end = dim;
-        }
+        int end = BitsUtil.nextClearBit(marked, start + 1);
+        end = (end == -1) ? dim : end;
         int[] signature = new int[dim << 1];
         Arrays.fill(signature, -1);
         signature[d << 1] = start;
@@ -335,9 +333,15 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       ClusterCandidate cand = it.next();
       final int size = cand.ids.size();
       if(size < minClusterSize) {
-        noise.addDBIDs(cand.ids);
+        if(size > 0) {
+          noise.addDBIDs(cand.ids);
+        }
         it.remove();
       }
+    }
+
+    if(LOG.isVerbose()) {
+      LOG.verbose("Number of clusters remaining: " + clusterCandidates.size());
     }
 
     // Relevant attribute computation.
@@ -666,13 +670,14 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     final ModifiableDBIDs intersection = DBIDUtil.intersection(first.ids, second.ids);
     final int support = intersection.size();
     // Interval width, computed using selected number of bins / total bins
-    double width = (second.spec[d2 + 1] + 1 - second.spec[d2]) / (double) numBins;
+    double width = (second.spec[d2 + 1] - second.spec[d2] + 1.) / (double) numBins;
     // Expected size thus:
-    double expect = support * width;
+    double expect = first.ids.size() * width;
     if(support <= expect) {
       return null;
     }
-    if(PoissonDistribution.rawProbability(support, expect) >= poissonThreshold) {
+    final double test = PoissonDistribution.rawProbability(support, expect);
+    if(test >= poissonThreshold) {
       return null;
     }
     // Create merged signature.
