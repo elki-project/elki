@@ -206,24 +206,28 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     MutableProgress mergeProgress = LOG.isVerbose() ? new MutableProgress("Merging signatures.", signatures.size(), LOG) : null;
 
+    // Annotate dimensions to 1-signatures:
+    int[] firstdim = new int[signatures.size()];
+    for(int i = 0; i < signatures.size(); i++) {
+      firstdim[i] = signatures.get(i).getFirstDim();
+    }
+
     // Merge to (p+1)-signatures (cluster cores).
     ArrayList<Signature> clusterCores = new ArrayList<>(signatures);
     // Try adding merge 1-signature with each cluster core.
     for(int i = 0; i < clusterCores.size(); ++i) {
-      final Signature first = clusterCores.get(i);
-      // Skip previous 1-signatures: merges are symmetrical. But include newly
-      // created cluster cores (i.e. those resulting from previous merges).
-      final int end = first.getFirstDim();
-      for(int j = 0; j < end; j++) {
-        final Signature signature = signatures.get(j);
-        final Signature merge = mergeSignatures(first, signature, binCount);
+      final Signature parent = clusterCores.get(i);
+      final int end = parent.getFirstDim();
+      for(int j = 0; j < signatures.size() && end < firstdim[j]; j++) {
+        final Signature onesig = signatures.get(j);
+        final Signature merge = mergeSignatures(parent, onesig, binCount);
         if(merge != null) {
           // We add each potential core to the list to allow remaining
           // 1-signatures to try merging with this p-signature as well.
           clusterCores.add(merge);
           // Flag both "parents" for removal.
-          first.prune = true;
-          signature.prune = true;
+          parent.prune = true;
+          onesig.prune = true;
         }
       }
       if(mergeProgress != null) {
@@ -238,15 +242,25 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     if(stepProgress != null) {
       stepProgress.beginStep(5, "Pruning redundant cluster cores.", LOG);
     }
-    
-    // FIXME: we don't have all redundancies yet!
 
     // Prune cluster cores based on Definition 3, Condition 2.
     ArrayList<Signature> retain = new ArrayList<>(clusterCores.size());
-    for(Signature clusterCore : clusterCores) {
-      if(!clusterCore.prune) {
-        retain.add(clusterCore);
+    outer: for(Signature clusterCore : clusterCores) {
+      if(clusterCore.prune) {
+        continue;
       }
+      for(int k = 0; k < clusterCores.size(); k++) {
+        Signature other = clusterCores.get(k);
+        if(other != clusterCore) {
+          if(other.isSuperset(clusterCore)) {
+            continue outer;
+          }
+        }
+      }
+      if(LOG.isDebugging()) {
+        LOG.debug("Retained cluster core: " + clusterCore);
+      }
+      retain.add(clusterCore);
     }
     clusterCores = retain;
     if(LOG.isVerbose()) {
@@ -291,7 +305,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       if(LOG.isVerbose()) {
         LOG.verbose("iteration " + it + " - expectation value: " + emNew);
       }
-      if((emNew - emOld) / emOld <= emDelta) {
+      if((emNew - emOld) <= emDelta) {
         break;
       }
     }
@@ -708,6 +722,23 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       super();
       this.spec = spec;
       this.ids = ids;
+    }
+
+    /**
+     * Test whether this is a superset of the other signature.
+     * 
+     * @param other Other signature.
+     * @return {@code true} when this is a superset.
+     */
+    public boolean isSuperset(Signature other) {
+      for(int i = 0; i < spec.length; i += 2) {
+        if(spec[i] != other.spec[i] || spec[i + 1] != other.spec[i]) {
+          if(other.spec[i] != -1) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
 
     /**

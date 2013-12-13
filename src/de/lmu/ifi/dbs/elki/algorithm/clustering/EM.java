@@ -328,7 +328,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * Computed as the sum of the logarithms of the prior probability of each
    * instance.
    * 
-   * @param database the database used for assignment to instances
+   * @param relation the database used for assignment to instances
    * @param normDistrFactor normalization factor for density function, based on
    *        current covariance matrix
    * @param means the current means
@@ -336,12 +336,12 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * @param clusterWeights the weights of the current clusters
    * @return the expectation value of the current mixture of distributions
    */
-  public static double assignProbabilitiesToInstances(Relation<? extends NumberVector<?>> database, double[] normDistrFactor, Vector[] means, Matrix[] invCovMatr, double[] clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
+  public static double assignProbabilitiesToInstances(Relation<? extends NumberVector<?>> relation, double[] normDistrFactor, Vector[] means, Matrix[] invCovMatr, double[] clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
     final int k = clusterWeights.length;
-    double emSum = 0.0;
+    double emSum = 0.;
 
-    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      Vector x = database.get(iditer).getColumnVector();
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      Vector x = relation.get(iditer).getColumnVector();
       double[] probabilities = new double[k];
       for(int i = 0; i < k; i++) {
         Vector difference = x.minus(means[i]);
@@ -384,7 +384,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       probClusterIGivenX.put(iditer, clusterProbabilities);
     }
 
-    return emSum;
+    return emSum / relation.size();
   }
 
   @Override
