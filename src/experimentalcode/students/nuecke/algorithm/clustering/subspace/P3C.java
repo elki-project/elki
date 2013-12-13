@@ -79,11 +79,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   private static final Logging LOG = Logging.getLogger(P3C.class);
 
   /**
-   * Minimum Log Likelihood.
-   */
-  private static final double MIN_LOGLIKELIHOOD = -100000;
-
-  /**
    * Parameter for the Poisson test threshold.
    */
   protected double poissonThreshold;
@@ -198,7 +193,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         signature[(d << 1) + 1] = end - 1; // inclusive
         HashSetModifiableDBIDs sids = unionDBIDs(parts, start, end /* exclusive */);
         if(LOG.isDebugging()) {
-          LOG.debug("1-signature: " + d + " " + start + "-" + end);
+          LOG.debug("1-signature: " + d + " " + start + "-" + (end - 1));
         }
         signatures.add(new Signature(signature, sids));
         start = (end < dim) ? BitsUtil.nextSetBit(marked, end + 1) : -1;
@@ -677,7 +672,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       return null;
     }
     final double test = PoissonDistribution.rawProbability(support, expect);
-    if(test >= poissonThreshold) {
+    if((1. - poissonThreshold) <= test) {
       return null;
     }
     // Create merged signature.
@@ -696,7 +691,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       buf.append(p).append("-signature: ");
       for(int i = 0; i < spec.length; i += 2) {
         if(spec[i] >= 0) {
-          buf.append(i).append(':');
+          buf.append(i >>> 1).append(':');
           buf.append(spec[i]).append('-').append(spec[i + 1]).append(' ');
         }
       }
@@ -849,7 +844,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       }
 
       {
-        DoubleParameter param = new DoubleParameter(POISSON_THRESHOLD_ID, 1.e-20);
+        DoubleParameter param = new DoubleParameter(POISSON_THRESHOLD_ID, 1.e-4);
         param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
         param.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
         if(config.grab(param)) {
