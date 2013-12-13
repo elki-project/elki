@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -30,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -105,10 +105,22 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   protected int minClusterSize;
 
   /**
-   * Sets up a new instance of the algorithm's environment.
+   * Alpha threshold for testing.
    */
-  public P3C(double poissonThreshold, int maxEmIterations, double emDelta, int minClusterSize) {
+  protected double alpha = 0.001;
+
+  /**
+   * Constructor.
+   * 
+   * @param alpha ChiSquared test threshold
+   * @param poissonThreshold Poisson test threshold
+   * @param maxEmIterations Maximum number of EM iterations
+   * @param emDelta EM stopping threshold
+   * @param minClusterSize Minimum cluster size
+   */
+  public P3C(double alpha, double poissonThreshold, int maxEmIterations, double emDelta, int minClusterSize) {
     super();
+    this.alpha = alpha;
     this.poissonThreshold = poissonThreshold;
     this.maxEmIterations = maxEmIterations;
     this.emDelta = emDelta;
@@ -132,37 +144,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     final int binCount = (int) Math.ceil(1 + (Math.log(relation.size()) / MathUtil.LOG2));
 
     // Perform 1-dimensional projections, and split into bins.
-    DBIDs[][] partitions = new DBIDs[dim][binCount];
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
-    DBIDArrayIter iter = ids.iter();
-    SortDBIDsBySingleDimension sorter = new VectorUtil.SortDBIDsBySingleDimension(relation, 0);
-    for(int d = 0; d < dim; d++) {
-      sorter.setDimension(d);
-      ids.sort(sorter);
-      // Minimum:
-      iter.seek(0);
-      double min = relation.get(iter).doubleValue(d);
-      // Extend:
-      iter.seek(ids.size() - 1);
-      double delta = (relation.get(iter).doubleValue(d) - min) / binCount;
-      if(delta > 0.) {
-        partition(relation, d, min, delta, ids, iter, 0, ids.size(), 0, binCount, partitions[d]);
-        if(LOG.isDebugging()) {
-          StringBuilder buf = new StringBuilder();
-          buf.append("Partition sizes of dim ").append(d).append(": ");
-          int sum = 0;
-          for(DBIDs p : partitions[d]) {
-            buf.append(p.size()).append(' ');
-            sum += p.size();
-          }
-          LOG.debug(buf.toString());
-          assert (sum == ids.size());
-        }
-      }
-      else {
-        partitions[d] = null; // Flag whole dimension as bad
-      }
-    }
+    SetDBIDs[][] partitions = partitionData(relation, binCount);
 
     if(stepProgress != null) {
       stepProgress.beginStep(2, "Searching for non-uniform bins in support histograms.", LOG);
@@ -172,7 +154,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     final long[][] markers = new long[dim][];
     int numuniform = 0;
     for(int d = 0; d < dim; d++) {
-      final DBIDs[] parts = partitions[d];
+      final SetDBIDs[] parts = partitions[d];
       if(parts == null) {
         continue; // Never mark any on constant dimensions.
       }
@@ -190,7 +172,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         card++;
       }
       if(LOG.isDebugging()) {
-        LOG.debug("Marked bins in dim " + d + ": " + BitsUtil.toString(marked, dim));
+        LOG.debug("Marked bins in dim " + d + ": " + BitsUtil.toString(marked, binCount));
       }
     }
 
@@ -334,7 +316,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Create a hard clustering, making sure each data point only is part of one
     // cluster, based on the best match from the membership matrix.
-    ArrayList<ClusterCandidate> clusterCandidates = hardClustering(probClusterIGivenX, clusterCores, ids);
+    ArrayList<ClusterCandidate> clusterCandidates = hardClustering(probClusterIGivenX, clusterCores, relation.getDBIDs());
 
     if(stepProgress != null) {
       stepProgress.beginStep(7, "Looking for outliers and moving them to the noise set.", LOG);
@@ -374,7 +356,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       CovarianceMatrix cvm = CovarianceMatrix.make(relation, candidate.ids);
       result.addToplevelCluster(new Cluster<>(candidate.ids, new SubspaceModel<>(new Subspace(candidate.dimensions), cvm.getMeanVector(relation))));
     }
-    LOG.verbose("Noise size: "+ noise.size());
+    LOG.verbose("Noise size: " + noise.size());
     if(noise.size() > 0) {
       result.addToplevelCluster(new Cluster<SubspaceModel<V>>(noise, true));
     }
@@ -384,6 +366,64 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     return result;
+  }
+
+  /**
+   * Partition the data set into {@code bins} bins in each dimension
+   * <i>independently</i>.
+   * 
+   * This can be used to construct a grid approximation of the data using O(d n)
+   * memory.
+   * 
+   * When a dimension is found to be constant, it will not be partitioned, but
+   * instead the corresponding array will be set to {@code null}.
+   * 
+   * @param relation Data relation to partition
+   * @param bins Number of bins
+   * @return Partitions of each dimension.
+   */
+  private SetDBIDs[][] partitionData(final Relation<V> relation, final int bins) {
+    final int dim = RelationUtil.dimensionality(relation);
+    SetDBIDs[][] partitions = new SetDBIDs[dim][bins];
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+    DBIDArrayIter iter = ids.iter(); // will be reused.
+    SortDBIDsBySingleDimension sorter = new VectorUtil.SortDBIDsBySingleDimension(relation, 0);
+    for(int d = 0; d < dim; d++) {
+      sorter.setDimension(d);
+      ids.sort(sorter);
+      // Minimum:
+      iter.seek(0);
+      double min = relation.get(iter).doubleValue(d);
+      // Extend:
+      iter.seek(ids.size() - 1);
+      double delta = (relation.get(iter).doubleValue(d) - min) / bins;
+      if(delta > 0.) {
+        SetDBIDs[] dimparts = partitions[d];
+        double split = min + delta;
+        HashSetModifiableDBIDs pids = DBIDUtil.newHashSet();
+        dimparts[0] = pids;
+        int i = 0;
+        for(iter.seek(0); iter.valid(); iter.advance()) {
+          final double v = relation.get(iter).doubleValue(d);
+          if(v <= split || i == dimparts.length - 1) {
+            pids.add(iter);
+          }
+          else {
+            i++;
+            split += delta;
+            pids = DBIDUtil.newHashSet();
+            dimparts[i] = pids;
+          }
+        }
+        for(++i; i < dimparts.length; ++i) {
+          dimparts[i] = pids;
+        }
+      }
+      else {
+        partitions[d] = null; // Flag whole dimension as bad
+      }
+    }
+    return partitions;
   }
 
   /**
@@ -407,81 +447,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   }
 
   /**
-   * Partition the data set by repeated binary splitting.
-   * 
-   * @param relation Relation
-   * @param d Dimension
-   * @param min Minimum
-   * @param delta Step size
-   * @param ids ID array
-   * @param iter ID iterator
-   * @param start ID interval start
-   * @param end ID interval end
-   * @param ps Partition interval start
-   * @param pe Partition interval end
-   * @param partitions
-   */
-  private void partition(Relation<V> relation, int d, double min, double delta, ArrayDBIDs ids, DBIDArrayIter iter, int start, int end, int ps, int pe, DBIDs[] partitions) {
-    final int ph = (ps + pe) >>> 1;
-    final double split = min + ph * delta;
-    // Perform binary search
-    int ss = start, se = end - 1;
-    while(ss < se) {
-      final int sh = (ss + se) >>> 1;
-      iter.seek(sh);
-      // LOG.debugFinest("sh: " + sh);
-      final double v = relation.get(iter).doubleValue(d);
-      if(split < v) {
-        if(ss < sh - 1) {
-          se = sh - 1;
-        }
-        else {
-          se = sh;
-          break;
-        }
-      }
-      else {
-        if(sh < se) {
-          ss = sh + 1;
-        }
-        else {
-          ss = sh;
-          break;
-        }
-      }
-    }
-    // LOG.debugFinest("ss: " + ss + " se: " + se + " start: " + start +
-    // " end: " +
-    // end);
-    // start to ss (inclusive) are left,
-    // ss + 1 to end (exclusive) are right.
-    if(ps == ph - 1) {
-      assert (partitions[ph] == null);
-      ModifiableDBIDs pids = DBIDUtil.newHashSet(ss + 1 - start);
-      iter.seek(start);
-      for(int i = start; i <= ss; i++, iter.advance()) {
-        pids.add(iter);
-      }
-      partitions[ps] = pids;
-    }
-    else {
-      partition(relation, d, min, delta, ids, iter, start, ss + 1, ps, ph, partitions);
-    }
-    if(ph == pe - 1) {
-      assert (partitions[ph] == null);
-      ModifiableDBIDs pids = DBIDUtil.newHashSet(end - (ss + 1));
-      iter.seek(start);
-      for(int i = ss + 1; i < end; i++, iter.advance()) {
-        pids.add(iter);
-      }
-      partitions[ph] = pids;
-    }
-    else {
-      partition(relation, d, min, delta, ids, iter, ss + 1, end, ph, pe, partitions);
-    }
-  }
-
-  /**
    * Performs a ChiSquared test to determine whether an attribute has a uniform
    * distribution.
    * 
@@ -490,7 +455,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param card Cardinality
    * @return Position of maximum, or -1 when uniform.
    */
-  private int chiSquaredUniformTest(DBIDs[] parts, long[] marked, int card) {
+  private int chiSquaredUniformTest(SetDBIDs[] parts, long[] marked, int card) {
     // Remaining number of bins.
     final int binCount = parts.length - card;
     // Get global mean over all unmarked bins.
@@ -508,13 +473,13 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         maxpos = i;
       }
     }
-    if(mv.getCount() < 1.) {
+    if(mv.getCount() < 1. || !(mv.getNaiveVariance() > 0.)) {
       return -1;
     }
     // ChiSquare statistic is the naive variance of the sizes!
-    double chiSquare = mv.getNaiveVariance();
-
-    if((1 - 0.001) < ChiSquaredDistribution.cdf(chiSquare, Math.max(1, binCount - card - 1))) {
+    final double chiSquare = mv.getNaiveVariance() / mv.getMean();
+    final double test = ChiSquaredDistribution.cdf(chiSquare, Math.max(1, binCount - card - 1));
+    if((1. - alpha) < test) {
       return maxpos;
     }
     return -1;
@@ -608,7 +573,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param dbids mapping matrix row to DBID.
    * @return a hard clustering based on the matrix.
    */
-  private ArrayList<ClusterCandidate> hardClustering(WritableDataStore<double[]> probClusterIGivenX, List<Signature> clusterCores, ArrayModifiableDBIDs dbids) {
+  private ArrayList<ClusterCandidate> hardClustering(WritableDataStore<double[]> probClusterIGivenX, List<Signature> clusterCores, DBIDs dbids) {
     final int k = clusterCores.size();
 
     // Initialize cluster sets.
@@ -714,6 +679,25 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     int[] spec = first.spec.clone();
     spec[d2] = second.spec[d2];
     spec[d2 + 1] = second.spec[d2];
+
+    if(LOG.isDebugging()) {
+      int p = 0;
+      for(int i = 0; i < spec.length; i += 2) {
+        if(spec[i] >= 0) {
+          p++;
+        }
+      }
+      StringBuilder buf = new StringBuilder();
+      buf.append(p).append("-signature: ");
+      for(int i = 0; i < spec.length; i += 2) {
+        if(spec[i] >= 0) {
+          buf.append(i).append(':');
+          buf.append(spec[i]).append('-').append(spec[i + 1]).append(' ');
+        }
+      }
+      LOG.debug(buf.toString());
+    }
+
     return new Signature(spec, intersection);
   }
 
@@ -792,6 +776,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
+     * Parameter for the chi squared test threshold.
+     */
+    public static final OptionID ALPHA_THRESHOLD_ID = new OptionID("p3c.alpha", "The significance level for uniform testing in the initial binning step.");
+
+    /**
      * Parameter for the poisson test threshold.
      */
     public static final OptionID POISSON_THRESHOLD_ID = new OptionID("p3c.threshold", "The threshold value for the poisson test used when merging signatures.");
@@ -811,6 +800,14 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
      * publication).
      */
     public static final OptionID MIN_CLUSTER_SIZE_ID = new OptionID("p3c.minsize", "The minimum size of a cluster, otherwise it is seen as noise (this is a cheat, it is not mentioned in the paper).");
+
+    /**
+     * Parameter for the chi squared test threshold.
+     * 
+     * While statistical values such as 0.01 are a good choice, we found the
+     * need to modify this parameter in our experiments.
+     */
+    protected double alpha;
 
     /**
      * Parameter for the poisson test threshold.
@@ -838,8 +835,18 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       super.makeOptions(config);
 
       {
+        DoubleParameter param = new DoubleParameter(ALPHA_THRESHOLD_ID, .001);
+        param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+        param.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
+        if(config.grab(param)) {
+          alpha = param.getValue();
+        }
+      }
+
+      {
         DoubleParameter param = new DoubleParameter(POISSON_THRESHOLD_ID, 1.e-20);
         param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+        param.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
         if(config.grab(param)) {
           poissonThreshold = param.getValue();
         }
@@ -872,7 +879,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     @Override
     protected P3C<V> makeInstance() {
-      return new P3C<>(poissonThreshold, maxEmIterations, emDelta, minClusterSize);
+      return new P3C<>(alpha, poissonThreshold, maxEmIterations, emDelta, minClusterSize);
     }
   }
 }
