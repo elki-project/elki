@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -204,20 +204,18 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       stepProgress.beginStep(4, "Computing cluster cores from merged p-signatures.", LOG);
     }
 
-    FiniteProgress mergeProgress = LOG.isVerbose() ? new FiniteProgress("1-signatures merges", signatures.size(), LOG) : null;
+    MutableProgress mergeProgress = LOG.isVerbose() ? new MutableProgress("Merging signatures.", signatures.size(), LOG) : null;
 
     // Merge to (p+1)-signatures (cluster cores).
     ArrayList<Signature> clusterCores = new ArrayList<>(signatures);
     // Try adding merge 1-signature with each cluster core.
-    for(int i = 0; i < signatures.size(); ++i) {
-      final Signature signature = signatures.get(i);
-      // Don't merge with future signatures:
-      final int end = clusterCores.size();
+    for(int i = 0; i < clusterCores.size(); ++i) {
+      final Signature first = clusterCores.get(i);
       // Skip previous 1-signatures: merges are symmetrical. But include newly
       // created cluster cores (i.e. those resulting from previous merges).
-      FiniteProgress submergeProgress = LOG.isVerbose() ? new FiniteProgress("p-signatures merges", end - (i + 1), LOG) : null;
-      for(int j = i + 1; j < end; ++j) {
-        final Signature first = clusterCores.get(j);
+      final int end = first.getFirstDim();
+      for(int j = 0; j < end; j++) {
+        final Signature signature = signatures.get(j);
         final Signature merge = mergeSignatures(first, signature, binCount);
         if(merge != null) {
           // We add each potential core to the list to allow remaining
@@ -227,24 +225,21 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
           first.prune = true;
           signature.prune = true;
         }
-        if(submergeProgress != null) {
-          submergeProgress.incrementProcessed(LOG);
-        }
-      }
-      if(submergeProgress != null) {
-        submergeProgress.ensureCompleted(LOG);
       }
       if(mergeProgress != null) {
+        mergeProgress.setTotal(clusterCores.size());
         mergeProgress.incrementProcessed(LOG);
       }
     }
     if(mergeProgress != null) {
-      mergeProgress.ensureCompleted(LOG);
+      mergeProgress.setProcessed(mergeProgress.getTotal(), LOG);
     }
 
     if(stepProgress != null) {
       stepProgress.beginStep(5, "Pruning redundant cluster cores.", LOG);
     }
+    
+    // FIXME: we don't have all redundancies yet!
 
     // Prune cluster cores based on Definition 3, Condition 2.
     ArrayList<Signature> retain = new ArrayList<>(clusterCores.size());
@@ -655,7 +650,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
     assert (d2 >= 0) : "Merging with empty signature?";
 
-    // Skip the merge if the interval is already part of the signature.
+    // Avoid generating redundant signatures.
     if(first.spec[d2] >= 0) {
       return null;
     }
@@ -668,7 +663,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     double width = (second.spec[d2 + 1] - second.spec[d2] + 1.) / (double) numBins;
     // Expected size thus:
     double expect = first.ids.size() * width;
-    if(support <= expect) {
+    if(support <= expect || support < minClusterSize) {
       return null;
     }
     final double test = PoissonDistribution.rawProbability(support, expect);
@@ -680,25 +675,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     spec[d2] = second.spec[d2];
     spec[d2 + 1] = second.spec[d2];
 
+    final Signature newsig = new Signature(spec, intersection);
     if(LOG.isDebugging()) {
-      int p = 0;
-      for(int i = 0; i < spec.length; i += 2) {
-        if(spec[i] >= 0) {
-          p++;
-        }
-      }
-      StringBuilder buf = new StringBuilder();
-      buf.append(p).append("-signature: ");
-      for(int i = 0; i < spec.length; i += 2) {
-        if(spec[i] >= 0) {
-          buf.append(i >>> 1).append(':');
-          buf.append(spec[i]).append('-').append(spec[i + 1]).append(' ');
-        }
-      }
-      LOG.debug(buf.toString());
+      LOG.debug(newsig.toString());
     }
-
-    return new Signature(spec, intersection);
+    return newsig;
   }
 
   private static class Signature implements Cloneable {
@@ -729,12 +710,46 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       this.ids = ids;
     }
 
+    /**
+     * Find the highest dimension set in this signature.
+     * 
+     * @return Dimension
+     */
+    public int getFirstDim() {
+      for(int i = 0; i < spec.length; i += 2) {
+        if(spec[i] >= 0) {
+          return (i >>> 1);
+        }
+      }
+      return -1;
+    }
+
     @Override
     protected Signature clone() throws CloneNotSupportedException {
       Signature c = (Signature) super.clone();
       c.spec = this.spec.clone();
       c.ids = null;
       return c;
+    }
+
+    @Override
+    public String toString() {
+      int p = 0;
+      for(int i = 0; i < spec.length; i += 2) {
+        if(spec[i] >= 0) {
+          p++;
+        }
+      }
+      StringBuilder buf = new StringBuilder();
+      buf.append(p).append("-signature: ");
+      for(int i = 0; i < spec.length; i += 2) {
+        if(spec[i] >= 0) {
+          buf.append(i >>> 1).append(':');
+          buf.append(spec[i]).append('-').append(spec[i + 1]).append(' ');
+        }
+      }
+      buf.append(" size: ").append(ids.size());
+      return buf.toString();
     }
   }
 
