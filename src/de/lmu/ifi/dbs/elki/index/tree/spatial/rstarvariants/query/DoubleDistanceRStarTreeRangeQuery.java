@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.PriorityQueue;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
@@ -33,9 +33,8 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
-import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -91,32 +90,37 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
   protected DoubleDistanceDBIDList doRangeQuery(O object, double epsilon) {
     tree.statistics.countRangeQuery();
     final DoubleDistanceIntegerDBIDList result = new DoubleDistanceIntegerDBIDList();
-    final PriorityQueue<DoubleDistanceSearchCandidate> pq = new PriorityQueue<>();
 
-    // push root
-    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));
+    // Processing queue.
+    int[] pq = new int[101];
+    int ps = 0;
+    pq[ps++] = tree.getRootID();
 
     // search in tree
-    while(!pq.isEmpty()) {
-      DoubleDistanceSearchCandidate pqNode = pq.poll();
-      if(pqNode.mindist > epsilon) {
-        break;
-      }
-
-      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
+    while(ps > 0) {
+      int pqNode = pq[--ps]; // Pop last.
+      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode);
       final int numEntries = node.getNumEntries();
 
-      for(int i = 0; i < numEntries; i++) {
-        double distance = distanceFunction.doubleMinDist(object, node.getEntry(i));
-        tree.statistics.countDistanceCalculation();
-        if(distance <= epsilon) {
-          if(node.isLeaf()) {
-            LeafEntry entry = (LeafEntry) node.getEntry(i);
+      if(node.isLeaf()) {
+        for(int i = 0; i < numEntries; i++) {
+          SpatialPointLeafEntry entry = (SpatialPointLeafEntry) node.getEntry(i);
+          double distance = distanceFunction.doubleMinDist(object, entry);
+          tree.statistics.countDistanceCalculation();
+          if(distance <= epsilon) {
             result.add(distance, entry.getDBID());
           }
-          else {
-            DirectoryEntry entry = (DirectoryEntry) node.getEntry(i);
-            pq.add(new DoubleDistanceSearchCandidate(distance, entry.getEntryID()));
+        }
+      }
+      else {
+        for(int i = 0; i < numEntries; i++) {
+          SpatialDirectoryEntry entry = (SpatialDirectoryEntry) node.getEntry(i);
+          double distance = distanceFunction.doubleMinDist(object, entry);
+          if(distance <= epsilon) {
+            if(ps == pq.length) {
+              pq = Arrays.copyOf(pq, pq.length + (pq.length >>> 1));
+            }
+            pq[ps++] = entry.getEntryID();
           }
         }
       }

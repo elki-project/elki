@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDSortedKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
@@ -48,7 +47,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
@@ -101,7 +102,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     }
     tree.statistics.countKNNQuery();
 
-    final DoubleDistanceKNNHeap knnList = new DoubleDistanceIntegerDBIDSortedKNNList(k);
+    final DoubleDistanceKNNHeap knnList = new DoubleDistanceIntegerDBIDKNNHeap(k);
     final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 21));
 
     // expand root
@@ -124,28 +125,27 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     // data node
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        SpatialEntry entry = node.getEntry(i);
+        SpatialPointLeafEntry entry = (SpatialPointLeafEntry) node.getEntry(i);
         double distance = distanceFunction.doubleMinDist(entry, object);
         tree.statistics.countDistanceCalculation();
         if(distance <= maxDist) {
-          knnList.insert(distance, ((LeafEntry) entry).getDBID());
-          maxDist = knnList.doubleKNNDistance();
+          maxDist = knnList.insert(distance, entry.getDBID());
         }
       }
     }
     // directory node
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        SpatialEntry entry = node.getEntry(i);
+        SpatialDirectoryEntry entry = (SpatialDirectoryEntry) node.getEntry(i);
         double distance = distanceFunction.doubleMinDist(entry, object);
         tree.statistics.countDistanceCalculation();
         // Greedy expand, bypassing the queue
         if(distance <= 0) {
-          expandNode(object, knnList, pq, maxDist, ((DirectoryEntry) entry).getPageID());
+          expandNode(object, knnList, pq, maxDist, entry.getPageID());
         }
         else {
           if(distance <= maxDist) {
-            pq.add(new DoubleDistanceSearchCandidate(distance, ((DirectoryEntry) entry).getPageID()));
+            pq.add(new DoubleDistanceSearchCandidate(distance, entry.getPageID()));
           }
         }
       }
