@@ -126,6 +126,11 @@ public class ArffParser implements Parser {
   Pattern magic_class;
 
   /**
+   * (Reused) buffer for building label lists.
+   */
+  ArrayList<String> labels = new ArrayList<>();
+
+  /**
    * Constructor.
    * 
    * @param magic_eid Magic to recognize external IDs
@@ -271,7 +276,7 @@ public class ArffParser implements Parser {
       }
       else if(TypeUtil.LABELLIST.equals(elkitypes[out])) {
         // Build a label list out of successive labels
-        LabelList ll = new LabelList(1);
+        labels.clear();
         for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
           iter.advance();
           int i = iter.key();
@@ -282,12 +287,12 @@ public class ArffParser implements Parser {
             break;
           }
           String v = (String) iter.value();
-          if(ll.size() < i - s) {
+          if(labels.size() < i - s) {
             LOG.warning("Sparse consecutive labels are currently not correctly supported.");
           }
-          ll.add(v);
+          labels.add(v);
         }
-        data[out] = ll;
+        data[out] = LabelList.make(labels);
       }
       else if(TypeUtil.EXTERNALID.equals(elkitypes[out])) {
         String val = (String) map.get(s);
@@ -343,15 +348,15 @@ public class ArffParser implements Parser {
       }
       else if(TypeUtil.LABELLIST.equals(etyp[out])) {
         // Build a label list out of successive labels
-        LabelList ll = new LabelList(dimsize[out]);
+        labels.clear();
         for(int k = 0; k < dimsize[out]; k++) {
           if(tokenizer.ttype != StreamTokenizer.TT_WORD) {
             throw new AbortException("Expected word token, got: " + tokenizer.toString());
           }
-          ll.add(tokenizer.sval);
+          labels.add(tokenizer.sval);
           nextToken(tokenizer);
         }
-        data[out] = ll;
+        data[out] = LabelList.make(labels);
       }
       else if(TypeUtil.EXTERNALID.equals(etyp[out])) {
         if(tokenizer.ttype != StreamTokenizer.TT_WORD) {

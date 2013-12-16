@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -47,15 +46,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 // TODO: use a non-string class for external ids?
 public class ExternalIDFilter implements ObjectFilter {
-  /**
-   * Parameter that specifies the index of the label to be used as external Id,
-   * must be an integer equal to or greater than 0.
-   * <p>
-   * Key: {@code -dbc.externalIdIndex}
-   * </p>
-   */
-  public static final OptionID EXTERNALID_INDEX_ID = new OptionID("dbc.externalIdIndex", "The index of the label to be used as external Id.");
-
   /**
    * The index of the label to be used as external Id.
    */
@@ -91,11 +81,20 @@ public class ExternalIDFilter implements ObjectFilter {
       List<LabelList> lblcol = new ArrayList<>(objects.dataLength());
 
       // Split the column
+      ArrayList<String> lbuf = new ArrayList<>();
       for(Object obj : objects.getColumn(i)) {
         if(obj != null) {
           LabelList ll = (LabelList) obj;
-          eidcol.add(new ExternalID(ll.remove(externalIdIndex)));
-          lblcol.add(ll);
+          int off = externalIdIndex >= 0 ? externalIdIndex : (ll.size() - externalIdIndex);
+          eidcol.add(new ExternalID(ll.get(off)));
+          lbuf.clear();
+          for(int j = 0; j < ll.size(); j++) {
+            if(j == off) {
+              continue;
+            }
+            lbuf.add(ll.get(j));
+          }
+          lblcol.add(LabelList.make(lbuf));
           if(ll.size() > 0) {
             keeplabelcol = true;
           }
@@ -123,13 +122,21 @@ public class ExternalIDFilter implements ObjectFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter that specifies the index of the label to be used as external
+     * Id, starting at 0. Negative numbers are counted from the end.
+     * <p>
+     * Key: {@code -dbc.externalIdIndex}
+     * </p>
+     */
+    public static final OptionID EXTERNALID_INDEX_ID = new OptionID("dbc.externalIdIndex", "The index of the label to be used as external Id. The first label is 0; negative indexes are relative to the end.");
+
     int externalIdIndex = -1;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter externalIdIndexParam = new IntParameter(EXTERNALID_INDEX_ID);
-      externalIdIndexParam.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(externalIdIndexParam)) {
         externalIdIndex = externalIdIndexParam.intValue();
       }

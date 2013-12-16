@@ -777,7 +777,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
           DoubleDistance dist = refine(currentID, query);
           stats.incrementRefinements();
           if(dist.doubleValue() < stopdist) {
-            result.add(dist.doubleValue(), currentID);
+            result.insert(dist.doubleValue(), currentID);
           }
         }
       }

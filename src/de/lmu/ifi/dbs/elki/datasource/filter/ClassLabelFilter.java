@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -48,23 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has ClassLabel
  */
 public class ClassLabelFilter implements ObjectFilter {
-  /**
-   * Optional parameter that specifies the index of the label to be used as
-   * class label, must be an integer equal to or greater than 0.
-   * <p>
-   * Key: {@code -dbc.classLabelIndex}
-   * </p>
-   */
-  public static final OptionID CLASS_LABEL_INDEX_ID = new OptionID("dbc.classLabelIndex", "The index of the label to be used as class label.");
-
-  /**
-   * Parameter to specify the class of occurring class labels.
-   * <p>
-   * Key: {@code -dbc.classLabelClass}
-   * </p>
-   */
-  public static final OptionID CLASS_LABEL_CLASS_ID = new OptionID("dbc.classLabelClass", "Class label class to use.");
-
   /**
    * The index of the label to be used as class label, null if no class label is
    * specified.
@@ -107,19 +89,28 @@ public class ClassLabelFilter implements ObjectFilter {
       List<ClassLabel> clscol = new ArrayList<>(objects.dataLength());
       List<LabelList> lblcol = new ArrayList<>(objects.dataLength());
 
+      ArrayList<String> lbuf = new ArrayList<>();
       // Split the column
       for(Object obj : objects.getColumn(i)) {
         if(obj != null) {
           LabelList ll = (LabelList) obj;
+          int off = (classLabelIndex >= 0) ? classLabelIndex : (ll.size() - classLabelIndex);
           try {
-            ClassLabel lbl = classLabelFactory.makeFromString(ll.remove(classLabelIndex));
+            ClassLabel lbl = classLabelFactory.makeFromString(ll.get(off));
             clscol.add(lbl);
           }
           catch(Exception e) {
             throw new AbortException("Cannot initialize class labels: " + e.getMessage(), e);
           }
-          lblcol.add(ll);
-          if(ll.size() > 0) {
+          lbuf.clear();
+          for(int j = 0; j < ll.size(); j++) {
+            if(j == off) {
+              continue;
+            }
+            lbuf.add(ll.get(j));
+          }
+          lblcol.add(LabelList.make(lbuf));
+          if(lbuf.size() > 0) {
             keeplabelcol = true;
           }
         }
@@ -146,6 +137,23 @@ public class ClassLabelFilter implements ObjectFilter {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
+     * Optional parameter that specifies the index of the label to be used as
+     * class label, must be an integer equal to or greater than 0.
+     * <p>
+     * Key: {@code -dbc.classLabelIndex}
+     * </p>
+     */
+    public static final OptionID CLASS_LABEL_INDEX_ID = new OptionID("dbc.classLabelIndex", "The index of the label to be used as class label. The first label is 0, negative indexes are relative to the end.");
+
+    /**
+     * Parameter to specify the class of occurring class labels.
+     * <p>
+     * Key: {@code -dbc.classLabelClass}
+     * </p>
+     */
+    public static final OptionID CLASS_LABEL_CLASS_ID = new OptionID("dbc.classLabelClass", "Class label class to use.");
+
+    /**
      * The index of the label to be used as class label, null if no class label
      * is specified.
      */
@@ -161,7 +169,6 @@ public class ClassLabelFilter implements ObjectFilter {
       super.makeOptions(config);
       // parameter class label index
       final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID);
-      classLabelIndexParam.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       final ObjectParameter<ClassLabel.Factory<?>> classlabelClassParam = new ObjectParameter<>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
 
       config.grab(classLabelIndexParam);

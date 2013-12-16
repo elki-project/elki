@@ -413,7 +413,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
 
         // refine the next element
         final double dist = refine(va.second, query).doubleValue();
-        result.add(dist, va.second);
+        result.insert(dist, va.second);
       }
       if(LOG.isDebuggingFinest()) {
         LOG.finest("query = (" + query + ")");

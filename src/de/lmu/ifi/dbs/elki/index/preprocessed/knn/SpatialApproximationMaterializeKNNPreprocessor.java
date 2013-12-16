@@ -126,12 +126,12 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
           D d = cache.remove(key);
           if(d != null) {
             // consume the previous result.
-            kNN.add(d, id2);
+            kNN.insert(d, id2);
           }
           else {
             // compute new and store the previous result.
             d = distanceQuery.distance(id, id2);
-            kNN.add(d, id2);
+            kNN.insert(d, id2);
             // put it into the cache, but with the keys reversed
             key = DBIDUtil.newPair(id2, id);
             cache.put(key, d);

@@ -224,12 +224,11 @@ public class MkMaxTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
         // p is nearer to q than the farthest kNN-candidate of q
         // ==> p becomes a knn-candidate
         if (dist_pq.doubleValue() <= knnDist_q) {
-          knns_q.add(dist_pq, p.getRoutingObjectID());
+          knns_q.insert(dist_pq, p.getRoutingObjectID());
           if (knns_q.size() >= getKmax()) {
             knnDist_q = knns_q.getKNNDistance().doubleValue();
             q.setKnnDistance(knnDist_q);
           }
-
         }
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p

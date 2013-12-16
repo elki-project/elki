@@ -129,8 +129,9 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
         continue;
       }
       if (o instanceof LabelList) {
-        for (String l : (LabelList) o) {
-          if (pattern.matcher(l).find()) {
+        final LabelList ll = (LabelList) o;
+        for(int j = 0; j < ll.size(); j++) {
+          if (pattern.matcher(ll.get(j)).find()) {
             return positive;
           }
         }

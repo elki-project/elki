@@ -108,7 +108,9 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
             LOG.warning("Duplicate label encountered: " + data + " in rows " + old + " and " + i);
           }
         } else if (data instanceof LabelList) {
-          for (String lbl : (LabelList) data) {
+          final LabelList ll = (LabelList) data;
+          for(int j = 0; j < ll.size(); j++) {
+            String lbl = ll.get(j);
             int old = labelmap.put(lbl, i);
             if (old != -1) {
               LOG.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
@@ -166,8 +168,9 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
         if (data instanceof String) {
           row = labelmap.get(data);
         } else if (data instanceof LabelList) {
-          for (String lbl : (LabelList) data) {
-            row = labelmap.get(lbl);
+          final LabelList ll = (LabelList) data;
+          for(int j = 0; j < ll.size(); j++) {
+            row = labelmap.get(ll.get(j));
             if (row >= 0) {
               break;
             }

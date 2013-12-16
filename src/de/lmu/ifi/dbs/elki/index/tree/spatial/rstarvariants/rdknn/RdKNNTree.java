@@ -368,7 +368,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
         // p is nearer to q than the farthest kNN-candidate of q
         // ==> p becomes a knn-candidate
         if (dist_pq.compareTo(knnDist_q) <= 0) {
-          knns_q.add(dist_pq, p.getDBID());
+          knns_q.insert(dist_pq, p.getDBID());
           if (knns_q.size() >= settings.k_max) {
             knnDist_q = knns_q.getKNNDistance();
             q.setKnnDistance(knnDist_q);

@@ -284,7 +284,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
         countDistanceComputation();
         if(dist <= maxdist) {
           iter.seek(middle);
-          knns.add(dist, iter);
+          knns.insert(dist, iter);
           maxdist = knns.doubleKNNDistance();
         }
         if(left < middle) {
@@ -305,7 +305,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
             countDistanceComputation();
             if(dist <= maxdist) {
               iter.seek(middle);
-              knns.add(dist, iter);
+              knns.insert(dist, iter);
               maxdist = knns.doubleKNNDistance();
             }
           }
@@ -323,7 +323,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
             countDistanceComputation();
             if(dist <= maxdist) {
               iter.seek(middle);
-              knns.add(dist, iter);
+              knns.insert(dist, iter);
               maxdist = knns.doubleKNNDistance();
             }
           }

@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -278,7 +277,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractDatabase.Parameterizer {
     /**
      * Holds the database connection to get the initial data from.
      */
@@ -293,7 +292,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get database connection.
-      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(Database.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
       if(config.grab(dbcP)) {
         databaseConnection = dbcP.instantiateClass(config);
       }

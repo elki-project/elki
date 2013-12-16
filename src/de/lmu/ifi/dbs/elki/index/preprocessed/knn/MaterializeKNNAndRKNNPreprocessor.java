@@ -204,7 +204,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
           if(heap == null) {
             heap = DBIDUtil.newHeap(oldkNNs);
           }
-          heap.add(dist, newid);
+          heap.insert(dist, newid);
         }
       }
       // kNNs for oldid have changed:

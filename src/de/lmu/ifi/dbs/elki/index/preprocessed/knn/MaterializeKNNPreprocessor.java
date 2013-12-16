@@ -236,7 +236,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
           if (heap == null) {
             heap = DBIDUtil.newHeap(kNNs);
           }
-          heap.add(dist, iter2);
+          heap.insert(dist, iter2);
         }
       }
       if (heap != null) {

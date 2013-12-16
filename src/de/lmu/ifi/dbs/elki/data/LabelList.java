@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -39,45 +38,80 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.composedOf String
  */
-public class LabelList extends ArrayList<String> {
+public class LabelList {
   /**
    * Serializer.
    */
   public static final ByteBufferSerializer<LabelList> SERIALIZER = new Serializer();
 
   /**
-   * Serial number.
+   * Labels.
    */
-  private static final long serialVersionUID = 1L;
+  private String[] labels;
 
   /**
-   * Constructor.
+   * Empty label list.
    */
-  public LabelList() {
-    super();
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param c existing collection
-   */
-  public LabelList(Collection<? extends String> c) {
-    super(c);
-  }
+  public static final LabelList EMPTY_LABELS = new LabelList(0);
 
   /**
    * Constructor.
    * 
    * @param initialCapacity initial size
    */
-  public LabelList(int initialCapacity) {
-    super(initialCapacity);
+  private LabelList(int initialCapacity) {
+    super();
+    labels = new String[initialCapacity];
+  }
+
+  /**
+   * Private constructor. Use {@link #make}.
+   * 
+   * @param array Label list
+   */
+  protected LabelList(String[] array) {
+    super();
+    this.labels = array;
+  }
+
+  /**
+   * Constructor replacement.
+   * 
+   * When the label list is empty, it will produce the same instance!
+   * 
+   * @param labels Existing labels
+   * @return Label list instance.
+   */
+  public static LabelList make(Collection<String> labels) {
+    int size = labels.size();
+    if(size == 0) {
+      return EMPTY_LABELS;
+    }
+    return new LabelList(labels.toArray(new String[size]));
+  }
+
+  /**
+   * Size of label list.
+   * 
+   * @return Size
+   */
+  public int size() {
+    return labels.length;
+  }
+
+  /**
+   * Get the label at position i.
+   * 
+   * @param i Position
+   * @return Label
+   */
+  public String get(int i) {
+    return labels[i];
   }
 
   @Override
   public String toString() {
-    return FormatUtil.format(this, " ");
+    return FormatUtil.format(labels, " ");
   }
 
   /**
@@ -92,27 +126,27 @@ public class LabelList extends ArrayList<String> {
     public LabelList fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int cnt = ByteArrayUtil.readUnsignedVarint(buffer);
       LabelList ret = new LabelList(cnt);
-      for (int i = 0; i < cnt; i++) {
-        ret.add(ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer));
+      for(int i = 0; i < cnt; i++) {
+        ret.labels[i] = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
       }
       return ret;
     }
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, LabelList object) throws IOException {
-      final int cnt = object.size();
+      final int cnt = object.labels.length;
       ByteArrayUtil.writeUnsignedVarint(buffer, cnt);
-      for (int i = 0; i < cnt; i++) {
-        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.get(i));
+      for(int i = 0; i < cnt; i++) {
+        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.labels[i]);
       }
     }
 
     @Override
     public int getByteSize(LabelList object) throws IOException {
-      final int cnt = object.size();
+      final int cnt = object.labels.length;
       int size = ByteArrayUtil.getUnsignedVarintSize(cnt);
-      for (int i = 0; i < cnt; i++) {
-        size += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.get(i));
+      for(int i = 0; i < cnt; i++) {
+        size += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.labels[i]);
       }
       return size;
     }

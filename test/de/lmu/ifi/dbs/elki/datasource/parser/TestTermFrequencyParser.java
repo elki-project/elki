@@ -62,14 +62,14 @@ public class TestTermFrequencyParser implements JUnit4Test {
   @Test
   public void testDBLPData() {
     ListParameterization config = new ListParameterization();
-    config.addParameter(AbstractDatabaseConnection.PARSER_ID, TermFrequencyParser.class);
-    config.addParameter(FileBasedDatabaseConnection.INPUT_ID, DBLP_DATA);
+    config.addParameter(AbstractDatabaseConnection.Parameterizer.PARSER_ID, TermFrequencyParser.class);
+    config.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, DBLP_DATA);
 
     ArrayList<Object> filters = new ArrayList<>();
     filters.add(TFIDFNormalization.class);
-    // Note: this filter is needed for the non-sparse euclidean distance below.
+    // Note: this filter is needed for the non-sparse Euclidean distance below.
     filters.add(SparseVectorFieldFilter.class);
-    config.addParameter(AbstractDatabaseConnection.FILTERS_ID, filters);
+    config.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, filters);
 
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, config);
 

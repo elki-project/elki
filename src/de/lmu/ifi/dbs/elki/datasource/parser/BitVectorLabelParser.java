@@ -78,6 +78,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
     int dimensionality = -1;
     List<BitVector> vectors = new ArrayList<>();
     List<LabelList> labels = new ArrayList<>();
+    ArrayList<String> ll = new ArrayList<>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
@@ -85,7 +86,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
           continue;
         }
         BitSet bitSet = new BitSet();
-        LabelList ll = null;
+        ll.clear();
         int i = 0;
         for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
           try {
@@ -95,9 +96,6 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
             ++i;
           }
           catch(NumberFormatException e) {
-            if(ll == null) {
-              ll = new LabelList(1);
-            }
             ll.add(tokenizer.getSubstring());
           }
         }
@@ -110,7 +108,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
         }
 
         vectors.add(new BitVector(bitSet, dimensionality));
-        labels.add(ll);
+        labels.add(LabelList.make(ll));
       }
     }
     catch(IOException e) {

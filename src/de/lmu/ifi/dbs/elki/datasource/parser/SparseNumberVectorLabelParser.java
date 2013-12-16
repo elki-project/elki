@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.regex.Pattern;
 
@@ -96,6 +97,11 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
   TIntDoubleHashMap values = new TIntDoubleHashMap();
 
   /**
+   * (Reused) label buffer.
+   */
+  ArrayList<String> labels = new ArrayList<>();
+
+  /**
    * Constructor.
    * 
    * @param colSep Column separator
@@ -115,7 +121,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
     int cardinality = (int) tokenizer.getLongBase10();
 
     values.clear();
-    LabelList labels = null;
+    labels.clear();
     int thismax = 0;
 
     while(tokenizer.valid()) {
@@ -137,15 +143,12 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
         }
       }
       // Fallback: treat as label
-      if(labels == null) {
-        labels = new LabelList(Math.max(1, labelcolumns.size()));
-        haslabels = true;
-      }
+      haslabels = true;
       labels.add(tokenizer.getSubstring());
       tokenizer.advance();
     }
     curvec = sparsefactory.newNumberVector(values, thismax);
-    curlbl = labels;
+    curlbl = LabelList.make(labels);
   }
 
   @Override

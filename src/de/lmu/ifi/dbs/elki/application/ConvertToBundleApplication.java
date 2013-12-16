@@ -28,7 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleWriter;
@@ -74,11 +74,11 @@ public class ConvertToBundleApplication extends AbstractApplication {
 
   @Override
   public void run() throws UnableToComplyException {
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("Loading data.");
     }
     MultipleObjectsBundle bundle = input.loadData();
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("Serializing to output file: " + outfile.toString());
     }
     // TODO: make configurable?
@@ -89,7 +89,8 @@ public class ConvertToBundleApplication extends AbstractApplication {
       writer.writeBundleStream(new StreamFromBundle(bundle), channel);
       channel.close();
       fos.close();
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       LOG.exception("IO Error", e);
     }
   }
@@ -115,8 +116,8 @@ public class ConvertToBundleApplication extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DatabaseConnection> inputP = new ObjectParameter<>(Database.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if (config.grab(inputP)) {
+      ObjectParameter<DatabaseConnection> inputP = new ObjectParameter<>(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      if(config.grab(inputP)) {
         input = inputP.instantiateClass(config);
       }
       outfile = super.getParameterOutputFile(config, "File name to serialize the bundle to.");

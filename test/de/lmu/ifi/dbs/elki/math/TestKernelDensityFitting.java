@@ -75,7 +75,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
   public final void testFitDoubleArray() {
     ListParameterization config = new ListParameterization();
     // Input
-    config.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    config.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
     // This data was generated with a mean of 0.0 and stddev 1.23,
 
     // get database

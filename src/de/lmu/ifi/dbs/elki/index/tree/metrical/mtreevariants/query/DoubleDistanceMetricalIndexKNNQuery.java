@@ -131,7 +131,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
             double d3 = distf.doubleDistance(o_i, q);
             index.statistics.countDistanceCalculation();
             if (d3 <= d_k) {
-              knnList.add(d3, id_i);
+              knnList.insert(d3, id_i);
               d_k = knnList.doubleKNNDistance();
             }
           }

@@ -112,8 +112,9 @@ public class ByLabelFilter extends AbstractStreamFilter {
           Object l = source.data(lblcol);
           if(l instanceof LabelList) {
             boolean good = false;
-            for(String label : (LabelList) l) {
-              if(pattern.matcher(label).matches()) {
+            final LabelList ll = (LabelList) l;
+            for(int i = 0; i < ll.size(); i++) {
+              if(pattern.matcher(ll.get(i)).matches()) {
                 good = true;
                 break;
               }

@@ -127,7 +127,7 @@ public class MetricalIndexKNNQuery<O, D extends NumberDistance<D, ?>> extends Ab
             D d3 = distanceQuery.distance(o_j, q);
             index.statistics.countDistanceCalculation();
             if (d3.compareTo(d_k) <= 0) {
-              knnList.add(d3, o_j);
+              knnList.insert(d3, o_j);
               d_k = knnList.getKNNDistance();
             }
           }

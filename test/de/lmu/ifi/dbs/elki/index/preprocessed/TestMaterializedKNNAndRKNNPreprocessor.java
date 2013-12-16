@@ -98,7 +98,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
   @Test
   public void testPreprocessor() throws ParameterException, UnableToComplyException {
     ListParameterization params = new ListParameterization();
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
 
     // get database
     UpdatableDatabase db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, params);

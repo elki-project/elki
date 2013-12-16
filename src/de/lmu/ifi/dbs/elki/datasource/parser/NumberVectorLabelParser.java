@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -134,9 +135,14 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   protected LabelList curlbl = null;
 
   /**
-   * Current numerical attributes.
+   * (Reused) store for numerical attributes.
    */
-  TDoubleArrayList attributes = new TDoubleArrayList();
+  final TDoubleArrayList attributes = new TDoubleArrayList();
+
+  /**
+   * (Reused) store for labels.
+   */
+  final ArrayList<String> labels = new ArrayList<>();
 
   /**
    * For String unification.
@@ -268,10 +274,10 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @param line Line to process
    */
   protected void parseLineInternal(String line) {
-    // Split into numerical attributes and labels
     attributes.reset();
-    LabelList labels = null;
+    labels.clear();
 
+    // Split into numerical attributes and labels
     int i = 0;
     for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance(), i++) {
       if(labelIndices == null || !labelIndices.get(i)) {
@@ -286,12 +292,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
         }
       }
       // Else: labels.
-      if(labels == null) {
-        labels = new LabelList(Math.max(1, labelcolumns.size()));
-        haslabels = true;
-      }
-      // Note: for Java 6, make a new String here to save memory!
-      // Java 7 will copy the bytes to a new string.
+      haslabels = true;
       final String lbl = tokenizer.getSubstring();
       String u = unique.get(lbl);
       if(u == null) {
@@ -302,7 +303,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     }
     // Maybe a label row?
     if(lineNumber == 1 && attributes.size() == 0) {
-      columnnames = labels;
+      columnnames = new ArrayList<>(labels);
       labelcolumns.clear();
       if(labelIndices != null) {
         labelcolumns.or(labelIndices);
@@ -314,7 +315,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     }
     // Pass outside via class variables
     curvec = createDBObject(attributes, ArrayLikeUtil.TDOUBLELISTADAPTER);
-    curlbl = labels;
+    curlbl = LabelList.make(labels);
   }
 
   /**
@@ -375,9 +376,9 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParser.Parameterizer {
     /**
-     * A comma separated list of the indices of labels (may be numeric), counting
-     * whitespace separated entries in a line starting with 0. The corresponding
-     * entries will be treated as a label.
+     * A comma separated list of the indices of labels (may be numeric),
+     * counting whitespace separated entries in a line starting with 0. The
+     * corresponding entries will be treated as a label.
      * <p>
      * Key: {@code -parser.labelIndices}
      * </p>

@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
  * Database specifies the requirements for any database implementation. Note
@@ -61,16 +60,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @apiviz.has DataStoreListener oneway - - invokes
  */
 public interface Database extends HierarchicalResult {
-  /**
-   * Option to specify the data source for the database.
-   * 
-   * Key:
-   * <p>
-   * {@code -dbc}
-   * </p>
-   */
-  public static final OptionID DATABASE_CONNECTION_ID = new OptionID("dbc", "Database connection class.");
-
   /**
    * Initialize the database, for example by loading the input data. (Since this
    * should NOT be done on construction time!)
