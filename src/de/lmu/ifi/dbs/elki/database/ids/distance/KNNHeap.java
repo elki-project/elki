@@ -70,7 +70,7 @@ public interface KNNHeap<D extends Distance<D>> {
    * @param distance Distance value
    * @param id ID number
    */
-  void add(D distance, DBIDRef id);
+  void insert(D distance, DBIDRef id);
 
   /**
    * Current size of heap.

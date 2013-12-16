@@ -132,7 +132,7 @@ final class IntegerDBIDRange implements DBIDRange, SetDBIDs {
   }
 
   @Override
-  public int mapDBIDToOffset(DBIDRef dbid) {
+  public final int mapDBIDToOffset(DBIDRef dbid) {
     return dbid.internalGetIndex() - start;
   }
 
@@ -157,7 +157,7 @@ final class IntegerDBIDRange implements DBIDRange, SetDBIDs {
     /**
      * Current position.
      */
-    private int pos = 0;
+    private int pos;
 
     /**
      * Interval length.
@@ -175,8 +175,7 @@ final class IntegerDBIDRange implements DBIDRange, SetDBIDs {
      * @param start Interval start
      * @param len Interval length
      */
-    private Itr(int start, int len) {
-      super();
+    public Itr(final int start, final int len) {
       this.start = start;
       this.len = len;
     }

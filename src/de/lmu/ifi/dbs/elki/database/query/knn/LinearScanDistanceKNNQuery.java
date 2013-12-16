@@ -67,7 +67,7 @@ public class LinearScanDistanceKNNQuery<O, D extends Distance<D>> extends Abstra
       int index = 0;
       for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
         KNNHeap<D> heap = heaps.get(index);
-        heap.add(distanceQuery.distance(iter2, iter), iter);
+        heap.insert(distanceQuery.distance(iter2, iter), iter);
         index++;
       }
     }
@@ -82,7 +82,7 @@ public class LinearScanDistanceKNNQuery<O, D extends Distance<D>> extends Abstra
       for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         final D dist = distanceQuery.distance(obj, relation.get(iter));
         if (max.compareTo(dist) > 0) {
-          heap.add(dist, iter);
+          heap.insert(dist, iter);
           if (heap.size() >= k) {
             max = heap.getKNNDistance();
           }
@@ -92,7 +92,7 @@ public class LinearScanDistanceKNNQuery<O, D extends Distance<D>> extends Abstra
       for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         final D dist = distanceQuery.distance(id, iter);
         if (max.compareTo(dist) > 0) {
-          heap.add(dist, iter);
+          heap.insert(dist, iter);
           if (heap.size() >= k) {
             max = heap.getKNNDistance();
           }
@@ -122,7 +122,7 @@ public class LinearScanDistanceKNNQuery<O, D extends Distance<D>> extends Abstra
   public KNNList<D> getKNNForObject(O obj, int k) {
     KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      heap.add(distanceQuery.distance(obj, iter), iter);
+      heap.insert(distanceQuery.distance(obj, iter), iter);
     }
     return heap.toKNNList();
   }

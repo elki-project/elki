@@ -39,8 +39,9 @@ public interface DoubleDistanceKNNHeap extends KNNHeap<DoubleDistance> {
    * 
    * @param distance Distance value
    * @param id ID number
+   * @return updated k-distance
    */
-  void add(double distance, DBIDRef id);
+  double insert(double distance, DBIDRef id);
 
   /**
    * Add a distance-id pair to the heap unless the distance is too large.
@@ -51,7 +52,7 @@ public interface DoubleDistanceKNNHeap extends KNNHeap<DoubleDistance> {
    * @param id ID number
    */
   @Deprecated
-  void add(Double distance, DBIDRef id);
+  void insert(Double distance, DBIDRef id);
 
   /**
    * Add a distance-id pair to the heap unless the distance is too large.
@@ -60,7 +61,7 @@ public interface DoubleDistanceKNNHeap extends KNNHeap<DoubleDistance> {
    * 
    * @param e Existing distance pair
    */
-  void add(DoubleDistanceDBIDPair e);
+  void insert(DoubleDistanceDBIDPair e);
 
   /**
    * {@inheritDoc}
@@ -70,7 +71,7 @@ public interface DoubleDistanceKNNHeap extends KNNHeap<DoubleDistance> {
    */
   @Override
   @Deprecated
-  void add(DoubleDistance dist, DBIDRef id);
+  void insert(DoubleDistance dist, DBIDRef id);
 
   /**
    * Get the distance to the k nearest neighbor, or maxdist otherwise.

@@ -166,14 +166,14 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
       DoubleDistanceKNNHeap heap = newDoubleDistanceHeap(exist.getK());
       // Insert backwards, as this will produce a proper heap
       for (int i = exist.size() - 1; i >= 0; i--) {
-        heap.add((DoubleDistanceDBIDPair) exist.get(i));
+        heap.insert((DoubleDistanceDBIDPair) exist.get(i));
       }
       return (KNNHeap<D>) heap;
     } else {
       DistanceDBIDPairKNNHeap<D> heap = new DistanceDBIDPairKNNHeap<>(exist.getK());
       // Insert backwards, as this will produce a proper heap
       for (int i = exist.size() - 1; i >= 0; i--) {
-        heap.add(exist.get(i));
+        heap.insert(exist.get(i));
       }
       return heap;
     }
@@ -182,10 +182,10 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   @Override
   public DoubleDistanceKNNHeap newDoubleDistanceHeap(int k) {
     // TODO: benchmark threshold!
-    if (k > 1000) {
+    //if (k > 1000) {
       return new DoubleDistanceIntegerDBIDKNNHeap(k);
-    }
-    return new DoubleDistanceIntegerDBIDSortedKNNList(k);
+    //}
+    //return new DoubleDistanceIntegerDBIDSortedKNNList(k);
   }
 
   @Override

@@ -76,24 +76,25 @@ public class DoubleDistanceDBIDPairKNNListHeap implements DoubleDistanceKNNList,
   }
 
   @Override
-  public void add(double distance, DBIDRef id) {
+  public double insert(double distance, DBIDRef id) {
     if (size < k || distance <= data[k - 1].doubleDistance()) {
-      add(DBIDUtil.newDistancePair(distance, id));
+      insert(DBIDUtil.newDistancePair(distance, id));
     }
+    return (size < k) ? Double.POSITIVE_INFINITY :  get(k - 1).doubleDistance();
   }
 
   @Override
-  public void add(Double distance, DBIDRef id) {
-    add(DBIDUtil.newDistancePair(distance.doubleValue(), id));
+  public void insert(Double distance, DBIDRef id) {
+    insert(DBIDUtil.newDistancePair(distance.doubleValue(), id));
   }
 
   @Override
-  public void add(DoubleDistance dist, DBIDRef id) {
-    add(DBIDUtil.newDistancePair(dist.doubleValue(), id));
+  public void insert(DoubleDistance dist, DBIDRef id) {
+    insert(DBIDUtil.newDistancePair(dist.doubleValue(), id));
   }
 
   @Override
-  public void add(DoubleDistanceDBIDPair e) {
+  public void insert(DoubleDistanceDBIDPair e) {
     if (size >= k) {
       if (e.doubleDistance() > data[size - 1].doubleDistance()) {
         return;
@@ -166,10 +167,7 @@ public class DoubleDistanceDBIDPairKNNListHeap implements DoubleDistanceKNNList,
 
   @Override
   public double doubleKNNDistance() {
-    if (size < k) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return get(k - 1).doubleDistance();
+    return (size < k) ? Double.POSITIVE_INFINITY :  get(k - 1).doubleDistance();
   }
 
   @Override

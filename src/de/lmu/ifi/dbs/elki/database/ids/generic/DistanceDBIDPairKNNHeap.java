@@ -68,7 +68,7 @@ public class DistanceDBIDPairKNNHeap<D extends Distance<D>> extends AbstractKNNH
   }
 
   @Override
-  public void add(D distance, DBIDRef id) {
+  public void insert(D distance, DBIDRef id) {
     if (size() < getK()) {
       heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
       heapModified();
@@ -83,7 +83,7 @@ public class DistanceDBIDPairKNNHeap<D extends Distance<D>> extends AbstractKNNH
   }
 
   @Override
-  public void add(DistanceDBIDPair<D> pair) {
+  public void insert(DistanceDBIDPair<D> pair) {
     if (size() < getK() || knndistance.compareTo(pair.getDistance()) >= 0) {
       heap.add(pair);
       heapModified();
