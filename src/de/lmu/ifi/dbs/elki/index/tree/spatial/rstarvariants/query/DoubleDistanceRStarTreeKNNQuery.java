@@ -39,6 +39,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDSortedKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
@@ -92,31 +94,29 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     this.distanceFunction = distanceFunction;
   }
 
-  /**
-   * Performs a k-nearest neighbor query for the given NumberVector with the
-   * given parameter k and the according distance function. The query result is
-   * in ascending order to the distance to the query object.
-   * 
-   * @param object the query object
-   * @param knnList the knn list containing the result
-   */
-  protected void doKNNQuery(O object, DoubleDistanceKNNHeap knnList) {
-    final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 21));
+  @Override
+  public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
+    if(k < 1) {
+      throw new IllegalArgumentException("At least one neighbor has to be requested!");
+    }
     tree.statistics.countKNNQuery();
 
-    // push root
-    pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));
-    double maxDist = Double.MAX_VALUE;
+    final DoubleDistanceKNNHeap knnList = new DoubleDistanceIntegerDBIDSortedKNNList(k);
+    final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 21));
+
+    // expand root
+    double maxDist = expandNode(obj, knnList, pq, Double.MAX_VALUE, tree.getRootID());
 
     // search in tree
     while(!pq.isEmpty()) {
       DoubleDistanceSearchCandidate pqNode = pq.poll();
 
       if(pqNode.mindist > maxDist) {
-        return;
+        break;
       }
-      maxDist = expandNode(object, knnList, pq, maxDist, pqNode.nodeID);
+      maxDist = expandNode(obj, knnList, pq, maxDist, pqNode.nodeID);
     }
+    return knnList.toKNNList();
   }
 
   private double expandNode(O object, DoubleDistanceKNNHeap knnList, final ComparableMinHeap<DoubleDistanceSearchCandidate> pq, double maxDist, final int nodeID) {
@@ -128,7 +128,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
         double distance = distanceFunction.doubleMinDist(entry, object);
         tree.statistics.countDistanceCalculation();
         if(distance <= maxDist) {
-          knnList.add(distance, ((LeafEntry) entry).getDBID());
+          knnList.insert(distance, ((LeafEntry) entry).getDBID());
           maxDist = knnList.doubleKNNDistance();
         }
       }
@@ -174,7 +174,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
           double dist_pq = distanceFunction.doubleDistance(relation.get(pid), relation.get(q));
           tree.statistics.countDistanceCalculation();
           if(dist_pq <= knn_q_maxDist) {
-            knns_q.add(dist_pq, pid);
+            knns_q.insert(dist_pq, pid);
           }
         }
       }
@@ -264,17 +264,6 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
   }
 
   @Override
-  public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
-    if(k < 1) {
-      throw new IllegalArgumentException("At least one enumeration has to be requested!");
-    }
-
-    final DoubleDistanceKNNHeap knnList = DBIDUtil.newDoubleDistanceHeap(k);
-    doKNNQuery(obj, knnList);
-    return knnList.toKNNList();
-  }
-
-  @Override
   public List<DoubleDistanceKNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
@@ -285,7 +274,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     final Map<DBID, DoubleDistanceKNNHeap> knnLists = new HashMap<>(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
-      knnLists.put(id, DBIDUtil.newDoubleDistanceHeap(k));
+      knnLists.put(id, new DoubleDistanceIntegerDBIDKNNHeap(k));
     }
 
     batchNN(tree.getRoot(), knnLists);

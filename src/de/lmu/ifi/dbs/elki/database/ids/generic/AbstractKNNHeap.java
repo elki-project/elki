@@ -59,7 +59,7 @@ abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance
    * 
    * @param pair Pair to add.
    */
-  public abstract void add(P pair);
+  public abstract void insert(P pair);
 
   @Override
   public final int getK() {

@@ -109,13 +109,15 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
    * 
    * @param distance Distance value
    * @param id ID number
+   * @return knn distance.
    */
   @Override
-  public final void add(final double distance, final DBIDRef id) {
+  public final double insert(final double distance, final DBIDRef id) {
     if (size() < getK() || knndistance >= distance) {
       heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
       heapModified();
     }
+    return knndistance;
   }
 
   /**
@@ -128,7 +130,7 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
    */
   @Override
   @Deprecated
-  public final void add(final Double distance, final DBIDRef id) {
+  public final void insert(final Double distance, final DBIDRef id) {
     if (size() < getK() || knndistance >= distance) {
       heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
       heapModified();
@@ -144,7 +146,7 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
   }
 
   @Override
-  public void add(final DoubleDistanceDBIDPair e) {
+  public void insert(final DoubleDistanceDBIDPair e) {
     if (size() < getK() || knndistance >= e.doubleDistance()) {
       heap.add(e);
       heapModified();
@@ -160,8 +162,8 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
    */
   @Override
   @Deprecated
-  public void add(DoubleDistance dist, DBIDRef id) {
-    add(dist.doubleValue(), id);
+  public void insert(DoubleDistance dist, DBIDRef id) {
+    insert(dist.doubleValue(), id);
   }
 
   /**

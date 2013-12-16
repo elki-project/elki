@@ -24,8 +24,10 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Track the k nearest neighbors, with insertion sort to ensure the correct
@@ -50,19 +52,19 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
    * @param id Object ID
    */
   @Override
-  protected void addInternal(final double dist, final int id) {
-    if (size >= k && dist > dists[kminus1]) {
+  protected final void addInternal(final double dist, final int id) {
+    if(size >= k && dist > dists[kminus1]) {
       return;
     }
     // Ensure we have enough space.
-    if (size == dists.length) {
+    if(size == dists.length) {
       grow();
     }
     // Increases size!
     insertionSort(dists, ids, size, dist, id);
     ++size;
     // Truncate if necessary:
-    if (size > k && dists[k] > dists[kminus1]) {
+    if(size > k && dists[k] > dists[kminus1]) {
       size = k; // truncate
     }
   }
@@ -78,10 +80,10 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
    */
   private static void insertionSort(final double[] dists, final int[] ids, final int size, final double dist, final int id) {
     int pos = size;
-    while (pos > 0) {
+    while(pos > 0) {
       final int pre = pos - 1;
       final double predist = dists[pre];
-      if (predist <= dist) {
+      if(predist <= dist) {
         break;
       }
       dists[pos] = predist;
@@ -94,9 +96,30 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
   }
 
   @Override
+  public double insert(double dist, DBIDRef id) {
+    addInternal(dist, id.internalGetIndex());
+    return (size >= k) ? dists[kminus1] : Double.POSITIVE_INFINITY;
+  }
+
+  @Override
+  public void add(double dist, DBIDRef id) {
+    addInternal(dist, id.internalGetIndex());
+  }
+
+  @Override
   @Deprecated
-  public void add(Double dist, DBIDRef id) {
-    add(dist.doubleValue(), id);
+  public void insert(Double dist, DBIDRef id) {
+    addInternal(dist.doubleValue(), id.internalGetIndex());
+  }
+
+  @Override
+  public void insert(DoubleDistanceDBIDPair e) {
+    addInternal(e.doubleDistance(), e.internalGetIndex());
+  }
+
+  @Override
+  public void insert(DoubleDistance dist, DBIDRef id) {
+    addInternal(dist.doubleValue(), id.internalGetIndex());
   }
 
   @Override
@@ -120,10 +143,10 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("kNNListHeap[");
-    for (DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
+    for(DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleDistance()).append(':').append(iter.internalGetIndex());
       iter.advance();
-      if (iter.valid()) {
+      if(iter.valid()) {
         buf.append(',');
       }
     }

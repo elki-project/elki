@@ -103,7 +103,7 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
 
   @Override
   @Deprecated
-  public void add(DoubleDistance distance, DBIDRef id) {
+  public void insert(DoubleDistance distance, DBIDRef id) {
     final double dist = distance.doubleValue();
     if (dist <= kdist) {
       addInternal(dist, id.internalGetIndex());
@@ -112,7 +112,7 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
 
   @Override
   @Deprecated
-  public void add(Double distance, DBIDRef id) {
+  public void insert(Double distance, DBIDRef id) {
     final double dist = distance.doubleValue();
     if (dist <= kdist) {
       addInternal(dist, id.internalGetIndex());
@@ -120,14 +120,15 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
   }
 
   @Override
-  public final void add(final double distance, final DBIDRef id) {
+  public final double insert(final double distance, final DBIDRef id) {
     if (distance <= kdist) {
       addInternal(distance, id.internalGetIndex());
     }
+    return kdist;
   }
 
   @Override
-  public void add(final DoubleDistanceDBIDPair e) {
+  public void insert(final DoubleDistanceDBIDPair e) {
     final double distance = e.doubleDistance();
     if (distance <= kdist) {
       addInternal(distance, e.internalGetIndex());

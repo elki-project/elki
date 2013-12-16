@@ -68,7 +68,7 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
       O candidate = relation.get(iter);
       for(int index = 0; index < size; index++) {
         O object = objs.get(index);
-        heaps.get(index).add(distanceQuery.distance(object, candidate), iter);
+        heaps.get(index).insert(distanceQuery.distance(object, candidate), iter);
       }
     }
   }

@@ -25,9 +25,9 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -49,14 +49,14 @@ public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQue
   PrimitiveDoubleDistanceFunction<O> rawdist;
 
   /**
-   * Constructor.
+   * Constructor.newDoubleDistanceHeap
    * 
    * @param distanceQuery Distance function to use
    */
   @SuppressWarnings("unchecked")
   public DoubleOptimizedDistanceKNNQuery(PrimitiveDistanceQuery<O, DoubleDistance> distanceQuery) {
     super(distanceQuery);
-    if (!(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction)) {
+    if(!(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction)) {
       throw new UnsupportedOperationException("DoubleOptimizedKNNQuery instantiated for non-PrimitiveDoubleDistanceFunction!");
     }
     rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
@@ -64,39 +64,26 @@ public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQue
 
   @Override
   public DoubleDistanceKNNList getKNNForDBID(DBIDRef id, int k) {
-    // Avoid getfield in hot loop:
-    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
-    final Relation<? extends O> relation = this.relation;
-    final O obj = relation.get(id); // Query object
-
-    double kdist = Double.POSITIVE_INFINITY;
-    DoubleDistanceKNNHeap heap = DBIDUtil.newDoubleDistanceHeap(k);
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      final double dist = rawdist.doubleDistance(obj, relation.get(iter));
-      if (dist <= kdist) {
-        heap.add(dist, iter);
-        kdist = heap.doubleKNNDistance();
-      }
-    }
+    final O obj = this.relation.get(id); // Query object
+    DoubleDistanceKNNHeap heap = new DoubleDistanceIntegerDBIDKNNHeap(k);
+    linearScan(relation, rawdist, obj, heap);
     return heap.toKNNList();
   }
 
   @Override
   public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
-    // Avoid getfield in hot loop:
-    final PrimitiveDoubleDistanceFunction<O> rawdist = this.rawdist;
-    final Relation<? extends O> relation = this.relation;
-    DoubleDistanceKNNHeap heap = DBIDUtil.newDoubleDistanceHeap(k);
+    DoubleDistanceKNNHeap heap = new DoubleDistanceIntegerDBIDKNNHeap(k);
+    linearScan(relation, rawdist, obj, heap);
+    return heap.toKNNList();
+  }
 
-    // The first k do not neeed checking.
+  private static <O> void linearScan(Relation<? extends O> relation, PrimitiveDoubleDistanceFunction<? super O> rawdist, final O obj, DoubleDistanceKNNHeap heap) {
     double kdist = Double.POSITIVE_INFINITY;
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double dist = rawdist.doubleDistance(obj, relation.get(iter));
-      if (dist <= kdist) {
-        heap.add(dist, iter);
-        kdist = heap.doubleKNNDistance();
+      if(dist <= kdist) {
+        kdist = heap.insert(dist, iter);
       }
     }
-    return heap.toKNNList();
   }
 }
