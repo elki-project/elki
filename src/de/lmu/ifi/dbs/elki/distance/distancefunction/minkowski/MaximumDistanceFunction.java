@@ -129,7 +129,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
 
   @Override
   public double doubleNorm(NumberVector<?> v) {
-    return Math.pow(doublePreNorm(v, 0, v.getDimensionality(), 0.), invp);
+    return doublePreNorm(v, 0, v.getDimensionality(), 0.);
   }
 
   @Override
