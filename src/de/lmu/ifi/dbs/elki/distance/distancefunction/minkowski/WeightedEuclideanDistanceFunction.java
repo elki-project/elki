@@ -116,7 +116,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
 
   @Override
   public double doubleNorm(NumberVector<?> v) {
-    return Math.pow(doublePreNorm(v, 0, v.getDimensionality(), 0.), invp);
+    return Math.sqrt(doublePreNorm(v, 0, v.getDimensionality(), 0.));
   }
 
   @Override
