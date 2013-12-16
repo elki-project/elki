@@ -44,10 +44,10 @@ public class LoadALOI {
     try {
       ListParameterization dbpar = new ListParameterization();
       // Input file
-      dbpar.addParameter(FileBasedDatabaseConnection.INPUT_ID, folder + "aloi-" + variant + ".csv.gz");
+      dbpar.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, folder + "aloi-" + variant + ".csv.gz");
       // Index
       if (index) {
-        dbpar.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+        dbpar.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
         dbpar.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, "10000");
         dbpar.addParameter(AbstractRStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
       }
@@ -64,14 +64,14 @@ public class LoadALOI {
     try {
       ListParameterization dbpar = new ListParameterization();
       // Input file
-      dbpar.addParameter(FileBasedDatabaseConnection.INPUT_ID, folder + "outlier/aloi-" + variant + ".csv.gz");
+      dbpar.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, folder + "outlier/aloi-" + variant + ".csv.gz");
       ArrayList<Object> filters = new ArrayList<>();
       filters.add(ClassLabelFilter.class);
-      dbpar.addParameter(AbstractDatabaseConnection.FILTERS_ID, filters);
-      dbpar.addParameter(ClassLabelFilter.CLASS_LABEL_INDEX_ID, "2");
+      dbpar.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, filters);
+      dbpar.addParameter(ClassLabelFilter.Parameterizer.CLASS_LABEL_INDEX_ID, "2");
       // Index
       if (index) {
-        dbpar.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+        dbpar.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
         dbpar.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, "16384");
         dbpar.addParameter(AbstractRStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
       }

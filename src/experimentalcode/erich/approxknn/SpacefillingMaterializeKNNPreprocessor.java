@@ -204,7 +204,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
       KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
       O vec = relation.get(iditer);
       for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-        heap.add(distanceQuery.distance(vec, iter), iter);
+        heap.insert(distanceQuery.distance(vec, iter), iter);
         distc++;
       }
 

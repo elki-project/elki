@@ -229,9 +229,9 @@ public class SpacefillingKNNExperiment {
     try {
       ListParameterization dbpar = new ListParameterization();
       // Input file
-      dbpar.addParameter(FileBasedDatabaseConnection.INPUT_ID, "/nfs/multimedia/images/ALOI/ColorHistograms/aloi-hsb-7x2x2.csv.gz");
+      dbpar.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, "/nfs/multimedia/images/ALOI/ColorHistograms/aloi-hsb-7x2x2.csv.gz");
       // Index
-      dbpar.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+      dbpar.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
       dbpar.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, "10000");
       // Instantiate
       Database db = ClassGenericsUtil.tryInstantiate(Database.class, StaticArrayDatabase.class, dbpar);

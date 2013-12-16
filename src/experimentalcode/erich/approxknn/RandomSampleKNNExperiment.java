@@ -222,15 +222,15 @@ public class RandomSampleKNNExperiment {
     try {
       ListParameterization dbpar = new ListParameterization();
       // Input file
-      dbpar.addParameter(FileBasedDatabaseConnection.INPUT_ID, "/nfs/multimedia/images/ALOI/ColorHistograms/outlier/aloi-27d-75000-max4-tot717.csv.gz");
+      dbpar.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, "/nfs/multimedia/images/ALOI/ColorHistograms/outlier/aloi-27d-75000-max4-tot717.csv.gz");
       // Index
-      dbpar.addParameter(StaticArrayDatabase.INDEX_ID, "tree.spatial.rstarvariants.rstar.RStarTreeFactory");
+      dbpar.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, "tree.spatial.rstarvariants.rstar.RStarTreeFactory");
       dbpar.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, "10000");
       // Class label filter
       List<Object> list = new ArrayList<>(1);
       list.add(ClassLabelFilter.class);
-      dbpar.addParameter(AbstractDatabaseConnection.FILTERS_ID, list);
-      dbpar.addParameter(ClassLabelFilter.CLASS_LABEL_INDEX_ID, 2);
+      dbpar.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, list);
+      dbpar.addParameter(ClassLabelFilter.Parameterizer.CLASS_LABEL_INDEX_ID, 2);
       // Instantiate
       Database db = ClassGenericsUtil.tryInstantiate(Database.class, StaticArrayDatabase.class, dbpar);
       db.initialize();

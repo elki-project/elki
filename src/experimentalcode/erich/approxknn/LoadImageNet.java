@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
@@ -65,11 +66,11 @@ public class LoadImageNet {
       ListParameterization dbpar = new ListParameterization();
       // Index for full-dimensional query
       if(index) {
-        dbpar.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+        dbpar.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
         dbpar.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, "10000");
         dbpar.addParameter(AbstractRStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
       }
-      dbpar.addParameter(Database.DATABASE_CONNECTION_ID, new MergingDBC(basedir + variant));
+      dbpar.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, new MergingDBC(basedir + variant));
       // Instantiate
       Database db = ClassGenericsUtil.tryInstantiate(Database.class, StaticArrayDatabase.class, dbpar);
       db.initialize();

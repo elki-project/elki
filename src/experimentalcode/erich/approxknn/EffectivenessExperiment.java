@@ -156,7 +156,7 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
             if (truedist > 0 && cands.size() >= k) {
               DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.ZERO_DISTANCE, k);
               for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-                heap.add(distanceFunction.doubleDistance(vec, rel.get(iter)), id);
+                heap.insert(distanceFunction.doubleDistance(vec, rel.get(iter)), id);
               }
               kdistmv[varnum].put((heap.doubleKNNDistance() - truedist) / truedist);
             } else {
@@ -175,7 +175,7 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
             if (truedist > 0 && cands.size() >= k) {
               DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.ZERO_DISTANCE, k);
               for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-                heap.add(distanceFunction.doubleDistance(vec, rel.get(iter)), id);
+                heap.insert(distanceFunction.doubleDistance(vec, rel.get(iter)), id);
               }
               kdistmv[varnum].put((heap.doubleKNNDistance() - truedist) / truedist);
             } else {

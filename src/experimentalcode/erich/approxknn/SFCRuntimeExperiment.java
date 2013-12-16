@@ -104,7 +104,7 @@ public class SFCRuntimeExperiment extends AbstractSFCExperiment {
       DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.ZERO_DISTANCE, k);
       NumberVector<?> qo = rel.get(id);
       for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-        heap.add(distanceFunction.doubleDistance(qo, rel.get(iter)), id);
+        heap.insert(distanceFunction.doubleDistance(qo, rel.get(iter)), id);
       }
     }
     qtime.end();

@@ -376,7 +376,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       KNNHeap<D> heap = DBIDUtil.newHeap(distq.getDistanceFactory(), k);
       final O vec = relation.get(id);
       for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-        heap.add(distq.distance(vec, iter), iter);
+        heap.insert(distq.distance(vec, iter), iter);
         distc++;
       }
       mean.put(distc / (double) k);
