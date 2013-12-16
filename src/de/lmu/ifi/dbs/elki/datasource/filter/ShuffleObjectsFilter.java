@@ -76,7 +76,7 @@ public class ShuffleObjectsFilter implements ObjectFilter {
     if (LOG.isDebugging()) {
       LOG.debug("Shuffling the data set");
     }
-    final Random random = rnd.getRandom();
+    final Random random = rnd.getSingleThreadedRandom();
 
     final int size = objects.dataLength();
     final int[] offsets = new int[size];

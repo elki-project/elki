@@ -141,7 +141,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
 
   public OutlierResult run(Database database, Relation<O> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    final Random random = rnd.getRandom();
+    final Random random = rnd.getSingleThreadedRandom();
     FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("Build aLOCI quadtress", g, LOG) : null;
 
     // Compute extend of dataset.

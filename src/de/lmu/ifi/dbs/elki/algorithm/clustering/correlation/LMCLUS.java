@@ -163,7 +163,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters found", LOG) : null;
     ModifiableDBIDs unclustered = DBIDUtil.newHashSet(relation.getDBIDs());
-    Random r = rnd.getRandom();
+    Random r = rnd.getSingleThreadedRandom();
 
     final int maxdim = Math.min(maxLMDim, RelationUtil.dimensionality(relation));
     int cnum = 0;

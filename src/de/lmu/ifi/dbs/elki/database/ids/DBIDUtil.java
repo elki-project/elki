@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.UnsafeRandom;
 
 /**
  * DBID Utility functions.
@@ -577,7 +578,7 @@ public final class DBIDUtil {
    * @param rnd Random generator
    */
   public static void randomShuffle(ArrayModifiableDBIDs ids, RandomFactory rnd) {
-    randomShuffle(ids, rnd.getRandom(), ids.size());
+    randomShuffle(ids, rnd.getSingleThreadedRandom(), ids.size());
   }
 
   /**
@@ -642,7 +643,7 @@ public final class DBIDUtil {
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, RandomFactory rnd) {
-    return randomSample(source, k, rnd.getRandom());
+    return randomSample(source, k, rnd.getSingleThreadedRandom());
   }
 
   /**
@@ -658,8 +659,9 @@ public final class DBIDUtil {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
     if (random == null) {
-      random = new Random();
+      random = new UnsafeRandom(); // Fast, and we're single-threaded here anyway.
     }
+    
     // TODO: better balancing for different sizes
     // Two methods: constructive vs. destructive
     if (k < source.size() >> 1) {
@@ -690,7 +692,7 @@ public final class DBIDUtil {
    * @param rnd Random generator
    */
   public static ArrayDBIDs[] randomSplit(DBIDs ids, int p, RandomFactory rnd) {
-    return randomSplit(ids, p, rnd.getRandom());
+    return randomSplit(ids, p, rnd.getSingleThreadedRandom());
   }
 
   /**
@@ -701,6 +703,9 @@ public final class DBIDUtil {
    * @param random Random generator
    */
   public static ArrayDBIDs[] randomSplit(DBIDs oids, int p, Random random) {
+    if (random == null) {
+      random = new UnsafeRandom(); // Fast, and we're single-threaded here anyway.
+    }
     ArrayModifiableDBIDs ids = newArray(oids);
     final int size = ids.size();
     ArrayDBIDs[] split = new ArrayDBIDs[p];

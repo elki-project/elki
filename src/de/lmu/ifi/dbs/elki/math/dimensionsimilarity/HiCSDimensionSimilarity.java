@@ -112,7 +112,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
 
   @Override
   public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
-    final Random random = rnd.getRandom();
+    final Random random = rnd.getSingleThreadedRandom();
     final int dim = matrix.size();
 
     // FIXME: only compute indexes necessary.

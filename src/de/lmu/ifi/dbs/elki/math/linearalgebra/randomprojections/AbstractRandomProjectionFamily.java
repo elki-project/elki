@@ -51,7 +51,7 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
    */
   public AbstractRandomProjectionFamily(RandomFactory random) {
     super();
-    this.random = random.getRandom();
+    this.random = random.getSingleThreadedRandom();
   }
 
   /**

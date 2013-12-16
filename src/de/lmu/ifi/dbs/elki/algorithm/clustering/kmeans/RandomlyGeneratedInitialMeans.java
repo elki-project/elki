@@ -60,7 +60,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
     NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
     List<V> means = new ArrayList<>(k);
-    final Random random = rnd.getRandom();
+    final Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < k; i++) {
       double[] r = MathUtil.randomDoubleArray(dim, random);
       // Rescale

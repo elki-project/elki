@@ -89,7 +89,7 @@ public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHas
   public ArrayList<? extends LocalitySensitiveHashFunction<? super NumberVector<?>>> generateHashFunctions(Relation<? extends NumberVector<?>> relation, int l) {
     int dim = RelationUtil.dimensionality(relation);
     ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(l);
-    final Random rnd = random.getRandom();
+    final Random rnd = random.getSingleThreadedRandom();
     for(int i = 0; i < l; i++) {
       RandomProjectionFamily.Projection mat = proj.generateProjection(dim, k);
       ps.add(new MultipleProjectionsLocalitySensitiveHashFunction(mat, width, rnd));

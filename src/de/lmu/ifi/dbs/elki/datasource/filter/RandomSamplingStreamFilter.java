@@ -59,7 +59,7 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
   public RandomSamplingStreamFilter(double prob, RandomFactory rnd) {
     super();
     this.prob = prob;
-    this.random = rnd.getRandom();
+    this.random = rnd.getSingleThreadedRandom();
   }
 
   @Override

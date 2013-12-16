@@ -86,4 +86,18 @@ public class RandomFactory {
       return new Random();
     }
   }
+
+  /**
+   * Get a <em>non-threadsafe</em> random generator.
+   * 
+   * @return Random generator
+   */
+  public Random getSingleThreadedRandom() {
+    if(seed != null) {
+      return new UnsafeRandom(seed.longValue());
+    }
+    else {
+      return new UnsafeRandom();
+    }
+  }
 }
