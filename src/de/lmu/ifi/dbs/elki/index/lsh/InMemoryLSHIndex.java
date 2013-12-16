@@ -296,7 +296,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
           final D dist = distanceQuery.distance(obj, iter);
           super.incRefinements(1);
-          heap.add(dist, iter);
+          heap.insert(dist, iter);
         }
         return heap.toKNNList();
       }

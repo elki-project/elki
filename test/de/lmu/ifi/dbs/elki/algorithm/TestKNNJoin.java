@@ -80,10 +80,10 @@ public class TestKNNJoin implements JUnit4Test {
   @Test
   public void testLinearScan() {
     ListParameterization inputparams = new ListParameterization();
-    inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
     List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
-    inputparams.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
-    inputparams.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
+    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.FILTERS_ID, filters);
+    inputparams.addParameter(FixedDBIDsFilter.Parameterizer.IDSTART_ID, 1);
 
     // get database
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);
@@ -130,7 +130,7 @@ public class TestKNNJoin implements JUnit4Test {
   @Test
   public void testKNNJoinRtreeMini() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 200);
 
     doKNNJoin(spatparams);
@@ -144,7 +144,7 @@ public class TestKNNJoin implements JUnit4Test {
   @Test
   public void testKNNJoinRtreeMaxi() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 2000);
 
     doKNNJoin(spatparams);
@@ -158,7 +158,7 @@ public class TestKNNJoin implements JUnit4Test {
   @Test
   public void testKNNJoinDeLiCluTreeMini() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, DeLiCluTreeFactory.class);
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, DeLiCluTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 200);
 
     doKNNJoin(spatparams);
@@ -171,10 +171,10 @@ public class TestKNNJoin implements JUnit4Test {
    * @throws ParameterException
    */
   void doKNNJoin(ListParameterization inputparams) {
-    inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
     List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
-    inputparams.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filters);
-    inputparams.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
+    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.FILTERS_ID, filters);
+    inputparams.addParameter(FixedDBIDsFilter.Parameterizer.IDSTART_ID, 1);
 
     // get database
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);

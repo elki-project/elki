@@ -82,6 +82,7 @@ public class StringParser implements Parser {
     int lineNumber = 0;
     List<String> data = new ArrayList<>();
     List<LabelList> labels = new ArrayList<>();
+    ArrayList<String> ll = new ArrayList<>(1);
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
@@ -90,9 +91,9 @@ public class StringParser implements Parser {
         }
         final String val = trimWhitespace ? line.trim() : line;
         data.add(val);
-        LabelList ll = new LabelList(1);
+        ll.clear();
         ll.add(val);
-        labels.add(ll);
+        labels.add(LabelList.make(ll));
       }
     } catch (IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");

@@ -152,7 +152,7 @@ public class TestOnlineLOF implements JUnit4Test {
    */
   private static UpdatableDatabase getDatabase() {
     ListParameterization params = new ListParameterization();
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
 
     UpdatableDatabase db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, params);
     params.failOnErrors();

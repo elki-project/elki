@@ -106,7 +106,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector<?>> exten
   protected void parseLineInternal(String line) {
     // Split into numerical attributes and labels
     attributes.reset();
-    LabelList labels = null;
+    labels.clear();
 
     int i = 0;
     for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance(), i++) {
@@ -132,15 +132,12 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector<?>> exten
         }
       }
       // Else: labels.
-      if(labels == null) {
-        labels = new LabelList(Math.max(1, labelcolumns.size()));
-        haslabels = true;
-      }
+      haslabels = true;
       labels.add(tokenizer.getSubstring());
     }
     // Pass outside via class variables
     curvec = createDBObject(attributes, ArrayLikeUtil.TDOUBLELISTADAPTER);
-    curlbl = labels;
+    curlbl = LabelList.make(labels);
   }
 
   @Override

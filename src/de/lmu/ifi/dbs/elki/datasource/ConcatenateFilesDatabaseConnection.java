@@ -162,7 +162,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileListParameter filesP = new FileListParameter(FileBasedDatabaseConnection.INPUT_ID, FilesType.INPUT_FILES);
+      FileListParameter filesP = new FileListParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, FilesType.INPUT_FILES);
       if (config.grab(filesP)) {
         files = filesP.getValue();
       }

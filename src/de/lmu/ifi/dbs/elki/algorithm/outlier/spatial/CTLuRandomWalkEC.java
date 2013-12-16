@@ -149,7 +149,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
           }
           final double e;
           final D distance = distFunc.distance(id, n);
-          heap.add(distance, n);
+          heap.insert(distance, n);
           double dist = distance.doubleValue();
           if(dist == 0) {
             LOG.warning("Zero distances are not supported - skipping: " + DBIDUtil.toString(id) + " " + DBIDUtil.toString(n));

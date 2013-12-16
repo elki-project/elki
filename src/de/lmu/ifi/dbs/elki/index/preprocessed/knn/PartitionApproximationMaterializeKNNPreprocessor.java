@@ -117,12 +117,12 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
           D d = cache.remove(key);
           if(d != null) {
             // consume the previous result.
-            kNN.add(d, iter2);
+            kNN.insert(d, iter2);
           }
           else {
             // compute new and store the previous result.
             d = distanceQuery.distance(iter, iter2);
-            kNN.add(d, iter2);
+            kNN.insert(d, iter2);
             // put it into the cache, but with the keys reversed
             key = DBIDUtil.newPair(iter2, iter);
             cache.put(key, d);

@@ -56,7 +56,7 @@ public class TestRelationSorting implements JUnit4Test {
   @Test
   public void testSorting() {
     ListParameterization params = new ListParameterization();
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
+    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, filename);
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
     if (params.hasUnusedParameters()) {
       fail("Unused parameters: " + params.getRemainingParameters());

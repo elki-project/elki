@@ -97,7 +97,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    */
   protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
     org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
+    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, filename);
 
     List<Class<?>> filterlist = new ArrayList<>();
     filterlist.add(FixedDBIDsFilter.class);
@@ -106,8 +106,8 @@ public abstract class AbstractSimpleAlgorithmTest {
         filterlist.add(filter);
       }
     }
-    params.addParameter(FileBasedDatabaseConnection.FILTERS_ID, filterlist);
-    params.addParameter(FixedDBIDsFilter.IDSTART_ID, 1);
+    params.addParameter(FileBasedDatabaseConnection.Parameterizer.FILTERS_ID, filterlist);
+    params.addParameter(FixedDBIDsFilter.Parameterizer.IDSTART_ID, 1);
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
 
     testParameterizationOk(params);

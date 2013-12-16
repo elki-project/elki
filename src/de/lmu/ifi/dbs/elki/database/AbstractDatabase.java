@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
@@ -66,14 +67,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @apiviz.has IndexFactory
  */
 public abstract class AbstractDatabase extends AbstractHierarchicalResult implements Database {
-  /**
-   * Parameter to specify the indexes to use.
-   * <p>
-   * Key: {@code -db.index}
-   * </p>
-   */
-  public static final OptionID INDEX_ID = new OptionID("db.index", "Database indexes to add.");
-
   /**
    * The event manager, collects events and fires them on demand.
    */
@@ -126,12 +119,13 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     try {
       // Build an object package
       SingleObjectBundle ret = new SingleObjectBundle();
-      for (Relation<?> relation : relations) {
+      for(Relation<?> relation : relations) {
         ret.append(relation.getDataTypeInformation(), relation.get(id));
       }
       return ret;
-    } catch (RuntimeException e) {
-      if (id == null) {
+    }
+    catch(RuntimeException e) {
+      if(id == null) {
         throw new UnsupportedOperationException("AbstractDatabase.getPackage(null) called!");
       }
       // throw e upwards.
@@ -148,13 +142,13 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   @Override
   public <O> Relation<O> getRelation(TypeInformation restriction, Object... hints) throws NoSupportedDataTypeException {
     // Get first match
-    for (Relation<?> relation : relations) {
-      if (restriction.isAssignableFromType(relation.getDataTypeInformation())) {
+    for(Relation<?> relation : relations) {
+      if(restriction.isAssignableFromType(relation.getDataTypeInformation())) {
         return (Relation<O>) relation;
       }
     }
     List<TypeInformation> types = new ArrayList<>(relations.size());
-    for (Relation<?> relation : relations) {
+    for(Relation<?> relation : relations) {
       types.add(relation.getDataTypeInformation());
     }
     throw new NoSupportedDataTypeException(restriction, types);
@@ -162,7 +156,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   @Override
   public <O, D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
-    if (distanceFunction == null) {
+    if(distanceFunction == null) {
       throw new AbortException("Distance query requested for 'null' distance!");
     }
     return distanceFunction.instantiate(objQuery);
@@ -170,7 +164,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   @Override
   public <O, D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(Relation<O> objQuery, SimilarityFunction<? super O, D> similarityFunction, Object... hints) {
-    if (similarityFunction == null) {
+    if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
     return similarityFunction.instantiate(objQuery);
@@ -178,28 +172,28 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   @Override
   public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if (distanceQuery == null) {
+    if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
     ListIterator<Index> iter = indexes.listIterator(indexes.size());
-    while (iter.hasPrevious()) {
+    while(iter.hasPrevious()) {
       Index idx = iter.previous();
-      if (idx instanceof KNNIndex) {
-        if (getLogger().isDebuggingFinest()) {
+      if(idx instanceof KNNIndex) {
+        if(getLogger().isDebuggingFinest()) {
           getLogger().debugFinest("Considering index for kNN Query: " + idx);
         }
         @SuppressWarnings("unchecked")
         final KNNIndex<O> knnIndex = (KNNIndex<O>) idx;
         KNNQuery<O, D> q = knnIndex.getKNNQuery(distanceQuery, hints);
-        if (q != null) {
+        if(q != null) {
           return q;
         }
       }
     }
 
     // Default
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -208,28 +202,28 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   @Override
   public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if (distanceQuery == null) {
+    if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
     ListIterator<Index> iter = indexes.listIterator(indexes.size());
-    while (iter.hasPrevious()) {
+    while(iter.hasPrevious()) {
       Index idx = iter.previous();
-      if (idx instanceof RangeIndex) {
-        if (getLogger().isDebuggingFinest()) {
+      if(idx instanceof RangeIndex) {
+        if(getLogger().isDebuggingFinest()) {
           getLogger().debugFinest("Considering index for range query: " + idx);
         }
         @SuppressWarnings("unchecked")
         final RangeIndex<O> rangeIndex = (RangeIndex<O>) idx;
         RangeQuery<O, D> q = rangeIndex.getRangeQuery(distanceQuery, hints);
-        if (q != null) {
+        if(q != null) {
           return q;
         }
       }
     }
 
     // Default
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
     }
@@ -238,20 +232,20 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   @Override
   public <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if (distanceQuery == null) {
+    if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
     ListIterator<Index> iter = indexes.listIterator(indexes.size());
-    while (iter.hasPrevious()) {
+    while(iter.hasPrevious()) {
       Index idx = iter.previous();
-      if (idx instanceof RKNNIndex) {
-        if (getLogger().isDebuggingFinest()) {
+      if(idx instanceof RKNNIndex) {
+        if(getLogger().isDebuggingFinest()) {
           getLogger().debugFinest("Considering index for RkNN Query: " + idx);
         }
         @SuppressWarnings("unchecked")
         final RKNNIndex<O> rknnIndex = (RKNNIndex<O>) idx;
         RKNNQuery<O, D> q = rknnIndex.getRKNNQuery(distanceQuery, hints);
-        if (q != null) {
+        if(q != null) {
           return q;
         }
       }
@@ -259,11 +253,11 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
     Integer maxk = null;
     // Default
-    for (Object hint : hints) {
-      if (hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
-      if (hint instanceof Integer) {
+      if(hint instanceof Integer) {
         maxk = (Integer) hint;
       }
     }
@@ -301,5 +295,39 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     return "database";
   }
 
+  /**
+   * Get the class logger.
+   * 
+   * @return Class logger
+   */
   protected abstract Logging getLogger();
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   */
+  public abstract static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Option to specify the data source for the database.
+     * 
+     * Key:
+     * <p>
+     * {@code -dbc}
+     * </p>
+     */
+    public static final OptionID DATABASE_CONNECTION_ID = new OptionID("dbc", "Database connection class.");
+
+    /**
+     * Parameter to specify the indexes to use.
+     * <p>
+     * Key: {@code -db.index}
+     * </p>
+     */
+    public static final OptionID INDEX_ID = new OptionID("db.index", "Database indexes to add.");
+
+    @Override
+    protected abstract Database makeInstance();
+  }
 }

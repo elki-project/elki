@@ -53,22 +53,6 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
   public static final String LABEL_CONCATENATION = " ";
 
   /**
-   * Filters to apply to the input data.
-   * <p>
-   * Key: {@code -dbc.filter}
-   * </p>
-   */
-  public static final OptionID FILTERS_ID = new OptionID("dbc.filter", "The filters to apply to the input data.");
-
-  /**
-   * Parameter to specify the parser to provide a database.
-   * <p>
-   * Key: {@code -dbc.parser}
-   * </p>
-   */
-  public static final OptionID PARSER_ID = new OptionID("dbc.parser", "Parser to provide the database.");
-
-  /**
    * The filters to invoke
    */
   protected List<ObjectFilter> filters;
@@ -183,6 +167,22 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Filters to apply to the input data.
+     * <p>
+     * Key: {@code -dbc.filter}
+     * </p>
+     */
+    public static final OptionID FILTERS_ID = new OptionID("dbc.filter", "The filters to apply to the input data.");
+
+    /**
+     * Parameter to specify the parser to provide a database.
+     * <p>
+     * Key: {@code -dbc.parser}
+     * </p>
+     */
+    public static final OptionID PARSER_ID = new OptionID("dbc.parser", "Parser to provide the database.");
+
     /**
      * Filters
      */

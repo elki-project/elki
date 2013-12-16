@@ -133,8 +133,8 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
    */
   private Object[] parseLine(String line) {
     ExternalID eid = null;
-    LabelList labels = null;
     List<Polygon> polys = new ArrayList<>(1);
+    ArrayList<String> labels = new ArrayList<>(); // TODO: reuse?
 
     List<Vector> coords = new ArrayList<>();
     for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
@@ -172,10 +172,6 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
         eid = new ExternalID(cur);
       }
       else {
-        // Label
-        if(labels == null) {
-          labels = new LabelList(1);
-        }
         labels.add(cur);
       }
     }
@@ -183,7 +179,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     if(coords.size() > 0) {
       polys.add(new Polygon(coords));
     }
-    return new Object[] { new PolygonsObject(polys), labels, eid };
+    return new Object[] { new PolygonsObject(polys), LabelList.make(labels), eid };
   }
 
   @Override

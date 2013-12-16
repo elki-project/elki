@@ -67,7 +67,7 @@ public class TestClusterContingencyTable implements JUnit4Test {
   public void testCompareDatabases() {
     ListParameterization params = new ListParameterization();
     // Input
-    params.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
 
     // get database
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);

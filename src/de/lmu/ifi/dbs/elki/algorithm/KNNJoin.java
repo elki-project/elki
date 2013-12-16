@@ -297,9 +297,9 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
         for(int i = 0; i < pr.getNumEntries(); i++) {
           final SpatialPointLeafEntry r_e = (SpatialPointLeafEntry) pr.getEntry(i);
           D distance = distFunction.minDist(s_e, r_e);
-          pr_heaps.get(i).add(distance, s_id);
+          pr_heaps.get(i).insert(distance, s_id);
           if(pr != ps && ps_heaps != null) {
-            ps_heaps.get(j).add(distance, r_e.getDBID());
+            ps_heaps.get(j).insert(distance, r_e.getDBID());
           }
         }
       }
@@ -324,9 +324,9 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
       for(int i = 0; i < pr.getNumEntries(); i++) {
         final SpatialPointLeafEntry r_e = (SpatialPointLeafEntry) pr.getEntry(i);
         double distance = df.doubleMinDist(s_e, r_e);
-        pr_heaps.get(i).add(distance, s_id);
+        pr_heaps.get(i).insert(distance, s_id);
         if(pr != ps && ps_heaps != null) {
-          ps_heaps.get(j).add(distance, r_e.getDBID());
+          ps_heaps.get(j).insert(distance, r_e.getDBID());
         }
       }
     }

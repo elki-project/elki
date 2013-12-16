@@ -178,7 +178,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
   public String toString() {
     Bit[] bitArray = new Bit[dimensionality];
     for (int i = 0; i < dimensionality; i++) {
-      bitArray[i] = new Bit(bits.get(i));
+      bitArray[i] = bits.get(i) ? Bit.TRUE : Bit.FALSE;
     }
     StringBuilder representation = new StringBuilder();
     for (Bit bit : bitArray) {

@@ -42,14 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public class FixedDBIDsFilter extends AbstractStreamFilter {
   /**
-   * Optional parameter to specify the first object ID to use.
-   * <p>
-   * Key: {@code -dbc.startid}
-   * </p>
-   */
-  public static final OptionID IDSTART_ID = new OptionID("dbc.startid", "Object ID to start counting with");
-
-  /**
    * The filtered meta
    */
   BundleMeta meta;
@@ -109,6 +101,13 @@ public class FixedDBIDsFilter extends AbstractStreamFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Optional parameter to specify the first object ID to use.
+     * <p>
+     * Key: {@code -dbc.startid}
+     * </p>
+     */
+    public static final OptionID IDSTART_ID = new OptionID("dbc.startid", "Object ID to start counting with");
     int startid = -1;
 
     @Override

@@ -219,7 +219,7 @@ public class VisualizerParameterizer implements Parameterizable {
       if(setting.second.equals(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
         distance = setting.second.getValue().toString();
       }
-      if(setting.second.equals(FileBasedDatabaseConnection.INPUT_ID)) {
+      if(setting.second.equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID)) {
         dataset = setting.second.getValue().toString();
       }
     }

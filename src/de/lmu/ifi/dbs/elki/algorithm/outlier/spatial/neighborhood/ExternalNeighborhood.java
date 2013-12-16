@@ -161,8 +161,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
           if(olq != null) {
             LabelList label = olq.get(iditer);
             if(label != null) {
-              for(String lbl : label) {
-                lblmap.put(lbl, DBIDUtil.deref(iditer));
+              for(int i = 0; i < label.size(); i++) {
+                lblmap.put(label.get(i), DBIDUtil.deref(iditer));
               }
             }
           }

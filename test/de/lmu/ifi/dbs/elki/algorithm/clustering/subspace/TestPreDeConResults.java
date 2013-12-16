@@ -58,7 +58,7 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
   public void testPreDeConResults() {
     // Additional input parameters
     ListParameterization inp = new ListParameterization();
-    inp.addParameter(ClassLabelFilter.CLASS_LABEL_INDEX_ID, 1);
+    inp.addParameter(ClassLabelFilter.Parameterizer.CLASS_LABEL_INDEX_ID, 1);
     Class<?>[] filters = new Class<?>[] { ClassLabelFilter.class };
     Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp, filters);
 

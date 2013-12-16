@@ -107,7 +107,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testMetrical() {
     ListParameterization metparams = new ListParameterization();
-    metparams.addParameter(StaticArrayDatabase.INDEX_ID, MTreeFactory.class);
+    metparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, MTreeFactory.class);
     metparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(metparams, DoubleDistanceMetricalIndexKNNQuery.class, DoubleDistanceMetricalIndexRangeQuery.class);
   }
@@ -118,7 +118,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testRStarTree() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
   }
@@ -129,7 +129,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testVAFile() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, VAFile.Factory.class);
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, VAFile.Factory.class);
     spatparams.addParameter(VAFile.Factory.PARTITIONS_ID, 4);
     testFileBasedDatabaseConnection(spatparams, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
   }
@@ -140,7 +140,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testPartialVAFile() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, PartialVAFile.Factory.class);
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, PartialVAFile.Factory.class);
     spatparams.addParameter(PartialVAFile.Factory.PARTITIONS_ID, 4);
     testFileBasedDatabaseConnection(spatparams, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
   }
@@ -153,7 +153,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testRStarTreeFast() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
     spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
@@ -180,7 +180,7 @@ public class TestIndexStructures implements JUnit4Test {
    * @param inputparams
    */
   void testFileBasedDatabaseConnection(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
-    inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
+    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
 
     // get database
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);

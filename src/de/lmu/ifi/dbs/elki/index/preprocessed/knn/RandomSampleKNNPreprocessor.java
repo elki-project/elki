@@ -109,7 +109,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
       DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rnd);
       for(DBIDIter iter2 = rsamp.iter(); iter2.valid(); iter2.advance()) {
         D dist = distanceQuery.distance(iter, iter2);
-        kNN.add(dist, iter2);
+        kNN.insert(dist, iter2);
       }
 
       storage.put(iter, kNN.toKNNList());

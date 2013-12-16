@@ -82,13 +82,14 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
     try {
       List<BitSet> bitSets = new ArrayList<>();
       List<LabelList> allLabels = new ArrayList<>();
+      ArrayList<String> labels = new ArrayList<>();
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
         if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
         }
         BitSet bitSet = new BitSet();
-        LabelList labels = null;
+        labels.clear();
 
         for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
           try {
@@ -97,23 +98,18 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
             dimensionality = Math.max(dimensionality, index);
           }
           catch(NumberFormatException e) {
-            if(labels == null) {
-              labels = new LabelList(1);
-            }
             labels.add(tokenizer.getSubstring());
           }
         }
 
         bitSets.add(bitSet);
-        allLabels.add(labels);
+        allLabels.add(LabelList.make(labels));
       }
 
-      dimensionality++;
+      ++dimensionality;
       for(int i = 0; i < bitSets.size(); i++) {
-        BitSet bitSet = bitSets.get(i);
-        LabelList labels = allLabels.get(i);
-        vectors.add(new BitVector(bitSet, dimensionality));
-        lblc.add(labels);
+        vectors.add(new BitVector(bitSets.get(i), dimensionality));
+        lblc.add(allLabels.get(i));
       }
     }
     catch(IOException e) {

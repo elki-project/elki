@@ -28,6 +28,7 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.regex.Pattern;
 
@@ -88,6 +89,11 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
   TIntDoubleHashMap values = new TIntDoubleHashMap();
 
   /**
+   * (Reused) label buffer.
+   */
+  ArrayList<String> labels = new ArrayList<>();
+  
+  /**
    * Constructor.
    * 
    * @param normalize Normalize
@@ -107,7 +113,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
   protected void parseLineInternal(String line) {
     double len = 0;
     values.clear();
-    LabelList labels = null;
+    labels.clear();
 
     String curterm = null;
     for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
@@ -129,9 +135,6 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
         }
         catch(NumberFormatException e) {
           if(curterm != null) {
-            if(labels == null) {
-              labels = new LabelList(1);
-            }
             labels.add(curterm);
           }
           curterm = tokenizer.getSubstring();
@@ -139,9 +142,6 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
       }
     }
     if(curterm != null) {
-      if(labels == null) {
-        labels = new LabelList(1);
-      }
       labels.add(curterm);
     }
     if(normalize) {
@@ -154,7 +154,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
     }
 
     curvec = sparsefactory.newNumberVector(values, numterms);
-    curlbl = labels;
+    curlbl = LabelList.make(labels);
   }
 
   @Override
