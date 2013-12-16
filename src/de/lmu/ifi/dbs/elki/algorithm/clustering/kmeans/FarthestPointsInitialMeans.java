@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  */
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -74,7 +73,7 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
   @Override
   public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
     // Get a distance query
-    if (!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
+    if(!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
       throw new AbortException("Farthest points K-Means initialization can only be used with numerical distances.");
     }
     @SuppressWarnings("unchecked")
@@ -84,26 +83,25 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     // Chose first mean
     List<V> means = new ArrayList<>(k);
 
-    Random random = rnd.getRandom();
-    DBIDIter first = DBIDUtil.randomSample(relation.getDBIDs(), 1, new Random(random.nextLong())).iter();
+    DBIDIter first = DBIDUtil.randomSample(relation.getDBIDs(), 1, rnd).iter();
     means.add(relation.get(first));
 
     DBIDVar best = DBIDUtil.newVar(first);
-    for (int i = (dropfirst ? 0 : 1); i < k; i++) {
+    for(int i = (dropfirst ? 0 : 1); i < k; i++) {
       // Find farthest object:
       double maxdist = Double.NEGATIVE_INFINITY;
-      for (DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         double dsum = 0.;
-        for (V ex : means) {
+        for(V ex : means) {
           dsum += distQ.distance(ex, it).doubleValue();
         }
-        if (dsum > maxdist) {
+        if(dsum > maxdist) {
           maxdist = dsum;
           best.set(it);
         }
       }
       // Add new mean:
-      if (k == 0) {
+      if(k == 0) {
         means.clear(); // Remove temporary first element.
       }
       means.add(relation.get(best));
@@ -114,7 +112,7 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
 
   @Override
   public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distQ2) {
-    if (!(distQ2.getDistanceFactory() instanceof NumberDistance)) {
+    if(!(distQ2.getDistanceFactory() instanceof NumberDistance)) {
       throw new AbortException("Farthest points K-Means initialization can only be used with numerical distances.");
     }
     @SuppressWarnings("unchecked")
@@ -123,26 +121,25 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     // Chose first mean
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
-    Random random = rnd.getRandom();
-    DBIDIter first = DBIDUtil.randomSample(relation.getDBIDs(), 1, new Random(random.nextLong())).iter();
+    DBIDIter first = DBIDUtil.randomSample(relation.getDBIDs(), 1, rnd).iter();
     means.add(first);
 
     DBIDVar best = DBIDUtil.newVar(first);
-    for (int i = (dropfirst ? 0 : 1); i < k; i++) {
+    for(int i = (dropfirst ? 0 : 1); i < k; i++) {
       // Find farthest object:
       double maxdist = Double.NEGATIVE_INFINITY;
-      for (DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         double dsum = 0.;
-        for (DBIDIter ex = means.iter(); ex.valid(); ex.advance()) {
+        for(DBIDIter ex = means.iter(); ex.valid(); ex.advance()) {
           dsum += distQ.distance(ex, it).doubleValue();
         }
-        if (dsum > maxdist) {
+        if(dsum > maxdist) {
           maxdist = dsum;
           best.set(it);
         }
       }
       // Add new mean:
-      if (k == 0) {
+      if(k == 0) {
         means.clear(); // Remove temporary first element.
       }
       means.add(best);
@@ -173,7 +170,7 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag dropfirstP = new Flag(DROPFIRST_ID);
-      if (config.grab(dropfirstP)) {
+      if(config.grab(dropfirstP)) {
         dropfirst = dropfirstP.isTrue();
       }
     }

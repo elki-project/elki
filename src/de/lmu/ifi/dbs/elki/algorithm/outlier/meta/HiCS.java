@@ -174,7 +174,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     final DBIDs ids = relation.getDBIDs();
 
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation);
-    Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex, rnd.getRandom());
+    Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex, rnd.getSingleThreadedRandom());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Number of high-contrast subspaces: " + subspaces.size());

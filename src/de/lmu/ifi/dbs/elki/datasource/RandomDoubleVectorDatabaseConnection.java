@@ -86,7 +86,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     List<DoubleVector> vectors = new ArrayList<>(size);
 
     // Setup random generator
-    final Random rand = rnd.getRandom();
+    final Random rand = rnd.getSingleThreadedRandom();
 
     // Produce random vectors
     for(int i = 0; i < size; i++) {

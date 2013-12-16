@@ -75,7 +75,7 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
   public HistogramJitterFilter(double jitter, RandomFactory rnd) {
     super();
     this.jitter = jitter;
-    this.rnd = new ExponentialDistribution(1, rnd.getRandom());
+    this.rnd = new ExponentialDistribution(1, rnd.getSingleThreadedRandom());
   }
 
   @Override

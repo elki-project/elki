@@ -84,8 +84,8 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     // Chose first mean
     List<V> means = new ArrayList<>(k);
 
-    Random random = rnd.getRandom();
-    DBID first = DBIDUtil.deref(DBIDUtil.randomSample(relation.getDBIDs(), 1, new Random(random.nextLong())).iter());
+    Random random = rnd.getSingleThreadedRandom();
+    DBID first = DBIDUtil.deref(DBIDUtil.randomSample(relation.getDBIDs(), 1, random).iter());
     means.add(relation.get(first));
 
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
@@ -134,8 +134,8 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     // Chose first mean
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
-    Random random = rnd.getRandom();
-    DBID first = DBIDUtil.deref(DBIDUtil.randomSample(distQ.getRelation().getDBIDs(), 1, new Random(random.nextLong())).iter());
+    Random random = rnd.getSingleThreadedRandom();
+    DBID first = DBIDUtil.deref(DBIDUtil.randomSample(distQ.getRelation().getDBIDs(), 1, random).iter());
     means.add(first);
 
     ArrayDBIDs ids = DBIDUtil.ensureArray(distQ.getRelation().getDBIDs());

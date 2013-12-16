@@ -148,7 +148,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
     RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
-    final Random random = rnd.getRandom();
+    final Random random = rnd.getSingleThreadedRandom();
 
     if (RelationUtil.dimensionality(relation) < l) {
       throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + RelationUtil.dimensionality(relation) + " < " + l + ")");

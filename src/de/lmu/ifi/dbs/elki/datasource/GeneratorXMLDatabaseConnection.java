@@ -758,7 +758,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
       final RandomParameter rndP = new RandomParameter(RANDOMSEED_ID);
       if (config.grab(rndP)) {
         // TODO: use RandomFactory in cluster
-        clusterRandom = rndP.getValue().getRandom();
+        clusterRandom = rndP.getValue().getSingleThreadedRandom();
       }
     }
 

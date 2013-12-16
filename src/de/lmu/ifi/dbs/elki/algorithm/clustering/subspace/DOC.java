@@ -251,7 +251,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Inform the user about the progress in the current iteration.
     FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
 
-    Random random = rnd.getRandom();
+    Random random = rnd.getSingleThreadedRandom();
     DBIDArrayIter iter = S.iter();
 
     for(int i = 0; i < n; ++i) {
@@ -345,7 +345,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Inform the user about the progress in the current iteration.
     FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
 
-    Random random = rnd.getRandom();
+    Random random = rnd.getSingleThreadedRandom();
 
     DBIDArrayIter iter = S.iter();
     outer: for(int i = 0; i < n; ++i) {

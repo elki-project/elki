@@ -106,7 +106,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
    */
   void initializeRandomAttributes(SimpleTypeInformation<V> in) {
     int d = ((VectorFieldTypeInformation<V>) in).getDimensionality();
-    selectedAttributes = Util.randomBitSet(k, d, rnd.getRandom());
+    selectedAttributes = Util.randomBitSet(k, d, rnd.getSingleThreadedRandom());
   }
 
   /**

@@ -71,7 +71,7 @@ public class RandomSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMT
    */
   public RandomSplit(RandomFactory rnd) {
     super();
-    this.random = rnd.getRandom();
+    this.random = rnd.getSingleThreadedRandom();
   }
 
   /**
