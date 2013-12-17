@@ -29,27 +29,7 @@ import java.util.ConcurrentModificationException;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
- * Advanced priority queue class, based on a binary heap (for small sizes),
- * which will for larger heaps be accompanied by a 4-ary heap (attached below
- * the root of the two-ary heap, making the root actually 3-ary).
- * 
- * This code was automatically instantiated for the type: Integer
- * 
- * This combination was found to work quite well in benchmarks, but YMMV.
- * 
- * Some other observations from benchmarking:
- * <ul>
- * <li>Bulk loading did not improve things</li>
- * <li>Primitive heaps are substantially faster.</li>
- * <li>Since an array in Java has an overhead of 12 bytes, odd-sized object and
- * integer arrays are actually well aligned both for 2-ary and 4-ary heaps.</li>
- * <li>Workload makes a huge difference. A load-once, poll-until-empty priority
- * queue is something different than e.g. a top-k heap, which will see a lot of
- * top element replacements.</li>
- * <li>Random vs. increasing vs. decreasing vs. sawtooth insertion patterns for
- * top-k make a difference.</li>
- * <li>Different day, different benchmark results ...</li>
- * </ul>
+ * Binary heap for primitive types.
  * 
  * @author Erich Schubert
  * 
@@ -62,11 +42,6 @@ public class IntegerMaxHeap implements IntegerHeap {
   protected int[] twoheap;
 
   /**
-   * Extension heap.
-   */
-  protected int[] fourheap;
-
-  /**
    * Current size of heap.
    */
   protected int size;
@@ -77,27 +52,9 @@ public class IntegerMaxHeap implements IntegerHeap {
   protected int modCount = 0;
 
   /**
-   * Maximum size of the 2-ary heap. A complete 2-ary heap has (2^k-1) elements.
-   */
-  private final static int TWO_HEAP_MAX_SIZE = (1 << 9) - 1;
-
-  /**
    * Initial size of the 2-ary heap.
    */
   private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
-
-  /**
-   * Initial size of 4-ary heap when initialized.
-   * 
-   * 21 = 4-ary heap of height 2: 1 + 4 + 4*4
-   * 
-   * 85 = 4-ary heap of height 3: 21 + 4*4*4
-   * 
-   * 341 = 4-ary heap of height 4: 85 + 4*4*4*4
-   * 
-   * Since we last grew by 255 (to 511), let's use 341.
-   */
-  private final static int FOUR_HEAP_INITIAL_SIZE = 341;
 
   /**
    * Constructor, with default size.
@@ -107,9 +64,6 @@ public class IntegerMaxHeap implements IntegerHeap {
     int[] twoheap = new int[TWO_HEAP_INITIAL_SIZE];
 
     this.twoheap = twoheap;
-    this.fourheap = null;
-    this.size = 0;
-    this.modCount = 0;
   }
 
   /**
@@ -119,27 +73,16 @@ public class IntegerMaxHeap implements IntegerHeap {
    */
   public IntegerMaxHeap(int minsize) {
     super();
-    if (minsize < TWO_HEAP_MAX_SIZE) {
-      final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-      int[] twoheap = new int[size];
+    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
+    int[] twoheap = new int[size];
       
-      this.twoheap = twoheap;
-      this.fourheap = null;
-    } else {
-      int[] twoheap = new int[TWO_HEAP_INITIAL_SIZE];
-      int[] fourheap = new int[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
-      this.twoheap = twoheap;
-      this.fourheap = fourheap;
-    }
-    this.size = 0;
-    this.modCount = 0;
+    this.twoheap = twoheap;
   }
 
   @Override
   public void clear() {
     size = 0;
     ++modCount;
-    fourheap = null;
     Arrays.fill(twoheap, 0);
   }
 
@@ -157,29 +100,15 @@ public class IntegerMaxHeap implements IntegerHeap {
   public void add(int o) {
     final int co = o;
     // System.err.println("Add: " + o);
-    if (size < TWO_HEAP_MAX_SIZE) {
-      if (size >= twoheap.length) {
-        // Grow by one layer.
-        twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
-      }
-      final int twopos = size;
-      twoheap[twopos] = co;
-      ++size;
-      heapifyUp2(twopos, co);
-      ++modCount;
-    } else {
-      final int fourpos = size - TWO_HEAP_MAX_SIZE;
-      if (fourheap == null) {
-        fourheap = new int[FOUR_HEAP_INITIAL_SIZE];
-      } else if (fourpos >= fourheap.length) {
-        // Grow extension heap by half.
-        fourheap = Arrays.copyOf(fourheap, fourheap.length + (fourheap.length >> 1));
-      }
-      fourheap[fourpos] = co;
-      ++size;
-      heapifyUp4(fourpos, co);
-      ++modCount;
+    if (size >= twoheap.length) {
+      // Grow by one layer.
+      twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
     }
+    final int twopos = size;
+    twoheap[twopos] = co;
+    ++size;
+    heapifyUp(twopos, co);
+    ++modCount;
   }
 
   @Override
@@ -205,7 +134,7 @@ public class IntegerMaxHeap implements IntegerHeap {
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
    */
-  private void heapifyUp2(int twopos, int cur) {
+  private void heapifyUp(int twopos, int cur) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
       int par = twoheap[parent];
@@ -218,41 +147,12 @@ public class IntegerMaxHeap implements IntegerHeap {
     twoheap[twopos] = cur;
   }
 
-  /**
-   * Heapify-Up method for 4-ary heap.
-   * 
-   * @param fourpos Position in 4-ary heap.
-   * @param cur Current object
-   */
-  private void heapifyUp4(int fourpos, int cur) {
-    while (fourpos > 0) {
-      final int parent = (fourpos - 1) >> 2;
-      int par = fourheap[parent];
-      if (cur <= par) {
-        break;
-      }
-      fourheap[fourpos] = par;
-      fourpos = parent;
-    }
-    if (fourpos == 0 && twoheap[0] < cur) {
-      fourheap[0] = twoheap[0];
-      twoheap[0] = cur;
-    } else {
-      fourheap[fourpos] = cur;
-    }
-  }
-
   @Override
   public int poll() {
     final int ret = twoheap[0];
     --size;
     // Replacement object:
-    if (size >= TWO_HEAP_MAX_SIZE) {
-      final int last = size - TWO_HEAP_MAX_SIZE;
-      final int reinsert = fourheap[last];
-      fourheap[last] = 0;
-      heapifyDown(reinsert);
-    } else if (size > 0) {
+    if (size > 0) {
       final int reinsert = twoheap[size];
       twoheap[size] = 0;
       heapifyDown(reinsert);
@@ -266,32 +166,11 @@ public class IntegerMaxHeap implements IntegerHeap {
   /**
    * Invoke heapify-down for the root object.
    * 
-   * @param reinsert Object to insert.
+   * @param cur Object to insert.
    */
-  private void heapifyDown(int reinsert) {
-    if (size > TWO_HEAP_MAX_SIZE) {
-      // Special case: 3-ary situation.
-      final int best = (twoheap[1] >= twoheap[2]) ? 1 : 2;
-      if (fourheap[0] > twoheap[best]) {
-        twoheap[0] = fourheap[0];
-        heapifyDown4(0, reinsert);
-      } else {
-        twoheap[0] = twoheap[best];
-        heapifyDown2(best, reinsert);
-      }
-      return;
-    }
-    heapifyDown2(0, reinsert);
-  }
-
-  /**
-   * Heapify-Down for 2-ary heap.
-   * 
-   * @param twopos Position in 2-ary heap.
-   * @param cur Current object
-   */
-  private void heapifyDown2(int twopos, int cur) {
-    final int stop = Math.min(size, TWO_HEAP_MAX_SIZE) >>> 1;
+  private void heapifyDown(int cur) {
+    final int stop = size >>> 1;
+    int twopos = 0;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
       int best = twoheap[bestchild];
@@ -307,51 +186,6 @@ public class IntegerMaxHeap implements IntegerHeap {
       twopos = bestchild;
     }
     twoheap[twopos] = cur;
-  }
-
-  /**
-   * Heapify-Down for 4-ary heap.
-   * 
-   * @param fourpos Position in 4-ary heap.
-   * @param cur Current object
-   */
-  private void heapifyDown4(int fourpos, int cur) {
-    final int stop = (size - TWO_HEAP_MAX_SIZE + 2) >>> 2;
-    while (fourpos < stop) {
-      final int child = (fourpos << 2) + 1;
-      int best = fourheap[child];
-      int bestchild = child, candidate = child + 1, minsize = candidate + TWO_HEAP_MAX_SIZE;
-      if (size > minsize) {
-        int nextchild = fourheap[candidate];
-        if (best < nextchild) {
-          bestchild = candidate;
-          best = nextchild;
-        }
-
-        minsize += 2;
-        if (size >= minsize) {
-          nextchild = fourheap[++candidate];
-          if (best < nextchild) {
-            bestchild = candidate;
-            best = nextchild;
-          }
-
-          if (size > minsize) {
-            nextchild = fourheap[++candidate];
-            if (best < nextchild) {
-              bestchild = candidate;
-              best = nextchild;
-            }
-          }
-        }
-      }
-      if (cur >= best) {
-        break;
-      }
-      fourheap[fourpos] = best;
-      fourpos = bestchild;
-    }
-    fourheap[fourpos] = cur;
   }
 
   @Override
@@ -416,7 +250,7 @@ public class IntegerMaxHeap implements IntegerHeap {
 
     @Override
     public int get() {
-      return ((pos < TWO_HEAP_MAX_SIZE) ? twoheap[pos] : fourheap[pos - TWO_HEAP_MAX_SIZE]);
+      return twoheap[pos];
     }
   }
 }
