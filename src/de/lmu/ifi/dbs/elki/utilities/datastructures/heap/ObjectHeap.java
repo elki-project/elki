@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2013
+ Copyright (C) 2012
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * @author Erich Schubert
  * 
  * @apiviz.has UnsortedIter
- * 
  * @param <K> Key type
  */
 public interface ObjectHeap<K> {
@@ -85,7 +84,7 @@ public interface ObjectHeap<K> {
    * @return Size
    */
   public int size();
-
+  
   /**
    * Is the heap empty?
    * 
@@ -112,7 +111,6 @@ public interface ObjectHeap<K> {
    * </pre>
    * 
    * @author Erich Schubert
-   * 
    * @param <K> Key type
    */
   public static interface UnsortedIter<K> extends Iter {

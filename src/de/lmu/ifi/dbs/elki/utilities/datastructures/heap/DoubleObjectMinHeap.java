@@ -29,27 +29,7 @@ import java.util.ConcurrentModificationException;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
- * Advanced priority queue class, based on a binary heap (for small sizes),
- * which will for larger heaps be accompanied by a 4-ary heap (attached below
- * the root of the two-ary heap, making the root actually 3-ary).
- * 
- * This code was automatically instantiated for the types: Double and Object
- * 
- * This combination was found to work quite well in benchmarks, but YMMV.
- * 
- * Some other observations from benchmarking:
- * <ul>
- * <li>Bulk loading did not improve things</li>
- * <li>Primitive heaps are substantially faster.</li>
- * <li>Since an array in Java has an overhead of 12 bytes, odd-sized object and
- * integer arrays are actually well aligned both for 2-ary and 4-ary heaps.</li>
- * <li>Workload makes a huge difference. A load-once, poll-until-empty priority
- * queue is something different than e.g. a top-k heap, which will see a lot of
- * top element replacements.</li>
- * <li>Random vs. increasing vs. decreasing vs. sawtooth insertion patterns for
- * top-k make a difference.</li>
- * <li>Different day, different benchmark results ...</li>
- * </ul>
+ * Binary heap for primitive types.
  * 
  * @author Erich Schubert
  * 
@@ -68,16 +48,6 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   protected Object[] twovals;
 
   /**
-   * Extension heap.
-   */
-  protected double[] fourheap;
-
-  /**
-   * Extension heapvalues.
-   */
-  protected Object[] fourvals;
-
-  /**
    * Current size of heap.
    */
   protected int size;
@@ -85,30 +55,12 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   /**
    * (Structural) modification counter. Used to invalidate iterators.
    */
-  protected int modCount = 0;
-
-  /**
-   * Maximum size of the 2-ary heap. A complete 2-ary heap has (2^k-1) elements.
-   */
-  private final static int TWO_HEAP_MAX_SIZE = (1 << 9) - 1;
+  protected int modCount;
 
   /**
    * Initial size of the 2-ary heap.
    */
   private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
-
-  /**
-   * Initial size of 4-ary heap when initialized.
-   * 
-   * 21 = 4-ary heap of height 2: 1 + 4 + 4*4
-   * 
-   * 85 = 4-ary heap of height 3: 21 + 4*4*4
-   * 
-   * 341 = 4-ary heap of height 4: 85 + 4*4*4*4
-   * 
-   * Since we last grew by 255 (to 511), let's use 341.
-   */
-  private final static int FOUR_HEAP_INITIAL_SIZE = 341;
 
   /**
    * Constructor, with default size.
@@ -120,10 +72,6 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
 
     this.twoheap = twoheap;
     this.twovals = twovals;
-    this.fourheap = null;
-    this.fourvals = null;
-    this.size = 0;
-    this.modCount = 0;
   }
 
   /**
@@ -133,35 +81,18 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
    */
   public DoubleObjectMinHeap(int minsize) {
     super();
-    if (minsize < TWO_HEAP_MAX_SIZE) {
-      final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-      double[] twoheap = new double[size];
-      Object[] twovals = new Object[size];
+    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
+    double[] twoheap = new double[size];
+    Object[] twovals = new Object[size];
       
-      this.twoheap = twoheap;
-      this.twovals = twovals;
-      this.fourheap = null;
-      this.fourvals = null;
-    } else {
-      double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
-      Object[] twovals = new Object[TWO_HEAP_INITIAL_SIZE];
-      double[] fourheap = new double[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
-      Object[] fourvals = new Object[Math.max(21, minsize - TWO_HEAP_MAX_SIZE)];
-      this.twoheap = twoheap;
-      this.twovals = twovals;
-      this.fourheap = fourheap;
-      this.fourvals = fourvals;
-    }
-    this.size = 0;
-    this.modCount = 0;
+    this.twoheap = twoheap;
+    this.twovals = twovals;
   }
 
   @Override
   public void clear() {
     size = 0;
     ++modCount;
-    fourheap = null;
-    fourvals = null;
     Arrays.fill(twoheap, 0.0);
     Arrays.fill(twovals, null);
   }
@@ -181,34 +112,17 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
     final double co = o;
     final Object cv = (Object)v;
     // System.err.println("Add: " + o);
-    if (size < TWO_HEAP_MAX_SIZE) {
-      if (size >= twoheap.length) {
-        // Grow by one layer.
-        twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
-        twovals = Arrays.copyOf(twovals, twovals.length + twovals.length + 1);
-      }
-      final int twopos = size;
-      twoheap[twopos] = co;
-      twovals[twopos] = cv;
-      ++size;
-      heapifyUp2(twopos, co, cv);
-      ++modCount;
-    } else {
-      final int fourpos = size - TWO_HEAP_MAX_SIZE;
-      if (fourheap == null) {
-        fourheap = new double[FOUR_HEAP_INITIAL_SIZE];
-        fourvals = new Object[FOUR_HEAP_INITIAL_SIZE];
-      } else if (fourpos >= fourheap.length) {
-        // Grow extension heap by half.
-        fourheap = Arrays.copyOf(fourheap, fourheap.length + (fourheap.length >> 1));
-        fourvals = Arrays.copyOf(fourvals, fourvals.length + (fourvals.length >> 1));
-      }
-      fourheap[fourpos] = co;
-      fourvals[fourpos] = cv;
-      ++size;
-      heapifyUp4(fourpos, co, cv);
-      ++modCount;
+    if (size >= twoheap.length) {
+      // Grow by one layer.
+      twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
+      twovals = Arrays.copyOf(twovals, twovals.length + twovals.length + 1);
     }
+    final int twopos = size;
+    twoheap[twopos] = co;
+    twovals[twopos] = cv;
+    ++size;
+    heapifyUp(twopos, co, cv);
+    ++modCount;
   }
 
   @Override
@@ -233,7 +147,7 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
    * @param cur Current object
    * @param val Current value
    */
-  private void heapifyUp2(int twopos, double cur, Object val) {
+  private void heapifyUp(int twopos, double cur, Object val) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
       double par = twoheap[parent];
@@ -248,47 +162,11 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
     twovals[twopos] = val;
   }
 
-  /**
-   * Heapify-Up method for 4-ary heap.
-   * 
-   * @param fourpos Position in 4-ary heap.
-   * @param cur Current object
-   * @param val Current value
-   */
-  private void heapifyUp4(int fourpos, double cur, Object val) {
-    while (fourpos > 0) {
-      final int parent = (fourpos - 1) >> 2;
-      double par = fourheap[parent];
-      if (cur >= par) {
-        break;
-      }
-      fourheap[fourpos] = par;
-      fourvals[fourpos] = fourvals[parent];
-      fourpos = parent;
-    }
-    if (fourpos == 0 && twoheap[0] > cur) {
-      fourheap[0] = twoheap[0];
-      fourvals[0] = twovals[0];
-      twoheap[0] = cur;
-      twovals[0] = val;
-    } else {
-      fourheap[fourpos] = cur;
-      fourvals[fourpos] = val;
-    }
-  }
-
   @Override
   public void poll() {
     --size;
     // Replacement object:
-    if (size >= TWO_HEAP_MAX_SIZE) {
-      final int last = size - TWO_HEAP_MAX_SIZE;
-      final double reinsert = fourheap[last];
-      final Object reinsertv = fourvals[last];
-      fourheap[last] = 0.0;
-      fourvals[last] = null;
-      heapifyDown(reinsert, reinsertv);
-    } else if (size > 0) {
+    if (size > 0) {
       final double reinsert = twoheap[size];
       final Object reinsertv = twovals[size];
       twoheap[size] = 0.0;
@@ -304,36 +182,12 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   /**
    * Invoke heapify-down for the root object.
    * 
-   * @param reinsert Object to insert.
+   * @param cur Object to insert.
    * @param val Value to reinsert.
    */
-  private void heapifyDown(double reinsert, Object val) {
-    if (size > TWO_HEAP_MAX_SIZE) {
-      // Special case: 3-ary situation.
-      final int best = (twoheap[1] <= twoheap[2]) ? 1 : 2;
-      if (fourheap[0] < twoheap[best]) {
-        twoheap[0] = fourheap[0];
-        twovals[0] = fourvals[0];
-        heapifyDown4(0, reinsert, val);
-      } else {
-        twoheap[0] = twoheap[best];
-        twovals[0] = twovals[best];
-        heapifyDown2(best, reinsert, val);
-      }
-      return;
-    }
-    heapifyDown2(0, reinsert, val);
-  }
-
-  /**
-   * Heapify-Down for 2-ary heap.
-   * 
-   * @param twopos Position in 2-ary heap.
-   * @param cur Current object
-   * @param val Value to reinsert.
-   */
-  private void heapifyDown2(int twopos, double cur, Object val) {
-    final int stop = Math.min(size, TWO_HEAP_MAX_SIZE) >>> 1;
+  private void heapifyDown(double cur, Object val) {
+    final int stop = size >>> 1;
+    int twopos = 0;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
       double best = twoheap[bestchild];
@@ -351,54 +205,6 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
     }
     twoheap[twopos] = cur;
     twovals[twopos] = val;
-  }
-
-  /**
-   * Heapify-Down for 4-ary heap.
-   * 
-   * @param fourpos Position in 4-ary heap.
-   * @param cur Current object
-   * @param val Value to reinsert.
-   */
-  private void heapifyDown4(int fourpos, double cur, Object val) {
-    final int stop = (size - TWO_HEAP_MAX_SIZE + 2) >>> 2;
-    while (fourpos < stop) {
-      final int child = (fourpos << 2) + 1;
-      double best = fourheap[child];
-      int bestchild = child, candidate = child + 1, minsize = candidate + TWO_HEAP_MAX_SIZE;
-      if (size > minsize) {
-        double nextchild = fourheap[candidate];
-        if (best > nextchild) {
-          bestchild = candidate;
-          best = nextchild;
-        }
-
-        minsize += 2;
-        if (size >= minsize) {
-          nextchild = fourheap[++candidate];
-          if (best > nextchild) {
-            bestchild = candidate;
-            best = nextchild;
-          }
-
-          if (size > minsize) {
-            nextchild = fourheap[++candidate];
-            if (best > nextchild) {
-              bestchild = candidate;
-              best = nextchild;
-            }
-          }
-        }
-      }
-      if (cur <= best) {
-        break;
-      }
-      fourheap[fourpos] = best;
-      fourvals[fourpos] = fourvals[bestchild];
-      fourpos = bestchild;
-    }
-    fourheap[fourpos] = cur;
-    fourvals[fourpos] = val;
   }
 
   @Override
@@ -469,14 +275,14 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
 
     @Override
     public double getKey() {
-      return ((pos < TWO_HEAP_MAX_SIZE) ? twoheap[pos] : fourheap[pos - TWO_HEAP_MAX_SIZE]);
+      return twoheap[pos];
     }
 
     @SuppressWarnings("unchecked")
 
     @Override
     public V getValue() {
-      return (V)((pos < TWO_HEAP_MAX_SIZE) ? twovals[pos] : fourvals[pos - TWO_HEAP_MAX_SIZE]);
+      return (V)twovals[pos];
     }
   }
 }
