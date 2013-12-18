@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
@@ -50,11 +49,6 @@ public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
    * Current size of heap.
    */
   protected int size;
-
-  /**
-   * (Structural) modification counter. Used to invalidate iterators.
-   */
-  protected int modCount;
 
   /**
    * Initial size of the 2-ary heap.
@@ -91,7 +85,6 @@ public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
   @Override
   public void clear() {
     size = 0;
-    ++modCount;
     Arrays.fill(twoheap, 0.0);
     Arrays.fill(twovals, 0);
   }
@@ -120,8 +113,7 @@ public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
     twoheap[twopos] = co;
     twovals[twopos] = cv;
     ++size;
-    heapifyUp2(twopos, co, cv);
-    ++modCount;
+    heapifyUp(twopos, co, cv);
   }
 
   @Override
@@ -136,7 +128,6 @@ public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
   @Override
   public void replaceTopElement(double reinsert, int val) {
     heapifyDown(reinsert, val);
-    ++modCount;
   }
 
   /**
@@ -146,7 +137,7 @@ public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
    * @param cur Current object
    * @param val Current value
    */
-  private void heapifyUp2(int twopos, double cur, int val) {
+  private void heapifyUp(int twopos, double cur, int val) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
       double par = twoheap[parent];
@@ -175,28 +166,17 @@ public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
       twoheap[0] = 0.0;
       twovals[0] = 0;
     }
-    ++modCount;
   }
 
   /**
    * Invoke heapify-down for the root object.
    * 
-   * @param reinsert Object to insert.
+   * @param cur Object to insert.
    * @param val Value to reinsert.
    */
-  private void heapifyDown(double reinsert, int val) {
-    heapifyDown2(0, reinsert, val);
-  }
-
-  /**
-   * Heapify-Down for 2-ary heap.
-   * 
-   * @param twopos Position in 2-ary heap.
-   * @param cur Current object
-   * @param val Value to reinsert.
-   */
-  private void heapifyDown2(int twopos, double cur, int val) {
+  private void heapifyDown(double cur, int val) {
     final int stop = size >>> 1;
+    int twopos = 0;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
       double best = twoheap[bestchild];
@@ -263,16 +243,8 @@ public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
      */
     protected int pos = 0;
 
-    /**
-     * Modification counter we were initialized at.
-     */
-    protected final int myModCount = modCount;
-
     @Override
     public boolean valid() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
       return pos < size;
     }
 

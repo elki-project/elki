@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
@@ -46,11 +45,6 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
    * Current size of heap.
    */
   protected int size;
-
-  /**
-   * (Structural) modification counter. Used to invalidate iterators.
-   */
-  protected int modCount;
 
   /**
    * Initial size of the 2-ary heap.
@@ -85,7 +79,6 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   @Override
   public void clear() {
     size = 0;
-    ++modCount;
     Arrays.fill(twoheap, null);
   }
 
@@ -112,7 +105,6 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
     twoheap[twopos] = co;
     ++size;
     heapifyUp(twopos, co);
-    ++modCount;
   }
 
   @Override
@@ -129,7 +121,6 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   public K replaceTopElement(K reinsert) {
     final Comparable<Object> ret = twoheap[0];
     heapifyDown((Comparable<Object>) reinsert);
-    ++modCount;
     return (K)ret;
   }
 
@@ -165,7 +156,6 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
     } else {
       twoheap[0] = null;
     }
-    ++modCount;
     return (K)ret;
   }
 
@@ -237,16 +227,8 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
      */
     protected int pos = 0;
 
-    /**
-     * Modification counter we were initialized at.
-     */
-    protected final int myModCount = modCount;
-
     @Override
     public boolean valid() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
       return pos < size;
     }
 

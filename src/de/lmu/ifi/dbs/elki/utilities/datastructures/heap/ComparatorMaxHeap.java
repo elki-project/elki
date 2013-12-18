@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
@@ -46,11 +45,6 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
    * Current size of heap.
    */
   protected int size;
-
-  /**
-   * (Structural) modification counter. Used to invalidate iterators.
-   */
-  protected int modCount = 0;
 
   /**
    * Initial size of the 2-ary heap.
@@ -95,7 +89,6 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
   @Override
   public void clear() {
     size = 0;
-    ++modCount;
     Arrays.fill(twoheap, null);
   }
 
@@ -121,7 +114,6 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
     twoheap[twopos] = co;
     ++size;
     heapifyUp(twopos, co);
-    ++modCount;
   }
 
   @Override
@@ -138,7 +130,6 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
   public K replaceTopElement(K reinsert) {
     final Object ret = twoheap[0];
     heapifyDown( reinsert);
-    ++modCount;
     return (K)ret;
   }
 
@@ -174,7 +165,6 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
     } else {
       twoheap[0] = null;
     }
-    ++modCount;
     return (K)ret;
   }
 
@@ -246,16 +236,8 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
      */
     protected int pos = 0;
 
-    /**
-     * Modification counter we were initialized at.
-     */
-    protected final int myModCount = modCount;
-
     @Override
     public boolean valid() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
       return pos < size;
     }
 
