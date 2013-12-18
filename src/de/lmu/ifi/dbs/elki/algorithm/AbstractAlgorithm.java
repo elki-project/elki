@@ -96,13 +96,14 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
       throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
     catch(InvocationTargetException e) {
-      if(e.getTargetException() instanceof RuntimeException) {
-        throw (RuntimeException) e.getTargetException();
+      final Throwable cause = e.getTargetException();
+      if(cause instanceof RuntimeException) {
+        throw (RuntimeException) cause;
       }
-      if(e.getTargetException() instanceof AssertionError) {
-        throw (AssertionError) e.getTargetException();
+      if(cause instanceof Error) {
+        throw (Error) cause;
       }
-      throw new APIViolationException("Invoking the real 'run' method failed: " + e.getTargetException().toString(), e.getTargetException());
+      throw new APIViolationException("Invoking the real 'run' method failed: " + cause.toString(), cause);
     }
 
     try {
@@ -116,13 +117,14 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
       throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
     catch(InvocationTargetException e) {
-      if(e.getTargetException() instanceof RuntimeException) {
-        throw (RuntimeException) e.getTargetException();
+      final Throwable cause = e.getTargetException();
+      if(cause instanceof RuntimeException) {
+        throw (RuntimeException) cause;
       }
-      if(e.getTargetException() instanceof AssertionError) {
-        throw (AssertionError) e.getTargetException();
+      if(cause instanceof Error) {
+        throw (Error) cause;
       }
-      throw new APIViolationException("Invoking the real 'run' method failed: " + e.getTargetException().toString(), e.getTargetException());
+      throw new APIViolationException("Invoking the real 'run' method failed: " + cause.toString(), cause);
     }
     throw new APIViolationException("No appropriate 'run' method found.");
   }
