@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
@@ -51,11 +50,6 @@ public class IntegerObjectMinHeap<V> implements IntegerObjectHeap<V> {
    * Current size of heap.
    */
   protected int size;
-
-  /**
-   * (Structural) modification counter. Used to invalidate iterators.
-   */
-  protected int modCount;
 
   /**
    * Initial size of the 2-ary heap.
@@ -92,7 +86,6 @@ public class IntegerObjectMinHeap<V> implements IntegerObjectHeap<V> {
   @Override
   public void clear() {
     size = 0;
-    ++modCount;
     Arrays.fill(twoheap, 0);
     Arrays.fill(twovals, null);
   }
@@ -122,7 +115,6 @@ public class IntegerObjectMinHeap<V> implements IntegerObjectHeap<V> {
     twovals[twopos] = cv;
     ++size;
     heapifyUp(twopos, co, cv);
-    ++modCount;
   }
 
   @Override
@@ -137,7 +129,6 @@ public class IntegerObjectMinHeap<V> implements IntegerObjectHeap<V> {
   @Override
   public void replaceTopElement(int reinsert, V val) {
     heapifyDown(reinsert, (Object)val);
-    ++modCount;
   }
 
   /**
@@ -176,7 +167,6 @@ public class IntegerObjectMinHeap<V> implements IntegerObjectHeap<V> {
       twoheap[0] = 0;
       twovals[0] = null;
     }
-    ++modCount;
   }
 
   /**
@@ -255,16 +245,8 @@ public class IntegerObjectMinHeap<V> implements IntegerObjectHeap<V> {
      */
     protected int pos = 0;
 
-    /**
-     * Modification counter we were initialized at.
-     */
-    protected final int myModCount = modCount;
-
     @Override
     public boolean valid() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
       return pos < size;
     }
 

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
@@ -45,11 +44,6 @@ public class IntegerMinHeap implements IntegerHeap {
    * Current size of heap.
    */
   protected int size;
-
-  /**
-   * (Structural) modification counter. Used to invalidate iterators.
-   */
-  protected int modCount;
 
   /**
    * Initial size of the 2-ary heap.
@@ -82,7 +76,6 @@ public class IntegerMinHeap implements IntegerHeap {
   @Override
   public void clear() {
     size = 0;
-    ++modCount;
     Arrays.fill(twoheap, 0);
   }
 
@@ -108,7 +101,6 @@ public class IntegerMinHeap implements IntegerHeap {
     twoheap[twopos] = co;
     ++size;
     heapifyUp(twopos, co);
-    ++modCount;
   }
 
   @Override
@@ -124,7 +116,6 @@ public class IntegerMinHeap implements IntegerHeap {
   public int replaceTopElement(int reinsert) {
     final int ret = twoheap[0];
     heapifyDown( reinsert);
-    ++modCount;
     return ret;
   }
 
@@ -159,7 +150,6 @@ public class IntegerMinHeap implements IntegerHeap {
     } else {
       twoheap[0] = 0;
     }
-    ++modCount;
     return ret;
   }
 
@@ -230,16 +220,8 @@ public class IntegerMinHeap implements IntegerHeap {
      */
     protected int pos = 0;
 
-    /**
-     * Modification counter we were initialized at.
-     */
-    protected final int myModCount = modCount;
-
     @Override
     public boolean valid() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
       return pos < size;
     }
 

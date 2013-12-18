@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
@@ -50,11 +49,6 @@ public class DoubleLongMaxHeap implements DoubleLongHeap {
    * Current size of heap.
    */
   protected int size;
-
-  /**
-   * (Structural) modification counter. Used to invalidate iterators.
-   */
-  protected int modCount;
 
   /**
    * Initial size of the 2-ary heap.
@@ -91,7 +85,6 @@ public class DoubleLongMaxHeap implements DoubleLongHeap {
   @Override
   public void clear() {
     size = 0;
-    ++modCount;
     Arrays.fill(twoheap, 0.0);
     Arrays.fill(twovals, 0);
   }
@@ -121,7 +114,6 @@ public class DoubleLongMaxHeap implements DoubleLongHeap {
     twovals[twopos] = cv;
     ++size;
     heapifyUp(twopos, co, cv);
-    ++modCount;
   }
 
   @Override
@@ -136,7 +128,6 @@ public class DoubleLongMaxHeap implements DoubleLongHeap {
   @Override
   public void replaceTopElement(double reinsert, long val) {
     heapifyDown(reinsert, val);
-    ++modCount;
   }
 
   /**
@@ -175,7 +166,6 @@ public class DoubleLongMaxHeap implements DoubleLongHeap {
       twoheap[0] = 0.0;
       twovals[0] = 0;
     }
-    ++modCount;
   }
 
   /**
@@ -253,16 +243,8 @@ public class DoubleLongMaxHeap implements DoubleLongHeap {
      */
     protected int pos = 0;
 
-    /**
-     * Modification counter we were initialized at.
-     */
-    protected final int myModCount = modCount;
-
     @Override
     public boolean valid() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
       return pos < size;
     }
 
