@@ -3,10 +3,19 @@ package de.lmu.ifi.dbs.elki.joglvis.scatterplot;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Class to manage the vector data in the GPU.
@@ -15,14 +24,19 @@ import javax.media.opengl.GL2;
  */
 public class ScatterData {
   /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(ScatterData.class);
+
+  /**
    * Vertex buffer IDs.
    */
-  int[] vbos;
+  int[] vbos = { -1 };
 
   /**
    * Number of vectors stored.
    */
-  int length;
+  int length = -1;
 
   /**
    * Stride, i.e. size of each point.
@@ -45,6 +59,21 @@ public class ScatterData {
   private int[] dims = { 0, 1, 2 };
 
   /**
+   * Relations to visualize.
+   */
+  private List<Relation<?>> relations;
+
+  /**
+   * Data dimensionality.
+   */
+  private int dim;
+
+  /**
+   * DBIDs to visualize.
+   */
+  private DBIDs ids;
+
+  /**
    * Size of a float, in bytes.
    */
   public static final int SIZE_FLOAT = 4;
@@ -58,37 +87,96 @@ public class ScatterData {
     return length;
   }
 
+  public ScatterData(DBIDs ids) {
+    this.ids = ids;
+    this.relations = new ArrayList<Relation<?>>();
+  }
+
+  public void addRelation(Relation<?> rel) {
+    this.relations.add(rel);
+  }
+
   public void initializeData(GL2 gl) {
-    length = 10000;
+    length = ids.size();
+    dim = 0;
+    vecOffset = -1;
+    classOffset = -1;
+
+    // Scan relations for dimensionalities:
+    int[] dims = new int[relations.size()];
+    ArrayList<Relation<? extends NumberVector<?>>> vrels = new ArrayList<>(relations.size());
+    for(int r = 0; r < relations.size(); r++) {
+      Relation<?> rel = relations.get(r);
+      final SimpleTypeInformation<?> type = rel.getDataTypeInformation();
+      if(type instanceof VectorFieldTypeInformation) {
+        @SuppressWarnings("unchecked")
+        final Relation<? extends NumberVector<?>> vrel = (Relation<? extends NumberVector<?>>) rel;
+        final int d = ((VectorFieldTypeInformation<?>) type).getDimensionality();
+        dims[r] = d;
+        vrels.add(vrel);
+        if(vecOffset < 0) {
+          vecOffset = dim;
+        }
+        dim += d;
+      }
+      else {
+        // FIXME: handle other relation types!
+        dims[r] = 0;
+        vrels.add(null);
+      }
+    }
+    if(classOffset < 0) {
+      ++dim;
+    }
 
     // Initialize vertex buffer handles:
-    vbos = new int[1];
+    assert (vbos[0] == -1);
     gl.glGenBuffers(1, vbos, 0);
     gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
     gl.glBufferData(GL.GL_ARRAY_BUFFER, length // Number of lines *
-        * 4 // 3 coordinates + 1 type
-        * SIZE_FLOAT //
+        * dim * SIZE_FLOAT //
         + 3 * SIZE_FLOAT // safety padding
     , null, GL2.GL_STATIC_DRAW);
     ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
     FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
 
-    Random r = new Random();
-    for(int i = 0; i < length; i++) {
-      vertices.put((float) r.nextGaussian());
-      vertices.put((float) r.nextGaussian());
-      vertices.put((float) r.nextGaussian());
-      vertices.put((float) r.nextInt(6));
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(int r = 0; r < dims.length; r++) {
+        if(dims[r] <= 0) {
+          continue;
+        }
+        final Relation<? extends NumberVector<?>> vrel = vrels.get(r);
+        if(vrel != null) {
+          NumberVector<?> vec = vrel.get(iter);
+          for(int d = 0; d < dims[r]; d++) {
+            vertices.put(vec.floatValue(d));
+          }
+        }
+      }
+      if(classOffset < 0) {
+        vertices.put(0.0f);
+      }
     }
-    stride = /* floats per vertex */4 * SIZE_FLOAT;
-    vecOffset = 0;
-    classOffset = 3 * SIZE_FLOAT;
+    stride = dim * SIZE_FLOAT;
+    if(classOffset < 0) {
+      classOffset = (dim - 1) * SIZE_FLOAT;
+    }
 
+    if(vertices.position() != length * dim) {
+      LOG.warning("Size mismatch: " + vertices.position() + " expected: " + length * dim, new Throwable());
+    }
     vertices.flip();
     gl.glUnmapBuffer(GL.GL_ARRAY_BUFFER);
     gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+
+    LOG.warning("Size: " + length + " dim: " + dim + " " + vecOffset + " " + classOffset);
   }
 
+  /**
+   * Free all memory allocations.
+   * 
+   * @param gl GL context
+   */
   public void free(GL2 gl) {
     if(vbos[0] >= 0) {
       gl.glDeleteBuffers(1, vbos, 0);
@@ -133,7 +221,7 @@ public class ScatterData {
   }
 
   /**
-   * Get the offset for the current shape source. 
+   * Get the offset for the current shape source.
    * 
    * @return Buffer offset in bytes.
    */
