@@ -1,32 +1,33 @@
 package de.lmu.ifi.dbs.elki.joglvis;
 
-import java.awt.BorderLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import javax.media.opengl.DebugGL2;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
-import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
 import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterData;
 import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterPlotOpenGL2Intel945;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
-public class ShaderTest implements GLEventListener {
+public class ScatterPlot3DVisualization implements GLEventListener {
+  private static final Logging LOG = Logging.getLogger(ScatterPlot3DVisualization.class);
+
   private static final boolean DEBUG = false;
 
-  ScatterData data = new ScatterData();
+  ScatterData data;
 
   SimpleCamera3D camera = new SimpleCamera3D();
 
   ScatterPlotOpenGL2Intel945 scatter = new ScatterPlotOpenGL2Intel945();
+
+  public ScatterPlot3DVisualization(ScatterData data) {
+    this.data = data;
+  }
 
   @Override
   public void init(GLAutoDrawable glautodrawable) {
@@ -37,6 +38,9 @@ public class ShaderTest implements GLEventListener {
     scatter.initializeTextures(gl, glautodrawable.getGLProfile());
     scatter.initializeShaders(gl);
     scatter.setCamera(camera);
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Loading data into video memory.");
+    }
     data.initializeData(gl);
   }
 
@@ -109,27 +113,14 @@ public class ShaderTest implements GLEventListener {
     scatter.free(gl);
   }
 
-  public static void main(String[] args) {
-    GLProfile glprofile = GLProfile.getDefault();
-    GLCapabilities glcapabilities = new GLCapabilities(glprofile);
-    final GLCanvas glcanvas = new GLCanvas(glcapabilities);
-
-    glcanvas.addGLEventListener(new ShaderTest());
-
-    final JFrame jframe = new JFrame("OpenGL Scatterplot");
-    jframe.addWindowListener(new WindowAdapter() {
+  public void start(GLCanvas canvas) {
+    // FIXME: Auto-start animator for now.
+    final FPSAnimator animator = new FPSAnimator(canvas, 25);
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void windowClosing(WindowEvent windowevent) {
-        jframe.dispose();
-        System.exit(0);
+      public void run() {
+        animator.start();
       }
     });
-
-    jframe.getContentPane().add(glcanvas, BorderLayout.CENTER);
-    jframe.setSize(640, 480);
-    jframe.setVisible(true);
-
-    final FPSAnimator animator = new FPSAnimator(glcanvas, 25);
-    animator.start();
   }
 }
