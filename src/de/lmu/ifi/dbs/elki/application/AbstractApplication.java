@@ -77,7 +77,12 @@ public abstract class AbstractApplication implements Parameterizable {
   /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "ELKI Version 0.5.5 (2012, December)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, S. Goldhofer, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Evaluation of Clusterings – Metrics and Visual Support." + NEWLINE + "In Proceedings of the 28th" + NEWLINE + "International Conference on Data Engineering (ICDE), Washington, DC, 2012." + NEWLINE;
+  public static final String INFORMATION = "ELKI Version 0.6.0 (2014, January)" + NEWLINE + NEWLINE //
+      + "published in:" + NEWLINE //
+      + "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:" + NEWLINE //
+      + "Interactive Data Mining with 3D-Parallel-Coordinate-Trees." + NEWLINE //
+      + "In Proceedings of the ACM International Conference on " + NEWLINE //
+      + "Management of Data (SIGMOD), New York City, NY, 2013." + NEWLINE;
 
   /**
    * Constructor.
@@ -108,55 +113,60 @@ public abstract class AbstractApplication implements Parameterizable {
       params.grab(helpLongF);
       params.grab(descriptionP);
       params.grab(debugP);
-      if (descriptionP.isDefined()) {
+      if(descriptionP.isDefined()) {
         params.clearErrors();
         printDescription(descriptionP.getValue());
         return;
       }
       // Fail silently on errors.
-      if (params.getErrors().size() > 0) {
+      if(params.getErrors().size() > 0) {
         params.logAndClearReportedErrors();
         return;
       }
-      if (debugP.isDefined()) {
+      if(debugP.isDefined()) {
         LoggingUtil.parseDebugParameter(debugP);
       }
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       printErrorMessage(e);
       return;
     }
     try {
       TrackParameters config = new TrackParameters(params);
-      if (config.grab(verboseF) && verboseF.isTrue()) {
+      if(config.grab(verboseF) && verboseF.isTrue()) {
         // Extra verbosity by repeating the flag:
         final Flag verbose2F = new Flag(Parameterizer.VERBOSE_ID);
-        if (config.grab(verbose2F) && verbose2F.isTrue()) {
+        if(config.grab(verbose2F) && verbose2F.isTrue()) {
           LoggingConfiguration.setVerbose(Level.VERYVERBOSE);
-        } else {
+        }
+        else {
           LoggingConfiguration.setVerbose(Level.VERBOSE);
         }
       }
       AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
-      if ((helpF.isDefined() && helpF.getValue()) || (helpLongF.isDefined() && helpLongF.getValue())) {
+      if((helpF.isDefined() && helpF.getValue()) || (helpLongF.isDefined() && helpLongF.getValue())) {
         LoggingConfiguration.setVerbose(Level.VERBOSE);
         LOG.verbose(usage(config.getAllParameters()));
-      } else {
+      }
+      else {
         params.logUnusedParameters();
-        if (params.getErrors().size() > 0) {
+        if(params.getErrors().size() > 0) {
           LoggingConfiguration.setVerbose(Level.VERBOSE);
           LOG.verbose("The following configuration errors prevented execution:\n");
-          for (ParameterException e : params.getErrors()) {
+          for(ParameterException e : params.getErrors()) {
             LOG.verbose(e.getMessage());
           }
           LOG.verbose("\n");
           LOG.verbose("Stopping execution because of configuration errors.");
           System.exit(1);
-        } else {
+        }
+        else {
           task.run();
         }
       }
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       printErrorMessage(e);
     }
   }
@@ -185,15 +195,18 @@ public abstract class AbstractApplication implements Parameterizable {
    * @param e Error Exception.
    */
   protected static void printErrorMessage(Exception e) {
-    if (e instanceof AbortException) {
+    if(e instanceof AbortException) {
       // ensure we actually show the message:
       LoggingConfiguration.setVerbose(Level.VERBOSE);
       LOG.verbose(e.getMessage());
-    } else if (e instanceof UnspecifiedParameterException) {
+    }
+    else if(e instanceof UnspecifiedParameterException) {
       LOG.error(e.getMessage());
-    } else if (e instanceof ParameterException) {
+    }
+    else if(e instanceof ParameterException) {
       LOG.error(e.getMessage());
-    } else {
+    }
+    else {
       LOG.exception(e);
     }
   }
@@ -202,7 +215,7 @@ public abstract class AbstractApplication implements Parameterizable {
    * Print the description for the given parameter
    */
   private static void printDescription(Class<?> descriptionClass) {
-    if (descriptionClass != null) {
+    if(descriptionClass != null) {
       LoggingConfiguration.setVerbose(Level.VERBOSE);
       LOG.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
     }
@@ -300,7 +313,7 @@ public abstract class AbstractApplication implements Parameterizable {
     protected File getParameterOutputFile(Parameterization config, String description) {
       final FileParameter outputP = new FileParameter(OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
       outputP.setShortDescription(description);
-      if (config.grab(outputP)) {
+      if(config.grab(outputP)) {
         return outputP.getValue();
       }
       return null;
@@ -326,7 +339,7 @@ public abstract class AbstractApplication implements Parameterizable {
     protected File getParameterInputFile(Parameterization config, String description) {
       final FileParameter inputP = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
       inputP.setShortDescription(description);
-      if (config.grab(inputP)) {
+      if(config.grab(inputP)) {
         return inputP.getValue();
       }
       return null;
