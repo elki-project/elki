@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -129,8 +130,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
     // "HEAVY" flag for knn query since it is used more than once
     KNNQuery<O, D> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
-    if (!(knnq instanceof PreprocessorKNNQuery)) {
-      if (stepprog != null) {
+    if(!(knnq instanceof PreprocessorKNNQuery)) {
+      if(stepprog != null) {
         stepprog.beginStep(1, "Materializing LOF neighborhoods.", LOG);
       }
       MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
@@ -139,109 +140,131 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
     DBIDs ids = relation.getDBIDs();
 
     // Compute LRDs
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.beginStep(2, "Computing LRDs.", LOG);
     }
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    {
-      FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        final KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
-        double sum = 0.0;
-        int count = 0;
-        if (neighbors instanceof DoubleDistanceKNNList) {
-          // Fast version for double distances
-          for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-            if (DBIDUtil.equal(neighbor, iter)) {
-              continue;
-            }
-            KNNList<D> neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
-            final double nkdist;
-            if (neighborsNeighbors instanceof DoubleDistanceKNNList) {
-              nkdist = ((DoubleDistanceKNNList) neighborsNeighbors).doubleKNNDistance();
-            } else {
-              nkdist = neighborsNeighbors.getKNNDistance().doubleValue();
-            }
-            sum += Math.max(neighbor.doubleDistance(), nkdist);
-            count++;
-          }
-        } else {
-          for (DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-            if (DBIDUtil.equal(neighbor, iter)) {
-              continue;
-            }
-            KNNList<D> neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
-            sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
-            count++;
-          }
-        }
-        // Avoid division by 0
-        final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
-        lrds.putDouble(iter, lrd);
-        if (lrdsProgress != null) {
-          lrdsProgress.incrementProcessed(LOG);
-        }
-      }
-      if (lrdsProgress != null) {
-        lrdsProgress.ensureCompleted(LOG);
-      }
-    }
+    computeLRDs(knnq, ids, lrds);
 
     // compute LOF_SCORE of each db object
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", LOG);
     }
-    WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
+    DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
+    WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
-    {
-      FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        final double lof;
-        final double lrdp = lrds.doubleValue(iter);
-        final KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
-        if (!Double.isInfinite(lrdp)) {
-          double sum = 0.0;
-          int count = 0;
-          for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-            // skip the point itself
-            if (DBIDUtil.equal(neighbor, iter)) {
-              continue;
-            }
-            final double val = lrds.doubleValue(neighbor);
-            sum += val;
-            count++;
-            if (Double.isInfinite(val)) {
-              break;
-            }
-          }
-          lof = sum / (lrdp * count);
-        } else {
-          lof = 1.0;
-        }
-        lofs.putDouble(iter, lof);
-        // update minimum and maximum
-        lofminmax.put(lof);
+    computeLOFScores(knnq, ids, lrds, lofs, lofminmax);
 
-        if (progressLOFs != null) {
-          progressLOFs.incrementProcessed(LOG);
-        }
-      }
-      if (progressLOFs != null) {
-        progressLOFs.ensureCompleted(LOG);
-      }
-    }
-
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.setCompleted(LOG);
     }
 
     // Build result representation.
     Relation<Double> scoreResult = new MaterializedRelation<>("Local Outlier Factor", "lof-outlier", TypeUtil.DOUBLE, lofs, ids);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
+    return new OutlierResult(scoreMeta, scoreResult);
+  }
 
-    return result;
+  /**
+   * Compute local reachability distances.
+   * 
+   * @param knnq KNN query
+   * @param ids IDs to process
+   * @param lrds Reachability storage
+   */
+  private void computeLRDs(KNNQuery<O, D> knnq, DBIDs ids, WritableDoubleDataStore lrds) {
+    FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      final KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
+      double sum = 0.0;
+      int count = 0;
+      if(neighbors instanceof DoubleDistanceKNNList) {
+        // Fast version for double distances
+        for(DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+          if(DBIDUtil.equal(neighbor, iter)) {
+            continue;
+          }
+          KNNList<D> neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
+          final double nkdist;
+          if(neighborsNeighbors instanceof DoubleDistanceKNNList) {
+            nkdist = ((DoubleDistanceKNNList) neighborsNeighbors).doubleKNNDistance();
+          }
+          else {
+            nkdist = neighborsNeighbors.getKNNDistance().doubleValue();
+          }
+          sum += Math.max(neighbor.doubleDistance(), nkdist);
+          count++;
+        }
+      }
+      else {
+        for(DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          if(DBIDUtil.equal(neighbor, iter)) {
+            continue;
+          }
+          KNNList<D> neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
+          sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
+          count++;
+        }
+      }
+      // Avoid division by 0
+      final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
+      lrds.putDouble(iter, lrd);
+      if(lrdsProgress != null) {
+        lrdsProgress.incrementProcessed(LOG);
+      }
+    }
+    if(lrdsProgress != null) {
+      lrdsProgress.ensureCompleted(LOG);
+    }
+  }
+
+  /**
+   * Compute local outlier factors.
+   * 
+   * @param knnq KNN query
+   * @param ids IDs to process
+   * @param lrds Local reachability distances
+   * @param lofs Local outlier factor storage
+   * @param lofminmax Score minimum/maximum tracker
+   */
+  private void computeLOFScores(KNNQuery<O, D> knnq, DBIDs ids, DoubleDataStore lrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
+    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      final double lof;
+      final double lrdp = lrds.doubleValue(iter);
+      final KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
+      if(!Double.isInfinite(lrdp)) {
+        double sum = 0.0;
+        int count = 0;
+        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          // skip the point itself
+          if(DBIDUtil.equal(neighbor, iter)) {
+            continue;
+          }
+          final double val = lrds.doubleValue(neighbor);
+          sum += val;
+          count++;
+          if(Double.isInfinite(val)) {
+            break;
+          }
+        }
+        lof = sum / (lrdp * count);
+      }
+      else {
+        lof = 1.0;
+      }
+      lofs.putDouble(iter, lof);
+      // update minimum and maximum
+      lofminmax.put(lof);
+
+      if(progressLOFs != null) {
+        progressLOFs.incrementProcessed(LOG);
+      }
+    }
+    if(progressLOFs != null) {
+      progressLOFs.ensureCompleted(LOG);
+    }
   }
 
   @Override
@@ -280,7 +303,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
 
       final IntParameter pK = new IntParameter(K_ID);
       pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if (config.grab(pK)) {
+      if(config.grab(pK)) {
         k = pK.getValue();
       }
     }
