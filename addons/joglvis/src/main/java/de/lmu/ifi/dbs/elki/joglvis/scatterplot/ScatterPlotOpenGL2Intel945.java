@@ -10,8 +10,8 @@ import javax.media.opengl.GLProfile;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
 
+import de.lmu.ifi.dbs.elki.joglvis.ShaderUtil;
 import de.lmu.ifi.dbs.elki.joglvis.SimpleCamera3D;
-import experimentalcode.erich.jogl.ShaderUtil;
 
 public class ScatterPlotOpenGL2Intel945 {
   private int[] textures = new int[2];

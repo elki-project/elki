@@ -1,4 +1,4 @@
-package experimentalcode.erich.jogl;
+package de.lmu.ifi.dbs.elki.joglvis;
 
 /*
  This file is part of ELKI:
