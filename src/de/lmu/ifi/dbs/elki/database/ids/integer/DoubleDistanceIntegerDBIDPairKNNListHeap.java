@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -46,7 +44,7 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
   /**
    * The value of k this was materialized for.
    */
-  private final int k, kminus1;
+  private final int k;
 
   /**
    * The actual data array.
@@ -67,66 +65,94 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
     super();
     this.data = new DoubleDistanceIntegerDBIDPair[k + 5];
     this.k = k;
-    this.kminus1 = k - 1;
     this.size = 0;
   }
 
   @Override
   public void clear() {
+    for(int i = 0; i < size; i++) {
+      data[i] = null; // discard
+    }
     size = 0;
-    Arrays.fill(data, null);
   }
 
   @Override
   public double insert(double distance, DBIDRef id) {
-    if (size < k || distance <= data[kminus1].doubleDistance()) {
-      addInternal(new DoubleDistanceIntegerDBIDPair(distance, id.internalGetIndex()));
+    final int kminus1 = k - 1;
+    if(size < k || distance <= data[kminus1].doubleDistance()) {
+      // Ensure we have enough space.
+      if(size > data.length) {
+        grow();
+      }
+      insertionSort(new DoubleDistanceIntegerDBIDPair(distance, id.internalGetIndex()));
+      // Truncate if necessary:
+      if(size > k && data[k].doubleDistance() > data[kminus1].doubleDistance()) {
+        truncate();
+      }
     }
-    return (size < k) ? Double.POSITIVE_INFINITY :  get(kminus1).doubleDistance();
+    return (size < k) ? Double.POSITIVE_INFINITY : get(kminus1).doubleDistance();
+  }
+
+  private void truncate() {
+    for(int i = k; i < size; i++) {
+      data[i] = null; // discard
+    }
+    size = k;
   }
 
   @Override
   @Deprecated
   public void insert(Double distance, DBIDRef id) {
-    if (size < k || distance.doubleValue() <= data[kminus1].doubleDistance()) {
-      addInternal(new DoubleDistanceIntegerDBIDPair(distance.doubleValue(), id.internalGetIndex()));
+    final int kminus1 = k - 1;
+    if(size < k || distance.doubleValue() <= data[kminus1].doubleDistance()) {
+      // Ensure we have enough space.
+      if(size > data.length) {
+        grow();
+      }
+      insertionSort(new DoubleDistanceIntegerDBIDPair(distance.doubleValue(), id.internalGetIndex()));
+      // Truncate if necessary:
+      if(size > k && data[k].doubleDistance() > data[kminus1].doubleDistance()) {
+        truncate();
+      }
     }
   }
 
   @Override
   @Deprecated
   public void insert(DoubleDistance dist, DBIDRef id) {
-    if (size < k || dist.doubleValue() <= data[kminus1].doubleDistance()) {
-      addInternal(new DoubleDistanceIntegerDBIDPair(dist.doubleValue(), id.internalGetIndex()));
+    final int kminus1 = k - 1;
+    if(size < k || dist.doubleValue() <= data[kminus1].doubleDistance()) {
+      // Ensure we have enough space.
+      if(size > data.length) {
+        grow();
+      }
+      insertionSort(new DoubleDistanceIntegerDBIDPair(dist.doubleValue(), id.internalGetIndex()));
+      // Truncate if necessary:
+      if(size > k && data[k].doubleDistance() > data[kminus1].doubleDistance()) {
+        truncate();
+      }
     }
   }
 
   @Override
   public void insert(DoubleDistanceDBIDPair e) {
-    double dist = e.doubleDistance();
-    if (size < k || dist <= data[kminus1].doubleDistance()) {
-      if (e instanceof DoubleDistanceIntegerDBIDPair) {
-        addInternal((DoubleDistanceIntegerDBIDPair) e);
-      } else {
-        addInternal(new DoubleDistanceIntegerDBIDPair(dist, e.internalGetIndex()));
+    final int kminus1 = k - 1;
+    final double dist = e.doubleDistance();
+    if(size < k || dist <= data[kminus1].doubleDistance()) {
+      // Ensure we have enough space.
+      if(size > data.length) {
+        grow();
       }
-    }
-  }
-
-  protected void addInternal(DoubleDistanceIntegerDBIDPair e) {
-    // Ensure we have enough space.
-    if (size > data.length) {
-      final DoubleDistanceIntegerDBIDPair[] old = data;
-      data = new DoubleDistanceIntegerDBIDPair[data.length + (data.length >> 1)];
-      System.arraycopy(old, 0, data, 0, old.length);
-    }
-    insertionSort(e);
-    // Truncate if necessary:
-    if (size > k && data[k].doubleDistance() > data[kminus1].doubleDistance()) {
-      for (int i = k; i < size; i++) {
-        data[i] = null; // discard
+      if(e instanceof DoubleDistanceIntegerDBIDPair) {
+        insertionSort((DoubleDistanceIntegerDBIDPair) e);
       }
-      size = k;
+      else {
+        insertionSort(new DoubleDistanceIntegerDBIDPair(dist, e.internalGetIndex()));
+      }
+      // Truncate if necessary:
+      if(size > k && data[k].doubleDistance() > data[kminus1].doubleDistance()) {
+        truncate();
+      }
     }
   }
 
@@ -138,10 +164,10 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
   private void insertionSort(DoubleDistanceIntegerDBIDPair obj) {
     // Insertion sort:
     int pos = size;
-    while (pos > 0) {
+    while(pos > 0) {
       final int prev = pos - 1;
       DoubleDistanceIntegerDBIDPair pobj = data[prev];
-      if (pobj.doubleDistance() <= obj.doubleDistance()) {
+      if(pobj.doubleDistance() <= obj.doubleDistance()) {
         break;
       }
       data[pos] = pobj;
@@ -149,6 +175,12 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
     }
     data[pos] = obj;
     ++size;
+  }
+
+  private void grow() {
+    final DoubleDistanceIntegerDBIDPair[] old = data;
+    data = new DoubleDistanceIntegerDBIDPair[data.length + (data.length >> 1)];
+    System.arraycopy(old, 0, data, 0, old.length);
   }
 
   @Override
@@ -176,28 +208,28 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
   @Override
   @Deprecated
   public DoubleDistance getKNNDistance() {
-    if (size < k) {
+    if(size < k) {
       return DoubleDistance.INFINITE_DISTANCE;
     }
-    return get(kminus1).getDistance();
+    return get(k - 1).getDistance();
   }
 
   @Override
   public double doubleKNNDistance() {
-    if (size < k) {
+    if(size < k) {
       return Double.POSITIVE_INFINITY;
     }
-    return get(kminus1).doubleDistance();
+    return get(k - 1).doubleDistance();
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
-    for (DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
+    for(DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleDistance()).append(':').append(DBIDUtil.toString(iter));
       iter.advance();
-      if (iter.valid()) {
+      if(iter.valid()) {
         buf.append(',');
       }
     }
@@ -222,8 +254,8 @@ public class DoubleDistanceIntegerDBIDPairKNNListHeap implements DoubleDistanceK
 
   @Override
   public boolean contains(DBIDRef o) {
-    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if (DBIDUtil.equal(iter, o)) {
+    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if(DBIDUtil.equal(iter, o)) {
         return true;
       }
     }

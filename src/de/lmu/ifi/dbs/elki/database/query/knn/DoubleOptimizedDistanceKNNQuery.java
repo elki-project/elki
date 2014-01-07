@@ -23,11 +23,12 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -42,7 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @param <O> Object type
  */
-public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQuery<O, DoubleDistance> {
+public class DoubleOptimizedDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O, DoubleDistance> implements LinearScanQuery {
   /**
    * Raw distance function.
    */
@@ -64,26 +65,27 @@ public class DoubleOptimizedDistanceKNNQuery<O> extends LinearScanDistanceKNNQue
 
   @Override
   public DoubleDistanceKNNList getKNNForDBID(DBIDRef id, int k) {
-    final O obj = this.relation.get(id); // Query object
-    DoubleDistanceKNNHeap heap = new DoubleDistanceIntegerDBIDKNNHeap(k);
-    linearScan(relation, rawdist, obj, heap);
+    final Relation<? extends O> relation = this.relation;
+    DoubleDistanceKNNHeap heap = DBIDFactory.FACTORY.newDoubleDistanceHeap(k);
+    linearScan(relation, relation.iterDBIDs(), rawdist, relation.get(id), heap);
     return heap.toKNNList();
   }
 
   @Override
   public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
-    DoubleDistanceKNNHeap heap = new DoubleDistanceIntegerDBIDKNNHeap(k);
-    linearScan(relation, rawdist, obj, heap);
+    DoubleDistanceKNNHeap heap = DBIDFactory.FACTORY.newDoubleDistanceHeap(k);
+    linearScan(relation, relation.iterDBIDs(), rawdist, obj, heap);
     return heap.toKNNList();
   }
 
-  private static <O> void linearScan(Relation<? extends O> relation, PrimitiveDoubleDistanceFunction<? super O> rawdist, final O obj, DoubleDistanceKNNHeap heap) {
+  private static <O> void linearScan(Relation<? extends O> relation, DBIDIter iter, PrimitiveDoubleDistanceFunction<? super O> rawdist, final O obj, DoubleDistanceKNNHeap heap) {
     double kdist = Double.POSITIVE_INFINITY;
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+    while(iter.valid()) {
       final double dist = rawdist.doubleDistance(obj, relation.get(iter));
       if(dist <= kdist) {
         kdist = heap.insert(dist, iter);
       }
+      iter.advance();
     }
   }
 }

@@ -53,32 +53,23 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
    */
   @Override
   protected final void addInternal(final double dist, final int id) {
-    if(size >= k && dist > dists[kminus1]) {
+    if(size >= k && dist > dists[k - 1]) {
       return;
     }
-    // Ensure we have enough space.
-    if(size == dists.length) {
-      grow();
-    }
-    // Increases size!
-    insertionSort(dists, ids, size, dist, id);
-    ++size;
-    // Truncate if necessary:
-    if(size > k && dists[k] > dists[kminus1]) {
-      size = k; // truncate
-    }
+    insertionSort(dist, id);
   }
 
   /**
    * Insertion sort a single object.
    * 
-   * @param dists Distances
-   * @param ids IDs
-   * @param size Current size
    * @param dist New distance
    * @param id New id
    */
-  private static void insertionSort(final double[] dists, final int[] ids, final int size, final double dist, final int id) {
+  private void insertionSort(final double dist, final int id) {
+    // Ensure we have enough space.
+    if(size == dists.length) {
+      grow();
+    }
     int pos = size;
     while(pos > 0) {
       final int pre = pos - 1;
@@ -88,16 +79,25 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
       }
       dists[pos] = predist;
       ids[pos] = ids[pre];
-      --pos;
+      pos = pre;
     }
     dists[pos] = dist;
     ids[pos] = id;
+    ++size;
+    if(size > k && dists[k] > dists[k - 1]) {
+      size = k; // truncate
+    }
     return;
   }
 
   @Override
   public double insert(double dist, DBIDRef id) {
-    addInternal(dist, id.internalGetIndex());
+    final int kminus1 = k - 1;
+    final int iid = id.internalGetIndex();
+    if(size >= k && dist > dists[kminus1]) {
+      return (size >= k) ? dists[kminus1] : Double.POSITIVE_INFINITY;
+    }
+    insertionSort(dist, iid);
     return (size >= k) ? dists[kminus1] : Double.POSITIVE_INFINITY;
   }
 
@@ -118,6 +118,7 @@ public class DoubleDistanceIntegerDBIDSortedKNNList extends DoubleDistanceIntege
   }
 
   @Override
+  @Deprecated
   public void insert(DoubleDistance dist, DBIDRef id) {
     addInternal(dist.doubleValue(), id.internalGetIndex());
   }

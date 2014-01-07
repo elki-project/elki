@@ -232,15 +232,16 @@ public final class QueryUtil {
    */
   public static <O, D extends Distance<D>> KNNQuery<O, D> getLinearScanKNNQuery(DistanceQuery<O, D> distanceQuery) {
     // Slight optimizations of linear scans
-    if (distanceQuery instanceof PrimitiveDistanceQuery) {
-      if (distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
+    if(distanceQuery instanceof PrimitiveDistanceQuery) {
+      if(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
         @SuppressWarnings("unchecked")
         final KNNQuery<O, ?> knnQuery = new DoubleOptimizedDistanceKNNQuery<>((PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
         @SuppressWarnings("unchecked")
         final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
         return castQuery;
-      } else {
+      }
+      else {
         final PrimitiveDistanceQuery<O, D> pdq = (PrimitiveDistanceQuery<O, D>) distanceQuery;
         return new LinearScanPrimitiveDistanceKNNQuery<>(pdq);
       }
@@ -258,15 +259,16 @@ public final class QueryUtil {
    */
   public static <O, D extends Distance<D>> RangeQuery<O, D> getLinearScanRangeQuery(DistanceQuery<O, D> distanceQuery) {
     // Slight optimizations of linear scans
-    if (distanceQuery instanceof PrimitiveDistanceQuery) {
-      if (distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
+    if(distanceQuery instanceof PrimitiveDistanceQuery) {
+      if(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
         @SuppressWarnings("unchecked")
         final RangeQuery<O, ?> knnQuery = new DoubleOptimizedDistanceRangeQuery<>((PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
         @SuppressWarnings("unchecked")
         final RangeQuery<O, D> castQuery = (RangeQuery<O, D>) knnQuery;
         return castQuery;
-      } else {
+      }
+      else {
         final PrimitiveDistanceQuery<O, D> pdq = (PrimitiveDistanceQuery<O, D>) distanceQuery;
         return new LinearScanPrimitiveDistanceRangeQuery<>(pdq);
       }

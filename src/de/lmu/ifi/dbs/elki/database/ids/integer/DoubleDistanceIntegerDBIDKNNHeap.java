@@ -90,7 +90,7 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
   @Override
   @Deprecated
   public DoubleDistance getKNNDistance() {
-    if (heap.size() < k) {
+    if(heap.size() < k) {
       return DoubleDistance.INFINITE_DISTANCE;
     }
     return new DoubleDistance(kdist);
@@ -105,47 +105,86 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
   @Deprecated
   public void insert(DoubleDistance distance, DBIDRef id) {
     final double dist = distance.doubleValue();
-    if (dist <= kdist) {
-      addInternal(dist, id.internalGetIndex());
+    final int iid = id.internalGetIndex();
+    if(heap.size() < k) {
+      heap.add(dist, iid);
+      if(heap.size() >= k) {
+        kdist = heap.peekKey();
+      }
+      return;
     }
+    // Tied with top:
+    if(dist >= kdist) {
+      if(dist == kdist) {
+        addToTies(iid);
+      }
+      return;
+    }
+    // Old top element: (kdist, previd)
+    updateHeap(dist, iid);
   }
 
   @Override
   @Deprecated
   public void insert(Double distance, DBIDRef id) {
     final double dist = distance.doubleValue();
-    if (dist <= kdist) {
-      addInternal(dist, id.internalGetIndex());
+    final int iid = id.internalGetIndex();
+    if(heap.size() < k) {
+      heap.add(dist, iid);
+      if(heap.size() >= k) {
+        kdist = heap.peekKey();
+      }
+      return;
     }
+    // Tied with top:
+    if(dist >= kdist) {
+      if(dist == kdist) {
+        addToTies(iid);
+      }
+      return;
+    }
+    // Old top element: (kdist, previd)
+    updateHeap(dist, iid);
   }
 
   @Override
   public final double insert(final double distance, final DBIDRef id) {
-    if (distance <= kdist) {
-      addInternal(distance, id.internalGetIndex());
+    final int iid = id.internalGetIndex();
+    if(heap.size() < k) {
+      heap.add(distance, iid);
+      if(heap.size() >= k) {
+        kdist = heap.peekKey();
+      }
+      return kdist;
     }
+    // Tied with top:
+    if(distance >= kdist) {
+      if(distance == kdist) {
+        addToTies(iid);
+      }
+      return kdist;
+    }
+    // Old top element: (kdist, previd)
+    updateHeap(distance, iid);
     return kdist;
   }
 
   @Override
   public void insert(final DoubleDistanceDBIDPair e) {
     final double distance = e.doubleDistance();
-    if (distance <= kdist) {
-      addInternal(distance, e.internalGetIndex());
-    }
-  }
-
-  private final void addInternal(final double distance, final int iid) {
-    if (heap.size() < k) {
+    final int iid = e.internalGetIndex();
+    if(heap.size() < k) {
       heap.add(distance, iid);
-      if (heap.size() >= k) {
+      if(heap.size() >= k) {
         kdist = heap.peekKey();
       }
       return;
     }
     // Tied with top:
-    if (distance >= kdist) {
-      addToTies(iid);
+    if(distance >= kdist) {
+      if(distance == kdist) {
+        addToTies(iid);
+      }
       return;
     }
     // Old top element: (kdist, previd)
@@ -164,9 +203,10 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
     heap.replaceTopElement(distance, iid);
     kdist = heap.peekKey();
     // If the kdist improved, zap ties.
-    if (kdist < prevdist) {
+    if(kdist < prevdist) {
       numties = 0;
-    } else {
+    }
+    else {
       addToTies(previd);
     }
   }
@@ -177,7 +217,7 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
    * @param id Id to add
    */
   private final void addToTies(int id) {
-    if (ties.length == numties) {
+    if(ties.length == numties) {
       ties = Arrays.copyOf(ties, (ties.length << 1) + 1); // grow.
     }
     ties[numties] = id;
@@ -187,10 +227,11 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
   @Override
   public DoubleDistanceIntegerDBIDPair poll() {
     final DoubleDistanceIntegerDBIDPair ret;
-    if (numties > 0) {
+    if(numties > 0) {
       ret = new DoubleDistanceIntegerDBIDPair(kdist, ties[numties - 1]);
       --numties;
-    } else {
+    }
+    else {
       ret = new DoubleDistanceIntegerDBIDPair(heap.peekKey(), heap.peekValue());
       heap.poll();
     }
@@ -201,16 +242,17 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
    * Pop the topmost element.
    */
   protected void pop() {
-    if (numties > 0) {
+    if(numties > 0) {
       --numties;
-    } else {
+    }
+    else {
       heap.poll();
     }
   }
 
   @Override
   public DoubleDistanceIntegerDBIDPair peek() {
-    if (numties > 0) {
+    if(numties > 0) {
       return new DoubleDistanceIntegerDBIDPair(kdist, ties[numties - 1]);
     }
     return new DoubleDistanceIntegerDBIDPair(heap.peekKey(), heap.peekValue());
@@ -234,7 +276,21 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
 
   @Override
   public DoubleDistanceIntegerDBIDKNNList toKNNList() {
-    return new DoubleDistanceIntegerDBIDKNNList(this);
+    final int hsize = heap.size();
+    DoubleDistanceIntegerDBIDKNNList ret = new DoubleDistanceIntegerDBIDKNNList(k, hsize + numties);
+    // Add ties:
+    for(int i = 0; i < numties; i++) {
+      ret.dists[hsize + i] = kdist;
+      ret.ids[hsize + i] = ties[i];
+    }
+    for(int j = hsize - 1; j >= 0; j--) {
+      ret.dists[j] = heap.peekKey();
+      ret.ids[j] = heap.peekValue();
+      heap.poll();
+    }
+    ret.size = hsize + numties;
+    ret.sort();
+    return ret;
   }
 
   /**
@@ -243,9 +299,10 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
    * @return distance
    */
   protected double peekDistance() {
-    if (numties > 0) {
+    if(numties > 0) {
       return kdist;
-    } else {
+    }
+    else {
       return heap.peekKey();
     }
   }
@@ -256,7 +313,7 @@ public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {
    * @return internal id
    */
   protected int peekInternalDBID() {
-    if (numties > 0) {
+    if(numties > 0) {
       return ties[numties - 1];
     }
     return heap.peekValue();
