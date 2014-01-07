@@ -28,7 +28,6 @@ import java.io.InputStream;
 import javax.media.opengl.GL2;
 
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
-import de.lmu.ifi.dbs.elki.visualization.parallel3d.OpenGL3DParallelCoordinates;
 
 /**
  * Class to help dealing with shaders.
@@ -39,15 +38,16 @@ public class ShaderUtil {
   /**
    * Compile a shader from a file.
    * 
+   * @param context Class context for loading the resource file.
    * @param gl GL context
    * @param type
    * @param name
    * @return Shader program number.
    * @throws ShaderCompilationException When compilation failed.
    */
-  public static int compileShader(GL2 gl, int type, String name) throws ShaderCompilationException {
+  public static int compileShader(Class<?> context, GL2 gl, int type, String name) throws ShaderCompilationException {
     int prog = -1;
-    try (InputStream in = OpenGL3DParallelCoordinates.class.getResourceAsStream(name)) {
+    try (InputStream in = context.getResourceAsStream(name)) {
       int[] error = new int[1];
       String shaderdata = FileUtil.slurp(in);
       prog = gl.glCreateShader(type);
@@ -55,7 +55,7 @@ public class ShaderUtil {
       gl.glCompileShader(prog);
       // This worked best for me to capture error messages:
       gl.glGetObjectParameterivARB(prog, GL2.GL_OBJECT_INFO_LOG_LENGTH_ARB, error, 0);
-      if (error[0] > 1) {
+      if(error[0] > 1) {
         byte[] info = new byte[error[0]];
         gl.glGetInfoLogARB(prog, info.length, error, 0, info, 0);
         String out = new String(info);
@@ -64,10 +64,11 @@ public class ShaderUtil {
       }
       // Different way of catching errors.
       gl.glGetShaderiv(prog, GL2.GL_COMPILE_STATUS, error, 0);
-      if (error[0] > 1) {
+      if(error[0] > 1) {
         throw new ShaderCompilationException("Shader compilation of '" + name + "' failed.");
       }
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new ShaderCompilationException("IO error loading shader: " + name, e);
     }
     return prog;
@@ -84,7 +85,7 @@ public class ShaderUtil {
   public static int linkShaderProgram(GL2 gl, int[] shaders) throws ShaderCompilationException {
     int[] error = new int[1];
     int shaderprogram = gl.glCreateProgram();
-    for (int shader : shaders) {
+    for(int shader : shaders) {
       gl.glAttachShader(shaderprogram, shader);
     }
     gl.glLinkProgram(shaderprogram);
@@ -92,7 +93,7 @@ public class ShaderUtil {
 
     // This worked best for me to get error messages:
     gl.glGetObjectParameterivARB(shaderprogram, GL2.GL_OBJECT_INFO_LOG_LENGTH_ARB, error, 0);
-    if (error[0] > 1) {
+    if(error[0] > 1) {
       byte[] info = new byte[error[0]];
       gl.glGetInfoLogARB(shaderprogram, info.length, error, 0, info, 0);
       String out = new String(info);
