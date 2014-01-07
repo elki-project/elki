@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.uses PrimitiveDistanceQuery
  */
-public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> extends LinearScanDistanceKNNQuery<O, D> {
+public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> implements LinearScanQuery {
   /**
    * Constructor.
    * 
@@ -75,7 +76,21 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
 
   @Override
   public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(relation.get(id), k);
+    final O obj = relation.get(id);
+    KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      heap.insert(distanceQuery.distance(obj, iter), iter);
+    }
+    return heap.toKNNList();
+  }
+
+  @Override
+  public KNNList<D> getKNNForObject(O obj, int k) {
+    KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      heap.insert(distanceQuery.distance(obj, iter), iter);
+    }
+    return heap.toKNNList();
   }
 
   @Override

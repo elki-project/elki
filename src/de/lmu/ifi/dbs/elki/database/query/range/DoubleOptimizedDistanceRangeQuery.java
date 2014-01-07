@@ -26,7 +26,9 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDList;
+import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -41,7 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @param <O> Database object type
  */
-public class DoubleOptimizedDistanceRangeQuery<O> extends LinearScanDistanceRangeQuery<O, DoubleDistance> {
+public class DoubleOptimizedDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<O, DoubleDistance> implements LinearScanQuery {
   /**
    * Raw distance function.
    */
@@ -63,8 +65,9 @@ public class DoubleOptimizedDistanceRangeQuery<O> extends LinearScanDistanceRang
 
   @Override
   public DistanceDBIDList<DoubleDistance> getRangeForDBID(DBIDRef id, DoubleDistance range) {
+    final Relation<? extends O> relation = this.relation;
     DoubleDistanceIntegerDBIDList result = new DoubleDistanceIntegerDBIDList();
-    linearScan(relation, rawdist, relation.get(id), range.doubleValue(), result);
+    linearScan(relation, relation.iterDBIDs(), rawdist, relation.get(id), range.doubleValue(), result);
     result.sort();
     return result;
   }
@@ -72,17 +75,18 @@ public class DoubleOptimizedDistanceRangeQuery<O> extends LinearScanDistanceRang
   @Override
   public DistanceDBIDList<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
     DoubleDistanceIntegerDBIDList result = new DoubleDistanceIntegerDBIDList();
-    linearScan(relation, rawdist, obj, range.doubleValue(), result);
+    linearScan(relation, relation.iterDBIDs(), rawdist, obj, range.doubleValue(), result);
     result.sort();
     return result;
   }
 
-  private static <O> void linearScan(Relation<? extends O> relation, PrimitiveDoubleDistanceFunction<? super O> rawdist, O obj, double range, DoubleDistanceIntegerDBIDList result) {
-    for(final DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+  private static <O> void linearScan(Relation<? extends O> relation, DBIDIter iter, PrimitiveDoubleDistanceFunction<? super O> rawdist, O obj, double range, ModifiableDoubleDistanceDBIDList result) {
+    while(iter.valid()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
       if(doubleDistance <= range) {
         result.add(doubleDistance, iter);
       }
+      iter.advance();
     }
   }
 }

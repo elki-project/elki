@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -41,7 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> extends LinearScanDistanceRangeQuery<O, D> {
+public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
   /**
    * Constructor.
    * 
@@ -54,6 +56,28 @@ public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> ext
   @Override
   public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range) {
     // Note: subtle optimization. Get "id" only once!
-    return getRangeForObject(relation.get(id), range);
+    final O obj = relation.get(id);
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      D currentDistance = distanceQuery.distance(obj, iter);
+      if(currentDistance.compareTo(range) <= 0) {
+        result.add(currentDistance, iter);
+      }
+    }
+    result.sort();
+    return result;
+  }
+
+  @Override
+  public DistanceDBIDList<D> getRangeForObject(O obj, D range) {
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      D currentDistance = distanceQuery.distance(obj, iter);
+      if(currentDistance.compareTo(range) <= 0) {
+        result.add(currentDistance, iter);
+      }
+    }
+    result.sort();
+    return result;
   }
 }

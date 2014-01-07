@@ -37,9 +37,9 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.DoubleOptimizedDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.LinearScanDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.DoubleOptimizedDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
@@ -98,7 +98,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testExact() {
     ListParameterization params = new ListParameterization();
-    testFileBasedDatabaseConnection(params, LinearScanDistanceKNNQuery.class, LinearScanDistanceRangeQuery.class);
+    testFileBasedDatabaseConnection(params, DoubleOptimizedDistanceKNNQuery.class, DoubleOptimizedDistanceRangeQuery.class);
   }
 
   /**
@@ -195,13 +195,13 @@ public class TestIndexStructures implements JUnit4Test {
       // get the 10 next neighbors
       DoubleVector dv = new DoubleVector(querypoint);
       KNNQuery<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
-      assertTrue("Returned knn query is not of expected class.", expectKNNQuery.isAssignableFrom(knnq.getClass()));
+      assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
       KNNList<DoubleDistance> ids = knnq.getKNNForObject(dv, k);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.
       int i = 0;
-      for (DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
+      for(DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
@@ -214,13 +214,13 @@ public class TestIndexStructures implements JUnit4Test {
       // Do a range query
       DoubleVector dv = new DoubleVector(querypoint);
       RangeQuery<DoubleVector, DoubleDistance> rangeq = db.getRangeQuery(dist, eps);
-      assertTrue("Returned range query is not of expected class.", expectRangeQuery.isAssignableFrom(rangeq.getClass()));
+      assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
       DistanceDBIDList<DoubleDistance> ids = rangeq.getRangeForObject(dv, eps);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.
       int i = 0;
-      for (DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
+      for(DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
