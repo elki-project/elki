@@ -42,6 +42,16 @@ public final class Util {
   private static final long HASHPRIME = 2654435761L;
 
   /**
+   * Detect Java 7.
+   */
+  public static final boolean IS_JAVA7 = System.getProperty("java.version").startsWith("1.7.");
+
+  /**
+   * Detect Oracle Java.
+   */
+  public static final boolean IS_ORACLE_JAVA = System.getProperty("java.vm.vendor").startsWith("Oracle");
+
+  /**
    * Fake constructor: do not instantiate.
    */
   private Util() {
@@ -64,13 +74,14 @@ public final class Util {
     assert (cardinality >= 0) : "Cannot set a negative number of bits!";
     assert (cardinality < capacity) : "Cannot set " + cardinality + " of " + capacity + " bits!";
     BitSet bitset = new BitSet(capacity);
-    if (cardinality < capacity >>> 1) {
-      while (bitset.cardinality() < cardinality) {
+    if(cardinality < capacity >>> 1) {
+      while(bitset.cardinality() < cardinality) {
         bitset.set(random.nextInt(capacity));
       }
-    } else {
+    }
+    else {
       bitset.flip(0, capacity);
-      while (bitset.cardinality() > cardinality) {
+      while(bitset.cardinality() > cardinality) {
         bitset.clear(random.nextInt(capacity));
       }
     }
@@ -119,11 +130,11 @@ public final class Util {
    * @return Mixed hash code
    */
   public static int mixHashCodes(int... hash) {
-    if (hash.length == 0) {
+    if(hash.length == 0) {
       return 0;
     }
     long result = hash[0];
-    for (int i = 1; i < hash.length; i++) {
+    for(int i = 1; i < hash.length; i++) {
       result = result * HASHPRIME + hash[i];
     }
     return (int) result;
