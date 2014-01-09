@@ -90,7 +90,6 @@ public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * Constructor for Angle-Based Outlier Detection (ABOD).
    * 
    * @param kernelFunction kernel function to use
-   * @param distanceFunction Distance function
    */
   public ABOD(SimilarityFunction<? super V, DoubleDistance> kernelFunction) {
     super();

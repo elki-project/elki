@@ -52,7 +52,8 @@ public class ProbabilityWeightedMoments {
    * Compute the alpha_r factors using the method of probability-weighted
    * moments.
    * 
-   * @param sorted <b>Presorted</b> data array.
+   * @param data <b>Presorted</b> data array.
+   * @param adapter Array adapter.
    * @param nmom Number of moments to compute
    * @return Alpha moments (0-indexed)
    */
@@ -75,7 +76,8 @@ public class ProbabilityWeightedMoments {
    * Compute the beta_r factors using the method of probability-weighted
    * moments.
    * 
-   * @param sorted <b>Presorted</b> data array.
+   * @param data <b>Presorted</b> data array.
+   * @param adapter Array adapter.
    * @param nmom Number of moments to compute
    * @return Beta moments (0-indexed)
    */
@@ -99,7 +101,8 @@ public class ProbabilityWeightedMoments {
    * probability-weighted moments. Usually cheaper than computing them
    * separately.
    * 
-   * @param sorted <b>Presorted</b> data array.
+   * @param data <b>Presorted</b> data array.
+   * @param adapter Array adapter.
    * @param nmom Number of moments to compute
    * @return Alpha and Beta moments (0-indexed, interleaved)
    */
@@ -125,6 +128,7 @@ public class ProbabilityWeightedMoments {
    * Compute the sample L-Moments using probability weighted moments.
    * 
    * @param sorted <b>Presorted</b> data array.
+   * @param adapter Array adapter.
    * @param nmom Number of moments to compute
    * @return Array containing Lambda1, Lambda2, Tau3 ... TauN
    */

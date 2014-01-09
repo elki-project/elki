@@ -50,6 +50,7 @@ public interface SparseFeatureVector<D> extends FeatureVector<D> {
    *   final int dim = v.iterDim(iter);
    *   // Do something.
    * }
+   * }
    * </pre>
    * 
    * @return Identifier for the first non-zero dimension, <b>not necessarily the

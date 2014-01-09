@@ -93,7 +93,7 @@ public class SampleKMeansInitialization<V extends NumberVector<?>, D extends Dis
     Clustering<? extends MeanModel<V>> clusters = innerkMeans.run(proxydb, proxyv);
     List<V> means = new ArrayList<>();
     for (Cluster<? extends MeanModel<V>> cluster : clusters.getAllClusters()) {
-      means.add((V) cluster.getModel().getMean());
+      means.add(cluster.getModel().getMean());
     }
 
     return means;

@@ -84,11 +84,13 @@ public class DoubleDistanceDBIDPairKNNListHeap implements DoubleDistanceKNNList,
   }
 
   @Override
+  @Deprecated
   public void insert(Double distance, DBIDRef id) {
     insert(DBIDUtil.newDistancePair(distance.doubleValue(), id));
   }
 
   @Override
+  @Deprecated
   public void insert(DoubleDistance dist, DBIDRef id) {
     insert(DBIDUtil.newDistancePair(dist.doubleValue(), id));
   }

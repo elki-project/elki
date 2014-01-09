@@ -74,7 +74,8 @@ public class UniformMinMaxEstimator implements DistributionEstimator<UniformDist
   /**
    * Estimate parameters from minimum and maximum observed.
    * 
-   * @param mm Minimum and Maximum
+   * @param min Minimum
+   * @param max Maximum
    * @return Estimation
    */
   public Distribution estimate(double min, double max) {

@@ -53,6 +53,9 @@ public class KernelMatrix {
    */
   Matrix kernel;
 
+  /**
+   * Static mapping from DBIDs to indexes.
+   */
   DBIDMap idmap;
 
   /**
@@ -230,7 +233,7 @@ public class KernelMatrix {
   /**
    * Returns the ith kernel matrix column for all objects in ids
    * 
-   * @param i the column which should be returned
+   * @param i1 the column which should be returned
    * @param ids the objects
    * @return the ith kernel matrix column for all objects in ids
    */

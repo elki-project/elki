@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, D extends Distance<?>, R extends Result> extends AbstractAlgorithm<R> {
   /**
    * Holds the instance of the distance function specified by
-   * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.
+   * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.
    */
   protected PrimitiveDistanceFunction<? super O, D> distanceFunction;
 

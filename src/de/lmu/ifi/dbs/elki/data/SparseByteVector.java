@@ -214,6 +214,7 @@ public class SparseByteVector extends AbstractNumberVector<Byte> implements Spar
   }
 
   @Override
+  @Deprecated
   public double doubleValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
@@ -225,6 +226,7 @@ public class SparseByteVector extends AbstractNumberVector<Byte> implements Spar
   }
 
   @Override
+  @Deprecated
   public long longValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
@@ -427,7 +429,7 @@ public class SparseByteVector extends AbstractNumberVector<Byte> implements Spar
       final byte[] values = new byte[nonzero];
       for(int i = 0; i < nonzero; i++) {
         dims[i] = ByteArrayUtil.readUnsignedVarint(buffer);
-        values[i] = (byte) buffer.get();
+        values[i] = buffer.get();
       }
       return new SparseByteVector(dims, values, dimensionality);
     }

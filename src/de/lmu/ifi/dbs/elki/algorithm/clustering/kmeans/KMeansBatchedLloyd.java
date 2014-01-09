@@ -178,7 +178,7 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
    * @param ids IDs to process
    * @param oldmeans a list of k means
    * @param meanshift delta to apply to each mean
-   * @param csize New cluster sizes
+   * @param changesize New cluster sizes
    * @param clusters cluster assignment
    * @param assignment Current cluster assignment
    * @return true when the object was reassigned

@@ -67,8 +67,7 @@ public class LineVisualization extends AbstractVisFactory {
   public static final String NAME = "Data lines";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public LineVisualization() {
     super();
@@ -180,7 +179,7 @@ public class LineVisualization extends AbstractVisFactory {
      * Draw a single line.
      * 
      * @param iter Object reference
-     * @return
+     * @return Line element
      */
     private Element drawLine(DBIDRef iter) {
       SVGPath path = new SVGPath();

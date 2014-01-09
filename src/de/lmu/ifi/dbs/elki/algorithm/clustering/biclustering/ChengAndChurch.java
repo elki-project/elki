@@ -72,7 +72,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
 
   /**
    * The minimum number of columns that the database must have so that a removal
-   * of columns is performed in {@link #multipleNodeDeletion()}.</p>
+   * of columns is performed in {@link #multipleNodeDeletion}.</p>
    * <p>
    * Just start deleting multiple columns when more than 100 columns are in the
    * data matrix.
@@ -82,7 +82,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
 
   /**
    * The minimum number of rows that the database must have so that a removal of
-   * rows is performed in {@link #multipleNodeDeletion()}.
+   * rows is performed in {@link #multipleNodeDeletion}.
    * <p>
    * Just start deleting multiple rows when more than 100 rows are in the data
    * matrix.
@@ -96,7 +96,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   private static final int MIN_ROW_REMOVE_THRESHOLD = 100;
 
   /**
-   * Threshold for the score ({@link #DELTA_PARAM}).
+   * Threshold for the score.
    */
   private double delta;
 
@@ -104,7 +104,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * The parameter for multiple node deletion.</p>
    * <p>
    * It is used to magnify the {@link #delta} value in the
-   * {@link #multipleNodeDeletion()} method.
+   * {@link #multipleNodeDeletion} method.
    * </p>
    */
   private double alpha;
@@ -365,11 +365,8 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     /**
      * Update the row means and column means.
      * 
-     * @param rows Masked rows
-     * @param cols Masked columns
-     * @param cand.rowM Output array for row means
-     * @param cand.colM Output array for column means
-     * @param mask Mask with substitution values
+     * @param mat Data matrix
+     * @param all Flag, to update all
      * @return overall mean
      */
     protected double updateRowAndColumnMeans(final double[][] mat, boolean all) {
@@ -399,12 +396,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     /**
      * Compute the mean square residue.
      * 
-     * @param rows Masked rows
-     * @param cols Masked columns
-     * @param cand.rowM Output array for row means
-     * @param cand.colM Output array for column means
-     * @param cand.allM overall mean
-     * @param mask Mask with substitution values
+     * @param mat Data matrix
      * @return mean squared residue
      */
     protected double computeMeanSquaredDeviation(final double[][] mat) {
@@ -426,9 +418,6 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
      * Computes the <b>mean row residue</b> of the given <code>row</code>.
      * 
      * @param mat Data matrix
-     * @param currentCols current columns
-     * @param cand.rowM Row means
-     * @param cand.colM Column means
      * @param row The row who's residue should be computed.
      * @param rowinverted Indicates if the row should be considered inverted.
      * @return The row residue of the given <code>row</code>.
@@ -477,8 +466,6 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
      * and columns.
      * 
      * @param mat Mask to update.
-     * @param rows Selected rows.
-     * @param cols Selected columns.
      * @param replacement Distribution to sample replacement values from.
      */
     protected void maskMatrix(final double[][] mat, final Distribution replacement) {
@@ -855,7 +842,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     public static final OptionID N_ID = new OptionID("chengandchurch.n", "The number of biclusters to be found.");
 
     /**
-     * Threshold for the score ({@link #DELTA_PARAM}).
+     * Threshold for the score ({@link #DELTA_ID}).
      */
     private double delta;
 
@@ -863,7 +850,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
      * The parameter for multiple node deletion.</p>
      * <p>
      * It is used to magnify the {@link #delta} value in the
-     * {@link #multipleNodeDeletion()} method.
+     * {@link ChengAndChurch#multipleNodeDeletion} method.
      * </p>
      */
     private double alpha;
