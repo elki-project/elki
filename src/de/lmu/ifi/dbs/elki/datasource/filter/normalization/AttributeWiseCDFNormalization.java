@@ -214,14 +214,11 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
    * @author Erich Schubert
    *
    * @apiviz.exclude
-   *
-   * @param <V> Vector type
    */
   private static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector<?>>> {
     /**
      * Dimension to process.
      */
-
     int dim;
 
     @Override
