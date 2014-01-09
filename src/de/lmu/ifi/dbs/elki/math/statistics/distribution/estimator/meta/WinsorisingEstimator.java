@@ -52,6 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses DistributionEstimator
+ *
  * @param <D> Distribution type
  */
 @Reference(authors = "C. Hastings, F. Mosteller, J. W. Tukey, C. P. Winsor", title = "Low moments for small samples: a comparative study of order statistics", booktitle = "The Annals of Mathematical Statistics, 18(3)", url = "http://dx.doi.org/10.1214/aoms/1177730388")

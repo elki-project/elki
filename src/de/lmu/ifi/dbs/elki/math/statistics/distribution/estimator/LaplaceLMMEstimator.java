@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has ExponentialDistribution
+ * @apiviz.has LaplaceDistribution
  */
 public class LaplaceLMMEstimator extends AbstractLMMEstimator<LaplaceDistribution> {
   /**

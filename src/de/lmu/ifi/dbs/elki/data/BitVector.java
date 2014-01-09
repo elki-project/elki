@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Provides a BitVector wrapping a BitSet.
  * 
  * @author Arthur Zimek
+ * 
+ * @apiviz.composeOf Bit
  */
 public class BitVector extends AbstractNumberVector<Bit> {
   /**

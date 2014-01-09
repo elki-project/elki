@@ -123,7 +123,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
 
       // We iterate over dimensions, this kind of filter needs fast random
       // access.
-      Adapter<V> adapter = new Adapter<>();
+      Adapter adapter = new Adapter();
       for (int d = 0; d < dim; d++) {
         adapter.dim = d;
         if (estimators.size() == 1) {
@@ -208,7 +208,16 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
     return result.toString();
   }
 
-  private static class Adapter<V extends NumberVector<?>> implements NumberArrayAdapter<Double, List<V>> {
+  /**
+   * Array adapter class for vectors.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   *
+   * @param <V> Vector type
+   */
+  private static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector<?>>> {
     /**
      * Dimension to process.
      */
@@ -216,42 +225,42 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
     int dim;
 
     @Override
-    public int size(List<V> array) {
+    public int size(List<? extends NumberVector<?>> array) {
       return array.size();
     }
 
     @Override
-    public Double get(List<V> array, int off) throws IndexOutOfBoundsException {
+    public Double get(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
       return getDouble(array, off);
     }
 
     @Override
-    public double getDouble(List<V> array, int off) throws IndexOutOfBoundsException {
+    public double getDouble(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).doubleValue(dim);
     }
 
     @Override
-    public float getFloat(List<V> array, int off) throws IndexOutOfBoundsException {
+    public float getFloat(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).floatValue(dim);
     }
 
     @Override
-    public int getInteger(List<V> array, int off) throws IndexOutOfBoundsException {
+    public int getInteger(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).intValue(dim);
     }
 
     @Override
-    public short getShort(List<V> array, int off) throws IndexOutOfBoundsException {
+    public short getShort(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).shortValue(dim);
     }
 
     @Override
-    public long getLong(List<V> array, int off) throws IndexOutOfBoundsException {
+    public long getLong(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).longValue(dim);
     }
 
     @Override
-    public byte getByte(List<V> array, int off) throws IndexOutOfBoundsException {
+    public byte getByte(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).byteValue(dim);
     }
   }

@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
  * @apiviz.uses IntegerDBIDPair oneway - - «create»
  * @apiviz.uses IntegerDBIDRange oneway - - «create»
  * @apiviz.uses TroveArrayModifiableDBIDs oneway - - «create»
- * @apiviz.uses TroveHashSetModifiableDBIDs oneway - - «create»
+ * @apiviz.uses IntegerArrayDBIDs oneway - - «create»
  */
 abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   /**

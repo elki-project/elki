@@ -65,6 +65,13 @@ public class LinearKernelFunction extends PolynomialKernelFunction {
     return Math.sqrt(doubleSimilarity(fv1, fv1) + doubleSimilarity(fv2, fv2) - 2 * doubleSimilarity(fv1, fv2));
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
     protected LinearKernelFunction makeInstance() {

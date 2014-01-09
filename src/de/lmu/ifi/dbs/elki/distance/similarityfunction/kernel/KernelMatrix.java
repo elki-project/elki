@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * 
  * @author Simon Paradies
  * 
- * @apiviz.uses SimilarityFunction
+ * @apiviz.uses PrimitiveSimilarityFunction
  */
 public class KernelMatrix {
   /**

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.math.statistics.KernelDensityFunction
+ * @apiviz.uses KernelDensityFunction
  */
 public class KernelDensityEstimator {
   /**

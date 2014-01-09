@@ -36,10 +36,8 @@ import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
  * Representing a DBID range allocation.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.has IntegerDBID
  */
-final class IntegerDBIDRange implements DBIDRange, SetDBIDs {
+final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
   /**
    * Start value.
    */

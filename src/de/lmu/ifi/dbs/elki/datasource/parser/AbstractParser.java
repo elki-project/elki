@@ -37,6 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * options.
  * 
  * @author Arthur Zimek
+ * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Tokenizer
  */
 public abstract class AbstractParser {
   /**
