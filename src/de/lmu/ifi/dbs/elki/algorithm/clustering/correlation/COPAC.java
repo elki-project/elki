@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -270,7 +270,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
   public ClusteringAlgorithm<Clustering<Model>> getPartitionAlgorithm(DistanceQuery<V, D> query) {
     ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
     ProxyDistanceFunction<V, D> dist = ProxyDistanceFunction.proxy(query);
-    reconfig.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);
+    reconfig.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);
     ClusteringAlgorithm<Clustering<Model>> instance = reconfig.tryInstantiate(partitionAlgorithm);
     reconfig.failOnErrors();
     return instance;
@@ -335,7 +335,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
       ClassParameter<ClusteringAlgorithm<Clustering<Model>>> algP = new ClassParameter<>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(algP)) {
         ListParameterization predefined = new ListParameterization();
-        predefined.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, pdistI);
+        predefined.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, pdistI);
         TrackParameters trackpar = new TrackParameters(config);
         ChainedParameterization chain = new ChainedParameterization(predefined, trackpar);
         chain.errorsTo(config);

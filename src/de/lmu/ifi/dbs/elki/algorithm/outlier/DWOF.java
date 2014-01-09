@@ -130,9 +130,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
   /**
    * Performs the Generalized DWOF_SCORE algorithm on the given database by
-   * calling all the other methods in the proper order. {@link #initializeRadii}
-   * {@link #updateRadii} {@link #clusterData} {@link #updateSizes}
-   * {@link #updateDWOFScores} {@link #wrapResult}
+   * calling all the other methods in the proper order.
    * 
    * @param database Database to query
    * @param relation Data to process

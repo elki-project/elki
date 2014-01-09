@@ -153,6 +153,6 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
    * @return Parameter object
    */
   public static <F extends DistanceFunction<?, ?>> ObjectParameter<F> makeParameterDistanceFunction(Class<?> defaultDistanceFunction, Class<?> restriction) {
-    return new ObjectParameter<>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
+    return new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
   }
 }

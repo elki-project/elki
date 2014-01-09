@@ -214,6 +214,7 @@ public class SparseShortVector extends AbstractNumberVector<Short> implements Sp
   }
 
   @Override
+  @Deprecated
   public double doubleValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
@@ -225,6 +226,7 @@ public class SparseShortVector extends AbstractNumberVector<Short> implements Sp
   }
 
   @Override
+  @Deprecated
   public long longValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
@@ -236,6 +238,7 @@ public class SparseShortVector extends AbstractNumberVector<Short> implements Sp
   }
 
   @Override
+  @Deprecated
   public short shortValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {

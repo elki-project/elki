@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -216,7 +216,7 @@ public class VisualizerParameterizer implements Parameterizable {
       if(setting.second.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
         algorithm = setting.second.getValue().toString();
       }
-      if(setting.second.equals(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
+      if(setting.second.equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
         distance = setting.second.getValue().toString();
       }
       if(setting.second.equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID)) {

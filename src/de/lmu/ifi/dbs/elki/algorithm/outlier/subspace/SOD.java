@@ -305,10 +305,8 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     /**
      * Initialize SOD Model
      * 
-     * @param relation Database
-     * @param neighborhood Neighborhood
-     * @param alpha Alpha value
-     * @param queryObject Query object
+     * @param center Center vector
+     * @param weightVector Selected dimensions
      */
     public SODModel(Vector center, BitSet weightVector) {
       this.center = center;

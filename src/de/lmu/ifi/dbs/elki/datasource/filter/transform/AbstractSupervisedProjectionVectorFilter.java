@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberVector<?>> implements ObjectFilter {
   /**
-   * r: the dimension to which the data should be reduced
+   * The dimensionality to which the data should be reduced.
    */
   protected int tdim;
 
@@ -180,7 +180,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
    * Partition the bundle based on the class label.
    * 
    * @param classcolumn
-   * @return
+   * @return Partitioned data set.
    */
   protected <O> Map<O, TIntList> partition(List<? extends O> classcolumn) {
     Map<O, TIntList> classes = new HashMap<>();

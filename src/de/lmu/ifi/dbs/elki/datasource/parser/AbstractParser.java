@@ -136,7 +136,7 @@ public abstract class AbstractParser {
 
     /**
      * OptionID for the quote character parameter (defaults to a double
-     * quotation mark as in {@link #QUOTE_CHARs}.
+     * quotation mark as in {@link AbstractParser#QUOTE_CHARS}.
      */
     public static final OptionID QUOTE_ID = new OptionID("parser.quote", "Quotation characters. By default, both double and single ASCII quotes are accepted.");
 

@@ -118,11 +118,8 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * Run the actual biclustering algorithm.
    * <p/>
    * This method is supposed to be called only from the method
-   * {@link #run(Database)}.
+   * {@link #run}.
    * <p/>
-   * If a bicluster is to be appended to the result, the methods
-   * {@link #defineBicluster(BitSet,BitSet)} and
-   * {@link #addBiclusterToResult(BiclusterModel)} should be used.
    */
   protected abstract Clustering<M> biclustering();
 

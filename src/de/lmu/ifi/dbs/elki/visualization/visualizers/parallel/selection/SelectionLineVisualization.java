@@ -145,7 +145,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
      * Draw a single line.
      * 
      * @param iter Object reference
-     * @return
+     * @return SVG Element
      */
     private Element drawLine(DBIDRef iter) {
       SVGPath path = new SVGPath();

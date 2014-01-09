@@ -73,7 +73,7 @@ public class IntStaticHistogram extends AbstractStaticHistogram implements IntHi
       } else {
         // Shift in place and clear head
         System.arraycopy(data, 0, data, -bin, size);
-        Arrays.fill(data, 0, -bin, (int) 0);
+        Arrays.fill(data, 0, -bin, 0);
       }
       data[0] = val;
       // Note that bin is negative, -bin is the shift offset!

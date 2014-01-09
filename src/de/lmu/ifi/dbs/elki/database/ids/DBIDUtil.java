@@ -698,7 +698,7 @@ public final class DBIDUtil {
   /**
    * Randomly split IDs into {@code p} partitions of almost-equal size.
    * 
-   * @param ids Original DBIDs
+   * @param oids Original DBIDs
    * @param p Desired number of partitions.
    * @param random Random generator
    */

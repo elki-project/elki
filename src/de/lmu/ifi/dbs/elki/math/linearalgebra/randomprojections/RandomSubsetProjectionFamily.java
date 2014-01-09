@@ -101,7 +101,7 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
    * 
    * FIXME: move to shared code.
    * 
-   * @param existing Existing array
+   * @param out Existing output array
    * @param random Random generator.
    * @return Same array.
    */

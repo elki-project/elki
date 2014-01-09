@@ -216,6 +216,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   }
 
   @Override
+  @Deprecated
   public double doubleValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
@@ -227,6 +228,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   }
 
   @Override
+  @Deprecated
   public long longValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {

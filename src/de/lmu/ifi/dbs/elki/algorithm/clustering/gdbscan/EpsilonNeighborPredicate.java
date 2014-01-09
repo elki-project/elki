@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -178,7 +178,7 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get a distance function.
-      ObjectParameter<DistanceFunction<O, D>> distanceP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<DistanceFunction<O, D>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       D distanceFactory = null;
       if(config.grab(distanceP)) {
         distfun = distanceP.instantiateClass(config);

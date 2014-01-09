@@ -87,7 +87,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   /**
    * Compute unscaled distance in a range of dimensions.
    * 
-   * @param v1 First vector
+   * @param v First vector
    * @param mbr Second MBR
    * @param start First dimension
    * @param end Exclusive last dimension
@@ -152,7 +152,7 @@ public class LPNormDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   /**
    * Compute unscaled norm in a range of dimensions.
    * 
-   * @param v Data object
+   * @param mbr Data object
    * @param start First dimension
    * @param end Exclusive last dimension
    * @param agg Current aggregate value

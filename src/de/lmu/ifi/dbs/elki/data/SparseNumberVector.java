@@ -53,6 +53,7 @@ public interface SparseNumberVector<N extends Number> extends NumberVector<N>, S
    *   final double val = v.iterDoubleValue(iter);
    *   // Do something.
    * }
+   * }
    * </pre>
    * 
    * @return Identifier for the first non-zero dimension, <b>not necessarily the
