@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf AchlioptasRandomProjection
+ * @apiviz.composedOf AchlioptasRandomProjectionFamily
  * 
  * @param <O> Object type
  */

@@ -307,6 +307,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**

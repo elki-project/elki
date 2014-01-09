@@ -77,8 +77,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
  * 
- * @apiviz.has KNNQuery
- * 
  * @param <V> Vector type
  */
 @Title("LB-ABOD: Lower Bounded Angle-Based Outlier Detection")

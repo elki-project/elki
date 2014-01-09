@@ -63,6 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf AffinityPropagationInitialization
+ * 
  * @param <O> object type
  */
 @Title("Affinity Propagation: Clustering by Passing Messages Between Data Points")

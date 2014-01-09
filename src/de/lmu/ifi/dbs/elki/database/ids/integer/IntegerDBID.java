@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.landmark
  * @apiviz.composedOf DynamicSerializer
  * @apiviz.composedOf StaticSerializer
  */

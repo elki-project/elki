@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has ExponentialDistribution
+ * @apiviz.has LaplaceDistribution
  */
 @Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
 public class LaplaceMADEstimator extends AbstractMADEstimator<LaplaceDistribution> {

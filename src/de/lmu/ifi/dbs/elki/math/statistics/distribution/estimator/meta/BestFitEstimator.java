@@ -87,11 +87,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf MOMDistributionEstimator
- * @apiviz.composedOf MADDistributionEstimator
- * @apiviz.composedOf LMMDistributionEstimator
- * @apiviz.composedOf LogMOMDistributionEstimator
- * @apiviz.composedOf LogMADDistributionEstimator
+ * @apiviz.uses MOMDistributionEstimator
+ * @apiviz.uses MADDistributionEstimator
+ * @apiviz.uses LMMDistributionEstimator
+ * @apiviz.uses LogMOMDistributionEstimator
+ * @apiviz.uses LogMADDistributionEstimator
  */
 public class BestFitEstimator implements DistributionEstimator<Distribution> {
   /**

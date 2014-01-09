@@ -1,16 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
-import gnu.trove.impl.hash.THashPrimitiveIterator;
-import gnu.trove.impl.hash.TIntHash;
-import gnu.trove.set.hash.TIntHashSet;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -34,13 +23,23 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.impl.hash.THashPrimitiveIterator;
+import gnu.trove.impl.hash.TIntHash;
+import gnu.trove.set.hash.TIntHashSet;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
+
 /**
  * Implementation using GNU Trove Int Hash Sets.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has IntegerDBID
- * @apiviz.has DBIDItr
+ * @apiviz.has Itr
  */
 class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBIDs {
   /**
@@ -85,7 +84,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   public boolean addDBIDs(DBIDs ids) {
     store.ensureCapacity(ids.size());
     boolean success = false;
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       success |= store.add(DBIDUtil.asInteger(iter));
     }
     return success;
@@ -94,7 +93,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
-    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       success |= store.remove(DBIDUtil.asInteger(id));
     }
     return success;
@@ -113,8 +112,8 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   @Override
   public boolean retainAll(DBIDs set) {
     boolean modified = false;
-    for (DBIDMIter it = iter(); it.valid(); it.advance()) {
-      if (!set.contains(it)) {
+    for(DBIDMIter it = iter(); it.valid(); it.advance()) {
+      if(!set.contains(it)) {
         it.remove();
         modified = true;
       }
@@ -146,8 +145,8 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append('[');
-    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if (buf.length() > 1) {
+    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if(buf.length() > 1) {
         buf.append(", ");
       }
       buf.append(iter.toString());

@@ -42,6 +42,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses DistributionEstimator
+ * 
  * @param <D> Distribution type
  */
 public class TrimmedEstimator<D extends Distribution> implements DistributionEstimator<D> {

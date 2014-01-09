@@ -35,6 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
  * Class to launch ELKI.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses AbstractApplication
  */
 public class ELKILauncher {
   /**

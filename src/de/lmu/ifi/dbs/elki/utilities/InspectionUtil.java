@@ -45,8 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * A collection of inspection-related utility functions.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.uses InspectionUtilFrequentlyScanned
  */
 public class InspectionUtil {
   /**

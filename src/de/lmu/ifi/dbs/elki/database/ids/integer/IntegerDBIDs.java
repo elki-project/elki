@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Integer DBID collection.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has IntegerDBIDIter
  */
 public interface IntegerDBIDs extends DBIDs {
   @Override
