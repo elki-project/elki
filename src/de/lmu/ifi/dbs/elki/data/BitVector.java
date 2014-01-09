@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.composeOf Bit
+ * @apiviz.composedOf Bit
  */
 public class BitVector extends AbstractNumberVector<Bit> {
   /**
