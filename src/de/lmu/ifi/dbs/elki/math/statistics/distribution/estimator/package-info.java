@@ -2,6 +2,8 @@
  * Estimators for statistical distributions.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.*
  */
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
