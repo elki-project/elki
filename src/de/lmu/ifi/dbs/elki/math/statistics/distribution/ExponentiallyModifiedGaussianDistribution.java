@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -159,8 +160,9 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
    */
   public static double pdf(double x, double mu, double sigma, double lambda) {
     final double dx = x - mu;
-    final double erfc = NormalDistribution.erfc(lambda * sigma * sigma - dx);
-    return .5 * lambda * Math.exp(lambda * (lambda * sigma * sigma * .5 - dx)) * erfc;
+    final double lss = lambda * sigma * sigma;
+    final double erfc = NormalDistribution.erfc((lss - dx) / (sigma * MathUtil.SQRT2));
+    return .5 * lambda * Math.exp(lambda * (lss * .5 - dx)) * erfc;
   }
 
   /**
@@ -214,17 +216,17 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
       super.makeOptions(config);
 
       DoubleParameter locP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(locP)) {
+      if(config.grab(locP)) {
         mean = locP.doubleValue();
       }
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if (config.grab(scaleP)) {
+      if(config.grab(scaleP)) {
         stddev = scaleP.doubleValue();
       }
 
       DoubleParameter rateP = new DoubleParameter(ExponentialDistribution.Parameterizer.RATE_ID);
-      if (config.grab(rateP)) {
+      if(config.grab(rateP)) {
         lambda = rateP.doubleValue();
       }
     }
