@@ -762,7 +762,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * 
    * @author Erich Schubert
    */
-  private static class Signature implements Cloneable {
+  private static class Signature {
     /**
      * Subspace specification
      */
@@ -819,14 +819,6 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         }
       }
       return -1;
-    }
-
-    @Override
-    protected Signature clone() throws CloneNotSupportedException {
-      Signature c = (Signature) super.clone();
-      c.spec = this.spec.clone();
-      c.ids = null;
-      return c;
     }
 
     @Override
