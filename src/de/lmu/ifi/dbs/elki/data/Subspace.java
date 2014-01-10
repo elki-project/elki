@@ -60,7 +60,6 @@ public class Subspace {
    * @param dimensions the dimensions building this subspace
    */
   public Subspace(BitSet dimensions) {
-    this.dimensions.clear();
     this.dimensions.or(dimensions);
     dimensionality = dimensions.cardinality();
   }
