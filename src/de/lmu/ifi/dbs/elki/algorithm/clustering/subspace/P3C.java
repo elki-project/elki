@@ -1,4 +1,27 @@
-package experimentalcode.students.nuecke.algorithm.clustering.subspace;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +103,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("P3C: A Robust Projected Clustering Algorithm.")
 @Reference(authors = "Gabriela Moise, Jörg Sander, Martin Ester", title = "P3C: A Robust Projected Clustering Algorithm", booktitle = "Proc. Sixth International Conference on Data Mining (ICDM '06)", url = "http://dx.doi.org/10.1109/ICDM.2006.123")
-public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> {
+public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -716,15 +739,9 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Expected size thus:
     double expect = first.ids.size() * width;
     if(support <= expect || support < minClusterSize) {
-      if(LOG.isDebugging()) {
-        LOG.debug("Pruning: expect: " + expect + " support: " + support);
-      }
       return null;
     }
     final double test = PoissonDistribution.rawProbability(support, expect);
-    if(LOG.isDebugging()) {
-      LOG.debug("Expect: " + expect + " support: " + support + " test: " + test);
-    }
     if((poissonThreshold) <= test) {
       return null;
     }
