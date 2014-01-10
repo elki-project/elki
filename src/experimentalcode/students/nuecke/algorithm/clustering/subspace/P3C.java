@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -63,10 +64,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In: Proc. Sixth International Conference on Data Mining (ICDM '06)
  * </p>
  * 
+ * This is not a complete implementation of P3C, but good enough for most users.
+ * Improvements are welcome. The most obviously missing step is section 3.5 of
+ * P3C, where the cluster subspaces are refined.
+ * 
  * @author Florian Nuecke
  * @author Erich Schubert
  * 
+ * @apiviz.uses EM
  * @apiviz.has SubspaceModel
+ * @apiviz.has ClusterCandidate
+ * @apiviz.has Signature
  * 
  * @param <V> the type of NumberVector handled by this Algorithm.
  */
@@ -175,102 +183,28 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       stepProgress.beginStep(3, "Merging marked bins to 1-signatures.", LOG);
     }
 
-    // Generate projected p-signature intervals.
-    ArrayList<Signature> signatures = new ArrayList<>();
-    for(int d = 0; d < dim; d++) {
-      final DBIDs[] parts = partitions[d];
-      if(parts == null) {
-        continue; // Never mark any on constant dimensions.
-      }
-      final long[] marked = markers[d];
-      // Find sequences of 1s in marked.
-      for(int start = BitsUtil.nextSetBit(marked, 0); start >= 0;) {
-        int end = BitsUtil.nextClearBit(marked, start + 1);
-        end = (end == -1) ? dim : end;
-        int[] signature = new int[dim << 1];
-        Arrays.fill(signature, -1);
-        signature[d << 1] = start;
-        signature[(d << 1) + 1] = end - 1; // inclusive
-        HashSetModifiableDBIDs sids = unionDBIDs(parts, start, end /* exclusive */);
-        if(LOG.isDebugging()) {
-          LOG.debug("1-signature: " + d + " " + start + "-" + (end - 1));
-        }
-        signatures.add(new Signature(signature, sids));
-        start = (end < dim) ? BitsUtil.nextSetBit(marked, end + 1) : -1;
-      }
-    }
+    ArrayList<Signature> signatures = constructOneSignatures(partitions, markers);
 
     if(stepProgress != null) {
       stepProgress.beginStep(4, "Computing cluster cores from merged p-signatures.", LOG);
     }
 
-    MutableProgress mergeProgress = LOG.isVerbose() ? new MutableProgress("Merging signatures.", signatures.size(), LOG) : null;
-
-    // Annotate dimensions to 1-signatures:
-    int[] firstdim = new int[signatures.size()];
-    for(int i = 0; i < signatures.size(); i++) {
-      firstdim[i] = signatures.get(i).getFirstDim();
-    }
-
-    // Merge to (p+1)-signatures (cluster cores).
-    ArrayList<Signature> clusterCores = new ArrayList<>(signatures);
-    // Try adding merge 1-signature with each cluster core.
-    for(int i = 0; i < clusterCores.size(); ++i) {
-      final Signature parent = clusterCores.get(i);
-      final int end = parent.getFirstDim();
-      for(int j = 0; j < signatures.size() && end < firstdim[j]; j++) {
-        final Signature onesig = signatures.get(j);
-        final Signature merge = mergeSignatures(parent, onesig, binCount);
-        if(merge != null) {
-          // We add each potential core to the list to allow remaining
-          // 1-signatures to try merging with this p-signature as well.
-          clusterCores.add(merge);
-          // Flag both "parents" for removal.
-          parent.prune = true;
-          onesig.prune = true;
-        }
-      }
-      if(mergeProgress != null) {
-        mergeProgress.setTotal(clusterCores.size());
-        mergeProgress.incrementProcessed(LOG);
-      }
-    }
-    if(mergeProgress != null) {
-      mergeProgress.setProcessed(mergeProgress.getTotal(), LOG);
-    }
+    ArrayList<Signature> clusterCores = mergeClusterCores(binCount, signatures);
 
     if(stepProgress != null) {
       stepProgress.beginStep(5, "Pruning redundant cluster cores.", LOG);
     }
 
-    // Prune cluster cores based on Definition 3, Condition 2.
-    ArrayList<Signature> retain = new ArrayList<>(clusterCores.size());
-    outer: for(Signature clusterCore : clusterCores) {
-      if(clusterCore.prune) {
-        continue;
-      }
-      for(int k = 0; k < clusterCores.size(); k++) {
-        Signature other = clusterCores.get(k);
-        if(other != clusterCore) {
-          if(other.isSuperset(clusterCore)) {
-            continue outer;
-          }
-        }
-      }
-      if(LOG.isDebugging()) {
-        LOG.debug("Retained cluster core: " + clusterCore);
-      }
-      retain.add(clusterCore);
-    }
-    clusterCores = retain;
+    clusterCores = pruneRedundantClusterCores(clusterCores);
     if(LOG.isVerbose()) {
       LOG.verbose("Number of cluster cores found: " + clusterCores.size());
     }
 
     if(clusterCores.size() == 0) {
       stepProgress.setCompleted(LOG);
-      // FIXME: return trivial noise clustering.
-      return null;
+      Clustering<SubspaceModel<V>> c = new Clustering<>("P3C", "P3C");
+      c.addToplevelCluster(new Cluster<SubspaceModel<V>>(relation.getDBIDs(), true));
+      return c;
     }
 
     if(stepProgress != null) {
@@ -348,10 +282,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       LOG.verbose("Number of clusters remaining: " + clusterCandidates.size());
     }
 
-    // Relevant attribute computation.
-    for(ClusterCandidate candidate : clusterCandidates) {
-      // TODO Check all attributes previously deemed uniform (section 3.5).
-    }
+    // TODO Check all attributes previously deemed uniform (section 3.5).
 
     if(stepProgress != null) {
       stepProgress.beginStep(9, "Generating final result.", LOG);
@@ -374,6 +305,112 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     return result;
+  }
+
+  /**
+   * Construct the 1-signatures by merging adjacent dense bins.
+   * 
+   * @param partitions Initial partitions.
+   * @param markers Markers for dense partitions.
+   * @return 1-signatures
+   */
+  private ArrayList<Signature> constructOneSignatures(SetDBIDs[][] partitions, final long[][] markers) {
+    final int dim = partitions.length;
+    // Generate projected p-signature intervals.
+    ArrayList<Signature> signatures = new ArrayList<>();
+    for(int d = 0; d < dim; d++) {
+      final DBIDs[] parts = partitions[d];
+      if(parts == null) {
+        continue; // Never mark any on constant dimensions.
+      }
+      final long[] marked = markers[d];
+      // Find sequences of 1s in marked.
+      for(int start = BitsUtil.nextSetBit(marked, 0); start >= 0;) {
+        int end = BitsUtil.nextClearBit(marked, start + 1);
+        end = (end == -1) ? dim : end;
+        int[] signature = new int[dim << 1];
+        Arrays.fill(signature, -1);
+        signature[d << 1] = start;
+        signature[(d << 1) + 1] = end - 1; // inclusive
+        HashSetModifiableDBIDs sids = unionDBIDs(parts, start, end /* exclusive */);
+        if(LOG.isDebugging()) {
+          LOG.debug("1-signature: " + d + " " + start + "-" + (end - 1));
+        }
+        signatures.add(new Signature(signature, sids));
+        start = (end < dim) ? BitsUtil.nextSetBit(marked, end + 1) : -1;
+      }
+    }
+    return signatures;
+  }
+
+  /**
+   * Merge 1-signatures into p-signatures.
+   * 
+   * @param binCount Number of bins in each dimension.
+   * @param signatures 1-signatures
+   * @return p-signatures
+   */
+  private ArrayList<Signature> mergeClusterCores(final int binCount, ArrayList<Signature> signatures) {
+    MutableProgress mergeProgress = LOG.isVerbose() ? new MutableProgress("Merging signatures.", signatures.size(), LOG) : null;
+
+    // Annotate dimensions to 1-signatures for quick stopping.
+    int[] firstdim = new int[signatures.size()];
+    for(int i = 0; i < signatures.size(); i++) {
+      firstdim[i] = signatures.get(i).getFirstDim();
+    }
+    LOG.debug("First dimensions: " + FormatUtil.format(firstdim));
+
+    // Merge to (p+1)-signatures (cluster cores).
+    ArrayList<Signature> clusterCores = new ArrayList<>(signatures);
+    // Try adding merge 1-signature with each cluster core.
+    for(int i = 0; i < clusterCores.size(); i++) {
+      final Signature parent = clusterCores.get(i);
+      final int end = parent.getFirstDim();
+      for(int j = 0; j < signatures.size() && firstdim[j] < end; j++) {
+        final Signature onesig = signatures.get(j);
+        final Signature merge = mergeSignatures(parent, onesig, binCount);
+        if(merge != null) {
+          // We add each potential core to the list to allow remaining
+          // 1-signatures to try merging with this p-signature as well.
+          clusterCores.add(merge);
+          // Flag both "parents" for removal.
+          parent.prune = true;
+          onesig.prune = true;
+        }
+      }
+      if(mergeProgress != null) {
+        mergeProgress.setTotal(clusterCores.size());
+        mergeProgress.incrementProcessed(LOG);
+      }
+    }
+    if(mergeProgress != null) {
+      mergeProgress.setProcessed(mergeProgress.getTotal(), LOG);
+    }
+    return clusterCores;
+  }
+
+  private ArrayList<Signature> pruneRedundantClusterCores(ArrayList<Signature> clusterCores) {
+    // Prune cluster cores based on Definition 3, Condition 2.
+    ArrayList<Signature> retain = new ArrayList<>(clusterCores.size());
+    outer: for(Signature clusterCore : clusterCores) {
+      if(clusterCore.prune) {
+        continue;
+      }
+      for(int k = 0; k < clusterCores.size(); k++) {
+        Signature other = clusterCores.get(k);
+        if(other != clusterCore) {
+          if(other.isSuperset(clusterCore)) {
+            continue outer;
+          }
+        }
+      }
+      if(LOG.isDebugging()) {
+        LOG.debug("Retained cluster core: " + clusterCore);
+      }
+      retain.add(clusterCore);
+    }
+    clusterCores = retain;
+    return clusterCores;
   }
 
   /**
@@ -630,13 +667,14 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       if(candidate.ids.size() < 2) {
         continue;
       }
+      final int dof = candidate.dimensions.cardinality();
+      final double threshold = ChiSquaredDistribution.quantile(1 - .001, dof);
       for(DBIDMIter iter = candidate.ids.iter(); iter.valid(); iter.advance()) {
         final Vector mean = means[c];
         final Vector delta = relation.get(iter).getColumnVector().minusEquals(mean);
         final Matrix invCov = invCovMatr[c];
         final double distance = MathUtil.mahalanobisDistance(invCov, delta);
-        final int dof = candidate.dimensions.cardinality() - 1;
-        if((1 - 0.001) <= ChiSquaredDistribution.cdf(distance, dof)) {
+        if(distance >= threshold) {
           // Outlier, remove it and add it to the outlier set.
           noise.add(iter);
           iter.remove();
@@ -678,10 +716,16 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Expected size thus:
     double expect = first.ids.size() * width;
     if(support <= expect || support < minClusterSize) {
+      if(LOG.isDebugging()) {
+        LOG.debug("Pruning: expect: " + expect + " support: " + support);
+      }
       return null;
     }
     final double test = PoissonDistribution.rawProbability(support, expect);
-    if((1. - poissonThreshold) <= test) {
+    if(LOG.isDebugging()) {
+      LOG.debug("Expect: " + expect + " support: " + support + " test: " + test);
+    }
+    if((poissonThreshold) <= test) {
       return null;
     }
     // Create merged signature.
@@ -696,6 +740,11 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     return newsig;
   }
 
+  /**
+   * P3C Cluster signature.
+   * 
+   * @author Erich Schubert
+   */
   private static class Signature implements Cloneable {
     /**
      * Subspace specification
@@ -742,7 +791,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     /**
-     * Find the highest dimension set in this signature.
+     * Find the first dimension set in this signature.
      * 
      * @return Dimension
      */
@@ -787,13 +836,24 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   /**
    * This class is used to represent potential clusters.
    * 
-   * TODO: Documentation.
+   * @author Erich Schubert
    */
   private static class ClusterCandidate {
+    /**
+     * Selected dimensions
+     */
     public final BitSet dimensions;
 
+    /**
+     * Objects contained in cluster.
+     */
     public final ModifiableDBIDs ids;
 
+    /**
+     * Constructor.
+     * 
+     * @param clusterCore Signature
+     */
     public ClusterCandidate(Signature clusterCore) {
       this.dimensions = new BitSet(clusterCore.spec.length >> 1);
       for(int i = 0; i < clusterCore.spec.length; i += 2) {
