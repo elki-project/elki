@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -36,6 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -58,7 +57,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
    * @param dimensions Selected dimensions
    * @param p p value
    */
-  public SubspaceLPNormDistanceFunction(double p, BitSet dimensions) {
+  public SubspaceLPNormDistanceFunction(double p, long[] dimensions) {
     super(dimensions);
     this.p = p;
   }
@@ -88,7 +87,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
     }
 
     double sqrDist = 0;
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
       sqrDist += Math.pow(delta, p);
     }
@@ -101,7 +100,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
     }
 
     double sqrDist = 0;
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       final double delta;
       final double value = v.doubleValue(d);
       final double omin = mbr.getMin(d);
@@ -128,7 +127,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
     double sqrDist = 0;
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       final double delta;
       final double max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d);
@@ -163,7 +162,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   @Override
   public double doubleNorm(NumberVector<?> obj) {
     double sqrDist = 0;
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       double delta = Math.abs(obj.doubleValue(d));
       sqrDist += Math.pow(delta, p);
     }

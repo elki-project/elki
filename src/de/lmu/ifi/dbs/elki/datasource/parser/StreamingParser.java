@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
-import java.io.InputStream;
-
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,6 +22,10 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.io.InputStream;
+
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
 
 /**
  * Interface for streaming parsers, that may be much more efficient in

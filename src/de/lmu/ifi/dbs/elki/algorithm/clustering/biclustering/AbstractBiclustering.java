@@ -218,7 +218,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * @return integer column ids
    */
   protected int[] colsBitsetToIDs(long[] cols) {
-    int[] colIDs = new int[(int) BitsUtil.cardinality(cols)];
+    int[] colIDs = new int[BitsUtil.cardinality(cols)];
     int colsIndex = 0;
     for (int cpos = 0, clpos = 0; clpos < cols.length; ++clpos) {
       long clong = cols[clpos];
@@ -243,7 +243,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * @return integer row ids
    */
   protected ArrayDBIDs rowsBitsetToIDs(long[] rows) {
-    ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray((int) BitsUtil.cardinality(rows));
+    ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray(BitsUtil.cardinality(rows));
     DBIDArrayIter iter = this.rowIDs.iter();
     outer: for (int rlpos = 0; rlpos < rows.length; ++rlpos) {
       long rlong = rows[rlpos];

@@ -23,12 +23,14 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -51,16 +53,19 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   /**
    * The dimensions to be considered for distance computation.
    */
-  protected BitSet dimensions;
+  protected long[] dimensions;
 
   /**
    * Constructor.
    * 
    * @param dimensions
    */
-  public AbstractDimensionsSelectingDoubleDistanceFunction(BitSet dimensions) {
+  public AbstractDimensionsSelectingDoubleDistanceFunction(long[] dimensions) {
     super();
     this.dimensions = dimensions;
+    if(dimensions == null) {
+      throw new AbortException("Invalid dimensions");
+    }
   }
 
   @Override
@@ -69,14 +74,14 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   }
 
   @Override
-  public BitSet getSelectedDimensions() {
+  public long[] getSelectedDimensions() {
     return dimensions;
   }
 
   @Override
-  public void setSelectedDimensions(BitSet dimensions) {
-    this.dimensions.clear();
-    this.dimensions.or(dimensions);
+  public void setSelectedDimensions(long[] dimensions) {
+    BitsUtil.zeroI(this.dimensions);
+    BitsUtil.orI(this.dimensions, dimensions);
   }
 
   @Override
@@ -103,18 +108,23 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
-    protected BitSet dimensions = null;
+    protected long[] dimensions = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      dimensions = new BitSet();
       final IntListParameter dimsP = new IntListParameter(DIMS_ID);
       dimsP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       dimsP.setOptional(true);
       if(config.grab(dimsP)) {
-        for(int d : dimsP.getValue()) {
-          dimensions.set(d);
+        final List<Integer> value = dimsP.getValue();
+        int maxd = 0;
+        for(int d : value) {
+          maxd = (d > maxd) ? d : maxd;
+        }
+        dimensions = BitsUtil.zero(maxd);
+        for(int d : value) {
+          BitsUtil.setI(dimensions, d);
         }
       }
     }

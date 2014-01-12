@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
  */
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -49,6 +48,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -141,7 +141,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", num, LOG) : null;
       for(int i = 0; i < num; i++) {
-        BitSet dimset = randomSubspace(dbdim, mindim, maxdim, rand);
+        long[] dimset = randomSubspace(dbdim, mindim, maxdim, rand);
         SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
         LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, df);
 
@@ -234,8 +234,8 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    * @param maxdim Maximum number to choose
    * @return Subspace as bits.
    */
-  private BitSet randomSubspace(final int alldim, final int mindim, final int maxdim, final Random rand) {
-    BitSet dimset = new BitSet();
+  private long[] randomSubspace(final int alldim, final int mindim, final int maxdim, final Random rand) {
+    long[] dimset = BitsUtil.zero(alldim);
     // Fill with all dimensions
     int[] dims = new int[alldim];
     for(int d = 0; d < alldim; d++) {
@@ -246,7 +246,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     // Shrink the subspace to the destination size
     for(int d = 0; d < alldim - subdim; d++) {
       int s = rand.nextInt(alldim - d);
-      dimset.set(dims[s]);
+      BitsUtil.setI(dimset, dims[s]);
       dims[s] = dims[alldim - d - 1];
     }
     return dimset;

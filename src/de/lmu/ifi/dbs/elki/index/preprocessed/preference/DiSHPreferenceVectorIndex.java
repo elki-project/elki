@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,11 +54,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -136,7 +134,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
 
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
@@ -184,12 +182,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
         }
       }
 
-      try {
-        storage.put(it, determinePreferenceVector(relation, allNeighbors, msg));
-      }
-      catch(UnableToComplyException e) {
-        throw new IllegalStateException(e);
-      }
+      storage.put(it, determinePreferenceVector(relation, allNeighbors, msg));
 
       if(LOG.isDebugging()) {
         LOG.debugFine(msg.toString());
@@ -218,10 +211,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector
-   * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    */
-  private BitSet determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) throws UnableToComplyException {
+  private long[] determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
     if(strategy.equals(Strategy.APRIORI)) {
       return determinePreferenceVectorByApriori(relation, neighborIDs, msg);
     }
@@ -240,11 +231,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector
-   * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
-   * 
    */
-  private BitSet determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) throws UnableToComplyException {
+  private long[] determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
     int dimensionality = neighborIDs.length;
 
     // database for apriori
@@ -272,27 +260,24 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     AprioriResult aprioriResult = apriori.run(apriori_db);
 
     // result of apriori
-    List<BitSet> frequentItemsets = aprioriResult.getSolution();
-    Map<BitSet, Integer> supports = aprioriResult.getSupports();
+    List<APRIORI.Itemset> frequentItemsets = aprioriResult.getItemsets();
     if(LOG.isDebugging()) {
       msg.append("\n Frequent itemsets: ").append(frequentItemsets);
-      msg.append("\n All supports: ").append(supports);
     }
     int maxSupport = 0;
     int maxCardinality = 0;
-    BitSet preferenceVector = new BitSet();
-    for(BitSet bitSet : frequentItemsets) {
-      int cardinality = bitSet.cardinality();
-      if((maxCardinality < cardinality) || (maxCardinality == cardinality && maxSupport == supports.get(bitSet))) {
-        preferenceVector = bitSet;
-        maxCardinality = cardinality;
-        maxSupport = supports.get(bitSet);
+    long[] preferenceVector = BitsUtil.zero(dimensionality);
+    for(APRIORI.Itemset itemset : frequentItemsets) {
+      if((maxCardinality < itemset.length()) || (maxCardinality == itemset.length() && maxSupport == itemset.getSupport())) {
+        preferenceVector = itemset.getItems();
+        maxCardinality = itemset.length();
+        maxSupport = itemset.getSupport();
       }
     }
 
     if(LOG.isDebugging()) {
       msg.append("\n preference ");
-      msg.append(FormatUtil.format(dimensionality, preferenceVector));
+      msg.append(BitsUtil.toString(preferenceVector, dimensionality));
       msg.append('\n');
       LOG.debugFine(msg.toString());
     }
@@ -307,9 +292,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVectorByMaxIntersection(ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
+  private long[] determinePreferenceVectorByMaxIntersection(ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
     int dimensionality = neighborIDs.length;
-    BitSet preferenceVector = new BitSet(dimensionality);
+    long[] preferenceVector = BitsUtil.zero(dimensionality);
 
     Map<Integer, ModifiableDBIDs> candidates = new HashMap<>(dimensionality);
     for(int i = 0; i < dimensionality; i++) {
@@ -325,7 +310,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     if(!candidates.isEmpty()) {
       int i = max(candidates);
       ModifiableDBIDs intersection = candidates.remove(i);
-      preferenceVector.set(i);
+      BitsUtil.setI(preferenceVector, i);
       while(!candidates.isEmpty()) {
         ModifiableDBIDs newIntersection = DBIDUtil.newHashSet();
         i = maxIntersection(candidates, intersection, newIntersection);
@@ -338,14 +323,14 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
           break;
         }
         else {
-          preferenceVector.set(i);
+          BitsUtil.setI(preferenceVector, i);
         }
       }
     }
 
     if(LOG.isDebugging()) {
       msg.append("\n preference ");
-      msg.append(FormatUtil.format(dimensionality, preferenceVector));
+      msg.append(BitsUtil.toString(preferenceVector, dimensionality));
       msg.append('\n');
       LOG.debug(msg.toString());
     }

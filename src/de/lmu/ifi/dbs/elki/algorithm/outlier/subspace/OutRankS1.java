@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -110,23 +111,23 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     Clustering<? extends SubspaceModel<?>> clustering = clusteralg.run(database);
 
     WritableDoubleDataStore score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT);
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       score.putDouble(iter, 0);
     }
 
     int maxdim = 0, maxsize = 0;
     // Find maximum dimensionality and cluster size
-    for (Cluster<? extends SubspaceModel<?>> cluster : clustering.getAllClusters()) {
+    for(Cluster<? extends SubspaceModel<?>> cluster : clustering.getAllClusters()) {
       maxsize = Math.max(maxsize, cluster.size());
-      maxdim = Math.max(maxdim, cluster.getModel().getDimensions().cardinality());
+      maxdim = Math.max(maxdim, BitsUtil.cardinality(cluster.getModel().getDimensions()));
     }
     // Iterate over all clusters:
     DoubleMinMax minmax = new DoubleMinMax();
-    for (Cluster<? extends SubspaceModel<?>> cluster : clustering.getAllClusters()) {
+    for(Cluster<? extends SubspaceModel<?>> cluster : clustering.getAllClusters()) {
       double relsize = cluster.size() / (double) maxsize;
-      double reldim = cluster.getModel().getDimensions().cardinality() / (double) maxdim;
+      double reldim = BitsUtil.cardinality(cluster.getModel().getDimensions()) / (double) maxdim;
       // Process objects in the cluster
-      for (DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
         double newscore = score.doubleValue(iter) + alpha * relsize + (1 - alpha) * reldim;
         score.putDouble(iter, newscore);
         minmax.put(newscore);
@@ -182,12 +183,12 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<SubspaceClusteringAlgorithm<? extends SubspaceModel<?>>> algP = new ObjectParameter<>(ALGORITHM_ID, SubspaceClusteringAlgorithm.class);
-      if (config.grab(algP)) {
+      if(config.grab(algP)) {
         algorithm = algP.instantiateClass(config);
       }
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.25);
       alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if (config.grab(alphaP)) {
+      if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
     }

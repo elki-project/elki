@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -690,7 +689,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       if(candidate.ids.size() < 2) {
         continue;
       }
-      final int dof = candidate.dimensions.cardinality();
+      final int dof = BitsUtil.cardinality(candidate.dimensions);
       final double threshold = ChiSquaredDistribution.quantile(1 - .001, dof);
       for(DBIDMIter iter = candidate.ids.iter(); iter.valid(); iter.advance()) {
         final Vector mean = means[c];
@@ -851,7 +850,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     /**
      * Selected dimensions
      */
-    public final BitSet dimensions;
+    public final long[] dimensions;
 
     /**
      * Objects contained in cluster.
@@ -864,9 +863,9 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
      * @param clusterCore Signature
      */
     public ClusterCandidate(Signature clusterCore) {
-      this.dimensions = new BitSet(clusterCore.spec.length >> 1);
+      this.dimensions = BitsUtil.zero(clusterCore.spec.length >> 1);
       for(int i = 0; i < clusterCore.spec.length; i += 2) {
-        this.dimensions.set(i >> 1);
+        BitsUtil.setI(this.dimensions, i >> 1);
       }
       this.ids = DBIDUtil.newArray(clusterCore.ids.size());
     }

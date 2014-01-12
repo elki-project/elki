@@ -24,9 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  */
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -42,7 +39,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -74,8 +70,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * to the correlation dimension of its objects and to then perform an arbitrary
  * clustering algorithm over the partitions.
  * <p>
- * Reference: Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.: Robust,
- * Complete, and Efficient Correlation Clustering. <br>
+ * Reference: Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.:<br />
+ * Robust, Complete, and Efficient Correlation Clustering. <br />
  * In Proc. 7th SIAM International Conference on Data Mining (SDM'07),
  * Minneapolis, MN, 2007
  * </p>
@@ -100,7 +96,8 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
   /**
    * Parameter to specify the local PCA preprocessor to derive partition
    * criterion, must extend
-   * {@link de.lmu.ifi.dbs.elki.index.preprocessed.localpca.AbstractFilteredPCAIndex}.
+   * {@link de.lmu.ifi.dbs.elki.index.preprocessed.localpca.AbstractFilteredPCAIndex}
+   * .
    * <p>
    * Key: {@code -copac.preprocessor}
    * </p>
@@ -177,26 +174,27 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    */
   @SuppressWarnings("unchecked")
   public Clustering<Model> run(Relation<V> relation) {
+    final int dim = RelationUtil.dimensionality(relation);
     if(LOG.isVerbose()) {
-      LOG.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + RelationUtil.dimensionality(relation));
+      LOG.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + dim);
     }
 
     partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D>) partitionDistanceFunction.instantiate(relation);
     LocalProjectionIndex<V, ?> preprocin = partitionDistanceQuery.getIndex();
 
     // partitioning
-    Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<>();
+    ModifiableDBIDs[] partitions = new ModifiableDBIDs[dim + 1];
     FiniteProgress partitionProgress = LOG.isVerbose() ? new FiniteProgress("Partitioning", relation.size(), LOG) : null;
     int processed = 1;
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       int corrdim = preprocin.getLocalProjection(iditer).getCorrelationDimension();
 
-      if(!partitionMap.containsKey(corrdim)) {
-        partitionMap.put(corrdim, DBIDUtil.newArray());
+      if(partitions[corrdim] == null) {
+        partitions[corrdim] = DBIDUtil.newArray();
       }
 
-      partitionMap.get(corrdim).add(iditer);
+      partitions[corrdim].add(iditer);
       if(partitionProgress != null) {
         partitionProgress.setProcessed(processed++, LOG);
       }
@@ -206,20 +204,16 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
       partitionProgress.ensureCompleted(LOG);
     }
     if(LOG.isVerbose()) {
-      for(Integer corrDim : partitionMap.keySet()) {
-        ModifiableDBIDs list = partitionMap.get(corrDim);
-        LOG.verbose("Partition [corrDim = " + corrDim + "]: " + list.size() + " objects.");
+      for(int i = 1; i <= dim; i++) {
+        ModifiableDBIDs list = partitions[i];
+        if(list != null) {
+          LOG.verbose("Partition [corrDim = " + i + "]: " + list.size() + " objects.");
+        }
       }
     }
 
-    // convert for partition algorithm.
-    // TODO: do this with DynamicDBIDs instead
-    Map<Integer, DBIDs> pmap = new HashMap<>();
-    for(Entry<Integer, ModifiableDBIDs> ent : partitionMap.entrySet()) {
-      pmap.put(ent.getKey(), ent.getValue());
-    }
     // running partition algorithm
-    return runPartitionAlgorithm(relation, pmap, partitionDistanceQuery);
+    return runPartitionAlgorithm(relation, partitions, partitionDistanceQuery);
   }
 
   /**
@@ -229,33 +223,36 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * @param partitionMap the map of partition IDs to object ids
    * @param query The preprocessor based query function
    */
-  private Clustering<Model> runPartitionAlgorithm(Relation<V> relation, Map<Integer, DBIDs> partitionMap, DistanceQuery<V, D> query) {
+  private Clustering<Model> runPartitionAlgorithm(Relation<V> relation, ModifiableDBIDs[] partitionMap, DistanceQuery<V, D> query) {
+    final int dim = RelationUtil.dimensionality(relation);
     Clustering<Model> result = new Clustering<>("COPAC clustering", "copac-clustering");
 
     // TODO: use an extra finite progress for the partitions?
-    for(Entry<Integer, DBIDs> pair : partitionMap.entrySet()) {
-      // noise partition
-      if(pair.getKey() == RelationUtil.dimensionality(relation)) {
-        // Make a Noise cluster
-        result.addToplevelCluster(new Cluster<Model>(pair.getValue(), true, ClusterModel.CLUSTER));
+    for(int d = 1; d <= dim; d++) {
+      // Nonexistant
+      if(partitionMap[d] == null) {
+        continue;
       }
-      else {
-        DBIDs partids = pair.getValue();
-        ProxyDatabase proxy = new ProxyDatabase(partids, relation);
-        
-        ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = getPartitionAlgorithm(query);
-        if(LOG.isVerbose()) {
-          LOG.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + pair.getKey() + "]...");
+      // noise partition
+      if(d == RelationUtil.dimensionality(relation)) {
+        // Make a Noise cluster
+        result.addToplevelCluster(new Cluster<Model>(partitionMap[d], true, ClusterModel.CLUSTER));
+        continue;
+      }
+      ProxyDatabase proxy = new ProxyDatabase(partitionMap[d], relation);
+
+      ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = getPartitionAlgorithm(query);
+      if(LOG.isVerbose()) {
+        LOG.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + d + "]...");
+      }
+      Clustering<Model> p = partitionAlgorithm.run(proxy);
+      // Re-Wrap resulting Clusters as DimensionModel clusters.
+      for(Cluster<Model> clus : p.getAllClusters()) {
+        if(clus.isNoise()) {
+          result.addToplevelCluster(new Cluster<Model>(clus.getIDs(), true, ClusterModel.CLUSTER));
         }
-        Clustering<Model> p = partitionAlgorithm.run(proxy);
-        // Re-Wrap resulting Clusters as DimensionModel clusters.
-        for(Cluster<Model> clus : p.getAllClusters()) {
-          if(clus.isNoise()) {
-            result.addToplevelCluster(new Cluster<Model>(clus.getIDs(), true, ClusterModel.CLUSTER));
-          }
-          else {
-            result.addToplevelCluster(new Cluster<Model>(clus.getIDs(), new DimensionModel(pair.getKey())));
-          }
+        else {
+          result.addToplevelCluster(new Cluster<Model>(clus.getIDs(), new DimensionModel(d)));
         }
       }
     }

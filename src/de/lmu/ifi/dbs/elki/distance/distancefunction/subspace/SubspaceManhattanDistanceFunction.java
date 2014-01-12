@@ -23,10 +23,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * Provides a distance function that computes the Euclidean distance between
@@ -40,7 +39,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
    * 
    * @param dimensions Selected dimensions
    */
-  public SubspaceManhattanDistanceFunction(BitSet dimensions) {
+  public SubspaceManhattanDistanceFunction(long[] dimensions) {
     super(1.0, dimensions);
   }
 
@@ -60,7 +59,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
     }
 
     double sum = 0;
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       sum += Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
     }
     return sum;
@@ -73,7 +72,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
     }
 
     double sum = 0;
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       final double value = v.doubleValue(d);
       final double omin = mbr.getMin(d);
       if(value < omin) {
@@ -98,7 +97,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
     double sum = 0;
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       final double max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d);
       if(max1 < min2) {
@@ -121,7 +120,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
   @Override
   public double doubleNorm(NumberVector<?> obj) {
     double sum = 0;
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       sum += Math.abs(obj.doubleValue(d));
     }
     return sum;

@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
@@ -42,6 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -101,7 +100,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
 
     StringBuilder msg = new StringBuilder();
 
@@ -118,7 +117,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       }
 
       KNNList<DoubleDistance> knns = knnQuery.getKNNForDBID(it, k);
-      BitSet preferenceVector = determinePreferenceVector(relation, it, knns, msg);
+      long[] preferenceVector = determinePreferenceVector(relation, it, knns, msg);
       storage.put(it, preferenceVector);
 
       if(progress != null) {
@@ -151,15 +150,15 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs, StringBuilder msg) {
+  private long[] determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs, StringBuilder msg) {
     // variances
     double[] variances = DatabaseUtil.variances(relation, relation.get(id), neighborIDs);
 
     // preference vector
-    BitSet preferenceVector = new BitSet(variances.length);
+    long[] preferenceVector = BitsUtil.zero(variances.length);
     for(int d = 0; d < variances.length; d++) {
       if(variances[d] < alpha) {
-        preferenceVector.set(d);
+        BitsUtil.setI(preferenceVector, d);
       }
     }
 
@@ -168,7 +167,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       msg.append("\nvariances ");
       msg.append(FormatUtil.format(variances, ", ", 4));
       msg.append("\npreference ");
-      msg.append(FormatUtil.format(variances.length, preferenceVector));
+      msg.append(BitsUtil.toString(preferenceVector, variances.length));
     }
 
     return preferenceVector;

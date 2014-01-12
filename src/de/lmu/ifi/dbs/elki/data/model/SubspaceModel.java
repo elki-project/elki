@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
@@ -73,7 +71,7 @@ public class SubspaceModel<V extends FeatureVector<?>> extends MeanModel<V> impl
    * 
    * @return the dimensions of the subspace
    */
-  public BitSet getDimensions() {
+  public long[] getDimensions() {
     return subspace.getDimensions();
   }
 

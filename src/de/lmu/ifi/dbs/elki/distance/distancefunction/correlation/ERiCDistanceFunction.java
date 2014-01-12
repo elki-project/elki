@@ -56,36 +56,14 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * eigenvectors p if the following condition holds for all strong eigenvectors
    * q_i of q (lambda_q < lambda_p): q_i' * M^check_p * q_i <= delta^2, must be
    * a double equal to or greater than 0.
-   * <p>
-   * Default value: {@code 0.1}
-   * </p>
-   * <p>
-   * Key: {@code -ericdf.delta}
-   * </p>
    */
-  public static final OptionID DELTA_ID = new OptionID("ericdf.delta", "Threshold for approximate linear dependency: " + "the strong eigenvectors of q are approximately linear dependent " + "from the strong eigenvectors p if the following condition " + "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " + "q_i' * M^check_p * q_i <= delta^2.");
+  private double delta;
 
   /**
    * Parameter to specify the threshold for the maximum distance between two
    * approximately linear dependent subspaces of two objects p and q (lambda_q <
    * lambda_p) before considering them as parallel, must be a double equal to or
    * greater than 0.
-   * <p>
-   * Default value: {@code 0.1}
-   * </p>
-   * <p>
-   * Key: {@code -ericdf.tau}
-   * </p>
-   */
-  public static final OptionID TAU_ID = new OptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
-
-  /**
-   * Holds the value of {@link #DELTA_ID}.
-   */
-  private double delta;
-
-  /**
-   * Holds the value of {@link #TAU_ID}.
    */
   private double tau;
 
@@ -259,6 +237,35 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<IndexFactory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>>> {
+    /**
+     * Parameter to specify the threshold for approximate linear dependency: the
+     * strong eigenvectors of q are approximately linear dependent from the
+     * strong eigenvectors p if the following condition holds for all strong
+     * eigenvectors q_i of q (lambda_q < lambda_p): q_i' * M^check_p * q_i <=
+     * delta^2, must be a double equal to or greater than 0.
+     * <p>
+     * Default value: {@code 0.1}
+     * </p>
+     * <p>
+     * Key: {@code -ericdf.delta}
+     * </p>
+     */
+    public static final OptionID DELTA_ID = new OptionID("ericdf.delta", "Threshold for approximate linear dependency: " + "the strong eigenvectors of q are approximately linear dependent " + "from the strong eigenvectors p if the following condition " + "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " + "q_i' * M^check_p * q_i <= delta^2.");
+
+    /**
+     * Parameter to specify the threshold for the maximum distance between two
+     * approximately linear dependent subspaces of two objects p and q (lambda_q
+     * < lambda_p) before considering them as parallel, must be a double equal
+     * to or greater than 0.
+     * <p>
+     * Default value: {@code 0.1}
+     * </p>
+     * <p>
+     * Key: {@code -ericdf.tau}
+     * </p>
+     */
+    public static final OptionID TAU_ID = new OptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
+
     double delta = 0.0;
 
     double tau = 0.0;

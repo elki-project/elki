@@ -23,8 +23,9 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
 import java.util.Comparator;
+
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * Represents a subspace of the original data space.
@@ -37,7 +38,7 @@ public class Subspace {
   /**
    * The dimensions building this subspace.
    */
-  private final BitSet dimensions = new BitSet();
+  private final long[] dimensions;
 
   /**
    * The dimensionality of this subspace.
@@ -50,7 +51,8 @@ public class Subspace {
    * @param dimension the dimension building this subspace
    */
   public Subspace(int dimension) {
-    dimensions.set(dimension);
+    dimensions = BitsUtil.zero(dimension);
+    BitsUtil.setI(dimensions, dimension);
     dimensionality = 1;
   }
 
@@ -59,9 +61,9 @@ public class Subspace {
    * 
    * @param dimensions the dimensions building this subspace
    */
-  public Subspace(BitSet dimensions) {
-    this.dimensions.or(dimensions);
-    dimensionality = dimensions.cardinality();
+  public Subspace(long[] dimensions) {
+    this.dimensions = dimensions;
+    dimensionality = BitsUtil.cardinality(dimensions);
   }
 
   /**
@@ -69,8 +71,8 @@ public class Subspace {
    * 
    * @return the dimensions of this subspace
    */
-  public final BitSet getDimensions() {
-    return (BitSet) dimensions.clone();
+  public final long[] getDimensions() {
+    return dimensions;
   }
 
   /**
@@ -94,7 +96,7 @@ public class Subspace {
    * @see Subspace#joinLastDimensions(Subspace)
    */
   public Subspace join(Subspace other) {
-    BitSet newDimensions = joinLastDimensions(other);
+    long[] newDimensions = joinLastDimensions(other);
     if(newDimensions == null) {
       return null;
     }
@@ -123,8 +125,8 @@ public class Subspace {
   public String toString(String pre) {
     StringBuilder result = new StringBuilder();
     result.append(pre).append("Dimensions: [");
-    int start = dimensions.nextSetBit(0);
-    for(int d = start; d >= 0; d = dimensions.nextSetBit(d + 1)) {
+    int start = BitsUtil.nextSetBit(dimensions, 0);
+    for(int d = start; d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       if(d != start) {
         result.append(", ");
       }
@@ -153,7 +155,7 @@ public class Subspace {
   public String dimensonsToString(String sep) {
     StringBuilder result = new StringBuilder();
     result.append("[");
-    for(int dim = dimensions.nextSetBit(0); dim >= 0; dim = dimensions.nextSetBit(dim + 1)) {
+    for(int dim = BitsUtil.nextSetBit(dimensions, 0); dim >= 0; dim = BitsUtil.nextSetBit(dimensions, dim + 1)) {
       if(result.length() == 1) {
         result.append(dim + 1);
       }
@@ -179,8 +181,9 @@ public class Subspace {
     if(this.dimensionality > subspace.dimensionality) {
       return false;
     }
-    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      if(!subspace.dimensions.get(d)) {
+    // FIXME: use bit operations.
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
+      if(!BitsUtil.get(subspace.dimensions, d)) {
         return false;
       }
     }
@@ -199,26 +202,25 @@ public class Subspace {
    *         specified subspace if the join condition is fulfilled, null
    *         otherwise.
    */
-  protected BitSet joinLastDimensions(Subspace other) {
+  protected long[] joinLastDimensions(Subspace other) {
     if(this.dimensionality != other.dimensionality) {
       return null;
     }
 
-    BitSet resultDimensions = new BitSet();
+    long[] resultDimensions = BitsUtil.zero(this.dimensionality);
     int last1 = -1, last2 = -1;
 
-    for(int d1 = this.dimensions.nextSetBit(0), d2 = other.dimensions.nextSetBit(0); d1 >= 0 && d2 >= 0; d1 = this.dimensions.nextSetBit(d1 + 1), d2 = other.dimensions.nextSetBit(d2 + 1)) {
-
+    for(int d1 = BitsUtil.nextSetBit(this.dimensions, 0), d2 = BitsUtil.nextSetBit(other.dimensions, 0); d1 >= 0 && d2 >= 0; d1 = BitsUtil.nextSetBit(this.dimensions, d1 + 1), d2 = BitsUtil.nextSetBit(other.dimensions, d2 + 1)) {
       if(d1 == d2) {
-        resultDimensions.set(d1);
+        BitsUtil.setI(resultDimensions, d1);
       }
       last1 = d1;
       last2 = d2;
     }
 
     if(last1 < last2) {
-      resultDimensions.set(last1);
-      resultDimensions.set(last2);
+      BitsUtil.setI(resultDimensions, last1);
+      BitsUtil.setI(resultDimensions, last2);
       return resultDimensions;
     }
     else {
@@ -272,9 +274,9 @@ public class Subspace {
      * greater than the dimensionality of the second subspace. Otherwise the
      * comparison works as follows: Let {@code d1} and {@code d2} be the first
      * occurrences of pairwise unequal dimensions in the specified subspaces.
-     * Then a negative integer or a positive integer will be returned if {@code
-     * d1} is less than or greater than {@code d2}. Otherwise the two subspaces
-     * have equal dimensions and zero will be returned.
+     * Then a negative integer or a positive integer will be returned if
+     * {@code d1} is less than or greater than {@code d2}. Otherwise the two
+     * subspaces have equal dimensions and zero will be returned.
      * 
      * {@inheritDoc}
      */
@@ -297,7 +299,7 @@ public class Subspace {
         return compare;
       }
 
-      for(int d1 = s1.getDimensions().nextSetBit(0), d2 = s2.getDimensions().nextSetBit(0); d1 >= 0 && d2 >= 0; d1 = s1.getDimensions().nextSetBit(d1 + 1), d2 = s2.getDimensions().nextSetBit(d2 + 1)) {
+      for(int d1 = BitsUtil.nextSetBit(s1.getDimensions(), 0), d2 = BitsUtil.nextSetBit(s2.getDimensions(), 0); d1 >= 0 && d2 >= 0; d1 = BitsUtil.nextSetBit(s1.getDimensions(), d1 + 1), d2 = BitsUtil.nextSetBit(s2.getDimensions(), d2 + 1)) {
         if(d1 != d2) {
           return d1 - d2;
         }

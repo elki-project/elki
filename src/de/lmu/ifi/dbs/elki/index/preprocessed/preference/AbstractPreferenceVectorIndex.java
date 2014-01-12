@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -40,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @param <NV> Number vector
  */
-public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?>> extends AbstractPreprocessorIndex<NV, BitSet> implements PreferenceVectorIndex<NV> {
+public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?>> extends AbstractPreprocessorIndex<NV, long[]> implements PreferenceVectorIndex<NV> {
   /**
    * Constructor.
    * 
@@ -51,7 +49,7 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?>> 
   }
 
   @Override
-  public BitSet getPreferenceVector(DBIDRef objid) {
+  public long[] getPreferenceVector(DBIDRef objid) {
     if(storage == null) {
       initialize();
     }

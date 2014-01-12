@@ -23,13 +23,12 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * Centroid only using a subset of dimensions.
@@ -46,7 +45,7 @@ public class ProjectedCentroid extends Centroid {
   /**
    * The selected dimensions.
    */
-  private BitSet dims;
+  private long[] dims;
 
   /**
    * Constructor for updating use.
@@ -54,10 +53,9 @@ public class ProjectedCentroid extends Centroid {
    * @param dims Dimensions to use (indexed with 0)
    * @param dim Full dimensionality
    */
-  public ProjectedCentroid(BitSet dims, int dim) {
+  public ProjectedCentroid(long[] dims, int dim) {
     super(dim);
     this.dims = dims;
-    assert (dims.length() <= dim) : (dims.length() + " > " + dim + " ?!?");
   }
 
   /**
@@ -69,7 +67,7 @@ public class ProjectedCentroid extends Centroid {
   public void put(double[] val) {
     assert (val.length == elements.length);
     wsum += 1.0;
-    for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
+    for(int i = BitsUtil.nextSetBit(dims, 0); i >= 0; i = BitsUtil.nextSetBit(dims, i + 1)) {
       final double delta = val[i] - elements[i];
       elements[i] += delta / wsum;
     }
@@ -84,11 +82,11 @@ public class ProjectedCentroid extends Centroid {
   @Override
   public void put(double[] val, double weight) {
     assert (val.length == elements.length);
-    if (weight == 0) {
+    if(weight == 0) {
       return; // Skip zero weights.
     }
     final double nwsum = weight + wsum;
-    for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
+    for(int i = BitsUtil.nextSetBit(dims, 0); i >= 0; i = BitsUtil.nextSetBit(dims, i + 1)) {
       final double delta = val[i] - elements[i];
       final double rval = delta * weight / nwsum;
       elements[i] += rval;
@@ -105,7 +103,7 @@ public class ProjectedCentroid extends Centroid {
   public void put(NumberVector<?> val) {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;
-    for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
+    for(int i = BitsUtil.nextSetBit(dims, 0); i >= 0; i = BitsUtil.nextSetBit(dims, i + 1)) {
       final double delta = val.doubleValue(i) - elements[i];
       elements[i] += delta / wsum;
     }
@@ -120,11 +118,11 @@ public class ProjectedCentroid extends Centroid {
   @Override
   public void put(NumberVector<?> val, double weight) {
     assert (val.getDimensionality() == elements.length);
-    if (weight == 0) {
+    if(weight == 0) {
       return; // Skip zero weights.
     }
     final double nwsum = weight + wsum;
-    for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
+    for(int i = BitsUtil.nextSetBit(dims, 0); i >= 0; i = BitsUtil.nextSetBit(dims, i + 1)) {
       final double delta = val.doubleValue(i) - elements[i];
       final double rval = delta * weight / nwsum;
       elements[i] += rval;
@@ -139,9 +137,8 @@ public class ProjectedCentroid extends Centroid {
    * @param relation Relation to process
    * @return Centroid
    */
-  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?>> relation) {
+  public static ProjectedCentroid make(long[] dims, Relation<? extends NumberVector<?>> relation) {
     ProjectedCentroid c = new ProjectedCentroid(dims, RelationUtil.dimensionality(relation));
-    assert (dims.size() <= RelationUtil.dimensionality(relation));
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       c.put(relation.get(iditer));
     }
@@ -156,9 +153,8 @@ public class ProjectedCentroid extends Centroid {
    * @param ids IDs to process
    * @return Centroid
    */
-  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?>> relation, DBIDs ids) {
+  public static ProjectedCentroid make(long[] dims, Relation<? extends NumberVector<?>> relation, DBIDs ids) {
     ProjectedCentroid c = new ProjectedCentroid(dims, RelationUtil.dimensionality(relation));
-    assert (dims.length() <= RelationUtil.dimensionality(relation));
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));
     }

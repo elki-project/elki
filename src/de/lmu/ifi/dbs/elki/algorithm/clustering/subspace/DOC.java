@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -52,6 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -206,8 +206,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Add the remainder as noise.
     if(S.size() > 0) {
-      BitSet alldims = new BitSet();
-      alldims.set(0, d);
+      long[] alldims = BitsUtil.ones(d);
       result.addToplevelCluster(new Cluster<>(S, true, new SubspaceModel<>(new Subspace(alldims), Centroid.make(relation, S).toVector(relation))));
     }
 
@@ -235,7 +234,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // Best cluster for the current run.
     DBIDs C = null;
     // Relevant attributes for the best cluster.
-    BitSet D = null;
+    long[] D = null;
     // Quality of the best cluster.
     double quality = Double.NEGATIVE_INFINITY;
 
@@ -244,7 +243,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // double[d], new double[d]);
 
     // Weights for distance (= rectangle query)
-    SubspaceMaximumDistanceFunction df = new SubspaceMaximumDistanceFunction(new BitSet(d));
+    SubspaceMaximumDistanceFunction df = new SubspaceMaximumDistanceFunction(BitsUtil.zero(d));
     DistanceQuery<V, DoubleDistance> dq = relation.getDatabase().getDistanceQuery(relation, df);
     RangeQuery<V, DoubleDistance> rq = relation.getDatabase().getRangeQuery(dq);
 
@@ -263,22 +262,22 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), r), random);
 
         // Initialize cluster info.
-        BitSet nD = new BitSet(d);
+        long[] nD = BitsUtil.zero(d);
 
         // Test each dimension and build bounding box.
         for(int k = 0; k < d; ++k) {
           if(dimensionIsRelevant(k, relation, randomSet)) {
-            nD.set(k);
+            BitsUtil.setI(nD, k);
           }
         }
-        if(nD.cardinality() > 0) {
+        if(BitsUtil.cardinality(nD) > 0) {
           // Get all points in the box.
           df.setSelectedDimensions(nD);
           // TODO: add filtering capabilities into query API!
           DBIDs nC = DBIDUtil.intersection(S, rq.getRangeForDBID(iter, wd));
 
           if(LOG.isDebuggingFiner()) {
-            LOG.finer("Testing a cluster candidate, |C| = " + nC.size() + ", |D| = " + nD.cardinality());
+            LOG.finer("Testing a cluster candidate, |C| = " + nC.size() + ", |D| = " + BitsUtil.cardinality(nD));
           }
 
           // Is the cluster large enough?
@@ -290,7 +289,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
           }
           else {
             // Better cluster than before?
-            double nQuality = computeClusterQuality(nC.size(), nD.cardinality());
+            double nQuality = computeClusterQuality(nC.size(), BitsUtil.cardinality(nD));
             if(nQuality > quality) {
               if(LOG.isDebuggingFiner()) {
                 LOG.finer("... and it's the best so far: " + nQuality + " vs. " + quality);
@@ -338,7 +337,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    */
   private Cluster<SubspaceModel<V>> runFastDOC(Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r) {
     // Relevant attributes of highest cardinality.
-    BitSet D = null;
+    long[] D = null;
     // The seed point for the best dimensions.
     DBIDVar dV = DBIDUtil.newVar();
 
@@ -357,20 +356,20 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), r), random);
 
         // Initialize cluster info.
-        BitSet nD = new BitSet(d);
+        long[] nD = BitsUtil.zero(d);
 
         // Test each dimension.
         for(int k = 0; k < d; ++k) {
           if(dimensionIsRelevant(k, relation, randomSet)) {
-            nD.set(k);
+            BitsUtil.setI(nD, k);
           }
         }
 
-        if(D == null || nD.cardinality() > D.cardinality()) {
+        if(D == null || BitsUtil.cardinality(nD) > BitsUtil.cardinality(D)) {
           D = nD;
           dV.set(iter);
 
-          if(D.cardinality() >= d_zero) {
+          if(BitsUtil.cardinality(D) >= d_zero) {
             if(iprogress != null) {
               iprogress.setProcessed(iprogress.getTotal(), LOG);
             }
@@ -389,7 +388,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     }
 
     // If no relevant dimensions were found, skip it.
-    if(D == null || D.cardinality() == 0) {
+    if(D == null || BitsUtil.cardinality(D) == 0) {
       return null;
     }
 
@@ -421,12 +420,11 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @return <code>true</code> if the dimension is relevant.
    */
   private boolean dimensionIsRelevant(int dimension, Relation<V> relation, DBIDs points) {
-    double min = Double.POSITIVE_INFINITY;
-    double max = Double.NEGATIVE_INFINITY;
+    double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
     for(DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
-      V xV = relation.get(iter);
-      min = Math.min(min, xV.doubleValue(dimension));
-      max = Math.max(max, xV.doubleValue(dimension));
+      double xV = relation.get(iter).doubleValue(dimension);
+      min = (xV < min) ? xV : min;
+      max = (xV > max) ? xV : max;
       if(max - min > w) {
         return false;
       }
@@ -443,7 +441,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @param D the relevant dimensions.
    * @return an object representing the subspace cluster.
    */
-  private Cluster<SubspaceModel<V>> makeCluster(Relation<V> relation, DBIDs C, BitSet D) {
+  private Cluster<SubspaceModel<V>> makeCluster(Relation<V> relation, DBIDs C, long[] D) {
     DBIDs ids = DBIDUtil.newHashSet(C); // copy, also to lose distance values!
     Cluster<SubspaceModel<V>> cluster = new Cluster<>(ids);
     cluster.setModel(new SubspaceModel<>(new Subspace(D), Centroid.make(relation, ids).toVector(relation)));

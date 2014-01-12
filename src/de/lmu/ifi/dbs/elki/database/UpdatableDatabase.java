@@ -41,9 +41,8 @@ public interface UpdatableDatabase extends Database {
    * 
    * @param objpackages the objects to be inserted
    * @return the IDs assigned to the inserted objects
-   * @throws UnableToComplyException if insertion is not possible
    */
-  DBIDs insert(ObjectBundle objpackages) throws UnableToComplyException;
+  DBIDs insert(ObjectBundle objpackages);
 
   /**
    * Removes and returns the specified objects with the given ids from the

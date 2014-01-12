@@ -190,6 +190,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     if(labelIndices != null) {
       labelcolumns.or(labelIndices);
     }
+    nextevent = null;
   }
 
   @Override

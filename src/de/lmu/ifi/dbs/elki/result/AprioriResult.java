@@ -23,58 +23,58 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
+
+import de.lmu.ifi.dbs.elki.algorithm.APRIORI.Itemset;
+import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Result class for Apriori Algorithm.
  * 
  * @author Erich Schubert
- *
  */
-public class AprioriResult extends BasicResult {
+public class AprioriResult extends BasicResult implements TextWriteable {
   /**
-   * The frequent itemsets.
+   * The supports of all frequent itemsets.
    */
-  private List<BitSet> solution;
+  private List<Itemset> itemsets;
 
   /**
-   * The supports of all itemsets.
+   * Metadata of the data relation, for item labels.
    */
-  private Map<BitSet, Integer> supports;
+  private VectorFieldTypeInformation<BitVector> meta;
 
   /**
    * Constructor.
    * 
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
-   * @param solution Frequent itemsets
-   * @param supports Supports for the itemsets
+   * @param itemsets Frequent itemsets
+   * @param meta Metadata
    */
-  public AprioriResult(String name, String shortname, List<BitSet> solution, Map<BitSet, Integer> supports) {
+  public AprioriResult(String name, String shortname, List<Itemset> itemsets, VectorFieldTypeInformation<BitVector> meta) {
     super(name, shortname);
-    this.solution = solution;
-    this.supports = supports;
+    this.itemsets = itemsets;
+    this.meta = meta;
   }
 
   /**
    * Returns the frequent item sets.
-   *
+   * 
    * @return the frequent item sets.
    */
-  public List<BitSet> getSolution() {
-      return solution;
+  public List<Itemset> getItemsets() {
+    return itemsets;
   }
 
-  /**
-   * Returns the frequencies of the frequent item sets.
-   *
-   * @return the frequencies of the frequent item sets
-   */
-  public Map<BitSet, Integer> getSupports() {
-      return supports;
+  @Override
+  public void writeToText(TextWriterStream out, String label) {
+    for(Itemset itemset : itemsets) {
+      out.inlinePrintNoQuotes(itemset.appendTo(new StringBuilder(), meta));
+      out.flush();
+    }
   }
-  
-  // TODO: text writer for AprioriResult!
 }

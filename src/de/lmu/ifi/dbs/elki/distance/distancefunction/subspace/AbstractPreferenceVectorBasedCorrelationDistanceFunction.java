@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -33,6 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceF
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.PreferenceVectorIndex;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -92,10 +91,10 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
     AbstractPreferenceVectorBasedCorrelationDistanceFunction<?, ?> other = (AbstractPreferenceVectorBasedCorrelationDistanceFunction<?, ?>) obj;
@@ -128,8 +127,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
 
     @Override
     public PreferenceVectorBasedCorrelationDistance distance(DBIDRef id1, DBIDRef id2) {
-      BitSet preferenceVector1 = index.getPreferenceVector(id1);
-      BitSet preferenceVector2 = index.getPreferenceVector(id2);
+      long[] preferenceVector1 = index.getPreferenceVector(id1);
+      long[] preferenceVector2 = index.getPreferenceVector(id2);
       V v1 = relation.get(id1);
       V v2 = relation.get(id2);
       return correlationDistance(v1, v2, preferenceVector1, preferenceVector2);
@@ -145,7 +144,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @param pv2 the second preference vector
      * @return the correlation distance between the two specified vectors
      */
-    public abstract PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2, BitSet pv1, BitSet pv2);
+    public abstract PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2, long[] pv1, long[] pv2);
 
     /**
      * Computes the weighted distance between the two specified vectors
@@ -157,17 +156,15 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @return the weighted distance between the two specified vectors according
      *         to the given preference vector
      */
-    public double weightedDistance(V v1, V v2, BitSet weightVector) {
-      if (v1.getDimensionality() != v2.getDimensionality()) {
+    public double weightedDistance(V v1, V v2, long[] weightVector) {
+      if(v1.getDimensionality() != v2.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
       }
 
       double sqrDist = 0;
-      for (int i = 0; i < v1.getDimensionality(); i++) {
-        if (weightVector.get(i)) {
-          double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
-          sqrDist += manhattanI * manhattanI;
-        }
+      for(int i = BitsUtil.nextSetBit(weightVector, 0); i >= 0; i = BitsUtil.nextSetBit(weightVector, i + 1)) {
+        double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
+        sqrDist += manhattanI * manhattanI;
       }
       return Math.sqrt(sqrDist);
     }
@@ -182,7 +179,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @return the weighted distance between the two specified vectors according
      *         to the given preference vector
      */
-    public double weightedDistance(DBID id1, DBID id2, BitSet weightVector) {
+    public double weightedDistance(DBID id1, DBID id2, long[] weightVector) {
       return weightedDistance(relation.get(id1), relation.get(id2), weightVector);
     }
 
@@ -223,7 +220,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     protected void configEpsilon(Parameterization config) {
       final DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, 0.001);
       epsilonP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if (config.grab(epsilonP)) {
+      if(config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }
     }

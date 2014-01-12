@@ -51,9 +51,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * A parser to load term frequency data, which essentially are sparse vectors
  * with text keys.
  * 
+ * If your data does not contain frequencies, you can maybe use
+ * {@link SimpleTransactionParser} instead.
+ * 
  * @author Erich Schubert
  * 
- * @apiviz.has SparseFloatVector
+ * @apiviz.has SparseNumberVector
  */
 @Title("Term frequency parser")
 @Description("Parse a file containing term frequencies. The expected format is 'label term1 <freq> term2 <freq> ...'. Terms must not contain the separator character!")
@@ -92,7 +95,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
    * (Reused) label buffer.
    */
   ArrayList<String> labels = new ArrayList<>();
-  
+
   /**
    * Constructor.
    * 

@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -41,12 +39,12 @@ public interface DimensionSelectingSubspaceDistanceFunction<O, D extends Distanc
    * 
    * @return a bit set representing the selected dimensions
    */
-  public BitSet getSelectedDimensions();
+  public long[] getSelectedDimensions();
 
   /**
    * Sets the selected dimensions according to the set bits in the given BitSet.
    * 
-   * @param dimensions a BitSet designating the new selected dimensions
+   * @param dimensions a bit set designating the new selected dimensions
    */
-  public void setSelectedDimensions(BitSet dimensions);
+  public void setSelectedDimensions(long[] dimensions);
 }

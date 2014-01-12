@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -35,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -93,19 +92,19 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
     double[] knns = new double[subset.size()];
 
     // TODO: optimize by using 1d indexes?
-    for (int x = 0; x < dim; x++) {
+    for(int x = 0; x < dim; x++) {
       final int i = matrix.dim(x);
-      for (int y = x + 1; y < dim; y++) {
+      for(int y = x + 1; y < dim; y++) {
         final int j = matrix.dim(y);
-        BitSet dims = new BitSet(dim);
-        dims.set(i);
-        dims.set(j);
+        long[] dims = BitsUtil.zero(dim);
+        BitsUtil.setI(dims, i);
+        BitsUtil.setI(dims, j);
         DistanceQuery<? extends NumberVector<?>, DoubleDistance> dq = database.getDistanceQuery(relation, new SubspaceEuclideanDistanceFunction(dims));
         KNNQuery<? extends NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(dq, k);
 
         kdistmean.reset();
         int knn = 0;
-        for (DBIDIter id1 = subset.iter(); id1.valid(); id1.advance(), knn++) {
+        for(DBIDIter id1 = subset.iter(); id1.valid(); id1.advance(), knn++) {
           final double kdist = knnq.getKNNForDBID(id1, k).getKNNDistance().doubleValue();
           kdistmean.put(kdist);
           knns[knn] = kdist;
@@ -114,9 +113,9 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
         // Deviation from mean:
         double diff = 0.;
         int below = 0;
-        for (int l = 0; l < knns.length; l++) {
+        for(int l = 0; l < knns.length; l++) {
           diff += Math.abs(mean - knns[l]);
-          if (knns[l] < mean) {
+          if(knns[l] < mean) {
             below++;
           }
         }

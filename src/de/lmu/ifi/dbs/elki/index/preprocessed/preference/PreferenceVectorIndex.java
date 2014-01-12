@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -45,7 +43,7 @@ public interface PreferenceVectorIndex<NV extends NumberVector<?>> extends Index
    * @param id Object ID
    * @return Matrix
    */
-  public BitSet getPreferenceVector(DBIDRef id);
+  public long[] getPreferenceVector(DBIDRef id);
 
   /**
    * Factory interface

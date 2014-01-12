@@ -343,7 +343,6 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     if (msg != null) {
       LOG.debugFine(msg.toString());
     }
-
   }
 
   /**

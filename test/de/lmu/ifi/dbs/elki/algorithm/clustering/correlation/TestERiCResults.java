@@ -70,8 +70,8 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0);
     // ERiC Distance function in DBSCAN:
     params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
-    params.addParameter(ERiCDistanceFunction.DELTA_ID, 0.20);
-    params.addParameter(ERiCDistanceFunction.TAU_ID, 0.04);
+    params.addParameter(ERiCDistanceFunction.Parameterizer.DELTA_ID, 0.20);
+    params.addParameter(ERiCDistanceFunction.Parameterizer.TAU_ID, 0.04);
     // Preprocessing via Local PCA:
     params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
     params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 50);
@@ -108,8 +108,8 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0);
     // ERiC Distance function in DBSCAN:
     params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
-    params.addParameter(ERiCDistanceFunction.DELTA_ID, 1.0);
-    params.addParameter(ERiCDistanceFunction.TAU_ID, 1.0);
+    params.addParameter(ERiCDistanceFunction.Parameterizer.DELTA_ID, 1.0);
+    params.addParameter(ERiCDistanceFunction.Parameterizer.TAU_ID, 1.0);
     // Preprocessing via Local PCA:
     params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
     params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 45);

@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -59,6 +57,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -149,50 +148,51 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), LOG) : null;
     final WritableDoubleDataStore sod_scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     WritableDataStore<SODModel> sod_models = null;
-    if (models) { // Models requested
+    if(models) { // Models requested
       sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     }
     DoubleMinMax minmax = new DoubleMinMax();
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      if (progress != null) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      if(progress != null) {
         progress.incrementProcessed(LOG);
       }
       DBIDs neighborhood = getNearestNeighbors(relation, snnInstance, iter);
 
       Vector center;
-      BitSet weightVector;
+      long[] weightVector;
       double sod;
-      if (neighborhood.size() > 0) {
+      if(neighborhood.size() > 0) {
         center = Centroid.make(relation, neighborhood);
         // Note: per-dimension variances; no covariances.
         double[] variances = computePerDimensionVariances(relation, center, neighborhood);
         double expectationOfVariance = Mean.of(variances);
-        weightVector = new BitSet(variances.length);
-        for (int d = 0; d < variances.length; d++) {
-          if (variances[d] < alpha * expectationOfVariance) {
-            weightVector.set(d, true);
+        weightVector = BitsUtil.zero(variances.length);
+        for(int d = 0; d < variances.length; d++) {
+          if(variances[d] < alpha * expectationOfVariance) {
+            BitsUtil.setI(weightVector, d);
           }
         }
         sod = subspaceOutlierDegree(relation.get(iter), center, weightVector);
-      } else {
+      }
+      else {
         center = relation.get(iter).getColumnVector();
         weightVector = null;
         sod = 0.;
       }
 
-      if (sod_models != null) {
+      if(sod_models != null) {
         sod_models.put(iter, new SODModel(center, weightVector));
       }
       sod_scores.putDouble(iter, sod);
       minmax.put(sod);
     }
-    if (progress != null) {
+    if(progress != null) {
       progress.ensureCompleted(LOG);
     }
     // combine results.
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new MaterializedRelation<>("Subspace Outlier Degree", "sod-outlier", TypeUtil.DOUBLE, sod_scores, relation.getDBIDs()));
-    if (sod_models != null) {
+    if(sod_models != null) {
       Relation<SODModel> models = new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<>(SODModel.class), sod_models, relation.getDBIDs());
       sodResult.addChildResult(models);
     }
@@ -215,18 +215,18 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    */
   private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBIDRef queryObject) {
     Heap<DoubleDBIDPair> nearestNeighbors = new TiedTopBoundedHeap<>(knn);
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      if (DBIDUtil.equal(iter, queryObject)) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      if(DBIDUtil.equal(iter, queryObject)) {
         continue;
       }
       double sim = simQ.similarity(queryObject, iter).doubleValue();
-      if (sim > 0.) {
+      if(sim > 0.) {
         nearestNeighbors.add(DBIDUtil.newPair(sim, iter));
       }
     }
     // Collect DBIDs
     ArrayModifiableDBIDs dbids = DBIDUtil.newArray(nearestNeighbors.size());
-    while (nearestNeighbors.size() > 0) {
+    while(nearestNeighbors.size() > 0) {
       dbids.add(nearestNeighbors.poll());
     }
     return dbids;
@@ -243,14 +243,14 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   private static double[] computePerDimensionVariances(Relation<? extends NumberVector<?>> relation, Vector center, DBIDs neighborhood) {
     double[] c = center.getArrayRef();
     double[] variances = new double[c.length];
-    for (DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
       NumberVector<?> databaseObject = relation.get(iter);
-      for (int d = 0; d < c.length; d++) {
+      for(int d = 0; d < c.length; d++) {
         final double deviation = databaseObject.doubleValue(d) - c[d];
         variances[d] += deviation * deviation;
       }
     }
-    for (int d = 0; d < variances.length; d++) {
+    for(int d = 0; d < variances.length; d++) {
       variances[d] /= neighborhood.size();
     }
     return variances;
@@ -264,9 +264,9 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @param weightVector Weight vector
    * @return sod score
    */
-  private double subspaceOutlierDegree(V queryObject, Vector center, BitSet weightVector) {
-    final int card = weightVector.cardinality();
-    if (card == 0) {
+  private double subspaceOutlierDegree(V queryObject, Vector center, long[] weightVector) {
+    final int card = BitsUtil.cardinality(weightVector);
+    if(card == 0) {
       return 0;
     }
     final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(weightVector);
@@ -300,7 +300,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     /**
      * Relevant dimensions.
      */
-    private BitSet weightVector;
+    private long[] weightVector;
 
     /**
      * Initialize SOD Model
@@ -308,7 +308,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
      * @param center Center vector
      * @param weightVector Selected dimensions
      */
-    public SODModel(Vector center, BitSet weightVector) {
+    public SODModel(Vector center, long[] weightVector) {
       this.center = center;
       this.weightVector = weightVector;
     }
@@ -377,24 +377,24 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final ObjectParameter<SimilarityFunction<V, D>> simP = new ObjectParameter<>(SIM_ID, SimilarityFunction.class, SharedNearestNeighborSimilarityFunction.class);
-      if (config.grab(simP)) {
+      if(config.grab(simP)) {
         similarityFunction = simP.instantiateClass(config);
       }
 
       final IntParameter knnP = new IntParameter(KNN_ID);
       knnP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if (config.grab(knnP)) {
+      if(config.grab(knnP)) {
         knn = knnP.getValue();
       }
 
       final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.1);
       alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if (config.grab(alphaP)) {
+      if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
 
       final Flag modelsF = new Flag(MODELS_ID);
-      if (config.grab(modelsF)) {
+      if(config.grab(modelsF)) {
         models = modelsF.isTrue();
       }
     }

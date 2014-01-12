@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
  */
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -74,7 +74,7 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
    * 
    * @param dimensions the dimensions building this subspace
    */
-  public CLIQUESubspace(BitSet dimensions) {
+  public CLIQUESubspace(long[] dimensions) {
     super(dimensions);
     denseUnits = new ArrayList<>();
     coverage = 0;
@@ -88,7 +88,7 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
   public void addDenseUnit(CLIQUEUnit<V> unit) {
     Collection<Interval> intervals = unit.getIntervals();
     for(Interval interval : intervals) {
-      if(!getDimensions().get(interval.getDimension())) {
+      if(!BitsUtil.get(getDimensions(), interval.getDimension())) {
         throw new IllegalArgumentException("Unit " + unit + "cannot be added to this subspace, because of wrong dimensions!");
       }
     }
@@ -131,7 +131,8 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
     unit.markAsAssigned();
     model.addDenseUnit(unit);
 
-    for(int dim = getDimensions().nextSetBit(0); dim >= 0; dim = getDimensions().nextSetBit(dim + 1)) {
+    final long[] dims = getDimensions();
+    for(int dim = BitsUtil.nextSetBit(dims, 0); dim >= 0; dim = BitsUtil.nextSetBit(dims, dim + 1)) {
       CLIQUEUnit<V> left = leftNeighbor(unit, dim);
       if(left != null && !left.isAssigned()) {
         dfs(left, cluster, model);
@@ -212,7 +213,7 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
    * @see de.lmu.ifi.dbs.elki.data.Subspace#joinLastDimensions
    */
   public CLIQUESubspace<V> join(CLIQUESubspace<V> other, double all, double tau) {
-    BitSet dimensions = joinLastDimensions(other);
+    long[] dimensions = joinLastDimensions(other);
     if(dimensions == null) {
       return null;
     }
