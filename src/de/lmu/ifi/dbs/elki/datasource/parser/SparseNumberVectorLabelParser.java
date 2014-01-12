@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * the number of attributes with coordinate value not zero. Subsequent entries
  * are of the form <code>index value </code> each, where index is the number of
  * the corresponding dimension, and value is the value of the corresponding
- * attribute. A complet line then could look like this:
+ * attribute. A complete line then could look like this:
  * 
  * <pre>
  * 3 7 12.34 8 56.78 11 1.234 objectlabel
@@ -77,7 +77,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> vector type
  */
-// FIXME: Maxdim!
 @Title("Sparse Vector Label Parser")
 @Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored.")
 public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> extends NumberVectorLabelParser<V> {
