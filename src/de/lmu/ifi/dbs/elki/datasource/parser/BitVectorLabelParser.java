@@ -23,12 +23,13 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.array.TLongArrayList;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -61,6 +62,11 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
   private static final Logging LOG = Logging.getLogger(BitVectorLabelParser.class);
 
   /**
+   * Buffer, will be reused.
+   */
+  TLongArrayList buf = new TLongArrayList();
+
+  /**
    * Constructor.
    * 
    * @param colSep Column separator
@@ -85,13 +91,18 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
         if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
         }
-        BitSet bitSet = new BitSet();
+        buf.clear();
         ll.clear();
         int i = 0;
         for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
           try {
+            final int word = i >>> 6;
+            final int off = i & 0x3F;
+            if(word >= buf.size()) { // Ensure size.
+              buf.add(0L);
+            }
             if(tokenizer.getLongBase10() > 0) {
-              bitSet.set(i);
+              buf.set(word, buf.get(word) | (1L << off));
             }
             ++i;
           }
@@ -107,7 +118,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
           throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
         }
 
-        vectors.add(new BitVector(bitSet, dimensionality));
+        vectors.add(new BitVector(buf.toArray(), dimensionality));
         labels.add(LabelList.make(ll));
       }
     }

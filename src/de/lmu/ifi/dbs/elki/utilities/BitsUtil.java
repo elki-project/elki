@@ -387,7 +387,7 @@ public final class BitsUtil {
    */
   public static boolean get(long[] v, int off) {
     final int wordindex = off >>> LONG_LOG2_SIZE;
-    return (v[wordindex] & (1L << off)) != 0;
+    return (wordindex < v.length) && (v[wordindex] & (1L << off)) != 0;
   }
 
   /**
@@ -1248,6 +1248,88 @@ public final class BitsUtil {
    */
   public static int magnitude(int v) {
     return Integer.SIZE - Integer.numberOfLeadingZeros(v);
+  }
+
+  /**
+   * Compute whether two Bitsets intersect.
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return {@code true} when the bitsets intersect.
+   */
+  public static boolean intersect(long x, long y) {
+    return (x & y) != 0L;
+  }
+
+  /**
+   * Compute the intersection size of two Bitsets.
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return {@code true} when the bitsets intersect.
+   */
+  public static boolean intersect(long[] x, long[] y) {
+    final int min = (x.length < y.length) ? x.length : y.length;
+    for(int i = 0; i < min; i++) {
+      if((x[i] & y[i]) != 0L) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Compute the intersection size of two Bitsets.
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return Intersection size
+   */
+  public static int intersectionSize(long x, long y) {
+    return cardinality(x & y);
+  }
+
+  /**
+   * Compute the intersection size of two Bitsets.
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return Intersection size
+   */
+  public static int intersectionSize(long[] x, long[] y) {
+    final int min = (x.length < y.length) ? x.length : y.length;
+    int res = 0;
+    for(int i = 0; i < min; i++) {
+      res += cardinality(x[i] & y[i]);
+    }
+    return res;
+  }
+
+  /**
+   * Compute the union size of two Bitsets.
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return Union size
+   */
+  public static int unionSize(long x, long y) {
+    return cardinality(x | y);
+  }
+
+  /**
+   * Compute the union size of two Bitsets.
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return Union size
+   */
+  public static int unionSize(long[] x, long[] y) {
+    final int min = (x.length < y.length) ? x.length : y.length;
+    int res = 0;
+    for(int i = 0; i < min; i++) {
+      res += cardinality(x[i] | y[i]);
+    }
+    return res;
   }
 
   /**

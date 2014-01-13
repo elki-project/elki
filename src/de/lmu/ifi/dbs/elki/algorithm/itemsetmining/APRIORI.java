@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
 /*
  This file is part of ELKI:
@@ -24,11 +24,11 @@ package de.lmu.ifi.dbs.elki.algorithm;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -145,31 +145,37 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         List<Itemset> supported = frequentItemsets(candidates, relation);
         if(msg != null) {
           if(LOG.isDebuggingFinest() && length > 2) {
-            msg.append("\ncandidates (").append(candidates.size()).append("):");
+            msg.append(length).append("-candidates (").append(candidates.size()).append("):");
             for(Itemset itemset : candidates) {
               msg.append(" [");
               itemset.appendTo(msg, meta);
               msg.append(']');
             }
+            msg.append('\n');
           }
-          msg.append("\nfrequentItemsets: (").append(supported.size()).append("):");
-          for(Itemset itemset : supported) {
-            msg.append(" [");
-            itemset.appendTo(msg, meta);
-            msg.append(']');
+          msg.append(length).append("-frequentItemsets (").append(supported.size()).append(")");
+          if(LOG.isDebuggingFine()) {
+            msg.append(':');
+            for(Itemset itemset : supported) {
+              msg.append(" [");
+              itemset.appendTo(msg, meta);
+              msg.append(']');
+            }
           }
+          msg.append('\n');
         }
         solution.addAll(supported);
         // Join to get the new candidates
         candidates = aprioriGenerate(supported, length + 1, dim);
         if(msg != null) {
-          if(length > 2) {
-            msg.append("\ncandidates after pruning (").append(candidates.size()).append("):");
+          if(length > 2 && LOG.isDebuggingFinest()) {
+            msg.append(length).append("candidates after pruning (").append(candidates.size()).append("):");
             for(Itemset itemset : candidates) {
               msg.append(" [");
               itemset.appendTo(msg, meta);
               msg.append(']');
             }
+            msg.append('\n');
           }
           LOG.verbose(msg.toString());
         }
@@ -193,7 +199,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       // TODO can we exploit that the candidate set it sorted?
       for(Itemset candidate : candidates) {
         if(candidate.containedIn(bv)) {
-          candidate.support++;
+          candidate.increaseSupport();
         }
       }
     }
@@ -202,7 +208,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     List<Itemset> supported = new ArrayList<>(candidates.size());
     for(Iterator<Itemset> iter = candidates.iterator(); iter.hasNext();) {
       final Itemset candidate = iter.next();
-      if(candidate.support >= needed) {
+      if(candidate.getSupport() >= needed) {
         supported.add(candidate);
       }
     }
@@ -230,7 +236,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         OneItemset ii = (OneItemset) supported.get(i);
         for(int j = i + 1; j < ssize; j++) {
           OneItemset ij = (OneItemset) supported.get(j);
-          candidateList.add(new SparseItemset(ii.item, ij.item));
+          candidateList.add(new SparseItemset(ii, ij));
         }
       }
       return candidateList;
@@ -250,10 +256,8 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         SparseItemset ii = (SparseItemset) supported.get(i);
         prefix: for(int j = i + 1; j < ssize; j++) {
           SparseItemset ij = (SparseItemset) supported.get(j);
-          for(int k = length - 3; k >= 0; k--) {
-            if(ii.indices[k] != ij.indices[k]) {
-              continue prefix; // Prefix doesn't match
-            }
+          if(!ii.prefixTest(ij)) {
+            break prefix; // Prefix doesn't match
           }
           // Test subsets (re-) using scratch object
           System.arraycopy(ii.indices, 1, scratch.indices, 0, length - 2);
@@ -262,6 +266,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
             scratch.indices[k] = ii.indices[k + 1];
             int pos = Collections.binarySearch(supported, scratch);
             if(pos < 0) {
+              // Prefix was okay, but one other subset was not frequent
               continue prefix;
             }
           }
@@ -320,451 +325,6 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   @Override
   protected Logging getLogger() {
     return LOG;
-  }
-
-  /**
-   * APRIORI itemset.
-   * 
-   * @author Erich Schubert
-   */
-  public static abstract class Itemset implements Comparable<Itemset> {
-    /**
-     * Support for this itemset.
-     */
-    int support;
-
-    /**
-     * Get item support.
-     * 
-     * @return Support
-     */
-    public int getSupport() {
-      return support;
-    }
-
-    /**
-     * Test whether the itemset is contained in a bit vector.
-     * 
-     * @param bv Bit vector
-     * @return {@code true} when the itemset is contained in this vector.
-     */
-    abstract public boolean containedIn(BitVector bv);
-
-    /**
-     * Itemset length.
-     * 
-     * @return Itemset length
-     */
-    abstract public int length();
-
-    /**
-     * Get the items.
-     * 
-     * @return Itemset contents.
-     */
-    abstract public long[] getItems();
-
-    @Override
-    public String toString() {
-      return appendTo(new StringBuilder(), null).toString();
-    }
-
-    /**
-     * Append to a string buffer.
-     * 
-     * @param buf Buffer
-     * @param labels Item labels
-     * @return String buffer for chaining.
-     */
-    abstract public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta);
-  }
-
-  /**
-   * APRIORI itemset.
-   * 
-   * @author Erich Schubert
-   */
-  public static class OneItemset extends Itemset {
-    /**
-     * Trivial item.
-     */
-    int item;
-
-    /**
-     * Constructor of 1-itemset.
-     * 
-     * @param item Item
-     */
-    public OneItemset(int item) {
-      this.item = item;
-    }
-
-    @Override
-    public int length() {
-      return 1;
-    }
-
-    @Override
-    public boolean containedIn(BitVector bv) {
-      // TODO: add a booleanValue method to BitVector?
-      return bv.longValue(item) != 0L;
-    }
-
-    @Override
-    public long[] getItems() {
-      long[] bits = BitsUtil.zero(item);
-      BitsUtil.setI(bits, item);
-      return bits;
-    }
-
-    @Override
-    public int hashCode() {
-      return item;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if(this == obj) {
-        return true;
-      }
-      if(obj == null) {
-        return false;
-      }
-      if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
-        return false;
-      }
-      if(getClass() != obj.getClass()) {
-        return false;
-      }
-      OneItemset other = (OneItemset) obj;
-      return item == other.item;
-    }
-
-    @Override
-    public int compareTo(Itemset o) {
-      int cmp = Integer.compare(1, o.length());
-      if(cmp != 0) {
-        return cmp;
-      }
-      if(o instanceof OneItemset) {
-        return Integer.compare(item, ((OneItemset) o).item);
-      }
-      throw new AbortException("Itemset of length 1 not using OneItemset!");
-    }
-
-    @Override
-    public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
-      String lbl = (meta != null) ? meta.getLabel(item) : null;
-      if(lbl == null) {
-        buf.append(item);
-      }
-      else {
-        buf.append(lbl);
-      }
-      return buf.append(": ").append(support);
-    }
-  }
-
-  /**
-   * APRIORI itemset.
-   * 
-   * @author Erich Schubert
-   */
-  public static class SparseItemset extends Itemset {
-    /**
-     * Items, as indexes.
-     */
-    private int[] indices;
-
-    /**
-     * Constructor.
-     * 
-     * @param items Items
-     */
-    public SparseItemset(int... indices) {
-      this.indices = indices;
-    }
-
-    @Override
-    public int length() {
-      return indices.length;
-    }
-
-    @Override
-    public boolean containedIn(BitVector bv) {
-      for(int item : indices) {
-        // TODO: add a booleanValue method to BitVector?
-        if(bv.longValue(item) == 0L) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    @Override
-    public long[] getItems() {
-      long[] bits = BitsUtil.zero(indices[indices.length - 1]);
-      for(int item : indices) {
-        BitsUtil.setI(bits, item);
-      }
-      return bits;
-    }
-
-    @Override
-    public int hashCode() {
-      return Arrays.hashCode(indices);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if(this == obj) {
-        return true;
-      }
-      if(obj == null) {
-        return false;
-      }
-      if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
-        return false;
-      }
-      // TODO: allow comparing to DenseItemset etc?
-      if(getClass() != obj.getClass()) {
-        return false;
-      }
-      return Arrays.equals(indices, ((SparseItemset) obj).indices);
-    }
-
-    @Override
-    public int compareTo(Itemset o) {
-      int cmp = Integer.compare(indices.length, o.length());
-      if(cmp != 0) {
-        return cmp;
-      }
-      SparseItemset other = (SparseItemset) o;
-      for(int i = 0; i < indices.length; i++) {
-        int c = Integer.compare(indices[i], other.indices[i]);
-        if(c != 0) {
-          return c;
-        }
-      }
-      return 0;
-    }
-
-    @Override
-    public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
-      for(int j = 0; j < indices.length; j++) {
-        if(j > 0) {
-          buf.append(", ");
-        }
-        String lbl = (meta != null) ? meta.getLabel(indices[j]) : null;
-        if(lbl == null) {
-          buf.append(indices[j]);
-        }
-        else {
-          buf.append(lbl);
-        }
-      }
-      buf.append(": ").append(support);
-      return buf;
-    }
-  }
-
-  /**
-   * APRIORI itemset.
-   * 
-   * @author Erich Schubert
-   */
-  public static class DenseItemset extends Itemset {
-    /**
-     * Items, as a bitmask.
-     */
-    long[] items;
-
-    /**
-     * Itemset length.
-     */
-    int length;
-
-    /**
-     * Constructor.
-     * 
-     * @param items Items
-     * @param length Length (Cardinality of itemset)
-     */
-    public DenseItemset(long[] items, int length) {
-      this.items = items;
-      this.length = length;
-    }
-
-    @Override
-    public int length() {
-      return length;
-    }
-
-    @Override
-    public boolean containedIn(BitVector bv) {
-      return bv.contains(items);
-    }
-
-    @Override
-    public long[] getItems() {
-      return items;
-    }
-
-    @Override
-    public int hashCode() {
-      return BitsUtil.hashCode(items);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if(this == obj) {
-        return true;
-      }
-      if(obj == null) {
-        return false;
-      }
-      if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
-        return false;
-      }
-      // TODO: allow comparison to DenseItemset?
-      if(getClass() != obj.getClass()) {
-        return false;
-      }
-      return BitsUtil.compare(items, ((DenseItemset) obj).items) == 0;
-    }
-
-    @Override
-    public int compareTo(Itemset o) {
-      int cmp = Integer.compare(length, o.length());
-      if(cmp != 0) {
-        return cmp;
-      }
-      DenseItemset other = (DenseItemset) o;
-      for(int i = 0; i < items.length; i++) {
-        if(items[i] != other.items[i]) {
-          return -Long.compare(Long.reverse(items[i]), Long.reverse(other.items[i]));
-        }
-      }
-      return 0;
-    }
-
-    @Override
-    public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
-      int i = BitsUtil.nextSetBit(items, 0);
-      while(true) {
-        String lbl = (meta != null) ? meta.getLabel(i) : null;
-        if(lbl == null) {
-          buf.append(i);
-        }
-        else {
-          buf.append(lbl);
-        }
-        i = BitsUtil.nextSetBit(items, i + 1);
-        if(i < 0) {
-          break;
-        }
-        buf.append(", ");
-      }
-      buf.append(": ").append(support);
-      return buf;
-    }
-  }
-
-  /**
-   * APRIORI itemset.
-   * 
-   * @author Erich Schubert
-   */
-  public static class SmallDenseItemset extends Itemset {
-    /**
-     * Items, as a bitmask.
-     */
-    long items;
-
-    /**
-     * Itemset length.
-     */
-    int length;
-
-    /**
-     * Constructor.
-     * 
-     * @param items Items
-     * @param length Length (Cardinality of itemset)
-     */
-    public SmallDenseItemset(long items, int length) {
-      this.items = items;
-      this.length = length;
-    }
-
-    @Override
-    public int length() {
-      return length;
-    }
-
-    @Override
-    public boolean containedIn(BitVector bv) {
-      return bv.contains(new long[] { items });
-    }
-
-    @Override
-    public long[] getItems() {
-      return new long[] { items };
-    }
-
-    @Override
-    public int hashCode() {
-      return BitsUtil.hashCode(items);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if(this == obj) {
-        return true;
-      }
-      if(obj == null) {
-        return false;
-      }
-      if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
-        return false;
-      }
-      // TODO: allow comparison to DenseItemset?
-      if(getClass() != obj.getClass()) {
-        return false;
-      }
-      return items == ((SmallDenseItemset) obj).items;
-    }
-
-    @Override
-    public int compareTo(Itemset o) {
-      int cmp = Integer.compare(length, o.length());
-      if(cmp != 0) {
-        return cmp;
-      }
-      SmallDenseItemset other = (SmallDenseItemset) o;
-      return -Long.compare(Long.reverse(items), Long.reverse(other.items));
-    }
-
-    @Override
-    public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
-      int i = BitsUtil.nextSetBit(items, 0);
-      while(true) {
-        String lbl = (meta != null) ? meta.getLabel(i) : null;
-        if(lbl == null) {
-          buf.append(i);
-        }
-        else {
-          buf.append(lbl);
-        }
-        i = BitsUtil.nextSetBit(items, i + 1);
-        if(i < 0) {
-          break;
-        }
-        buf.append(", ");
-      }
-      buf.append(": ").append(support);
-      return buf;
-    }
   }
 
   /**

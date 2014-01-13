@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -56,7 +55,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
   /**
    * Storing the bits.
    */
-  private final BitSet bits;
+  private final long[] bits;
 
   /**
    * Dimensionality of this bit vector.
@@ -69,28 +68,10 @@ public class BitVector extends AbstractNumberVector<Bit> {
    * 
    * @param bits the bits to be set in this BitVector
    * @param dimensionality the dimensionality of this BitVector
-   * @throws IllegalArgumentException if the specified dimensionality is to
-   *         small to match the given BitSet
    */
-  public BitVector(BitSet bits, int dimensionality) throws IllegalArgumentException {
-    if(dimensionality < bits.length()) {
-      throw new IllegalArgumentException("Specified dimensionality " + dimensionality + " is to low for specified BitSet of length " + bits.length());
-    }
+  public BitVector(long[] bits, int dimensionality) {
     this.bits = bits;
     this.dimensionality = dimensionality;
-  }
-
-  /**
-   * Provides a new BitVector corresponding to the bits in the given array.
-   * 
-   * @param bits an array of bits specifying the bits in this bit vector
-   */
-  public BitVector(Bit[] bits) {
-    this.bits = new BitSet(bits.length);
-    for(int i = 0; i < bits.length; i++) {
-      this.bits.set(i, bits[i].bitValue());
-    }
-    this.dimensionality = bits.length;
   }
 
   @Override
@@ -98,29 +79,30 @@ public class BitVector extends AbstractNumberVector<Bit> {
     return dimensionality;
   }
 
+  /**
+   * Get the value of a single bit.
+   * 
+   * @param dimension Bit number to get
+   * @return {@code true} when set
+   */
+  public boolean booleanValue(int dimension) {
+    return BitsUtil.get(bits, dimension);
+  }
+
   @Override
   @Deprecated
   public Bit getValue(int dimension) {
-    if(dimension < 1) {
-      throw new IllegalArgumentException("illegal dimension: " + dimension);
-    }
-    return new Bit(bits.get(dimension - 1));
+    return new Bit(booleanValue(dimension));
   }
 
   @Override
   public double doubleValue(int dimension) {
-    if(dimension < 0) {
-      throw new IllegalArgumentException("illegal dimension: " + dimension);
-    }
-    return bits.get(dimension) ? 1.0 : 0.0;
+    return BitsUtil.get(bits, dimension) ? 1. : 0.;
   }
 
   @Override
   public long longValue(int dimension) {
-    if(dimension < 0) {
-      throw new IllegalArgumentException("illegal dimension: " + dimension);
-    }
-    return bits.get(dimension) ? 1L : 0L;
+    return BitsUtil.get(bits, dimension) ? 1L : 0L;
   }
 
   /**
@@ -138,7 +120,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
   public Vector getColumnVector() {
     double[] values = new double[dimensionality];
     for(int i = 0; i < dimensionality; i++) {
-      values[i] = bits.get(i) ? 1 : 0;
+      values[i] = BitsUtil.get(bits, i) ? 1 : 0;
     }
     return new Vector(values);
   }
@@ -152,8 +134,12 @@ public class BitVector extends AbstractNumberVector<Bit> {
    *         the specified BitSet, false otherwise
    */
   public boolean contains(long[] bitset) {
-    for(int i = BitsUtil.nextSetBit(bitset, 0); i >= 0; i = BitsUtil.nextSetBit(bitset, i + 1)) {
-      if(!bits.get(i)) {
+    for(int i = 0; i < bitset.length; i++) {
+      final long b = bitset[i];
+      if(i >= bits.length && b != 0L) {
+        return false;
+      }
+      if((b & bits[i]) != b) {
         return false;
       }
     }
@@ -165,8 +151,8 @@ public class BitVector extends AbstractNumberVector<Bit> {
    * 
    * @return a copy of the bits currently set in this BitVector
    */
-  public BitSet getBits() {
-    return (BitSet) bits.clone();
+  public long[] getBits() {
+    return bits.clone();
   }
 
   /**
@@ -179,16 +165,12 @@ public class BitVector extends AbstractNumberVector<Bit> {
    */
   @Override
   public String toString() {
-    Bit[] bitArray = new Bit[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      bitArray[i] = bits.get(i) ? Bit.TRUE : Bit.FALSE;
-    }
     StringBuilder representation = new StringBuilder();
-    for(Bit bit : bitArray) {
-      if(representation.length() > 0) {
+    for(int i = 0; i < dimensionality; i++) {
+      if(i > 0) {
         representation.append(ATTRIBUTE_SEPARATOR);
       }
-      representation.append(bit.toString());
+      representation.append(BitsUtil.get(bits, i) ? '1' : '0');
     }
     return representation.toString();
   }
@@ -223,10 +205,11 @@ public class BitVector extends AbstractNumberVector<Bit> {
     @Override
     public <A> BitVector newFeatureVector(A array, ArrayAdapter<Bit, A> adapter) {
       int dim = adapter.size(array);
-      BitSet bits = new BitSet(dim);
+      long[] bits = BitsUtil.zero(dim);
       for(int i = 0; i < dim; i++) {
-        bits.set(i, adapter.get(array, i).bitValue());
-        i++;
+        if(adapter.get(array, i).bitValue()) {
+          BitsUtil.setI(bits, i);
+        }
       }
       return new BitVector(bits, dim);
     }
@@ -234,10 +217,10 @@ public class BitVector extends AbstractNumberVector<Bit> {
     @Override
     public <A> BitVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
-      BitSet bits = new BitSet(dim);
+      long[] bits = BitsUtil.zero(dim);
       for(int i = 0; i < dim; i++) {
         if(adapter.getDouble(array, i) >= 0.5) {
-          bits.set(i);
+          BitsUtil.setI(bits, i);
         }
       }
       return new BitVector(bits, dim);
@@ -286,7 +269,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
         throw new IOException("Not enough data for a bit vector!");
       }
       // read values
-      BitSet values = new BitSet(dimensionality);
+      long[] bits = BitsUtil.zero(dimensionality);
       byte b = 0;
       for(int i = 0; i < dimensionality; i++) {
         // read the next byte when needed.
@@ -295,10 +278,10 @@ public class BitVector extends AbstractNumberVector<Bit> {
         }
         final byte bit = (byte) (1 << (i & 7));
         if((b & bit) != 0) {
-          values.set(i + 1);
+          BitsUtil.setI(bits, i);
         }
       }
-      return new BitVector(values, dimensionality);
+      return new BitVector(bits, dimensionality);
     }
 
     @Override
@@ -316,7 +299,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
       byte b = 0;
       for(int i = 0; i < dim; i++) {
         final byte mask = (byte) (1 << (i & 7));
-        if(vec.bits.get(i)) {
+        if(BitsUtil.get(vec.bits, i)) {
           b |= mask;
         }
         else {

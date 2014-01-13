@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.APRIORI.Itemset;
+import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.Itemset;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;

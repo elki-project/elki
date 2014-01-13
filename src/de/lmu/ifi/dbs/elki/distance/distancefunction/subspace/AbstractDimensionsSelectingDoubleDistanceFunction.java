@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFu
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -63,9 +62,6 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   public AbstractDimensionsSelectingDoubleDistanceFunction(long[] dimensions) {
     super();
     this.dimensions = dimensions;
-    if(dimensions == null) {
-      throw new AbortException("Invalid dimensions");
-    }
   }
 
   @Override
@@ -80,6 +76,10 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
 
   @Override
   public void setSelectedDimensions(long[] dimensions) {
+    if(this.dimensions == null || this.dimensions.length < dimensions.length) {
+      this.dimensions = dimensions.clone();
+      return;
+    }
     BitsUtil.zeroI(this.dimensions);
     BitsUtil.orI(this.dimensions, dimensions);
   }

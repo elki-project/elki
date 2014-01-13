@@ -44,6 +44,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByModelClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.APRIORI
 de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD
 de.lmu.ifi.dbs.elki.algorithm.outlier.FastABOD
 de.lmu.ifi.dbs.elki.algorithm.outlier.LBABOD
@@ -104,7 +105,6 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
 de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 # de.lmu.ifi.dbs.elki.algorithm.DummyAlgorithm
-de.lmu.ifi.dbs.elki.algorithm.APRIORI
 de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator
 de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder
 de.lmu.ifi.dbs.elki.algorithm.KNNJoin

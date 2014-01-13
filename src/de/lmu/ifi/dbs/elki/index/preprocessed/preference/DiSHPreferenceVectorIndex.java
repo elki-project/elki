@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
-import de.lmu.ifi.dbs.elki.data.Bit;
+import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.APRIORI;
+import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.Itemset;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -239,20 +239,17 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     UpdatableDatabase apriori_db = new HashmapDatabase();
     SimpleTypeInformation<?> bitmeta = new VectorFieldTypeInformation<>(BitVector.class, dimensionality);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      Bit[] bits = new Bit[dimensionality];
+      long[] bits = BitsUtil.zero(dimensionality);
       boolean allFalse = true;
       for(int d = 0; d < dimensionality; d++) {
         if(neighborIDs[d].contains(it)) {
-          bits[d] = Bit.TRUE;
+          BitsUtil.setI(bits, d);
           allFalse = false;
-        }
-        else {
-          bits[d] = Bit.FALSE;
         }
       }
       if(!allFalse) {
         SingleObjectBundle oaa = new SingleObjectBundle();
-        oaa.append(bitmeta, new BitVector(bits));
+        oaa.append(bitmeta, new BitVector(bits, dimensionality));
         apriori_db.insert(oaa);
       }
     }
@@ -260,14 +257,14 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     AprioriResult aprioriResult = apriori.run(apriori_db);
 
     // result of apriori
-    List<APRIORI.Itemset> frequentItemsets = aprioriResult.getItemsets();
+    List<Itemset> frequentItemsets = aprioriResult.getItemsets();
     if(LOG.isDebugging()) {
       msg.append("\n Frequent itemsets: ").append(frequentItemsets);
     }
     int maxSupport = 0;
     int maxCardinality = 0;
     long[] preferenceVector = BitsUtil.zero(dimensionality);
-    for(APRIORI.Itemset itemset : frequentItemsets) {
+    for(Itemset itemset : frequentItemsets) {
       if((maxCardinality < itemset.length()) || (maxCardinality == itemset.length() && maxSupport == itemset.getSupport())) {
         preferenceVector = itemset.getItems();
         maxCardinality = itemset.length();

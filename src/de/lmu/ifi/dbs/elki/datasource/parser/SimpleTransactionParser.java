@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  */
 
 import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
@@ -31,7 +32,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.BitSet;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
@@ -102,6 +102,11 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
   BitVector curvec;
 
   /**
+   * Buffer, will be reused.
+   */
+  TLongArrayList buf = new TLongArrayList();
+
+  /**
    * Constructor.
    * 
    * @param colSep Column separator
@@ -134,7 +139,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
           continue;
         }
         // Don't reuse bitsets, will not be copied by BitVector constructor.
-        BitSet bits = new BitSet(keymap.size());
+        buf.clear();
         for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
           String token = tokenizer.getSubstring();
           int t = keymap.get(token);
@@ -142,9 +147,14 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
             t = keymap.size();
             keymap.put(token, t);
           }
-          bits.set(t);
+          final int word = t >>> 6;
+          final int off = t & 0x3F;
+          while(word >= buf.size()) { // Ensure size.
+            buf.add(0L);
+          }
+          buf.set(word, buf.get(word) | (1L << off));
         }
-        curvec = new BitVector(bits, keymap.size());
+        curvec = new BitVector(buf.toArray(), keymap.size());
         return Event.NEXT_OBJECT;
       }
       reader.close();
