@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -56,8 +57,8 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
     Database db = makeSimpleDatabase(UNITTEST + "subspace-hierarchy.csv", 450);
 
     ListParameterization params = new ListParameterization();
-    params.addParameter(DiSH.EPSILON_ID, 0.005);
-    params.addParameter(DiSH.MU_ID, 50);
+    params.addParameter(DiSH.Parameterizer.EPSILON_ID, 0.005);
+    params.addParameter(DiSH.Parameterizer.MU_ID, 50);
 
     // setup algorithm
     DiSH<DoubleVector> dish = ClassGenericsUtil.parameterizeOrAbort(DiSH.class, params);
@@ -81,14 +82,15 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(DiSH.EPSILON_ID, 0.1);
-    params.addParameter(DiSH.MU_ID, 30);
+    params.addParameter(DiSH.Parameterizer.EPSILON_ID, 0.1);
+    params.addParameter(DiSH.Parameterizer.MU_ID, 30);
+    params.addParameter(DiSHPreferenceVectorIndex.Factory.STRATEGY_ID, DiSHPreferenceVectorIndex.Strategy.APRIORI);
     DiSH<DoubleVector> dish = ClassGenericsUtil.parameterizeOrAbort(DiSH.class, params);
     testParameterizationOk(params);
 
     // run DiSH on database
     Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
-    testFMeasure(db, result, 0.6376870);
-    testClusterSizes(result, new int[] { 33, 52, 72, 109, 172, 314, 348 });
+    testFMeasure(db, result, 0.651889);
+    testClusterSizes(result, new int[] { 33, 67, 142, 193, 326, 339 });
   }
 }

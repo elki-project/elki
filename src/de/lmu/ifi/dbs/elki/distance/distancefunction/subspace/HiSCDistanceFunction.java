@@ -98,8 +98,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?>> extends AbstractPre
      */
     @Override
     public PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2, long[] pv1, long[] pv2) {
-      long[] commonPreferenceVector = (long[]) pv1.clone();
-      BitsUtil.andI(commonPreferenceVector, pv2);
+      final long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
       final int dim = v1.getDimensionality();
 
       // number of zero values in commonPreferenceVector
@@ -112,12 +111,9 @@ public class HiSCDistanceFunction<V extends NumberVector<?>> extends AbstractPre
       if(Math.max(dist1, dist2) > epsilon) {
         subspaceDim++;
         if(LOG.isDebugging()) {
-          // Representation<String> rep = rep.getObjectLabelQuery();
           StringBuilder msg = new StringBuilder();
           msg.append("\ndist1 ").append(dist1);
           msg.append("\ndist2 ").append(dist2);
-          // msg.append("\nv1 ").append(rep.get(v1.getID()));
-          // msg.append("\nv2 ").append(rep.get(v2.getID()));
           msg.append("\nsubspaceDim ").append(subspaceDim);
           msg.append("\ncommon pv ").append(BitsUtil.toString(commonPreferenceVector, dim));
           LOG.debugFine(msg.toString());

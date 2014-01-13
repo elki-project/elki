@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -105,26 +104,22 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
      */
     @Override
     public PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2, long[] pv1, long[] pv2) {
-      long[] commonPreferenceVector = pv1.clone();
-      BitsUtil.andI(pv1, pv2);
+      long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
       final int dim = v1.getDimensionality();
 
       // number of zero values in commonPreferenceVector
       int subspaceDim = dim - BitsUtil.cardinality(commonPreferenceVector);
 
       // special case: v1 and v2 are in parallel subspaces
-      if(BitsUtil.compare(pv1, pv2) == 0) {
-        double d = weightedDistance(v1, v2, pv1);
+      if(BitsUtil.equal(commonPreferenceVector, pv1) || BitsUtil.equal(commonPreferenceVector, pv2)) {
+        double d = weightedDistance(v1, v2, commonPreferenceVector);
         if(d > 2 * epsilon) {
           subspaceDim++;
-          if(LOG.isDebugging()) {
-            // Representation<String> rep = database.getObjectLabelQuery();
+          if(LOG.isDebuggingFine()) {
             StringBuilder msg = new StringBuilder();
             msg.append("d ").append(d);
-            // msg.append("\nv1 ").append(rep.get(v1.getID()));
-            // msg.append("\nv2 ").append(rep.get(v2.getID()));
             msg.append("\nsubspaceDim ").append(subspaceDim);
-            msg.append("\ncommon pv ").append(BitsUtil.toString(pv1, dim));
+            msg.append("\ncommon pv ").append(BitsUtil.toString(commonPreferenceVector, dim));
             LOG.debugFine(msg.toString());
           }
         }
@@ -134,7 +129,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
       long[] inverseCommonPreferenceVector = BitsUtil.ones(dim);
       BitsUtil.xorI(inverseCommonPreferenceVector, commonPreferenceVector);
 
-      return new PreferenceVectorBasedCorrelationDistance(RelationUtil.dimensionality(relation), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
+      return new PreferenceVectorBasedCorrelationDistance(dim, subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
     }
   }
 

@@ -109,34 +109,6 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   private static final Logging LOG = Logging.getLogger(DiSH.class);
 
   /**
-   * Parameter that specifies the maximum radius of the neighborhood to be
-   * considered in each dimension for determination of the preference vector,
-   * must be a double equal to or greater than 0.
-   * <p>
-   * Default value: {@code 0.001}
-   * </p>
-   * <p>
-   * Key: {@code -dish.epsilon}
-   * </p>
-   */
-  public static final OptionID EPSILON_ID = new OptionID("dish.epsilon", //
-  "The maximum radius of the neighborhood to be considered in each " //
-      + " dimension for determination of the preference vector.");
-
-  /**
-   * Parameter that specifies the a minimum number of points as a smoothing
-   * factor to avoid the single-link-effect, must be an integer greater than 0.
-   * <p>
-   * Default value: {@code 1}
-   * </p>
-   * <p>
-   * Key: {@code -dish.mu}
-   * </p>
-   */
-  public static final OptionID MU_ID = new OptionID("dish.mu", //
-  "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
-
-  /**
    * Holds the value of {@link #EPSILON_ID}.
    */
   private double epsilon;
@@ -312,7 +284,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         parallelClusters.add(cluster);
       }
       cluster.add(entry.getID());
-      entryToClusterMap.put(entry.getID(), new Pair<long[], ArrayModifiableDBIDs>(preferenceVector, cluster));
+      entryToClusterMap.put(entry.getID(), new Pair<>(preferenceVector, cluster));
 
       if(progress != null) {
         progress.setProcessed(++processed, LOG);
@@ -348,7 +320,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         }
         ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> predecessor = entryMap.get(predecessorID);
         // parallel cluster
-        if(BitsUtil.compare(predecessor.getReachability().getCommonPreferenceVector(), entry.getReachability().getCommonPreferenceVector()) == 0) {
+        if(BitsUtil.equal(predecessor.getReachability().getCommonPreferenceVector(), entry.getReachability().getCommonPreferenceVector())) {
           continue;
         }
         if(predecessor.getReachability().compareTo(entry.getReachability()) < 0) {
@@ -359,7 +331,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         oldCluster.second.remove(predecessorID);
         cluster.add(predecessorID);
         entryToClusterMap.remove(predecessorID);
-        entryToClusterMap.put(predecessorID, new Pair<long[], ArrayModifiableDBIDs>(pv, cluster));
+        entryToClusterMap.put(predecessorID, new Pair<>(pv, cluster));
       }
     }
 
@@ -435,7 +407,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         List<ArrayModifiableDBIDs> newParallelClusters = new ArrayList<>(parallelClusters.size());
         for(ArrayModifiableDBIDs c : parallelClusters) {
           if(!BitsUtil.isZero(pv) && c.size() < minpts) {
-            notAssigned.add(new Pair<long[], ArrayModifiableDBIDs>(pv, c));
+            notAssigned.add(new Pair<>(pv, c));
           }
           else {
             newParallelClusters.add(c);
@@ -492,15 +464,14 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         continue;
       }
 
-      long[] pv = childPV.clone();
-      BitsUtil.andI(pv, parentPV);
+      long[] pv = BitsUtil.andCMin(childPV, parentPV);
       if(pv.equals(parentPV)) {
         List<ArrayModifiableDBIDs> parentList = clustersMap.get(parentPV);
         for(ArrayModifiableDBIDs parent : parentList) {
           V parent_centroid = ProjectedCentroid.make(parentPV, database, parent).toVector(database);
           double d = distFunc.weightedDistance(child_centroid, parent_centroid, parentPV);
           if(d <= 2 * epsilon) {
-            result = new Pair<long[], ArrayModifiableDBIDs>(parentPV, parent);
+            result = new Pair<>(parentPV, parent);
             resultCardinality = parentCardinality;
             break;
           }
@@ -637,6 +608,34 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    /**
+     * Parameter that specifies the maximum radius of the neighborhood to be
+     * considered in each dimension for determination of the preference vector,
+     * must be a double equal to or greater than 0.
+     * <p>
+     * Default value: {@code 0.001}
+     * </p>
+     * <p>
+     * Key: {@code -dish.epsilon}
+     * </p>
+     */
+    public static final OptionID EPSILON_ID = new OptionID("dish.epsilon", //
+    "The maximum radius of the neighborhood to be considered in each " //
+        + " dimension for determination of the preference vector.");
+
+    /**
+     * Parameter that specifies the a minimum number of points as a smoothing
+     * factor to avoid the single-link-effect, must be an integer greater than 0.
+     * <p>
+     * Default value: {@code 1}
+     * </p>
+     * <p>
+     * Key: {@code -dish.mu}
+     * </p>
+     */
+    public static final OptionID MU_ID = new OptionID("dish.mu", //
+    "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
+
     protected double epsilon = 0.0;
 
     protected int mu = 1;

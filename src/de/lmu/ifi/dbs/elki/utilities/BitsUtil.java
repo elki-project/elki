@@ -78,7 +78,7 @@ public final class BitsUtil {
 
     @Override
     public boolean equals(long[] arg0, long[] arg1) {
-      return compare(arg0, arg1) == 0;
+      return equal(arg0, arg1);
     }
   };
 
@@ -528,7 +528,7 @@ public final class BitsUtil {
   public static long[] andI(long[] v, long[] o) {
     int i = 0;
     for(; i < o.length; i++) {
-      v[i] |= o[i];
+      v[i] &= o[i];
     }
     // Zero higher words
     Arrays.fill(v, i, v.length, 0);
@@ -582,6 +582,52 @@ public final class BitsUtil {
   }
 
   /**
+   * AND o onto v in a copy, i.e. v & o
+   * 
+   * The resulting array will have the shorter length of the two.
+   * 
+   * @param v Primary object
+   * @param o data to and
+   * @return Copy of v and o
+   */
+  public static long[] andCMin(long[] v, long[] o) {
+    final int min = Math.min(v.length, o.length);
+    long[] out = new long[min];
+    int i = 0;
+    for(; i < min; i++) {
+      out[i] = v[i] & o[i];
+    }
+    return out;
+  }
+
+  /**
+   * AND o onto v in a copy, i.e. v & o
+   * 
+   * The resulting array will have the shorter length of the two.
+   * 
+   * @param v Primary object
+   * @param o data to and
+   * @return Copy of v and o
+   */
+  public static long[] andCMax(long[] v, long[] o) {
+    final int min, max;
+    if(v.length < o.length) {
+      min = v.length;
+      max = o.length;
+    }
+    else {
+      min = o.length;
+      max = v.length;
+    }
+    long[] out = new long[max];
+    int i = 0;
+    for(; i < min; i++) {
+      out[i] = v[i] & o[i];
+    }
+    return out;
+  }
+
+  /**
    * NOTAND o onto v inplace, i.e. v &= ~o
    * 
    * @param v Primary object
@@ -591,7 +637,7 @@ public final class BitsUtil {
   public static long[] nandI(long[] v, long[] o) {
     int i = 0;
     for(; i < o.length; i++) {
-      v[i] |= ~o[i];
+      v[i] &= ~o[i];
     }
     return v;
   }
@@ -1340,6 +1386,36 @@ public final class BitsUtil {
    */
   public static int capacity(long[] v) {
     return v.length * Long.SIZE;
+  }
+
+  /**
+   * Test two bitsets for equality
+   * 
+   * @param x First bitset
+   * @param y Second bitset
+   * @return {@code true} when the bitsets are equal
+   */
+  public static boolean equal(long[] x, long[] y) {
+    if(x == null || y == null) {
+      return (x == null) && (y == null);
+    }
+    int p = Math.min(x.length, y.length) - 1;
+    for(int i = x.length - 1; i > p; i--) {
+      if(x[i] != 0L) {
+        return false;
+      }
+    }
+    for(int i = y.length - 1; i > p; i--) {
+      if(y[i] != 0L) {
+        return false;
+      }
+    }
+    for(; p >= 0; p--) {
+      if(x[p] != y[p]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

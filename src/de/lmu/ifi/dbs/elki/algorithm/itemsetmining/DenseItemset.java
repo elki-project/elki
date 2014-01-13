@@ -88,7 +88,7 @@ public class DenseItemset extends Itemset {
     if(getClass() != obj.getClass()) {
       return false;
     }
-    return BitsUtil.compare(items, ((DenseItemset) obj).items) == 0;
+    return BitsUtil.equal(items, ((DenseItemset) obj).items);
   }
 
   @Override
