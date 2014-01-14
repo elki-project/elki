@@ -42,13 +42,10 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * K-Means initialization by repeatedly choosing the farthest point (by the
- * <em>minimum</em> distance to earlier points).
+ * <em>sum</em> of distances to previous objects).
  * 
  * Note: this is less random than other initializations, so running multiple
  * times will be more likely to return the same local minima.
@@ -58,21 +55,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
-  /**
-   * Discard the first vector.
-   */
-  boolean dropfirst = true;
-
+public class FarthestSumPointsInitialMeans<V, D extends NumberDistance<D, ?>> extends FarthestPointsInitialMeans<V, D> {
   /**
    * Constructor.
    * 
    * @param rnd Random generator.
    * @param dropfirst Flag to discard the first vector.
    */
-  public FarthestPointsInitialMeans(RandomFactory rnd, boolean dropfirst) {
-    super(rnd);
-    this.dropfirst = dropfirst;
+  public FarthestSumPointsInitialMeans(RandomFactory rnd, boolean dropfirst) {
+    super(rnd, dropfirst);
   }
 
   @Override
@@ -86,7 +77,7 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, distF);
 
     DBIDs ids = relation.getDBIDs();
-    WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
+    WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     // Chose first mean
     List<V> means = new ArrayList<>(k);
@@ -104,13 +95,13 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
         if(prev != prev) {
           continue; // NaN: already chosen!
         }
-        double val = Math.min(prev, distQ.distance(prevmean, it).doubleValue());
+        double dsum = prev + distQ.distance(prevmean, it).doubleValue();
         // Don't store distance to first mean, when it will be dropped below.
         if(i > 0) {
-          store.putDouble(it, val);
+          store.putDouble(it, dsum);
         }
-        if(val > maxdist) {
-          maxdist = val;
+        if(dsum > maxdist) {
+          maxdist = dsum;
           best.set(it);
         }
       }
@@ -140,7 +131,7 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     final Relation<V> relation = (Relation<V>) distQ.getRelation();
 
     DBIDs ids = relation.getDBIDs();
-    WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
+    WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
@@ -157,13 +148,13 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
         if(prev != prev) {
           continue; // NaN: already chosen!
         }
-        double val = Math.min(prev, distQ.distance(prevmean, it).doubleValue());
+        double dsum = prev + distQ.distance(prevmean, it).doubleValue();
         // Don't store distance to first mean, when it will be dropped below.
         if(i > 0) {
-          store.putDouble(it, val);
+          store.putDouble(it, dsum);
         }
-        if(val > maxdist) {
-          maxdist = val;
+        if(dsum > maxdist) {
+          maxdist = dsum;
           best.set(it);
         }
       }
@@ -186,29 +177,15 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization.Parameterizer<V> {
-    /**
-     * Option ID to control the handling of the first object chosen.
-     */
-    public static final OptionID KEEPFIRST_ID = new OptionID("farthest.keepfirst", "Keep the first object chosen (which is chosen randomly) for the farthest points heuristic.");
-
+  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends FarthestPointsInitialMeans.Parameterizer<V, D> {
     /**
      * Flag for discarding the first object chosen.
      */
     protected boolean keepfirst = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      Flag dropfirstP = new Flag(KEEPFIRST_ID);
-      if(config.grab(dropfirstP)) {
-        keepfirst = dropfirstP.isTrue();
-      }
-    }
-
-    @Override
-    protected FarthestPointsInitialMeans<V, D> makeInstance() {
-      return new FarthestPointsInitialMeans<>(rnd, !keepfirst);
+    protected FarthestSumPointsInitialMeans<V, D> makeInstance() {
+      return new FarthestSumPointsInitialMeans<>(rnd, !keepfirst);
     }
   }
 }

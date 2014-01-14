@@ -289,7 +289,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       transfers[i] = DBIDUtil.newArray();
     }
 
-    for(int iter = 0; maxiter < 0 || iter < maxiter; iter++) {
+    for(int iter = 0; maxiter <= 0 || iter < maxiter; iter++) {
       updateDistances(relation, means, metas, df);
       tids.sort(comp);
       int active = 0; // Track if anything has changed

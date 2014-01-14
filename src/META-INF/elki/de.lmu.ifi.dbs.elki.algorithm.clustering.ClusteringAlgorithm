@@ -13,6 +13,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.BestOfMultipleKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBisecting
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBatchedLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi
 de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering
