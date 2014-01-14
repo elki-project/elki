@@ -28,10 +28,13 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -81,16 +84,17 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     final PrimitiveDistanceFunction<? super V, D> distF = (PrimitiveDistanceFunction<? super V, D>) distanceFunction;
     DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, distF);
 
+    DBIDs ids = relation.getDBIDs();
+    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
+
     // Chose first mean
     List<V> means = new ArrayList<>(k);
 
     Random random = rnd.getSingleThreadedRandom();
-    DBID first = DBIDUtil.deref(DBIDUtil.randomSample(relation.getDBIDs(), 1, random).iter());
+    DBID first = DBIDUtil.deref(DBIDUtil.randomSample(ids, 1, random).iter());
     means.add(relation.get(first));
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Initialize weights
-    double[] weights = new double[ids.size()];
     double weightsum = initialWeights(weights, ids, first, distQ);
     while(means.size() < k) {
       if(weightsum > Double.MAX_VALUE) {
@@ -100,16 +104,19 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
         LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few data points?");
       }
       double r = random.nextDouble() * weightsum;
-      int pos = 0;
-      while(r > 0 && pos < weights.length - 1) {
-        r -= weights[pos];
-        pos++;
+      DBIDIter it = ids.iter();
+      for(; r > 0. && it.valid(); it.advance()) {
+        double w = weights.doubleValue(it);
+        if(w != w) {
+          continue; // NaN: alrady chosen.
+        }
+        r -= w;
       }
       // Add new mean:
-      DBID newmean = ids.get(pos);
-      means.add(relation.get(newmean));
+      final V newmean = relation.get(it);
+      means.add(newmean);
       // Update weights:
-      weights[pos] = 0.0;
+      weights.putDouble(it, Double.NaN);
       // Choose optimized version for double distances, if applicable.
       if(distF instanceof PrimitiveDoubleDistanceFunction) {
         @SuppressWarnings("unchecked")
@@ -121,6 +128,9 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
       }
     }
 
+    // Explicitly destroy temporary data.
+    weights.destroy();
+
     return means;
   }
 
@@ -131,16 +141,19 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     }
     @SuppressWarnings("unchecked")
     DistanceQuery<? super V, D> distQ = (DistanceQuery<? super V, D>) distQ2;
-    // Chose first mean
+    @SuppressWarnings("unchecked")
+    final Relation<V> rel = (Relation<V>) distQ.getRelation();
+
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
+    DBIDs ids = rel.getDBIDs();
+    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
+
     Random random = rnd.getSingleThreadedRandom();
-    DBID first = DBIDUtil.deref(DBIDUtil.randomSample(distQ.getRelation().getDBIDs(), 1, random).iter());
+    DBIDRef first = DBIDUtil.randomSample(distQ.getRelation().getDBIDs(), 1, random).iter();
     means.add(first);
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(distQ.getRelation().getDBIDs());
     // Initialize weights
-    double[] weights = new double[ids.size()];
     double weightsum = initialWeights(weights, ids, first, distQ);
     while(means.size() < k) {
       if(weightsum > Double.MAX_VALUE) {
@@ -150,17 +163,19 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
         LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few data points?");
       }
       double r = random.nextDouble() * weightsum;
-      int pos = 0;
-      while(r > 0 && pos < weights.length) {
-        r -= weights[pos];
-        pos++;
+      DBIDIter it = ids.iter();
+      for(; r > 0. && it.valid(); it.advance()) {
+        double w = weights.doubleValue(it);
+        if(w != w) {
+          continue; // NaN: alrady chosen.
+        }
+        r -= w;
       }
       // Add new mean:
-      DBID newmean = ids.get(pos);
-      means.add(newmean);
+      means.add(it);
       // Update weights:
-      weights[pos] = 0.0;
-      weightsum = updateWeights(weights, ids, newmean, distQ);
+      weights.putDouble(it, Double.NaN);
+      weightsum = updateWeights(weights, ids, rel.get(it), distQ);
     }
 
     return means;
@@ -175,18 +190,13 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
    * @param distQ Distance query
    * @return Weight sum
    */
-  protected double initialWeights(double[] weights, ArrayDBIDs ids, DBID latest, DistanceQuery<? super V, D> distQ) {
-    double weightsum = 0.0;
-    DBIDIter it = ids.iter();
-    for(int i = 0; i < weights.length; i++, it.advance()) {
-      if(DBIDUtil.equal(latest, it)) {
-        weights[i] = 0.0;
-      }
-      else {
-        double d = distQ.distance(latest, it).doubleValue();
-        weights[i] = d * d;
-      }
-      weightsum += weights[i];
+  protected double initialWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<? super V, D> distQ) {
+    double weightsum = 0.;
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      // Distance will usually already be squared
+      double weight = distQ.distance(latest, it).doubleValue();
+      weights.putDouble(it, weight);
+      weightsum += weight;
     }
     return weightsum;
   }
@@ -200,15 +210,19 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
    * @param distQ Distance query
    * @return Weight sum
    */
-  protected double updateWeights(double[] weights, ArrayDBIDs ids, DBID latest, DistanceQuery<? super V, D> distQ) {
-    double weightsum = 0.0;
-    DBIDIter it = ids.iter();
-    for(int i = 0; i < weights.length; i++, it.advance()) {
-      if(weights[i] > 0.0) {
-        double d = distQ.distance(latest, it).doubleValue();
-        weights[i] = Math.min(weights[i], d * d);
-        weightsum += weights[i];
+  protected double updateWeights(WritableDoubleDataStore weights, DBIDs ids, V latest, DistanceQuery<? super V, D> distQ) {
+    double weightsum = 0.;
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      double weight = weights.doubleValue(it);
+      if(weight != weight) {
+        continue; // NaN: already chosen!
       }
+      double newweight = distQ.distance(latest, it).doubleValue();
+      if(newweight < weight) {
+        weights.putDouble(it, newweight);
+        weight = newweight;
+      }
+      weightsum += weight;
     }
     return weightsum;
   }
@@ -220,18 +234,22 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
    * @param ids IDs
    * @param latest Added ID
    * @param distF Distance function
+   * @param rel Data relation
    * @return Weight sum
    */
-  protected double updateWeights(double[] weights, ArrayDBIDs ids, DBID latest, PrimitiveDoubleDistanceFunction<V> distF, Relation<V> rel) {
-    final V lv = rel.get(latest);
-    double weightsum = 0.0;
-    DBIDIter it = ids.iter();
-    for(int i = 0; i < weights.length; i++, it.advance()) {
-      if(weights[i] > 0.0) {
-        double d = distF.doubleDistance(lv, rel.get(it));
-        weights[i] = Math.min(weights[i], d * d);
-        weightsum += weights[i];
+  protected double updateWeights(WritableDoubleDataStore weights, DBIDs ids, V latest, PrimitiveDoubleDistanceFunction<V> distF, Relation<V> rel) {
+    double weightsum = 0.;
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      double weight = weights.doubleValue(it);
+      if(weight != weight) {
+        continue; // NaN: already chosen!
       }
+      double newweight = distF.doubleDistance(latest, rel.get(it));
+      if(newweight < weight) {
+        weights.putDouble(it, newweight);
+        weight = newweight;
+      }
+      weightsum += weight;
     }
     return weightsum;
   }
