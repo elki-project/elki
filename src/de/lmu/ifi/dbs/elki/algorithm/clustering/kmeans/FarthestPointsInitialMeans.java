@@ -99,7 +99,8 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     for(int i = (dropfirst ? 0 : 1); i < k; i++) {
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         double dsum = distQ.distance(prevmean, it).doubleValue() + store.doubleValue(it);
-        if(i > 0) { // Don't store distance to first mean.
+        // Don't store distance to first mean, when it will be dropped below.
+        if(i > 0) {
           store.putDouble(it, dsum);
         }
         if(dsum > maxdist) {
@@ -107,7 +108,7 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
           best.set(it);
         }
       }
-      // Add new mean:
+      // Add new mean (and drop the initial mean when desired)
       if(i == 0) {
         means.clear(); // Remove temporary first element.
       }
@@ -167,25 +168,25 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     /**
      * Option ID to control the handling of the first object chosen.
      */
-    public static final OptionID DROPFIRST_ID = new OptionID("farthest.dropfirst", "Drop the first object chosen (which is chosen randomly) for the farthest points heuristic.");
+    public static final OptionID KEEPFIRST_ID = new OptionID("farthest.keepfirst", "Keep the first object chosen (which is chosen randomly) for the farthest points heuristic.");
 
     /**
      * Flag for discarding the first object chosen.
      */
-    protected boolean dropfirst = true;
+    protected boolean keepfirst = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag dropfirstP = new Flag(DROPFIRST_ID);
+      Flag dropfirstP = new Flag(KEEPFIRST_ID);
       if(config.grab(dropfirstP)) {
-        dropfirst = dropfirstP.isTrue();
+        keepfirst = dropfirstP.isTrue();
       }
     }
 
     @Override
     protected FarthestPointsInitialMeans<V, D> makeInstance() {
-      return new FarthestPointsInitialMeans<>(rnd, dropfirst);
+      return new FarthestPointsInitialMeans<>(rnd, !keepfirst);
     }
   }
 }
