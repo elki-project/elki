@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @apiviz.has Instance
  */
-public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, BitDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, BitDistance> {
+public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, DoubleDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, DoubleDistance> {
   /**
    * Parameter to specify the threshold for approximate linear dependency: the
    * strong eigenvectors of q are approximately linear dependent from the strong
@@ -81,8 +81,8 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
   }
 
   @Override
-  public BitDistance getDistanceFactory() {
-    return BitDistance.FACTORY;
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 
   @Override
@@ -134,7 +134,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public BitDistance distance(NumberVector<?> v1, NumberVector<?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
+  public DoubleDistance distance(NumberVector<?> v1, NumberVector<?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
     if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
@@ -148,7 +148,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     }
 
     if(!approximatelyLinearDependent) {
-      return new BitDistance(true);
+      return new DoubleDistance(1.);
     }
 
     else {
@@ -165,10 +165,10 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
       }
 
       if(affineDistance > tau) {
-        return new BitDistance(true);
+        return new DoubleDistance(1.);
       }
 
-      return new BitDistance(false);
+      return DoubleDistance.ZERO_DISTANCE;
     }
   }
 
@@ -189,7 +189,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, BitDistance, ERiCDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, BitDistance> {
+  public static class Instance<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, DoubleDistance, ERiCDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, DoubleDistance> {
     /**
      * Holds the value of {@link #DELTA_ID}.
      */
@@ -220,7 +220,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
      * than the pca of o2.
      */
     @Override
-    public BitDistance distance(DBIDRef id1, DBIDRef id2) {
+    public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
       V v1 = relation.get(id1);

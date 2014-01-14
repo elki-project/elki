@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -47,8 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <O> object type
  */
-// todo arthur comment class
-public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
+public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, DoubleDistance> {
   /**
    * Constructor.
    * 
@@ -59,8 +58,8 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
   }
 
   @Override
-  public IntegerDistance getDistanceFactory() {
-    return IntegerDistance.FACTORY;
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 
   /**
@@ -74,15 +73,17 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
     int intersection = 0;
     DBIDIter iter1 = neighbors1.iter();
     DBIDIter iter2 = neighbors2.iter();
-    while (iter1.valid() && iter2.valid()) {
+    while(iter1.valid() && iter2.valid()) {
       final int comp = DBIDUtil.compare(iter1, iter2);
-      if (comp == 0) {
+      if(comp == 0) {
         intersection++;
         iter1.advance();
         iter2.advance();
-      } else if (comp < 0) {
+      }
+      else if(comp < 0) {
         iter1.advance();
-      } else // iter2 < iter1
+      }
+      else // iter2 < iter1
       {
         iter2.advance();
       }
@@ -106,7 +107,7 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
    * 
    * @param <O> Object type
    */
-  public static class Instance<O> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, IntegerDistance> {
+  public static class Instance<O> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, DoubleDistance> {
     /**
      * Similarity function.
      */
@@ -124,19 +125,19 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
     }
 
     @Override
-    public IntegerDistance similarity(DBIDRef id1, DBIDRef id2) {
+    public DoubleDistance similarity(DBIDRef id1, DBIDRef id2) {
       DBIDs neighbors1 = index.getNearestNeighborSet(id1);
       DBIDs neighbors2 = index.getNearestNeighborSet(id2);
-      return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
+      return new DoubleDistance(countSharedNeighbors(neighbors1, neighbors2));
     }
 
     @Override
-    public IntegerDistance getDistanceFactory() {
-      return IntegerDistance.FACTORY;
+    public DoubleDistance getDistanceFactory() {
+      return DoubleDistance.FACTORY;
     }
 
     @Override
-    public SimilarityFunction<? super O, IntegerDistance> getSimilarityFunction() {
+    public SimilarityFunction<? super O, DoubleDistance> getSimilarityFunction() {
       return similarityFunction;
     }
   }

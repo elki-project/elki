@@ -46,9 +46,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
@@ -101,14 +99,14 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   /**
    * The COPAC clustering algorithm.
    */
-  private COPAC<V, IntegerDistance> copacAlgorithm;
+  private COPAC<V, DoubleDistance> copacAlgorithm;
 
   /**
    * Constructor.
    * 
    * @param copacAlgorithm COPAC to use
    */
-  public ERiC(COPAC<V, IntegerDistance> copacAlgorithm) {
+  public ERiC(COPAC<V, DoubleDistance> copacAlgorithm) {
     super();
     this.copacAlgorithm = copacAlgorithm;
   }
@@ -130,7 +128,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
     Clustering<Model> copacResult = copacAlgorithm.run(relation);
 
-    DistanceQuery<V, IntegerDistance> query = copacAlgorithm.getPartitionDistanceQuery();
+    DistanceQuery<V, DoubleDistance> query = copacAlgorithm.getPartitionDistanceQuery();
 
     // extract correlation clusters
     if (stepprog != null) {
@@ -290,7 +288,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     return parameters;
   }
 
-  private void buildHierarchy(Clustering<CorrelationModel<V>> clustering, List<List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, IntegerDistance> query) {
+  private void buildHierarchy(Clustering<CorrelationModel<V>> clustering, List<List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, DoubleDistance> query) {
     StringBuilder msg = LOG.isDebuggingFine() ? new StringBuilder() : null;
     Hierarchy<Cluster<CorrelationModel<V>>> hier = clustering.getClusterHierarchy();
 
@@ -328,8 +326,8 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
                 msg.append('\n').append(parent).append(" is parent of ").append(child);
               }
             } else {
-              BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
-              if (!dist.bitValue() && (hier.numParents(child) == 0 || !isParent(distanceFunction, parent, hier.iterParents(child)))) {
+              DoubleDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
+              if (dist.doubleValue() < 1. && (hier.numParents(child) == 0 || !isParent(distanceFunction, parent, hier.iterParents(child)))) {
                 clustering.addChildCluster(parent, child);
                 if (msg != null) {
                   msg.append('\n').append(parent).append(" is parent of ").append(child);
@@ -365,11 +363,11 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         return false;
       }
 
-      BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
+      DoubleDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
       if (msg != null) {
         msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
       }
-      if (!dist.bitValue()) {
+      if (dist.doubleValue() < 1.) {
         if (msg != null) {
           LOG.debugFine(msg);
         }
@@ -404,7 +402,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     /**
      * The COPAC instance to use
      */
-    protected COPAC<V, IntegerDistance> copac;
+    protected COPAC<V, DoubleDistance> copac;
 
     @SuppressWarnings("unchecked")
     @Override

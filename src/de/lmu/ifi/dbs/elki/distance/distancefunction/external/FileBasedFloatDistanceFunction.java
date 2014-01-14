@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external text file.")
-public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction<FloatDistance> {
+public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> {
   /**
    * Parameter that specifies the name of the distance matrix file.
    * <p>
@@ -79,7 +79,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
   /**
    * The distance cache
    */
-  private Map<DBIDPair, FloatDistance> cache;
+  private Map<DBIDPair, DoubleDistance> cache;
 
   /**
    * Constructor.
@@ -87,7 +87,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
    * @param parser Parser
    * @param matrixfile input file
    */
-  public FileBasedFloatDistanceFunction(DistanceParser<FloatDistance> parser, File matrixfile) {
+  public FileBasedFloatDistanceFunction(DistanceParser<DoubleDistance> parser, File matrixfile) {
     super();
     try {
       loadCache(parser, matrixfile);
@@ -108,7 +108,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(DBIDRef id1, DBIDRef id2) {
+  public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
     if(id1 == null) {
       return getDistanceFactory().undefinedDistance();
     }
@@ -119,22 +119,22 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
     if(DBIDUtil.compare(id1, id2) > 0) {
       return distance(id2, id1);
     }
-    FloatDistance ret = cache.get(DBIDUtil.newPair(id1, id2));
+    DoubleDistance ret = cache.get(DBIDUtil.newPair(id1, id2));
     if (ret == null && DBIDUtil.equal(id1, id2)) {
-      return FloatDistance.ZERO_DISTANCE;
+      return DoubleDistance.ZERO_DISTANCE;
     }
     return ret;
   }
 
-  private void loadCache(DistanceParser<FloatDistance> parser, File matrixfile) throws IOException {
+  private void loadCache(DistanceParser<DoubleDistance> parser, File matrixfile) throws IOException {
     InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
-    DistanceParsingResult<FloatDistance> res = parser.parse(in);
+    DistanceParsingResult<DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
   }
 
   @Override
-  public FloatDistance getDistanceFactory() {
-    return FloatDistance.FACTORY;
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 
   @Override
@@ -159,7 +159,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
   public static class Parameterizer extends AbstractParameterizer {
     protected File matrixfile = null;
 
-    protected DistanceParser<FloatDistance> parser = null;
+    protected DistanceParser<DoubleDistance> parser = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -168,10 +168,10 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
       if(config.grab(MATRIX_PARAM)) {
         matrixfile = MATRIX_PARAM.getValue();
       }
-      final ObjectParameter<DistanceParser<FloatDistance>> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+      final ObjectParameter<DistanceParser<DoubleDistance>> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         ListParameterization parserConfig = new ListParameterization();
-        parserConfig.addParameter(DistanceParser.DISTANCE_ID, FloatDistance.class);
+        parserConfig.addParameter(DistanceParser.DISTANCE_ID, DoubleDistance.class);
         ChainedParameterization combinedConfig = new ChainedParameterization(parserConfig, config);
         combinedConfig.errorsTo(config);
         parser = PARSER_PARAM.instantiateClass(combinedConfig);

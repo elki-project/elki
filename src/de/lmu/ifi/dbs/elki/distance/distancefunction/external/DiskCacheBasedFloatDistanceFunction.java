@@ -29,7 +29,7 @@ import java.io.IOException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external matrix.")
-public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction<FloatDistance> {
+public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> {
   // TODO: constructor with file.
   
   /**
@@ -95,7 +95,7 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(DBIDRef id1, DBIDRef id2) {
+  public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
     if(id1 == null) {
       return getDistanceFactory().undefinedDistance();
     }
@@ -119,12 +119,12 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
     catch(IOException e) {
       throw new RuntimeException("Read error when loading distance " + id1 + "," + id2 + " from cache file.", e);
     }
-    return new FloatDistance(distance);
+    return new DoubleDistance(distance);
   }
 
   @Override
-  public FloatDistance getDistanceFactory() {
-    return FloatDistance.FACTORY;
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 
   @Override

@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.strings;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Description("Levenshtein distance.")
 @Reference(authors = "V. I. Levenshtein", title = "Binary codes capable of correcting deletions, insertions and reversals.", booktitle = "Soviet physics doklady. Vol. 10. 1966.")
-public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFunction<String, IntegerDistance> {
+public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFunction<String, DoubleDistance> {
   /**
    * Static instance, case sensitive.
    */
@@ -65,12 +65,12 @@ public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFuncti
   }
 
   @Override
-  public IntegerDistance distance(String o1, String o2) {
+  public DoubleDistance distance(String o1, String o2) {
     if (o1.equals(o2)) {
-      return new IntegerDistance(0);
+      return DoubleDistance.ZERO_DISTANCE;
     }
     final int cost = levenshteinDistance(o1, o2);
-    return new IntegerDistance(cost);
+    return new DoubleDistance(cost);
   }
 
   /**
@@ -110,8 +110,8 @@ public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFuncti
   }
 
   @Override
-  public IntegerDistance getDistanceFactory() {
-    return IntegerDistance.FACTORY;
+  public DoubleDistance getDistanceFactory() {
+    return DoubleDistance.FACTORY;
   }
 
   @Override

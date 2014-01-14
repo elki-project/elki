@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -84,21 +83,9 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
   private static final Logging LOG = Logging.getLogger(SNNClustering.class);
 
   /**
-   * Parameter to specify the minimum SNN density, must be an integer greater
-   * than 0.
-   */
-  public static final OptionID EPSILON_ID = new OptionID("snn.epsilon", "The minimum SNN density.");
-
-  /**
    * Holds the value of {@link #EPSILON_ID}.
    */
-  private IntegerDistance epsilon;
-
-  /**
-   * Parameter to specify the threshold for minimum number of points in the
-   * epsilon-SNN-neighborhood of a point, must be an integer greater than 0.
-   */
-  public static final OptionID MINPTS_ID = new OptionID("snn.minpts", "Threshold for minimum number of points in " + "the epsilon-SNN-neighborhood of a point.");
+  private int epsilon;
 
   /**
    * Holds the value of {@link #MINPTS_ID}.
@@ -132,7 +119,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @param epsilon Epsilon
    * @param minpts Minpts
    */
-  public SNNClustering(SharedNearestNeighborSimilarityFunction<O> similarityFunction, IntegerDistance epsilon, int minpts) {
+  public SNNClustering(SharedNearestNeighborSimilarityFunction<O> similarityFunction, int epsilon, int minpts) {
     super();
     this.similarityFunction = similarityFunction;
     this.epsilon = epsilon;
@@ -147,7 +134,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @return Result
    */
   public Clustering<Model> run(Database database, Relation<O> relation) {
-    SimilarityQuery<O, IntegerDistance> snnInstance = similarityFunction.instantiate(relation);
+    SimilarityQuery<O, DoubleDistance> snnInstance = similarityFunction.instantiate(relation);
 
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("SNNClustering", relation.size(), LOG) : null;
     IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
@@ -201,10 +188,10 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @return the shared nearest neighbors of the specified query object in the
    *         given database
    */
-  protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O, IntegerDistance> snnInstance, DBID queryObject) {
+  protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O, DoubleDistance> snnInstance, DBID queryObject) {
     ArrayModifiableDBIDs neighbors = DBIDUtil.newArray();
     for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      if(snnInstance.similarity(queryObject, iditer).compareTo(epsilon) >= 0) {
+      if(snnInstance.similarity(queryObject, iditer).doubleValue() >= epsilon) {
         neighbors.add(iditer);
       }
     }
@@ -222,7 +209,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @param objprog the progress object to report about the progress of
    *        clustering
    */
-  protected void expandCluster(SimilarityQuery<O, IntegerDistance> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(SimilarityQuery<O, DoubleDistance> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     ArrayModifiableDBIDs seeds = findSNNNeighbors(snnInstance, startObjectID);
 
     // startObject is no core-object
@@ -310,7 +297,19 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @param <O> object type
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
-    protected IntegerDistance epsilon;
+    /**
+     * Parameter to specify the minimum SNN density, must be an integer greater
+     * than 0.
+     */
+    public static final OptionID EPSILON_ID = new OptionID("snn.epsilon", "The minimum SNN density.");
+
+    /**
+     * Parameter to specify the threshold for minimum number of points in the
+     * epsilon-SNN-neighborhood of a point, must be an integer greater than 0.
+     */
+    public static final OptionID MINPTS_ID = new OptionID("snn.minpts", "Threshold for minimum number of points in " + "the epsilon-SNN-neighborhood of a point.");
+
+    protected int epsilon;
 
     protected int minpts;
 
@@ -322,7 +321,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       Class<SharedNearestNeighborSimilarityFunction<O>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
       similarityFunction = config.tryInstantiate(cls);
 
-      DistanceParameter<IntegerDistance> epsilonP = new DistanceParameter<>(EPSILON_ID, IntegerDistance.FACTORY);
+      IntParameter epsilonP = new IntParameter(EPSILON_ID);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }

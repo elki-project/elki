@@ -58,8 +58,8 @@ public class TestSNNClusteringResults extends AbstractSimpleAlgorithmTest implem
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(SNNClustering.EPSILON_ID, 77);
-    params.addParameter(SNNClustering.MINPTS_ID, 28);
+    params.addParameter(SNNClustering.Parameterizer.EPSILON_ID, 77);
+    params.addParameter(SNNClustering.Parameterizer.MINPTS_ID, 28);
     params.addParameter(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 100);
     SNNClustering<DoubleVector> snn = ClassGenericsUtil.parameterizeOrAbort(SNNClustering.class, params);
     testParameterizationOk(params);
