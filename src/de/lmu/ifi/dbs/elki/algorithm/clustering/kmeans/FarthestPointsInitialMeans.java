@@ -27,6 +27,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -80,20 +83,24 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     final PrimitiveDistanceFunction<? super V, D> distF = (PrimitiveDistanceFunction<? super V, D>) distanceFunction;
     DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, distF);
 
+    DBIDs ids = relation.getDBIDs();
+    WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
+
     // Chose first mean
     List<V> means = new ArrayList<>(k);
 
-    DBIDIter first = DBIDUtil.randomSample(relation.getDBIDs(), 1, rnd).iter();
-    means.add(relation.get(first));
+    DBIDIter first = DBIDUtil.randomSample(ids, 1, rnd).iter();
+    V prevmean = relation.get(first);
+    means.add(prevmean);
 
+    // Find farthest object each.
+    double maxdist = Double.NEGATIVE_INFINITY;
     DBIDVar best = DBIDUtil.newVar(first);
     for(int i = (dropfirst ? 0 : 1); i < k; i++) {
-      // Find farthest object:
-      double maxdist = Double.NEGATIVE_INFINITY;
-      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        double dsum = 0.;
-        for(V ex : means) {
-          dsum += distQ.distance(ex, it).doubleValue();
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        double dsum = distQ.distance(prevmean, it).doubleValue() + store.doubleValue(it);
+        if(i > 0) { // Don't store distance to first mean.
+          store.putDouble(it, dsum);
         }
         if(dsum > maxdist) {
           maxdist = dsum;
@@ -101,10 +108,11 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
         }
       }
       // Add new mean:
-      if(k == 0) {
+      if(i == 0) {
         means.clear(); // Remove temporary first element.
       }
-      means.add(relation.get(best));
+      prevmean = relation.get(best);
+      means.add(prevmean);
     }
 
     return means;
