@@ -98,7 +98,11 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
     DBIDVar best = DBIDUtil.newVar(first);
     for(int i = (dropfirst ? 0 : 1); i < k; i++) {
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        double dsum = distQ.distance(prevmean, it).doubleValue() + store.doubleValue(it);
+        final double prev = store.doubleValue(it);
+        if(prev != prev) {
+          continue; // NaN: already chosen!
+        }
+        double dsum = prev + distQ.distance(prevmean, it).doubleValue();
         // Don't store distance to first mean, when it will be dropped below.
         if(i > 0) {
           store.putDouble(it, dsum);
@@ -112,9 +116,13 @@ public class FarthestPointsInitialMeans<V, D extends NumberDistance<D, ?>> exten
       if(i == 0) {
         means.clear(); // Remove temporary first element.
       }
+      store.putDouble(best, Double.NaN); // So it won't be chosen twice.
       prevmean = relation.get(best);
       means.add(prevmean);
     }
+
+    // Explicitly destroy temporary data.
+    store.destroy();
 
     return means;
   }
