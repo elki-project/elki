@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
@@ -63,7 +62,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
  * 
  * @param <D> distance type.
  */
-public class ClusterOrderResult<D extends Distance<D>> extends BasicResult implements IterableResult<ClusterOrderEntry<D>> {
+public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult implements IterableResult<ClusterOrderEntry<D>> {
   /**
    * Cluster order storage
    */
@@ -279,7 +278,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
 
     @Override
     public SimpleTypeInformation<D> getDataTypeInformation() {
-      return new SimpleTypeInformation<>(Distance.class);
+      return new SimpleTypeInformation<>(Comparable.class);
     }
 
     @Override

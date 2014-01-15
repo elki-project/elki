@@ -47,19 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<?>, P extends PreferenceVectorIndex<V>> extends AbstractIndexBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
   /**
-   * Parameter to specify the maximum distance between two vectors with equal
-   * preference vectors before considering them as parallel, must be a double
-   * equal to or greater than 0.
-   * <p>
-   * Default value: {@code 0.001}
-   * </p>
-   * <p>
-   * Key: {@code -pvbasedcorrelationdf.epsilon}
-   * </p>
-   */
-  public static final OptionID EPSILON_ID = new OptionID("distancefunction.epsilon", "The maximum distance between two vectors with equal preference vectors before considering them as parallel.");
-
-  /**
    * Holds the value of {@link #EPSILON_ID}.
    */
   private double epsilon;
@@ -209,6 +196,19 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * @apiviz.exclude
    */
   public abstract static class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractIndexBasedDistanceFunction.Parameterizer<F> {
+    /**
+     * Parameter to specify the maximum distance between two vectors with equal
+     * preference vectors before considering them as parallel, must be a double
+     * equal to or greater than 0.
+     * <p>
+     * Default value: {@code 0.001}
+     * </p>
+     * <p>
+     * Key: {@code -pvbasedcorrelationdf.epsilon}
+     * </p>
+     */
+    public static final OptionID EPSILON_ID = new OptionID("distancefunction.epsilon", "The maximum distance between two vectors with equal preference vectors before considering them as parallel.");
+
     protected double epsilon = 0.0;
 
     @Override

@@ -4,8 +4,6 @@ de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances
 de.lmu.ifi.dbs.elki.algorithm.clustering.CanopyPreClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS
-de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
@@ -18,8 +16,8 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBisecting
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBatchedLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
-de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.HiCO
-de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC
+de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS
+de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DeLiClu
 de.lmu.ifi.dbs.elki.algorithm.outlier.COP
 de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore

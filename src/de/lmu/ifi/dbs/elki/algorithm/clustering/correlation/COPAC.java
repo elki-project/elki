@@ -147,8 +147,8 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
   /**
    * The last used distance query
    */
-  // FIXME: remove this when migrating to a full Factory pattern! This is
-  // non-reentrant!
+  // FIXME: remove this when migrating to a full Factory pattern!
+  // This will not allow concurrent jobs.
   private FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D> partitionDistanceQuery;
 
   /**
@@ -175,31 +175,41 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
   @SuppressWarnings("unchecked")
   public Clustering<Model> run(Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    if(LOG.isVerbose()) {
-      LOG.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + dim);
-    }
 
     partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D>) partitionDistanceFunction.instantiate(relation);
     LocalProjectionIndex<V, ?> preprocin = partitionDistanceQuery.getIndex();
 
-    // partitioning
+    ModifiableDBIDs[] partitions = partitionByCorrelationDimensionality(relation, preprocin, dim);
+
+    // running partition algorithm
+    return runPartitionAlgorithm(relation, partitions, partitionDistanceQuery);
+  }
+
+  /**
+   * Partition the data set by correlation dimensionality.
+   * 
+   * @param relation Relation
+   * @param preproc Preprocessor
+   * @param dim Dimensionality of data set
+   * @return Data set partitions
+   */
+  protected ModifiableDBIDs[] partitionByCorrelationDimensionality(Relation<V> relation, LocalProjectionIndex<V, ?> preproc, final int dim) {
     ModifiableDBIDs[] partitions = new ModifiableDBIDs[dim + 1];
     FiniteProgress partitionProgress = LOG.isVerbose() ? new FiniteProgress("Partitioning", relation.size(), LOG) : null;
     int processed = 1;
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      int corrdim = preprocin.getLocalProjection(iditer).getCorrelationDimension();
+      int corrdim = preproc.getLocalProjection(iditer).getCorrelationDimension();
 
       if(partitions[corrdim] == null) {
         partitions[corrdim] = DBIDUtil.newArray();
       }
-
       partitions[corrdim].add(iditer);
+
       if(partitionProgress != null) {
         partitionProgress.setProcessed(processed++, LOG);
       }
     }
-
     if(partitionProgress != null) {
       partitionProgress.ensureCompleted(LOG);
     }
@@ -211,9 +221,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
         }
       }
     }
-
-    // running partition algorithm
-    return runPartitionAlgorithm(relation, partitions, partitionDistanceQuery);
+    return partitions;
   }
 
   /**
@@ -229,7 +237,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
 
     // TODO: use an extra finite progress for the partitions?
     for(int d = 1; d <= dim; d++) {
-      // Nonexistant
+      // Skip empty partitions
       if(partitionMap[d] == null) {
         continue;
       }
@@ -239,9 +247,9 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
         result.addToplevelCluster(new Cluster<Model>(partitionMap[d], true, ClusterModel.CLUSTER));
         continue;
       }
+      // Setup context to run the inner algorithm:
       ProxyDatabase proxy = new ProxyDatabase(partitionMap[d], relation);
-
-      ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = getPartitionAlgorithm(query);
+      ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = instantiatePartitionAlgorithm(query);
       if(LOG.isVerbose()) {
         LOG.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + d + "]...");
       }
@@ -264,7 +272,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * 
    * @return the specified partition algorithm
    */
-  public ClusteringAlgorithm<Clustering<Model>> getPartitionAlgorithm(DistanceQuery<V, D> query) {
+  protected ClusteringAlgorithm<Clustering<Model>> instantiatePartitionAlgorithm(DistanceQuery<V, D> query) {
     ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
     ProxyDistanceFunction<V, D> dist = ProxyDistanceFunction.proxy(query);
     reconfig.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);

@@ -29,6 +29,8 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DeLiClu;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;

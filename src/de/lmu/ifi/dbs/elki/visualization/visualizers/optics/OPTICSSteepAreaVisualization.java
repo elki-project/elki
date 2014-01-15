@@ -30,8 +30,8 @@ import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;

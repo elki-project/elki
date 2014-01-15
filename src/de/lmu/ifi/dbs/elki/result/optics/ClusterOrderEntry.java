@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.result.optics;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Generic Cluster Order Entry Interface.
@@ -35,10 +34,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.composedOf DBID
  * @apiviz.composedOf Distance
- *
+ * 
  * @param <D> Distance type
  */
-public interface ClusterOrderEntry<D extends Distance<D>> {
+public interface ClusterOrderEntry<D extends Comparable<D>> extends Comparable<ClusterOrderEntry<D>> {
   /**
    * Returns the object id of this entry.
    * 

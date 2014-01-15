@@ -292,7 +292,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     StringBuilder msg = LOG.isDebuggingFine() ? new StringBuilder() : null;
     Hierarchy<Cluster<CorrelationModel<V>>> hier = clustering.getClusterHierarchy();
 
-    DBSCAN<V, DoubleDistance> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm(query));
+    DBSCAN<V, DoubleDistance> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.instantiatePartitionAlgorithm(copacAlgorithm.getPartitionDistanceQuery()));
     if (dbscan == null) {
       // TODO: appropriate exception class?
       throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");

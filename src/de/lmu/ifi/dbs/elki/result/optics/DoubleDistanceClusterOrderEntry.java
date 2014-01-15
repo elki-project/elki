@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Elke Achtert
  */
-public class DoubleDistanceClusterOrderEntry implements Comparable<ClusterOrderEntry<DoubleDistance>>, ClusterOrderEntry<DoubleDistance> {
+public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<DoubleDistance> {
   /**
    * The id of the entry.
    */

@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -667,7 +667,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     public void configDiSHDistance(Parameterization config, double epsilon, int minpts) {
       ListParameterization dishParameters = new ListParameterization();
-      dishParameters.addParameter(DiSHDistanceFunction.EPSILON_ID, epsilon);
+      dishParameters.addParameter(DiSHDistanceFunction.Parameterizer.EPSILON_ID, epsilon);
       dishParameters.addParameter(IndexBasedDistanceFunction.INDEX_ID, DiSHPreferenceVectorIndex.Factory.class);
       dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.EPSILON_ID, Double.toString(epsilon));
       dishParameters.addParameter(DiSHPreferenceVectorIndex.Factory.MINPTS_ID, minpts);

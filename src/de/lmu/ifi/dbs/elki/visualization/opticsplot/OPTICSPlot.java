@@ -133,7 +133,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * @return distance adapter
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private static <D extends Distance<D>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
+  private static <D extends Comparable<D>> OPTICSDistanceAdapter<D> getAdapterForDistance(ClusterOrderResult<D> co) {
     Class<?> dcls = co.getDistanceClass();
     if(dcls != null && NumberDistance.class.isAssignableFrom(dcls)) {
       return new OPTICSNumberDistance();
@@ -157,7 +157,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
    * @param co Cluster order result
    * @return test result
    */
-  public static <D extends Distance<D>> boolean canPlot(ClusterOrderResult<D> co) {
+  public static <D extends Comparable<D>> boolean canPlot(ClusterOrderResult<D> co) {
     try {
       if(getAdapterForDistance(co) != null) {
         return true;

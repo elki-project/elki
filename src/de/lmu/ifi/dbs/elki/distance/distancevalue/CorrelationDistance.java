@@ -110,20 +110,19 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
    */
   @Override
   public int compareTo(D other) {
-    int compare = (this.correlationValue < other.getCorrelationValue()) ? -1 : (this.correlationValue > other.getCorrelationValue()) ? +1 : 0;
-    if (compare != 0) {
-      return compare;
-    } else {
-      return Double.compare(this.euclideanValue, other.getEuclideanValue());
+    if(this.correlationValue < other.getCorrelationValue()) {
+      return -1;
     }
+    if(this.correlationValue > other.getCorrelationValue()) {
+      return +1;
+    }
+    return Double.compare(this.euclideanValue, other.getEuclideanValue());
   }
 
   @Override
   public int hashCode() {
-    int result;
-    long temp;
-    result = correlationValue;
-    temp = euclideanValue >= Double.MIN_NORMAL ? Double.doubleToLongBits(euclideanValue) : 0L;
+    int result = correlationValue;
+    long temp = euclideanValue >= Double.MIN_NORMAL ? Double.doubleToLongBits(euclideanValue) : 0L;
     result = 29 * result + (int) (temp ^ (temp >>> 32));
     return result;
   }
@@ -131,17 +130,17 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if(getClass() != obj.getClass()) {
       return false;
     }
     final CorrelationDistance<D> other = (CorrelationDistance<D>) obj;
-    if (this.correlationValue != other.correlationValue) {
+    if(this.correlationValue != other.correlationValue) {
       return false;
     }
-    if (this.euclideanValue != other.euclideanValue) {
+    if(this.euclideanValue != other.euclideanValue) {
       return false;
     }
     return true;

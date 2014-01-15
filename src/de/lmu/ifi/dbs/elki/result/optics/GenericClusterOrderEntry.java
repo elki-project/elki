@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.result.optics;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Provides an entry in a cluster order.
@@ -33,7 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Elke Achtert
  * @param <D> the type of Distance used by the ClusterOrderEntry
  */
-public class GenericClusterOrderEntry<D extends Distance<D>> implements Comparable<ClusterOrderEntry<D>>, ClusterOrderEntry<D> {
+public class GenericClusterOrderEntry<D extends Comparable<D>> implements ClusterOrderEntry<D> {
   /**
    * The id of the entry.
    */
@@ -138,7 +137,10 @@ public class GenericClusterOrderEntry<D extends Distance<D>> implements Comparab
 
   @Override
   public int compareTo(ClusterOrderEntry<D> o) {
-    int delta = this.getReachability().compareTo(o.getReachability());
+    if (this.reachability == null) {
+      return +1;
+    }
+    int delta = this.reachability.compareTo(o.getReachability());
     if(delta != 0) {
       return delta;
     }

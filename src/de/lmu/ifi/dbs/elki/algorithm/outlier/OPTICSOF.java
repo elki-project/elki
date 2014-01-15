@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;

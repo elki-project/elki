@@ -23,17 +23,17 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 
 /**
- * Interface to map ClusterOrderEntries to double values to use in the OPTICS plot.
+ * Interface to map ClusterOrderEntries to double values to use in the OPTICS
+ * plot.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <D> Distance type
  */
-public interface OPTICSDistanceAdapter<D extends Distance<D>> {
+public interface OPTICSDistanceAdapter<D extends Comparable<D>> {
   /**
    * Get the double value for plotting for a cluster order entry.
    * 
