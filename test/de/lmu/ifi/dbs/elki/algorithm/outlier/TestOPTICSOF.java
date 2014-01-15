@@ -47,7 +47,7 @@ public class TestOPTICSOF extends AbstractSimpleAlgorithmTest implements JUnit4T
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(OPTICS.MINPTS_ID, 22);
+    params.addParameter(OPTICS.Parameterizer.MINPTS_ID, 22);
 
     // setup Algorithm
     OPTICSOF<DoubleVector, DoubleDistance> opticsof = ClassGenericsUtil.parameterizeOrAbort(OPTICSOF.class, params);

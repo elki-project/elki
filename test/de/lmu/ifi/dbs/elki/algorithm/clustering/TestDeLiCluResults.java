@@ -70,9 +70,9 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
 
     // Setup actual algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(DeLiClu.MINPTS_ID, 18);
-    params.addParameter(OPTICSXi.XI_ID, 0.038);
-    params.addParameter(OPTICSXi.XIALG_ID, DeLiClu.class);
+    params.addParameter(DeLiClu.Parameterizer.MINPTS_ID, 18);
+    params.addParameter(OPTICSXi.Parameterizer.XI_ID, 0.038);
+    params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, DeLiClu.class);
     OPTICSXi<DoubleDistance> opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
     testParameterizationOk(params);
 

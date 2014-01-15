@@ -58,9 +58,9 @@ public class TestOPTICSResults extends AbstractSimpleAlgorithmTest implements JU
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(OPTICS.MINPTS_ID, 18);
-    params.addParameter(OPTICSXi.XI_ID, 0.038);
-    params.addParameter(OPTICSXi.XIALG_ID, OPTICS.class);
+    params.addParameter(OPTICS.Parameterizer.MINPTS_ID, 18);
+    params.addParameter(OPTICSXi.Parameterizer.XI_ID, 0.038);
+    params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, OPTICS.class);
     OPTICSXi<DoubleDistance> opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
     testParameterizationOk(params);
 
