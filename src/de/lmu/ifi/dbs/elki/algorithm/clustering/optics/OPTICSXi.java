@@ -74,16 +74,6 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
   private static final Logging LOG = Logging.getLogger(OPTICSXi.class);
 
   /**
-   * Parameter to specify the actual OPTICS algorithm to use.
-   */
-  public static final OptionID XIALG_ID = new OptionID("opticsxi.algorithm", "The actual OPTICS-type algorithm to use.");
-
-  /**
-   * Parameter to specify the steepness threshold.
-   */
-  public static final OptionID XI_ID = new OptionID("opticsxi.xi", "Threshold for the steepness requirement.");
-
-  /**
    * The actual algorithm we use.
    */
   OPTICSTypeAlgorithm<N> optics;
@@ -652,6 +642,16 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
    * @apiviz.exclude
    */
   public static class Parameterizer<D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+    /**
+     * Parameter to specify the actual OPTICS algorithm to use.
+     */
+    public static final OptionID XIALG_ID = new OptionID("opticsxi.algorithm", "The actual OPTICS-type algorithm to use.");
+
+    /**
+     * Parameter to specify the steepness threshold.
+     */
+    public static final OptionID XI_ID = new OptionID("opticsxi.xi", "Threshold for the steepness requirement.");
+
     protected OPTICSTypeAlgorithm<D> optics;
 
     protected double xi = 0.0;

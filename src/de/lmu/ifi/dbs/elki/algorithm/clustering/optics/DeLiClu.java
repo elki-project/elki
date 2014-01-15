@@ -94,12 +94,6 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
   private static final Logging LOG = Logging.getLogger(DeLiClu.class);
 
   /**
-   * Parameter to specify the threshold for minimum number of points within a
-   * cluster, must be an integer greater than 0.
-   */
-  public static final OptionID MINPTS_ID = new OptionID("deliclu.minpts", "Threshold for minimum number of points within a cluster.");
-
-  /**
    * The priority queue for the algorithm.
    */
   private UpdatableHeap<SpatialObjectPair> heap;
@@ -492,6 +486,11 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
    * @apiviz.exclude
    */
   public static class Parameterizer<NV extends NumberVector<?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<NV, D> {
+    /**
+     * Parameter to specify the threshold for minimum number of points within a
+     * cluster, must be an integer greater than 0.
+     */
+    public static final OptionID MINPTS_ID = new OptionID("deliclu.minpts", "Threshold for minimum number of points within a cluster.");
     protected int minpts = 0;
 
     @Override

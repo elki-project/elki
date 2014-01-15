@@ -194,7 +194,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(OPTICS.MINPTS_ID);
+      final IntParameter param = new IntParameter(OPTICS.Parameterizer.MINPTS_ID);
       param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(param)) {
         minpts = param.getValue();

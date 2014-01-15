@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.GeneralizedOPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -115,23 +114,23 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, Prefer
   }
 
   @Override
-  public ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> run(Database database, Relation<V> relation) {
+  public ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> run(Relation<V> relation) {
     assert (this.index == null && this.relation == null) : "Running algorithm instance multiple times in parallel is not supported.";
     this.index = indexfactory.instantiate(relation);
     this.relation = relation;
-    ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> result = super.run(database, relation);
+    ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> result = super.run(relation);
     this.index = null;
     this.relation = null;
     return result;
   }
 
   @Override
-  protected ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> makeSeedEntry(DBID objectID) {
+  protected ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> makeSeedEntry(Relation<V> relation, DBID objectID) {
     return new GenericClusterOrderEntry<>(objectID, null, PreferenceVectorBasedCorrelationDistance.FACTORY.infiniteDistance());
   }
 
   @Override
-  protected Collection<? extends ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> getNeighborsForDBID(DBID id) {
+  protected Collection<? extends ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> getNeighborsForDBID(Relation<V> relation, DBID id) {
     DBID id1 = DBIDUtil.deref(id);
     long[] pv1 = index.getPreferenceVector(id1);
     V v1 = relation.get(id1);

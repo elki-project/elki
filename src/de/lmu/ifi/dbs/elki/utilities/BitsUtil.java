@@ -65,7 +65,7 @@ public final class BitsUtil {
   /**
    * Hashing strategy to use with Trove.
    */
-  public static final HashingStrategy<long[]> HASH_STRATEGY = new HashingStrategy<long[]>() {
+  public static final HashingStrategy<long[]> TROVE_HASH_STRATEGY = new HashingStrategy<long[]>() {
     /**
      * Serial version number.
      */

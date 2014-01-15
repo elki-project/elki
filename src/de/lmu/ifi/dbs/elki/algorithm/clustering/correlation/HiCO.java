@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.GeneralizedOPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -114,11 +113,6 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, PCACor
   double delta;
 
   /**
-   * Relation we are currently processing.
-   */
-  private Relation<V> relation;
-
-  /**
    * Constructor.
    * 
    * @param indexfactory Index factory
@@ -131,23 +125,21 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, PCACor
   }
 
   @Override
-  public ClusterOrderResult<PCACorrelationDistance> run(Database database, Relation<V> relation) {
-    assert (this.index == null && this.relation == null) : "Running algorithm instance multiple times in parallel is not supported.";
+  public ClusterOrderResult<PCACorrelationDistance> run(Relation<V> relation) {
+    assert (this.index == null) : "Running algorithm instance multiple times in parallel is not supported.";
     this.index = indexfactory.instantiate(relation);
-    this.relation = relation;
-    ClusterOrderResult<PCACorrelationDistance> result = super.run(database, relation);
+    ClusterOrderResult<PCACorrelationDistance> result = super.run(relation);
     this.index = null;
-    this.relation = null;
     return result;
   }
 
   @Override
-  protected ClusterOrderEntry<PCACorrelationDistance> makeSeedEntry(DBID objectID) {
+  protected ClusterOrderEntry<PCACorrelationDistance> makeSeedEntry(Relation<V> relation, DBID objectID) {
     return new GenericClusterOrderEntry<>(objectID, null, PCACorrelationDistance.FACTORY.infiniteDistance());
   }
 
   @Override
-  protected Collection<ClusterOrderEntry<PCACorrelationDistance>> getNeighborsForDBID(DBID id) {
+  protected Collection<ClusterOrderEntry<PCACorrelationDistance>> getNeighborsForDBID(Relation<V> relation, DBID id) {
     DBID id1 = DBIDUtil.deref(id);
     PCAFilteredResult pca1 = index.getLocalProjection(id1);
     V dv1 = relation.get(id1);

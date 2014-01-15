@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -80,7 +79,7 @@ public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends Abst
    * @param relation Relation
    * @return Result
    */
-  public ClusterOrderResult<D> run(Database database, Relation<O> relation) {
+  public ClusterOrderResult<D> run(Relation<O> relation) {
     int size = relation.size();
     final FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Generalized OPTICS", size, getLogger()) : null;
 
@@ -89,7 +88,7 @@ public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends Abst
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(!processedIDs.contains(iditer)) {
-        expandClusterOrder(clusterOrder, database, DBIDUtil.deref(iditer), progress);
+        expandClusterOrder(clusterOrder, relation, DBIDUtil.deref(iditer), progress);
       }
     }
     if(progress != null) {
@@ -103,24 +102,24 @@ public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends Abst
    * OPTICS-function expandClusterOrder.
    * 
    * @param clusterOrder Cluster order result to expand
-   * @param database the database on which the algorithm is run
+   * @param relation the data relation to run on
    * @param rangeQuery the range query to use
    * @param objectID the currently processed object
    * @param epsilon Epsilon range value
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database database, DBID objectID, FiniteProgress progress) {
+  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Relation<O> relation, DBID objectID, FiniteProgress progress) {
     UpdatableHeap<ClusterOrderEntry<D>> heap = new UpdatableHeap<>();
-    heap.add(makeSeedEntry(objectID));
+    heap.add(makeSeedEntry(relation, objectID));
 
     while(!heap.isEmpty()) {
       final ClusterOrderEntry<D> current = heap.poll();
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      Collection<? extends ClusterOrderEntry<D>> neighbors = getNeighborsForDBID(current.getID());
-      if(neighbors.size() >= minpts) {
+      Collection<? extends ClusterOrderEntry<D>> neighbors = getNeighborsForDBID(relation, current.getID());
+      if(neighbors != null && neighbors.size() >= minpts) {
         for(ClusterOrderEntry<D> entry : neighbors) {
           if(processedIDs.contains(entry.getID())) {
             continue;
@@ -134,9 +133,23 @@ public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends Abst
     }
   }
 
-  abstract protected ClusterOrderEntry<D> makeSeedEntry(DBID objectID);
+  /**
+   * Create the initial element to seed the algorithm.
+   * 
+   * @param relation Data relation
+   * @param objectID Object ID
+   * @return Seed element.
+   */
+  abstract protected ClusterOrderEntry<D> makeSeedEntry(Relation<O> relation, DBID objectID);
 
-  abstract protected Collection<? extends ClusterOrderEntry<D>> getNeighborsForDBID(DBID id);
+  /**
+   * Compute the neighbors for the given DBID.
+   * 
+   * @param relation Data relation
+   * @param id Current object ID
+   * @return Neighbors
+   */
+  abstract protected Collection<? extends ClusterOrderEntry<D>> getNeighborsForDBID(Relation<O> relation, DBID id);
 
   @Override
   public int getMinPts() {
