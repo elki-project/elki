@@ -68,15 +68,16 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, Doub
     try {
       List<?> l = List.class.cast(obj);
       // do extra validation:
-      for (Object o : l) {
-        if (!(o instanceof Double)) {
+      for(Object o : l) {
+        if(!(o instanceof Double)) {
           throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
         }
       }
       // TODO: can we use reflection to get extra checks?
       // TODO: Should we copy the list?
-      return (List<Double>)l;
-    } catch (ClassCastException e) {
+      return (List<Double>) l;
+    }
+    catch(ClassCastException e) {
       // continue with others
     }
     if(obj instanceof String) {
@@ -85,6 +86,11 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, Doub
       for(String val : values) {
         doubleValue.add(FormatUtil.parseDouble(val));
       }
+      return doubleValue;
+    }
+    if(obj instanceof Double) {
+      ArrayList<Double> doubleValue = new ArrayList<>(1);
+      doubleValue.add((Double) obj);
       return doubleValue;
     }
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Double values!");
@@ -97,11 +103,10 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, Doub
    *        parameter
    */
   // Unused?
-  /*public void setDefaultValue(double allListDefaultValue) {
-    for(int i = 0; i < defaultValue.size(); i++) {
-      defaultValue.set(i, allListDefaultValue);
-    }
-  }*/
+  /*
+   * public void setDefaultValue(double allListDefaultValue) { for(int i = 0; i
+   * < defaultValue.size(); i++) { defaultValue.set(i, allListDefaultValue); } }
+   */
 
   /**
    * Returns a string representation of the parameter's type.
