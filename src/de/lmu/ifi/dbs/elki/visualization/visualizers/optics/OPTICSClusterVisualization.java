@@ -30,11 +30,10 @@ import java.util.Map;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -80,9 +79,9 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for (OPTICSProjector<?> p : ops) {
+    for(OPTICSProjector<?> p : ops) {
       final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
-      if (ocl != null) {
+      if(ocl != null) {
         final VisualizationTask task = new VisualizationTask(NAME, ocl, null, this);
         task.level = VisualizationTask.LEVEL_DATA;
         baseResult.getHierarchy().add(p, task);
@@ -94,7 +93,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleDistance>(task);
+    return new Instance(task);
   }
 
   @Override
@@ -112,16 +111,17 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   @SuppressWarnings("unchecked")
   protected static Clustering<OPTICSModel> findOPTICSClustering(Result result) {
     Collection<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
-    for (Clustering<?> clus : cs) {
-      if (clus.getToplevelClusters().size() == 0) {
+    for(Clustering<?> clus : cs) {
+      if(clus.getToplevelClusters().size() == 0) {
         continue;
       }
       try {
         Cluster<?> firstcluster = clus.getToplevelClusters().iterator().next();
-        if (firstcluster.getModel() instanceof OPTICSModel) {
+        if(firstcluster.getModel() instanceof OPTICSModel) {
           return (Clustering<OPTICSModel>) clus;
         }
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         // Empty clustering? Shouldn't happen.
         LOG.warning("Clustering with no cluster detected.", e);
       }
@@ -135,10 +135,8 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
    * @author Erich Schubert
    * 
    * @apiviz.uses Clustering oneway - - «visualizes»
-   * 
-   * @param <D> Distance type (actually unused)
    */
-  public class Instance<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
+  public class Instance extends AbstractOPTICSVisualization<ClusterOrderEntry<?>> {
     /**
      * CSS class for markers
      */
@@ -169,7 +167,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
       ColorLibrary colors = context.getStyleResult().getStyleLibrary().getColorSet(StyleLibrary.PLOT);
       HashMap<Cluster<?>, String> colormap = new HashMap<>();
       int cnum = 0;
-      for (Cluster<?> c : clus.getAllClusters()) {
+      for(Cluster<?> c : clus.getAllClusters()) {
         colormap.put(c, colors.getColor(cnum));
         cnum++;
       }
@@ -186,7 +184,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
     private void drawClusters(Clustering<OPTICSModel> clustering, Hierarchy.Iter<Cluster<OPTICSModel>> clusters, int depth, Map<Cluster<?>, String> colormap) {
       final double scale = StyleLibrary.SCALE;
 
-      for (; clusters.valid(); clusters.advance()) {
+      for(; clusters.valid(); clusters.advance()) {
         Cluster<OPTICSModel> cluster = clusters.get();
         try {
           OPTICSModel model = cluster.getModel();
@@ -196,16 +194,17 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
           Element e = svgp.svgLine(x1, y, x2, y);
           SVGUtil.addCSSClass(e, CSS_BRACKET);
           String color = colormap.get(cluster);
-          if (color != null) {
+          if(color != null) {
             SVGUtil.setAtt(e, SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + color);
           }
           layer.appendChild(e);
-        } catch (ClassCastException e) {
+        }
+        catch(ClassCastException e) {
           LOG.warning("Expected OPTICSModel, got: " + cluster.getModel().getClass().getSimpleName());
         }
         // Descend
         final Hierarchy.Iter<Cluster<OPTICSModel>> children = clustering.getClusterHierarchy().iterChildren(cluster);
-        if (children != null) {
+        if(children != null) {
           drawClusters(clustering, children, depth + 1, colormap);
         }
       }
@@ -216,7 +215,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses() {
       // Class for the markers
-      if (!svgp.getCSSClassManager().contains(CSS_BRACKET)) {
+      if(!svgp.getCSSClassManager().contains(CSS_BRACKET)) {
         final CSSClass cls = new CSSClass(this, CSS_BRACKET);
         final StyleLibrary style = context.getStyleResult().getStyleLibrary();
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.PLOT));

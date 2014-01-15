@@ -23,32 +23,28 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DoubleDistanceClusterOrderEntry;
 
 /**
  * Adapter that will map a regular number distance to its double value.
  * 
  * @author Erich Schubert
  */
-public class OPTICSNumberDistance<D extends NumberDistance<D, ?>> implements OPTICSDistanceAdapter<D> {
+public class OPTICSNumberDistanceAdapter implements OPTICSDistanceAdapter<DoubleDistanceClusterOrderEntry> {
   /**
    * Default constructor.
    */
-  public OPTICSNumberDistance() {
+  public OPTICSNumberDistanceAdapter() {
     super();
   }
 
   @Override
-  public double getDoubleForEntry(ClusterOrderEntry<D> coe) {
-    if (coe.getReachability() == null) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return coe.getReachability().doubleValue();
+  public double getDoubleForEntry(DoubleDistanceClusterOrderEntry coe) {
+    return coe.doubleReachability();
   }
 
   @Override
-  public boolean isInfinite(ClusterOrderEntry<D> coe) {
-    return coe.getReachability().isInfiniteDistance();
+  public boolean isInfinite(DoubleDistanceClusterOrderEntry coe) {
+    return coe.doubleReachability() >= Double.POSITIVE_INFINITY;
   }
 }

@@ -840,23 +840,25 @@ public final class BitsUtil {
       return "null";
     }
     final int mag = magnitude(v);
-    if(v.length == 0 || mag == 0) {
+    if(mag == 0) {
       return "0";
     }
-    final int words = ((mag - 1) >>> LONG_LOG2_SIZE) + 1;
     char[] digits = new char[mag];
-
     int pos = mag - 1;
-    for(int w = 0; w < words; w++) {
+
+    outer: for(int w = 0; w < v.length; w++) {
       long f = 1L;
       for(int i = 0; i < Long.SIZE; i++) {
         digits[pos] = ((v[w] & f) == 0) ? '0' : '1';
-        pos--;
         f <<= 1;
+        --pos;
         if(pos < 0) {
-          break;
+          break outer;
         }
       }
+    }
+    for(; pos >= 0; --pos) {
+      digits[pos] = '0';
     }
     return new String(digits);
   }
@@ -873,23 +875,25 @@ public final class BitsUtil {
       return "null";
     }
     final int mag = Math.max(magnitude(v), minw);
-    if(v.length == 0 || mag == 0) {
+    if(mag == 0) {
       return "0";
     }
-    final int words = ((mag - 1) >>> LONG_LOG2_SIZE) + 1;
     char[] digits = new char[mag];
-
     int pos = mag - 1;
-    for(int w = 0; w < words; w++) {
+
+    outer: for(int w = 0; w < v.length; w++) {
       long f = 1L;
       for(int i = 0; i < Long.SIZE; i++) {
         digits[pos] = ((v[w] & f) == 0) ? '0' : '1';
-        pos--;
         f <<= 1;
+        --pos;
         if(pos < 0) {
-          break;
+          break outer;
         }
       }
+    }
+    for(; pos >= 0; --pos) {
+      digits[pos] = '0';
     }
     return new String(digits);
   }
@@ -907,15 +911,98 @@ public final class BitsUtil {
     }
     char[] digits = new char[mag];
 
-    int pos = mag - 1;
     long f = 1L;
-    for(int i = 0; i < Long.SIZE; i++) {
+    for(int pos = mag - 1; pos >= 0; --pos, f <<= 1) {
       digits[pos] = ((v & f) == 0) ? '0' : '1';
-      pos--;
-      f <<= 1;
-      if(pos < 0) {
-        break;
+    }
+    return new String(digits);
+  }
+
+  /**
+   * Convert bitset to a string consisting of "0" and "1", in low-endian order.
+   * 
+   * @param v Value to process
+   * @return String representation
+   */
+  public static String toStringLow(long[] v) {
+    if(v == null) {
+      return "null";
+    }
+    final int mag = magnitude(v);
+    if(mag == 0) {
+      return "0";
+    }
+    char[] digits = new char[mag];
+    int pos = 0;
+
+    outer: for(int w = 0; w < v.length; w++) {
+      long f = 1L;
+      for(int i = 0; i < Long.SIZE; i++) {
+        digits[pos] = ((v[w] & f) == 0) ? '0' : '1';
+        f <<= 1;
+        ++pos;
+        if(pos >= mag) {
+          break outer;
+        }
       }
+    }
+    for(; pos < mag; ++pos) {
+      digits[pos] = '0';
+    }
+    return new String(digits);
+  }
+
+  /**
+   * Convert bitset to a string consisting of "0" and "1", in low-endian order.
+   * 
+   * @param v Value to process
+   * @param minw Minimum width
+   * @return String representation
+   */
+  public static String toStringLow(long[] v, int minw) {
+    if(v == null) {
+      return "null";
+    }
+    final int mag = Math.max(magnitude(v), minw);
+    if(mag == 0) {
+      return "0";
+    }
+    char[] digits = new char[mag];
+    int pos = 0;
+
+    outer: for(int w = 0; w < v.length; w++) {
+      long f = 1L;
+      for(int i = 0; i < Long.SIZE; i++) {
+        digits[pos] = ((v[w] & f) == 0) ? '0' : '1';
+        f <<= 1;
+        ++pos;
+        if(pos >= mag) {
+          break outer;
+        }
+      }
+    }
+    for(; pos < mag; ++pos) {
+      digits[pos] = '0';
+    }
+    return new String(digits);
+  }
+
+  /**
+   * Convert bitset to a string consisting of "0" and "1", in low-endian order.
+   * 
+   * @param v Value to process
+   * @return String representation
+   */
+  public static String toStringLow(long v) {
+    final int mag = magnitude(v);
+    if(mag == 0) {
+      return "0";
+    }
+    char[] digits = new char[mag];
+
+    long f = 1L;
+    for(int pos = 0; pos < mag; ++pos, f <<= 1) {
+      digits[pos] = ((v & f) == 0) ? '0' : '1';
     }
     return new String(digits);
   }

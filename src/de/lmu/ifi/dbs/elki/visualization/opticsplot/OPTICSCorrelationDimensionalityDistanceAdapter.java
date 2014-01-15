@@ -23,37 +23,33 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.CorrelationDistance;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrderEntry;
 
 /**
  * Adapter that will map a correlation distance to its dimensionality.
  * 
  * @author Erich Schubert
+ * 
+ * @param <D> Cluster order entry type.
  */
-public class OPTICSCorrelationDimensionalityDistance<D extends CorrelationDistance<D>> implements OPTICSDistanceAdapter<D> {
+public class OPTICSCorrelationDimensionalityDistanceAdapter implements OPTICSDistanceAdapter<CorrelationClusterOrderEntry<?>> {
   /**
    * Default constructor.
    */
-  public OPTICSCorrelationDimensionalityDistance() {
+  public OPTICSCorrelationDimensionalityDistanceAdapter() {
     super();
   }
 
   @Override
-  public double getDoubleForEntry(ClusterOrderEntry<D> coe) {
-    final D reachability = coe.getReachability();
-    if (reachability == null) {
+  public double getDoubleForEntry(CorrelationClusterOrderEntry<?> coe) {
+    if(coe.getCorrelationValue() == Integer.MAX_VALUE) {
       return Double.POSITIVE_INFINITY;
     }
-    if (reachability.isInfiniteDistance() || reachability.isUndefinedDistance()) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return reachability.getCorrelationValue();
+    return coe.getCorrelationValue();
   }
 
   @Override
-  public boolean isInfinite(ClusterOrderEntry<D> coe) {
-    final D reachability = coe.getReachability();
-    return reachability == null || reachability.isInfiniteDistance();
+  public boolean isInfinite(CorrelationClusterOrderEntry<?> coe) {
+    return coe.getCorrelationValue() == Integer.MAX_VALUE;
   }
 }

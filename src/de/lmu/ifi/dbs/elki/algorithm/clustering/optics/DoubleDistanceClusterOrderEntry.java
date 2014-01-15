@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.result.optics;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 /*
  This file is part of ELKI:
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Elke Achtert
  */
-public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<DoubleDistance> {
+public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<DoubleDistanceClusterOrderEntry> {
   /**
    * The id of the entry.
    */
@@ -130,24 +130,27 @@ public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<Double
    * 
    * @return the reachability distance of this entry
    */
-  @Override
+  @Deprecated
   public DoubleDistance getReachability() {
     return new DoubleDistance(reachability);
   }
 
+  /**
+   * Returns the reachability distance of this entry
+   * 
+   * @return the reachability distance of this entry
+   */
+  public double doubleReachability() {
+    return reachability;
+  }
+
   @Override
-  public int compareTo(ClusterOrderEntry<DoubleDistance> o) {
-    if(o instanceof DoubleDistanceClusterOrderEntry) {
-      int delta = Double.compare(this.reachability, ((DoubleDistanceClusterOrderEntry) o).reachability);
-      if(delta != 0) {
-        return delta;
-      }
+  public int compareTo(DoubleDistanceClusterOrderEntry o) {
+    if(this.reachability < o.reachability) {
+      return -1;
     }
-    else {
-      int delta = this.getReachability().compareTo(o.getReachability());
-      if(delta != 0) {
-        return delta;
-      }
+    if(this.reachability > o.reachability) {
+      return +1;
     }
     return -getID().compareTo(o.getID());
   }

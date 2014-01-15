@@ -167,7 +167,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       msg.append("\nvariances ");
       msg.append(FormatUtil.format(variances, ", ", 4));
       msg.append("\npreference ");
-      msg.append(BitsUtil.toString(preferenceVector, variances.length));
+      msg.append(BitsUtil.toStringLow(preferenceVector, variances.length));
     }
 
     return preferenceVector;

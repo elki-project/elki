@@ -28,8 +28,7 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -79,7 +78,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleDistance>(task);
+    return new Instance(task);
   }
 
   @Override
@@ -92,10 +91,8 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
    * Instance.
    * 
    * @author Erich Schubert
-   * 
-   * @param <D> Distance type
    */
-  public class Instance<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
+  public class Instance extends AbstractOPTICSVisualization<ClusterOrderEntry<?>> {
     /**
      * Constructor.
      * 
@@ -110,7 +107,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
       makeLayerElement();
       // addCSSClasses();
 
-      OPTICSPlot<D> opticsplot = optics.getOPTICSPlot(context);
+      OPTICSPlot<?> opticsplot = optics.getOPTICSPlot(context);
       String ploturi = opticsplot.getSVGPlotURI();
 
       Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);

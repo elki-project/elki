@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
 
 /**
  * Interface to map ClusterOrderEntries to double values to use in the OPTICS
@@ -31,16 +31,16 @@ import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
  * 
  * @author Erich Schubert
  * 
- * @param <D> Distance type
+ * @param <E> Cluster order entry type.
  */
-public interface OPTICSDistanceAdapter<D extends Comparable<D>> {
+public interface OPTICSDistanceAdapter<E extends ClusterOrderEntry<?>> {
   /**
    * Get the double value for plotting for a cluster order entry.
    * 
    * @param coe Cluster Order Entry
    * @return Double value (height)
    */
-  double getDoubleForEntry(ClusterOrderEntry<D> coe);
+  double getDoubleForEntry(E coe);
 
   /**
    * Test whether the reachability is infinite.
@@ -48,5 +48,5 @@ public interface OPTICSDistanceAdapter<D extends Comparable<D>> {
    * @param coe Cluster order entry
    * @return true, when infinite
    */
-  boolean isInfinite(ClusterOrderEntry<D> coe);
+  boolean isInfinite(E coe);
 }

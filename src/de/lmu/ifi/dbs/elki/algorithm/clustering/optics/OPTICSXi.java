@@ -42,11 +42,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -63,11 +60,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @apiviz.composedOf OPTICSTypeAlgorithm oneway
  * @apiviz.uses ClusterOrderResult oneway
  * @apiviz.has SteepAreaResult
- * 
- * @param <N> Number distance used by OPTICS
  */
 @Alias({ "OPTICSXi", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi" })
-public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
+public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
   /**
    * The logger for this class.
    */
@@ -76,7 +71,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
   /**
    * The actual algorithm we use.
    */
-  OPTICSTypeAlgorithm<N> optics;
+  OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> optics;
 
   /**
    * Xi parameter
@@ -89,21 +84,25 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
    * @param optics OPTICS algorithm to use
    * @param xi Xi value
    */
-  public OPTICSXi(OPTICSTypeAlgorithm<N> optics, double xi) {
+  public OPTICSXi(OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> optics, double xi) {
     super();
     this.optics = optics;
     this.xi = xi;
   }
 
   public Clustering<OPTICSModel> run(Database database, Relation<?> relation) {
-    // TODO: ensure we are using the same relation?
-    ClusterOrderResult<N> opticsresult = optics.run(database);
-
-    if(!NumberDistance.class.isInstance(optics.getDistanceFactory())) {
-      LOG.verbose("Xi cluster extraction only supported for number distances!");
+    if(!DoubleDistanceClusterOrderEntry.class.isAssignableFrom(optics.getEntryType())) {
+      LOG.warning("Xi cluster extraction only supported for number distances!");
       return null;
     }
 
+    // TODO: ensure we are using the same relation?
+    ClusterOrderResult<DoubleDistanceClusterOrderEntry> opticsresult = optics.run(database);
+
+    if(!DoubleDistanceClusterOrderEntry.class.isAssignableFrom(opticsresult.getEntryType())) {
+      LOG.warning("Xi cluster extraction only supported for number distances!");
+      return null;
+    }
     if(LOG.isVerbose()) {
       LOG.verbose("Extracting clusters with Xi: " + xi);
     }
@@ -119,9 +118,9 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
    * @param minpts Parameter minPts
    */
   // TODO: resolve handling of the last point in the cluster order
-  private Clustering<OPTICSModel> extractClusters(ClusterOrderResult<N> clusterOrderResult, Relation<?> relation, double ixi, int minpts) {
+  private Clustering<OPTICSModel> extractClusters(ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrderResult, Relation<?> relation, double ixi, int minpts) {
     // TODO: add progress?
-    List<ClusterOrderEntry<N>> clusterOrder = clusterOrderResult.getClusterOrder();
+    List<DoubleDistanceClusterOrderEntry> clusterOrder = clusterOrderResult.getClusterOrder();
     double mib = 0.0;
     // TODO: make it configurable to keep this list; this is mostly useful for
     // visualization
@@ -131,18 +130,18 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
 
-    SteepScanPosition<N> scan = new SteepScanPosition<>(clusterOrder);
+    SteepScanPosition scan = new SteepScanPosition(clusterOrder);
     while(scan.hasNext()) {
       final int curpos = scan.index;
       // Update maximum-inbetween
-      mib = Math.max(mib, scan.ecurr.getReachability().doubleValue());
+      mib = Math.max(mib, scan.ecurr.doubleReachability());
       // The last point cannot be the start of a steep area.
       if(scan.esucc != null) {
         // Xi-steep down area
         if(scan.steepDown(ixi)) {
           // Update mib values with current mib and filter
           updateFilterSDASet(mib, sdaset, ixi);
-          final double startval = scan.ecurr.getReachability().doubleValue();
+          final double startval = scan.ecurr.doubleReachability();
           int startsteep = scan.index;
           int endsteep = Math.min(scan.index + 1, clusterOrder.size());
           {
@@ -164,7 +163,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
               }
             }
           }
-          mib = clusterOrder.get(endsteep).getReachability().doubleValue();
+          mib = clusterOrder.get(endsteep).doubleReachability();
           final SteepDownArea sda = new SteepDownArea(startsteep, endsteep, startval, 0);
           if(LOG.isDebuggingFinest()) {
             LOG.debugFinest("Xi " + sda.toString());
@@ -185,8 +184,8 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
           {
             int startsteep = scan.index;
             int endsteep = scan.index + 1;
-            mib = scan.ecurr.getReachability().doubleValue();
-            double esuccr = scan.esucc.getReachability().doubleValue();
+            mib = scan.ecurr.doubleReachability();
+            double esuccr = scan.esucc.doubleReachability();
             // There is nothing higher than infinity
             if(!Double.isInfinite(esuccr)) {
               // find end of steep-up-area, eventually updating mib again
@@ -199,8 +198,8 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
                 // still steep - continue.
                 if(scan.steepUp(ixi)) {
                   endsteep = Math.min(scan.index + 1, clusterOrder.size() - 1);
-                  mib = scan.ecurr.getReachability().doubleValue();
-                  esuccr = scan.esucc.getReachability().doubleValue();
+                  mib = scan.ecurr.doubleReachability();
+                  esuccr = scan.esucc.doubleReachability();
                 }
                 else {
                   // Stop looking after minpts non-up steps.
@@ -233,7 +232,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
             int cstart = sda.getStartIndex();
             int cend = sua.getEndIndex();
             // Hotfix: never include infinity-reachable points at the end
-            while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).getReachability().doubleValue())) {
+            while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).doubleReachability())) {
               --cend;
             }
             // However, we sometimes have to adjust this (Condition 4):
@@ -241,7 +240,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
               // Case b)
               if(sda.getMaximum() * ixi >= sua.getMaximum()) {
                 while(cstart < sda.getEndIndex()) {
-                  if(clusterOrder.get(cstart + 1).getReachability().doubleValue() > sua.getMaximum()) {
+                  if(clusterOrder.get(cstart + 1).doubleReachability() > sua.getMaximum()) {
                     cstart++;
                   }
                   else {
@@ -252,7 +251,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
               // Case c)
               else if(sua.getMaximum() * ixi >= sda.getMaximum()) {
                 while(cend > sua.getStartIndex()) {
-                  if(clusterOrder.get(cend - 1).getReachability().doubleValue() > sda.getMaximum()) {
+                  if(clusterOrder.get(cend - 1).doubleReachability() > sda.getMaximum()) {
                     cend--;
                   }
                   else {
@@ -304,7 +303,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     if(curclusters.size() > 0 || unclaimedids.size() > 0) {
       if(unclaimedids.size() > 0) {
         final Cluster<OPTICSModel> allcluster;
-        if(clusterOrder.get(clusterOrder.size() - 1).getReachability().isInfiniteDistance()) {
+        if(clusterOrder.get(clusterOrder.size() - 1).doubleReachability() >= Double.POSITIVE_INFINITY) {
           allcluster = new Cluster<>("Noise", unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1));
         }
         else {
@@ -365,14 +364,12 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
    * @author Erich Schubert
    * 
    * @apiviz.exclude
-   * 
-   * @param <N> Distance type
    */
-  private static class SteepScanPosition<N extends NumberDistance<N, ?>> {
+  private static class SteepScanPosition {
     /**
      * Cluster order
      */
-    List<ClusterOrderEntry<N>> co;
+    List<DoubleDistanceClusterOrderEntry> co;
 
     /**
      * Current position
@@ -382,19 +379,19 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     /**
      * Current entry
      */
-    ClusterOrderEntry<N> ecurr = null;
+    DoubleDistanceClusterOrderEntry ecurr = null;
 
     /**
      * Next entry
      */
-    ClusterOrderEntry<N> esucc = null;
+    DoubleDistanceClusterOrderEntry esucc = null;
 
     /**
      * Constructor.
      * 
      * @param co Cluster order
      */
-    public SteepScanPosition(List<ClusterOrderEntry<N>> co) {
+    public SteepScanPosition(List<DoubleDistanceClusterOrderEntry> co) {
       super();
       this.co = co;
       this.ecurr = (co.size() >= 1) ? co.get(0) : null;
@@ -428,13 +425,13 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
      * @return truth value
      */
     public boolean steepUp(double ixi) {
-      if(ecurr.getReachability().isInfiniteDistance()) {
+      if(ecurr.doubleReachability() >= Double.POSITIVE_INFINITY) {
         return false;
       }
       if(esucc == null) {
         return true;
       }
-      return ecurr.getReachability().doubleValue() <= esucc.getReachability().doubleValue() * ixi;
+      return ecurr.doubleReachability() <= esucc.doubleReachability() * ixi;
     }
 
     /**
@@ -447,10 +444,10 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
       if(esucc == null) {
         return false;
       }
-      if(esucc.getReachability().isInfiniteDistance()) {
+      if(esucc.doubleReachability() >= Double.POSITIVE_INFINITY) {
         return false;
       }
-      return ecurr.getReachability().doubleValue() * ixi >= esucc.getReachability().doubleValue();
+      return ecurr.doubleReachability() * ixi >= esucc.doubleReachability();
     }
   }
 
@@ -641,7 +638,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter to specify the actual OPTICS algorithm to use.
      */
@@ -652,9 +649,9 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
      */
     public static final OptionID XI_ID = new OptionID("opticsxi.xi", "Threshold for the steepness requirement.");
 
-    protected OPTICSTypeAlgorithm<D> optics;
+    protected OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> optics;
 
-    protected double xi = 0.0;
+    protected double xi = 0.;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -666,15 +663,15 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
         xi = xiP.doubleValue();
       }
 
-      ClassParameter<OPTICSTypeAlgorithm<D>> opticsP = new ClassParameter<>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICS.class);
+      ClassParameter<OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry>> opticsP = new ClassParameter<>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICS.class);
       if(config.grab(opticsP)) {
         optics = opticsP.instantiateClass(config);
       }
     }
 
     @Override
-    protected OPTICSXi<D> makeInstance() {
-      return new OPTICSXi<>(optics, xi);
+    protected OPTICSXi makeInstance() {
+      return new OPTICSXi(optics, xi);
     }
   }
 }

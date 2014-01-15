@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.result.optics;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 /*
  This file is part of ELKI:
@@ -60,18 +60,18 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
  * @apiviz.composedOf ClusterOrderResult.ReachabilityDistanceAdapter
  * @apiviz.composedOf ClusterOrderResult.PredecessorAdapter
  * 
- * @param <D> distance type.
+ * @param <E> entry type.
  */
-public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult implements IterableResult<ClusterOrderEntry<D>> {
+public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicResult implements IterableResult<E> {
   /**
    * Cluster order storage
    */
-  private ArrayList<ClusterOrderEntry<D>> clusterOrder;
+  private ArrayList<E> clusterOrder;
 
   /**
    * Map of object IDs to their cluster order entry
    */
-  private WritableDataStore<ClusterOrderEntry<D>> map;
+  private WritableDataStore<E> map;
 
   /**
    * The DBIDs we are defined for
@@ -100,28 +100,30 @@ public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult imp
    * 
    * @return cluster order
    */
-  public List<ClusterOrderEntry<D>> getClusterOrder() {
+  public List<E> getClusterOrder() {
     return clusterOrder;
+  }
+
+  /**
+   * Get the type of entries in this cluster order.
+   * 
+   * @return Cluster order
+   */
+  public Class<? super E> getEntryType() {
+    if(clusterOrder.size() <= 0) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    Class<? super E> cls = (Class<? super E>) clusterOrder.get(0).getClass();
+    return cls;
   }
 
   /**
    * The cluster order is iterable
    */
   @Override
-  public Iterator<ClusterOrderEntry<D>> iterator() {
+  public Iterator<E> iterator() {
     return clusterOrder.iterator();
-  }
-
-  /**
-   * Add an object to the cluster order.
-   * 
-   * @param id Object ID
-   * @param predecessor Predecessor ID
-   * @param reachability Reachability distance
-   */
-  public void add(DBID id, DBID predecessor, D reachability) {
-    add(new GenericClusterOrderEntry<>(id, predecessor, reachability));
-    dbids.add(id);
   }
 
   /**
@@ -129,25 +131,10 @@ public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult imp
    * 
    * @param ce Entry
    */
-  public void add(ClusterOrderEntry<D> ce) {
+  public void add(E ce) {
     clusterOrder.add(ce);
     map.put(ce.getID(), ce);
     dbids.add(ce.getID());
-  }
-
-  /**
-   * Get the distance class
-   * 
-   * @return distance class. Can be {@code null} for an all-undefined result!
-   */
-  public Class<?> getDistanceClass() {
-    for(ClusterOrderEntry<D> ce : clusterOrder) {
-      D dist = ce.getReachability();
-      if(dist != null) {
-        return dist.getClass();
-      }
-    }
-    return null;
   }
 
   /**
@@ -159,14 +146,14 @@ public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult imp
     /**
      * Access reference.
      */
-    private ArrayList<ClusterOrderEntry<D>> clusterOrder;
+    private ArrayList<E> clusterOrder;
 
     /**
      * Constructor.
      * 
      * @param clusterOrder order to return
      */
-    public ClusterOrderAdapter(final ArrayList<ClusterOrderEntry<D>> clusterOrder) {
+    public ClusterOrderAdapter(final ArrayList<E> clusterOrder) {
       super();
       this.clusterOrder = clusterOrder;
     }
@@ -184,7 +171,7 @@ public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult imp
     @Override
     public ArrayModifiableDBIDs iter(DBIDs ids) {
       ArrayModifiableDBIDs res = DBIDUtil.newArray(ids.size());
-      for(ClusterOrderEntry<D> e : clusterOrder) {
+      for(E e : clusterOrder) {
         if(ids.contains(e.getID())) {
           res.add(e.getID());
         }
@@ -208,11 +195,11 @@ public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult imp
    * 
    * @author Erich Schubert
    */
-  class ReachabilityDistanceAdapter implements Relation<D>, ResultAdapter {
+  class ReachabilityDistanceAdapter<D extends Comparable<D>, E2 extends GenericClusterOrderEntry<D>> implements Relation<D>, ResultAdapter {
     /**
      * Access reference.
      */
-    private DataStore<ClusterOrderEntry<D>> map;
+    private DataStore<E2> map;
 
     /**
      * DBIDs
@@ -225,7 +212,7 @@ public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult imp
      * @param map Map that stores the results.
      * @param dbids DBIDs we are defined for.
      */
-    public ReachabilityDistanceAdapter(DataStore<ClusterOrderEntry<D>> map, DBIDs dbids) {
+    public ReachabilityDistanceAdapter(DataStore<E2> map, DBIDs dbids) {
       super();
       this.map = map;
       this.dbids = dbids;
@@ -301,7 +288,7 @@ public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult imp
     /**
      * Access reference.
      */
-    private DataStore<ClusterOrderEntry<D>> map;
+    private DataStore<E> map;
 
     /**
      * Database IDs
@@ -314,7 +301,7 @@ public class ClusterOrderResult<D extends Comparable<D>> extends BasicResult imp
      * @param map Map that stores the results.
      * @param dbids DBIDs we are defined for
      */
-    public PredecessorAdapter(DataStore<ClusterOrderEntry<D>> map, DBIDs dbids) {
+    public PredecessorAdapter(DataStore<E> map, DBIDs dbids) {
       super();
       this.map = map;
       this.dbids = dbids;

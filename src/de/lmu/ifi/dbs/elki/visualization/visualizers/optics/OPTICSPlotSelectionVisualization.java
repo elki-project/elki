@@ -32,19 +32,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -102,7 +100,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleDistance>(task);
+    return new Instance(task);
   }
 
   @Override
@@ -118,10 +116,8 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
    * @author Erich Schubert
    * 
    * @apiviz.uses DBIDSelection oneway - 1 visualizes
-   * 
-   * @param <D> distance type
    */
-  public class Instance<D extends Distance<D>> extends AbstractOPTICSVisualization<D> implements DragableArea.DragListener {
+  public class Instance extends AbstractOPTICSVisualization<ClusterOrderEntry<?>> implements DragableArea.DragListener {
     /**
      * CSS class for markers
      */
@@ -172,7 +168,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * Add marker for the selected IDs to mtag
      */
     public void addMarker() {
-      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
       // TODO: replace mtag!
       DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
@@ -218,7 +214,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     @Override
     public boolean startDrag(SVGPoint startPoint, Event evt) {
-      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
       int mouseActIndex = getSelectedIndex(order, startPoint);
       if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
         double width = plotwidth / order.size();
@@ -233,7 +229,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     @Override
     public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
       int mouseDownIndex = getSelectedIndex(order, startPoint);
       int mouseActIndex = getSelectedIndex(order, dragPoint);
       final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
@@ -250,7 +246,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     @Override
     public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
       int mouseDownIndex = getSelectedIndex(order, startPoint);
       int mouseActIndex = getSelectedIndex(order, dragPoint);
       Mode mode = getInputMode(evt);
@@ -291,7 +287,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * @param cPt clicked point
      * @return Index of the object
      */
-    private int getSelectedIndex(List<ClusterOrderEntry<D>> order, SVGPoint cPt) {
+    private int getSelectedIndex(List<? extends ClusterOrderEntry<?>> order, SVGPoint cPt) {
       int mouseActIndex = (int) ((cPt.getX() / plotwidth) * order.size());
       return mouseActIndex;
     }
@@ -304,7 +300,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * @param end last index to select
      */
     protected void updateSelection(Mode mode, int begin, int end) {
-      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
       if(begin < 0 || begin > end || end >= order.size()) {
         LOG.warning("Invalid range in updateSelection: " + begin + " .. " + end);
         return;

@@ -32,8 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
@@ -43,9 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by the algorithm
- * @param <D> the type of Distance used to discern objects
+ * @param <E> the type of entries in the cluster order
  */
-public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends AbstractAlgorithm<ClusterOrderResult<D>> implements OPTICSTypeAlgorithm<D> {
+public abstract class GeneralizedOPTICS<O, E extends ClusterOrderEntry<E>> extends AbstractAlgorithm<ClusterOrderResult<E>> implements OPTICSTypeAlgorithm<E> {
   /**
    * Parameter to specify the threshold for minimum number of points in the
    * epsilon-neighborhood of a point, must be an integer greater than 0.
@@ -79,12 +77,12 @@ public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends Abst
    * @param relation Relation
    * @return Result
    */
-  public ClusterOrderResult<D> run(Relation<O> relation) {
+  public ClusterOrderResult<E> run(Relation<O> relation) {
     int size = relation.size();
     final FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Generalized OPTICS", size, getLogger()) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
-    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<>("OPTICS Clusterorder", "optics-clusterorder");
+    ClusterOrderResult<E> clusterOrder = new ClusterOrderResult<>("OPTICS Clusterorder", "optics-clusterorder");
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(!processedIDs.contains(iditer)) {
@@ -109,18 +107,18 @@ public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends Abst
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Relation<O> relation, DBID objectID, FiniteProgress progress) {
-    UpdatableHeap<ClusterOrderEntry<D>> heap = new UpdatableHeap<>();
+  protected void expandClusterOrder(ClusterOrderResult<E> clusterOrder, Relation<O> relation, DBID objectID, FiniteProgress progress) {
+    UpdatableHeap<E> heap = new UpdatableHeap<>();
     heap.add(makeSeedEntry(relation, objectID));
 
     while(!heap.isEmpty()) {
-      final ClusterOrderEntry<D> current = heap.poll();
+      final E current = heap.poll();
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      Collection<? extends ClusterOrderEntry<D>> neighbors = getNeighborsForDBID(relation, current.getID());
+      Collection<E> neighbors = getNeighborsForDBID(relation, current.getID());
       if(neighbors != null && neighbors.size() >= minpts) {
-        for(ClusterOrderEntry<D> entry : neighbors) {
+        for(E entry : neighbors) {
           if(processedIDs.contains(entry.getID())) {
             continue;
           }
@@ -140,7 +138,7 @@ public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends Abst
    * @param objectID Object ID
    * @return Seed element.
    */
-  abstract protected ClusterOrderEntry<D> makeSeedEntry(Relation<O> relation, DBID objectID);
+  abstract protected E makeSeedEntry(Relation<O> relation, DBID objectID);
 
   /**
    * Compute the neighbors for the given DBID.
@@ -149,7 +147,7 @@ public abstract class GeneralizedOPTICS<O, D extends Comparable<D>> extends Abst
    * @param id Current object ID
    * @return Neighbors
    */
-  abstract protected Collection<? extends ClusterOrderEntry<D>> getNeighborsForDBID(Relation<O> relation, DBID id);
+  abstract protected Collection<E> getNeighborsForDBID(Relation<O> relation, DBID id);
 
   @Override
   public int getMinPts() {

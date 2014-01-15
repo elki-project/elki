@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 
 /**
  * Interface for OPTICS type algorithms, that can be analysed by OPTICS Xi etc.
@@ -34,11 +33,11 @@ import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
  * 
  * @apiviz.has ClusterOrderResult
  * 
- * @param <D> Distance type
+ * @param <E> Cluster order entry type
  */
-public interface OPTICSTypeAlgorithm<D extends Comparable<D>> extends Algorithm {
+public interface OPTICSTypeAlgorithm<E extends ClusterOrderEntry<E>> extends Algorithm {
   @Override
-  ClusterOrderResult<D> run(Database database);
+  ClusterOrderResult<E> run(Database database);
 
   /**
    * Get the minpts value used. Needed for OPTICS Xi etc.
@@ -48,10 +47,9 @@ public interface OPTICSTypeAlgorithm<D extends Comparable<D>> extends Algorithm 
   public int getMinPts();
 
   /**
-   * Get the distance factory. Needed for type checking (i.e. is number
-   * distance)
+   * Get the entry type. Needed for type checking (i.e. is number distance)
    * 
-   * @return distance factory
+   * @return entry type
    */
-  public D getDistanceFactory();
+  public Class<? super E> getEntryType();
 }

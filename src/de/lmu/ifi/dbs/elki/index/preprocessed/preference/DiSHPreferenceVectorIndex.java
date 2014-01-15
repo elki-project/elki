@@ -274,7 +274,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
     if(LOG.isDebugging()) {
       msg.append("\n preference ");
-      msg.append(BitsUtil.toString(preferenceVector, dimensionality));
+      msg.append(BitsUtil.toStringLow(preferenceVector, dimensionality));
       msg.append('\n');
       LOG.debugFine(msg.toString());
     }
@@ -327,7 +327,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
     if(LOG.isDebugging()) {
       msg.append("\n preference ");
-      msg.append(BitsUtil.toString(preferenceVector, dimensionality));
+      msg.append(BitsUtil.toStringLow(preferenceVector, dimensionality));
       msg.append('\n');
       LOG.debug(msg.toString());
     }

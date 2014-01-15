@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.GeneralizedOPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -36,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.PCACorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
@@ -45,9 +46,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.result.optics.GenericClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -81,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Mining Hierarchies of Correlation Clusters")
 @Description("Algorithm for detecting hierarchies of correlation clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger, A. Zimek", title = "Mining Hierarchies of Correlation Clusters", booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06), Vienna, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.35")
-public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, PCACorrelationDistance> {
+public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiCO.HiCOClusterOrderEntry> {
   /**
    * The logger for this class.
    */
@@ -125,27 +123,27 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, PCACor
   }
 
   @Override
-  public ClusterOrderResult<PCACorrelationDistance> run(Relation<V> relation) {
+  public ClusterOrderResult<HiCOClusterOrderEntry> run(Relation<V> relation) {
     assert (this.index == null) : "Running algorithm instance multiple times in parallel is not supported.";
     this.index = indexfactory.instantiate(relation);
-    ClusterOrderResult<PCACorrelationDistance> result = super.run(relation);
+    ClusterOrderResult<HiCOClusterOrderEntry> result = super.run(relation);
     this.index = null;
     return result;
   }
 
   @Override
-  protected ClusterOrderEntry<PCACorrelationDistance> makeSeedEntry(Relation<V> relation, DBID objectID) {
-    return new GenericClusterOrderEntry<>(objectID, null, PCACorrelationDistance.FACTORY.infiniteDistance());
+  protected HiCOClusterOrderEntry makeSeedEntry(Relation<V> relation, DBID objectID) {
+    return new HiCOClusterOrderEntry(objectID, null, Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
   }
 
   @Override
-  protected Collection<ClusterOrderEntry<PCACorrelationDistance>> getNeighborsForDBID(Relation<V> relation, DBID id) {
+  protected Collection<HiCOClusterOrderEntry> getNeighborsForDBID(Relation<V> relation, DBID id) {
     DBID id1 = DBIDUtil.deref(id);
     PCAFilteredResult pca1 = index.getLocalProjection(id1);
     V dv1 = relation.get(id1);
     final int dim = dv1.getDimensionality();
 
-    ArrayList<ClusterOrderEntry<PCACorrelationDistance>> result = new ArrayList<>();
+    ArrayList<HiCOClusterOrderEntry> result = new ArrayList<>();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       PCAFilteredResult pca2 = index.getLocalProjection(iter);
       V dv2 = relation.get(iter);
@@ -153,15 +151,14 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, PCACor
       int correlationDistance = correlationDistance(pca1, pca2, dim);
       double euclideanDistance = EuclideanDistanceFunction.STATIC.doubleDistance(dv1, dv2);
 
-      PCACorrelationDistance reachability = new PCACorrelationDistance(correlationDistance, euclideanDistance);
-      result.add(new GenericClusterOrderEntry<>(DBIDUtil.deref(iter), id1, reachability));
+      result.add(new HiCOClusterOrderEntry(DBIDUtil.deref(iter), id1, correlationDistance, euclideanDistance));
     }
     Collections.sort(result);
     // This is a hack, but needed to enforce core-distance of OPTICS:
     if(result.size() >= getMinPts()) {
-      PCACorrelationDistance coredist = result.get(getMinPts() - 1).getReachability();
+      HiCOClusterOrderEntry coredist = result.get(getMinPts() - 1);
       for(int i = 0; i < getMinPts() - 1; i++) {
-        result.set(i, new GenericClusterOrderEntry<>(result.get(i).getID(), id1, coredist));
+        result.set(i, new HiCOClusterOrderEntry(result.get(i).getID(), id1, coredist.getCorrelationValue(), coredist.getEuclideanValue()));
       }
     }
     return result;
@@ -272,13 +269,33 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, PCACor
   }
 
   @Override
-  public PCACorrelationDistance getDistanceFactory() {
-    return PCACorrelationDistance.FACTORY;
+  public Class<? super HiCOClusterOrderEntry> getEntryType() {
+    return HiCOClusterOrderEntry.class;
   }
 
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  /**
+   * Cluster order entry for HiCO.
+   * 
+   * @author Elke Achtert
+   * @author Erich Schubert
+   */
+  public static class HiCOClusterOrderEntry extends CorrelationClusterOrderEntry<HiCOClusterOrderEntry> {
+    /**
+     * Constructs a new CorrelationDistance object.
+     * 
+     * @param correlationValue the correlation dimension to be represented by
+     *        the CorrelationDistance
+     * @param euclideanValue the Euclidean distance to be represented by the
+     *        CorrelationDistance
+     */
+    public HiCOClusterOrderEntry(DBID objectID, DBID predecessorID, int correlationValue, double euclideanValue) {
+      super(objectID, predecessorID, correlationValue, euclideanValue);
+    }
   }
 
   /**

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 /*
  This file is part of ELKI:
@@ -29,14 +29,11 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DeLiClu;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
@@ -73,13 +70,13 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
     params.addParameter(DeLiClu.Parameterizer.MINPTS_ID, 18);
     params.addParameter(OPTICSXi.Parameterizer.XI_ID, 0.038);
     params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, DeLiClu.class);
-    OPTICSXi<DoubleDistance> opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
+    OPTICSXi opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
     testParameterizationOk(params);
 
     // run DeLiClu on database
     Clustering<?> clustering = opticsxi.run(db);
 
-    // Test F-Measure    
+    // Test F-Measure
     ByLabelClustering bylabel = new ByLabelClustering();
     Clustering<Model> rbl = bylabel.run(db);
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);

@@ -27,8 +27,7 @@ import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.OPTICSProjection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -42,13 +41,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * 
  * @apiviz.uses OPTICSProjection
  * 
- * @param <D>
+ * @param <E> Cluster order entry type
  */
-public abstract class AbstractOPTICSVisualization<D extends Distance<D>> extends AbstractVisualization {
+public abstract class AbstractOPTICSVisualization<E extends ClusterOrderEntry<?>> extends AbstractVisualization {
   /**
    * The plot
    */
-  final protected OPTICSProjection<D> optics;
+  final protected OPTICSProjection<E> optics;
 
   /**
    * Width of plot (in display units)
@@ -87,7 +86,7 @@ public abstract class AbstractOPTICSVisualization<D extends Distance<D>> extends
    * 
    * @return Cluster order
    */
-  protected List<ClusterOrderEntry<D>> getClusterOrder() {
+  protected List<E> getClusterOrder() {
     return optics.getResult().getClusterOrder();
   }
 }

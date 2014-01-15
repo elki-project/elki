@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.result.optics;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 /*
  This file is part of ELKI:
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * @author Elke Achtert
  * @param <D> the type of Distance used by the ClusterOrderEntry
  */
-public class GenericClusterOrderEntry<D extends Comparable<D>> implements ClusterOrderEntry<D> {
+public class GenericClusterOrderEntry<D extends Comparable<D>> implements ClusterOrderEntry<GenericClusterOrderEntry<D>> {
   /**
    * The id of the entry.
    */
@@ -130,14 +130,13 @@ public class GenericClusterOrderEntry<D extends Comparable<D>> implements Cluste
    * 
    * @return the reachability distance of this entry
    */
-  @Override
   public D getReachability() {
     return reachability;
   }
 
   @Override
-  public int compareTo(ClusterOrderEntry<D> o) {
-    if (this.reachability == null) {
+  public int compareTo(GenericClusterOrderEntry<D> o) {
+    if(this.reachability == null) {
       return +1;
     }
     int delta = this.reachability.compareTo(o.getReachability());

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.result.optics;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 /*
  This file is part of ELKI:
@@ -35,9 +35,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @apiviz.composedOf DBID
  * @apiviz.composedOf Distance
  * 
- * @param <D> Distance type
+ * @param <SELF> Type self-reference.
  */
-public interface ClusterOrderEntry<D extends Comparable<D>> extends Comparable<ClusterOrderEntry<D>> {
+public interface ClusterOrderEntry<SELF> extends Comparable<SELF> {
   /**
    * Returns the object id of this entry.
    * 
@@ -52,11 +52,4 @@ public interface ClusterOrderEntry<D extends Comparable<D>> extends Comparable<C
    * @return the id of the predecessor of this entry
    */
   public DBID getPredecessorID();
-
-  /**
-   * Returns the reachability distance of this entry
-   * 
-   * @return the reachability distance of this entry
-   */
-  public D getReachability();
 }

@@ -27,14 +27,13 @@ import java.util.Collection;
 
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -74,8 +73,8 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ClusterOrderResult<DoubleDistance>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
-    for(ClusterOrderResult<DoubleDistance> co : cos) {
+    Collection<ClusterOrderResult<?>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
+    for(ClusterOrderResult<?> co : cos) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, co, p.getRelation(), this);
@@ -104,7 +103,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
     /**
      * The result we visualize
      */
-    protected ClusterOrderResult<?> result;
+    protected ClusterOrderResult<? extends ClusterOrderEntry<?>> result;
 
     public Instance(VisualizationTask task) {
       super(task);

@@ -67,8 +67,8 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
     // run DiSH on database
     Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
 
-    testFMeasure(db, result, 0.996976); // Hierarchical pairs scored: 0.9991258
-    testClusterSizes(result, new int[] { 51, 199, 200 });
+    testFMeasure(db, result, 1.0);
+    testClusterSizes(result, new int[] { 50, 200, 200 });
   }
 
   /**
@@ -83,14 +83,14 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(DiSH.Parameterizer.EPSILON_ID, 0.1);
-    params.addParameter(DiSH.Parameterizer.MU_ID, 30);
+    params.addParameter(DiSH.Parameterizer.MU_ID, 40);
     params.addParameter(DiSHPreferenceVectorIndex.Factory.STRATEGY_ID, DiSHPreferenceVectorIndex.Strategy.APRIORI);
     DiSH<DoubleVector> dish = ClassGenericsUtil.parameterizeOrAbort(DiSH.class, params);
     testParameterizationOk(params);
 
     // run DiSH on database
     Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
-    testFMeasure(db, result, 0.651889);
-    testClusterSizes(result, new int[] { 33, 67, 142, 193, 326, 339 });
+    testFMeasure(db, result, 0.6646);
+    testClusterSizes(result, new int[] { 57, 84, 151, 189, 282, 337 });
   }
 }

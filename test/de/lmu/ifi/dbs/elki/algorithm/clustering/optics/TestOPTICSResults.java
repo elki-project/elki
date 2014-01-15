@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 /*
  This file is part of ELKI:
@@ -27,11 +27,8 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -61,7 +58,7 @@ public class TestOPTICSResults extends AbstractSimpleAlgorithmTest implements JU
     params.addParameter(OPTICS.Parameterizer.MINPTS_ID, 18);
     params.addParameter(OPTICSXi.Parameterizer.XI_ID, 0.038);
     params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, OPTICS.class);
-    OPTICSXi<DoubleDistance> opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
+    OPTICSXi opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
     testParameterizationOk(params);
 
     // run OPTICS on database

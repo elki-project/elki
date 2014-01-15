@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.GeneralizedOPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -36,13 +38,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.result.optics.GenericClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -76,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("Finding Hierarchies of Subspace Clusters")
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Finding Hierarchies of Subspace Clusters", booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
-public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, PreferenceVectorBasedCorrelationDistance> {
+public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiSC.HiSCClusterOrderEntry> {
   /**
    * The logger for this class.
    */
@@ -114,29 +112,29 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, Prefer
   }
 
   @Override
-  public ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> run(Relation<V> relation) {
+  public ClusterOrderResult<HiSCClusterOrderEntry> run(Relation<V> relation) {
     assert (this.index == null && this.relation == null) : "Running algorithm instance multiple times in parallel is not supported.";
     this.index = indexfactory.instantiate(relation);
     this.relation = relation;
-    ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> result = super.run(relation);
+    ClusterOrderResult<HiSCClusterOrderEntry> result = super.run(relation);
     this.index = null;
     this.relation = null;
     return result;
   }
 
   @Override
-  protected ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> makeSeedEntry(Relation<V> relation, DBID objectID) {
-    return new GenericClusterOrderEntry<>(objectID, null, PreferenceVectorBasedCorrelationDistance.FACTORY.infiniteDistance());
+  protected HiSCClusterOrderEntry makeSeedEntry(Relation<V> relation, DBID objectID) {
+    return new HiSCClusterOrderEntry(objectID, null, Integer.MAX_VALUE, Double.POSITIVE_INFINITY, new long[0]);
   }
 
   @Override
-  protected Collection<? extends ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> getNeighborsForDBID(Relation<V> relation, DBID id) {
+  protected Collection<HiSCClusterOrderEntry> getNeighborsForDBID(Relation<V> relation, DBID id) {
     DBID id1 = DBIDUtil.deref(id);
     long[] pv1 = index.getPreferenceVector(id1);
     V v1 = relation.get(id1);
     final int dim = v1.getDimensionality();
 
-    ArrayList<ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> result = new ArrayList<>();
+    ArrayList<HiSCClusterOrderEntry> result = new ArrayList<>();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       long[] pv2 = index.getPreferenceVector(iter);
       V v2 = relation.get(iter);
@@ -156,7 +154,7 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, Prefer
           msg.append("\ndist1 ").append(dist1);
           msg.append("\ndist2 ").append(dist2);
           msg.append("\nsubspaceDim ").append(subspaceDim);
-          msg.append("\ncommon pv ").append(BitsUtil.toString(commonPreferenceVector, dim));
+          msg.append("\ncommon pv ").append(BitsUtil.toStringLow(commonPreferenceVector, dim));
           LOG.debugFine(msg.toString());
         }
       }
@@ -165,9 +163,8 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, Prefer
       long[] inverseCommonPreferenceVector = BitsUtil.ones(dim);
       BitsUtil.xorI(inverseCommonPreferenceVector, commonPreferenceVector);
 
-      PreferenceVectorBasedCorrelationDistance reachability = new PreferenceVectorBasedCorrelationDistance(dim, subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
-
-      result.add(new GenericClusterOrderEntry<>(DBIDUtil.deref(iter), id1, reachability));
+      final double orthogonalDistance = weightedDistance(v1, v2, inverseCommonPreferenceVector);
+      result.add(new HiSCClusterOrderEntry(DBIDUtil.deref(iter), id1, subspaceDim, orthogonalDistance, commonPreferenceVector));
     }
     Collections.sort(result);
     return result;
@@ -193,8 +190,8 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, Prefer
   }
 
   @Override
-  public PreferenceVectorBasedCorrelationDistance getDistanceFactory() {
-    return PreferenceVectorBasedCorrelationDistance.FACTORY;
+  public Class<? super HiSCClusterOrderEntry> getEntryType() {
+    return HiSCClusterOrderEntry.class;
   }
 
   @Override
@@ -205,6 +202,61 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, Prefer
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  /**
+   * Cluster order entry for HiSC.
+   * 
+   * @author Elke Achtert
+   * @author Erich Schubert
+   */
+  public static class HiSCClusterOrderEntry extends CorrelationClusterOrderEntry<HiSCClusterOrderEntry> {
+    /**
+     * The common preference vector of the two objects defining this distance.
+     */
+    private long[] commonPreferenceVector;
+
+    /**
+     * Constructs a new CorrelationDistance object.
+     * 
+     * @param correlationValue the correlation dimension to be represented by
+     *        the CorrelationDistance
+     * @param euclideanValue the Euclidean distance to be represented by the
+     *        CorrelationDistance
+     * @param commonPreferenceVector the common preference vector of the two
+     *        objects defining this distance
+     */
+    public HiSCClusterOrderEntry(DBID objectID, DBID predecessorID, int correlationValue, double euclideanValue, long[] commonPreferenceVector) {
+      super(objectID, predecessorID, correlationValue, euclideanValue);
+      this.commonPreferenceVector = commonPreferenceVector;
+    }
+
+    /**
+     * Returns the common preference vector of the two objects defining this
+     * distance.
+     * 
+     * @return the common preference vector
+     */
+    public long[] getCommonPreferenceVector() {
+      return commonPreferenceVector;
+    }
+
+    /**
+     * Returns a string representation of this
+     * PreferenceVectorBasedCorrelationDistance.
+     * 
+     * @return the correlation value, the Euclidean value and the common
+     *         preference vector separated by blanks
+     */
+    @Override
+    public String toString() {
+      return super.toString() + SEPARATOR + commonPreferenceVector.toString();
+    }
+
+    @Override
+    public int compareTo(HiSCClusterOrderEntry other) {
+      return super.compareTo(other);
+    }
   }
 
   /**

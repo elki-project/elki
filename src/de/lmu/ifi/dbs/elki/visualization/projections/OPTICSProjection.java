@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
@@ -36,19 +36,21 @@ import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
  * consistency in the visualizer API.
  * 
  * @author Erich Schubert
+ * 
+ * @param <E> Cluster order entry type
  */
-public class OPTICSProjection<D extends Distance<D>> extends AbstractHierarchicalResult implements Projection {
+public class OPTICSProjection<E extends ClusterOrderEntry<?>> extends AbstractHierarchicalResult implements Projection {
   /**
    * The projector we were generated from.
    */
-  OPTICSProjector<D> projector;
+  OPTICSProjector<E> projector;
 
   /**
    * Constructor.
-   *
+   * 
    * @param opticsProjector OPTICS projector
    */
-  public OPTICSProjection(OPTICSProjector<D> opticsProjector) {
+  public OPTICSProjection(OPTICSProjector<E> opticsProjector) {
     super();
     this.projector = opticsProjector;
   }
@@ -79,7 +81,7 @@ public class OPTICSProjection<D extends Distance<D>> extends AbstractHierarchica
    * @param context Context to use
    * @return Plot
    */
-  public OPTICSPlot<D> getOPTICSPlot(VisualizerContext context) {
+  public OPTICSPlot<E> getOPTICSPlot(VisualizerContext context) {
     return projector.getOPTICSPlot(context);
   }
 
@@ -88,7 +90,7 @@ public class OPTICSProjection<D extends Distance<D>> extends AbstractHierarchica
    * 
    * @return Cluster oder result.
    */
-  public ClusterOrderResult<D> getResult() {
+  public ClusterOrderResult<E> getResult() {
     return projector.getResult();
   }
 }
