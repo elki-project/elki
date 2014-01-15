@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 /*
  This file is part of ELKI:
@@ -28,13 +28,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.SubspaceDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -64,10 +65,11 @@ public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFun
   }
 
   @Override
-  public <V extends NumberVector<?>> Instance<V> instantiate(Relation<V> database) {
-    // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
+  public <T extends NumberVector<?>> Instance<T> instantiate(Relation<T> database) {
+    // We can't really avoid these warnings, due to a limitation in Java
+    // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) indexFactory.instantiate((Relation<NumberVector<?>>)database);
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?>>) database);
     return new Instance<>(database, indexinst, this);
   }
 
@@ -111,7 +113,7 @@ public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFun
      * @return the distance between two given DatabaseObjects according to this
      *         distance function
      */
-    public SubspaceDistance distance(V o1, V o2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
+    public static <V extends NumberVector<?>> SubspaceDistance distance(V o1, V o2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
       if(pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
         throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
       }
@@ -121,10 +123,8 @@ public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFun
       Matrix m1 = weak_ev2.getColumnDimensionality() == 0 ? strong_ev1.transpose() : strong_ev1.transposeTimes(weak_ev2);
       double d1 = m1.norm2();
 
-      WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
-      WeightedDistanceFunction df2 = new WeightedDistanceFunction(pca2.similarityMatrix());
-
-      double affineDistance = Math.max(df1.distance(o1, o2).doubleValue(), df2.distance(o1, o2).doubleValue());
+      Vector o1_minus_o2 = o1.getColumnVector().minusEquals(o2.getColumnVector());
+      double affineDistance = Math.max(MathUtil.mahalanobisDistance(pca1.similarityMatrix(), o1_minus_o2), MathUtil.mahalanobisDistance(pca2.similarityMatrix(), o1_minus_o2));
 
       return new SubspaceDistance(d1, affineDistance);
     }
@@ -142,7 +142,7 @@ public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFun
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configIndexFactory(config, LocalProjectionIndex.Factory.class, KNNQueryFilteredPCAIndex.Factory.class);
-   }
+    }
 
     @Override
     protected LocalSubspaceDistanceFunction makeInstance() {

@@ -28,11 +28,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -50,6 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @apiviz.has Instance
  */
 public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, DoubleDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, DoubleDistance> {
+  /**
+   * Constant distance returned for "do not match."
+   */
+  private static final DoubleDistance ONE_DISTANCE = new DoubleDistance(1.);
+
   /**
    * Parameter to specify the threshold for approximate linear dependency: the
    * strong eigenvectors of q are approximately linear dependent from the strong
@@ -95,13 +100,13 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
   }
 
   /**
-   * Returns true, if the strong eigenvectors of the two specified pcas span up
-   * the same space. Note, that the first pca must have equal ore more strong
-   * eigenvectors than the second pca.
+   * Returns true, if the strong eigenvectors of the two specified PCAs span up
+   * the same space. Note, that the first PCA must have at least as many strong
+   * eigenvectors than the second PCA.
    * 
    * @param pca1 first PCA
    * @param pca2 second PCA
-   * @return true, if the strong eigenvectors of the two specified pcas span up
+   * @return true, if the strong eigenvectors of the two specified PCAs span up
    *         the same space
    */
   private boolean approximatelyLinearDependent(PCAFilteredResult pca1, PCAFilteredResult pca2) {
@@ -124,8 +129,8 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
 
   /**
    * Computes the distance between two given DatabaseObjects according to this
-   * distance function. Note, that the first pca must have equal or more strong
-   * eigenvectors than the second pca.
+   * distance function. Note, that the first PCA must have equal or more strong
+   * eigenvectors than the second PCA.
    * 
    * @param v1 first DatabaseObject
    * @param v2 second DatabaseObject
@@ -139,7 +144,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
 
-    boolean approximatelyLinearDependent;
+    final boolean approximatelyLinearDependent;
     if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
     }
@@ -148,28 +153,23 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     }
 
     if(!approximatelyLinearDependent) {
-      return new DoubleDistance(1.);
+      return ONE_DISTANCE;
     }
 
+    Vector v1_minus_v2 = v1.getColumnVector().minusEquals(v2.getColumnVector());
+    final double affineDistance;
+    if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
+      affineDistance = Math.max(MathUtil.mahalanobisDistance(pca1.similarityMatrix(), v1_minus_v2), MathUtil.mahalanobisDistance(pca2.similarityMatrix(), v1_minus_v2));
+    }
     else {
-      double affineDistance;
-
-      if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
-        WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
-        WeightedDistanceFunction df2 = new WeightedDistanceFunction(pca2.similarityMatrix());
-        affineDistance = Math.max(df1.distance(v1, v2).doubleValue(), df2.distance(v1, v2).doubleValue());
-      }
-      else {
-        WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
-        affineDistance = df1.distance(v1, v2).doubleValue();
-      }
-
-      if(affineDistance > tau) {
-        return new DoubleDistance(1.);
-      }
-
-      return DoubleDistance.ZERO_DISTANCE;
+      affineDistance = MathUtil.mahalanobisDistance(pca1.similarityMatrix(), v1_minus_v2);
     }
+
+    if(affineDistance > tau) {
+      return ONE_DISTANCE;
+    }
+
+    return DoubleDistance.ZERO_DISTANCE;
   }
 
   @Override
