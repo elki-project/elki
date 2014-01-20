@@ -38,14 +38,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
@@ -66,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
-public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNList<D>> {
+public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
   /**
    * Class logger
    */
@@ -108,7 +107,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
    * @param variants Number of curve variants to generate
    * @param random Random number generator
    */
-  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, List<SpatialSorter> curvegen, double window, int variants, Random random) {
+  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, List<SpatialSorter> curvegen, double window, int variants, Random random) {
     super(relation, distanceFunction, k);
     this.curvegen = curvegen;
     this.window = window;
@@ -130,7 +129,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     }
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final NumberVector<?> v = relation.get(iditer);
+      final NumberVector v = relation.get(iditer);
       SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
       for(List<SpatialRef> curve : curves) {
         curve.add(ref);
@@ -201,7 +200,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
       }
 
       int distc = 0;
-      KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
+      KNNHeap heap = DBIDUtil.newHeap(k);
       O vec = relation.get(iditer);
       for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
         heap.insert(distanceQuery.distance(vec, iter), iter);
@@ -239,7 +238,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
   }
 
   @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distQ, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distQ, Object... hints) {
     for(Object hint : hints) {
       if(DatabaseQuery.HINT_EXACT.equals(hint)) {
         return null;
@@ -263,7 +262,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     /**
      * Vector.
      */
-    protected NumberVector<?> vec;
+    protected NumberVector vec;
 
     /**
      * Constructor.
@@ -271,7 +270,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
      * @param id
      * @param vec
      */
-    protected SpatialRef(DBID id, NumberVector<?> vec) {
+    protected SpatialRef(DBID id, NumberVector vec) {
       super();
       this.id = id;
       this.vec = vec;
@@ -299,9 +298,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
    * @author Erich Schubert
    * 
    * @param <V> Vector type
-   * @param <D> Distance type
    */
-  public static class Factory<V extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<V, D, KNNList<D>> {
+  public static class Factory<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<V, KNNList> {
     /**
      * Spatial curve generators
      */
@@ -330,7 +328,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
      * @param variants Number of curve variants to generate
      * @param random Random number generator
      */
-    public Factory(int k, DistanceFunction<? super V, D> distanceFunction, List<SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
+    public Factory(int k, DistanceFunction<? super V> distanceFunction, List<SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
       super(k, distanceFunction);
       this.curvegen = curvegen;
       this.window = window;
@@ -339,7 +337,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     }
 
     @Override
-    public SpacefillingMaterializeKNNPreprocessor<V, D> instantiate(Relation<V> relation) {
+    public SpacefillingMaterializeKNNPreprocessor<V> instantiate(Relation<V> relation) {
       return new SpacefillingMaterializeKNNPreprocessor<>(relation, distanceFunction, k, curvegen, window, variants, random.getRandom());
     }
 
@@ -356,9 +354,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
      * @apiviz.exclude
      * 
      * @param <V> Vector type
-     * @param <D> Distance type
      */
-    public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<V, D> {
+    public static class Parameterizer<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<V> {
       /**
        * Parameter for choosing the space filling curves to use.
        */
@@ -422,7 +419,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
       }
 
       @Override
-      protected Factory<V, D> makeInstance() {
+      protected Factory<V> makeInstance() {
         return new Factory<>(k, distanceFunction, curvegen, window, variants, random);
       }
     }

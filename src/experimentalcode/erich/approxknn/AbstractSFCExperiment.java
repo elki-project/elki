@@ -83,7 +83,7 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
     return positions;
   }
 
-  protected List<ArrayList<SpatialRef>> initializeCurves(Relation<NumberVector<?>> rel, DBIDs ids, final int numcurves) {
+  protected List<ArrayList<SpatialRef>> initializeCurves(Relation<NumberVector> rel, DBIDs ids, final int numcurves) {
     Duration proj = new MillisTimeDuration("approxnn.project");
     proj.begin();
     List<ArrayList<SpatialRef>> curves = allocateCurves(rel, ids, numcurves);
@@ -168,11 +168,11 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
 
   abstract protected Logging getLogger();
 
-  protected static List<ArrayList<SpatialRef>> allocateCurves(Relation<NumberVector<?>> rel, DBIDs ids, final int numcurves) {
+  protected static List<ArrayList<SpatialRef>> allocateCurves(Relation<NumberVector> rel, DBIDs ids, final int numcurves) {
     List<ArrayList<SpatialRef>> curves = new ArrayList<>(numcurves);
     ArrayList<SpatialRef> first = new ArrayList<>(ids.size());
     for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      final NumberVector<?> v = rel.get(id);
+      final NumberVector v = rel.get(id);
       SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
       first.add(ref);
     }

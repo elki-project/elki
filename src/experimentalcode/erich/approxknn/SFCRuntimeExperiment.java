@@ -33,13 +33,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
@@ -57,7 +56,7 @@ import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
 public class SFCRuntimeExperiment extends AbstractSFCExperiment {
   private static final Logging LOG = Logging.getLogger(SFCRuntimeExperiment.class);
 
-  PrimitiveDoubleDistanceFunction<? super NumberVector<?>> distanceFunction = ManhattanDistanceFunction.STATIC;
+  PrimitiveDistanceFunction<? super NumberVector> distanceFunction = ManhattanDistanceFunction.STATIC;
 
   @Override
   public void run() {
@@ -65,7 +64,7 @@ public class SFCRuntimeExperiment extends AbstractSFCExperiment {
     Duration load = new MillisTimeDuration("approxknn.load");
     load.begin();
     Database database = LoadImageNet.loadDatabase("ImageNet-Haralick-1", false);
-    Relation<NumberVector<?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
     load.end();
     LOG.statistics(new LongStatistic("approxknn.dataset.numobj", ids.size()));
@@ -101,10 +100,10 @@ public class SFCRuntimeExperiment extends AbstractSFCExperiment {
         }
       }
       candmv.put(cands.size());
-      DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.ZERO_DISTANCE, k);
-      NumberVector<?> qo = rel.get(id);
+      KNNHeap heap = DBIDUtil.newHeap(k);
+      NumberVector qo = rel.get(id);
       for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-        heap.insert(distanceFunction.doubleDistance(qo, rel.get(iter)), id);
+        heap.insert(distanceFunction.distance(qo, rel.get(iter)), id);
       }
     }
     qtime.end();

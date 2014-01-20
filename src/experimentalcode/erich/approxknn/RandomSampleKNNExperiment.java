@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor;
@@ -66,11 +65,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class RandomSampleKNNExperiment {
   private static final Logging LOG = Logging.getLogger(RandomSampleKNNExperiment.class);
 
-  DistanceFunction<? super NumberVector<?>, DoubleDistance> distanceFunction = ManhattanDistanceFunction.STATIC;
+  DistanceFunction<? super NumberVector> distanceFunction = ManhattanDistanceFunction.STATIC;
 
   private void run() {
     Database database = loadDatabase();
-    Relation<NumberVector<?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
     HashSetModifiableDBIDs pos = DBIDUtil.newHashSet();
 
@@ -100,15 +99,15 @@ public class RandomSampleKNNExperiment {
     // Results for full kNN:
     {
       // Setup preprocessor
-      MaterializeKNNPreprocessor.Factory<NumberVector<?>, DoubleDistance> ppf = new MaterializeKNNPreprocessor.Factory<>(maxk + 1, distanceFunction);
-      MaterializeKNNPreprocessor<NumberVector<?>, DoubleDistance> pp = ppf.instantiate(rel);
+      MaterializeKNNPreprocessor.Factory<NumberVector> ppf = new MaterializeKNNPreprocessor.Factory<>(maxk + 1, distanceFunction);
+      MaterializeKNNPreprocessor<NumberVector> pp = ppf.instantiate(rel);
       database.addIndex(pp);
 
       {
         FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN iterations", iters, LOG) : null;
         for(int i = 1; i <= iters; i++) {
           final int k = i * step;
-          KNNOutlier<NumberVector<?>, DoubleDistance> knn = new KNNOutlier<>(distanceFunction, k);
+          KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
@@ -126,7 +125,7 @@ public class RandomSampleKNNExperiment {
         FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", iters, LOG) : null;
         for(int i = 1; i <= iters; i++) {
           final int k = i * step;
-          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction);
+          LOF<NumberVector> lof = new LOF<>(k, distanceFunction);
           OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
@@ -158,13 +157,13 @@ public class RandomSampleKNNExperiment {
         final int k = i * step;
         double share = i / (double) iters;
         // Setup preprocessor
-        RandomSampleKNNPreprocessor.Factory<NumberVector<?>, DoubleDistance> ppf = new RandomSampleKNNPreprocessor.Factory<>(maxk + 1, distanceFunction, share, new RandomFactory(1L));
-        RandomSampleKNNPreprocessor<NumberVector<?>, DoubleDistance> pp = ppf.instantiate(rel);
+        RandomSampleKNNPreprocessor.Factory<NumberVector> ppf = new RandomSampleKNNPreprocessor.Factory<>(maxk + 1, distanceFunction, share, new RandomFactory(1L));
+        RandomSampleKNNPreprocessor<NumberVector> pp = ppf.instantiate(rel);
         database.addIndex(pp);
 
         // Max k kNNOutlier run
         {
-          KNNOutlier<NumberVector<?>, DoubleDistance> knn = new KNNOutlier<>(distanceFunction, maxk);
+          KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, maxk);
           OutlierResult res = knn.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
@@ -172,7 +171,7 @@ public class RandomSampleKNNExperiment {
         }
         // Scaled k kNNOutlier run
         {
-          KNNOutlier<NumberVector<?>, DoubleDistance> knn = new KNNOutlier<>(distanceFunction, k);
+          KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
@@ -180,7 +179,7 @@ public class RandomSampleKNNExperiment {
         }
         // Max k LOF run
         {
-          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(maxk, distanceFunction);
+          LOF<NumberVector> lof = new LOF<>(maxk, distanceFunction);
           OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
@@ -188,7 +187,7 @@ public class RandomSampleKNNExperiment {
         }
         // Scaled k LOF run
         {
-          LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction);
+          LOF<NumberVector> lof = new LOF<>(k, distanceFunction);
           OutlierResult res = lof.run(database, rel);
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);

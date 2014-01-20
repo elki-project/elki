@@ -40,15 +40,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -75,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
-public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends AbstractIndex<O> implements KNNIndex<O> {
+public class SpacefillingKNNPreprocessor<O extends NumberVector> extends AbstractIndex<O> implements KNNIndex<O> {
   /**
    * Class logger
    */
@@ -171,7 +170,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
     if(proj == null) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        final NumberVector<?> v = relation.get(iditer);
+        final NumberVector v = relation.get(iditer);
         SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
         for(List<SpatialRef> curve : curves) {
           curve.add(ref);
@@ -210,7 +209,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       final int idim = RelationUtil.dimensionality(relation);
       final int dim = (odim < 0) ? idim : odim;
       final int[] permutation = range(0, dim);
-      NumberVector.Factory<O, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+      NumberVector.Factory<O>  factory = RelationUtil.getNumberVectorFactory(relation);
       final double[] mms = new double[odim << 1];
 
       for(int j = 0; j < numcurves; j++) {
@@ -325,40 +324,38 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     for(Object hint : hints) {
       if(DatabaseQuery.HINT_EXACT.equals(hint)) {
         return null;
       }
     }
-    return new SpaceFillingKNNQuery<>(distanceQuery);
+    return new SpaceFillingKNNQuery(distanceQuery);
   }
 
   /**
    * KNN Query processor for space filling curves
    * 
    * @author Erich Schubert
-   * 
-   * @param <D> Distance type
    */
-  protected class SpaceFillingKNNQuery<D extends Distance<D>> implements KNNQuery<O, D> {
+  protected class SpaceFillingKNNQuery implements KNNQuery<O> {
     /**
      * Distance query to use for refinement
      */
-    DistanceQuery<O, D> distq;
+    DistanceQuery<O> distq;
 
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query to use for refinement
      */
-    public SpaceFillingKNNQuery(DistanceQuery<O, D> distanceQuery) {
+    public SpaceFillingKNNQuery(DistanceQuery<O> distanceQuery) {
       super();
       this.distq = distanceQuery;
     }
 
     @Override
-    public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
       final int wsize = (int) Math.ceil(window * k);
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(2 * wsize * curves.size());
@@ -373,7 +370,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       }
       // Refine:
       int distc = 0;
-      KNNHeap<D> heap = DBIDUtil.newHeap(distq.getDistanceFactory(), k);
+      KNNHeap heap = DBIDUtil.newHeap(k);
       final O vec = relation.get(id);
       for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
         heap.insert(distq.distance(vec, iter), iter);
@@ -384,12 +381,12 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     }
 
     @Override
-    public List<KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
       throw new AbortException("Not yet implemented");
     }
 
     @Override
-    public KNNList<D> getKNNForObject(O obj, int k) {
+    public KNNList getKNNForObject(O obj, int k) {
       throw new AbortException("Not yet implemented");
     }
   }
@@ -409,7 +406,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     /**
      * Spatial vector.
      */
-    protected NumberVector<?> vec;
+    protected NumberVector vec;
 
     /**
      * Constructor.
@@ -417,7 +414,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
      * @param id
      * @param vec
      */
-    protected SpatialRef(DBID id, NumberVector<?> vec) {
+    protected SpatialRef(DBID id, NumberVector vec) {
       super();
       this.id = id;
       this.vec = vec;
@@ -446,7 +443,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?>> implements IndexFactory<V, SpacefillingKNNPreprocessor<V>> {
+  public static class Factory<V extends NumberVector> implements IndexFactory<V, SpacefillingKNNPreprocessor<V>> {
     /**
      * Spatial curve generators
      */

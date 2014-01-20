@@ -35,17 +35,16 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
@@ -63,7 +62,7 @@ import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
 public class EffectivenessExperiment extends AbstractSFCExperiment {
   private static final Logging LOG = Logging.getLogger(EffectivenessExperiment.class);
 
-  PrimitiveDoubleDistanceFunction<? super NumberVector<?>> distanceFunction = ManhattanDistanceFunction.STATIC;
+  PrimitiveDistanceFunction<? super NumberVector> distanceFunction = ManhattanDistanceFunction.STATIC;
 
   @Override
   public void run() {
@@ -71,7 +70,7 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
     load.begin();
     Database database = LoadImageNet.loadDatabase("ImageNet-Haralick-1", true);
     // Database database = LoadALOI.loadALOI("hsb-7x2x2", true);
-    Relation<NumberVector<?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
     load.end();
     LOG.statistics(new LongStatistic("approxknn.dataset.numobj", ids.size()));
@@ -93,8 +92,8 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
 
     // Counting distance queries, for r-tree evaluation.
     final CountingManhattanDistanceFunction cdist = new CountingManhattanDistanceFunction();
-    DistanceQuery<NumberVector<?>, DoubleDistance> cdistq = database.getDistanceQuery(rel, cdist);
-    KNNQuery<NumberVector<?>, DoubleDistance> cknnq = database.getKNNQuery(cdistq, k);
+    DistanceQuery<NumberVector> cdistq = database.getDistanceQuery(rel, cdist);
+    KNNQuery<NumberVector> cknnq = database.getKNNQuery(cdistq, k);
 
     // The curve combinations to test:
     String[] sfc_names = {//
@@ -133,13 +132,13 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
     MeanVariance[] recallmv = MeanVariance.newArray(numvars);
     MeanVariance[] kdistmv = MeanVariance.newArray(numvars);
     for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
-      NumberVector<?> vec = rel.get(id);
+      NumberVector vec = rel.get(id);
       // Get the exact nearest neighbors (use an index, luke!)
       long pre = cdist.counter;
-      final KNNList<DoubleDistance> trueNN = cknnq.getKNNForObject(vec, k);
+      final KNNList trueNN = cknnq.getKNNForObject(vec, k);
       distcmv[numvars].put((double) (cdist.counter - pre));
       SetDBIDs trueNNS = DBIDUtil.newHashSet(trueNN);
-      double truedist = trueNN.getKNNDistance().doubleValue();
+      double truedist = trueNN.getKNNDistance();
 
       int[] posi = positions.get(id);
 
@@ -154,11 +153,11 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
             recallmv[varnum].put(Math.min(1., DBIDUtil.intersectionSize(trueNNS, cands) / (double) k));
             // Compute kdist in approximated kNNs:
             if (truedist > 0 && cands.size() >= k) {
-              DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.ZERO_DISTANCE, k);
+              KNNHeap heap = DBIDUtil.newHeap(k);
               for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-                heap.insert(distanceFunction.doubleDistance(vec, rel.get(iter)), id);
+                heap.insert(distanceFunction.distance(vec, rel.get(iter)), id);
               }
-              kdistmv[varnum].put((heap.doubleKNNDistance() - truedist) / truedist);
+              kdistmv[varnum].put((heap.getKNNDistance() - truedist) / truedist);
             } else {
               // Actually must be correct on duplicates, avoid div by 0.
               kdistmv[varnum].put(1.0);
@@ -173,11 +172,11 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
             recallmv[varnum].put(Math.min(1., DBIDUtil.intersectionSize(trueNNS, cands) / (double) k));
             // Compute kdist in approximated kNNs:
             if (truedist > 0 && cands.size() >= k) {
-              DoubleDistanceKNNHeap heap = (DoubleDistanceKNNHeap) DBIDUtil.newHeap(DoubleDistance.ZERO_DISTANCE, k);
+              KNNHeap heap = DBIDUtil.newHeap(k);
               for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-                heap.insert(distanceFunction.doubleDistance(vec, rel.get(iter)), id);
+                heap.insert(distanceFunction.distance(vec, rel.get(iter)), id);
               }
-              kdistmv[varnum].put((heap.doubleKNNDistance() - truedist) / truedist);
+              kdistmv[varnum].put((heap.getKNNDistance() - truedist) / truedist);
             } else {
               // NOT WELL DEFINED, unfortunately. Ignore for now.
             }
@@ -248,21 +247,21 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
     long counter = 0;
 
     @Override
-    public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+    public double distance(NumberVector v1, NumberVector v2) {
       counter++;
-      return super.doubleDistance(v1, v2);
+      return super.distance(v1, v2);
     }
 
     @Override
-    public double doubleNorm(NumberVector<?> v) {
+    public double norm(NumberVector v) {
       counter++;
-      return super.doubleNorm(v);
+      return super.norm(v);
     }
 
     @Override
-    public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
       counter++;
-      return super.doubleMinDist(mbr1, mbr2);
+      return super.minDist(mbr1, mbr2);
     }
   }
 }
