@@ -32,12 +32,11 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -69,11 +68,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has DistanceFunction
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
- * @param <D> the type of distance the used distance function will return
  */
 @Title("Shared nearest neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
-public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends AbstractPreprocessorIndex<O, ArrayDBIDs> implements SharedNearestNeighborIndex<O> {
+public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIndex<O, ArrayDBIDs> implements SharedNearestNeighborIndex<O> {
   /**
    * Get a logger for this class.
    */
@@ -87,7 +85,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceFunction<O, D> distanceFunction;
+  protected DistanceFunction<O> distanceFunction;
 
   /**
    * Constructor.
@@ -96,7 +94,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
    * @param numberOfNeighbors Number of neighbors
    * @param distanceFunction Distance function
    */
-  public SharedNearestNeighborPreprocessor(Relation<O> relation, int numberOfNeighbors, DistanceFunction<O, D> distanceFunction) {
+  public SharedNearestNeighborPreprocessor(Relation<O> relation, int numberOfNeighbors, DistanceFunction<O> distanceFunction) {
     super(relation);
     this.numberOfNeighbors = numberOfNeighbors;
     this.distanceFunction = distanceFunction;
@@ -108,12 +106,12 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ArrayDBIDs.class);
-    KNNQuery<O, D> knnquery = QueryUtil.getKNNQuery(relation, distanceFunction, numberOfNeighbors);
+    KNNQuery<O> knnquery = QueryUtil.getKNNQuery(relation, distanceFunction, numberOfNeighbors);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       ArrayModifiableDBIDs neighbors = DBIDUtil.newArray(numberOfNeighbors);
-      KNNList<D> kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
+      DBIDs kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
       for(DBIDIter iter = kNN.iter(); iter.valid(); iter.advance()) {
         // if(!id.equals(nid)) {
         neighbors.add(iter);
@@ -180,7 +178,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
    * @apiviz.stereotype factory
    * @apiviz.uses SharedNearestNeighborPreprocessor oneway - - «create»
    */
-  public static class Factory<O, D extends Distance<D>> implements SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborPreprocessor<O, D>>, Parameterizable {
+  public static class Factory<O> implements SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborPreprocessor<O>>, Parameterizable {
     /**
      * Parameter to indicate the number of neighbors to be taken into account
      * for the shared-nearest-neighbor similarity.
@@ -215,7 +213,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     /**
      * Hold the distance function to be used.
      */
-    protected DistanceFunction<O, D> distanceFunction;
+    protected DistanceFunction<O> distanceFunction;
 
     /**
      * Constructor.
@@ -223,14 +221,14 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
      * @param numberOfNeighbors Number of neighbors
      * @param distanceFunction Distance function
      */
-    public Factory(int numberOfNeighbors, DistanceFunction<O, D> distanceFunction) {
+    public Factory(int numberOfNeighbors, DistanceFunction<O> distanceFunction) {
       super();
       this.numberOfNeighbors = numberOfNeighbors;
       this.distanceFunction = distanceFunction;
     }
 
     @Override
-    public SharedNearestNeighborPreprocessor<O, D> instantiate(Relation<O> relation) {
+    public SharedNearestNeighborPreprocessor<O> instantiate(Relation<O> relation) {
       return new SharedNearestNeighborPreprocessor<>(relation, numberOfNeighbors, distanceFunction);
     }
 
@@ -256,7 +254,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
+    public static class Parameterizer<O> extends AbstractParameterizer {
       /**
        * Holds the number of nearest neighbors to be used.
        */
@@ -265,7 +263,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
       /**
        * Hold the distance function to be used.
        */
-      protected DistanceFunction<O, D> distanceFunction;
+      protected DistanceFunction<O> distanceFunction;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -276,14 +274,14 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
           numberOfNeighbors = numberOfNeighborsP.getValue();
         }
 
-        final ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        final ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
         if(config.grab(distanceFunctionP)) {
           distanceFunction = distanceFunctionP.instantiateClass(config);
         }
       }
 
       @Override
-      protected Factory<O, D> makeInstance() {
+      protected Factory<O> makeInstance() {
         return new Factory<>(numberOfNeighbors, distanceFunction);
       }
     }

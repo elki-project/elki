@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Robert Rödler
  */
 @Reference(authors = "A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, and D. A. Keim.", title = "Automated Analytical Methods to Support Visual Exploration of High-Dimensional Data", booktitle = "IEEE Trans. Visualization and Computer Graphics, 2011", url = "http://dx.doi.org/10.1109/TVCG.2010.242")
-public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
+public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**
    * Static instance.
    */
@@ -79,7 +79,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     final int resolution = 512;
     boolean[][][][] pics = new boolean[dim][dim][][]; // [resolution][resolution];
@@ -94,9 +94,9 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
     // sample only.
     double[] off = new double[dim], scale = new double[dim];
     {
-      Pair<? extends NumberVector<?>, ? extends NumberVector<?>> mm = DatabaseUtil.computeMinMax(relation);
-      NumberVector<?> min = mm.first;
-      NumberVector<?> max = mm.second;
+      Pair<? extends NumberVector, ? extends NumberVector> mm = DatabaseUtil.computeMinMax(relation);
+      NumberVector min = mm.first;
+      NumberVector max = mm.second;
       for (int d = 0; d < dim; d++) {
         off[d] = min.doubleValue(matrix.dim(d));
         final double m = max.doubleValue(matrix.dim(d));
@@ -105,7 +105,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
     }
     // Iterate dataset
     for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
-      NumberVector<?> pvec = relation.get(id);
+      NumberVector pvec = relation.get(id);
       for (int i = 0; i < dim - 1; i++) {
         double xi = (pvec.doubleValue(matrix.dim(i)) - off[i]) * scale[i];
         for (int j = i + 1; j < dim; j++) {

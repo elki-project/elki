@@ -24,32 +24,31 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Instance for the query on a particular database.
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractRKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RKNNQuery<O, D> {
+public abstract class AbstractRKNNQuery<O> extends AbstractDataBasedQuery<O> implements RKNNQuery<O> {
   /**
    * Hold the distance function to be used.
    */
-  protected final DistanceQuery<O, D> distanceQuery;
+  protected final DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
    * 
    * @param distanceQuery distance query
    */
-  public AbstractRKNNQuery(DistanceQuery<O, D> distanceQuery) {
+  public AbstractRKNNQuery(DistanceQuery<O> distanceQuery) {
     super(distanceQuery.getRelation());
     this.distanceQuery = distanceQuery;
   }
 
   @Override
-  abstract public DistanceDBIDList<D> getRKNNForDBID(DBIDRef id, int k);
+  abstract public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k);
 }

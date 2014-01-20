@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @author Erich Schubert
  */
-public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
+class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
   /**
    * The actual storage.
    */
@@ -48,7 +48,7 @@ public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
    * 
    * @param ids Array of ids.
    */
-  public ArrayStaticIntegerDBIDs(int... ids) {
+  protected ArrayStaticIntegerDBIDs(int... ids) {
     super();
     this.store = ids;
   }

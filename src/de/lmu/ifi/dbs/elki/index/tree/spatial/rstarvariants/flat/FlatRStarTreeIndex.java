@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @param <O> Object type
  */
-public class FlatRStarTreeIndex<O extends NumberVector<?>> extends FlatRStarTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
+public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   /**
    * The relation we index
    */
@@ -160,7 +159,7 @@ public class FlatRStarTreeIndex<O extends NumberVector<?>> extends FlatRStarTree
   }
 
   @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
     if(distanceQuery.getRelation() != relation) {
       return null;
@@ -169,12 +168,12 @@ public class FlatRStarTreeIndex<O extends NumberVector<?>> extends FlatRStarTree
     if(!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
-    SpatialDistanceQuery<O, D> dq = (SpatialDistanceQuery<O, D>) distanceQuery;
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getRangeQuery(this, dq, hints);
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
     if(distanceQuery.getRelation() != relation) {
       return null;
@@ -183,7 +182,7 @@ public class FlatRStarTreeIndex<O extends NumberVector<?>> extends FlatRStarTree
     if(!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
-    SpatialDistanceQuery<O, D> dq = (SpatialDistanceQuery<O, D>) distanceQuery;
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getKNNQuery(this, dq, hints);
   }
 

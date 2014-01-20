@@ -1,15 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
-import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,6 +22,14 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Class to materialize the kNN using a spatial join on an R-tree.
@@ -39,9 +37,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * @author Erich Schubert
  * 
  * @param <V> vector type
- * @param <D> distance type
  */
-public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<V, D, KNNList<D>> {
+public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor<V, KNNList> {
   /**
    * Logging class.
    */
@@ -54,14 +51,14 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<?>, D exte
    * @param distanceFunction Distance function
    * @param k k
    */
-  public KNNJoinMaterializeKNNPreprocessor(Relation<V> relation, DistanceFunction<? super V, D> distanceFunction, int k) {
+  public KNNJoinMaterializeKNNPreprocessor(Relation<V> relation, DistanceFunction<? super V> distanceFunction, int k) {
     super(relation, distanceFunction, k);
   }
 
   @Override
   protected void preprocess() {
     // Run KNNJoin
-    KNNJoin<V, D, ?, ?> knnjoin = new KNNJoin<V, D, RStarTreeNode, SpatialEntry>(distanceFunction, k);
+    KNNJoin<V, ?, ?> knnjoin = new KNNJoin<V, RStarTreeNode, SpatialEntry>(distanceFunction, k);
     storage = knnjoin.run(relation.getDatabase(), relation);
   }
 
@@ -95,21 +92,20 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<?>, D exte
    * @apiviz.uses AbstractMaterializeKNNPreprocessor oneway - - «create»
    * 
    * @param <O> The object type
-   * @param <D> The distance type
    */
-  public static class Factory<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNList<D>> {
+  public static class Factory<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
     /**
      * Constructor.
      * 
      * @param k K
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super O, D> distanceFunction) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction) {
       super(k, distanceFunction);
     }
 
     @Override
-    public KNNJoinMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
+    public KNNJoinMaterializeKNNPreprocessor<O> instantiate(Relation<O> relation) {
       return new KNNJoinMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
     }
 
@@ -121,11 +117,10 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<?>, D exte
      * @apiviz.exclude
      * 
      * @param <O> Object type
-     * @param <D> Distance type
      */
-    public static class Parameterizer<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       @Override
-      protected KNNJoinMaterializeKNNPreprocessor.Factory<O, D> makeInstance() {
+      protected KNNJoinMaterializeKNNPreprocessor.Factory<O> makeInstance() {
         return new KNNJoinMaterializeKNNPreprocessor.Factory<>(k, distanceFunction);
       }
     }

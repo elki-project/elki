@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @apiviz.uses DistributionEstimator
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
-public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements Normalization<V> {
+public class AttributeWiseCDFNormalization<V extends NumberVector> implements Normalization<V> {
   /**
    * Class logger.
    */
@@ -85,7 +85,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
   /**
    * Number vector factory.
    */
-  protected NumberVector.Factory<V, ?> factory;
+  protected NumberVector.Factory<V>  factory;
 
   /**
    * Constructor.
@@ -215,49 +215,49 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
    *
    * @apiviz.exclude
    */
-  private static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector<?>>> {
+  private static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector>> {
     /**
      * Dimension to process.
      */
     int dim;
 
     @Override
-    public int size(List<? extends NumberVector<?>> array) {
+    public int size(List<? extends NumberVector> array) {
       return array.size();
     }
 
     @Override
-    public Double get(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
+    public Double get(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
       return getDouble(array, off);
     }
 
     @Override
-    public double getDouble(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
+    public double getDouble(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).doubleValue(dim);
     }
 
     @Override
-    public float getFloat(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
+    public float getFloat(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).floatValue(dim);
     }
 
     @Override
-    public int getInteger(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
+    public int getInteger(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).intValue(dim);
     }
 
     @Override
-    public short getShort(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
+    public short getShort(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).shortValue(dim);
     }
 
     @Override
-    public long getLong(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
+    public long getLong(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).longValue(dim);
     }
 
     @Override
-    public byte getByte(List<? extends NumberVector<?>> array, int off) throws IndexOutOfBoundsException {
+    public byte getByte(List<? extends NumberVector> array, int off) throws IndexOutOfBoundsException {
       return array.get(off).byteValue(dim);
     }
   }
@@ -269,7 +269,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector<?>> implements
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter for distribution estimators.
      */

@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 @Description("This parser expects data in roughly the same format as the NumberVectorLabelParser,\n"//
     + "except that it will enumerate all unique strings to always produce numerical values.\n"//
     + "This way, it can for example handle files that contain lines like 'y,n,y,y,n,y,n'.")
-public class CategorialDataAsNumberVectorParser<V extends NumberVector<?>> extends NumberVectorLabelParser<V> {
+public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends NumberVectorLabelParser<V> {
   /**
    * Logging class.
    */
@@ -76,7 +76,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector<?>> exten
    * 
    * @param factory Vector factory
    */
-  public CategorialDataAsNumberVectorParser(NumberVector.Factory<V, ?> factory) {
+  public CategorialDataAsNumberVectorParser(NumberVector.Factory<V>  factory) {
     this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHARS, Pattern.compile(COMMENT_PATTERN), null, factory);
   }
 
@@ -89,7 +89,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector<?>> exten
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public CategorialDataAsNumberVectorParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V, ?> factory) {
+  public CategorialDataAsNumberVectorParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V>  factory) {
     super(colSep, quoteChars, comment, labelIndices, factory);
   }
 
@@ -152,7 +152,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector<?>> exten
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends NumberVectorLabelParser.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override
     protected CategorialDataAsNumberVectorParser<V> makeInstance() {
       return new CategorialDataAsNumberVectorParser<>(colSep, quoteChars, comment, labelIndices, factory);

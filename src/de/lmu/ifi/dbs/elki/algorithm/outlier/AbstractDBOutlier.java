@@ -31,13 +31,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Simple distance based outlier detection algorithms.
@@ -50,9 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @author Lisa Reichert
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <D> the type of Distance used by this Algorithm
  */
-public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter to specify the size of the D-neighborhood
    */
@@ -61,7 +59,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
   /**
    * Holds the value of {@link #D_ID}.
    */
-  private D d;
+  private double d;
 
   /**
    * Constructor with actual parameters.
@@ -69,7 +67,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * @param distanceFunction distance function to use
    * @param d d value
    */
-  public AbstractDBOutlier(DistanceFunction<? super O, D> distanceFunction, D d) {
+  public AbstractDBOutlier(DistanceFunction<? super O> distanceFunction, double d) {
     super(distanceFunction);
     this.d = d;
   }
@@ -99,7 +97,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * @param d distance
    * @return computed scores
    */
-  protected abstract DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, D d);
+  protected abstract DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double d);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -113,11 +111,11 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Query radius
      */
-    protected D d = null;
+    protected double d;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -130,9 +128,8 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
      * 
      * @param config Parameterization
      */
-    protected void configD(Parameterization config, DistanceFunction<?, D> distanceFunction) {
-      final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
-      final DistanceParameter<D> param = new DistanceParameter<>(D_ID, distanceFactory);
+    protected void configD(Parameterization config, DistanceFunction<?> distanceFunction) {
+      final DoubleParameter param = new DoubleParameter(D_ID);
       if(config.grab(param)) {
         d = param.getValue();
       }

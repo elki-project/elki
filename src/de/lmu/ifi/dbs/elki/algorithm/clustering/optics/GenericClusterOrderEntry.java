@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * Provides an entry in a cluster order.
  * 
  * @author Elke Achtert
- * @param <D> the type of Distance used by the ClusterOrderEntry
  */
 public class GenericClusterOrderEntry<D extends Comparable<D>> implements ClusterOrderEntry<GenericClusterOrderEntry<D>> {
   /**

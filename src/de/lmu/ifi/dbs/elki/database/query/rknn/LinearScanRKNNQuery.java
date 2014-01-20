@@ -30,14 +30,13 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Default linear scan RKNN query class.
@@ -48,14 +47,13 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.has KNNQuery
  * 
  * @param <O> Database object type
- * @param <D> Distance type
  */
 // FIXME: Validate this works correctly.
-public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery<O, D> implements LinearScanQuery {
+public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements LinearScanQuery {
   /**
    * KNN query we use.
    */
-  protected final KNNQuery<O, D> knnQuery;
+  protected final KNNQuery<O> knnQuery;
 
   /**
    * Constructor.
@@ -64,24 +62,24 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
    * @param knnQuery kNN query to use.
    * @param maxk k to use
    */
-  public LinearScanRKNNQuery(DistanceQuery<O, D> distanceQuery, KNNQuery<O, D> knnQuery, Integer maxk) {
+  public LinearScanRKNNQuery(DistanceQuery<O> distanceQuery, KNNQuery<O> knnQuery, Integer maxk) {
     super(distanceQuery);
     this.knnQuery = knnQuery;
   }
 
   @Override
-  public DistanceDBIDList<D> getRKNNForObject(O obj, int k) {
-    GenericDistanceDBIDList<D> rNNlist = new GenericDistanceDBIDList<>();
+  public DoubleDBIDList getRKNNForObject(O obj, int k) {
+    ModifiableDoubleDBIDList rNNlist = DBIDUtil.newDistanceDBIDList();
 
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
-    List<? extends KNNList<D>> kNNLists = knnQuery.getKNNForBulkDBIDs(allIDs, k);
+    List<? extends KNNList> kNNLists = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
-    for (DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      KNNList<D> knn = kNNLists.get(i);
+    for(DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
+      KNNList knn = kNNLists.get(i);
       int last = Math.min(k - 1, knn.size() - 1);
-      D dist = distanceQuery.distance(obj, iter);
-      if(last < k - 1 || dist.compareTo(knn.get(last).getDistance()) < 1) {
+      double dist = distanceQuery.distance(obj, iter);
+      if(last < k - 1 || dist <= knn.get(last).doubleValue()) {
         rNNlist.add(dist, iter);
       }
       i++;
@@ -91,18 +89,18 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
   }
 
   @Override
-  public DistanceDBIDList<D> getRKNNForDBID(DBIDRef id, int k) {
-    GenericDistanceDBIDList<D> rNNList = new GenericDistanceDBIDList<>();
-    
+  public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
+    ModifiableDoubleDBIDList rNNList = DBIDUtil.newDistanceDBIDList();
+
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
-    List<? extends KNNList<D>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
+    List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
-    for (DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      KNNList<D> knn = kNNList.get(i);
-      for(DistanceDBIDListIter<D> n = knn.iter(); n.valid(); n.advance()) {
+    for(DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
+      KNNList knn = kNNList.get(i);
+      for(DoubleDBIDListIter n = knn.iter(); n.valid(); n.advance()) {
         if(DBIDUtil.equal(n, id)) {
-          rNNList.add(n.getDistance(), iter);
+          rNNList.add(n.doubleValue(), iter);
         }
       }
       i++;
@@ -112,24 +110,24 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
   }
 
   @Override
-  public List<GenericDistanceDBIDList<D>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    List<GenericDistanceDBIDList<D>> rNNList = new ArrayList<>(ids.size());
+  public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    List<ModifiableDoubleDBIDList> rNNList = new ArrayList<>(ids.size());
     for(int i = 0; i < ids.size(); i++) {
-      rNNList.add(new GenericDistanceDBIDList<D>());
+      rNNList.add(DBIDUtil.newDistanceDBIDList());
     }
 
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
-    List<? extends KNNList<D>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
+    List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
-    for (DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      KNNList<D> knn = kNNList.get(i);
-      for(DistanceDBIDListIter<D> n = knn.iter(); n.valid(); n.advance()) {
+    for(DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
+      KNNList knn = kNNList.get(i);
+      for(DoubleDBIDListIter n = knn.iter(); n.valid(); n.advance()) {
         int j = 0;
-        for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+        for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           if(DBIDUtil.equal(n, iter2)) {
-            GenericDistanceDBIDList<D> rNN = rNNList.get(j);
-            rNN.add(n.getDistance(), iter);
+            ModifiableDoubleDBIDList rNN = rNNList.get(j);
+            rNN.add(n.doubleValue(), iter);
           }
           j++;
         }

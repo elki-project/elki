@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class SparseByteVector extends AbstractNumberVector<Byte> implements SparseNumberVector<Byte> {
+public class SparseByteVector extends AbstractNumberVector implements SparseNumberVector {
   /**
    * Static instance.
    */
@@ -360,13 +360,13 @@ public class SparseByteVector extends AbstractNumberVector<Byte> implements Spar
    * 
    * @apiviz.has SparseByteVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<SparseByteVector, Byte> implements SparseNumberVector.Factory<SparseByteVector, Byte> {
+  public static class Factory extends AbstractNumberVector.Factory<SparseByteVector> implements SparseNumberVector.Factory<SparseByteVector> {
     @Override
-    public <A> SparseByteVector newFeatureVector(A array, ArrayAdapter<Byte, A> adapter) {
+    public <A> SparseByteVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       byte[] values = new byte[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i);
+        values[i] = adapter.get(array, i).byteValue();
       }
       // TODO: improve efficiency
       return new SparseByteVector(values);

@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * 
  * @param <O> Object type processed
  */
-public abstract class AbstractNormalization<O extends NumberVector<?>> extends AbstractVectorConversionFilter<O, O> implements Normalization<O> {
+public abstract class AbstractNormalization<O extends NumberVector> extends AbstractVectorConversionFilter<O, O> implements Normalization<O> {
   /**
    * Initializes the option handler and the parameter map.
    */

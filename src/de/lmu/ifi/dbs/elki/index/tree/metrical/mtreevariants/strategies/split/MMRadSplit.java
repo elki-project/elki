@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -44,12 +43,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Elke Achtert
  * 
  * @param <O> the type of DatabaseObject to be stored in the M-Tree
- * @param <D> the type of Distance used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class MMRadSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends MTreeSplit<O, D, N, E> {
+public class MMRadSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends MTreeSplit<O, N, E> {
   /**
    * Creates a new split object.
    */
@@ -67,17 +65,17 @@ public class MMRadSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMTr
    * @param node the node to be split
    */
   @Override
-  public Assignments<E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
+  public Assignments<E> split(AbstractMTree<O, N, E, ?> tree, N node) {
     double miSumCR = Double.POSITIVE_INFINITY;
     double[] distanceMatrix = computeDistanceMatrix(tree, node);
 
     Assignments<E> bestAssignment = null;
-    for (int i = 0; i < node.getNumEntries(); i++) {
-      for (int j = i + 1; j < node.getNumEntries(); j++) {
+    for(int i = 0; i < node.getNumEntries(); i++) {
+      for(int j = i + 1; j < node.getNumEntries(); j++) {
         Assignments<E> currentAssignments = balancedPartition(tree, node, i, j, distanceMatrix);
 
         double maxCR = Math.max(currentAssignments.getFirstCoveringRadius(), currentAssignments.getSecondCoveringRadius());
-        if (maxCR < miSumCR) {
+        if(maxCR < miSumCR) {
           miSumCR = maxCR;
           bestAssignment = currentAssignments;
         }

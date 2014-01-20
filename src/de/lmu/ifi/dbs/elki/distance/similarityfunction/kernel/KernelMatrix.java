@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -141,8 +140,7 @@ public class KernelMatrix {
    * @param relation the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public <O, D extends NumberDistance<?, ?>> KernelMatrix(PrimitiveSimilarityFunction<? super O, D> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
-    LoggingUtil.logExpensive(Level.FINER, "Computing kernel matrix");
+  public <O> KernelMatrix(PrimitiveSimilarityFunction<? super O> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
     this.kernel = new Matrix(ids.size(), ids.size());
     if(ids instanceof DBIDRange) {
       this.idmap = new RangeMap((DBIDRange) ids);
@@ -155,7 +153,7 @@ public class KernelMatrix {
     for(i1.seek(0); i1.valid(); i1.advance()) {
       O o1 = relation.get(i1);
       for(i2.seek(i1.getOffset()); i2.valid(); i2.advance()) {
-        double value = kernelFunction.similarity(o1, relation.get(i2)).doubleValue();
+        double value = kernelFunction.similarity(o1, relation.get(i2));
         kernel.set(i1.getOffset(), i2.getOffset(), value);
         kernel.set(i2.getOffset(), i1.getOffset(), value);
       }
@@ -169,7 +167,7 @@ public class KernelMatrix {
    * @param relation the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
    */
-  public <O, D extends NumberDistance<?, ?>> KernelMatrix(SimilarityQuery<? super O, D> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
+  public <O> KernelMatrix(SimilarityQuery<? super O> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
     LoggingUtil.logExpensive(Level.FINER, "Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
     if(ids instanceof DBIDRange) {
@@ -182,7 +180,7 @@ public class KernelMatrix {
     for(i1.seek(0); i1.valid(); i1.advance()) {
       O o1 = relation.get(i1);
       for(i2.seek(i1.getOffset()); i2.valid(); i2.advance()) {
-        double value = kernelFunction.similarity(o1, i2).doubleValue();
+        double value = kernelFunction.similarity(o1, i2);
         kernel.set(i1.getOffset(), i2.getOffset(), value);
         kernel.set(i2.getOffset(), i1.getOffset(), value);
       }

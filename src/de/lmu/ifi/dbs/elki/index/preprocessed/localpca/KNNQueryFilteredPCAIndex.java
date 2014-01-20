@@ -26,12 +26,11 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 // TODO: loosen DoubleDistance restriction.
 @Title("Knn Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on k nearest neighbor queries.")
-public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends AbstractFilteredPCAIndex<NV> {
+public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractFilteredPCAIndex<NV> {
   /**
    * Logger.
    */
@@ -65,7 +64,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
   /**
    * The kNN query instance we use.
    */
-  private final KNNQuery<NV, DoubleDistance> knnQuery;
+  private final KNNQuery<NV> knnQuery;
 
   /**
    * Query k.
@@ -80,7 +79,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
    * @param knnQuery KNN Query to use
    * @param k k value
    */
-  public KNNQueryFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner<NV> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
+  public KNNQueryFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner<NV> pca, KNNQuery<NV> knnQuery, int k) {
     super(relation, pca);
     this.knnQuery = knnQuery;
     this.k = k;
@@ -92,7 +91,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
   }
 
   @Override
-  protected KNNList<DoubleDistance> objectsForPCA(DBIDRef id) {
+  protected KNNList objectsForPCA(DBIDRef id) {
     return knnQuery.getKNNForDBID(id, k);
   }
 
@@ -125,7 +124,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
    * @apiviz.landmark
    * @apiviz.uses KNNQueryFilteredPCAIndex oneway - - «create»
    */
-  public static class Factory<V extends NumberVector<?>> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
+  public static class Factory<V extends NumberVector> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
     /**
      * Optional parameter to specify the number of nearest neighbors considered
      * in the PCA, must be an integer greater than 0. If this parameter is not
@@ -152,7 +151,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
      * @param pca PCA class
      * @param k k
      */
-    public Factory(DistanceFunction<V, DoubleDistance> pcaDistanceFunction, PCAFilteredRunner<V> pca, Integer k) {
+    public Factory(DistanceFunction<V> pcaDistanceFunction, PCAFilteredRunner<V> pca, Integer k) {
       super(pcaDistanceFunction, pca);
       this.k = k;
     }
@@ -160,7 +159,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
     @Override
     public KNNQueryFilteredPCAIndex<V> instantiate(Relation<V> relation) {
       // TODO: set bulk flag, once the parent class supports bulk.
-      KNNQuery<V, DoubleDistance> knnquery = QueryUtil.getKNNQuery(relation, pcaDistanceFunction, k);
+      KNNQuery<V> knnquery = QueryUtil.getKNNQuery(relation, pcaDistanceFunction, k);
       return new KNNQueryFilteredPCAIndex<>(relation, pca, knnquery, k);
     }
 
@@ -171,7 +170,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<?>> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
+    public static class Parameterizer<NV extends NumberVector> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
       protected int k = 0;
 
       @Override

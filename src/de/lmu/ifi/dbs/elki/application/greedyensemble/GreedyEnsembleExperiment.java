@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedManhattanDistanceFunction;
@@ -180,12 +180,12 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   public void run() {
     // Note: the database contains the *result vectors*, not the original data.
     final Database database = inputstep.getDatabase();
-    Relation<NumberVector<?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    final NumberVector.Factory<NumberVector<?>, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    Relation<NumberVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    final NumberVector.Factory<NumberVector> factory = RelationUtil.getNumberVectorFactory(relation);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
-    if (!firstlabel.matches("bylabel")) {
+    if(!firstlabel.matches("bylabel")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
     relation = applyPrescaling(prescaling, relation, firstid);
@@ -193,7 +193,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
     // Dimensionality and reference vector
     final int dim = RelationUtil.dimensionality(relation);
-    final NumberVector<?> refvec = relation.get(firstid);
+    final NumberVector refvec = relation.get(firstid);
 
     // Build the positive index set for ROC AUC.
     ROC.Predicate<ROC.DecreasingVectorIter> positive = new ROC.VectorNonZero(refvec);
@@ -206,25 +206,25 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     {
       int k = 0;
       ArrayList<ROC.DecreasingVectorIter> iters = new ArrayList<>(numcand);
-      if (minvote >= numcand) {
+      if(minvote >= numcand) {
         minvote = Math.max(1, numcand - 1);
       }
-      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         // Skip "by label", obviously
-        if (DBIDUtil.equal(firstid, iditer)) {
+        if(DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
         iters.add(new ROC.DecreasingVectorIter(relation.get(iditer)));
       }
-      loop: while (union_outliers < desired_outliers) {
-        for (ROC.DecreasingVectorIter iter : iters) {
-          if (!iter.valid()) {
+      loop: while(union_outliers < desired_outliers) {
+        for(ROC.DecreasingVectorIter iter : iters) {
+          if(!iter.valid()) {
             LOG.warning("Union_outliers=" + union_outliers + " < desired_outliers=" + desired_outliers + " minvote=" + minvote);
             break loop;
           }
           int cur = iter.dim();
           outliers_seen[cur] += 1;
-          if (outliers_seen[cur] == minvote) {
+          if(outliers_seen[cur] == minvote) {
             union_outliers += 1;
           }
           iter.advance();
@@ -237,32 +237,32 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final double[] estimated_weights = new double[dim];
     final double[] estimated_truth = new double[dim];
     updateEstimations(outliers_seen, union_outliers, estimated_weights, estimated_truth);
-    NumberVector<?> estimated_truth_vec = factory.newNumberVector(estimated_truth);
+    NumberVector estimated_truth_vec = factory.newNumberVector(estimated_truth);
 
-    PrimitiveDoubleDistanceFunction<NumberVector<?>> wdist = getDistanceFunction(estimated_weights);
-    PrimitiveDoubleDistanceFunction<NumberVector<?>> tdist = wdist;
+    PrimitiveDistanceFunction<NumberVector> wdist = getDistanceFunction(estimated_weights);
+    PrimitiveDistanceFunction<NumberVector> tdist = wdist;
 
     // Build the naive ensemble:
     final double[] naiveensemble = new double[dim];
     {
       double[] buf = new double[numcand];
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         int i = 0;
-        for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-          if (DBIDUtil.equal(firstid, iditer)) {
+        for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+          if(DBIDUtil.equal(firstid, iditer)) {
             continue;
           }
-          final NumberVector<?> vec = relation.get(iditer);
+          final NumberVector vec = relation.get(iditer);
           buf[i] = vec.doubleValue(d);
           i++;
         }
         naiveensemble[d] = voting.combine(buf, i);
-        if (Double.isNaN(naiveensemble[d])) {
+        if(Double.isNaN(naiveensemble[d])) {
           LOG.warning("NaN after combining: " + FormatUtil.format(buf) + " i=" + i + " " + voting.toString());
         }
       }
     }
-    NumberVector<?> naivevec = factory.newNumberVector(naiveensemble);
+    NumberVector naivevec = factory.newNumberVector(naiveensemble);
 
     // Compute single AUC scores and estimations.
     // Remember the method most similar to the estimation
@@ -275,27 +275,27 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     {
       final double[] greedyensemble = new double[dim];
       // Compute individual scores
-      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        if (DBIDUtil.equal(firstid, iditer)) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        if(DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
         // fout.append(labels.get(id));
-        final NumberVector<?> vec = relation.get(iditer);
+        final NumberVector vec = relation.get(iditer);
         singleEnsemble(greedyensemble, vec);
         final Vector v2 = new Vector(greedyensemble);
         double auc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(v2)));
-        double estimated = wdist.doubleDistance(v2, estimated_truth_vec);
-        double cost = tdist.doubleDistance(v2, refvec);
+        double estimated = wdist.distance(v2, estimated_truth_vec);
+        double cost = tdist.distance(v2, refvec);
         LOG.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(iditer));
-        if (auc > bestauc) {
+        if(auc > bestauc) {
           bestauc = auc;
           bestaucstr = labels.get(iditer);
         }
-        if (cost < bestcost) {
+        if(cost < bestcost) {
           bestcost = cost;
           bestcoststr = labels.get(iditer);
         }
-        if (estimated < bestest || bestid == null) {
+        if(estimated < bestest || bestid == null) {
           bestest = estimated;
           bestid = DBIDUtil.deref(iditer);
         }
@@ -303,12 +303,12 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
 
     // Initialize ensemble with "best" method
-    if (prescaling != null) {
+    if(prescaling != null) {
       LOG.verbose("Input prescaling: " + prescaling);
     }
     LOG.verbose("Distance function: " + wdist);
     LOG.verbose("Ensemble voting: " + voting);
-    if (scaling != null) {
+    if(scaling != null) {
       LOG.verbose("Ensemble rescaling: " + scaling);
     }
     LOG.verbose("Initial estimation of outliers: " + union_outliers);
@@ -323,31 +323,31 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     singleEnsemble(greedyensemble, relation.get(bestid));
     // Greedily grow the ensemble
     final double[] testensemble = new double[dim];
-    while (enscands.size() > 0) {
-      NumberVector<?> greedyvec = factory.newNumberVector(greedyensemble);
-      final double oldd = wdist.doubleDistance(estimated_truth_vec, greedyvec);
+    while(enscands.size() > 0) {
+      NumberVector greedyvec = factory.newNumberVector(greedyensemble);
+      final double oldd = wdist.distance(estimated_truth_vec, greedyvec);
 
       final int heapsize = enscands.size();
       ArrayList<DoubleDBIDPair> heap = new ArrayList<>(heapsize);
       double[] tmp = new double[dim];
-      for (DBIDIter iter = enscands.iter(); iter.valid(); iter.advance()) {
-        final NumberVector<?> vec = relation.get(iter);
+      for(DBIDIter iter = enscands.iter(); iter.valid(); iter.advance()) {
+        final NumberVector vec = relation.get(iter);
         singleEnsemble(tmp, vec);
         final Vector v2 = new Vector(greedyensemble);
-        double diversity = wdist.doubleDistance(v2, greedyvec);
+        double diversity = wdist.distance(v2, greedyvec);
         heap.add(DBIDUtil.newPair(diversity, iter));
       }
       Collections.sort(heap); // , Collections.reverseOrder());
-      while (heap.size() > 0) {
+      while(heap.size() > 0) {
         DBIDRef bestadd = heap.remove(heap.size() - 1);
         enscands.remove(bestadd);
-        final NumberVector<?> vec = relation.get(bestadd);
+        final NumberVector vec = relation.get(bestadd);
         // Build combined ensemble.
         {
           double buf[] = new double[ensemble.size() + 1];
-          for (int i = 0; i < dim; i++) {
+          for(int i = 0; i < dim; i++) {
             int j = 0;
-            for (DBIDIter iter = ensemble.iter(); iter.valid(); iter.advance()) {
+            for(DBIDIter iter = ensemble.iter(); iter.valid(); iter.advance()) {
               buf[j] = relation.get(iter).doubleValue(i);
               j++;
             }
@@ -356,46 +356,48 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
           }
         }
         applyScaling(testensemble, scaling);
-        NumberVector<?> testvec = factory.newNumberVector(testensemble);
-        double newd = wdist.doubleDistance(estimated_truth_vec, testvec);
+        NumberVector testvec = factory.newNumberVector(testensemble);
+        double newd = wdist.distance(estimated_truth_vec, testvec);
         // LOG.verbose("Distances: " + oldd + " vs. " + newd + " " +
         // labels.get(bestadd));
-        if (newd < oldd) {
+        if(newd < oldd) {
           System.arraycopy(testensemble, 0, greedyensemble, 0, dim);
           ensemble.add(bestadd);
           // logger.verbose("Growing ensemble with: " + labels.get(bestadd));
           break; // Recompute heap
-        } else {
+        }
+        else {
           dropped.add(bestadd);
           // logger.verbose("Discarding: " + labels.get(bestadd));
-          if (refine_truth) {
+          if(refine_truth) {
             // Update target vectors and weights
             ArrayList<ROC.DecreasingVectorIter> iters = new ArrayList<>(numcand);
-            for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+            for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
               // Skip "by label", obviously
-              if (DBIDUtil.equal(firstid, iditer) || dropped.contains(iditer)) {
+              if(DBIDUtil.equal(firstid, iditer) || dropped.contains(iditer)) {
                 continue;
               }
               iters.add(new ROC.DecreasingVectorIter(relation.get(iditer)));
             }
-            if (minvote >= iters.size()) {
+            if(minvote >= iters.size()) {
               minvote = iters.size() - 1;
             }
 
             union_outliers = 0;
             Arrays.fill(outliers_seen, 0);
-            while (union_outliers < desired_outliers) {
-              for (ROC.DecreasingVectorIter iter : iters) {
-                if (!iter.valid()) {
+            while(union_outliers < desired_outliers) {
+              for(ROC.DecreasingVectorIter iter : iters) {
+                if(!iter.valid()) {
                   break;
                 }
                 int cur = iter.dim();
-                if (outliers_seen[cur] == 0) {
+                if(outliers_seen[cur] == 0) {
                   outliers_seen[cur] = 1;
-                } else {
+                }
+                else {
                   outliers_seen[cur] += 1;
                 }
-                if (outliers_seen[cur] == minvote) {
+                if(outliers_seen[cur] == minvote) {
                   union_outliers += 1;
                 }
                 iter.advance();
@@ -411,15 +413,15 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Build the improved ensemble:
     StringBuilder greedylbl = new StringBuilder();
     {
-      for (DBIDIter iter = ensemble.iter(); iter.valid(); iter.advance()) {
-        if (greedylbl.length() > 0) {
+      for(DBIDIter iter = ensemble.iter(); iter.valid(); iter.advance()) {
+        if(greedylbl.length() > 0) {
           greedylbl.append(' ');
         }
         greedylbl.append(labels.get(iter));
       }
     }
-    NumberVector<?> greedyvec = factory.newNumberVector(greedyensemble);
-    if (refine_truth) {
+    NumberVector greedyvec = factory.newNumberVector(greedyensemble);
+    if(refine_truth) {
       LOG.verbose("Estimated outliers remaining: " + union_outliers);
     }
     LOG.verbose("Greedy ensemble (" + ensemble.size() + "): " + greedylbl.toString());
@@ -430,14 +432,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     double naiveauc, naivecost;
     {
       naiveauc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(naivevec)));
-      naivecost = tdist.doubleDistance(naivevec, refvec);
+      naivecost = tdist.distance(naivevec, refvec);
       LOG.verbose("Naive ensemble AUC:   " + naiveauc + " cost: " + naivecost);
       LOG.verbose("Naive ensemble Gain:  " + gain(naiveauc, bestauc, 1) + " cost gain: " + gain(naivecost, bestcost, 0));
     }
     double greedyauc, greedycost;
     {
       greedyauc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(greedyvec)));
-      greedycost = tdist.doubleDistance(greedyvec, refvec);
+      greedycost = tdist.distance(greedyvec, refvec);
       LOG.verbose("Greedy ensemble AUC:  " + greedyauc + " cost: " + greedycost);
       LOG.verbose("Greedy ensemble Gain to best:  " + gain(greedyauc, bestauc, 1) + " cost gain: " + gain(greedycost, bestcost, 0));
       LOG.verbose("Greedy ensemble Gain to naive: " + gain(greedyauc, naiveauc, 1) + " cost gain: " + gain(greedycost, naivecost, 0));
@@ -447,17 +449,17 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       MeanVariance meancost = new MeanVariance();
       HashSetModifiableDBIDs candidates = DBIDUtil.newHashSet(relation.getDBIDs());
       candidates.remove(firstid);
-      for (int i = 0; i < 1000; i++) {
+      for(int i = 0; i < 1000; i++) {
         // Build the improved ensemble:
         final double[] randomensemble = new double[dim];
         {
           DBIDs random = DBIDUtil.randomSample(candidates, ensemble.size(), (long) i);
           double[] buf = new double[random.size()];
-          for (int d = 0; d < dim; d++) {
+          for(int d = 0; d < dim; d++) {
             int j = 0;
-            for (DBIDIter iter = random.iter(); iter.valid(); iter.advance()) {
+            for(DBIDIter iter = random.iter(); iter.valid(); iter.advance()) {
               assert (!DBIDUtil.equal(firstid, iter));
-              final NumberVector<?> vec = relation.get(iter);
+              final NumberVector vec = relation.get(iter);
               buf[j] = vec.doubleValue(d);
               j++;
             }
@@ -465,10 +467,10 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
           }
         }
         applyScaling(randomensemble, scaling);
-        NumberVector<?> randomvec = factory.newNumberVector(randomensemble);
+        NumberVector randomvec = factory.newNumberVector(randomensemble);
         double auc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(randomvec)));
         meanauc.put(auc);
-        double cost = tdist.doubleDistance(randomvec, refvec);
+        double cost = tdist.distance(randomvec, refvec);
         meancost.put(cost);
       }
       LOG.verbose("Random ensemble AUC:  " + meanauc.getMean() + " + stddev: " + meanauc.getSampleStddev() + " = " + (meanauc.getMean() + meanauc.getSampleStddev()));
@@ -489,12 +491,12 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    * @param ensemble
    * @param vec
    */
-  protected void singleEnsemble(final double[] ensemble, final NumberVector<?> vec) {
+  protected void singleEnsemble(final double[] ensemble, final NumberVector vec) {
     double buf[] = new double[1];
-    for (int i = 0; i < ensemble.length; i++) {
+    for(int i = 0; i < ensemble.length; i++) {
       buf[0] = vec.doubleValue(i);
       ensemble[i] = voting.combine(buf, 1);
-      if (Double.isNaN(ensemble[i])) {
+      if(Double.isNaN(ensemble[i])) {
         LOG.warning("NaN after combining: " + FormatUtil.format(buf) + " " + voting.toString());
       }
     }
@@ -510,17 +512,17 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    * @param skip DBIDs to pass unmodified
    * @return New relation
    */
-  public static Relation<NumberVector<?>> applyPrescaling(ScalingFunction scaling, Relation<NumberVector<?>> relation, DBIDs skip) {
-    if (scaling == null) {
+  public static Relation<NumberVector> applyPrescaling(ScalingFunction scaling, Relation<NumberVector> relation, DBIDs skip) {
+    if(scaling == null) {
       return relation;
     }
-    NumberVector.Factory<NumberVector<?>, ?> factory = (NumberVector.Factory<NumberVector<?>, ?>) RelationUtil.assumeVectorField(relation).getFactory();
+    NumberVector.Factory<NumberVector> factory = RelationUtil.getNumberVectorFactory(relation);
     DBIDs ids = relation.getDBIDs();
-    WritableDataStore<NumberVector<?>> contents = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, NumberVector.class);
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      NumberVector<?> v = relation.get(iter);
+    WritableDataStore<NumberVector> contents = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, NumberVector.class);
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      NumberVector v = relation.get(iter);
       double[] raw = v.getColumnVector().getArrayRef();
-      if (!skip.contains(iter)) {
+      if(!skip.contains(iter)) {
         applyScaling(raw, scaling);
       }
       contents.put(iter, factory.newNumberVector(raw, ArrayLikeUtil.DOUBLEARRAYADAPTER));
@@ -529,15 +531,15 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   }
 
   private static void applyScaling(double[] raw, ScalingFunction scaling) {
-    if (scaling == null) {
+    if(scaling == null) {
       return;
     }
-    if (scaling instanceof OutlierScalingFunction) {
+    if(scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) scaling).prepare(raw, ArrayLikeUtil.DOUBLEARRAYADAPTER);
     }
-    for (int i = 0; i < raw.length; i++) {
+    for(int i = 0; i < raw.length; i++) {
       final double newval = scaling.getScaled(raw[i]);
-      if (Double.isNaN(newval)) {
+      if(Double.isNaN(newval)) {
         LOG.warning("NaN after prescaling: " + raw[i] + " " + scaling.toString() + " -> " + newval);
       }
       raw[i] = newval;
@@ -550,19 +552,20 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // final double orate = union_outliers * 1.0 / (outliers_seen.length);
     final double oscore = 1.; // .5 - .5 * orate;
     final double iscore = 0.; // 1 - .5 * orate;
-    for (int i = 0; i < outliers.length; i++) {
-      if (outliers[i] >= minvote) {
+    for(int i = 0; i < outliers.length; i++) {
+      if(outliers[i] >= minvote) {
         weights[i] = oweight;
         truth[i] = oscore;
-      } else {
+      }
+      else {
         weights[i] = iweight;
         truth[i] = iscore;
       }
     }
   }
 
-  private PrimitiveDoubleDistanceFunction<NumberVector<?>> getDistanceFunction(double[] estimated_weights) {
-    switch(distance) {
+  private PrimitiveDistanceFunction<NumberVector> getDistanceFunction(double[] estimated_weights) {
+    switch(distance){
     case SQEUCLIDEAN:
       return new WeightedSquaredEuclideanDistanceFunction(estimated_weights);
     case EUCLIDEAN:
@@ -658,29 +661,29 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       inputstep = config.tryInstantiate(InputStep.class);
       // Voting method
       ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class);
-      if (config.grab(votingP)) {
+      if(config.grab(votingP)) {
         voting = votingP.instantiateClass(config);
       }
       // Similarity measure
       EnumParameter<Distance> distanceP = new EnumParameter<>(DISTANCE_ID, Distance.class);
-      if (config.grab(distanceP)) {
+      if(config.grab(distanceP)) {
         distance = distanceP.getValue();
       }
       // Prescaling
       ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<>(PRESCALING_ID, ScalingFunction.class);
       prescalingP.setOptional(true);
-      if (config.grab(prescalingP)) {
+      if(config.grab(prescalingP)) {
         prescaling = prescalingP.instantiateClass(config);
       }
       // Ensemble scaling
       ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class);
       scalingP.setOptional(true);
-      if (config.grab(scalingP)) {
+      if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
       // Expected rate of outliers
       DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.01);
-      if (config.grab(rateP)) {
+      if(config.grab(rateP)) {
         rate = rateP.doubleValue();
       }
     }

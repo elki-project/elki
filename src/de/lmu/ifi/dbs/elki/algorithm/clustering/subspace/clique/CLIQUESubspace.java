@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> the type of NumberVector this subspace contains
  */
-public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
+public class CLIQUESubspace<V extends NumberVector> extends Subspace {
   /**
    * The dense units belonging to this subspace.
    */

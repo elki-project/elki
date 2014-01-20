@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.database.query.similarity;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * A distance query serves as adapter layer for database and primitive
@@ -35,9 +34,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param O Input object type
- * @param D Distance result type
  */
-public abstract class AbstractSimilarityQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements SimilarityQuery<O, D> {
+public abstract class AbstractSimilarityQuery<O> extends AbstractDataBasedQuery<O> implements SimilarityQuery<O> {
   /**
    * Constructor.
    * 
@@ -55,7 +53,7 @@ public abstract class AbstractSimilarityQuery<O, D extends Distance<D>> extends 
    * @return the distance between the two objects specified by their object ids
    */
   @Override
-  public abstract D similarity(DBIDRef id1, DBIDRef id2);
+  public abstract double similarity(DBIDRef id1, DBIDRef id2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.
@@ -65,7 +63,7 @@ public abstract class AbstractSimilarityQuery<O, D extends Distance<D>> extends 
    * @return the distance between the two objects specified by their object ids
    */
   @Override
-  public abstract D similarity(O o1, DBIDRef id2);
+  public abstract double similarity(O o1, DBIDRef id2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.
@@ -75,7 +73,7 @@ public abstract class AbstractSimilarityQuery<O, D extends Distance<D>> extends 
    * @return the distance between the two objects specified by their object ids
    */
   @Override
-  public abstract D similarity(DBIDRef id1, O o2);
+  public abstract double similarity(DBIDRef id1, O o2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.
@@ -85,5 +83,5 @@ public abstract class AbstractSimilarityQuery<O, D extends Distance<D>> extends 
    * @return the distance between the two objects specified by their object ids
    */
   @Override
-  public abstract D similarity(O o1, O o2);
+  public abstract double similarity(O o1, O o2);
 }

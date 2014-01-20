@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -43,12 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.uses AbstractMkTreeUnified oneway - - «create»
  * 
  * @param <O> Object type
- * @param <D> Distance type
  * @param <N> Node type
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMkTreeUnifiedFactory<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, I extends AbstractMkTree<O, D, N, E, S> & Index, S extends MkTreeSettings<O, D, N, E>> extends AbstractMTreeFactory<O, D, N, E, I, S> {
+public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, I extends AbstractMkTree<O, N, E, S> & Index, S extends MkTreeSettings<O, N, E>> extends AbstractMTreeFactory<O, N, E, I, S> {
   /**
    * Constructor.
    * 
@@ -66,7 +64,7 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends NumberDistance<D
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, D, N, E>> extends AbstractMTreeFactory.Parameterizer<O, D, N, E, S> {
+  public abstract static class Parameterizer<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, N, E>> extends AbstractMTreeFactory.Parameterizer<O, N, E, S> {
     /**
      * Parameter specifying the maximal number k of reverse k nearest neighbors
      * to be supported, must be an integer greater than 0.
@@ -88,6 +86,6 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends NumberDistance<D
     }
 
     @Override
-    protected abstract AbstractMkTreeUnifiedFactory<O, D, N, E, ?, S> makeInstance();
+    protected abstract AbstractMkTreeUnifiedFactory<O, N, E, ?, S> makeInstance();
   }
 }

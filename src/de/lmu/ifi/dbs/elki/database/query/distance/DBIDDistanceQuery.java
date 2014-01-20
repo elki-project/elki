@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Run a distance query based on DBIDs
@@ -36,14 +35,12 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.landmark
  * @apiviz.uses DBIDDistanceFunction
- * 
- * @param <D> Distance result type.
  */
-public class DBIDDistanceQuery<D extends Distance<D>> extends AbstractDatabaseDistanceQuery<DBID, D> {
+public class DBIDDistanceQuery extends AbstractDatabaseDistanceQuery<DBID> {
   /**
    * The distance function we use.
    */
-  final protected DBIDDistanceFunction<D> distanceFunction;
+  final protected DBIDDistanceFunction distanceFunction;
 
   /**
    * Constructor.
@@ -51,13 +48,13 @@ public class DBIDDistanceQuery<D extends Distance<D>> extends AbstractDatabaseDi
    * @param relation Database to use.
    * @param distanceFunction Our distance function
    */
-  public DBIDDistanceQuery(Relation<DBID> relation, DBIDDistanceFunction<D> distanceFunction) {
+  public DBIDDistanceQuery(Relation<DBID> relation, DBIDDistanceFunction distanceFunction) {
     super(relation);
     this.distanceFunction = distanceFunction;
   }
 
   @Override
-  public D distance(DBIDRef id1, DBIDRef id2) {
+  public double distance(DBIDRef id1, DBIDRef id2) {
     if(id1 == null) {
       throw new UnsupportedOperationException("This distance function can only be used for objects stored in the database.");
     }
@@ -68,7 +65,7 @@ public class DBIDDistanceQuery<D extends Distance<D>> extends AbstractDatabaseDi
   }
 
   @Override
-  public DBIDDistanceFunction<D> getDistanceFunction() {
+  public DBIDDistanceFunction getDistanceFunction() {
     return distanceFunction;
   }
 }

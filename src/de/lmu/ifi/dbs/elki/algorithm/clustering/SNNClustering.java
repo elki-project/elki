@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -134,7 +133,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @return Result
    */
   public Clustering<Model> run(Database database, Relation<O> relation) {
-    SimilarityQuery<O, DoubleDistance> snnInstance = similarityFunction.instantiate(relation);
+    SimilarityQuery<O> snnInstance = similarityFunction.instantiate(relation);
 
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("SNNClustering", relation.size(), LOG) : null;
     IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
@@ -188,10 +187,10 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @return the shared nearest neighbors of the specified query object in the
    *         given database
    */
-  protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O, DoubleDistance> snnInstance, DBID queryObject) {
+  protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O> snnInstance, DBID queryObject) {
     ArrayModifiableDBIDs neighbors = DBIDUtil.newArray();
     for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      if(snnInstance.similarity(queryObject, iditer).doubleValue() >= epsilon) {
+      if(snnInstance.similarity(queryObject, iditer) >= epsilon) {
         neighbors.add(iditer);
       }
     }
@@ -209,7 +208,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @param objprog the progress object to report about the progress of
    *        clustering
    */
-  protected void expandCluster(SimilarityQuery<O, DoubleDistance> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(SimilarityQuery<O> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     ArrayModifiableDBIDs seeds = findSNNNeighbors(snnInstance, startObjectID);
 
     // startObject is no core-object

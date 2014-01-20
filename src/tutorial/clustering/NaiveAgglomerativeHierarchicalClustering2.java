@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -69,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <O> Object type
  */
-public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, Result> {
+public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
   /**
    * Class logger
    */
@@ -86,7 +85,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
    * @param distanceFunction Distance function to use
    * @param numclusters Number of clusters
    */
-  public NaiveAgglomerativeHierarchicalClustering2(DistanceFunction<? super O, D> distanceFunction, int numclusters) {
+  public NaiveAgglomerativeHierarchicalClustering2(DistanceFunction<? super O> distanceFunction, int numclusters) {
     super(distanceFunction);
     this.numclusters = numclusters;
   }
@@ -99,7 +98,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
    * @return Clustering hierarchy
    */
   public Result run(Database db, Relation<O> relation) {
-    DistanceQuery<O, D> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -116,7 +115,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
     for (int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
       for (int y = 0; y < x; y++, iy.advance()) {
-        scratch[pos] = dq.distance(ix, iy).doubleValue();
+        scratch[pos] = dq.distance(ix, iy);
         pos++;
       }
     }
@@ -252,9 +251,8 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
    * @author Erich Schubert
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Desired number of clusters.
      */
@@ -271,7 +269,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O, D extends NumberDistan
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering2<O, D> makeInstance() {
+    protected NaiveAgglomerativeHierarchicalClustering2<O> makeInstance() {
       return new NaiveAgglomerativeHierarchicalClustering2<>(distanceFunction, numclusters);
     }
   }

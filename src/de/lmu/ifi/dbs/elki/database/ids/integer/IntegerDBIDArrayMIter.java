@@ -29,6 +29,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
  * 
  * @author Erich Schubert
  */
-public interface IntegerDBIDArrayMIter extends IntegerDBIDArrayIter, IntegerDBIDMIter, DBIDArrayMIter {
+interface IntegerDBIDArrayMIter extends IntegerDBIDArrayIter, IntegerDBIDMIter, DBIDArrayMIter {
   // Empty
 }

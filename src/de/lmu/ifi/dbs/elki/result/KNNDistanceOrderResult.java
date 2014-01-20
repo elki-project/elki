@@ -24,22 +24,17 @@ package de.lmu.ifi.dbs.elki.result;
  */
 
 import java.util.Iterator;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Wraps a list containing the knn distances.
  * 
  * @author Arthur Zimek
- * @param <D> the type of Distance used by this Result
- * 
  */
-public class KNNDistanceOrderResult<D extends Distance<D>> extends BasicResult implements IterableResult<D> {
+public class KNNDistanceOrderResult extends BasicResult implements IterableResult<Double> {
   /**
    * Store the kNN Distances
    */
-  private final List<D> knnDistances;
+  private final double[] knnDistances;
 
   /**
    * Construct result
@@ -48,7 +43,7 @@ public class KNNDistanceOrderResult<D extends Distance<D>> extends BasicResult i
    * @param shortname the short name (for filenames etc.)
    * @param knnDistances distance list to wrap.
    */
-  public KNNDistanceOrderResult(String name, String shortname, final List<D> knnDistances) {
+  public KNNDistanceOrderResult(String name, String shortname, final double[] knnDistances) {
     super(name, shortname);
     this.knnDistances = knnDistances;
   }
@@ -57,7 +52,25 @@ public class KNNDistanceOrderResult<D extends Distance<D>> extends BasicResult i
    * Return an iterator.
    */
   @Override
-  public Iterator<D> iterator() {
-    return knnDistances.iterator();
+  public Iterator<Double> iterator() {
+    return new Iterator<Double>() {
+      int pos = -1;
+
+      @Override
+      public boolean hasNext() {
+        return (pos < knnDistances.length);
+      }
+
+      @Override
+      public Double next() {
+        ++pos;
+        return knnDistances[pos];
+      }
+
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    };
   }
 }

@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @author Elke Achtert
  */
 // TODO: Factory with parameterizable weight matrix?
-public class WeightedDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class WeightedDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * The weight matrix.
    */
@@ -53,14 +53,14 @@ public class WeightedDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
+  public double distance(NumberVector o1, NumberVector o2) {
     dimensionality(o1, o2, weightMatrix.getColumnDimensionality());
     Vector o1_minus_o2 = o1.getColumnVector().minusEquals(o2.getColumnVector());
     return MathUtil.mahalanobisDistance(weightMatrix, o1_minus_o2);
   }
 
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public VectorFieldTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return new VectorFieldTypeInformation<>(NumberVector.class, weightMatrix.getColumnDimensionality());
   }
 }

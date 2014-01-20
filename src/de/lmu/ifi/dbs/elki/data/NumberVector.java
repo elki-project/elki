@@ -33,15 +33,13 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * 
  * @author Arthur Zimek
  * 
- * @param <N> the type of the attribute values
- * 
  * @apiviz.landmark
  * @apiviz.has Vector
  */
-public interface NumberVector<N extends Number> extends FeatureVector<N>, SpatialComparable {
+public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
   @Deprecated
   @Override
-  N getValue(int dimension);
+  Number getValue(int dimension);
   
   /**
    * Returns the value in the specified dimension as double.
@@ -139,9 +137,8 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
    * @apiviz.has NumberVector
    * 
    * @param <V> Vector type
-   * @param <N> Data type of vector
    */
-  interface Factory<V extends NumberVector<? extends N>, N extends Number> extends FeatureVector.Factory<V, N> {
+  interface Factory<V extends NumberVector> extends FeatureVector.Factory<V, Number> {
     /**
      * Returns a new NumberVector of N for the given values.
      * 

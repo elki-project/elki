@@ -31,6 +31,6 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  * 
  * @param <O> Object type
  */
-public interface NormalizedPrimitiveSimilarityFunction<O> extends PrimitiveDoubleSimilarityFunction<O>, NormalizedSimilarityFunction<O> {
+public interface NormalizedPrimitiveSimilarityFunction<O> extends PrimitiveSimilarityFunction<O>, NormalizedSimilarityFunction<O> {
   // empty marker interface
 }

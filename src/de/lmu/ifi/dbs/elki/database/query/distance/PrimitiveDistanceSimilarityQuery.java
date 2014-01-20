@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 
 /**
@@ -38,14 +37,13 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * @apiviz.uses PrimitiveSimilarityFunction
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class PrimitiveDistanceSimilarityQuery<O, D extends Distance<D>> extends PrimitiveDistanceQuery<O, D> implements DistanceSimilarityQuery<O, D> {
+public class PrimitiveDistanceSimilarityQuery<O> extends PrimitiveDistanceQuery<O> implements DistanceSimilarityQuery<O> {
   /**
    * Typed reference to the similarity function (usually the same as the
    * distance function!)
    */
-  private PrimitiveSimilarityFunction<? super O, D> similarityFunction;
+  private PrimitiveSimilarityFunction<? super O> similarityFunction;
 
   /**
    * Constructor.
@@ -55,37 +53,37 @@ public class PrimitiveDistanceSimilarityQuery<O, D extends Distance<D>> extends 
    * @param similarityFunction similarity function (usually the same as the
    *        distance function!)
    */
-  public PrimitiveDistanceSimilarityQuery(Relation<? extends O> relation, PrimitiveDistanceFunction<? super O, D> distanceFunction, PrimitiveSimilarityFunction<? super O, D> similarityFunction) {
+  public PrimitiveDistanceSimilarityQuery(Relation<? extends O> relation, PrimitiveDistanceFunction<? super O> distanceFunction, PrimitiveSimilarityFunction<? super O> similarityFunction) {
     super(relation, distanceFunction);
     this.similarityFunction = similarityFunction;
   }
 
   @Override
-  public D similarity(DBIDRef id1, DBIDRef id2) {
+  public double similarity(DBIDRef id1, DBIDRef id2) {
     O o1 = relation.get(id1);
     O o2 = relation.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
-  public D similarity(O o1, DBIDRef id2) {
+  public double similarity(O o1, DBIDRef id2) {
     O o2 = relation.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
-  public D similarity(DBIDRef id1, O o2) {
+  public double similarity(DBIDRef id1, O o2) {
     O o1 = relation.get(id1);
     return similarity(o1, o2);
   }
 
   @Override
-  public D similarity(O o1, O o2) {
+  public double similarity(O o1, O o2) {
     return this.similarityFunction.similarity(o1, o2);
   }
 
   @Override
-  public PrimitiveSimilarityFunction<? super O, D> getSimilarityFunction() {
+  public PrimitiveSimilarityFunction<? super O> getSimilarityFunction() {
     return similarityFunction;
   }
 }

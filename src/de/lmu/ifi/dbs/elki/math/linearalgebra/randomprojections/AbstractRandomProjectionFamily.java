@@ -116,7 +116,7 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
     }
 
     @Override
-    public double[] project(NumberVector<?> in) {
+    public double[] project(NumberVector in) {
       for (int d = 0; d < vals.length; d++) {
         vals[d] = in.doubleValue(d);
       }

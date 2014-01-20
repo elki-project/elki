@@ -142,7 +142,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
    */
   // FIXME: make non-static, react to database changes!
   // FIXME: cache histogram instead of recomputing it.
-  public class Instance<NV extends NumberVector<?>> extends AbstractHistogramVisualization {
+  public class Instance<NV extends NumberVector> extends AbstractHistogramVisualization {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

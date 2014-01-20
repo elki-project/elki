@@ -25,11 +25,11 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Default linear scan range query class.
@@ -40,24 +40,23 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.has DistanceQuery
  * 
  * @param <O> Database object type
- * @param <D> Distance type
  */
-public class LinearScanDistanceRangeQuery<O, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> implements LinearScanQuery {
+public class LinearScanDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<O> implements LinearScanQuery {
   /**
    * Constructor.
    * 
    * @param distanceQuery Distance function to use
    */
-  public LinearScanDistanceRangeQuery(DistanceQuery<O, D> distanceQuery) {
+  public LinearScanDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
     super(distanceQuery);
   }
 
   @Override
-  public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range) {
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
+    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      D currentDistance = distanceQuery.distance(id, iter);
-      if(currentDistance.compareTo(range) <= 0) {
+      double currentDistance = distanceQuery.distance(id, iter);
+      if(currentDistance <= range) {
         result.add(currentDistance, iter);
       }
     }
@@ -66,11 +65,11 @@ public class LinearScanDistanceRangeQuery<O, D extends Distance<D>> extends Abst
   }
 
   @Override
-  public DistanceDBIDList<D> getRangeForObject(O obj, D range) {
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+  public DoubleDBIDList getRangeForObject(O obj, double range) {
+    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      D currentDistance = distanceQuery.distance(obj, iter);
-      if(currentDistance.compareTo(range) <= 0) {
+      double currentDistance = distanceQuery.distance(obj, iter);
+      if(currentDistance <= range) {
         result.add(currentDistance, iter);
       }
     }

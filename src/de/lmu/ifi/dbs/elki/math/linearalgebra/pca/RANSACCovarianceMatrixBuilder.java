@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <V> Vector type
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", title = "Outlier Detection in Arbitrarily Oriented Subspaces", booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
-public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends AbstractCovarianceMatrixBuilder<V> {
+public class RANSACCovarianceMatrixBuilder<V extends NumberVector> extends AbstractCovarianceMatrixBuilder<V> {
   /**
    * Number of iterations to perform
    */
@@ -147,7 +147,7 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Number of iterations.
      */

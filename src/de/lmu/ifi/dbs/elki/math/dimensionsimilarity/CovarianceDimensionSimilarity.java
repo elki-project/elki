@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class CovarianceDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
+public class CovarianceDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**
    * Static instance
    */
@@ -48,7 +48,7 @@ public class CovarianceDimensionSimilarity implements DimensionSimilarity<Number
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     // FIXME: Use only necessary dimensions!
     CovarianceMatrix covmat = CovarianceMatrix.make(relation, subset);

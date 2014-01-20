@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -48,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <R> the result we return
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector<?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
+public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
    * Holds the value of {@link Parameterizer#K_ID}.
    */
@@ -67,7 +66,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
   /**
    * The euclidean distance function.
    */
-  private DistanceFunction<? super V, DoubleDistance> distanceFunction = EuclideanDistanceFunction.STATIC;
+  private DistanceFunction<? super V> distanceFunction = EuclideanDistanceFunction.STATIC;
 
   /**
    * Internal constructor.
@@ -88,7 +87,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
    * 
    * @return the distance function
    */
-  protected DistanceFunction<? super V, DoubleDistance> getDistanceFunction() {
+  protected DistanceFunction<? super V> getDistanceFunction() {
     return distanceFunction;
   }
 
@@ -97,7 +96,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
    * 
    * @return the distance function
    */
-  protected DistanceQuery<V, DoubleDistance> getDistanceQuery(Database database) {
+  protected DistanceQuery<V> getDistanceQuery(Database database) {
     return QueryUtil.getDistanceQuery(database, distanceFunction);
   }
 

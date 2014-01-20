@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -72,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Approximate ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url = "http://dx.doi.org/10.1145/1401890.1401946")
-public class FastABOD<V extends NumberVector<?>> extends ABOD<V> {
+public class FastABOD<V extends NumberVector> extends ABOD<V> {
   /**
    * The logger for this class.
    */
@@ -89,7 +88,7 @@ public class FastABOD<V extends NumberVector<?>> extends ABOD<V> {
    * @param kernelFunction kernel function to use
    * @param k Number of nearest neighbors
    */
-  public FastABOD(SimilarityFunction<? super V, DoubleDistance> kernelFunction, int k) {
+  public FastABOD(SimilarityFunction<? super V> kernelFunction, int k) {
     super(kernelFunction);
     this.k = k;
   }
@@ -104,7 +103,7 @@ public class FastABOD<V extends NumberVector<?>> extends ABOD<V> {
   public OutlierResult run(Database db, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
     // Build a kernel matrix, to make O(n^3) slightly less bad.
-    SimilarityQuery<V, DoubleDistance> sq = db.getSimilarityQuery(relation, kernelFunction);
+    SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
@@ -191,7 +190,7 @@ public class FastABOD<V extends NumberVector<?>> extends ABOD<V> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends ABOD.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends ABOD.Parameterizer<V> {
     /**
      * Parameter for the nearest neighbors.
      */

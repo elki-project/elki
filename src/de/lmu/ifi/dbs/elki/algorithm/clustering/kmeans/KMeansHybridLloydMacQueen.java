@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -54,9 +53,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @apiviz.has KMeansModel
  * 
  * @param <V> vector datatype
- * @param <D> distance value type
  */
-public class KMeansHybridLloydMacQueen<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, KMeansModel<V>> {
+public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractKMeans<V, KMeansModel<V>> {
   /**
    * The logger for this class.
    */
@@ -70,59 +68,59 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector<?>, D extends Dist
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansHybridLloydMacQueen(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMeansHybridLloydMacQueen(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   @Override
   public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
-    if (relation.size() <= 0) {
+    if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
     List<Vector> means = new ArrayList<>(k);
-    for (NumberVector<?> nv : initializer.chooseInitialMeans(database, relation, k, getDistanceFunction())) {
+    for(NumberVector nv : initializer.chooseInitialMeans(database, relation, k, getDistanceFunction())) {
       means.add(nv.getColumnVector());
     }
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration += 2) {
+    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration += 2) {
       { // MacQueen
-        if (prog != null) {
+        if(prog != null) {
           prog.incrementProcessed(LOG);
         }
         boolean changed = macQueenIterate(relation, means, clusters, assignment);
-        if (!changed) {
+        if(!changed) {
           break;
         }
       }
       { // Lloyd
-        if (prog != null) {
+        if(prog != null) {
           prog.incrementProcessed(LOG);
         }
         boolean changed = assignToNearestCluster(relation, means, clusters, assignment);
         // Stop if no cluster assignment changed.
-        if (!changed) {
+        if(!changed) {
           break;
         }
         // Recompute means.
         means = means(clusters, means, relation);
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.setCompleted(LOG);
     }
 
     // Wrap result
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for (int i = 0; i < clusters.size(); i++) {
+    for(int i = 0; i < clusters.size(); i++) {
       KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
@@ -141,14 +139,14 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector<?>, D extends Dist
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
     protected Logging getLogger() {
       return LOG;
     }
 
     @Override
-    protected KMeansHybridLloydMacQueen<V, D> makeInstance() {
+    protected KMeansHybridLloydMacQueen<V> makeInstance() {
       return new KMeansHybridLloydMacQueen<>(distanceFunction, k, maxiter, initializer);
     }
   }

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
@@ -32,9 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public interface DistanceBasedAlgorithm<O, D extends Distance<?>> extends Algorithm {
+public interface DistanceBasedAlgorithm<O> extends Algorithm {
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_ID}.
    */
@@ -45,5 +43,5 @@ public interface DistanceBasedAlgorithm<O, D extends Distance<?>> extends Algori
    * 
    * @return the distanceFunction
    */
-  DistanceFunction<? super O, D> getDistanceFunction();
+  DistanceFunction<? super O> getDistanceFunction();
 }

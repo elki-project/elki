@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -66,10 +65,10 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
    * vectors.
    * 
    * @return the Edit Distance With Real Penalty distance between the given two
-   *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
+   *         vectors as an instance of {@link distance distance}.
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     // Current and previous columns of the matrix
     double[] curr = new double[v2.getDimensionality()];
     double[] prev = new double[v2.getDimensionality()];

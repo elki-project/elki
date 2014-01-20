@@ -33,16 +33,13 @@ import java.nio.channels.FileLock;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -63,9 +60,8 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * @apiviz.has DistanceFunction
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> extends AbstractApplication {
+public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
   /**
    * The logger for this class.
    */
@@ -79,7 +75,7 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O, D> distance;
+  private DistanceFunction<O> distance;
 
   /**
    * Number of neighbors to precompute.
@@ -107,7 +103,7 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
    * @param k Number of nearest neighbors
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceKNNLists(InputStep input, DistanceFunction<O, D> distance, int k, File out) {
+  public CacheDoubleDistanceKNNLists(InputStep input, DistanceFunction<O> distance, int k, File out) {
     super();
     this.input = input;
     this.distance = distance;
@@ -119,8 +115,8 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
   public void run() {
     Database database = input.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distance);
-    KNNQuery<O, D> knnQ = database.getKNNQuery(distanceQuery, DatabaseQuery.HINT_HEAVY_USE);
+    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
+    KNNQuery<O> knnQ = database.getKNNQuery(distanceQuery, DatabaseQuery.HINT_HEAVY_USE);
 
     // open file.
     try (RandomAccessFile file = new RandomAccessFile(out, "rw");
@@ -136,7 +132,7 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing kNN", relation.size(), LOG) : null;
 
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        final KNNList<D> nn = knnQ.getKNNForDBID(it, k);
+        final KNNList nn = knnQ.getKNNForDBID(it, k);
         final int nnsize = nn.size();
 
         // Grow the buffer when needed:
@@ -151,17 +147,9 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
         ByteArrayUtil.writeUnsignedVarint(buffer, it.internalGetIndex());
         ByteArrayUtil.writeUnsignedVarint(buffer, nnsize);
         int c = 0;
-        if(nn instanceof DoubleDistanceDBIDList) {
-          for(DoubleDistanceDBIDListIter ni = ((DoubleDistanceDBIDList) nn).iter(); ni.valid(); ni.advance(), c++) {
-            ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
-            buffer.putDouble(ni.doubleDistance());
-          }
-        }
-        else {
-          for(DistanceDBIDListIter<D> ni = nn.iter(); ni.valid(); ni.advance(), c++) {
-            ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
-            buffer.putDouble(ni.getDistance().doubleValue());
-          }
+        for(DoubleDBIDListIter ni = nn.iter(); ni.valid(); ni.advance(), c++) {
+          ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
+          buffer.putDouble(ni.doubleValue());
         }
         if(c != nn.size()) {
           throw new AbortException("Sizes did not agree. Cache is invalid.");
@@ -191,7 +179,7 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**
      * Parameter that specifies the name of the directory to be re-parsed.
      * <p>
@@ -224,7 +212,7 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<O, D> distance = null;
+    private DistanceFunction<O> distance = null;
 
     /**
      * Number of neighbors to precompute.
@@ -241,7 +229,7 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
       super.makeOptions(config);
       input = config.tryInstantiate(InputStep.class);
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
@@ -258,7 +246,7 @@ public class CacheDoubleDistanceKNNLists<O, D extends NumberDistance<D, ?>> exte
     }
 
     @Override
-    protected CacheDoubleDistanceKNNLists<O, D> makeInstance() {
+    protected CacheDoubleDistanceKNNLists<O> makeInstance() {
       return new CacheDoubleDistanceKNNLists<>(input, distance, k, out);
     }
   }

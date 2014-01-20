@@ -74,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("Finding Hierarchies of Subspace Clusters")
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Finding Hierarchies of Subspace Clusters", booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
-public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiSC.HiSCClusterOrderEntry> {
+public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, HiSC.HiSCClusterOrderEntry> {
   /**
    * The logger for this class.
    */
@@ -83,12 +83,12 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiSC.H
   /**
    * Factory to produce
    */
-  private IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector<?>>> indexfactory;
+  private IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>> indexfactory;
 
   /**
    * Instantiated index.
    */
-  private HiSCPreferenceVectorIndex<NumberVector<?>> index;
+  private HiSCPreferenceVectorIndex<NumberVector> index;
 
   /**
    * Relation we are currently processing.
@@ -105,7 +105,7 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiSC.H
    * 
    * @param indexfactory HiSC index factory
    */
-  public HiSC(IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector<?>>> indexfactory, double epsilon) {
+  public HiSC(IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>> indexfactory, double epsilon) {
     super(2);
     this.indexfactory = indexfactory;
     this.alpha = epsilon;
@@ -266,7 +266,7 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiSC.H
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter to specify the maximum distance between two vectors with equal
      * preference vectors before considering them as parallel, must be a double
@@ -283,7 +283,7 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiSC.H
     /**
      * Factory to produce the index.
      */
-    private IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector<?>>> indexfactory;
+    private IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>> indexfactory;
 
     /**
      * Alpha parameter.
@@ -309,7 +309,7 @@ public class HiSC<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiSC.H
 
       ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
       chain.errorsTo(config);
-      final Class<? extends IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector<?>>>> cls = ClassGenericsUtil.uglyCrossCast(HiSCPreferenceVectorIndex.Factory.class, IndexFactory.class);
+      final Class<? extends IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>>> cls = ClassGenericsUtil.uglyCrossCast(HiSCPreferenceVectorIndex.Factory.class, IndexFactory.class);
       indexfactory = chain.tryInstantiate(cls);
     }
 

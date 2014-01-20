@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -55,12 +54,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Elke Achtert
  * 
  * @param <O> the type of DatabaseObject to be stored in the M-Tree
- * @param <D> the type of Distance used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class RandomSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends MTreeSplit<O, D, N, E> {
+public class RandomSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends MTreeSplit<O, N, E> {
   /**
    * Random generator.
    */
@@ -84,10 +82,10 @@ public class RandomSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMT
    * @param node the node to be split
    */
   @Override
-  public Assignments<E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
+  public Assignments<E> split(AbstractMTree<O, N, E, ?> tree, N node) {
     int pos1 = random.nextInt(node.getNumEntries());
     int pos2 = random.nextInt(node.getNumEntries() - 1);
-    if (pos2 >= pos1) {
+    if(pos2 >= pos1) {
       ++pos2;
     }
     DBID id1 = node.getEntry(pos1).getRoutingObjectID();
@@ -104,11 +102,10 @@ public class RandomSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMT
    * @apiviz.exclude
    * 
    * @param <O> the type of DatabaseObject to be stored in the M-Tree
-   * @param <D> the type of Distance used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree
    * @param <E> the type of MetricalEntry used in the M-Tree
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends AbstractParameterizer {
+  public static class Parameterizer<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends AbstractParameterizer {
     /**
      * Option ID for the random generator.
      */
@@ -123,13 +120,13 @@ public class RandomSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMT
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }
 
     @Override
-    protected RandomSplit<O, D, N, E> makeInstance() {
+    protected RandomSplit<O, N, E> makeInstance() {
       return new RandomSplit<>(rnd);
     }
   }

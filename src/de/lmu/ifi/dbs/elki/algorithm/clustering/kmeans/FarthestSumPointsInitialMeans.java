@@ -39,9 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * K-Means initialization by repeatedly choosing the farthest point (by the
@@ -53,9 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
-public class FarthestSumPointsInitialMeans<V, D extends NumberDistance<D, ?>> extends FarthestPointsInitialMeans<V, D> {
+public class FarthestSumPointsInitialMeans<V> extends FarthestPointsInitialMeans<V> {
   /**
    * Constructor.
    * 
@@ -67,14 +64,11 @@ public class FarthestSumPointsInitialMeans<V, D extends NumberDistance<D, ?>> ex
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     // Get a distance query
-    if(!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
-      throw new AbortException("Farthest points K-Means initialization can only be used with numerical distances.");
-    }
     @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super V, D> distF = (PrimitiveDistanceFunction<? super V, D>) distanceFunction;
-    DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, distF);
+    final PrimitiveDistanceFunction<? super V> distF = (PrimitiveDistanceFunction<? super V>) distanceFunction;
+    DistanceQuery<V> distQ = database.getDistanceQuery(relation, distF);
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
@@ -95,7 +89,7 @@ public class FarthestSumPointsInitialMeans<V, D extends NumberDistance<D, ?>> ex
         if(prev != prev) {
           continue; // NaN: already chosen!
         }
-        double dsum = prev + distQ.distance(prevmean, it).doubleValue();
+        double dsum = prev + distQ.distance(prevmean, it);
         // Don't store distance to first mean, when it will be dropped below.
         if(i > 0) {
           store.putDouble(it, dsum);
@@ -121,12 +115,7 @@ public class FarthestSumPointsInitialMeans<V, D extends NumberDistance<D, ?>> ex
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distQ2) {
-    if(!(distQ2.getDistanceFactory() instanceof NumberDistance)) {
-      throw new AbortException("Farthest points K-Means initialization can only be used with numerical distances.");
-    }
-    @SuppressWarnings("unchecked")
-    DistanceQuery<? super V, D> distQ = (DistanceQuery<? super V, D>) distQ2;
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distQ) {
     @SuppressWarnings("unchecked")
     final Relation<V> relation = (Relation<V>) distQ.getRelation();
 
@@ -148,7 +137,7 @@ public class FarthestSumPointsInitialMeans<V, D extends NumberDistance<D, ?>> ex
         if(prev != prev) {
           continue; // NaN: already chosen!
         }
-        double dsum = prev + distQ.distance(prevmean, it).doubleValue();
+        double dsum = prev + distQ.distance(prevmean, it);
         // Don't store distance to first mean, when it will be dropped below.
         if(i > 0) {
           store.putDouble(it, dsum);
@@ -177,14 +166,14 @@ public class FarthestSumPointsInitialMeans<V, D extends NumberDistance<D, ?>> ex
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends FarthestPointsInitialMeans.Parameterizer<V, D> {
+  public static class Parameterizer<V> extends FarthestPointsInitialMeans.Parameterizer<V> {
     /**
      * Flag for discarding the first object chosen.
      */
     protected boolean keepfirst = false;
 
     @Override
-    protected FarthestSumPointsInitialMeans<V, D> makeInstance() {
+    protected FarthestSumPointsInitialMeans<V> makeInstance() {
       return new FarthestSumPointsInitialMeans<>(rnd, !keepfirst);
     }
   }

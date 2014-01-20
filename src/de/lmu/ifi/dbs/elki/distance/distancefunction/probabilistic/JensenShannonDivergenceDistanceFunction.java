@@ -49,8 +49,8 @@ public class JensenShannonDivergenceDistanceFunction extends JeffreyDivergenceDi
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    return .5 * super.doubleDistance(v1, v2);
+  public double distance(NumberVector v1, NumberVector v2) {
+    return .5 * super.distance(v1, v2);
   }
 
   @Override

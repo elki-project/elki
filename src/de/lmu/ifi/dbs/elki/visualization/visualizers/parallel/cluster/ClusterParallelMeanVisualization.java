@@ -83,7 +83,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
     for (Clustering<?> c : clusterings) {
       if (c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
-        Clustering<MeanModel<? extends NumberVector<?>>> mcls = findMeanModel(c);
+        Clustering<MeanModel<? extends NumberVector>> mcls = findMeanModel(c);
         if (mcls != null) {
           Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
           for (ParallelPlotProjector<?> p : ps) {
@@ -104,9 +104,9 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
    * @return the clustering cast to return a mean model, null otherwise.
    */
   @SuppressWarnings("unchecked")
-  private static Clustering<MeanModel<? extends NumberVector<?>>> findMeanModel(Clustering<?> c) {
+  private static Clustering<MeanModel<? extends NumberVector>> findMeanModel(Clustering<?> c) {
     if (c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
-      return (Clustering<MeanModel<? extends NumberVector<?>>>) c;
+      return (Clustering<MeanModel<? extends NumberVector>>) c;
     }
     return null;
   }
@@ -123,7 +123,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
    * @author Robert Rödler
    * 
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector<?>> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -133,7 +133,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
     /**
      * The result we visualize.
      */
-    private Clustering<MeanModel<? extends NumberVector<?>>> clustering;
+    private Clustering<MeanModel<? extends NumberVector>> clustering;
 
     /**
      * Constructor.
@@ -159,13 +159,13 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
     protected void redraw() {
       addCSSClasses(svgp);
 
-      Iterator<Cluster<MeanModel<? extends NumberVector<?>>>> ci = clustering.getAllClusters().iterator();
+      Iterator<Cluster<MeanModel<? extends NumberVector>>> ci = clustering.getAllClusters().iterator();
       for (int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-        Cluster<MeanModel<? extends NumberVector<?>>> clus = ci.next();
+        Cluster<MeanModel<? extends NumberVector>> clus = ci.next();
         if (clus.getModel() == null) {
           continue;
         }
-        NumberVector<?> mean = clus.getModel().getMean();
+        NumberVector mean = clus.getModel().getMean();
         if (mean == null) {
           continue;
         }

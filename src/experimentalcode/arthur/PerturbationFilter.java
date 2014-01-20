@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * 
  * @author Arthur Zimek
  */
-public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVectorConversionFilter<V, V> {
+public class PerturbationFilter<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> {
   /**
    * Class logger
    */
@@ -278,7 +278,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter for minimum.
      */

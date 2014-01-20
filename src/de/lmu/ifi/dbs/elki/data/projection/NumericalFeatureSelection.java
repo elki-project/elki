@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @param <V> Vector type
  */
-public class NumericalFeatureSelection<V extends NumberVector<?>> implements Projection<V, V> {
+public class NumericalFeatureSelection<V extends NumberVector> implements Projection<V, V> {
   /**
    * Minimum dimensionality required for projection.
    */
@@ -55,7 +55,7 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
   /**
    * Object factory.
    */
-  private NumberVector.Factory<V, ?> factory;
+  private NumberVector.Factory<V> factory;
 
   /**
    * Output dimensionality.
@@ -84,10 +84,11 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
     this.mindim = mind;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void initialize(SimpleTypeInformation<V> in) {
     final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
-    factory = (NumberVector.Factory<V, ?>) vin.getFactory();
+    factory = (NumberVector.Factory<V>) vin.getFactory();
     if(vin.getDimensionality() < mindim) {
       throw new AbortException("Data does not have enough dimensions for this projection!");
     }
@@ -119,7 +120,7 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Dimensions to select.
      */

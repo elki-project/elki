@@ -134,14 +134,14 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     while(scan.hasNext()) {
       final int curpos = scan.index;
       // Update maximum-inbetween
-      mib = Math.max(mib, scan.ecurr.doubleReachability());
+      mib = Math.max(mib, scan.ecurr.getReachability());
       // The last point cannot be the start of a steep area.
       if(scan.esucc != null) {
         // Xi-steep down area
         if(scan.steepDown(ixi)) {
           // Update mib values with current mib and filter
           updateFilterSDASet(mib, sdaset, ixi);
-          final double startval = scan.ecurr.doubleReachability();
+          final double startval = scan.ecurr.getReachability();
           int startsteep = scan.index;
           int endsteep = Math.min(scan.index + 1, clusterOrder.size());
           {
@@ -163,7 +163,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
               }
             }
           }
-          mib = clusterOrder.get(endsteep).doubleReachability();
+          mib = clusterOrder.get(endsteep).getReachability();
           final SteepDownArea sda = new SteepDownArea(startsteep, endsteep, startval, 0);
           if(LOG.isDebuggingFinest()) {
             LOG.debugFinest("Xi " + sda.toString());
@@ -184,8 +184,8 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
           {
             int startsteep = scan.index;
             int endsteep = scan.index + 1;
-            mib = scan.ecurr.doubleReachability();
-            double esuccr = scan.esucc.doubleReachability();
+            mib = scan.ecurr.getReachability();
+            double esuccr = scan.esucc.getReachability();
             // There is nothing higher than infinity
             if(!Double.isInfinite(esuccr)) {
               // find end of steep-up-area, eventually updating mib again
@@ -198,8 +198,8 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
                 // still steep - continue.
                 if(scan.steepUp(ixi)) {
                   endsteep = Math.min(scan.index + 1, clusterOrder.size() - 1);
-                  mib = scan.ecurr.doubleReachability();
-                  esuccr = scan.esucc.doubleReachability();
+                  mib = scan.ecurr.getReachability();
+                  esuccr = scan.esucc.getReachability();
                 }
                 else {
                   // Stop looking after minpts non-up steps.
@@ -232,7 +232,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
             int cstart = sda.getStartIndex();
             int cend = sua.getEndIndex();
             // Hotfix: never include infinity-reachable points at the end
-            while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).doubleReachability())) {
+            while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).getReachability())) {
               --cend;
             }
             // However, we sometimes have to adjust this (Condition 4):
@@ -240,7 +240,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
               // Case b)
               if(sda.getMaximum() * ixi >= sua.getMaximum()) {
                 while(cstart < sda.getEndIndex()) {
-                  if(clusterOrder.get(cstart + 1).doubleReachability() > sua.getMaximum()) {
+                  if(clusterOrder.get(cstart + 1).getReachability() > sua.getMaximum()) {
                     cstart++;
                   }
                   else {
@@ -251,7 +251,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
               // Case c)
               else if(sua.getMaximum() * ixi >= sda.getMaximum()) {
                 while(cend > sua.getStartIndex()) {
-                  if(clusterOrder.get(cend - 1).doubleReachability() > sda.getMaximum()) {
+                  if(clusterOrder.get(cend - 1).getReachability() > sda.getMaximum()) {
                     cend--;
                   }
                   else {
@@ -303,7 +303,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     if(curclusters.size() > 0 || unclaimedids.size() > 0) {
       if(unclaimedids.size() > 0) {
         final Cluster<OPTICSModel> allcluster;
-        if(clusterOrder.get(clusterOrder.size() - 1).doubleReachability() >= Double.POSITIVE_INFINITY) {
+        if(clusterOrder.get(clusterOrder.size() - 1).getReachability() >= Double.POSITIVE_INFINITY) {
           allcluster = new Cluster<>("Noise", unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1));
         }
         else {
@@ -425,13 +425,13 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
      * @return truth value
      */
     public boolean steepUp(double ixi) {
-      if(ecurr.doubleReachability() >= Double.POSITIVE_INFINITY) {
+      if(ecurr.getReachability() >= Double.POSITIVE_INFINITY) {
         return false;
       }
       if(esucc == null) {
         return true;
       }
-      return ecurr.doubleReachability() <= esucc.doubleReachability() * ixi;
+      return ecurr.getReachability() <= esucc.getReachability() * ixi;
     }
 
     /**
@@ -444,10 +444,10 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       if(esucc == null) {
         return false;
       }
-      if(esucc.doubleReachability() >= Double.POSITIVE_INFINITY) {
+      if(esucc.getReachability() >= Double.POSITIVE_INFINITY) {
         return false;
       }
-      return ecurr.doubleReachability() * ixi >= esucc.doubleReachability();
+      return ecurr.getReachability() * ixi >= esucc.getReachability();
     }
   }
 

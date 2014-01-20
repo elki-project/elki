@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Distance functions valid in a database context only (i.e. for DBIDs)
@@ -39,10 +38,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.landmark
  * @apiviz.uses DBID oneway - - defined on
- * 
- * @param <D> Distance type
  */
-public interface DBIDDistanceFunction<D extends Distance<?>> extends DistanceFunction<DBID, D> {
+public interface DBIDDistanceFunction extends DistanceFunction<DBID> {
   /**
    * Returns the distance between the two objects specified by their object ids.
    * 
@@ -50,5 +47,5 @@ public interface DBIDDistanceFunction<D extends Distance<?>> extends DistanceFun
    * @param id2 second object id
    * @return the distance between the two objects specified by their object ids
    */
-  D distance(DBIDRef id1, DBIDRef id2);
+  double distance(DBIDRef id1, DBIDRef id2);
 }

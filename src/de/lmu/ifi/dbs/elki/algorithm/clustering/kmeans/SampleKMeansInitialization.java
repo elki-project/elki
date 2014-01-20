@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -54,11 +53,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector type
  */
-public class SampleKMeansInitialization<V extends NumberVector<?>, D extends Distance<?>> extends AbstractKMeansInitialization<V> {
+public class SampleKMeansInitialization<V extends NumberVector> extends AbstractKMeansInitialization<V> {
   /**
    * Variant of kMeans for the bisecting step.
    */
-  private KMeans<V, D, ?> innerkMeans;
+  private KMeans<V, ?> innerkMeans;
 
   /**
    * Sample size.
@@ -72,14 +71,14 @@ public class SampleKMeansInitialization<V extends NumberVector<?>, D extends Dis
    * @param innerkMeans Inner k-means algorithm.
    * @param rate Sampling rate.
    */
-  public SampleKMeansInitialization(RandomFactory rnd, KMeans<V, D, ?> innerkMeans, double rate) {
+  public SampleKMeansInitialization(RandomFactory rnd, KMeans<V, ?> innerkMeans, double rate) {
     super(rnd);
     this.innerkMeans = innerkMeans;
     this.rate = rate;
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     final int samplesize = (int) Math.ceil(rate * relation.size());
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), samplesize, rnd);
 
@@ -87,12 +86,10 @@ public class SampleKMeansInitialization<V extends NumberVector<?>, D extends Dis
     ProxyDatabase proxydb = new ProxyDatabase(sample, proxyv);
 
     innerkMeans.setK(k);
-    @SuppressWarnings("unchecked")
-    PrimitiveDistanceFunction<? super NumberVector<?>, D> df = (PrimitiveDistanceFunction<? super NumberVector<?>, D>) distanceFunction;
-    innerkMeans.setDistanceFunction(df);
+    innerkMeans.setDistanceFunction(distanceFunction);
     Clustering<? extends MeanModel<V>> clusters = innerkMeans.run(proxydb, proxyv);
     List<V> means = new ArrayList<>();
-    for (Cluster<? extends MeanModel<V>> cluster : clusters.getAllClusters()) {
+    for(Cluster<? extends MeanModel<V>> cluster : clusters.getAllClusters()) {
       means.add(cluster.getModel().getMean());
     }
 
@@ -107,9 +104,8 @@ public class SampleKMeansInitialization<V extends NumberVector<?>, D extends Dis
    * @apiviz.exclude
    * 
    * @param <V> Vector type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<?>> extends AbstractKMeansInitialization.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractKMeansInitialization.Parameterizer<V> {
     /**
      * Parameter to specify the kMeans variant.
      */
@@ -123,8 +119,8 @@ public class SampleKMeansInitialization<V extends NumberVector<?>, D extends Dis
     /**
      * Inner k-means algorithm to use.
      */
-    protected KMeans<V, D, ?> innerkMeans;
-    
+    protected KMeans<V, ?> innerkMeans;
+
     /**
      * Sampling rate.
      */
@@ -133,8 +129,8 @@ public class SampleKMeansInitialization<V extends NumberVector<?>, D extends Dis
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KMeans<V, D, ?>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class);
-      if (config.grab(kMeansVariantP)) {
+      ObjectParameter<KMeans<V, ?>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class);
+      if(config.grab(kMeansVariantP)) {
         ListParameterization kMeansVariantParameters = new ListParameterization();
 
         // We will always invoke this with k as requested from outside!
@@ -145,15 +141,15 @@ public class SampleKMeansInitialization<V extends NumberVector<?>, D extends Dis
         combinedConfig.errorsTo(config);
         innerkMeans = kMeansVariantP.instantiateClass(combinedConfig);
       }
-      
+
       DoubleParameter sampleP = new DoubleParameter(SAMPLE_ID);
-      if (config.grab(sampleP)) {
+      if(config.grab(sampleP)) {
         rate = sampleP.doubleValue();
       }
     }
 
     @Override
-    protected SampleKMeansInitialization<V, D> makeInstance() {
+    protected SampleKMeansInitialization<V> makeInstance() {
       return new SampleKMeansInitialization<>(rnd, innerkMeans, rate);
     }
   }

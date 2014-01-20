@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  */
 @Alias({ "arccos" })
-public class ArcCosineDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class ArcCosineDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance
    */
@@ -67,7 +67,7 @@ public class ArcCosineDistanceFunction extends AbstractSpatialDoubleDistanceFunc
    * @return the cosine distance for two given feature vectors v1 and v2
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     double d = Math.acos(VectorUtil.cosAngle(v1, v2));
     if (d < 0) {
       d = 0;
@@ -76,7 +76,7 @@ public class ArcCosineDistanceFunction extends AbstractSpatialDoubleDistanceFunc
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = Math.acos(VectorUtil.minCosAngle(mbr1, mbr2));
     if (d < 0) {
       d = 0;
@@ -101,7 +101,7 @@ public class ArcCosineDistanceFunction extends AbstractSpatialDoubleDistanceFunc
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 

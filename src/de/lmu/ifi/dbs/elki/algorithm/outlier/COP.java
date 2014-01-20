@@ -38,14 +38,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
@@ -84,11 +83,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
- * @param <D> Distance type
  */
 @Title("COP: Correlation Outlier Probability")
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", title = "Outlier Detection in Arbitrarily Oriented Subspaces", booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
-public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
+public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -209,7 +207,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @param dist Distance distribution model (ChiSquared, Gamma)
    * @param models Report models
    */
-  public COP(DistanceFunction<? super V, D> distanceFunction, int k, PCARunner<V> pca, double expect, DistanceDist dist, boolean models) {
+  public COP(DistanceFunction<? super V> distanceFunction, int k, PCARunner<V> pca, double expect, DistanceDist dist, boolean models) {
     super(distanceFunction);
     this.k = k;
     this.pca = pca;
@@ -226,7 +224,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    */
   public OutlierResult run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
-    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k + 1);
+    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k + 1);
 
     final int dim = RelationUtil.dimensionality(relation);
     if(k <= dim + 1) {
@@ -244,7 +242,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
 
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      KNNList<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
+      KNNList neighbors = knnQuery.getKNNForDBID(id, k + 1);
       ModifiableDBIDs nids = DBIDUtil.newHashSet(neighbors);
       nids.remove(id); // Do not use query object
 
@@ -360,7 +358,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its COP_SCORE, must be an integer greater than
@@ -461,7 +459,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     @Override
-    protected COP<V, D> makeInstance() {
+    protected COP<V> makeInstance() {
       return new COP<>(distanceFunction, k, pca, expect, dist, models);
     }
   }

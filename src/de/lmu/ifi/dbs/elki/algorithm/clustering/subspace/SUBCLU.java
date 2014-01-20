@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingSubspaceDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -85,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("SUBCLU: Density connected Subspace Clustering")
 @Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. SUBCLU delivers for each subspace the same clusters DBSCAN would have found, when applied to this subspace seperately.")
 @Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
-public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -125,12 +124,12 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * Holds the instance of the distance function specified by
    * {@link #DISTANCE_FUNCTION_ID}.
    */
-  private DimensionSelectingSubspaceDistanceFunction<V, DoubleDistance> distanceFunction;
+  private DimensionSelectingSubspaceDistanceFunction<V> distanceFunction;
 
   /**
    * Holds the value of {@link #EPSILON_ID}.
    */
-  private DoubleDistance epsilon;
+  private double epsilon;
 
   /**
    * Holds the value of {@link #MINPTS_ID}.
@@ -149,7 +148,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * @param epsilon Epsilon value
    * @param minpts Minpts value
    */
-  public SUBCLU(DimensionSelectingSubspaceDistanceFunction<V, DoubleDistance> distanceFunction, DoubleDistance epsilon, int minpts) {
+  public SUBCLU(DimensionSelectingSubspaceDistanceFunction<V> distanceFunction, double epsilon, int minpts) {
     super();
     this.distanceFunction = distanceFunction;
     this.epsilon = epsilon;
@@ -308,7 +307,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
 
     proxy = new ProxyDatabase(ids, relation);
 
-    DBSCAN<V, DoubleDistance> dbscan = new DBSCAN<>(distanceFunction, epsilon, minpts);
+    DBSCAN<V> dbscan = new DBSCAN<>(distanceFunction, epsilon, minpts);
     // run DBSCAN
     if(LOG.isVerbose()) {
       LOG.verbose("\nRun DBSCAN on subspace " + subspace.dimensonsToString());
@@ -467,22 +466,22 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     protected int minpts = 0;
 
-    protected DoubleDistance epsilon = null;
+    protected double epsilon;
 
-    protected DimensionSelectingSubspaceDistanceFunction<V, DoubleDistance> distance = null;
+    protected DimensionSelectingSubspaceDistanceFunction<V> distance = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DimensionSelectingSubspaceDistanceFunction<V, DoubleDistance>> param = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DimensionSelectingSubspaceDistanceFunction.class, SubspaceEuclideanDistanceFunction.class);
+      ObjectParameter<DimensionSelectingSubspaceDistanceFunction<V>> param = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DimensionSelectingSubspaceDistanceFunction.class, SubspaceEuclideanDistanceFunction.class);
       if(config.grab(param)) {
         distance = param.instantiateClass(config);
       }
 
-      DistanceParameter<DoubleDistance> epsilonP = new DistanceParameter<>(EPSILON_ID, distance);
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }

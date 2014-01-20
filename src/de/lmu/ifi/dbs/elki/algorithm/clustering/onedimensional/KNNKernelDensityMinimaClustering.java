@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  */
-public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<ClusterModel>> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
+public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends AbstractAlgorithm<Clustering<ClusterModel>> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
   /**
    * Class logger.
    */
@@ -293,7 +293,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector<?>> extends
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Dimension to use for clustering.
      */

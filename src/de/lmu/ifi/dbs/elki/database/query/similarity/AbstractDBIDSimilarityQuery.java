@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.query.similarity;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Run a database query in a database context.
@@ -33,9 +32,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <O> Database object type.
- * @param <D> Distance result type.
  */
-public abstract class AbstractDBIDSimilarityQuery<O, D extends Distance<D>> extends AbstractSimilarityQuery<O, D> {
+public abstract class AbstractDBIDSimilarityQuery<O> extends AbstractSimilarityQuery<O> {
   /**
    * Constructor.
    * 
@@ -46,17 +44,17 @@ public abstract class AbstractDBIDSimilarityQuery<O, D extends Distance<D>> exte
   }
 
   @Override
-  public D similarity(O o1, DBIDRef id2) {
+  public double similarity(O o1, DBIDRef id2) {
     throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");
   }
 
   @Override
-  public D similarity(DBIDRef id1, O o2) {
+  public double similarity(DBIDRef id1, O o2) {
     throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");
   }
 
   @Override
-  public D similarity(O o1, O o2) {
+  public double similarity(O o1, O o2) {
     throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");
   }
 }

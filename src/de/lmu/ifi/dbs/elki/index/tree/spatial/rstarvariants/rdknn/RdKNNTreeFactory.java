@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
@@ -48,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory<O, RdKNNNode<D>, RdKNNEntry<D>, RdKNNTree<O, D>, RdkNNSettings<O, D>> {
+public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RdKNNNode, RdKNNEntry, RdKNNTree<O>, RdkNNSettings<O>> {
   /**
    * Parameter for k
    */
@@ -70,18 +69,18 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
    * @param pageFileFactory Data storage
    * @param settings Settings class
    */
-  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, RdkNNSettings<O, D> settings) {
+  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, RdkNNSettings<O> settings) {
     super(pageFileFactory, settings);
   }
 
   @Override
-  public RdKNNTree<O, D> instantiate(Relation<O> relation) {
-    PageFile<RdKNNNode<D>> pagefile = makePageFile(getNodeClass());
-    RdKNNTree<O, D> index = new RdKNNTree<>(relation, pagefile, settings);
+  public RdKNNTree<O> instantiate(Relation<O> relation) {
+    PageFile<RdKNNNode> pagefile = makePageFile(getNodeClass());
+    RdKNNTree<O> index = new RdKNNTree<>(relation, pagefile, settings);
     return index;
   }
 
-  protected Class<RdKNNNode<D>> getNodeClass() {
+  protected Class<RdKNNNode> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(RdKNNNode.class);
   }
 
@@ -92,7 +91,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory.Parameterizer<O, RdkNNSettings<O, D>> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RdkNNSettings<O>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -102,19 +101,19 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
         settings.k_max = k_maxP.intValue();
       }
 
-      ObjectParameter<SpatialPrimitiveDistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      ObjectParameter<SpatialPrimitiveDistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       if(config.grab(distanceFunctionP)) {
         settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }
     }
 
     @Override
-    protected RdKNNTreeFactory<O, D> makeInstance() {
+    protected RdKNNTreeFactory<O> makeInstance() {
       return new RdKNNTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected RdkNNSettings<O, D> createSettings() {
+    protected RdkNNSettings<O> createSettings() {
       return new RdkNNSettings<>();
     }
   }

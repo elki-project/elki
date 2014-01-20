@@ -35,10 +35,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -46,7 +44,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -89,13 +86,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.has KNNQuery
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <D> Distance type
  */
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url = "http://dx.doi.org/10.1145/342009.335388")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LOF", "outlier.LOF", "LOF" })
-public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -112,7 +108,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
    * @param k the value of k
    * @param distanceFunction the neighborhood distance function
    */
-  public LOF(int k, DistanceFunction<? super O, D> distanceFunction) {
+  public LOF(int k, DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);
     this.k = k + 1;
   }
@@ -126,15 +122,15 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
-    DistanceQuery<O, D> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
     // "HEAVY" flag for knn query since it is used more than once
-    KNNQuery<O, D> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
         stepprog.beginStep(1, "Materializing LOF neighborhoods.", LOG);
       }
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
+      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       knnq = preproc.getKNNQuery(dq, k);
     }
     DBIDs ids = relation.getDBIDs();
@@ -173,39 +169,19 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
    * @param ids IDs to process
    * @param lrds Reachability storage
    */
-  private void computeLRDs(KNNQuery<O, D> knnq, DBIDs ids, WritableDoubleDataStore lrds) {
+  private void computeLRDs(KNNQuery<O> knnq, DBIDs ids, WritableDoubleDataStore lrds) {
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
+      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
       double sum = 0.0;
       int count = 0;
-      if(neighbors instanceof DoubleDistanceKNNList) {
-        // Fast version for double distances
-        for(DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-          if(DBIDUtil.equal(neighbor, iter)) {
-            continue;
-          }
-          KNNList<D> neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
-          final double nkdist;
-          if(neighborsNeighbors instanceof DoubleDistanceKNNList) {
-            nkdist = ((DoubleDistanceKNNList) neighborsNeighbors).doubleKNNDistance();
-          }
-          else {
-            nkdist = neighborsNeighbors.getKNNDistance().doubleValue();
-          }
-          sum += Math.max(neighbor.doubleDistance(), nkdist);
-          count++;
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        if(DBIDUtil.equal(neighbor, iter)) {
+          continue;
         }
-      }
-      else {
-        for(DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if(DBIDUtil.equal(neighbor, iter)) {
-            continue;
-          }
-          KNNList<D> neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
-          sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
-          count++;
-        }
+        KNNList neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
+        sum += Math.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
+        count++;
       }
       // Avoid division by 0
       final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
@@ -228,12 +204,12 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
    * @param lofs Local outlier factor storage
    * @param lofminmax Score minimum/maximum tracker
    */
-  private void computeLOFScores(KNNQuery<O, D> knnq, DBIDs ids, DoubleDataStore lrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
+  private void computeLOFScores(KNNQuery<O> knnq, DBIDs ids, DoubleDataStore lrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lof;
       final double lrdp = lrds.doubleValue(iter);
-      final KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
+      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
       if(!Double.isInfinite(lrdp)) {
         double sum = 0.0;
         int count = 0;
@@ -283,8 +259,10 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its LOF_SCORE, must be an integer greater than
@@ -309,7 +287,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBase
     }
 
     @Override
-    protected LOF<O, D> makeInstance() {
+    protected LOF<O> makeInstance() {
       return new LOF<>(k, distanceFunction);
     }
   }

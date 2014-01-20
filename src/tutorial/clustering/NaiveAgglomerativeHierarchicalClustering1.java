@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -69,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <O> Object type
  */
-public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, Result> {
+public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
   /**
    * Class logger
    */
@@ -86,7 +85,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
    * @param distanceFunction Distance function to use
    * @param numclusters Number of clusters
    */
-  public NaiveAgglomerativeHierarchicalClustering1(DistanceFunction<? super O, D> distanceFunction, int numclusters) {
+  public NaiveAgglomerativeHierarchicalClustering1(DistanceFunction<? super O> distanceFunction, int numclusters) {
     super(distanceFunction);
     this.numclusters = numclusters;
   }
@@ -99,7 +98,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
    * @return Clustering hierarchy
    */
   public Result run(Database db, Relation<O> relation) {
-    DistanceQuery<O, D> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -108,10 +107,10 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
     // Compute the initial distance matrix.
     double[][] matrix = new double[size][size];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
-    for (int x = 0; ix.valid(); x++, ix.advance()) {
+    for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
-      for (int y = 0; y < x; y++, iy.advance()) {
-        final double dist = dq.distance(ix, iy).doubleValue();
+      for(int y = 0; y < x; y++, iy.advance()) {
+        final double dist = dq.distance(ix, iy);
         matrix[x][y] = dist;
         matrix[y][x] = dist;
       }
@@ -129,18 +128,18 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
     // Repeat until everything merged, except the desired number of clusters:
     final int stop = size - numclusters;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", stop, LOG) : null;
-    for (int i = 0; i < stop; i++) {
+    for(int i = 0; i < stop; i++) {
       double min = Double.POSITIVE_INFINITY;
       int minx = -1, miny = -1;
-      for (int x = 0; x < size; x++) {
-        if (height[x] < Double.POSITIVE_INFINITY) {
+      for(int x = 0; x < size; x++) {
+        if(height[x] < Double.POSITIVE_INFINITY) {
           continue;
         }
-        for (int y = 0; y < x; y++) {
-          if (height[y] < Double.POSITIVE_INFINITY) {
+        for(int y = 0; y < x; y++) {
+          if(height[y] < Double.POSITIVE_INFINITY) {
             continue;
           }
-          if (matrix[x][y] < min) {
+          if(matrix[x][y] < min) {
             min = matrix[x][y];
             minx = x;
             miny = y;
@@ -158,36 +157,37 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
       // Merge into cluster
       ModifiableDBIDs cx = clusters.get(minx);
       ModifiableDBIDs cy = clusters.get(miny);
-      if (cy == null) {
+      if(cy == null) {
         cy = DBIDUtil.newHashSet();
         cy.add(iy);
       }
-      if (cx == null) {
+      if(cx == null) {
         cy.add(ix);
-      } else {
+      }
+      else {
         cy.addDBIDs(cx);
         clusters.remove(minx);
       }
       clusters.put(miny, cy);
       // Update distance matrix for y:
-      for (int j = 0; j < size; j++) {
+      for(int j = 0; j < size; j++) {
         matrix[j][miny] = Math.min(matrix[j][minx], matrix[j][miny]);
         matrix[miny][j] = Math.min(matrix[minx][j], matrix[miny][j]);
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(LOG);
     }
 
     // Build the clustering result
     final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");
-    for (int x = 0; x < size; x++) {
-      if (height[x] < Double.POSITIVE_INFINITY) {
+    for(int x = 0; x < size; x++) {
+      if(height[x] < Double.POSITIVE_INFINITY) {
         DBIDs cids = clusters.get(x);
-        if (cids == null) {
+        if(cids == null) {
           ix.seek(x);
           cids = DBIDUtil.deref(ix);
         }
@@ -215,9 +215,8 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
    * @author Erich Schubert
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Desired number of clusters.
      */
@@ -228,13 +227,13 @@ public class NaiveAgglomerativeHierarchicalClustering1<O, D extends NumberDistan
       super.makeOptions(config);
       IntParameter numclustersP = new IntParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID);
       numclustersP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if (config.grab(numclustersP)) {
+      if(config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
       }
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering1<O, D> makeInstance() {
+    protected NaiveAgglomerativeHierarchicalClustering1<O> makeInstance() {
       return new NaiveAgglomerativeHierarchicalClustering1<>(distanceFunction, numclusters);
     }
   }

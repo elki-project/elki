@@ -27,20 +27,18 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * A distance query serves as adapter layer for database and primitive distances.
+ * A distance query serves as adapter layer for database and primitive
+ * distances.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has Distance
  * 
  * @param O Input object type
- * @param D Distance result type
  */
-public interface DistanceQuery<O, D extends Distance<?>> extends DatabaseQuery {
+public interface DistanceQuery<O> extends DatabaseQuery {
   /**
    * Returns the distance between the two objects specified by their object ids.
    * 
@@ -48,7 +46,7 @@ public interface DistanceQuery<O, D extends Distance<?>> extends DatabaseQuery {
    * @param id2 second object id
    * @return the distance between the two objects specified by their object ids
    */
-  D distance(DBIDRef id1, DBIDRef id2);
+  double distance(DBIDRef id1, DBIDRef id2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.
@@ -57,7 +55,7 @@ public interface DistanceQuery<O, D extends Distance<?>> extends DatabaseQuery {
    * @param id2 second object id
    * @return the distance between the two objects specified by their object ids
    */
-  D distance(O o1, DBIDRef id2);
+  double distance(O o1, DBIDRef id2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.
@@ -66,7 +64,7 @@ public interface DistanceQuery<O, D extends Distance<?>> extends DatabaseQuery {
    * @param o2 second object
    * @return the distance between the two objects specified by their object ids
    */
-  D distance(DBIDRef id1, O o2);
+  double distance(DBIDRef id1, O o2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.
@@ -75,43 +73,15 @@ public interface DistanceQuery<O, D extends Distance<?>> extends DatabaseQuery {
    * @param o2 second object
    * @return the distance between the two objects specified by their object ids
    */
-  D distance(O o1, O o2);
-
-  /**
-   * Method to get the distance functions factory.
-   * 
-   * @return Factory for distance objects
-   */
-  D getDistanceFactory();
+  double distance(O o1, O o2);
 
   /**
    * Get the inner distance function.
    * 
    * @return Distance function
    */
-  DistanceFunction<? super O, D> getDistanceFunction();
+  DistanceFunction<? super O> getDistanceFunction();
 
-  /**
-   * Provides an infinite distance.
-   * 
-   * @return an infinite distance
-   */
-  D infiniteDistance();
-
-  /**
-   * Provides a null distance.
-   * 
-   * @return a null distance
-   */
-  D nullDistance();
-
-  /**
-   * Provides an undefined distance.
-   * 
-   * @return an undefined distance
-   */
-  D undefinedDistance();
-  
   /**
    * Access the underlying data query.
    * 

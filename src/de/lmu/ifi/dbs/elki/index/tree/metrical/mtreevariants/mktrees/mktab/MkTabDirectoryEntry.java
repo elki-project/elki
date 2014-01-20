@@ -113,7 +113,6 @@ class MkTabDirectoryEntry extends MTreeDirectoryEntry implements MkTabEntry {
    *         cannot be found.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     int k_max = in.readInt();
@@ -132,7 +131,6 @@ class MkTabDirectoryEntry extends MTreeDirectoryEntry implements MkTabEntry {
    *         knnDistances as this entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
     if (this == o) {
       return true;

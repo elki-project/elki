@@ -1,0 +1,179 @@
+package de.lmu.ifi.dbs.elki.database.ids.integer;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+
+/**
+ * Sublist of an existing result to contain only the first k elements.
+ * 
+ * @author Erich Schubert
+ */
+public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
+  /**
+   * Parameter k.
+   */
+  private final int k;
+
+  /**
+   * Actual size, including ties.
+   */
+  private final int size;
+
+  /**
+   * Wrapped inner result.
+   */
+  private final IntegerDBIDKNNList inner;
+
+  /**
+   * Constructor.
+   * 
+   * @param inner Inner instance
+   * @param k k value
+   */
+  public IntegerDBIDKNNSubList(IntegerDBIDKNNList inner, int k) {
+    this.inner = inner;
+    this.k = k;
+    // Compute list size
+    if(k < inner.getK()) {
+      DoubleIntegerDBIDListIter iter = inner.iter();
+      iter.seek(k);
+      double dist = iter.doubleValue();
+      int i = k;
+      while(iter.valid()) {
+        iter.advance();
+        if(dist < iter.doubleValue()) {
+          break;
+        }
+        i++;
+      }
+      size = i;
+    }
+    else {
+      size = inner.size();
+    }
+  }
+
+  @Override
+  public int getK() {
+    return k;
+  }
+
+  @Override
+  public DoubleIntegerDBIDPair get(int index) {
+    assert (index < size) : "Access beyond design size of list.";
+    return inner.get(index);
+  }
+
+  @Override
+  public double getKNNDistance() {
+    return inner.get(k).doubleValue();
+  }
+
+  @Override
+  public DoubleIntegerDBIDListIter iter() {
+    return new Itr();
+  }
+
+  @Override
+  public boolean contains(DBIDRef o) {
+    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if(DBIDUtil.equal(iter, o)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return size == 0;
+  }
+
+  @Override
+  public int size() {
+    return size;
+  }
+
+  /**
+   * Iterator for the sublist.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private class Itr implements DoubleIntegerDBIDListIter {
+    /**
+     * Current position.
+     */
+    private int pos = 0;
+
+    @Override
+    public boolean valid() {
+      return pos < size;
+    }
+
+    @Override
+    public void advance() {
+      pos++;
+    }
+
+    @Override
+    public double doubleValue() {
+      return inner.get(pos).doubleValue();
+    }
+
+    @Override
+    public DoubleDBIDPair getPair() {
+      return inner.get(pos);
+    }
+
+    @Override
+    public int internalGetIndex() {
+      return inner.get(pos).internalGetIndex();
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      --pos;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
+    }
+  }
+}

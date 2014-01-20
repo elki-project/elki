@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.similarity.AbstractDBIDSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -44,9 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> object type
  * @param <I> index type
- * @param <D> distance type
  */
-public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index, R, D extends Distance<D>> implements IndexBasedSimilarityFunction<O, D> {
+public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index> implements IndexBasedSimilarityFunction<O> {
   /**
    * Parameter to specify the preprocessor to be used.
    * <p>
@@ -74,7 +72,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index, R
   }
 
   @Override
-  abstract public <T extends O> Instance<T, ?, R, D> instantiate(Relation<T> database);
+  abstract public <T extends O> Instance<T, ?> instantiate(Relation<T> database);
 
   @Override
   public boolean isSymmetric() {
@@ -95,9 +93,8 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index, R
    * 
    * @param <O> Object type
    * @param <I> Index type
-   * @param <D> Distance result type
    */
-  abstract public static class Instance<O, I extends Index, R, D extends Distance<D>> extends AbstractDBIDSimilarityQuery<O, D> implements IndexBasedSimilarityFunction.Instance<O, I, D> {
+  abstract public static class Instance<O, I extends Index> extends AbstractDBIDSimilarityQuery<O> implements IndexBasedSimilarityFunction.Instance<O, I> {
     /**
      * Parent index
      */

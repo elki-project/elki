@@ -30,8 +30,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -66,7 +67,7 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
   /**
    * Distance function to use.
    */
-  PrimitiveDoubleDistanceFunction<? super O> dist = null;
+  PrimitiveDistanceFunction<? super O> dist = null;
 
   /**
    * Target dimensionality
@@ -79,7 +80,7 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
    * @param tdim Target dimensionality.
    * @param dist Distance function to use.
    */
-  public ClassicMultidimensionalScalingTransform(int tdim, PrimitiveDoubleDistanceFunction<? super O> dist) {
+  public ClassicMultidimensionalScalingTransform(int tdim, PrimitiveDistanceFunction<? super O> dist) {
     super();
     this.tdim = tdim;
     this.dist = dist;
@@ -105,14 +106,14 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
       // Get the replacement type information
       @SuppressWarnings("unchecked")
       final List<O> castColumn = (List<O>) column;
-      NumberVector.Factory<? extends NumberVector<?>, ?> factory = null;
+      NumberVector.Factory<? extends NumberVector> factory = null;
       {
         if (type instanceof VectorFieldTypeInformation) {
           final VectorFieldTypeInformation<?> ctype = (VectorFieldTypeInformation<?>) type;
           // Note two-step cast, to make stricter compilers happy.
           @SuppressWarnings("unchecked")
-          final VectorFieldTypeInformation<? extends NumberVector<?>> vtype = (VectorFieldTypeInformation<? extends NumberVector<?>>) ctype;
-          factory = (NumberVector.Factory<? extends NumberVector<?>, ?>) vtype.getFactory();
+          final VectorFieldTypeInformation<? extends NumberVector> vtype = (VectorFieldTypeInformation<? extends NumberVector>) ctype;
+          factory = FilterUtil.guessFactory(vtype);
         } else {
           factory = DoubleVector.FACTORY;
         }
@@ -128,7 +129,7 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
           final O ox = castColumn.get(x);
           for (int y = x + 1; y < size; y++) {
             final O oy = castColumn.get(y);
-            double distance = Math.abs(dist.doubleDistance(ox, oy));
+            double distance = Math.abs(dist.distance(ox, oy));
             imat[x][y] = distance;
             if (dprog != null) {
               dprog.incrementProcessed(LOG);
@@ -230,7 +231,7 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**
      * Desired dimensionality.
      */
@@ -249,7 +250,7 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
     /**
      * Distance function to use.
      */
-    PrimitiveDoubleDistanceFunction<? super O> dist = null;
+    PrimitiveDistanceFunction<? super O> dist = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -260,7 +261,7 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
         tdim = dimP.intValue();
       }
 
-      ObjectParameter<PrimitiveDoubleDistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDoubleDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if (config.grab(distP)) {
         dist = distP.instantiateClass(config);
       }

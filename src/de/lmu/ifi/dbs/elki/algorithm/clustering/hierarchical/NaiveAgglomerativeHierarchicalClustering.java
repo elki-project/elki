@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDistanceDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -40,8 +40,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -82,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  */
 @Reference(authors = "G. N. Lance and W. T. Williams", title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", booktitle = "The computer journal 9.4", url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
-public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, PointerHierarchyRepresentationResult<DoubleDistance>> implements HierarchicalClusteringAlgorithm<DoubleDistance> {
+public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -99,7 +97,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
    * @param distanceFunction Distance function to use
    * @param linkage Linkage method
    */
-  public NaiveAgglomerativeHierarchicalClustering(DistanceFunction<? super O, D> distanceFunction, LinkageMethod linkage) {
+  public NaiveAgglomerativeHierarchicalClustering(DistanceFunction<? super O> distanceFunction, LinkageMethod linkage) {
     super(distanceFunction);
     this.linkage = linkage;
   }
@@ -111,8 +109,8 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult<DoubleDistance> run(Database db, Relation<O> relation) {
-    DistanceQuery<O, D> dq = db.getDistanceQuery(relation, getDistanceFunction());
+  public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -131,7 +129,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     boolean square = WardLinkageMethod.class.isInstance(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
     for (ix.seek(0); ix.valid(); ix.advance()) {
       for (iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
-        scratch[pos] = dq.distance(ix, iy).doubleValue();
+        scratch[pos] = dq.distance(ix, iy);
         // Ward uses variances -- i.e. squared values
         if (square) {
           scratch[pos] *= scratch[pos];
@@ -142,7 +140,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
 
     // Initialize space for result:
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDoubleDistanceDataStore lambda = DataStoreUtil.makeDoubleDistanceStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableIntegerDataStore csize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       pi.put(it, it);
@@ -230,7 +228,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
       prog.ensureCompleted(LOG);
     }
 
-    return new PointerHierarchyRepresentationResult<>(ids, pi, lambda);
+    return new PointerHierarchyRepresentationResult(ids, pi, lambda);
   }
 
   /**
@@ -241,11 +239,6 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
    */
   protected static int triangleSize(int x) {
     return (x * (x - 1)) >>> 1;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   @Override
@@ -267,9 +260,8 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
    * @apiviz.exclude
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Option ID for linkage parameter.
      */
@@ -283,7 +275,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     @Override
     protected void makeOptions(Parameterization config) {
       // We don't call super, because we want a different default distance.
-      ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, DistanceFunction.class);
       if (config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
@@ -296,7 +288,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O, D extends NumberDistanc
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering<O, D> makeInstance() {
+    protected NaiveAgglomerativeHierarchicalClustering<O> makeInstance() {
       return new NaiveAgglomerativeHierarchicalClustering<>(distanceFunction, linkage);
     }
   }

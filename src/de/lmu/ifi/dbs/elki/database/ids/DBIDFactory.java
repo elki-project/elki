@@ -23,13 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 
@@ -132,25 +126,6 @@ public interface DBIDFactory {
   DoubleDBIDPair newPair(double val, DBIDRef id);
 
   /**
-   * Make a new distance-DBID pair.
-   * 
-   * @param val Distance value
-   * @param id Object ID
-   * @param <D> Distance type
-   * @return New pair
-   */
-  <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id);
-
-  /**
-   * Make a new distance-DBID pair.
-   * 
-   * @param val Distance value
-   * @param id Object ID
-   * @return New pair
-   */
-  DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id);
-
-  /**
    * Make a new (modifiable) array of DBIDs.
    * 
    * @return New array
@@ -197,33 +172,20 @@ public interface DBIDFactory {
   HashSetModifiableDBIDs newHashSet(DBIDs existing);
 
   /**
-   * Create an appropriate heap for the distance function.
+   * Create an heap for kNN search.
    * 
-   * This will use a double heap if appropriate.
-   * 
-   * @param factory distance prototype
    * @param k K value
-   * @param <D> distance type
-   * @return New heap of size k, appropriate for this distance type.
+   * @return New heap of size k.
    */
-  <D extends Distance<D>> KNNHeap<D> newHeap(D factory, int k);
+  KNNHeap newHeap(int k);
 
   /**
    * Build a new heap from a given list.
    * 
    * @param exist Existing result
-   * @param <D> Distance type
    * @return New heap
    */
-  <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist);
-
-  /**
-   * Create an appropriate heap for double distances.
-   * 
-   * @param k K value
-   * @return New heap of size k, appropriate for this distance type.
-   */
-  DoubleDistanceKNNHeap newDoubleDistanceHeap(int k);
+  KNNHeap newHeap(KNNList exist);
 
   /**
    * Get a serializer for DBIDs.
@@ -278,4 +240,19 @@ public interface DBIDFactory {
    * @return Invalid value
    */
   DBIDRef invalid();
+
+  /**
+   * Create a modifiable list to store distance-DBID pairs.
+   * 
+   * @param size initial size estimate
+   * @return New list of given initial size
+   */
+  ModifiableDoubleDBIDList newDistanceDBIDList(int size);
+
+  /**
+   * Create a modifiable list to store distance-DBID pairs.
+   * 
+   * @return New list
+   */
+  ModifiableDoubleDBIDList newDistanceDBIDList();
 }

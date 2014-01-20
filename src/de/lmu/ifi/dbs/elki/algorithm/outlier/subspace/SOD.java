@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -90,12 +89,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has SharedNearestNeighborSimilarityFunction
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
- * @param <D> distance type
  */
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
-public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -114,7 +112,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   /**
    * Similarity function to use.
    */
-  private SimilarityFunction<V, D> similarityFunction;
+  private SimilarityFunction<V> similarityFunction;
 
   /**
    * Report models.
@@ -129,7 +127,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @param similarityFunction Shared nearest neighbor similarity function
    * @param models Report generated models
    */
-  public SOD(int knn, double alpha, SimilarityFunction<V, D> similarityFunction, boolean models) {
+  public SOD(int knn, double alpha, SimilarityFunction<V> similarityFunction, boolean models) {
     super();
     this.knn = knn;
     this.alpha = alpha;
@@ -144,7 +142,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @return Outlier result
    */
   public OutlierResult run(Relation<V> relation) {
-    SimilarityQuery<V, D> snnInstance = similarityFunction.instantiate(relation);
+    SimilarityQuery<V> snnInstance = similarityFunction.instantiate(relation);
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), LOG) : null;
     final WritableDoubleDataStore sod_scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     WritableDataStore<SODModel> sod_models = null;
@@ -213,13 +211,13 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @return the k nearest neighbors in terms of the shared nearest neighbor
    *         distance without the query object
    */
-  private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBIDRef queryObject) {
+  private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V> simQ, DBIDRef queryObject) {
     Heap<DoubleDBIDPair> nearestNeighbors = new TiedTopBoundedHeap<>(knn);
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       if(DBIDUtil.equal(iter, queryObject)) {
         continue;
       }
-      double sim = simQ.similarity(queryObject, iter).doubleValue();
+      double sim = simQ.similarity(queryObject, iter);
       if(sim > 0.) {
         nearestNeighbors.add(DBIDUtil.newPair(sim, iter));
       }
@@ -240,11 +238,11 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @param neighborhood Neighbors
    * @return Per-dimension variances.
    */
-  private static double[] computePerDimensionVariances(Relation<? extends NumberVector<?>> relation, Vector center, DBIDs neighborhood) {
+  private static double[] computePerDimensionVariances(Relation<? extends NumberVector> relation, Vector center, DBIDs neighborhood) {
     double[] c = center.getArrayRef();
     double[] variances = new double[c.length];
     for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
-      NumberVector<?> databaseObject = relation.get(iter);
+      NumberVector databaseObject = relation.get(iter);
       for(int d = 0; d < c.length; d++) {
         final double deviation = databaseObject.doubleValue(d) - c[d];
         variances[d] += deviation * deviation;
@@ -270,9 +268,9 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       return 0;
     }
     final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(weightVector);
-    double distance = df.distance(queryObject, center).doubleValue();
-    distance /= card; // FIXME: defined as card, should be sqrt(card),
-                      // unfortunately
+    double distance = df.distance(queryObject, center);
+    distance /= card; // FIXME: defined and published as card, should be
+                      // sqrt(card), unfortunately
     return distance;
   }
 
@@ -329,7 +327,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter to specify the number of shared nearest neighbors to be
      * considered for learning the subspace properties., must be an integer
@@ -366,7 +364,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     /**
      * The similarity function.
      */
-    private SimilarityFunction<V, D> similarityFunction;
+    private SimilarityFunction<V> similarityFunction;
 
     /**
      * Track models.
@@ -376,7 +374,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<SimilarityFunction<V, D>> simP = new ObjectParameter<>(SIM_ID, SimilarityFunction.class, SharedNearestNeighborSimilarityFunction.class);
+      final ObjectParameter<SimilarityFunction<V>> simP = new ObjectParameter<>(SIM_ID, SimilarityFunction.class, SharedNearestNeighborSimilarityFunction.class);
       if(config.grab(simP)) {
         similarityFunction = simP.instantiateClass(config);
       }
@@ -400,7 +398,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     @Override
-    protected SOD<V, D> makeInstance() {
+    protected SOD<V> makeInstance() {
       return new SOD<>(knn, alpha, similarityFunction, models);
     }
   }

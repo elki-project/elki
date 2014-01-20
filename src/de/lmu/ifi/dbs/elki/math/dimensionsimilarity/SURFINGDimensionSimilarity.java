@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -69,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.uses SubspaceEuclideanDistanceFunction
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
-public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
+public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**
    * Static instance.
    */
@@ -84,7 +83,7 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
 
   @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", title = "Subspace Selection for Clustering High-Dimensional Data", booktitle = "IEEE International Conference on Data Mining, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10112")
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     Mean kdistmean = new Mean();
     final int k = Math.max(1, subset.size() / 10);
@@ -99,13 +98,13 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
         long[] dims = BitsUtil.zero(dim);
         BitsUtil.setI(dims, i);
         BitsUtil.setI(dims, j);
-        DistanceQuery<? extends NumberVector<?>, DoubleDistance> dq = database.getDistanceQuery(relation, new SubspaceEuclideanDistanceFunction(dims));
-        KNNQuery<? extends NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(dq, k);
+        DistanceQuery<? extends NumberVector> dq = database.getDistanceQuery(relation, new SubspaceEuclideanDistanceFunction(dims));
+        KNNQuery<? extends NumberVector> knnq = database.getKNNQuery(dq, k);
 
         kdistmean.reset();
         int knn = 0;
         for(DBIDIter id1 = subset.iter(); id1.valid(); id1.advance(), knn++) {
-          final double kdist = knnq.getKNNForDBID(id1, k).getKNNDistance().doubleValue();
+          final double kdist = knnq.getKNNForDBID(id1, k).getKNNDistance();
           kdistmean.put(kdist);
           knns[knn] = kdist;
         }

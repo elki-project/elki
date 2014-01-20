@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -43,8 +43,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -72,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @apiviz.uses KNNQuery
  */
-public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, Result> {
+public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
   /**
    * The logger for this class.
    */
@@ -119,7 +117,7 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
    * @param forcelinear Force the use of linear scanning.
    * @param pattern
    */
-  public ValidateApproximativeKNNIndex(DistanceFunction<? super O, D> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
+  public ValidateApproximativeKNNIndex(DistanceFunction<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
     super(distanceFunction);
     this.k = k;
     this.queries = queries;
@@ -138,14 +136,14 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
    */
   public Result run(Database database, Relation<O> relation) {
     // Get a distance and kNN query instance.
-    DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     // Approximate query:
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(distQuery, k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
     if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
       throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
     }
     // Exact query:
-    KNNQuery<O, D> truekNNQuery;
+    KNNQuery<O> truekNNQuery;
     if(forcelinear) {
       truekNNQuery = QueryUtil.getLinearScanKNNQuery(distQuery);
     }
@@ -180,9 +178,9 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
       for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         if(pattern == null || pattern.matcher(lrel.get(iditer)).find()) {
           // Query index:
-          KNNList<D> knns = knnQuery.getKNNForDBID(iditer, k);
+          KNNList knns = knnQuery.getKNNForDBID(iditer, k);
           // Query reference:
-          KNNList<D> trueknns = truekNNQuery.getKNNForDBID(iditer, k);
+          KNNList trueknns = truekNNQuery.getKNNForDBID(iditer, k);
 
           // Put adjusted knn size:
           mv.put(knns.size() * k / (double) trueknns.size());
@@ -191,15 +189,12 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
           mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / trueknns.size());
 
           if(knns.size() >= k) {
-            D kdist = knns.getKNNDistance();
-            if(kdist instanceof NumberDistance) {
-              final double dist = ((NumberDistance<?, ?>) kdist).doubleValue();
-              final double tdist = ((NumberDistance<?, ?>) trueknns.getKNNDistance()).doubleValue();
-              if(tdist > 0.0) {
-                mvdist.put(dist);
-                mvdaerr.put(dist - tdist);
-                mvdrerr.put(dist / tdist);
-              }
+            double kdist = knns.getKNNDistance();
+            final double tdist = trueknns.getKNNDistance();
+            if(tdist > 0.0) {
+              mvdist.put(kdist);
+              mvdaerr.put(kdist - tdist);
+              mvdrerr.put(kdist / tdist);
             }
           }
           else {
@@ -268,9 +263,9 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         O o = (O) bundle.data(off, col);
 
         // Query index:
-        KNNList<D> knns = knnQuery.getKNNForObject(o, k);
+        KNNList knns = knnQuery.getKNNForObject(o, k);
         // Query reference:
-        KNNList<D> trueknns = truekNNQuery.getKNNForObject(o, k);
+        KNNList trueknns = truekNNQuery.getKNNForObject(o, k);
 
         // Put adjusted knn size:
         mv.put(knns.size() * k / (double) trueknns.size());
@@ -279,15 +274,12 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
         mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / trueknns.size());
 
         if(knns.size() >= k) {
-          D kdist = knns.getKNNDistance();
-          if(kdist instanceof NumberDistance) {
-            final double dist = ((NumberDistance<?, ?>) kdist).doubleValue();
-            final double tdist = ((NumberDistance<?, ?>) trueknns.getKNNDistance()).doubleValue();
-            if(tdist > 0.0) {
-              mvdist.put(dist);
-              mvdaerr.put(dist - tdist);
-              mvdrerr.put(dist / tdist);
-            }
+          double kdist = knns.getKNNDistance();
+          final double tdist = trueknns.getKNNDistance();
+          if(tdist > 0.0) {
+            mvdist.put(kdist);
+            mvdaerr.put(kdist - tdist);
+            mvdrerr.put(kdist / tdist);
           }
         }
         else {
@@ -334,9 +326,8 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
    * @author Erich Schubert
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter for the number of neighbors.
      */
@@ -432,7 +423,7 @@ public class ValidateApproximativeKNNIndex<O, D extends Distance<D>> extends Abs
     }
 
     @Override
-    protected ValidateApproximativeKNNIndex<O, D> makeInstance() {
+    protected ValidateApproximativeKNNIndex<O> makeInstance() {
       return new ValidateApproximativeKNNIndex<>(distanceFunction, k, queries, sampling, forcelinear, random, pattern);
     }
   }

@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  */
 @Alias({ "cosine" })
-public class CosineDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class CosineDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance
    */
@@ -67,7 +67,7 @@ public class CosineDistanceFunction extends AbstractSpatialDoubleDistanceFunctio
    * @return the cosine distance for two given feature vectors v1 and v2
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     double d = 1 - VectorUtil.cosAngle(v1, v2);
     if (d < 0) {
       d = 0;
@@ -76,7 +76,7 @@ public class CosineDistanceFunction extends AbstractSpatialDoubleDistanceFunctio
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = 1 - VectorUtil.minCosAngle(mbr1, mbr2);
     if (d < 0) {
       d = 0;
@@ -101,7 +101,7 @@ public class CosineDistanceFunction extends AbstractSpatialDoubleDistanceFunctio
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 

@@ -36,20 +36,16 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -59,7 +55,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMaxHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -97,7 +93,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Fast Outlier Detection in High Dimensional Spaces")
 @Description("Algorithm to compute outliers using Hilbert space filling curves")
 @Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", url = "http://dx.doi.org/10.1145/375663.375668")
-public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> implements OutlierAlgorithm {
+public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -131,7 +127,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
   /**
    * Distance query
    */
-  private DistanceQuery<O, DoubleDistance> distq;
+  private DistanceQuery<O> distq;
 
   /**
    * Set sizes, total and current iteration
@@ -142,13 +138,6 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
    * Outlier threshold
    */
   private double omega_star;
-
-  // public int distcomp = 1;
-  
-  /**
-   * Comparator for sorting the heaps.
-   */
-  private static final Comparator<? super DistanceDBIDPair<?>> COMPARATOR = DistanceDBIDResultUtil.distanceComparator();
 
   /**
    * Type of output: all scores (upper bounds) or top n only
@@ -193,18 +182,18 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       Pair<O, O> hbbs = DatabaseUtil.computeMinMax(relation);
       min = new double[d];
       double[] max = new double[d];
-      for (int i = 0; i < d; i++) {
+      for(int i = 0; i < d; i++) {
         min[i] = hbbs.first.doubleValue(i);
         max[i] = hbbs.second.doubleValue(i);
         diameter = Math.max(diameter, max[i] - min[i]);
       }
       // Enlarge bounding box to have equal lengths.
-      for (int i = 0; i < d; i++) {
+      for(int i = 0; i < d; i++) {
         double diff = (diameter - (max[i] - min[i])) * .5;
         min[i] -= diff;
         max[i] += diff;
       }
-      if (LOG.isVerbose()) {
+      if(LOG.isVerbose()) {
         LOG.verbose("Rescaling dataset by " + (1 / diameter) + " to fit the unit cube.");
       }
     }
@@ -216,7 +205,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
     FiniteProgress progressHilOut = LOG.isVerbose() ? new FiniteProgress("HilOut iterations", d + 1, LOG) : null;
     FiniteProgress progressTrueOut = LOG.isVerbose() ? new FiniteProgress("True outliers found", n, LOG) : null;
     // Main part: 1. Phase max. d+1 loops
-    for (int j = 0; j <= d && n_star < n; j++) {
+    for(int j = 0; j <= d && n_star < n; j++) {
       // initialize (clear) out and wlb - not 100% clear in the paper
       h.out.clear();
       h.wlb.clear();
@@ -226,51 +215,51 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       scan(h, (int) (k * capital_n / (double) capital_n_star));
       // determine the true outliers (n_star)
       trueOutliers(h);
-      if (progressTrueOut != null) {
+      if(progressTrueOut != null) {
         progressTrueOut.setProcessed(n_star, LOG);
       }
       // Build the top Set as out + wlb
       h.top.clear();
       HashSetModifiableDBIDs top_keys = DBIDUtil.newHashSet(h.out.size());
-      for (ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
+      for(ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
         HilFeature entry = iter.get();
         top_keys.add(entry.id);
         h.top.add(entry);
       }
-      for (ObjectHeap.UnsortedIter<HilFeature> iter = h.wlb.unsortedIter(); iter.valid(); iter.advance()) {
+      for(ObjectHeap.UnsortedIter<HilFeature> iter = h.wlb.unsortedIter(); iter.valid(); iter.advance()) {
         HilFeature entry = iter.get();
-        if (!top_keys.contains(entry.id)) {
+        if(!top_keys.contains(entry.id)) {
           // No need to update top_keys - discarded
           h.top.add(entry);
         }
       }
-      if (progressHilOut != null) {
+      if(progressHilOut != null) {
         progressHilOut.incrementProcessed(LOG);
       }
     }
     // 2. Phase: Additional Scan if less than n true outliers determined
-    if (n_star < n) {
+    if(n_star < n) {
       h.out.clear();
       h.wlb.clear();
       // TODO: reinitialize shift to 0?
       scan(h, capital_n);
     }
-    if (progressHilOut != null) {
+    if(progressHilOut != null) {
       progressHilOut.setProcessed(d, LOG);
       progressHilOut.ensureCompleted(LOG);
     }
-    if (progressTrueOut != null) {
+    if(progressTrueOut != null) {
       progressTrueOut.setProcessed(n, LOG);
       progressTrueOut.ensureCompleted(LOG);
     }
     DoubleMinMax minmax = new DoubleMinMax();
     // Return weights in out
-    if (tn == ScoreType.TopN) {
+    if(tn == ScoreType.TopN) {
       minmax.put(0.0);
-      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         hilout_weight.putDouble(iditer, 0.0);
       }
-      for (ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
+      for(ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
         HilFeature ent = iter.get();
         minmax.put(ent.ubound);
         hilout_weight.putDouble(ent.id, ent.ubound);
@@ -278,7 +267,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
     }
     // Return all weights in pf
     else {
-      for (HilFeature ent : h.pf) {
+      for(HilFeature ent : h.pf) {
         minmax.put(ent.ubound);
         hilout_weight.putDouble(ent.id, ent.ubound);
       }
@@ -297,35 +286,37 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
    */
   private void scan(HilbertFeatures hf, int k0) {
     final int mink0 = Math.min(2 * k0, capital_n - 1);
-    if (LOG.isDebuggingFine()) {
+    if(LOG.isDebuggingFine()) {
       LOG.debugFine("Scanning with k0=" + k0 + " (" + mink0 + ")" + " N*=" + capital_n_star);
     }
-    for (int i = 0; i < hf.pf.length; i++) {
-      if (hf.pf[i].ubound < omega_star) {
+    for(int i = 0; i < hf.pf.length; i++) {
+      if(hf.pf[i].ubound < omega_star) {
         continue;
       }
-      if (hf.pf[i].lbound < hf.pf[i].ubound) {
+      if(hf.pf[i].lbound < hf.pf[i].ubound) {
         double omega = hf.fastUpperBound(i);
-        if (omega < omega_star) {
+        if(omega < omega_star) {
           hf.pf[i].ubound = omega;
-        } else {
+        }
+        else {
           int maxcount;
           // capital_n-1 instead of capital_n: all, except self
-          if (hf.top.contains(hf.pf[i])) {
+          if(hf.top.contains(hf.pf[i])) {
             maxcount = capital_n - 1;
-          } else {
+          }
+          else {
             maxcount = mink0;
           }
           innerScan(hf, i, maxcount);
         }
       }
-      if (hf.pf[i].ubound > 0) {
+      if(hf.pf[i].ubound > 0) {
         hf.updateOUT(i);
       }
-      if (hf.pf[i].lbound > 0) {
+      if(hf.pf[i].lbound > 0) {
         hf.updateWLB(i);
       }
-      if (hf.wlb.size() >= n) {
+      if(hf.wlb.size() >= n) {
         omega_star = Math.max(omega_star, hf.wlb.peek().lbound);
       }
     }
@@ -344,40 +335,43 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
     int a = i, b = i;
     int level = h, levela = h, levelb = h;
     // Explore up to "maxcount" neighbors in this pass
-    for (int count = 0; count < maxcount; count++) {
+    for(int count = 0; count < maxcount; count++) {
       final int c; // Neighbor to explore
-      if (a == 0) { // At left end, explore right
-        // assert (b < capital_n - 1);
-        levelb = Math.min(levelb, hf.pf[b].level);
-        b++;
-        c = b;
-      } else if (b >= capital_n - 1) { // At right end, explore left
-        // assert (a > 0);
-        a--;
-        levela = Math.min(levela, hf.pf[a].level);
-        c = a;
-      } else if (hf.pf[a - 1].level >= hf.pf[b].level) { // Prefer higher level
-        a--;
-        levela = Math.min(levela, hf.pf[a].level);
-        c = a;
-      } else {
+      if(a == 0) { // At left end, explore right
         // assert (b < capital_n - 1);
         levelb = Math.min(levelb, hf.pf[b].level);
         b++;
         c = b;
       }
-      if (!hf.pf[i].nn_keys.contains(hf.pf[c].id)) {
+      else if(b >= capital_n - 1) { // At right end, explore left
+        // assert (a > 0);
+        a--;
+        levela = Math.min(levela, hf.pf[a].level);
+        c = a;
+      }
+      else if(hf.pf[a - 1].level >= hf.pf[b].level) { // Prefer higher level
+        a--;
+        levela = Math.min(levela, hf.pf[a].level);
+        c = a;
+      }
+      else {
+        // assert (b < capital_n - 1);
+        levelb = Math.min(levelb, hf.pf[b].level);
+        b++;
+        c = b;
+      }
+      if(!hf.pf[i].nn_keys.contains(hf.pf[c].id)) {
         // hf.distcomp ++;
-        hf.pf[i].insert(hf.pf[c].id, distq.distance(p, hf.pf[c].id).doubleValue(), k);
-        if (hf.pf[i].nn.size() == k) {
-          if (hf.pf[i].sum_nn < omega_star) {
+        hf.pf[i].insert(hf.pf[c].id, distq.distance(p, hf.pf[c].id), k);
+        if(hf.pf[i].nn.size() == k) {
+          if(hf.pf[i].sum_nn < omega_star) {
             break; // stop = true
           }
           final int mlevel = Math.max(levela, levelb);
-          if (mlevel < level) {
+          if(mlevel < level) {
             level = mlevel;
             final double delta = hf.minDistLevel(hf.pf[i].id, level);
-            if (delta >= hf.pf[i].nn.peek().doubleDistance()) {
+            if(delta >= hf.pf[i].nn.peek().doubleValue()) {
               break; // stop = true
             }
           }
@@ -387,17 +381,17 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
     double br = hf.boxRadius(i, a - 1, b + 1);
     double newlb = 0.0;
     double newub = 0.0;
-    for (ObjectHeap.UnsortedIter<DoubleDistanceDBIDPair> iter = hf.pf[i].nn.unsortedIter(); iter.valid(); iter.advance()) {
-      DoubleDistanceDBIDPair entry = iter.get();
-      newub += entry.doubleDistance();
-      if (entry.doubleDistance() <= br) {
-        newlb += entry.doubleDistance();
+    for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iter = hf.pf[i].nn.unsortedIter(); iter.valid(); iter.advance()) {
+      DoubleDBIDPair entry = iter.get();
+      newub += entry.doubleValue();
+      if(entry.doubleValue() <= br) {
+        newlb += entry.doubleValue();
       }
     }
-    if (newlb > hf.pf[i].lbound) {
+    if(newlb > hf.pf[i].lbound) {
       hf.pf[i].lbound = newlb;
     }
-    if (newub < hf.pf[i].ubound) {
+    if(newub < hf.pf[i].ubound) {
       hf.pf[i].ubound = newub;
     }
   }
@@ -411,9 +405,9 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
 
   private void trueOutliers(HilbertFeatures h) {
     n_star = 0;
-    for (ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
+    for(ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
       HilFeature entry = iter.get();
-      if (entry.ubound >= omega_star && (entry.ubound - entry.lbound < 1E-10)) {
+      if(entry.ubound >= omega_star && (entry.ubound - entry.lbound < 1E-10)) {
         n_star++;
       }
     }
@@ -494,8 +488,8 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       this.pf = new HilFeature[relation.size()];
 
       int pos = 0;
-      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new ComparatorMaxHeap<DoubleDistanceDBIDPair>(k, COMPARATOR));
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new ComparableMaxHeap<DoubleDBIDPair>(k));
       }
       this.out = new ComparatorMinHeap<>(n, new Comparator<HilFeature>() {
         @Override
@@ -523,42 +517,45 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       // FIXME: 64 bit mode untested - sign bit is tricky to handle correctly
       // with the rescaling. 63 bit should be fine. The sign bit probably needs
       // to be handled differently, or at least needs careful testing of the API
-      if (h >= 32) { // 32 to 63 bit
+      if(h >= 32) { // 32 to 63 bit
         final long scale = Long.MAX_VALUE; // = 63 bits
-        for (int i = 0; i < pf.length; i++) {
-          NumberVector<?> obj = relation.get(pf[i].id);
+        for(int i = 0; i < pf.length; i++) {
+          NumberVector obj = relation.get(pf[i].id);
           long[] coord = new long[d];
-          for (int dim = 0; dim < d; dim++) {
+          for(int dim = 0; dim < d; dim++) {
             coord[dim] = (long) (getDimForObject(obj, dim) * .5 * scale);
           }
           pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 1);
         }
-      } else if (h >= 16) { // 16-31 bit
+      }
+      else if(h >= 16) { // 16-31 bit
         final int scale = ~1 >>> 1;
-        for (int i = 0; i < pf.length; i++) {
-          NumberVector<?> obj = relation.get(pf[i].id);
+        for(int i = 0; i < pf.length; i++) {
+          NumberVector obj = relation.get(pf[i].id);
           int[] coord = new int[d];
-          for (int dim = 0; dim < d; dim++) {
+          for(int dim = 0; dim < d; dim++) {
             coord[dim] = (int) (getDimForObject(obj, dim) * .5 * scale);
           }
           pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 1);
         }
-      } else if (h >= 8) { // 8-15 bit
+      }
+      else if(h >= 8) { // 8-15 bit
         final int scale = ~1 >>> 16;
-        for (int i = 0; i < pf.length; i++) {
-          NumberVector<?> obj = relation.get(pf[i].id);
+        for(int i = 0; i < pf.length; i++) {
+          NumberVector obj = relation.get(pf[i].id);
           short[] coord = new short[d];
-          for (int dim = 0; dim < d; dim++) {
+          for(int dim = 0; dim < d; dim++) {
             coord[dim] = (short) (getDimForObject(obj, dim) * .5 * scale);
           }
           pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 16);
         }
-      } else { // 1-7 bit
+      }
+      else { // 1-7 bit
         final int scale = ~1 >>> 8;
-        for (int i = 0; i < pf.length; i++) {
-          NumberVector<?> obj = relation.get(pf[i].id);
+        for(int i = 0; i < pf.length; i++) {
+          NumberVector obj = relation.get(pf[i].id);
           byte[] coord = new byte[d];
-          for (int dim = 0; dim < d; dim++) {
+          for(int dim = 0; dim < d; dim++) {
             coord[dim] = (byte) (getDimForObject(obj, dim) * .5 * scale);
           }
           pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 24);
@@ -566,13 +563,13 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       }
       java.util.Arrays.sort(pf);
       // Update levels
-      for (int i = 0; i < pf.length - 1; i++) {
+      for(int i = 0; i < pf.length - 1; i++) {
         pf[i].level = minRegLevel(i, i + 1);
       }
       // Count candidates
       capital_n_star = 0;
-      for (int i = 0; i < pf.length; i++) {
-        if (pf[i].ubound >= omega_star) {
+      for(int i = 0; i < pf.length; i++) {
+        if(pf[i].ubound >= omega_star) {
           capital_n_star++;
         }
       }
@@ -584,11 +581,12 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * @param i position in pf of the feature to be inserted
      */
     private void updateOUT(int i) {
-      if (out.size() < n) {
+      if(out.size() < n) {
         out.add(pf[i]);
-      } else {
+      }
+      else {
         HilFeature head = out.peek();
-        if (pf[i].ubound > head.ubound) {
+        if(pf[i].ubound > head.ubound) {
           // replace smallest
           out.replaceTopElement(pf[i]);
         }
@@ -601,11 +599,12 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * @param i position in pf of the feature to be inserted
      */
     private void updateWLB(int i) {
-      if (wlb.size() < n) {
+      if(wlb.size() < n) {
         wlb.add(pf[i]);
-      } else {
+      }
+      else {
         HilFeature head = wlb.peek();
-        if (pf[i].lbound > head.lbound) {
+        if(pf[i].lbound > head.lbound) {
           // replace smallest
           wlb.replaceTopElement(pf[i]);
         }
@@ -622,12 +621,13 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
     private double fastUpperBound(int i) {
       int pre = i;
       int post = i;
-      while (post - pre < k) {
+      while(post - pre < k) {
         int pre_level = (pre - 1 >= 0) ? pf[pre - 1].level : -2;
         int post_level = (post < capital_n - 1) ? pf[post].level : -2;
-        if (post_level >= pre_level) {
+        if(post_level >= pre_level) {
           post++;
-        } else {
+        }
+        else {
           pre--;
         }
       }
@@ -642,12 +642,12 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * @param level Level of the corresponding r-region
      */
     private double minDistLevel(DBID id, int level) {
-      final NumberVector<?> obj = relation.get(id);
+      final NumberVector obj = relation.get(id);
       // level 1 is supposed to have r=1 as in the original publication
       // 2 ^ - (level - 1)
       final double r = 1.0 / (1 << (level - 1));
       double dist = Double.POSITIVE_INFINITY;
-      for (int dim = 0; dim < d; dim++) {
+      for(int dim = 0; dim < d; dim++) {
         final double p_m_r = getDimForObject(obj, dim) % r;
         dist = Math.min(dist, Math.min(p_m_r, r - p_m_r));
       }
@@ -662,36 +662,39 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * @param level Level of the corresponding r-region
      */
     private double maxDistLevel(DBID id, int level) {
-      final NumberVector<?> obj = relation.get(id);
+      final NumberVector obj = relation.get(id);
       // level 1 is supposed to have r=1 as in the original publication
       final double r = 1.0 / (1 << (level - 1));
       double dist;
-      if (t == 1.0) {
+      if(t == 1.0) {
         dist = 0.0;
-        for (int dim = 0; dim < d; dim++) {
+        for(int dim = 0; dim < d; dim++) {
           final double p_m_r = getDimForObject(obj, dim) % r;
           // assert (p_m_r >= 0);
           dist += Math.max(p_m_r, r - p_m_r);
         }
-      } else if (t == 2.0) {
+      }
+      else if(t == 2.0) {
         dist = 0.0;
-        for (int dim = 0; dim < d; dim++) {
+        for(int dim = 0; dim < d; dim++) {
           final double p_m_r = getDimForObject(obj, dim) % r;
           // assert (p_m_r >= 0);
           double a = Math.max(p_m_r, r - p_m_r);
           dist += a * a;
         }
         dist = Math.sqrt(dist);
-      } else if (!Double.isInfinite(t)) {
+      }
+      else if(!Double.isInfinite(t)) {
         dist = 0.0;
-        for (int dim = 0; dim < d; dim++) {
+        for(int dim = 0; dim < d; dim++) {
           final double p_m_r = getDimForObject(obj, dim) % r;
           dist += Math.pow(Math.max(p_m_r, r - p_m_r), t);
         }
         dist = Math.pow(dist, 1.0 / t);
-      } else {
+      }
+      else {
         dist = Double.NEGATIVE_INFINITY;
-        for (int dim = 0; dim < d; dim++) {
+        for(int dim = 0; dim < d; dim++) {
           final double p_m_r = getDimForObject(obj, dim) % r;
           dist = Math.max(dist, Math.max(p_m_r, r - p_m_r));
         }
@@ -707,9 +710,9 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * @return Number of level shared
      */
     private int numberSharedLevels(long[] a, long[] b) {
-      for (int i = 0, j = a.length - 1; i < a.length; i++, j--) {
+      for(int i = 0, j = a.length - 1; i < a.length; i++, j--) {
         final long diff = a[j] ^ b[j];
-        if (diff != 0) {
+        if(diff != 0) {
           // expected unused = available - used
           final int expected = (a.length * Long.SIZE) - (d * h);
           return ((BitsUtil.numberOfLeadingZeros(diff) + i * Long.SIZE) - expected) / d;
@@ -758,14 +761,16 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
     private double boxRadius(int i, int a, int b) {
       // level are inversely ordered to box sizes. min -> max
       final int level;
-      if (a < 0) {
-        if (b >= pf.length) {
+      if(a < 0) {
+        if(b >= pf.length) {
           return Double.POSITIVE_INFINITY;
         }
         level = maxRegLevel(i, b);
-      } else if (b >= pf.length) {
+      }
+      else if(b >= pf.length) {
         level = maxRegLevel(i, a);
-      } else {
+      }
+      else {
         level = Math.max(maxRegLevel(i, a), maxRegLevel(i, b));
       }
       return minDistLevel(pf[i].id, level);
@@ -778,7 +783,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * @param dim Dimension
      * @return Projected and shifted position
      */
-    private double getDimForObject(NumberVector<?> obj, int dim) {
+    private double getDimForObject(NumberVector obj, int dim) {
       return (obj.doubleValue(dim) - min[dim]) / diameter + shift;
     }
   }
@@ -822,7 +827,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
     /**
      * Heap with the nearest known neighbors
      */
-    public ObjectHeap<DoubleDistanceDBIDPair> nn;
+    public ObjectHeap<DoubleDBIDPair> nn;
 
     /**
      * Set representation of the nearest neighbors for faster lookups
@@ -840,7 +845,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * @param id Object ID
      * @param nn Heap for neighbors
      */
-    public HilFeature(DBID id, ObjectHeap<DoubleDistanceDBIDPair> nn) {
+    public HilFeature(DBID id, ObjectHeap<DoubleDBIDPair> nn) {
       super();
       this.id = id;
       this.nn = nn;
@@ -861,21 +866,22 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      */
     protected void insert(DBID id, double dt, int k) {
       // assert (!nn_keys.contains(id));
-      if (nn.size() < k) {
-        DoubleDistanceDBIDPair entry = DBIDFactory.FACTORY.newDistancePair(dt, id);
+      if(nn.size() < k) {
+        DoubleDBIDPair entry = DBIDUtil.newPair(dt, id);
         nn.add(entry);
         nn_keys.add(id);
         sum_nn += dt;
-      } else {
-        DoubleDistanceDBIDPair head = nn.peek();
-        if (dt < head.doubleDistance()) {
+      }
+      else {
+        DoubleDBIDPair head = nn.peek();
+        if(dt < head.doubleValue()) {
           head = nn.poll(); // Remove worst
-          sum_nn -= head.doubleDistance();
+          sum_nn -= head.doubleValue();
           nn_keys.remove(head);
 
           // assert (nn.peek().doubleDistance() <= head.doubleDistance());
 
-          DoubleDistanceDBIDPair entry = DBIDFactory.FACTORY.newDistancePair(dt, id);
+          DoubleDBIDPair entry = DBIDUtil.newPair(dt, id);
           nn.add(entry);
           nn_keys.add(id);
           sum_nn += dt;
@@ -893,7 +899,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
    * 
    * @param <O> Vector type
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter to specify how many next neighbors should be used in the
      * computation
@@ -951,27 +957,27 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       super.makeOptions(config);
 
       final IntParameter kP = new IntParameter(K_ID, 5);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
 
       final IntParameter nP = new IntParameter(N_ID, 10);
-      if (config.grab(nP)) {
+      if(config.grab(nP)) {
         n = nP.getValue();
       }
 
       final IntParameter hP = new IntParameter(H_ID, 32);
-      if (config.grab(hP)) {
+      if(config.grab(hP)) {
         h = hP.getValue();
       }
 
       ObjectParameter<LPNormDistanceFunction> distP = AbstractDistanceBasedAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, LPNormDistanceFunction.class);
-      if (config.grab(distP)) {
+      if(config.grab(distP)) {
         distfunc = distP.instantiateClass(config);
       }
 
       final EnumParameter<ScoreType> tnP = new EnumParameter<>(TN_ID, ScoreType.class, ScoreType.TopN);
-      if (config.grab(tnP)) {
+      if(config.grab(tnP)) {
         tn = tnP.getValue();
       }
     }

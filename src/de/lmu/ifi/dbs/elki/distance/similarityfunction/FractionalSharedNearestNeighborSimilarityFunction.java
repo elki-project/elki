@@ -23,13 +23,11 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -47,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <O> object type
  */
-public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, ArrayDBIDs, DoubleDistance> implements NormalizedSimilarityFunction<O> {
+public class FractionalSharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>> implements NormalizedSimilarityFunction<O> {
   /**
    * Constructor.
    * 
@@ -73,7 +71,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
    * 
    * @param <T> Object type
    */
-  public static class Instance<T> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>, ArrayDBIDs, DoubleDistance> {
+  public static class Instance<T> extends AbstractIndexBasedSimilarityFunction.Instance<T, SharedNearestNeighborIndex<T>> {
     /**
      * Similarity function.
      */
@@ -118,27 +116,17 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
     }
 
     @Override
-    public DoubleDistance similarity(DBIDRef id1, DBIDRef id2) {
+    public double similarity(DBIDRef id1, DBIDRef id2) {
       DBIDs neighbors1 = index.getNearestNeighborSet(id1);
       DBIDs neighbors2 = index.getNearestNeighborSet(id2);
       int intersection = countSharedNeighbors(neighbors1, neighbors2);
-      return new DoubleDistance((double) intersection / index.getNumberOfNeighbors());
+      return (double) intersection / index.getNumberOfNeighbors();
     }
 
     @Override
-    public SimilarityFunction<? super T, DoubleDistance> getSimilarityFunction() {
+    public SimilarityFunction<? super T> getSimilarityFunction() {
       return similarityFunction;
     }
-
-    @Override
-    public DoubleDistance getDistanceFactory() {
-      return DoubleDistance.FACTORY;
-    }
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   /**

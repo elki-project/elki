@@ -35,6 +35,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 /**
  * View on an ArrayDBIDs masked using a BitMask for efficient mask changing.
  * 
+ * FIXME: switch to long[] instead of BitSet
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.uses DBIDs

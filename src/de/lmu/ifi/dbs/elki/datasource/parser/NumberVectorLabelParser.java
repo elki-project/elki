@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> the type of NumberVector used
  */
-public class NumberVectorLabelParser<V extends NumberVector<?>> extends AbstractStreamingParser {
+public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStreamingParser {
   /**
    * Logging class.
    */
@@ -87,7 +87,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
   /**
    * Vector factory class.
    */
-  protected NumberVector.Factory<V, ?> factory;
+  protected NumberVector.Factory<V>  factory;
 
   /**
    * Buffer reader.
@@ -159,7 +159,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * 
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(NumberVector.Factory<V, ?> factory) {
+  public NumberVectorLabelParser(NumberVector.Factory<V>  factory) {
     this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHARS, Pattern.compile(COMMENT_PATTERN), null, factory);
   }
 
@@ -172,7 +172,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V, ?> factory) {
+  public NumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V>  factory) {
     super(colSep, quoteChars, comment);
     this.labelIndices = labelIndices;
     this.factory = factory;
@@ -375,7 +375,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParser.Parameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParser.Parameterizer {
     /**
      * A comma separated list of the indices of labels (may be numeric),
      * counting whitespace separated entries in a line starting with 0. The
@@ -403,7 +403,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     /**
      * Factory object.
      */
-    protected NumberVector.Factory<V, ?> factory;
+    protected NumberVector.Factory<V>  factory;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -418,7 +418,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
      * @param config Parameterization
      */
     protected void getFactory(Parameterization config) {
-      ObjectParameter<NumberVector.Factory<V, ?>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
+      ObjectParameter<NumberVector.Factory<V> > factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
       if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }

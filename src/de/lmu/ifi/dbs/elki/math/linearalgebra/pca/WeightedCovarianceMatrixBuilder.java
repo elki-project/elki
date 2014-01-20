@@ -26,16 +26,12 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -73,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("Weighted Covariance Matrix / PCA")
 @Description("A PCA modification by using weights while building the covariance matrix, to obtain more stable results")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends AbstractCovarianceMatrixBuilder<V> {
+public class WeightedCovarianceMatrixBuilder<V extends NumberVector> extends AbstractCovarianceMatrixBuilder<V> {
   /**
    * Parameter to specify the weight function to use in weighted PCA, must
    * implement
@@ -94,7 +90,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
    * Holds the distance function used for weight calculation.
    */
   // TODO: make configurable?
-  private PrimitiveDistanceFunction<? super V, DoubleDistance> weightDistance = EuclideanDistanceFunction.STATIC;
+  private PrimitiveDistanceFunction<? super V> weightDistance = EuclideanDistanceFunction.STATIC;
 
   /**
    * Constructor.
@@ -126,9 +122,9 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
     double maxdist = 0.0;
     double stddev = 0.0;
     {
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         V obj = relation.get(iter);
-        double distance = weightDistance.distance(centroid, obj).doubleValue();
+        double distance = weightDistance.distance(centroid, obj);
         stddev += distance * distance;
         if(distance > maxdist) {
           maxdist = distance;
@@ -141,9 +137,9 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
       stddev = Math.sqrt(stddev / ids.size());
     }
 
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       V obj = relation.get(iter);
-      double distance = weightDistance.distance(centroid, obj).doubleValue();
+      double distance = weightDistance.distance(centroid, obj);
       double weight = weightfunction.getWeight(distance, maxdist, stddev);
       cmat.put(obj, weight);
     }
@@ -158,11 +154,10 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
    * @param results a collection of QueryResults
    * @param database the database used
    * @param k number of elements to process
-   * @param <D> distance type
    * @return Covariance Matrix
    */
   @Override
-  public <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDList<D> results, Relation<? extends V> database, int k) {
+  public Matrix processQueryResults(DoubleDBIDList results, Relation<? extends V> database, int k) {
     final int dim = RelationUtil.dimensionality(database);
     final CovarianceMatrix cmat = new CovarianceMatrix(dim);
 
@@ -176,15 +171,8 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
     double stddev = 0.0;
     {
       int i = 0;
-      for (DistanceDBIDListIter<D> it = results.iter(); it.valid() && i < k; it.advance(), k++) {
-        DistanceDBIDPair<D> res = it.getDistancePair();
-        final double dist;
-        if(res instanceof DoubleDistanceDBIDPair) {
-          dist = ((DoubleDistanceDBIDPair) res).doubleDistance();
-        }
-        else {
-          dist = res.getDistance().doubleValue();
-        }
+      for(DoubleDBIDListIter it = results.iter(); it.valid() && i < k; it.advance(), k++) {
+        final double dist = it.doubleValue();
         stddev += dist * dist;
         if(dist > maxdist) {
           maxdist = dist;
@@ -198,17 +186,9 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
 
     // calculate weighted PCA
     int i = 0;
-    for (DistanceDBIDListIter<D> it = results.iter(); it.valid() && i < k; it.advance(), k++) {
-      DistanceDBIDPair<D> res = it.getDistancePair();
-      final double dist;
-      if(res instanceof DoubleDistanceDBIDPair) {
-        dist = ((DoubleDistanceDBIDPair) res).doubleDistance();
-      }
-      else {
-        dist = res.getDistance().doubleValue();
-      }
-
-      V obj = database.get(res);
+    for(DoubleDBIDListIter it = results.iter(); it.valid() && i < k; it.advance(), k++) {
+      final double dist = it.doubleValue();
+      V obj = database.get(it);
       double weight = weightfunction.getWeight(dist, maxdist, stddev);
       cmat.put(obj, weight);
     }
@@ -222,7 +202,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Weight function.
      */

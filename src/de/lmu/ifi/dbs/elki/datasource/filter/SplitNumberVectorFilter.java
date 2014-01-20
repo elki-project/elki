@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -48,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @param <V> Vector type
  */
-public class SplitNumberVectorFilter<V extends NumberVector<?>> implements ObjectFilter {
+public class SplitNumberVectorFilter<V extends NumberVector> implements ObjectFilter {
   /**
    * Selected dimensions.
    */
@@ -83,7 +82,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
       // Should be a vector type after above test.
       @SuppressWarnings("unchecked")
       final VectorFieldTypeInformation<V> vtype = VectorFieldTypeInformation.class.cast(type);
-      Factory<V, ?> factory = FilterUtil.guessFactory(vtype);
+      NumberVector.Factory<V> factory = FilterUtil.guessFactory(vtype);
 
       // Get the replacement type informations
       VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<>(factory, dims.length);
@@ -154,7 +153,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * The parameter listing the split dimensions.
      */

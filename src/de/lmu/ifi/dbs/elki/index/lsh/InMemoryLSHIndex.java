@@ -32,18 +32,17 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -222,31 +221,31 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
     }
 
     @Override
-    public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+    public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
       for(Object hint : hints) {
         if(DatabaseQuery.HINT_EXACT.equals(hint)) {
           return null;
         }
       }
-      DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
+      DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
       if(!family.isCompatible(df)) {
         return null;
       }
-      return (KNNQuery<V, D>) new LSHKNNQuery<>(distanceQuery);
+      return new LSHKNNQuery(distanceQuery);
     }
 
     @Override
-    public <D extends Distance<D>> RangeQuery<V, D> getRangeQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+    public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
       for(Object hint : hints) {
         if(DatabaseQuery.HINT_EXACT.equals(hint)) {
           return null;
         }
       }
-      DistanceFunction<? super V, D> df = distanceQuery.getDistanceFunction();
+      DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
       if(!family.isCompatible(df)) {
         return null;
       }
-      return (RangeQuery<V, D>) new LSHRangeQuery<>(distanceQuery);
+      return new LSHRangeQuery(distanceQuery);
     }
 
     /**
@@ -256,20 +255,19 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
      * 
      * @apiviz.exclude
      * 
-     * @param <D> Distance type
      */
-    protected class LSHKNNQuery<D extends Distance<D>> extends AbstractKNNQuery<D> {
+    protected class LSHKNNQuery extends AbstractKNNQuery {
       /**
        * Constructor.
        * 
        * @param distanceQuery
        */
-      public LSHKNNQuery(DistanceQuery<V, D> distanceQuery) {
+      public LSHKNNQuery(DistanceQuery<V> distanceQuery) {
         super(distanceQuery);
       }
 
       @Override
-      public KNNList<D> getKNNForObject(V obj, int k) {
+      public KNNList getKNNForObject(V obj, int k) {
         ModifiableDBIDs candidates = null;
         final int numhash = hashtables.size();
         for(int i = 0; i < numhash; i++) {
@@ -292,9 +290,9 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         }
 
         // Refine.
-        KNNHeap<D> heap = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
+        KNNHeap heap = DBIDUtil.newHeap(k);
         for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
-          final D dist = distanceQuery.distance(obj, iter);
+          final double dist = distanceQuery.distance(obj, iter);
           super.incRefinements(1);
           heap.insert(dist, iter);
         }
@@ -308,21 +306,19 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
      * @author Erich Schubert
      * 
      * @apiviz.exclude
-     * 
-     * @param <D> Distance type
      */
-    protected class LSHRangeQuery<D extends Distance<D>> extends AbstractRangeQuery<D> {
+    protected class LSHRangeQuery extends AbstractRangeQuery {
       /**
        * Constructor.
        * 
        * @param distanceQuery
        */
-      public LSHRangeQuery(DistanceQuery<V, D> distanceQuery) {
+      public LSHRangeQuery(DistanceQuery<V> distanceQuery) {
         super(distanceQuery);
       }
 
       @Override
-      public DistanceDBIDList<D> getRangeForObject(V obj, D range) {
+      public DoubleDBIDList getRangeForObject(V obj, double range) {
         ModifiableDBIDs candidates = DBIDUtil.newHashSet();
         final int numhash = hashtables.size();
         for(int i = 0; i < numhash; i++) {
@@ -339,11 +335,11 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         }
 
         // Refine.
-        GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+        ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
         for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
-          final D dist = distanceQuery.distance(obj, iter);
+          final double dist = distanceQuery.distance(obj, iter);
           super.incRefinements(1);
-          if(range.compareTo(dist) >= 0) {
+          if(dist <= range) {
             result.add(dist, iter);
           }
         }

@@ -42,8 +42,6 @@ import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -79,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex<O, O> {
+public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O, O> {
   /**
    * Constructor.
    * 
@@ -105,7 +103,7 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
 
   @SuppressWarnings("unchecked")
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if (!(inner instanceof KNNIndex)) {
       return null;
     }
@@ -120,17 +118,17 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
         return null;
       }
     }
-    SpatialPrimitiveDistanceQuery<O, DoubleDistance> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
-    KNNQuery<O, DoubleDistance> innerq = ((KNNIndex<O>) inner).getKNNQuery(innerQuery, hints);
+    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
+    KNNQuery<O> innerq = ((KNNIndex<O>) inner).getKNNQuery(innerQuery, hints);
     if (innerq == null) {
       return null;
     }
-    return (KNNQuery<O, D>) new ProjectedKNNQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
+    return (KNNQuery<O>) new ProjectedKNNQuery(distanceQuery, innerq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if (!(inner instanceof RangeIndex)) {
       return null;
     }
@@ -145,17 +143,17 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
         return null;
       }
     }
-    SpatialPrimitiveDistanceQuery<O, DoubleDistance> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
-    RangeQuery<O, DoubleDistance> innerq = ((RangeIndex<O>) inner).getRangeQuery(innerQuery, hints);
+    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
+    RangeQuery<O> innerq = ((RangeIndex<O>) inner).getRangeQuery(innerQuery, hints);
     if (innerq == null) {
       return null;
     }
-    return (RangeQuery<O, D>) new ProjectedRangeQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
+    return (RangeQuery<O>) new ProjectedRangeQuery(distanceQuery, innerq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if (!(inner instanceof RKNNIndex)) {
       return null;
     }
@@ -170,12 +168,12 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
         return null;
       }
     }
-    SpatialPrimitiveDistanceQuery<O, DoubleDistance> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
-    RKNNQuery<O, DoubleDistance> innerq = ((RKNNIndex<O>) inner).getRKNNQuery(innerQuery, hints);
+    SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistanceFunction.STATIC.instantiate(view);
+    RKNNQuery<O> innerq = ((RKNNIndex<O>) inner).getRKNNQuery(innerQuery, hints);
     if (innerq == null) {
       return null;
     }
-    return (RKNNQuery<O, D>) new ProjectedRKNNQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
+    return (RKNNQuery<O>) new ProjectedRKNNQuery((DistanceQuery<O>) distanceQuery, innerq);
   }
 
   /**
@@ -187,7 +185,7 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
    * 
    * @param <O> Data type.
    */
-  public static class Factory<O extends NumberVector<?>> extends ProjectedIndex.Factory<O, O> {
+  public static class Factory<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
     /**
      * Constructor.
      * 
@@ -233,7 +231,7 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
      * 
      * @param <O> Outer object type.
      */
-    public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
+    public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
       /**
        * Inner index factory.
        */

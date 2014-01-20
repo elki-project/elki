@@ -75,7 +75,7 @@ public interface FullProjection extends Projection {
    * @param data vector in data space
    * @return vector in scaled space
    */
-  Vector projectDataToScaledSpace(NumberVector<?> data);
+  Vector projectDataToScaledSpace(NumberVector data);
 
   /**
    * Project a data vector from data space to scaled space.
@@ -91,7 +91,7 @@ public interface FullProjection extends Projection {
    * @param data relative vector in data space
    * @return relative vector in scaled space
    */
-  Vector projectRelativeDataToScaledSpace(NumberVector<?> data);
+  Vector projectRelativeDataToScaledSpace(NumberVector data);
 
   /**
    * Project a relative data vector from data space to scaled space.
@@ -107,7 +107,7 @@ public interface FullProjection extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  Vector projectDataToRenderSpace(NumberVector<?> data);
+  Vector projectDataToRenderSpace(NumberVector data);
 
   /**
    * Project a data vector from data space to rendering space.
@@ -125,7 +125,7 @@ public interface FullProjection extends Projection {
    * @param factory Object factory
    * @return vector in data space
    */
-  <NV extends NumberVector<?>> NV projectScaledToDataSpace(Vector v, NumberVector.Factory<NV, ?> factory);
+  <NV extends NumberVector> NV projectScaledToDataSpace(Vector v, NumberVector.Factory<NV>  factory);
 
   /**
    * Project a vector from rendering space to data space.
@@ -135,7 +135,7 @@ public interface FullProjection extends Projection {
    * @param prototype Object factory
    * @return vector in data space
    */
-  <NV extends NumberVector<?>> NV projectRenderToDataSpace(Vector v, NumberVector.Factory<NV, ?> prototype);
+  <NV extends NumberVector> NV projectRenderToDataSpace(Vector v, NumberVector.Factory<NV>  prototype);
 
   /**
    * Project a relative data vector from data space to rendering space.
@@ -143,7 +143,7 @@ public interface FullProjection extends Projection {
    * @param data relative vector in data space
    * @return relative vector in rendering space
    */
-  Vector projectRelativeDataToRenderSpace(NumberVector<?> data);
+  Vector projectRelativeDataToRenderSpace(NumberVector data);
 
   /**
    * Project a relative data vector from data space to rendering space.
@@ -161,7 +161,7 @@ public interface FullProjection extends Projection {
    * @param prototype Object factory
    * @return relative vector in data space
    */
-  <NV extends NumberVector<?>> NV projectRelativeScaledToDataSpace(Vector v, NumberVector.Factory<NV, ?> prototype);
+  <NV extends NumberVector> NV projectRelativeScaledToDataSpace(Vector v, NumberVector.Factory<NV>  prototype);
 
   /**
    * Project a relative vector from rendering space to data space.
@@ -171,5 +171,5 @@ public interface FullProjection extends Projection {
    * @param prototype Object factory
    * @return relative vector in data space
    */
-  <NV extends NumberVector<?>> NV projectRelativeRenderToDataSpace(Vector v, NumberVector.Factory<NV, ?> prototype);
+  <NV extends NumberVector> NV projectRelativeRenderToDataSpace(Vector v, NumberVector.Factory<NV>  prototype);
 }

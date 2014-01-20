@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DoubleNorm;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Erich Schubert
  */
 // TODO: implement SpatialDistanceFunction
-public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector<?>, DoubleDistance> implements DoubleNorm<SparseNumberVector<?>> {
+public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector> implements Norm<SparseNumberVector> {
   /**
    * Keeps the currently set p.
    */
@@ -56,7 +55,7 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
   }
 
   @Override
-  public double doubleDistance(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
+  public double distance(SparseNumberVector v1, SparseNumberVector v2) {
     // Get the bit masks
     double accu = 0.;
     int i1 = v1.iter(), i2 = v2.iter();
@@ -98,7 +97,7 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
   }
 
   @Override
-  public double doubleNorm(SparseNumberVector<?> v1) {
+  public double norm(SparseNumberVector v1) {
     double accu = 0.;
     for(int it = v1.iter(); v1.iterValid(it); it = v1.iterAdvance(it)) {
       final double val = Math.abs(v1.iterDoubleValue(it));
@@ -108,22 +107,7 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
   }
 
   @Override
-  public DoubleDistance norm(SparseNumberVector<?> obj) {
-    return new DoubleDistance(doubleNorm(obj));
-  }
-
-  @Override
-  public DoubleDistance distance(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
-    return new DoubleDistance(doubleDistance(v1, v2));
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
-
-  @Override
-  public SimpleTypeInformation<? super SparseNumberVector<?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super SparseNumberVector> getInputTypeRestriction() {
     return TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH;
   }
 

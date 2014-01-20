@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -30,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -44,13 +44,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D, ?>> implements AffinityPropagationInitialization<O> {
+public class DistanceBasedInitializationWithMedian<O> implements AffinityPropagationInitialization<O> {
   /**
    * Distance function.
    */
-  DistanceFunction<? super O, D> distance;
+  DistanceFunction<? super O> distance;
 
   /**
    * Quantile to use.
@@ -63,7 +62,7 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
    * @param distance Similarity function
    * @param quantile Quantile
    */
-  public DistanceBasedInitializationWithMedian(DistanceFunction<? super O, D> distance, double quantile) {
+  public DistanceBasedInitializationWithMedian(DistanceFunction<? super O> distance, double quantile) {
     super();
     this.distance = distance;
     this.quantile = quantile;
@@ -72,16 +71,16 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
   @Override
   public double[][] getSimilarityMatrix(Database db, Relation<O> relation, ArrayDBIDs ids) {
     final int size = ids.size();
-    DistanceQuery<O, D> dq = db.getDistanceQuery(relation, distance);
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, distance);
     double[][] mat = new double[size][size];
     double[] flat = new double[(size * (size - 1)) >> 1];
     // TODO: optimize for double valued primitive distances.
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();
-    for (int i = 0, j = 0; i < size; i++, i1.advance()) {
+    for(int i = 0, j = 0; i < size; i++, i1.advance()) {
       double[] mati = mat[i];
       i2.seek(i + 1);
-      for (int k = i + 1; k < size; k++, i2.advance()) {
-        mati[k] = -dq.distance(i1, i2).doubleValue();
+      for(int k = i + 1; k < size; k++, i2.advance()) {
+        mati[k] = -dq.distance(i1, i2);
         mat[k][i] = mati[k]; // symmetry.
         flat[j] = mati[k];
         j++;
@@ -89,7 +88,7 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
     }
     double median = QuickSelect.quantile(flat, quantile);
     // On the diagonal, we place the median
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       mat[i][i] = median;
     }
     return mat;
@@ -108,9 +107,8 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
    * @apiviz.exclude
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * Parameter for the distance function.
      */
@@ -119,7 +117,7 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
     /**
      * istance function.
      */
-    DistanceFunction<? super O, D> distance;
+    DistanceFunction<? super O> distance;
 
     /**
      * Quantile to use.
@@ -129,19 +127,19 @@ public class DistanceBasedInitializationWithMedian<O, D extends NumberDistance<D
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O, D>> param = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
-      if (config.grab(param)) {
+      ObjectParameter<DistanceFunction<? super O>> param = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      if(config.grab(param)) {
         distance = param.instantiateClass(config);
       }
 
       DoubleParameter quantileP = new DoubleParameter(QUANTILE_ID, .5);
-      if (config.grab(quantileP)) {
+      if(config.grab(quantileP)) {
         quantile = quantileP.doubleValue();
       }
     }
 
     @Override
-    protected DistanceBasedInitializationWithMedian<O, D> makeInstance() {
+    protected DistanceBasedInitializationWithMedian<O> makeInstance() {
       return new DistanceBasedInitializationWithMedian<>(distance, quantile);
     }
   }

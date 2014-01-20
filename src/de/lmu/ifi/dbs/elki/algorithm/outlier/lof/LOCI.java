@@ -37,15 +37,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -59,7 +58,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
@@ -80,13 +78,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @apiviz.has RangeQuery
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
 @Alias({"de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI"})
-public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -111,7 +108,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   /**
    * Holds the value of {@link #RMAX_ID}.
    */
-  private D rmax;
+  private double rmax;
 
   /**
    * Holds the value of {@link #NMIN_ID}.
@@ -131,7 +128,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
    */
-  public LOCI(DistanceFunction<? super O, D> distanceFunction, D rmax, int nmin, double alpha) {
+  public LOCI(DistanceFunction<? super O> distanceFunction, double rmax, int nmin, double alpha) {
     super(distanceFunction);
     this.rmax = rmax;
     this.nmin = nmin;
@@ -146,25 +143,25 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    RangeQuery<O, D> rangeQuery = database.getRangeQuery(distFunc);
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    RangeQuery<O> rangeQuery = database.getRangeQuery(distFunc);
 
     FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("LOCI preprocessing", relation.size(), LOG) : null;
     // LOCI preprocessing step
     WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DistanceDBIDList<D> neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
+      DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
       // build list of critical distances
       ArrayList<DoubleIntPair> cdist = new ArrayList<>(neighbors.size() << 1);
       {
         for(int i = 0; i < neighbors.size(); i++) {
-          DistanceDBIDPair<D> r = neighbors.get(i);
-          if(i + 1 < neighbors.size() && r.getDistance().compareTo(neighbors.get(i + 1).getDistance()) == 0) {
+          DoubleDBIDPair r = neighbors.get(i);
+          if(i + 1 < neighbors.size() && r.doubleValue() == neighbors.get(i + 1).doubleValue()) {
             continue;
           }
-          cdist.add(new DoubleIntPair(r.getDistance().doubleValue(), i));
-          final double ri = r.getDistance().doubleValue() / alpha;
-          if(ri <= rmax.doubleValue()) {
+          cdist.add(new DoubleIntPair(r.doubleValue(), i));
+          final double ri = r.doubleValue() / alpha;
+          if(ri <= rmax) {
             cdist.add(new DoubleIntPair(ri, Integer.MIN_VALUE));
           }
         }
@@ -204,9 +201,8 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       double maxmdefnorm = 0.0;
       double maxnormr = 0;
       if(maxneig >= nmin) {
-        D range = distFunc.getDistanceFactory().fromDouble(maxdist);
         // Compute the largest neighborhood we will need.
-        DistanceDBIDList<D> maxneighbors = rangeQuery.getRangeForDBID(iditer, range);
+        DoubleDBIDList maxneighbors = rangeQuery.getRangeForDBID(iditer, maxdist);
         // TODO: Ensure the set is sorted. Should be a no-op with most indexes.
         // For any critical distance, compute the normalized MDEF score.
         for(DoubleIntPair c : cdist) {
@@ -221,9 +217,9 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
           // compute \hat{n}(p_i, r, \alpha) and the corresponding \simga_{MDEF}
           MeanVariance mv_n_r_alpha = new MeanVariance();
           // TODO: optimize for double distances
-          for (DistanceDBIDListIter<D> neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          for (DoubleDBIDListIter neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
             // Stop at radius r
-            if(neighbor.getDistance().doubleValue() > r) {
+            if(neighbor.doubleValue() > r) {
               break;
             }
             int rn_alphar = elementsAtRadius(interestingDistances.get(neighbor), alpha_r);
@@ -304,9 +300,11 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
-    protected D rmax = null;
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+    protected double rmax;
 
     protected int nmin = 0;
 
@@ -315,15 +313,14 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
-      final DistanceParameter<D> rmaxP = new DistanceParameter<>(RMAX_ID, distanceFactory);
+      final DoubleParameter rmaxP = new DoubleParameter(RMAX_ID);
       if(config.grab(rmaxP)) {
-        rmax = rmaxP.getValue();
+        rmax = rmaxP.doubleValue();
       }
 
       final IntParameter nminP = new IntParameter(NMIN_ID, 20);
       if(config.grab(nminP)) {
-        nmin = nminP.getValue();
+        nmin = nminP.intValue();
       }
 
       final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5);
@@ -333,7 +330,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
 
     @Override
-    protected LOCI<O, D> makeInstance() {
+    protected LOCI<O> makeInstance() {
       return new LOCI<>(distanceFunction, rmax, nmin, alpha);
     }
   }

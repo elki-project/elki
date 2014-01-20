@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -41,9 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @apiviz.has MkAppEntry oneway - - contains
  * 
  * @param <O> object type
- * @param <D> distance type
  */
-class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkAppTreeNode<O, D>, MkAppEntry> {
+class MkAppTreeNode<O> extends AbstractMTreeNode<O, MkAppTreeNode<O>, MkAppEntry> {
   private static final long serialVersionUID = 2;
 
   /**
@@ -109,13 +107,13 @@ class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
    * @param mTree the M-Tree object holding this node
    */
   @Override
-  public void adjustEntry(MkAppEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry, ?> mTree) {
+  public void adjustEntry(MkAppEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkAppTreeNode<O>, MkAppEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // entry.setKnnDistanceApproximation(knnDistanceApproximation());
   }
 
   @Override
-  protected void integrityCheckParameters(MkAppEntry parentEntry, MkAppTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry, ?> mTree) {
+  protected void integrityCheckParameters(MkAppEntry parentEntry, MkAppTreeNode<O> parent, int index, AbstractMTree<O, MkAppTreeNode<O>, MkAppEntry, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
 
     MkAppEntry entry = parent.getEntry(index);

@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Reference(authors = "S. Kullback", title = "Information theory and statistics", booktitle = "Information theory and statistics, Courier Dover Publications, 1997.")
 @Alias("kl")
-public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -66,7 +66,7 @@ public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends Abstrac
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {

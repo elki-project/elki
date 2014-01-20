@@ -59,7 +59,7 @@ public class ZCurveTransformer {
    * @param relation Relation to transform
    * @param ids IDs subset to process
    */
-  public ZCurveTransformer(Relation<? extends NumberVector<?>> relation, DBIDs ids) {
+  public ZCurveTransformer(Relation<? extends NumberVector> relation, DBIDs ids) {
     this.dimensionality = RelationUtil.dimensionality(relation);
     this.minValues = new double[dimensionality];
     this.maxValues = new double[dimensionality];
@@ -68,7 +68,7 @@ public class ZCurveTransformer {
     Arrays.fill(minValues, Double.POSITIVE_INFINITY);
     Arrays.fill(maxValues, Double.NEGATIVE_INFINITY);
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      NumberVector<?> vector = relation.get(iter);
+      NumberVector vector = relation.get(iter);
       for(int dim = 0; dim < dimensionality; ++dim) {
         double dimValue = vector.doubleValue(dim);
         minValues[dim] = Math.min(minValues[dim], dimValue);
@@ -84,7 +84,7 @@ public class ZCurveTransformer {
    * @return Z curve value as bigint
    */
   @Deprecated
-  public BigInteger asBigInteger(NumberVector<?> vector) {
+  public BigInteger asBigInteger(NumberVector vector) {
     return new BigInteger(asByteArray(vector));
   }
 
@@ -94,7 +94,7 @@ public class ZCurveTransformer {
    * @param vector Vector to transform
    * @return Z curve value as byte array
    */
-  public byte[] asByteArray(NumberVector<?> vector) {
+  public byte[] asByteArray(NumberVector vector) {
     final long[] longValueList = new long[dimensionality];
 
     for(int dim = 0; dim < dimensionality; ++dim) {

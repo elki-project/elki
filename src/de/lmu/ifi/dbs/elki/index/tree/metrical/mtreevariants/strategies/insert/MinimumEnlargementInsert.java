@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -44,9 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  */
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class MinimumEnlargementInsert<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> implements MTreeInsert<O, D, N, E> {
+public class MinimumEnlargementInsert<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> implements MTreeInsert<O, N, E> {
   @Override
-  public IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E, ?> tree, E object) {
+  public IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object) {
     return choosePath(tree, object, tree.getRootPath());
   }
 
@@ -59,7 +58,7 @@ public class MinimumEnlargementInsert<O, D extends NumberDistance<D, ?>, N exten
    * @param subtree the subtree to be tested for insertion
    * @return the path of the appropriate subtree to insert the given object
    */
-  private IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E, ?> tree, E object, IndexTreePath<E> subtree) {
+  private IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object, IndexTreePath<E> subtree) {
     N node = tree.getNode(subtree.getLastPathComponent().getEntry());
 
     // leaf
@@ -75,7 +74,7 @@ public class MinimumEnlargementInsert<O, D extends NumberDistance<D, ?>, N exten
     {
       bestIdx = 0;
       bestEntry = node.getEntry(0);
-      bestDistance = tree.distance(object.getRoutingObjectID(), bestEntry.getRoutingObjectID()).doubleValue();
+      bestDistance = tree.distance(object.getRoutingObjectID(), bestEntry.getRoutingObjectID());
       if (bestDistance <= bestEntry.getCoveringRadius()) {
         enlarge = 0.;
       } else {
@@ -86,7 +85,7 @@ public class MinimumEnlargementInsert<O, D extends NumberDistance<D, ?>, N exten
     // Iterate over remaining
     for (int i = 1; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      double distance = tree.distance(object.getRoutingObjectID(), entry.getRoutingObjectID()).doubleValue();
+      double distance = tree.distance(object.getRoutingObjectID(), entry.getRoutingObjectID());
 
       if (distance <= entry.getCoveringRadius()) {
         if (enlarge > 0. || distance < bestDistance) {

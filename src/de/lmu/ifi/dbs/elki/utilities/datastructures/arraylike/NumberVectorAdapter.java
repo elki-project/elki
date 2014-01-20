@@ -31,10 +31,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * Use the static instance from {@link ArrayLikeUtil}!
  * 
  * @author Erich Schubert
- * 
- * @param <N> Number type
  */
-public class NumberVectorAdapter<N extends Number> implements NumberArrayAdapter<N, NumberVector<N>> {
+public class NumberVectorAdapter implements NumberArrayAdapter<Number, NumberVector> {
   /**
    * Constructor.
    * 
@@ -45,43 +43,43 @@ public class NumberVectorAdapter<N extends Number> implements NumberArrayAdapter
   }
 
   @Override
-  public int size(NumberVector<N> array) {
+  public int size(NumberVector array) {
     return array.getDimensionality();
   }
 
   @Override
   @Deprecated
-  public N get(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
+  public Number get(NumberVector array, int off) throws IndexOutOfBoundsException {
     return array.getValue(off + 1);
   }
 
   @Override
-  public double getDouble(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
+  public double getDouble(NumberVector array, int off) throws IndexOutOfBoundsException {
     return array.doubleValue(off);
   }
 
   @Override
-  public float getFloat(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
+  public float getFloat(NumberVector array, int off) throws IndexOutOfBoundsException {
     return array.floatValue(off);
   }
 
   @Override
-  public int getInteger(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
+  public int getInteger(NumberVector array, int off) throws IndexOutOfBoundsException {
     return array.intValue(off);
   }
 
   @Override
-  public short getShort(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
+  public short getShort(NumberVector array, int off) throws IndexOutOfBoundsException {
     return array.shortValue(off);
   }
 
   @Override
-  public long getLong(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
+  public long getLong(NumberVector array, int off) throws IndexOutOfBoundsException {
     return array.longValue(off);
   }
 
   @Override
-  public byte getByte(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
+  public byte getByte(NumberVector array, int off) throws IndexOutOfBoundsException {
     return array.byteValue(off);
   }
 }

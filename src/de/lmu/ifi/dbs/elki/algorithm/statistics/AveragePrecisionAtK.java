@@ -29,19 +29,17 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -60,10 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector type
- * @param <D> Distance type
+ * @param <O> Object type
  */
-public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
@@ -98,7 +95,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
    * @param seed Random sampling seed (may be null)
    * @param includeSelf Include query object in evaluation
    */
-  public AveragePrecisionAtK(DistanceFunction<? super V, D> distanceFunction, int k, double sampling, Long seed, boolean includeSelf) {
+  public AveragePrecisionAtK(DistanceFunction<? super O> distanceFunction, int k, double sampling, Long seed, boolean includeSelf) {
     super(distanceFunction);
     this.k = k;
     this.sampling = sampling;
@@ -114,10 +111,10 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
    * @param lrelation Relation for class label comparison
    * @return Vectors containing mean and standard deviation.
    */
-  public CollectionResult<DoubleVector> run(Database database, Relation<V> relation, Relation<ClassLabel> lrelation) {
-    final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+  public CollectionResult<DoubleVector> run(Database database, Relation<O> relation, Relation<ClassLabel> lrelation) {
+    final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final int qk = k + (includeSelf ? 0 : 1);
-    final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, qk);
+    final KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, qk);
 
     MeanVariance[] mvs = MeanVariance.newArray(k);
 
@@ -136,7 +133,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), LOG) : null;
     // sort neighbors
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList<D> knn = knnQuery.getKNNForDBID(iter, qk);
+      KNNList knn = knnQuery.getKNNForDBID(iter, qk);
       Object label = lrelation.get(iter);
 
       int positive = 0, i = 0;
@@ -193,8 +190,10 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter k to compute the average precision at.
      */
@@ -262,7 +261,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     }
 
     @Override
-    protected AveragePrecisionAtK<V, D> makeInstance() {
+    protected AveragePrecisionAtK<O> makeInstance() {
       return new AveragePrecisionAtK<>(distanceFunction, k, sampling, seed, includeSelf);
     }
   }

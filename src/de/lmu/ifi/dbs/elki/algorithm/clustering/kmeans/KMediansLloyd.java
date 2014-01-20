@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -59,11 +58,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Erich Schubert
  * 
  * @param <V> vector datatype
- * @param <D> distance value type
  */
 @Title("K-Medians")
 @Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url = "http://nips.djvuzone.org/djvu/nips09/0368.djvu")
-public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, MeanModel<V>> {
+public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, MeanModel<V>> {
   /**
    * The logger for this class.
    */
@@ -77,44 +75,44 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMediansLloyd(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMediansLloyd(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   @Override
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
-    if (relation.size() <= 0) {
+    if(relation.size() <= 0) {
       return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
-    List<? extends NumberVector<?>> medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<? extends NumberVector> medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medians iteration", LOG) : null;
-    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if (prog != null) {
+    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
       boolean changed = assignToNearestCluster(relation, medians, clusters, assignment);
       // Stop if no cluster assignment changed.
-      if (!changed) {
+      if(!changed) {
         break;
       }
       // Recompute medians.
       medians = medians(clusters, medians, relation);
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.setCompleted(LOG);
     }
     // Wrap result
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<MeanModel<V>> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
-    for (int i = 0; i < clusters.size(); i++) {
+    for(int i = 0; i < clusters.size(); i++) {
       MeanModel<V> model = new MeanModel<>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
@@ -133,14 +131,14 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
     protected Logging getLogger() {
       return LOG;
     }
 
     @Override
-    protected KMediansLloyd<V, D> makeInstance() {
+    protected KMediansLloyd<V> makeInstance() {
       return new KMediansLloyd<>(distanceFunction, k, maxiter, initializer);
     }
   }

@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -49,7 +48,7 @@ public class TestKNNOutlier extends AbstractSimpleAlgorithmTest implements JUnit
     params.addParameter(KNNOutlier.K_ID, 2);
 
     // setup Algorithm
-    KNNOutlier<DoubleVector, DoubleDistance> knnOutlier = ClassGenericsUtil.parameterizeOrAbort(KNNOutlier.class, params);
+    KNNOutlier<DoubleVector> knnOutlier = ClassGenericsUtil.parameterizeOrAbort(KNNOutlier.class, params);
     testParameterizationOk(params);
 
     // run KNNOutlier on database

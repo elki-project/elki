@@ -32,8 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 
 /**
  * Class for computing the average overall distance.
@@ -42,48 +40,27 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
  * 
  * @author Stephan Baier
  */
-public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMeasure<NumberVector<?>, NumberDistance<?, ?>> {
+public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector<?>> double calculateCost(Clustering<? extends MeanModel<V>> clustering, PrimitiveDistanceFunction<? super V, ? extends NumberDistance<?, ?>> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel<V>> clustering, PrimitiveDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
     @SuppressWarnings("unchecked")
     final List<Cluster<MeanModel<V>>> clusterList = (List<Cluster<MeanModel<V>>>) (List<?>) clustering.getAllClusters();
 
-    if (distanceFunction instanceof PrimitiveDoubleDistanceFunction) {
-      @SuppressWarnings("unchecked")
-      PrimitiveDoubleDistanceFunction<? super V> df = (PrimitiveDoubleDistanceFunction<? super V>) distanceFunction;
-      double clusterDistanceSum = 0;
-      for (Cluster<MeanModel<V>> cluster : clusterList) {
-        DBIDs ids = cluster.getIDs();
+    double clusterDistanceSum = 0;
+    for(Cluster<MeanModel<V>> cluster : clusterList) {
+      DBIDs ids = cluster.getIDs();
 
-        // Compute sum of pairwise distances:
-        double clusterPairwiseDistanceSum = 0;
-        for (DBIDIter iter1 = ids.iter(); iter1.valid(); iter1.advance()) {
-          V obj1 = relation.get(iter1);
-          for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-            clusterPairwiseDistanceSum += df.doubleDistance(obj1, relation.get(iter2));
-          }
+      // Compute sum of pairwise distances:
+      double clusterPairwiseDistanceSum = 0;
+      for(DBIDIter iter1 = ids.iter(); iter1.valid(); iter1.advance()) {
+        V obj1 = relation.get(iter1);
+        for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+          clusterPairwiseDistanceSum += distanceFunction.distance(obj1, relation.get(iter2));
         }
-        clusterDistanceSum += clusterPairwiseDistanceSum / (ids.size() * ids.size());
       }
-
-      return clusterDistanceSum / clusterList.size();
-    } else {
-      double clusterDistanceSum = 0;
-      for (Cluster<MeanModel<V>> cluster : clusterList) {
-        DBIDs ids = cluster.getIDs();
-
-        // Compute sum of pairwise distances:
-        double clusterPairwiseDistanceSum = 0;
-        for (DBIDIter iter1 = ids.iter(); iter1.valid(); iter1.advance()) {
-          V obj1 = relation.get(iter1);
-          for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-            clusterPairwiseDistanceSum += distanceFunction.distance(obj1, relation.get(iter2)).doubleValue();
-          }
-        }
-        clusterDistanceSum += clusterPairwiseDistanceSum / (ids.size() * ids.size());
-      }
-
-      return clusterDistanceSum / clusterList.size();
+      clusterDistanceSum += clusterPairwiseDistanceSum / (ids.size() * ids.size());
     }
+
+    return clusterDistanceSum / clusterList.size();
   }
 }

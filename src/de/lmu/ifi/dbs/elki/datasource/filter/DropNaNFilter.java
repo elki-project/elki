@@ -87,7 +87,7 @@ public class DropNaNFilter extends AbstractStreamFilter {
         }
         boolean good = true;
         for (int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
-          NumberVector<?> v = (NumberVector<?>) source.data(j);
+          NumberVector v = (NumberVector) source.data(j);
           if (v == null) {
             good = false;
             break;
@@ -150,7 +150,7 @@ public class DropNaNFilter extends AbstractStreamFilter {
       final Object[] row = objects.getRow(i);
       boolean good = true;
       for (int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
-        NumberVector<?> v = (NumberVector<?>) row[j];
+        NumberVector v = (NumberVector) row[j];
         if (v == null) {
           good = false;
           break;

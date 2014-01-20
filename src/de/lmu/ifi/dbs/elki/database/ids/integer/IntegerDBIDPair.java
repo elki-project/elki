@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
  * 
  * @author Erich Schubert
  */
-public class IntegerDBIDPair implements DBIDPair {
+class IntegerDBIDPair implements DBIDPair {
   /**
    * First value in pair
    */
@@ -47,7 +47,7 @@ public class IntegerDBIDPair implements DBIDPair {
    * @param first first parameter
    * @param second second parameter
    */
-  public IntegerDBIDPair(int first, int second) {
+  protected IntegerDBIDPair(int first, int second) {
     this.first = first;
     this.second = second;
   }

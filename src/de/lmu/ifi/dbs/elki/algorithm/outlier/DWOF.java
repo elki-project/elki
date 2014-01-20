@@ -35,10 +35,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -92,13 +91,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Omar Yousry
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <D> Distance type
  */
-
 @Title("DWOF: Dynamic Window Outlier Factor")
 @Description("Algorithm to compute dynamic-window outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "R. Momtaz, N. Mohssen, M. A. Gowayyed", title = "DWOF: A Robust Density-Based OutlierDetection Approach", booktitle = "Pattern Recognition and Image Analysis, Proc. 6th Iberian Conference, IbPRIA 2013, Funchal, Madeira, Portugal, 2013.", url = "http://dx.doi.org/10.1007%2F978-3-642-38628-2_61")
-public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -122,7 +119,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @param k the value of k
    * @param delta Radius increase factor
    */
-  public DWOF(DistanceFunction<? super O, D> distanceFunction, int k, double delta) {
+  public DWOF(DistanceFunction<? super O> distanceFunction, int k, double delta) {
     super(distanceFunction);
     this.k = k + 1;
     this.delta = delta;
@@ -138,10 +135,10 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     final DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     // Get k nearest neighbor and range query on the relation.
-    KNNQuery<O, D> knnq = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
-    RangeQuery<O, D> rnnQuery = database.getRangeQuery(distFunc, DatabaseQuery.HINT_HEAVY_USE);
+    KNNQuery<O> knnq = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
+    RangeQuery<O> rnnQuery = database.getRangeQuery(distFunc, DatabaseQuery.HINT_HEAVY_USE);
 
     StepProgress stepProg = LOG.isVerbose() ? new StepProgress("DWOF", 2) : null;
     // DWOF output score storage.
@@ -213,7 +210,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @param knnq kNN search function
    * @param radii WritableDoubleDataStore to store radii
    */
-  private void initializeRadii(DBIDs ids, KNNQuery<O, D> knnq, DistanceQuery<O, D> distFunc, WritableDoubleDataStore radii) {
+  private void initializeRadii(DBIDs ids, KNNQuery<O> knnq, DistanceQuery<O> distFunc, WritableDoubleDataStore radii) {
     FiniteProgress avgDistProgress = LOG.isVerbose() ? new FiniteProgress("Calculating average kNN distances-", ids.size(), LOG) : null;
     double absoluteMinDist = Double.POSITIVE_INFINITY;
     double minAvgDist = Double.POSITIVE_INFINITY;
@@ -221,7 +218,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     Mean mean = new Mean();
     // Iterate over all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList<D> iterNeighbors = knnq.getKNNForDBID(iter, k);
+      KNNList iterNeighbors = knnq.getKNNForDBID(iter, k);
       // skip the point itself
       mean.reset();
       for(DBIDIter neighbor1 = iterNeighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
@@ -232,7 +229,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
           if(DBIDUtil.equal(neighbor1, neighbor2) || DBIDUtil.equal(neighbor2, iter)) {
             continue;
           }
-          double distance = distFunc.distance(neighbor1, neighbor2).doubleValue();
+          double distance = distFunc.distance(neighbor1, neighbor2);
           mean.put(distance);
           if(distance > 0. && distance < absoluteMinDist) {
             absoluteMinDist = distance;
@@ -272,7 +269,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @param radii Radii to cluster accordingly
    * @param labels Label storage.
    */
-  private void clusterData(DBIDs ids, RangeQuery<O, D> rnnQuery, WritableDoubleDataStore radii, WritableDataStore<ModifiableDBIDs> labels) {
+  private void clusterData(DBIDs ids, RangeQuery<O> rnnQuery, WritableDoubleDataStore radii, WritableDataStore<ModifiableDBIDs> labels) {
     FiniteProgress clustProg = LOG.isVerbose() ? new FiniteProgress("Density-Based Clustering", ids.size(), LOG) : null;
     // Iterate over all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -291,9 +288,9 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       nChain.add(iter);
       // iterate over nChain
       for(DBIDIter toGetNeighbors = nChain.iter(); toGetNeighbors.valid(); toGetNeighbors.advance()) {
-        D range = rnnQuery.getDistanceFactory().fromDouble(radii.doubleValue(toGetNeighbors));
-        DistanceDBIDList<D> nNeighbors = rnnQuery.getRangeForDBID(toGetNeighbors, range);
-        for(DistanceDBIDListIter<D> iter2 = nNeighbors.iter(); iter2.valid(); iter2.advance()) {
+        double range = radii.doubleValue(toGetNeighbors);
+        DoubleDBIDList nNeighbors = rnnQuery.getRangeForDBID(toGetNeighbors, range);
+        for(DoubleDBIDListIter iter2 = nNeighbors.iter(); iter2.valid(); iter2.advance()) {
           if(DBIDUtil.equal(toGetNeighbors, iter2)) {
             continue;
           }
@@ -360,8 +357,10 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @author Omar Yousry
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Option ID for the number of neighbors.
      */
@@ -400,7 +399,7 @@ public class DWOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
 
     @Override
-    protected DWOF<O, D> makeInstance() {
+    protected DWOF<O> makeInstance() {
       return new DWOF<>(distanceFunction, k, delta);
     }
   }

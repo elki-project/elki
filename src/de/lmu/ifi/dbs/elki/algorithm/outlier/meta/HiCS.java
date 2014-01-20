@@ -102,7 +102,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")
 @Description("Algorithm to compute High Contrast Subspaces in a database as a pre-processing step for for density-based outlier ranking methods.")
 @Reference(authors = "Fabian Keller, Emmanuel Müller, Klemens Böhm", title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)", url = "http://dx.doi.org/10.1109/ICDE.2012.88")
-public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The Logger for this class.
    */
@@ -232,7 +232,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * @param relation Relation to index
    * @return List of sorted objects
    */
-  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation) {
+  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<>(dim + 1);
 
@@ -254,7 +254,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * @param subspaceIndex Subspace indexes
    * @return a set of high contrast subspaces
    */
-  private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?>> relation, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
+  private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector> relation, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
     final int dbdim = RelationUtil.dimensionality(relation);
 
     FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Subspace dimensionality", dbdim, LOG) : null;
@@ -345,7 +345,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * @param subspace Subspace
    * @param subspaceIndex Subspace indexes
    */
-  private void calculateContrast(Relation<? extends NumberVector<?>> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
+  private void calculateContrast(Relation<? extends NumberVector> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
     final int card = subspace.cardinality();
     final double alpha1 = Math.pow(alpha, (1.0 / card));
     final int windowsize = (int) (relation.size() * alpha1);
@@ -530,7 +530,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * 
    * @param <V> vector type
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter that specifies the number of iterations in the Monte-Carlo
      * process of identifying high contrast subspaces.

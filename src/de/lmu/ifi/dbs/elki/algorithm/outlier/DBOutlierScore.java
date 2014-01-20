@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -51,12 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @apiviz.has RangeQuery
  * 
  * @param <O> Database object type
- * @param <D> Distance type
  */
 @Title("Distance based outlier score")
 @Description("Generalization of the original DB-Outlier approach to a ranking method, by turning the fraction parameter into the output value.")
 @Reference(prefix = "Generalization of a method proposed in", authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
-public class DBOutlierScore<O, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
+public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
   /**
    * The logger for this class.
    */
@@ -68,14 +66,14 @@ public class DBOutlierScore<O, D extends Distance<D>> extends AbstractDBOutlier<
    * @param distanceFunction Distance function
    * @param d distance radius parameter
    */
-  public DBOutlierScore(DistanceFunction<O, D> distanceFunction, D d) {
+  public DBOutlierScore(DistanceFunction<O> distanceFunction, double d) {
     super(distanceFunction, d);
   }
 
   @Override
-  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, D d) {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    RangeQuery<O, D> rangeQuery = database.getRangeQuery(distFunc);
+  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double d) {
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    RangeQuery<O> rangeQuery = database.getRangeQuery(distFunc);
     final double size = distFunc.getRelation().size();
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -100,9 +98,9 @@ public class DBOutlierScore<O, D extends Distance<D>> extends AbstractDBOutlier<
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
     @Override
-    protected DBOutlierScore<O, D> makeInstance() {
+    protected DBOutlierScore<O> makeInstance() {
       return new DBOutlierScore<>(distanceFunction, d);
     }
   }

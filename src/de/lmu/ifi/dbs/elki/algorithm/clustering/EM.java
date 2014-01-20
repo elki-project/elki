@@ -89,7 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("EM-Clustering: Clustering by Expectation Maximization")
 @Description("Provides k Gaussian mixtures maximizing the probability of the given data")
 @Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", title = "Maximum Likelihood from Incomplete Data via the EM algorithm", booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", url = "http://www.jstor.org/stable/2984875")
-public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>> {
+public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -176,7 +176,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     Vector[] means = new Vector[k];
     {
       int i = 0;
-      for(NumberVector<?> nv : initialMeans) {
+      for(NumberVector nv : initialMeans) {
         means[i] = nv.getColumnVector();
         i++;
       }
@@ -244,7 +244,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       }
       hardClusters.get(maxIndex).add(iditer);
     }
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<EMModel<V>> result = new Clustering<>("EM Clustering", "em-clustering");
     // provide models within the result
     for(int i = 0; i < k; i++) {
@@ -295,7 +295,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * @param covarianceMatrices Output covariance matrixes
    * @param dimensionality Data set dimensionality
    */
-  public static void recomputeCovarianceMatrices(Relation<? extends NumberVector<?>> relation, WritableDataStore<double[]> probClusterIGivenX, Vector[] means, Matrix[] covarianceMatrices, final int dimensionality) {
+  public static void recomputeCovarianceMatrices(Relation<? extends NumberVector> relation, WritableDataStore<double[]> probClusterIGivenX, Vector[] means, Matrix[] covarianceMatrices, final int dimensionality) {
     final int k = means.length;
     CovarianceMatrix[] cms = new CovarianceMatrix[k];
     for(int i = 0; i < k; i++) {
@@ -337,7 +337,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * @param clusterWeights the weights of the current clusters
    * @return the expectation value of the current mixture of distributions
    */
-  public static double assignProbabilitiesToInstances(Relation<? extends NumberVector<?>> relation, double[] normDistrFactor, Vector[] means, Matrix[] invCovMatr, double[] clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
+  public static double assignProbabilitiesToInstances(Relation<? extends NumberVector> relation, double[] normDistrFactor, Vector[] means, Matrix[] invCovMatr, double[] clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
     final int k = clusterWeights.length;
     double emSum = 0.;
 
@@ -419,7 +419,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter to specify the number of clusters to find, must be an integer
      * greater than 0.

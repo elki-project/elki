@@ -24,9 +24,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  */
 
 import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 
 /**
@@ -35,10 +34,8 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * objects cluster.
  * 
  * @author Erich Schubert
- * 
- * @param <D> Distance type
  */
-public class PointerHierarchyRepresentationResult<D extends Distance<D>> extends BasicResult {
+public class PointerHierarchyRepresentationResult extends BasicResult {
   /**
    * The DBIDs in this result.
    */
@@ -52,7 +49,7 @@ public class PointerHierarchyRepresentationResult<D extends Distance<D>> extends
   /**
    * Distance to the parent object.
    */
-  DataStore<D> parentDistance;
+  DoubleDataStore parentDistance;
 
   /**
    * Constructor.
@@ -61,7 +58,7 @@ public class PointerHierarchyRepresentationResult<D extends Distance<D>> extends
    * @param parent Parent pointer.
    * @param parentDistance Distance to parent.
    */
-  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DataStore<D> parentDistance) {
+  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance) {
     super("Pointer Representation", "pointer-representation");
     this.ids = ids;
     this.parent = parent;
@@ -91,7 +88,7 @@ public class PointerHierarchyRepresentationResult<D extends Distance<D>> extends
    * 
    * @return Parent distance.
    */
-  public DataStore<D> getParentDistanceStore() {
+  public DoubleDataStore getParentDistanceStore() {
     return parentDistance;
   }
 }

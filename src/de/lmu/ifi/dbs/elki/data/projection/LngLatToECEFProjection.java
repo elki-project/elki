@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector type
  */
-public class LngLatToECEFProjection<V extends NumberVector<?>> implements Projection<V, V> {
+public class LngLatToECEFProjection<V extends NumberVector> implements Projection<V, V> {
   /**
    * Earth model to use
    */
@@ -50,7 +50,7 @@ public class LngLatToECEFProjection<V extends NumberVector<?>> implements Projec
   /**
    * Vector factory to use.
    */
-  private NumberVector.Factory<V, ?> factory;
+  private NumberVector.Factory<V> factory;
 
   /**
    * Constructor.
@@ -62,10 +62,11 @@ public class LngLatToECEFProjection<V extends NumberVector<?>> implements Projec
     this.model = model;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void initialize(SimpleTypeInformation<V> in) {
     final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
-    factory = (NumberVector.Factory<V, ?>) vin.getFactory();
+    factory = (NumberVector.Factory<V>) vin.getFactory();
   }
 
   @Override
@@ -100,13 +101,13 @@ public class LngLatToECEFProjection<V extends NumberVector<?>> implements Projec
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-      if (config.grab(modelP)) {
+      if(config.grab(modelP)) {
         model = modelP.instantiateClass(config);
       }
     }
 
     @Override
-    protected LngLatToECEFProjection<NumberVector<?>> makeInstance() {
+    protected LngLatToECEFProjection<NumberVector> makeInstance() {
       return new LngLatToECEFProjection<>(model);
     }
   }

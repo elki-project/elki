@@ -258,7 +258,7 @@ public final class MathUtil {
    * @param y second FeatureVector
    * @return the Pearson product-moment correlation coefficient for x and y
    */
-  public static double pearsonCorrelationCoefficient(NumberVector<?> x, NumberVector<?> y) {
+  public static double pearsonCorrelationCoefficient(NumberVector x, NumberVector y) {
     final int xdim = x.getDimensionality();
     final int ydim = y.getDimensionality();
     if (xdim != ydim) {
@@ -285,7 +285,7 @@ public final class MathUtil {
    * @param weights Weights
    * @return the Pearson product-moment correlation coefficient for x and y
    */
-  public static double weightedPearsonCorrelationCoefficient(NumberVector<?> x, NumberVector<?> y, double[] weights) {
+  public static double weightedPearsonCorrelationCoefficient(NumberVector x, NumberVector y, double[] weights) {
     final int xdim = x.getDimensionality();
     final int ydim = y.getDimensionality();
     if (xdim != ydim) {
@@ -312,7 +312,7 @@ public final class MathUtil {
    * @param weights Weights
    * @return the Pearson product-moment correlation coefficient for x and y
    */
-  public static double weightedPearsonCorrelationCoefficient(NumberVector<?> x, NumberVector<?> y, NumberVector<?> weights) {
+  public static double weightedPearsonCorrelationCoefficient(NumberVector x, NumberVector y, NumberVector weights) {
     final int xdim = x.getDimensionality();
     final int ydim = y.getDimensionality();
     if (xdim != ydim) {

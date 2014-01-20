@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 
 /**
@@ -33,18 +32,18 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  * 
  * @author Elke Achtert
  */
-interface RdKNNEntry<D extends NumberDistance<D, ?>> extends SpatialEntry {
+interface RdKNNEntry extends SpatialEntry {
   /**
    * Returns the knn distance of this entry.
    * 
    * @return the knn distance of this entry
    */
-  public D getKnnDistance();
+  public double getKnnDistance();
 
   /**
    * Sets the knn distance of this entry.
    * 
    * @param knnDistance the knn distance to be set
    */
-  public void setKnnDistance(D knnDistance);
+  public void setKnnDistance(double knnDistance);
 }

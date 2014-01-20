@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.landmark
  */
-public class Vector implements NumberVector<Double> {
+public class Vector implements NumberVector {
   /**
    * Array for internal storage of elements.
    * 

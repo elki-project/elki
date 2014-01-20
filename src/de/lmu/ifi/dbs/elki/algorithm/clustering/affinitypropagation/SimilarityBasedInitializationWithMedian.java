@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
@@ -44,13 +43,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class SimilarityBasedInitializationWithMedian<O, D extends NumberDistance<D, ?>> implements AffinityPropagationInitialization<O> {
+public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropagationInitialization<O> {
   /**
    * Similarity function.
    */
-  SimilarityFunction<? super O, D> similarity;
+  SimilarityFunction<? super O> similarity;
 
   /**
    * Quantile to use.
@@ -63,7 +61,7 @@ public class SimilarityBasedInitializationWithMedian<O, D extends NumberDistance
    * @param similarity Similarity function
    * @param quantile Quantile
    */
-  public SimilarityBasedInitializationWithMedian(SimilarityFunction<? super O, D> similarity, double quantile) {
+  public SimilarityBasedInitializationWithMedian(SimilarityFunction<? super O> similarity, double quantile) {
     super();
     this.similarity = similarity;
     this.quantile = quantile;
@@ -72,21 +70,21 @@ public class SimilarityBasedInitializationWithMedian<O, D extends NumberDistance
   @Override
   public double[][] getSimilarityMatrix(Database db, Relation<O> relation, ArrayDBIDs ids) {
     final int size = ids.size();
-    SimilarityQuery<O, D> sq = db.getSimilarityQuery(relation, similarity);
+    SimilarityQuery<O> sq = db.getSimilarityQuery(relation, similarity);
     double[][] mat = new double[size][size];
     double[] flat = new double[(size * (size - 1)) >> 1];
     // TODO: optimize for double valued primitive distances.
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();
     // Compute self-similarities first, for centering:
     for (int i = 0; i < size; i++, i1.advance()) {
-      mat[i][i] = sq.similarity(i1, i1).doubleValue() * .5;
+      mat[i][i] = sq.similarity(i1, i1) * .5;
     }
     i1.seek(0);
     for (int i = 0, j = 0; i < size; i++, i1.advance()) {
       final double[] mati = mat[i]; // Probably faster access.
       i2.seek(i + 1);
       for (int k = i + 1; k < size; k++, i2.advance()) {
-        mati[k] = sq.similarity(i1, i2).doubleValue() - mati[i] - mat[k][k];
+        mati[k] = sq.similarity(i1, i2) - mati[i] - mat[k][k];
         mat[k][i] = mati[k]; // symmetry.
         flat[j] = mati[k];
         j++;
@@ -113,9 +111,8 @@ public class SimilarityBasedInitializationWithMedian<O, D extends NumberDistance
    * @apiviz.exclude
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * Parameter for the similarity function.
      */
@@ -124,7 +121,7 @@ public class SimilarityBasedInitializationWithMedian<O, D extends NumberDistance
     /**
      * Similarity function.
      */
-    SimilarityFunction<? super O, D> similarity;
+    SimilarityFunction<? super O> similarity;
 
     /**
      * Quantile to use.
@@ -134,7 +131,7 @@ public class SimilarityBasedInitializationWithMedian<O, D extends NumberDistance
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<SimilarityFunction<? super O, D>> param = new ObjectParameter<>(SIMILARITY_ID, SimilarityFunction.class, LinearKernelFunction.class);
+      ObjectParameter<SimilarityFunction<? super O>> param = new ObjectParameter<>(SIMILARITY_ID, SimilarityFunction.class, LinearKernelFunction.class);
       if (config.grab(param)) {
         similarity = param.instantiateClass(config);
       }
@@ -146,7 +143,7 @@ public class SimilarityBasedInitializationWithMedian<O, D extends NumberDistance
     }
 
     @Override
-    protected SimilarityBasedInitializationWithMedian<O, D> makeInstance() {
+    protected SimilarityBasedInitializationWithMedian<O> makeInstance() {
       return new SimilarityBasedInitializationWithMedian<>(similarity, quantile);
     }
   }

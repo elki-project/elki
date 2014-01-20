@@ -63,7 +63,7 @@ public final class ArrayLikeUtil {
   /**
    * Use a number vector in the array API.
    */
-  public static final NumberVectorAdapter<?> NUMBERVECTORADAPTER = new NumberVectorAdapter<Double>();
+  public static final NumberVectorAdapter NUMBERVECTORADAPTER = new NumberVectorAdapter();
 
   /**
    * Adapter for matrixes, reinterpreted as flat arrays.
@@ -152,9 +152,8 @@ public final class ArrayLikeUtil {
    * @param prototype Prototype value, for type inference
    * @return Instance
    */
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> NumberVectorAdapter<N> numberVectorAdapter(NumberVector<N> prototype) {
-    return (NumberVectorAdapter<N>) NUMBERVECTORADAPTER;
+  public static NumberVectorAdapter numberVectorAdapter(NumberVector prototype) {
+    return NUMBERVECTORADAPTER;
   }
 
   /**
@@ -236,7 +235,7 @@ public final class ArrayLikeUtil {
    * @param obj Object to convert
    * @return primitive double array
    */
-  public static <N extends Number> double[] toPrimitiveDoubleArray(NumberVector<N> obj) {
+  public static double[] toPrimitiveDoubleArray(NumberVector obj) {
     return toPrimitiveDoubleArray(obj, numberVectorAdapter(obj));
   }
 
@@ -274,7 +273,7 @@ public final class ArrayLikeUtil {
    * @param obj Object to convert
    * @return primitive float array
    */
-  public static <N extends Number> float[] toPrimitiveFloatArray(NumberVector<N> obj) {
+  public static float[] toPrimitiveFloatArray(NumberVector obj) {
     return toPrimitiveFloatArray(obj, numberVectorAdapter(obj));
   }
 
@@ -309,7 +308,7 @@ public final class ArrayLikeUtil {
    * @param obj Object to convert
    * @return primitive double array
    */
-  public static <N extends Number> int[] toPrimitiveIntegerArray(NumberVector<N> obj) {
+  public static int[] toPrimitiveIntegerArray(NumberVector obj) {
     return toPrimitiveIntegerArray(obj, numberVectorAdapter(obj));
   }
 }

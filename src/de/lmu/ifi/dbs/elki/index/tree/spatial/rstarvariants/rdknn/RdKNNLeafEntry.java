@@ -23,14 +23,13 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 
 /**
  * Represents an entry in a leaf node of an RdKNN-Tree. Additionally to a
@@ -38,15 +37,14 @@ import java.io.ObjectOutput;
  * data object.
  * 
  * @author Elke Achtert
- * @param <D> Distance type
  */
-public class RdKNNLeafEntry<D extends NumberDistance<D, ?>> extends SpatialPointLeafEntry implements RdKNNEntry<D> {
-  private static final long serialVersionUID = 1;
+public class RdKNNLeafEntry extends SpatialPointLeafEntry implements RdKNNEntry {
+  private static final long serialVersionUID = 2;
 
   /**
    * The knn distance of the underlying data object.
    */
-  private D knnDistance;
+  private double knnDistance;
 
   /**
    * Empty constructor for serialization purposes.
@@ -62,18 +60,18 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, ?>> extends SpatialPoint
    * @param values the values of the underlying data object
    * @param knnDistance the knn distance of the underlying data object
    */
-  public RdKNNLeafEntry(DBID id, NumberVector<?> vector, D knnDistance) {
+  public RdKNNLeafEntry(DBID id, NumberVector vector, double knnDistance) {
     super(id, vector);
     this.knnDistance = knnDistance;
   }
 
   @Override
-  public D getKnnDistance() {
+  public double getKnnDistance() {
     return knnDistance;
   }
 
   @Override
-  public void setKnnDistance(D knnDistance) {
+  public void setKnnDistance(double knnDistance) {
     this.knnDistance = knnDistance;
   }
 
@@ -87,7 +85,7 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, ?>> extends SpatialPoint
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeObject(knnDistance);
+    out.writeDouble(knnDistance);
   }
 
   /**
@@ -100,10 +98,9 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, ?>> extends SpatialPoint
    *         cannot be found.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.knnDistance = (D) in.readObject();
+    this.knnDistance = in.readDouble();
   }
 
   /**
@@ -125,8 +122,8 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, ?>> extends SpatialPoint
       return false;
     }
 
-    final RdKNNLeafEntry<?> that = (RdKNNLeafEntry<?>) o;
+    final RdKNNLeafEntry that = (RdKNNLeafEntry) o;
 
-    return knnDistance.equals(that.knnDistance);
+    return knnDistance == that.knnDistance;
   }
 }

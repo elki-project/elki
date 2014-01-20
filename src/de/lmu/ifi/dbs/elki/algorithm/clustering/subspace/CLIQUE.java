@@ -95,7 +95,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")
 @Description("Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality.")
 @Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", url = "http://dx.doi.org/10.1145/276304.276314")
-public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -582,7 +582,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     protected int xsi;
 
     protected double tau;

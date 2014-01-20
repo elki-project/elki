@@ -52,7 +52,7 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
    * 
    * @param sim Similarity measure
    */
-  public MultidimensionalScalingMSTLayout3DPC(DimensionSimilarity<NumberVector<?>> sim) {
+  public MultidimensionalScalingMSTLayout3DPC(DimensionSimilarity<NumberVector> sim) {
     super(sim);
   }
 

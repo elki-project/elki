@@ -26,28 +26,19 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Base interface for any kind of distances.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object type
- * @param <D> Distance result type
  * 
  * @apiviz.landmark
  * @apiviz.has Distance
  */
-public interface DistanceFunction<O, D extends Distance<?>> extends Parameterizable {
-  /**
-   * Method to get the distance functions factory.
-   * 
-   * @return Factory for distance objects
-   */
-  D getDistanceFactory();
-
+public interface DistanceFunction<O> extends Parameterizable {
   /**
    * Is this function symmetric?
    * 
@@ -76,5 +67,5 @@ public interface DistanceFunction<O, D extends Distance<?>> extends Parameteriza
    * @param relation The representation to use
    * @return Actual distance query.
    */
-  public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> relation);
+  public <T extends O> DistanceQuery<T> instantiate(Relation<T> relation);
 }

@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Alias("lda")
 @Reference(authors = "R. A. Fisher", title = "The use of multiple measurements in taxonomic problems", booktitle = "Annals of eugenics 7.2 (1936)", url = "http://dx.doi.org/10.1111/j.1469-1809.1936.tb02137.x")
-public class LinearDiscriminantAnalysisFilter<V extends NumberVector<?>> extends AbstractSupervisedProjectionVectorFilter<V> {
+public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends AbstractSupervisedProjectionVectorFilter<V> {
   /**
    * Class logger.
    */
@@ -156,7 +156,7 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector<?>> extends
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractSupervisedProjectionVectorFilter.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractSupervisedProjectionVectorFilter.Parameterizer<V> {
     @Override
     protected LinearDiscriminantAnalysisFilter<V> makeInstance() {
       return new LinearDiscriminantAnalysisFilter<>(tdim);

@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class ByteVector extends AbstractNumberVector<Byte> {
+public class ByteVector extends AbstractNumberVector {
   /**
    * Static instance (object factory).
    */
@@ -150,13 +150,13 @@ public class ByteVector extends AbstractNumberVector<Byte> {
    * 
    * @apiviz.has ByteVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<ByteVector, Byte> {
+  public static class Factory extends AbstractNumberVector.Factory<ByteVector> {
     @Override
-    public <A> ByteVector newFeatureVector(A array, ArrayAdapter<Byte, A> adapter) {
+    public <A> ByteVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       byte[] values = new byte[dim];
       for (int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i);
+        values[i] = adapter.get(array, i).byteValue();
       }
       return new ByteVector(values, true);
     }

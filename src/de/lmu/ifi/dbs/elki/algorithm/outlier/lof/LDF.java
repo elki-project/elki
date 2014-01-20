@@ -37,10 +37,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -49,7 +47,6 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -88,10 +85,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has KernelDensityFunction
  * 
  * @param <O> the type of objects handled by this Algorithm
- * @param <D> Distance type
  */
 @Reference(authors = "L. J. Latecki, A. Lazarevic, D. Pokrajac", title = "Outlier Detection with Kernel Density Functions", booktitle = "Machine Learning and Data Mining in Pattern Recognition", url = "http://dx.doi.org/10.1007/978-3-540-73499-4_6")
-public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -125,7 +121,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @param h Kernel bandwidth scaling
    * @param c Score scaling parameter
    */
-  public LDF(int k, DistanceFunction<? super O, D> distance, KernelDensityFunction kernel, double h, double c) {
+  public LDF(int k, DistanceFunction<? super O> distance, KernelDensityFunction kernel, double h, double c) {
     super(distance);
     this.k = k + 1;
     this.kernel = kernel;
@@ -148,15 +144,15 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     DBIDs ids = relation.getDBIDs();
 
     // "HEAVY" flag for KNN Query since it is used more than once
-    KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
       }
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
+      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       database.addIndex(preproc);
-      DistanceQuery<O, D> rdq = database.getDistanceQuery(relation, getDistanceFunction());
+      DistanceQuery<O> rdq = database.getDistanceQuery(relation, getDistanceFunction());
       knnq = preproc.getKNNQuery(rdq, k);
     }
 
@@ -167,18 +163,18 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     WritableDoubleDataStore ldes = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
+      final KNNList neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
-      if(neighbors instanceof DoubleDistanceKNNList) {
+      if(neighbors instanceof KNNList) {
         // Fast version for double distances
-        for(DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+        for(DoubleDBIDListIter neighbor = ((KNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if(DBIDUtil.equal(neighbor, it)) {
             continue;
           }
-          final double nkdist = ((DoubleDistanceKNNList) knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
+          final double nkdist = ((KNNList) knnq.getKNNForDBID(neighbor, k)).getKNNDistance();
           if(nkdist > 0.) {
-            final double v = Math.max(nkdist, neighbor.doubleDistance()) / (h * nkdist);
+            final double v = Math.max(nkdist, neighbor.doubleValue()) / (h * nkdist);
             sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
             count++;
           }
@@ -190,13 +186,13 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
         }
       }
       else {
-        for(DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if(DBIDUtil.equal(neighbor, it)) {
             continue;
           }
-          final double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
+          final double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance();
           if(nkdist > 0.) {
-            final double v = Math.max(nkdist, neighbor.getDistance().doubleValue()) / (h * nkdist);
+            final double v = Math.max(nkdist, neighbor.doubleValue()) / (h * nkdist);
             sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
             count++;
           }
@@ -227,7 +223,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Local Density Factors", ids.size(), LOG) : null;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final double lrdp = ldes.doubleValue(it);
-      final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
+      final KNNList neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
       for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
@@ -283,9 +279,8 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @apiviz.exclude
    * 
    * @param <O> vector type
-   * @param <D> distance type
    */
-  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Option ID for kernel.
      */
@@ -353,7 +348,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     @Override
-    protected LDF<O, D> makeInstance() {
+    protected LDF<O> makeInstance() {
       return new LDF<>(k, distanceFunction, kernel, h, c);
     }
   }

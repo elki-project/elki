@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.impl.Constants;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -34,12 +36,11 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
@@ -64,13 +65,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @apiviz.uses SpatialIndexTree
  * 
- * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor<O, D, KNNList<D>> {
+public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
   /**
    * Logger to use
    */
@@ -83,13 +83,13 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+  public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
     super(relation, distanceFunction, k);
   }
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<O> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
 
     Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation, SpatialIndexTree.class);
     if(indexes.size() != 1) {
@@ -118,13 +118,13 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       for(int i = 0; i < size; i++) {
         ids.add(((LeafEntry) node.getEntry(i)).getDBID());
       }
-      HashMap<DBIDPair, D> cache = new HashMap<>((size * size * 3) >> 3);
+      TObjectDoubleHashMap<DBIDPair> cache = new TObjectDoubleHashMap<>((size * size * 3) >> 3, Constants.DEFAULT_LOAD_FACTOR, Double.NaN);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        KNNHeap<D> kNN = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
+        KNNHeap kNN = DBIDUtil.newHeap(k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
           DBIDPair key = DBIDUtil.newPair(id, id2);
-          D d = cache.remove(key);
-          if(d != null) {
+          double d = cache.remove(key);
+          if(d == d) { // Not NaN
             // consume the previous result.
             kNN.insert(d, id2);
           }
@@ -187,24 +187,23 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * @apiviz.uses SpatialApproximationMaterializeKNNPreprocessor oneway - -
    *              «create»
    * 
-   * @param <D> the type of distance the used distance function will return
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Factory<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector<?>, D, KNNList<D>> {
+  public static class Factory<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector, KNNList> {
     /**
      * Constructor.
      * 
      * @param k k
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super NumberVector<?>, D> distanceFunction) {
+    public Factory(int k, DistanceFunction<? super NumberVector> distanceFunction) {
       super(k, distanceFunction);
     }
 
     @Override
-    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E> instantiate(Relation<NumberVector<?>> relation) {
-      SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
+    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instantiate(Relation<NumberVector> relation) {
+      SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
       return instance;
     }
 
@@ -215,9 +214,9 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<NumberVector<?>, D> {
+    public static class Parameterizer<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<NumberVector> {
       @Override
-      protected Factory<D, N, E> makeInstance() {
+      protected Factory<N, E> makeInstance() {
         return new Factory<>(k, distanceFunction);
       }
     }

@@ -109,7 +109,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
  */
 @Alias({ "3dpc", "3DPC" })
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
-public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements ResultHandler {
+public class OpenGL3DParallelCoordinates<O extends NumberVector> implements ResultHandler {
   /**
    * Logging class.
    */
@@ -219,7 +219,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
    * 
    * @param <O> Object type
    */
-  public static class Instance<O extends NumberVector<?>> implements GLEventListener {
+  public static class Instance<O extends NumberVector> implements GLEventListener {
     /**
      * Flag to enable debug rendering.
      */
@@ -652,7 +652,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector<?>> implements R
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**
      * Option for layouting method
      */

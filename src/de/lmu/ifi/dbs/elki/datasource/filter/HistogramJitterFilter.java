@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <V> Vector type
  */
 @Description("Add uniform Jitter to a dataset, while preserving the total vector sum.")
-public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVectorStreamConversionFilter<V, V> {
+public class HistogramJitterFilter<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> {
   /**
    * Jitter amount.
    */

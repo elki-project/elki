@@ -32,13 +32,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -57,9 +56,8 @@ import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class ParallelKNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
    */
@@ -71,7 +69,7 @@ public class ParallelKNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelKNNWeightOutlier(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public ParallelKNNWeightOutlier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -89,11 +87,11 @@ public class ParallelKNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends
   public OutlierResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
-    DistanceQuery<O, D> distq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnq = database.getKNNQuery(distq, k);
+    DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<O> knnq = database.getKNNQuery(distq, k);
 
-    KNNMapper<O, D> knnm = new KNNMapper<>(k, knnq);
-    SharedObject<KNNList<D>> knnv = new SharedObject<>();
+    KNNMapper<O> knnm = new KNNMapper<>(k, knnq);
+    SharedObject<KNNList> knnv = new SharedObject<>();
     KNNWeightMapper kdistm = new KNNWeightMapper(k);
     SharedDouble kdistv = new SharedDouble();
     WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(store);
@@ -126,9 +124,8 @@ public class ParallelKNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends
    * @apiviz.exclude
    *
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * K parameter
      */
@@ -145,7 +142,7 @@ public class ParallelKNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends
     }
 
     @Override
-    protected ParallelKNNWeightOutlier<O, D> makeInstance() {
+    protected ParallelKNNWeightOutlier<O> makeInstance() {
       return new ParallelKNNWeightOutlier<>(distanceFunction, k);
     }
   }

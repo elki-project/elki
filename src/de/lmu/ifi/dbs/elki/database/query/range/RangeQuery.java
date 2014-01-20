@@ -24,9 +24,8 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * The interface for range queries
@@ -37,9 +36,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.uses DistanceDBIDList oneway - - «create»
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public interface RangeQuery<O, D extends Distance<D>> extends DatabaseQuery {
+public interface RangeQuery<O> extends DatabaseQuery {
   /**
    * Get the nearest neighbors for a particular id in a given query range
    * 
@@ -47,7 +45,7 @@ public interface RangeQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param range Query range
    * @return neighbors
    */
-  public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range);
+  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range);
 
   /**
    * Get the nearest neighbors for a particular object in a given query range
@@ -56,12 +54,5 @@ public interface RangeQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param range Query range
    * @return neighbors
    */
-  public DistanceDBIDList<D> getRangeForObject(O obj, D range);
-
-  /**
-   * Get the distance factory for the given distance type.
-   * 
-   * @return Distance factory.
-   */
-  public D getDistanceFactory();
+  public DoubleDBIDList getRangeForObject(O obj, double range);
 }

@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -51,8 +51,8 @@ public class LinearKernelFunction extends PolynomialKernelFunction {
   }
 
   @Override
-  public double doubleSimilarity(final NumberVector<?> o1, final NumberVector<?> o2) {
-    final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(o1, o2);
+  public double similarity(final NumberVector o1, final NumberVector o2) {
+    final int dim = AbstractNumberVectorDistanceFunction.dimensionality(o1, o2);
     double sim = 0.;
     for (int i = 0; i < dim; i++) {
       sim += o1.doubleValue(i) * o2.doubleValue(i);
@@ -61,8 +61,8 @@ public class LinearKernelFunction extends PolynomialKernelFunction {
   }
 
   @Override
-  public double doubleDistance(final NumberVector<?> fv1, final NumberVector<?> fv2) {
-    return Math.sqrt(doubleSimilarity(fv1, fv1) + doubleSimilarity(fv2, fv2) - 2 * doubleSimilarity(fv1, fv2));
+  public double distance(final NumberVector fv1, final NumberVector fv2) {
+    return Math.sqrt(similarity(fv1, fv1) + similarity(fv2, fv2) - 2 * similarity(fv1, fv2));
   }
 
   /**

@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 
@@ -76,14 +75,14 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    * @param i Increment.
    */
   protected void countRefinements(int i) {
-    if (refinements != null) {
+    if(refinements != null) {
       refinements.increment(i);
     }
   }
 
   @Override
   public void logStatistics() {
-    if (refinements != null) {
+    if(refinements != null) {
       getLogger().statistics(refinements);
     }
   }
@@ -106,13 +105,13 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    * 
    * @apiviz.excludeSubtypes
    */
-  public abstract class AbstractRangeQuery<D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
+  public abstract class AbstractRangeQuery extends AbstractDistanceRangeQuery<O> {
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query object
      */
-    public AbstractRangeQuery(DistanceQuery<O, D> distanceQuery) {
+    public AbstractRangeQuery(DistanceQuery<O> distanceQuery) {
       super(distanceQuery);
     }
 
@@ -123,7 +122,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
      * @param q Query object
      * @return Distance
      */
-    protected D refine(DBIDRef id, O q) {
+    protected double refine(DBIDRef id, O q) {
       AbstractRefiningIndex.this.countRefinements(1);
       return distanceQuery.distance(q, id);
     }
@@ -145,13 +144,13 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    * 
    * @apiviz.excludeSubtypes
    */
-  public abstract class AbstractKNNQuery<D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
+  public abstract class AbstractKNNQuery extends AbstractDistanceKNNQuery<O> {
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query object
      */
-    public AbstractKNNQuery(DistanceQuery<O, D> distanceQuery) {
+    public AbstractKNNQuery(DistanceQuery<O> distanceQuery) {
       super(distanceQuery);
     }
 
@@ -162,7 +161,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
      * @param q Query object
      * @return Distance
      */
-    protected D refine(DBID id, O q) {
+    protected double refine(DBID id, O q) {
       AbstractRefiningIndex.this.countRefinements(1);
       return distanceQuery.distance(q, id);
     }

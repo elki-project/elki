@@ -98,7 +98,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
-public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -603,7 +603,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @return Usually, v1.dim - commonPreference.cardinality, unless either pv1
    *         and pv2 are a subset of the other.
    */
-  private int subspaceDimensionality(NumberVector<?> v1, NumberVector<?> v2, long[] pv1, long[] pv2, long[] commonPreferenceVector) {
+  private int subspaceDimensionality(NumberVector v1, NumberVector v2, long[] pv1, long[] pv2, long[] commonPreferenceVector) {
     // number of zero values in commonPreferenceVector
     int subspaceDim = v1.getDimensionality() - BitsUtil.cardinality(commonPreferenceVector);
 
@@ -627,7 +627,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @return the weighted distance between the two specified vectors according
    *         to the given preference vector
    */
-  protected static double weightedDistance(NumberVector<?> v1, NumberVector<?> v2, long[] weightVector) {
+  protected static double weightedDistance(NumberVector v1, NumberVector v2, long[] weightVector) {
     double sqrDist = 0;
     for(int i = BitsUtil.nextSetBit(weightVector, 0); i >= 0; i = BitsUtil.nextSetBit(weightVector, i + 1)) {
       double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
@@ -800,7 +800,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter that specifies the maximum radius of the neighborhood to be
      * considered in each dimension for determination of the preference vector,

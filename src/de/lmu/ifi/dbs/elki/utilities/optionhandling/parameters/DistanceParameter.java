@@ -24,24 +24,16 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  */
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Parameter class for a parameter specifying a double value.
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
- * 
- * @param <D> Distance type 
  */
-public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<DistanceParameter<D>, D> {
-  /**
-   * Distance type
-   */
-  D dist;
-
+@Deprecated
+public class DistanceParameter extends DoubleParameter {
   /**
    * Constructs a double parameter with the given optionID and default value.
    * 
@@ -49,9 +41,8 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param dist distance factory
    * @param defaultValue the default value for this double parameter
    */
-  public DistanceParameter(OptionID optionID, D dist, D defaultValue) {
+  public DistanceParameter(OptionID optionID, Double dist, Double defaultValue) {
     super(optionID, defaultValue);
-    this.dist = dist;
   }
 
   /**
@@ -61,9 +52,8 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param dist distance factory
    * @param defaultValue the default value for this double parameter
    */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, D defaultValue) {
+  public DistanceParameter(OptionID optionID, DistanceFunction<?> dist, Double defaultValue) {
     super(optionID, defaultValue);
-    this.dist = (dist != null) ? dist.getDistanceFactory() : null;
   }
 
   /**
@@ -73,9 +63,9 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param dist distance factory
    * @param optional specifies whether this parameter is an optional parameter
    */
-  public DistanceParameter(OptionID optionID, D dist, boolean optional) {
-    super(optionID, optional);
-    this.dist = dist;
+  public DistanceParameter(OptionID optionID, Double dist, boolean optional) {
+    super(optionID);
+    setOptional(true);
   }
 
   /**
@@ -85,9 +75,9 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param dist distance factory
    * @param optional specifies whether this parameter is an optional parameter
    */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, boolean optional) {
-    super(optionID, optional);
-    this.dist = (dist != null) ? dist.getDistanceFactory() : null;
+  public DistanceParameter(OptionID optionID, DistanceFunction<?> dist, boolean optional) {
+    super(optionID);
+    setOptional(true);
   }
 
   /**
@@ -96,45 +86,13 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param optionID the unique id of this parameter
    * @param dist distance factory
    */
-  public DistanceParameter(OptionID optionID, D dist) {
+  public DistanceParameter(OptionID optionID, DistanceFunction<?> dist) {
     super(optionID);
-    this.dist = dist;
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param dist distance factory
-   */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist) {
-    super(optionID);
-    this.dist = (dist != null) ? dist.getDistanceFactory() : null;
   }
 
   @Override
   public String getValueAsString() {
     return getValue().toString();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  protected D parseValue(Object obj) throws WrongParameterValueException {
-    if (dist == null) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a distance value, but the distance was not set!");
-    }
-    if (obj == null) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a distance value, but a null value was given!");
-    }
-    if(dist.nullDistance().getClass().isAssignableFrom(obj.getClass())) {
-      return (D) dist.nullDistance().getClass().cast(obj);
-    }
-    try {
-      return dist.parseString(obj.toString());
-    }
-    catch(IllegalArgumentException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a distance value, read: " + obj + "!\n");
-    }
   }
 
   /**

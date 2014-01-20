@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPre
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -39,9 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <N> Object type for neighborhood
  * @param <O> Non-spatial object type
- * @param <D> Distance value type
  */
-public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier<N> {
+public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends AbstractNeighborhoodOutlier<N> {
   /**
    * Parameter to specify the non spatial distance function to use
    */
@@ -50,7 +48,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
   /**
    * The distance function to use
    */
-  private DistanceFunction<O, D> nonSpatialDistanceFunction;
+  private DistanceFunction<O> nonSpatialDistanceFunction;
 
   /**
    * Constructor.
@@ -59,7 +57,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
    * @param nonSpatialDistanceFunction Distance function to use on the
    *        non-spatial attributes.
    */
-  public AbstractDistanceBasedSpatialOutlier(NeighborSetPredicate.Factory<N> npredf, DistanceFunction<O, D> nonSpatialDistanceFunction) {
+  public AbstractDistanceBasedSpatialOutlier(NeighborSetPredicate.Factory<N> npredf, DistanceFunction<O> nonSpatialDistanceFunction) {
     super(npredf);
     this.nonSpatialDistanceFunction = nonSpatialDistanceFunction;
   }
@@ -69,7 +67,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
    * 
    * @return the distance function to use on the non-spatial attributes
    */
-  protected DistanceFunction<O, D> getNonSpatialDistanceFunction() {
+  protected DistanceFunction<O> getNonSpatialDistanceFunction() {
     return nonSpatialDistanceFunction;
   }
 
@@ -82,18 +80,17 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
    * 
    * @param <N> Object type for neighborhood
    * @param <O> Non-spatial object type
-   * @param <D> Distance value type
    */
-  public abstract static class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public abstract static class Parameterizer<N, O> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     /**
      * The distance function to use on the non-spatial attributes.
      */
-    protected PrimitiveDistanceFunction<O, D> distanceFunction = null;
+    protected PrimitiveDistanceFunction<O> distanceFunction = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistanceFunction<O, D>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

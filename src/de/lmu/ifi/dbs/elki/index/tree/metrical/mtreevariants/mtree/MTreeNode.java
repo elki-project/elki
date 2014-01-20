@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
@@ -32,9 +31,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @author Elke Achtert
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class MTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MTreeNode<O, D>, MTreeEntry> {
+public class MTreeNode<O> extends AbstractMTreeNode<O, MTreeNode<O>, MTreeEntry> {
   /**
    * Serial version
    */

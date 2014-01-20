@@ -73,7 +73,7 @@ public class AddSingleScale implements Algorithm {
   public Result run(Database database) {
     for(Relation<?> rel : database.getRelations()) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        ScalesResult res = run((Relation<? extends NumberVector<?>>) rel);
+        ScalesResult res = run((Relation<? extends NumberVector>) rel);
         ResultUtil.addChildResult(rel, res);
       }
     }
@@ -86,13 +86,13 @@ public class AddSingleScale implements Algorithm {
    * @param rel Relation
    * @return Scales
    */
-  private ScalesResult run(Relation<? extends NumberVector<?>> rel) {
+  private ScalesResult run(Relation<? extends NumberVector> rel) {
     final int dim = RelationUtil.dimensionality(rel);
     LinearScale[] scales = new LinearScale[dim];
     if(minmax == null) {
       DoubleMinMax mm = new DoubleMinMax();
       for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        NumberVector<?> vec = rel.get(iditer);
+        NumberVector vec = rel.get(iditer);
         for(int d = 0; d < dim; d++) {
           final double val = vec.doubleValue(d);
           if(val != val) {

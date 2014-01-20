@@ -31,15 +31,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DistanceDBIDPairKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 
@@ -134,60 +128,36 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
 
   @Override
   public DoubleDBIDPair newPair(double val, DBIDRef id) {
-    return new IntegerDoubleDBIDPair(val, id.internalGetIndex());
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id) {
-    if(val instanceof DoubleDistance) {
-      return (DistanceDBIDPair<D>) new DoubleDistanceIntegerDBIDPair(((DoubleDistance) val).doubleValue(), id.internalGetIndex());
-    }
-    return new DistanceIntegerDBIDPair<>(val, id.internalGetIndex());
+    return new DoubleIntegerDBIDPair(val, id.internalGetIndex());
   }
 
   @Override
-  public DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id) {
-    return new DoubleDistanceIntegerDBIDPair(val, id.internalGetIndex());
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <D extends Distance<D>> KNNHeap<D> newHeap(D factory, int k) {
-    if(factory instanceof DoubleDistance) {
-      return (KNNHeap<D>) newDoubleDistanceHeap(k);
-    }
-    return new DistanceDBIDPairKNNHeap<>(k);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist) {
-    if(exist instanceof DoubleDistanceKNNList) {
-      DoubleDistanceKNNHeap heap = newDoubleDistanceHeap(exist.getK());
-      // Insert backwards, as this will produce a proper heap
-      for(int i = exist.size() - 1; i >= 0; i--) {
-        heap.insert((DoubleDistanceDBIDPair) exist.get(i));
-      }
-      return (KNNHeap<D>) heap;
-    }
-    else {
-      DistanceDBIDPairKNNHeap<D> heap = new DistanceDBIDPairKNNHeap<>(exist.getK());
-      // Insert backwards, as this will produce a proper heap
-      for(int i = exist.size() - 1; i >= 0; i--) {
-        heap.insert(exist.get(i));
-      }
-      return heap;
-    }
-  }
-
-  @Override
-  public DoubleDistanceKNNHeap newDoubleDistanceHeap(int k) {
+  public KNNHeap newHeap(int k) {
     // TODO: benchmark threshold!
     if(k > 1000) {
-      return new DoubleDistanceIntegerDBIDKNNHeap(k);
+      return new DoubleIntegerDBIDKNNHeap(k);
     }
-    return new DoubleDistanceIntegerDBIDSortedKNNList(k);
+    return new DoubleIntegerDBIDListKNNHeap(k);
+  }
+
+  @Override
+  public KNNHeap newHeap(KNNList exist) {
+    KNNHeap heap = newHeap(exist.getK());
+    // Insert backwards, as this will produce a proper heap
+    for(int i = exist.size() - 1; i >= 0; i--) {
+      heap.insert(exist.get(i));
+    }
+    return heap;
+  }
+
+  @Override
+  public ModifiableDoubleDBIDList newDistanceDBIDList(int size) {
+    return new DoubleIntegerDBIDList(size);
+  }
+
+  @Override
+  public ModifiableDoubleDBIDList newDistanceDBIDList() {
+    return new DoubleIntegerDBIDList();
   }
 
   @Override

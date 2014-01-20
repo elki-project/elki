@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -82,7 +81,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("LB-ABOD: Lower Bounded Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url = "http://dx.doi.org/10.1145/1401890.1401946")
-public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
+public class LBABOD<V extends NumberVector> extends FastABOD<V> {
   /**
    * The logger for this class.
    */
@@ -100,7 +99,7 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
    * @param k k parameter
    * @param l Number of outliers to find exact
    */
-  public LBABOD(SimilarityFunction<? super V, DoubleDistance> kernelFunction, int k, int l) {
+  public LBABOD(SimilarityFunction<? super V> kernelFunction, int k, int l) {
     super(kernelFunction, k);
     this.l = l;
   }
@@ -114,7 +113,7 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
   @Override
   public OutlierResult run(Database db, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-    SimilarityQuery<V, DoubleDistance> sq = relation.getDatabase().getSimilarityQuery(relation, kernelFunction);
+    SimilarityQuery<V> sq = relation.getDatabase().getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     // Output storage.
@@ -259,7 +258,7 @@ public class LBABOD<V extends NumberVector<?>> extends FastABOD<V> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends FastABOD.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends FastABOD.Parameterizer<V> {
     /**
      * Parameter to specify the number of outliers to compute exactly.
      */

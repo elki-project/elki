@@ -29,12 +29,11 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
@@ -60,10 +59,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
 @Reference(title = "Subsampling for Efficient and Effective Unsupervised Outlier Detection Ensembles", authors = "A. Zimek and M. Gaudet and R. J. G. B. Campello and J. Sander", booktitle = "Proc. 19th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, KDD '13")
-public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNList<D>> {
+public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
   /**
    * Logger
    */
@@ -88,7 +86,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
    * @param share Relative share
    * @param rnd Random generator
    */
-  public RandomSampleKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, double share, RandomFactory rnd) {
+  public RandomSampleKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, double share, RandomFactory rnd) {
     super(relation, distanceFunction, k);
     this.share = share;
     this.rnd = rnd;
@@ -96,7 +94,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<O> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing random-sample k nearest neighbors (k=" + k + ")", relation.size(), getLogger()) : null;
 
@@ -104,11 +102,11 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
     final int samplesize = (int) (ids.size() * share);
 
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNHeap<D> kNN = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
+      KNNHeap kNN = DBIDUtil.newHeap(k);
 
       DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rnd);
       for(DBIDIter iter2 = rsamp.iter(); iter2.valid(); iter2.advance()) {
-        D dist = distanceQuery.distance(iter, iter2);
+        double dist = distanceQuery.distance(iter, iter2);
         kNN.insert(dist, iter2);
       }
 
@@ -153,9 +151,8 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
    * @apiviz.uses AbstractMaterializeKNNPreprocessor oneway - - «create»
    * 
    * @param <O> The object type
-   * @param <D> The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNList<D>> {
+  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
     /**
      * Relative share of objects to get
      */
@@ -174,14 +171,14 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
      * @param share Sample size (relative)
      * @param rnd Random generator
      */
-    public Factory(int k, DistanceFunction<? super O, D> distanceFunction, double share, RandomFactory rnd) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction, double share, RandomFactory rnd) {
       super(k, distanceFunction);
       this.share = share;
       this.rnd = rnd;
     }
 
     @Override
-    public RandomSampleKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
+    public RandomSampleKNNPreprocessor<O> instantiate(Relation<O> relation) {
       return new RandomSampleKNNPreprocessor<>(relation, distanceFunction, k, share, rnd);
     }
 
@@ -193,9 +190,8 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
      * @apiviz.exclude
      * 
      * @param <O> Object type
-     * @param <D> Distance type
      */
-    public static class Parameterizer<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**
        * Parameter to specify how many objects to consider for computing the
        * kNN.
@@ -241,7 +237,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
       }
 
       @Override
-      protected RandomSampleKNNPreprocessor.Factory<O, D> makeInstance() {
+      protected RandomSampleKNNPreprocessor.Factory<O> makeInstance() {
         return new RandomSampleKNNPreprocessor.Factory<>(k, distanceFunction, share, rnd);
       }
     }

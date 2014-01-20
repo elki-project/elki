@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -87,25 +86,23 @@ public interface Database extends HierarchicalResult {
    * Get the distance query for a particular distance function.
    * 
    * @param <O> Object type
-   * @param <D> Distance result type
    * @param relation Relation used
    * @param distanceFunction Distance function to use
    * @param hints Optimizer hints
    * @return Instance to query the database with this distance
    */
-  <O, D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, Object... hints);
+  <O> DistanceQuery<O> getDistanceQuery(Relation<O> relation, DistanceFunction<? super O> distanceFunction, Object... hints);
 
   /**
    * Get the similarity query for a particular similarity function.
    * 
    * @param <O> Object type
-   * @param <D> Similarity result type
    * @param relation Relation used
    * @param similarityFunction Similarity function to use
    * @param hints Optimizer hints
    * @return Instance to query the database with this similarity
    */
-  <O, D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(Relation<O> relation, SimilarityFunction<? super O, D> similarityFunction, Object... hints);
+  <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> relation, SimilarityFunction<? super O> similarityFunction, Object... hints);
 
   /**
    * Get a KNN query object for the given distance query.
@@ -121,12 +118,11 @@ public interface Database extends HierarchicalResult {
    * </ul>
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    * @param distanceQuery Distance query
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
+  <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
 
   /**
    * Get a range query object for the given distance query.
@@ -142,12 +138,11 @@ public interface Database extends HierarchicalResult {
    * </ul>
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    * @param distanceQuery Distance query
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
+  <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints);
 
   /**
    * Get a rKNN query object for the given distance query.
@@ -163,12 +158,11 @@ public interface Database extends HierarchicalResult {
    * </ul>
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    * @param distanceQuery Distance query
    * @param hints Optimizer hints
    * @return KNN Query object
    */
-  <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints);
+  <O> RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

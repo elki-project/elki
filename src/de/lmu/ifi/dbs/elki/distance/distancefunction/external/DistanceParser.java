@@ -25,31 +25,23 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 import java.io.InputStream;
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-
 /**
- * A DistanceParser shall provide a DistanceParsingResult by parsing an InputStream.
- *
+ * A DistanceParser shall provide a DistanceParsingResult by parsing an
+ * InputStream.
+ * 
  * @author Arthur Zimek
  * 
- * @apiviz.uses DistanceParsingResult oneway - - «create»
- * 
- * @param <D> distance type
+ * @apiviz.uses DistanceCacheWriter oneway - - «create»
  */
-public interface DistanceParser<D extends Distance<D>> {
+public interface DistanceParser {
   /**
-   * Parameter for distance function.
-   */
-  public static final OptionID DISTANCE_ID = new OptionID("parser.distance", "Distance type used for parsing values.");
-
-  /**
-   * Returns a list of the objects parsed from the specified input stream
-   * and a list of the labels associated with the objects.
-   *
+   * Returns a list of the objects parsed from the specified input stream and a
+   * list of the labels associated with the objects.
+   * 
    * @param in the stream to parse objects from
-   * @return a list containing those objects parsed
-   *         from the input stream and their associated labels.
+   * @param cache Cache writer
+   * @return a list containing those objects parsed from the input stream and
+   *         their associated labels.
    */
-  DistanceParsingResult<D> parse(InputStream in);
+  void parse(InputStream in, DistanceCacheWriter cache);
 }

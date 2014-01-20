@@ -31,12 +31,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -51,21 +50,20 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject to be stored in the metrical index
- * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  * @param <S> the type of Settings kept.
  */
-public abstract class AbstractMkTree<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, D, N, E>> extends AbstractMTree<O, D, N, E, S> {
+public abstract class AbstractMkTree<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, N, E>> extends AbstractMTree<O, N, E, S> {
   /**
    * Internal class for performing knn queries
    */
-  protected KNNQuery<O, D> knnq;
+  protected KNNQuery<O> knnq;
 
   /**
    * Distance query to use.
    */
-  private DistanceQuery<O, D> distanceQuery;
+  private DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
@@ -82,9 +80,9 @@ public abstract class AbstractMkTree<O, D extends NumberDistance<D, ?>, N extend
   }
 
   @Override
-  public D distance(DBIDRef id1, DBIDRef id2) {
-    if (id1 == null || id2 == null) {
-      return getDistanceFactory().undefinedDistance();
+  public double distance(DBIDRef id1, DBIDRef id2) {
+    if(id1 == null || id2 == null) {
+      return Double.NaN;
     }
     statistics.countDistanceCalculation();
     return distanceQuery.distance(id1, id2);
@@ -98,7 +96,7 @@ public abstract class AbstractMkTree<O, D extends NumberDistance<D, ?>, N extend
    * @param k the number of nearest neighbors to be returned
    * @return a List of the query results
    */
-  public abstract DistanceDBIDList<D> reverseKNNQuery(final DBIDRef id, int k);
+  public abstract DoubleDBIDList reverseKNNQuery(final DBIDRef id, int k);
 
   /**
    * Performs a batch k-nearest neighbor query for a list of query objects.
@@ -111,9 +109,9 @@ public abstract class AbstractMkTree<O, D extends NumberDistance<D, ?>, N extend
    * @deprecated Change to use by-object NN lookups instead.
    */
   @Deprecated
-  protected final Map<DBID, KNNList<D>> batchNN(N node, DBIDs ids, int kmax) {
-    Map<DBID, KNNList<D>> res = new HashMap<>(ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+  protected final Map<DBID, KNNList> batchNN(N node, DBIDs ids, int kmax) {
+    Map<DBID, KNNList> res = new HashMap<>(ids.size());
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       res.put(id, knnq.getKNNForDBID(id, kmax));
     }

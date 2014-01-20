@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Interface for computing the quality of a K-Means clustering.
@@ -36,9 +35,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <O> Input Object restriction type
- * @param <D> Distance restriction type
  */
-public interface KMeansQualityMeasure<O extends NumberVector<?>, D extends Distance<?>> {
+public interface KMeansQualityMeasure<O extends NumberVector> {
   /**
    * Calculates and returns the quality measure.
    * 
@@ -50,5 +48,5 @@ public interface KMeansQualityMeasure<O extends NumberVector<?>, D extends Dista
    * 
    * @return quality measure
    */
-  <V extends O> double calculateCost(Clustering<? extends MeanModel<V>> clustering, PrimitiveDistanceFunction<? super V, ? extends D> distanceFunction, Relation<V> relation);
+  <V extends O> double calculateCost(Clustering<? extends MeanModel<V>> clustering, PrimitiveDistanceFunction<? super V> distanceFunction, Relation<V> relation);
 }

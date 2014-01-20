@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Alias({ "bray-curtis", "braycurtis", "sorensen", "dice", "sorensen-dice" })
 @Reference(authors = "J. R. Bray and J. T. Curtis", title = "An ordination of the upland forest communities of southern Wisconsin", booktitle = "Ecological monographs 27.4", url = "http://dx.doi.org/10.2307/1942268")
-public class BrayCurtisDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance.
    */
@@ -103,7 +103,7 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDoubleDistanceFun
   };
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double sumdiff = 0., sumsum = 0.;
     for (int d = 0; d < dim; d++) {
@@ -115,7 +115,7 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDoubleDistanceFun
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double sumdiff = 0., sumsum = 0.;
     for (int d = 0; d < dim; d++) {

@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.database.query.similarity;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 
 /**
@@ -36,12 +35,10 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has Distance
  * 
- * @param O Input object type
- * @param D Distance result type
+ * @param <O> Input object type
  */
-public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery {
+public interface SimilarityQuery<O> extends DatabaseQuery {
   /**
    * Returns the similarity between the two objects specified by their object
    * ids.
@@ -51,7 +48,7 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * @return the similarity between the two objects specified by their object
    *         ids
    */
-  D similarity(DBIDRef id1, DBIDRef id2);
+  double similarity(DBIDRef id1, DBIDRef id2);
 
   /**
    * Returns the similarity between the two objects specified by their object
@@ -62,7 +59,7 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * @return the similarity between the two objects specified by their object
    *         ids
    */
-  D similarity(O o1, DBIDRef id2);
+  double similarity(O o1, DBIDRef id2);
 
   /**
    * Returns the similarity between the two objects specified by their object
@@ -73,7 +70,7 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * @return the similarity between the two objects specified by their object
    *         ids
    */
-  D similarity(DBIDRef id1, O o2);
+  double similarity(DBIDRef id1, O o2);
 
   /**
    * Returns the similarity between the two objects specified by their object
@@ -84,14 +81,7 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * @return the similarity between the two objects specified by their object
    *         ids
    */
-  D similarity(O o1, O o2);
-
-  /**
-   * Method to get the distance functions factory.
-   * 
-   * @return Factory for distance objects
-   */
-  D getDistanceFactory();
+  double similarity(O o1, O o2);
 
   /**
    * Access the underlying data query.
@@ -105,5 +95,5 @@ public interface SimilarityQuery<O, D extends Distance<?>> extends DatabaseQuery
    * 
    * @return Similarity function
    */
-  SimilarityFunction<? super O, D> getSimilarityFunction();
+  SimilarityFunction<? super O> getSimilarityFunction();
 }

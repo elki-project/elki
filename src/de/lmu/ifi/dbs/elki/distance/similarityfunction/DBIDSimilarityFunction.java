@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Interface DBIDSimilarityFunction describes the requirements of any similarity
@@ -34,10 +33,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.landmark
  * @apiviz.uses DBID oneway - - defined on
- * 
- * @param <D> distance type
  */
-public interface DBIDSimilarityFunction<D extends Distance<D>> extends SimilarityFunction<DBID, D> {
+public interface DBIDSimilarityFunction extends SimilarityFunction<DBID> {
   /**
    * Computes the similarity between two given DatabaseObjects according to this
    * similarity function.
@@ -47,5 +44,5 @@ public interface DBIDSimilarityFunction<D extends Distance<D>> extends Similarit
    * @return the similarity between two given DatabaseObjects according to this
    *         similarity function
    */
-  D similarity(DBID id1, DBID id2);
+  double similarity(DBID id1, DBID id2);
 }

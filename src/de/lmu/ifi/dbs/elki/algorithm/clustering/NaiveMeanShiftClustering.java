@@ -35,15 +35,14 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
@@ -52,7 +51,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -80,10 +79,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
 @Reference(authors = "Y. Cheng", title = "Mean shift, mode seeking, and clustering", booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", url = "http://dx.doi.org/10.1109/34.400568")
-public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
   /**
    * Class logger.
    */
@@ -97,7 +95,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
   /**
    * Range of the kernel.
    */
-  D range;
+  double bandwidth;
 
   /**
    * Maximum number of iterations.
@@ -111,10 +109,10 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
    * @param kernel Kernel function
    * @param range Kernel radius
    */
-  public NaiveMeanShiftClustering(DistanceFunction<? super V, D> distanceFunction, KernelDensityFunction kernel, D range) {
+  public NaiveMeanShiftClustering(DistanceFunction<? super V> distanceFunction, KernelDensityFunction kernel, double range) {
     super(distanceFunction);
     this.kernel = kernel;
-    this.range = range;
+    this.bandwidth = range;
   }
 
   /**
@@ -125,12 +123,10 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
    * @return Clustering result
    */
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
-    final DistanceQuery<V, D> distq = database.getDistanceQuery(relation, getDistanceFunction());
-    final RangeQuery<V, D> rangeq = database.getRangeQuery(distq);
+    final DistanceQuery<V> distq = database.getDistanceQuery(relation, getDistanceFunction());
+    final RangeQuery<V> rangeq = database.getRangeQuery(distq);
     final int dim = RelationUtil.dimensionality(relation);
 
-    // Kernel bandwidth, for normalization
-    final double bandwidth = range.doubleValue();
     // Stopping threshold
     final double threshold = bandwidth * 1E-10;
 
@@ -141,25 +137,25 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Mean-shift clustering", relation.size(), LOG) : null;
 
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       // Initial position:
       V position = relation.get(iter);
-      iterations: for (int j = 1; j <= MAXITER; j++) {
+      iterations: for(int j = 1; j <= MAXITER; j++) {
         // Compute new position:
         V newvec = null;
         {
-          DistanceDBIDList<D> neigh = rangeq.getRangeForObject(position, range);
+          DoubleDBIDList neigh = rangeq.getRangeForObject(position, bandwidth);
           boolean okay = (neigh.size() > 1) || (neigh.size() >= 1 && j > 1);
-          if (okay) {
+          if(okay) {
             Centroid newpos = new Centroid(dim);
-            for (DistanceDBIDListIter<D> niter = neigh.iter(); niter.valid(); niter.advance()) {
-              final double weight = kernel.density(niter.getDistance().doubleValue() / bandwidth);
+            for(DoubleDBIDListIter niter = neigh.iter(); niter.valid(); niter.advance()) {
+              final double weight = kernel.density(niter.doubleValue() / bandwidth);
               newpos.put(relation.get(niter), weight);
             }
             newvec = newpos.toVector(relation);
             // TODO: detect 0 weight!
           }
-          if (!okay) {
+          if(!okay) {
             noise.add(iter);
             break iterations;
           }
@@ -167,28 +163,28 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
         // Test if we are close to one of the known clusters:
         double bestd = Double.POSITIVE_INFINITY;
         Pair<V, ModifiableDBIDs> bestp = null;
-        for (Pair<V, ModifiableDBIDs> pair : clusters) {
-          final double merged = distq.distance(newvec, pair.first).doubleValue();
-          if (merged < bestd) {
+        for(Pair<V, ModifiableDBIDs> pair : clusters) {
+          final double merged = distq.distance(newvec, pair.first);
+          if(merged < bestd) {
             bestd = merged;
             bestp = pair;
           }
         }
         // Check for convergence:
-        D delta = distq.distance(position, newvec);
-        if (bestd < 10 * threshold || bestd * 2 < delta.doubleValue()) {
+        double delta = distq.distance(position, newvec);
+        if(bestd < 10 * threshold || bestd * 2 < delta) {
           bestp.second.add(iter);
           break iterations;
         }
-        if (j == MAXITER) {
-          LOG.warning("No convergence after " + MAXITER + " iterations. Distance: " + delta.toString());
+        if(j == MAXITER) {
+          LOG.warning("No convergence after " + MAXITER + " iterations. Distance: " + delta);
         }
-        if (Double.isNaN(delta.doubleValue())) {
+        if(Double.isNaN(delta)) {
           LOG.warning("Encountered NaN distance. Invalid center vector? " + newvec.toString());
           break iterations;
         }
-        if (j == MAXITER || delta.doubleValue() < threshold) {
-          if (LOG.isDebuggingFine()) {
+        if(j == MAXITER || delta < threshold) {
+          if(LOG.isDebuggingFine()) {
             LOG.debugFine("New cluster:" + newvec + " delta: " + delta + " threshold: " + threshold + " bestd: " + bestd);
           }
           ArrayModifiableDBIDs cids = DBIDUtil.newArray();
@@ -198,19 +194,19 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
         }
         position = newvec;
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(LOG);
     }
 
     ArrayList<Cluster<MeanModel<V>>> cs = new ArrayList<>(clusters.size());
-    for (Pair<V, ModifiableDBIDs> pair : clusters) {
+    for(Pair<V, ModifiableDBIDs> pair : clusters) {
       cs.add(new Cluster<>(pair.second, new MeanModel<>(pair.first)));
     }
-    if (noise.size() > 0) {
+    if(noise.size() > 0) {
       cs.add(new Cluster<MeanModel<V>>(noise, true));
     }
     Clustering<MeanModel<V>> c = new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
@@ -235,9 +231,8 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
    * @apiviz.exclude
    * 
    * @param <V> Vector type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Parameter for kernel function.
      */
@@ -256,23 +251,23 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
     /**
      * Kernel radius.
      */
-    D range;
+    double range;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
-      if (config.grab(kernelP)) {
+      if(config.grab(kernelP)) {
         kernel = kernelP.instantiateClass(config);
       }
-      DistanceParameter<D> rangeP = new DistanceParameter<>(RANGE_ID, distanceFunction);
-      if (config.grab(rangeP)) {
+      DoubleParameter rangeP = new DoubleParameter(RANGE_ID);
+      if(config.grab(rangeP)) {
         range = rangeP.getValue();
       }
     }
 
     @Override
-    protected NaiveMeanShiftClustering<V, D> makeInstance() {
+    protected NaiveMeanShiftClustering<V> makeInstance() {
       return new NaiveMeanShiftClustering<>(distanceFunction, kernel, range);
     }
   }

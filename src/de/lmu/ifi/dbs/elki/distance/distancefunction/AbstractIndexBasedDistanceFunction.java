@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -44,9 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> the type of object to compute the distances in between
  * @param <I> the type of Index used
- * @param <D> the type of Distance used
  */
-public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index, D extends Distance<D>> extends AbstractDatabaseDistanceFunction<O, D> implements IndexBasedDistanceFunction<O, D> {
+public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index> extends AbstractDatabaseDistanceFunction<O> implements IndexBasedDistanceFunction<O> {
   /**
    * Parameter to specify the preprocessor to be used.
    * <p>
@@ -87,10 +85,9 @@ public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index, D e
    * 
    * @param <O> Object type
    * @param <I> Index type
-   * @param <D> Distance type
    * @param <F> Distance function type
    */
-  abstract public static class Instance<O, I extends Index, D extends Distance<D>, F extends DistanceFunction<? super O, D>> extends AbstractDatabaseDistanceQuery<O, D> implements IndexBasedDistanceFunction.Instance<O, I, D> {
+  abstract public static class Instance<O, I extends Index, F extends DistanceFunction<? super O>> extends AbstractDatabaseDistanceQuery<O> implements IndexBasedDistanceFunction.Instance<O, I> {
     /**
      * Index we use
      */

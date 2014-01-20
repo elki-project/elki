@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -53,12 +52,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @apiviz.has MTreeNode oneway - - contains
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
- * @param <D> the type of Distance used in the metrical index
  */
 @Title("M-Tree")
 @Description("Efficient Access Method for Similarity Search in Metric Spaces")
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-abstract public class MTree<O, D extends NumberDistance<D, ?>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry>> {
+abstract public class MTree<O> extends AbstractMTree<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
   /**
    * The logger for this class.
    */
@@ -70,7 +68,7 @@ abstract public class MTree<O, D extends NumberDistance<D, ?>> extends AbstractM
    * @param pagefile Page file
    * @param settings Tree settings
    */
-  public MTree(PageFile<MTreeNode<O, D>> pagefile, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry> settings) {
+  public MTree(PageFile<MTreeNode<O>> pagefile, MTreeSettings<O, MTreeNode<O>, MTreeEntry> settings) {
     super(pagefile, settings);
   }
 
@@ -86,7 +84,7 @@ abstract public class MTree<O, D extends NumberDistance<D, ?>> extends AbstractM
    * @return a new MTreeDirectoryEntry representing the specified node
    */
   @Override
-  protected MTreeEntry createNewDirectoryEntry(MTreeNode<O, D> node, DBID routingObjectID, double parentDistance) {
+  protected MTreeEntry createNewDirectoryEntry(MTreeNode<O> node, DBID routingObjectID, double parentDistance) {
     return new MTreeDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this));
   }
 
@@ -103,7 +101,7 @@ abstract public class MTree<O, D extends NumberDistance<D, ?>> extends AbstractM
    * @return a new MTreeNode which is a leaf node
    */
   @Override
-  protected MTreeNode<O, D> createNewLeafNode() {
+  protected MTreeNode<O> createNewLeafNode() {
     return new MTreeNode<>(leafCapacity, true);
   }
 
@@ -111,7 +109,7 @@ abstract public class MTree<O, D extends NumberDistance<D, ?>> extends AbstractM
    * @return a new MTreeNode which is a directory node
    */
   @Override
-  protected MTreeNode<O, D> createNewDirectoryNode() {
+  protected MTreeNode<O> createNewDirectoryNode() {
     return new MTreeNode<>(dirCapacity, false);
   }
 

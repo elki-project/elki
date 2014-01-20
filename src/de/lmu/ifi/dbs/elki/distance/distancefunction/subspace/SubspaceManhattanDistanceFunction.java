@@ -53,7 +53,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
    *         selected dimensions
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " + "first argument: " + v1 + "\n  " + "second argument: " + v2);
     }
@@ -66,7 +66,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
   }
 
   @Override
-  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
+  protected double minDistObject(SpatialComparable mbr, NumberVector v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -92,7 +92,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
@@ -118,7 +118,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> obj) {
+  public double norm(NumberVector obj) {
     double sum = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       sum += Math.abs(obj.doubleValue(d));
@@ -133,7 +133,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractDimensionsSelectingDoubleDistanceFunction.Parameterizer {
+  public static class Parameterizer extends AbstractDimensionsSelectingDistanceFunction.Parameterizer {
     @Override
     protected SubspaceManhattanDistanceFunction makeInstance() {
       return new SubspaceManhattanDistanceFunction(dimensions);

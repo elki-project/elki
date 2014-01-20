@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -41,11 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector type.
  */
-public class LngLatToECEFFilter<V extends NumberVector<?>> extends AbstractStreamConversionFilter<V, V> {
+public class LngLatToECEFFilter<V extends NumberVector> extends AbstractStreamConversionFilter<V, V> {
   /**
    * Vector factory to use.
    */
-  private NumberVector.Factory<V, ?> factory;
+  private NumberVector.Factory<V> factory;
 
   /**
    * Earth model to use.
@@ -74,9 +75,8 @@ public class LngLatToECEFFilter<V extends NumberVector<?>> extends AbstractStrea
 
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
-    VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
-    factory = (NumberVector.Factory<V, ?>) vin.getFactory();
-    return new VectorFieldTypeInformation<>(vin.getFactory(), 3, 3, in.getSerializer());
+    factory = FilterUtil.guessFactory(in);
+    return new VectorFieldTypeInformation<>(factory, 3, 3, in.getSerializer());
   }
 
   /**
@@ -88,7 +88,7 @@ public class LngLatToECEFFilter<V extends NumberVector<?>> extends AbstractStrea
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Earth model to use.
      */
@@ -98,7 +98,7 @@ public class LngLatToECEFFilter<V extends NumberVector<?>> extends AbstractStrea
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-      if (config.grab(modelP)) {
+      if(config.grab(modelP)) {
         model = modelP.instantiateClass(config);
       }
     }

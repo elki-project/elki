@@ -100,7 +100,7 @@ public class ProjectedCentroid extends Centroid {
    * @param val Value
    */
   @Override
-  public void put(NumberVector<?> val) {
+  public void put(NumberVector val) {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;
     for(int i = BitsUtil.nextSetBit(dims, 0); i >= 0; i = BitsUtil.nextSetBit(dims, i + 1)) {
@@ -116,7 +116,7 @@ public class ProjectedCentroid extends Centroid {
    * @param weight weight
    */
   @Override
-  public void put(NumberVector<?> val, double weight) {
+  public void put(NumberVector val, double weight) {
     assert (val.getDimensionality() == elements.length);
     if(weight == 0) {
       return; // Skip zero weights.
@@ -137,7 +137,7 @@ public class ProjectedCentroid extends Centroid {
    * @param relation Relation to process
    * @return Centroid
    */
-  public static ProjectedCentroid make(long[] dims, Relation<? extends NumberVector<?>> relation) {
+  public static ProjectedCentroid make(long[] dims, Relation<? extends NumberVector> relation) {
     ProjectedCentroid c = new ProjectedCentroid(dims, RelationUtil.dimensionality(relation));
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       c.put(relation.get(iditer));
@@ -153,7 +153,7 @@ public class ProjectedCentroid extends Centroid {
    * @param ids IDs to process
    * @return Centroid
    */
-  public static ProjectedCentroid make(long[] dims, Relation<? extends NumberVector<?>> relation, DBIDs ids) {
+  public static ProjectedCentroid make(long[] dims, Relation<? extends NumberVector> relation, DBIDs ids) {
     ProjectedCentroid c = new ProjectedCentroid(dims, RelationUtil.dimensionality(relation));
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));

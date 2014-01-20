@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @param <V> Vector type
  */
-public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<?>> extends AbstractNormalization<V> {
+public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
    */
@@ -102,7 +102,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<
       final int dim = featureVector.iterDim(it);
       vals.put(dim, featureVector.iterDoubleValue(it) * idf.get(dim));
     }
-    return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
+    return ((SparseNumberVector.Factory<V> ) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override
@@ -112,7 +112,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<
       final int dim = featureVector.iterDim(it);
       vals.put(dim, featureVector.iterDoubleValue(it) / idf.get(dim));
     }
-    return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
+    return ((SparseNumberVector.Factory<V> ) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override

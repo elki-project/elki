@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -53,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -69,12 +68,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Arthur Zimek
  * @param <O> the type of Object the algorithm is applied to
- * @param <D> the type of Distance used
  */
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
 @Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
-public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -83,7 +81,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   /**
    * Holds the epsilon radius threshold.
    */
-  protected D epsilon;
+  protected double epsilon;
 
   /**
    * Holds the minimum cluster size.
@@ -112,7 +110,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * @param epsilon Epsilon value
    * @param minpts Minpts parameter
    */
-  public DBSCAN(DistanceFunction<? super O, D> distanceFunction, D epsilon, int minpts) {
+  public DBSCAN(DistanceFunction<? super O> distanceFunction, double epsilon, int minpts) {
     super(distanceFunction);
     this.epsilon = epsilon;
     this.minpts = minpts;
@@ -122,7 +120,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * Performs the DBSCAN algorithm on the given database.
    */
   public Clustering<Model> run(Relation<O> relation) {
-    RangeQuery<O, D> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
+    RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
@@ -181,7 +179,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Relation<O> relation, RangeQuery<O, D> rangeQuery, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(Relation<O> relation, RangeQuery<O> rangeQuery, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     DBIDs neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
 
     // startObject is no core-object
@@ -270,7 +268,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.
@@ -283,14 +281,14 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
      */
     public static final OptionID MINPTS_ID = new OptionID("dbscan.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
-    protected D epsilon = null;
+    protected double epsilon;
 
     protected int minpts = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DistanceParameter<D> epsilonP = new DistanceParameter<>(EPSILON_ID, distanceFunction);
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -303,7 +301,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     }
 
     @Override
-    protected DBSCAN<O, D> makeInstance() {
+    protected DBSCAN<O> makeInstance() {
       return new DBSCAN<>(distanceFunction, epsilon, minpts);
     }
   }

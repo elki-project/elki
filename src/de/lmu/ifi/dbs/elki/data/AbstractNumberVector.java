@@ -29,10 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * AbstractNumberVector is an abstract implementation of FeatureVector.
  * 
  * @author Arthur Zimek
- * 
- * @param <N> the type of number stored in this vector
  */
-public abstract class AbstractNumberVector<N extends Number> implements NumberVector<N> {
+public abstract class AbstractNumberVector implements NumberVector {
   /**
    * The String to separate attribute values in a String that represents the
    * values.
@@ -77,9 +75,8 @@ public abstract class AbstractNumberVector<N extends Number> implements NumberVe
    * @apiviz.has AbstractNumberVector
    * 
    * @param <V> Vector type
-   * @param <N> Number type
    */
-  public abstract static class Factory<V extends AbstractNumberVector<N>, N extends Number> implements NumberVector.Factory<V, N> {
+  public abstract static class Factory<V extends AbstractNumberVector> implements NumberVector.Factory<V> {
     @Override
     public V newNumberVector(double[] values) {
       return newNumberVector(values, ArrayLikeUtil.doubleArrayAdapter());

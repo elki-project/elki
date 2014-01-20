@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.impl.Constants;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -32,12 +34,11 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.Node;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
@@ -63,13 +64,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @apiviz.uses MetricalIndexTree
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
- * @param <D> the type of distance the used distance function will return
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor<O, D, KNNList<D>> {
+public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
   /**
    * Logger to use
    */
@@ -82,15 +82,15 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MetricalIndexApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+  public MetricalIndexApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
     super(relation, distanceFunction, k);
   }
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<O> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
 
-    MetricalIndexTree<O, D, N, E> index = getMetricalIndex(relation);
+    MetricalIndexTree<O, N, E> index = getMetricalIndex(relation);
 
     createStorage();
     MeanVariance pagesize = new MeanVariance();
@@ -113,13 +113,13 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       for(int i = 0; i < size; i++) {
         ids.add(((LeafEntry) node.getEntry(i)).getDBID());
       }
-      HashMap<DBIDPair, D> cache = new HashMap<>((size * size * 3) >> 2);
+      TObjectDoubleHashMap<DBIDPair> cache = new TObjectDoubleHashMap<>((size * size * 3) >> 2, Constants.DEFAULT_LOAD_FACTOR, Double.NaN);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        KNNHeap<D> kNN = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
+        KNNHeap kNN = DBIDUtil.newHeap(k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
           DBIDPair key = DBIDUtil.newPair(id, id2);
-          D d = cache.remove(key);
-          if(d != null) {
+          double d = cache.remove(key);
+          if(d == d) { // Not NaN
             // consume the previous result.
             kNN.insert(d, id2);
           }
@@ -161,9 +161,9 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @return Metrical index
    * @throws IllegalStateException when the cast fails.
    */
-  private MetricalIndexTree<O, D, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
-    Class<MetricalIndexTree<O, D, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndexTree.class);
-    ArrayList<MetricalIndexTree<O, D, N, E>> indexes = ResultUtil.filterResults(relation.getDatabase(), mcls);
+  private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
+    Class<MetricalIndexTree<O, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndexTree.class);
+    ArrayList<MetricalIndexTree<O, N, E>> indexes = ResultUtil.filterResults(relation.getDatabase(), mcls);
     // FIXME: check we got the right the representation
     if(indexes.size() == 1) {
       return indexes.get(0);
@@ -204,24 +204,23 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    *              - «create»
    * 
    * @param <O> the type of database objects the preprocessor can be applied to
-   * @param <D> the type of distance the used distance function will return
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Factory<O extends NumberVector<?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNList<D>> {
+  public static class Factory<O extends NumberVector, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
     /**
      * Constructor.
      * 
      * @param k k
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super O, D> distanceFunction) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction) {
       super(k, distanceFunction);
     }
 
     @Override
-    public MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instantiate(Relation<O> relation) {
-      MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
+    public MetricalIndexApproximationMaterializeKNNPreprocessor<O, N, E> instantiate(Relation<O> relation) {
+      MetricalIndexApproximationMaterializeKNNPreprocessor<O, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
       return instance;
     }
 
@@ -232,9 +231,9 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O extends NumberVector<?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O extends NumberVector, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       @Override
-      protected Factory<O, D, N, E> makeInstance() {
+      protected Factory<O, N, E> makeInstance() {
         return new Factory<>(k, distanceFunction);
       }
     }

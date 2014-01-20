@@ -26,7 +26,7 @@ package tutorial.distancefunction;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 
 /**
  * Tutorial example for ELKI.
@@ -37,16 +37,16 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanc
  * 
  * @author Erich Schubert
  */
-public class TutorialDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class TutorialDistanceFunction extends AbstractNumberVectorDistanceFunction {
   @Override
-  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
+  public double distance(NumberVector o1, NumberVector o2) {
     double dx = (o1.doubleValue(0) - o2.doubleValue(0));
     double dy = (o1.doubleValue(1) - o2.doubleValue(1));
     return dx * dx + Math.abs(dy);
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return new VectorFieldTypeInformation<>(NumberVector.class, 2);
   }
 }

@@ -83,35 +83,35 @@ public class TestTermFrequencyParser implements JUnit4Test {
 
     db.initialize();
 
-    Relation<SparseNumberVector<?>> rel = db.getRelation(TypeUtil.SPARSE_VECTOR_FIELD);
+    Relation<SparseNumberVector> rel = db.getRelation(TypeUtil.SPARSE_VECTOR_FIELD);
 
     // Get first three objects:
     DBIDIter iter = rel.iterDBIDs();
-    SparseNumberVector<?> v1 = rel.get(iter);
+    SparseNumberVector v1 = rel.get(iter);
     iter.advance();
-    SparseNumberVector<?> v2 = rel.get(iter);
+    SparseNumberVector v2 = rel.get(iter);
     iter.advance();
-    SparseNumberVector<?> v3 = rel.get(iter);
+    SparseNumberVector v3 = rel.get(iter);
 
     // "Dense" euclidean distance:
-    double euclid1_12 = EuclideanDistanceFunction.STATIC.doubleDistance(v1, v2);
-    double euclid1_13 = EuclideanDistanceFunction.STATIC.doubleDistance(v1, v3);
-    double euclid1_23 = EuclideanDistanceFunction.STATIC.doubleDistance(v2, v3);
-    double euclid1_21 = EuclideanDistanceFunction.STATIC.doubleDistance(v2, v1);
+    double euclid1_12 = EuclideanDistanceFunction.STATIC.distance(v1, v2);
+    double euclid1_13 = EuclideanDistanceFunction.STATIC.distance(v1, v3);
+    double euclid1_23 = EuclideanDistanceFunction.STATIC.distance(v2, v3);
+    double euclid1_21 = EuclideanDistanceFunction.STATIC.distance(v2, v1);
     // Sparse euclidean distance:
-    double euclid2_12 = SparseEuclideanDistanceFunction.STATIC.doubleDistance(v1, v2);
-    double euclid2_13 = SparseEuclideanDistanceFunction.STATIC.doubleDistance(v1, v3);
-    double euclid2_23 = SparseEuclideanDistanceFunction.STATIC.doubleDistance(v2, v3);
-    double euclid2_21 = SparseEuclideanDistanceFunction.STATIC.doubleDistance(v2, v1);
+    double euclid2_12 = SparseEuclideanDistanceFunction.STATIC.distance(v1, v2);
+    double euclid2_13 = SparseEuclideanDistanceFunction.STATIC.distance(v1, v3);
+    double euclid2_23 = SparseEuclideanDistanceFunction.STATIC.distance(v2, v3);
+    double euclid2_21 = SparseEuclideanDistanceFunction.STATIC.distance(v2, v1);
     // (Auto-switching) angular distance:
-    double arccos_12 = ArcCosineDistanceFunction.STATIC.doubleDistance(v1, v2);
-    double arccos_13 = ArcCosineDistanceFunction.STATIC.doubleDistance(v1, v3);
-    double arccos_23 = ArcCosineDistanceFunction.STATIC.doubleDistance(v2, v3);
-    double arccos_21 = ArcCosineDistanceFunction.STATIC.doubleDistance(v2, v1);
+    double arccos_12 = ArcCosineDistanceFunction.STATIC.distance(v1, v2);
+    double arccos_13 = ArcCosineDistanceFunction.STATIC.distance(v1, v3);
+    double arccos_23 = ArcCosineDistanceFunction.STATIC.distance(v2, v3);
+    double arccos_21 = ArcCosineDistanceFunction.STATIC.distance(v2, v1);
 
-    assertEquals("Euclidean self-distance is not 0.", 0., EuclideanDistanceFunction.STATIC.doubleDistance(v1, v1), Double.MIN_VALUE);
-    assertEquals("Sparse Euclidean self-distance is not 0.", 0., SparseEuclideanDistanceFunction.STATIC.doubleDistance(v1, v1), Double.MIN_VALUE);
-    assertEquals("Arccos self-distance is not 0.", 0., ArcCosineDistanceFunction.STATIC.doubleDistance(v1, v1), Double.MIN_VALUE);
+    assertEquals("Euclidean self-distance is not 0.", 0., EuclideanDistanceFunction.STATIC.distance(v1, v1), Double.MIN_VALUE);
+    assertEquals("Sparse Euclidean self-distance is not 0.", 0., SparseEuclideanDistanceFunction.STATIC.distance(v1, v1), Double.MIN_VALUE);
+    assertEquals("Arccos self-distance is not 0.", 0., ArcCosineDistanceFunction.STATIC.distance(v1, v1), Double.MIN_VALUE);
     assertEquals("Euclidean distance not symmetric.", euclid1_12, euclid1_21, Double.MIN_VALUE);
     assertEquals("Sparse Euclidean distance not symmetric.", euclid2_12, euclid2_21, Double.MIN_VALUE);
     assertEquals("Arccos distance not symmetric.", arccos_12, arccos_21, Double.MIN_VALUE);

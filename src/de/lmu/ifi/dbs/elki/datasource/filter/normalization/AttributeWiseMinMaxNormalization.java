@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @apiviz.uses NumberVector
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
-public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends AbstractNormalization<V> {
+public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
    */
@@ -206,7 +206,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Stores the maximum in each dimension.
      */

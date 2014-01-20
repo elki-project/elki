@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -76,12 +75,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
 // TODO: optimize for double distances.
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
-public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
+public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
@@ -125,7 +123,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
    * @param exact Exactness flag
    * @param sampling Sampling flag
    */
-  public DistanceStatisticsWithClasses(DistanceFunction<? super O, D> distanceFunction, int numbins, boolean exact, boolean sampling) {
+  public DistanceStatisticsWithClasses(DistanceFunction<? super O> distanceFunction, int numbins, boolean exact, boolean sampling) {
     super(distanceFunction);
     this.numbin = numbins;
     this.exact = exact;
@@ -135,7 +133,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   @Override
   public HistogramResult<DoubleVector> run(Database database) {
     final Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    final DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 
     final StepProgress stepprog = LOG.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
 
@@ -222,7 +220,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
           if(DBIDUtil.equal(id1, iter2)) {
             continue;
           }
-          double d = distFunc.distance(id1, iter2).doubleValue();
+          double d = distFunc.distance(id1, iter2);
 
           histogram.putData(d, incFirst);
 
@@ -247,7 +245,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
             if(DBIDUtil.equal(id1, iter2)) {
               continue;
             }
-            double d = distFunc.distance(id1, iter2).doubleValue();
+            double d = distFunc.distance(id1, iter2);
 
             histogram.putData(d, incSecond);
 
@@ -316,7 +314,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
    * @param distFunc Distance function to use
    * @return Minimum and maximum
    */
-  private DoubleMinMax sampleMinMax(Relation<O> relation, DistanceQuery<O, D> distFunc) {
+  private DoubleMinMax sampleMinMax(Relation<O> relation, DistanceQuery<O> distFunc) {
     int size = relation.size();
     Random rnd = new Random();
     // estimate minimum and maximum.
@@ -344,12 +342,12 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         if(DBIDUtil.equal(iter, pair)) {
           continue;
         }
-        double d = distFunc.distance(iter, pair).doubleValue();
+        double d = distFunc.distance(iter, pair);
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, pair));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        double d = distFunc.distance(iter, iter2).doubleValue();
+        double d = distFunc.distance(iter, iter2);
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, iter2));
       }
@@ -363,12 +361,12 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         if(DBIDUtil.equal(iter, pair)) {
           continue;
         }
-        double d = distFunc.distance(iter, pair).doubleValue();
+        double d = distFunc.distance(iter, pair);
         np2.add(DBIDUtil.newPair(d, iter));
         np2.add(DBIDUtil.newPair(d, pair));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        double d = distFunc.distance(iter, iter2).doubleValue();
+        double d = distFunc.distance(iter, iter2);
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, iter2));
       }
@@ -393,7 +391,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
    * @param distFunc Distance function
    * @return Exact maximum and minimum
    */
-  private DoubleMinMax exactMinMax(Relation<O> relation, DistanceQuery<O, D> distFunc) {
+  private DoubleMinMax exactMinMax(Relation<O> relation, DistanceQuery<O> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -402,7 +400,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         if(DBIDUtil.equal(iditer, iditer2)) {
           continue;
         }
-        double d = distFunc.distance(iditer, iditer2).doubleValue();
+        double d = distFunc.distance(iditer, iditer2);
         minmax.put(d);
       }
     }
@@ -447,8 +445,10 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Number of bins to use in sampling.
      */
@@ -490,7 +490,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     }
 
     @Override
-    protected DistanceStatisticsWithClasses<O, D> makeInstance() {
+    protected DistanceStatisticsWithClasses<O> makeInstance() {
       return new DistanceStatisticsWithClasses<>(distanceFunction, numbin, exact, sampling);
     }
   }

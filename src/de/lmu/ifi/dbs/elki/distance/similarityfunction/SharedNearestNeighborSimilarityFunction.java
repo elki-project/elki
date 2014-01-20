@@ -27,9 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -47,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <O> object type
  */
-public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>, SetDBIDs, DoubleDistance> {
+public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBasedSimilarityFunction<O, SharedNearestNeighborIndex<O>> {
   /**
    * Constructor.
    * 
@@ -55,11 +53,6 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
    */
   public SharedNearestNeighborSimilarityFunction(SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborIndex<O>> indexFactory) {
     super(indexFactory);
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   /**
@@ -107,7 +100,7 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
    * 
    * @param <O> Object type
    */
-  public static class Instance<O> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>, SetDBIDs, DoubleDistance> {
+  public static class Instance<O> extends AbstractIndexBasedSimilarityFunction.Instance<O, SharedNearestNeighborIndex<O>> {
     /**
      * Similarity function.
      */
@@ -125,19 +118,14 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
     }
 
     @Override
-    public DoubleDistance similarity(DBIDRef id1, DBIDRef id2) {
+    public double similarity(DBIDRef id1, DBIDRef id2) {
       DBIDs neighbors1 = index.getNearestNeighborSet(id1);
       DBIDs neighbors2 = index.getNearestNeighborSet(id2);
-      return new DoubleDistance(countSharedNeighbors(neighbors1, neighbors2));
+      return countSharedNeighbors(neighbors1, neighbors2);
     }
 
     @Override
-    public DoubleDistance getDistanceFactory() {
-      return DoubleDistance.FACTORY;
-    }
-
-    @Override
-    public SimilarityFunction<? super O, DoubleDistance> getSimilarityFunction() {
+    public SimilarityFunction<? super O> getSimilarityFunction() {
       return similarityFunction;
     }
   }

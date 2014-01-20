@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceNorm;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  */
-public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDistanceNorm implements DimensionSelectingSubspaceDistanceFunction<NumberVector<?>, DoubleDistance> {
+public class DimensionSelectingDistanceFunction extends AbstractSpatialNorm implements DimensionSelectingSubspaceDistanceFunction<NumberVector> {
   /**
    * Parameter for dimensionality.
    */
@@ -73,7 +72,7 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
    *         distance function
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     if(dim >= v1.getDimensionality() || dim >= v2.getDimensionality() || dim < 0) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
@@ -83,7 +82,7 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(dim >= mbr1.getDimensionality() || dim >= mbr2.getDimensionality() || dim < 0) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
@@ -107,7 +106,7 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> obj) {
+  public double norm(NumberVector obj) {
     return Math.abs(obj.doubleValue(dim));
   }
 
@@ -141,13 +140,8 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialDoubleDis
   }
 
   @Override
-  public VectorTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public VectorTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return new VectorFieldTypeInformation<>(NumberVector.class, dim, Integer.MAX_VALUE);
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   @Override

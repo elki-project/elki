@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  */
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Interface for hierarchical clustering algorithms.
@@ -35,17 +34,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @apiviz.has PointerHierarchyRepresentationResult
- * 
- * @param <D> Distance type
  */
-public interface HierarchicalClusteringAlgorithm<D extends Distance<D>> extends Algorithm {
+public interface HierarchicalClusteringAlgorithm extends Algorithm {
   @Override
-  public PointerHierarchyRepresentationResult<D> run(Database db);
-
-  /**
-   * Return the distance type that will be used by the algorithm.
-   * 
-   * @return Distance factory.
-   */
-  public D getDistanceFactory();
+  public PointerHierarchyRepresentationResult run(Database db);
 }

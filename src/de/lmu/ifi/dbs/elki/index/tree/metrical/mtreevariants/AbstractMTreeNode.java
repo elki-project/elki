@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
@@ -39,11 +38,10 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of DatabaseObject to be stored in the M-Tree
- * @param <D> the type of Distance used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
-public abstract class AbstractMTreeNode<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends AbstractNode<E> {
+public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends AbstractNode<E> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -73,14 +71,14 @@ public abstract class AbstractMTreeNode<O, D extends NumberDistance<D, ?>, N ext
    *        the routing object of the parent node
    * @param mTree the M-Tree object holding this node
    */
-  public void adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, D, N, E, ?> mTree) {
+  public void adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, N, E, ?> mTree) {
     entry.setRoutingObjectID(routingObjectID);
     entry.setParentDistance(parentDistance);
     entry.setCoveringRadius(coveringRadius(entry.getRoutingObjectID(), mTree));
 
     for (int i = 0; i < getNumEntries(); i++) {
       E childEntry = getEntry(i);
-      double dist = mTree.distance(routingObjectID, childEntry.getRoutingObjectID()).doubleValue();
+      double dist = mTree.distance(routingObjectID, childEntry.getRoutingObjectID());
       childEntry.setParentDistance(dist);
     }
   }
@@ -92,11 +90,11 @@ public abstract class AbstractMTreeNode<O, D extends NumberDistance<D, ?>, N ext
    * @param mTree the M-Tree
    * @return the covering radius of this node
    */
-  public double coveringRadius(DBID routingObjectID, AbstractMTree<O, D, N, E, ?> mTree) {
+  public double coveringRadius(DBID routingObjectID, AbstractMTree<O, N, E, ?> mTree) {
     double coveringRadius = 0.;
     for (int i = 0; i < getNumEntries(); i++) {
       E entry = getEntry(i);
-      double distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID).doubleValue() + entry.getCoveringRadius();
+      double distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID) + entry.getCoveringRadius();
       coveringRadius = Math.max(coveringRadius, distance);
     }
     return coveringRadius;
@@ -109,7 +107,7 @@ public abstract class AbstractMTreeNode<O, D extends NumberDistance<D, ?>, N ext
    * @param entry the entry representing this node
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck(AbstractMTree<O, D, N, E, ?> mTree, E entry) {
+  public final void integrityCheck(AbstractMTree<O, N, E, ?> mTree, E entry) {
     // leaf node
     if (isLeaf()) {
       for (int i = 0; i < getCapacity(); i++) {
@@ -174,10 +172,10 @@ public abstract class AbstractMTreeNode<O, D extends NumberDistance<D, ?>, N ext
    * @param index the index of the entry in the parents child arry
    * @param mTree the M-Tree holding this node
    */
-  protected void integrityCheckParameters(E parentEntry, N parent, int index, AbstractMTree<O, D, N, E, ?> mTree) {
+  protected void integrityCheckParameters(E parentEntry, N parent, int index, AbstractMTree<O, N, E, ?> mTree) {
     // test if parent distance is correctly set
     E entry = parent.getEntry(index);
-    double parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID()).doubleValue();
+    double parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID());
     if (Math.abs(entry.getParentDistance() - parentDistance) > 1E-10) {
       throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + parentDistance + ",\n ist: " + entry.getParentDistance());
     }

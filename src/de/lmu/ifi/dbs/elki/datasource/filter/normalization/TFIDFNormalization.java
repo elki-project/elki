@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @param <V> Vector type
  */
-public class TFIDFNormalization<V extends SparseNumberVector<?>> extends InverseDocumentFrequencyNormalization<V> {
+public class TFIDFNormalization<V extends SparseNumberVector> extends InverseDocumentFrequencyNormalization<V> {
   /**
    * Class logger.
    */
@@ -67,7 +67,7 @@ public class TFIDFNormalization<V extends SparseNumberVector<?>> extends Inverse
       final int dim = featureVector.iterDim(it);
       vals.put(dim, featureVector.iterDoubleValue(it) / sum * idf.get(dim));
     }
-    return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
+    return ((SparseNumberVector.Factory<V> ) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override

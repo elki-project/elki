@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class SparseShortVector extends AbstractNumberVector<Short> implements SparseNumberVector<Short> {
+public class SparseShortVector extends AbstractNumberVector implements SparseNumberVector {
   /**
    * Static instance.
    */
@@ -360,13 +360,13 @@ public class SparseShortVector extends AbstractNumberVector<Short> implements Sp
    * 
    * @apiviz.has SparseShortVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<SparseShortVector, Short> implements SparseNumberVector.Factory<SparseShortVector, Short> {
+  public static class Factory extends AbstractNumberVector.Factory<SparseShortVector> implements SparseNumberVector.Factory<SparseShortVector> {
     @Override
-    public <A> SparseShortVector newFeatureVector(A array, ArrayAdapter<Short, A> adapter) {
+    public <A> SparseShortVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       short[] values = new short[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i);
+        values[i] = adapter.get(array, i).shortValue();
       }
       // TODO: improve efficiency
       return new SparseShortVector(values);

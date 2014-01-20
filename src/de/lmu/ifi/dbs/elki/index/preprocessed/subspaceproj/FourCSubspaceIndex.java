@@ -26,14 +26,10 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
@@ -62,11 +58,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @apiviz.composedOf PCAFilteredRunner
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
 @Title("4C Preprocessor")
 @Description("Computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n" + "The PCA is based on epsilon range queries.")
-public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex<V, D, PCAFilteredResult> {
+public class FourCSubspaceIndex<V extends NumberVector> extends AbstractSubspaceProjectionIndex<V, PCAFilteredResult> {
   /**
    * Our logger
    */
@@ -86,18 +81,14 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
    * @param minpts MinPts value
    * @param pca PCA runner
    */
-  public FourCSubspaceIndex(Relation<V> relation, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V> pca) {
+  public FourCSubspaceIndex(Relation<V> relation, double epsilon, DistanceFunction<V> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V> pca) {
     super(relation, epsilon, rangeQueryDistanceFunction, minpts);
     this.pca = pca;
   }
 
   @Override
-  protected PCAFilteredResult computeProjection(DBIDRef id, DistanceDBIDList<D> neighbors, Relation<V> database) {
-    ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
-    for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-      ids.add(neighbor);
-    }
-    PCAFilteredResult pcares = pca.processIds(ids, database);
+  protected PCAFilteredResult computeProjection(DBIDRef id, DoubleDBIDList neighbors, Relation<V> database) {
+    PCAFilteredResult pcares = pca.processIds(neighbors, database);
 
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
@@ -137,9 +128,8 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
    * @apiviz.uses FourCSubspaceIndex oneway - - «creates»
    * 
    * @param <V> Vector type
-   * @param <D> Distance type
    */
-  public static class Factory<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory<V, D, FourCSubspaceIndex<V, D>> {
+  public static class Factory<V extends NumberVector> extends AbstractSubspaceProjectionIndex.Factory<V, FourCSubspaceIndex<V>> {
     /**
      * The default value for delta.
      */
@@ -158,13 +148,13 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
      * @param minpts
      * @param pca
      */
-    public Factory(D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V> pca) {
+    public Factory(double epsilon, DistanceFunction<V> rangeQueryDistanceFunction, int minpts, PCAFilteredRunner<V> pca) {
       super(epsilon, rangeQueryDistanceFunction, minpts);
       this.pca = pca;
     }
 
     @Override
-    public FourCSubspaceIndex<V, D> instantiate(Relation<V> relation) {
+    public FourCSubspaceIndex<V> instantiate(Relation<V> relation) {
       return new FourCSubspaceIndex<>(relation, epsilon, rangeQueryDistanceFunction, minpts, pca);
     }
 
@@ -175,7 +165,7 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
+    public static class Parameterizer<V extends NumberVector> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, Factory<V>> {
       /**
        * The Filtered PCA Runner
        */
@@ -252,7 +242,7 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
       }
 
       @Override
-      protected Factory<V, D> makeInstance() {
+      protected Factory<V> makeInstance() {
         return new Factory<>(epsilon, rangeQueryDistanceFunction, minpts, pca);
       }
     }

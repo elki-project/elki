@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -155,7 +154,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   }
 
   @Override
-  public <O, D extends Distance<D>> DistanceQuery<O, D> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O, D> distanceFunction, Object... hints) {
+  public <O> DistanceQuery<O> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O> distanceFunction, Object... hints) {
     if(distanceFunction == null) {
       throw new AbortException("Distance query requested for 'null' distance!");
     }
@@ -163,7 +162,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   }
 
   @Override
-  public <O, D extends Distance<D>> SimilarityQuery<O, D> getSimilarityQuery(Relation<O> objQuery, SimilarityFunction<? super O, D> similarityFunction, Object... hints) {
+  public <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> objQuery, SimilarityFunction<? super O> similarityFunction, Object... hints) {
     if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
@@ -171,7 +170,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   }
 
   @Override
-  public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
@@ -184,7 +183,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         }
         @SuppressWarnings("unchecked")
         final KNNIndex<O> knnIndex = (KNNIndex<O>) idx;
-        KNNQuery<O, D> q = knnIndex.getKNNQuery(distanceQuery, hints);
+        KNNQuery<O> q = knnIndex.getKNNQuery(distanceQuery, hints);
         if(q != null) {
           return q;
         }
@@ -201,7 +200,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   }
 
   @Override
-  public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
@@ -214,7 +213,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         }
         @SuppressWarnings("unchecked")
         final RangeIndex<O> rangeIndex = (RangeIndex<O>) idx;
-        RangeQuery<O, D> q = rangeIndex.getRangeQuery(distanceQuery, hints);
+        RangeQuery<O> q = rangeIndex.getRangeQuery(distanceQuery, hints);
         if(q != null) {
           return q;
         }
@@ -231,7 +230,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   }
 
   @Override
-  public <O, D extends Distance<D>> RKNNQuery<O, D> getRKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public <O> RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
@@ -244,7 +243,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         }
         @SuppressWarnings("unchecked")
         final RKNNIndex<O> rknnIndex = (RKNNIndex<O>) idx;
-        RKNNQuery<O, D> q = rknnIndex.getRKNNQuery(distanceQuery, hints);
+        RKNNQuery<O> q = rknnIndex.getRKNNQuery(distanceQuery, hints);
         if(q != null) {
           return q;
         }
@@ -261,7 +260,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         maxk = (Integer) hint;
       }
     }
-    KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
+    KNNQuery<O> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
     return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
   }
 

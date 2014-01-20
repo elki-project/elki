@@ -210,7 +210,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
             double[] mean;
             if (model instanceof MeanModel) {
               @SuppressWarnings("unchecked")
-              MeanModel<? extends NumberVector<?>> mmodel = (MeanModel<? extends NumberVector<?>>) model;
+              MeanModel<? extends NumberVector> mmodel = (MeanModel<? extends NumberVector>) model;
               mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
             } else if (model instanceof MedoidModel) {
               MedoidModel mmodel = (MedoidModel) model;
@@ -240,7 +240,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
             Vector mean;
             if (model instanceof MeanModel) {
               @SuppressWarnings("unchecked")
-              MeanModel<? extends NumberVector<?>> mmodel = (MeanModel<? extends NumberVector<?>>) model;
+              MeanModel<? extends NumberVector> mmodel = (MeanModel<? extends NumberVector>) model;
               mean = mmodel.getMean().getColumnVector();
             } else if (model instanceof MedoidModel) {
               MedoidModel mmodel = (MedoidModel) model;

@@ -40,11 +40,11 @@ public class OPTICSNumberDistanceAdapter implements OPTICSDistanceAdapter<Double
 
   @Override
   public double getDoubleForEntry(DoubleDistanceClusterOrderEntry coe) {
-    return coe.doubleReachability();
+    return coe.getReachability();
   }
 
   @Override
   public boolean isInfinite(DoubleDistanceClusterOrderEntry coe) {
-    return coe.doubleReachability() >= Double.POSITIVE_INFINITY;
+    return coe.getReachability() >= Double.POSITIVE_INFINITY;
   }
 }

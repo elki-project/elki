@@ -52,7 +52,7 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     DBIDIter iter = relation.iterDBIDs();
     List<V> means = new ArrayList<>(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {
@@ -62,7 +62,7 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distanceFunction) {
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distanceFunction) {
     DBIDIter iter = distanceFunction.getRelation().iterDBIDs();
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {
@@ -78,7 +78,7 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     @Override
     protected FirstKInitialMeans<V> makeInstance() {
       return new FirstKInitialMeans<>();

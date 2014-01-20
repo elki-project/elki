@@ -60,7 +60,7 @@ public class LevenshteinDistanceFunctionTest implements JUnit4Test {
   public void testStringLevenshtein() {
     LevenshteinDistanceFunction f = LevenshteinDistanceFunction.STATIC_SENSITIVE;
     for (int i = 0; i < TESTS.length; i++) {
-      assertEquals("Distance does not agree: " + TESTS[i][0] + " <-> " + TESTS[i][1], SCORES[i], f.distance(TESTS[i][0], TESTS[i][1]).intValue());
+      assertEquals("Distance does not agree: " + TESTS[i][0] + " <-> " + TESTS[i][1], SCORES[i], (int) f.distance(TESTS[i][0], TESTS[i][1]));
     }
   }
 }

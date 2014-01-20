@@ -23,10 +23,8 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Run a database query in a database context.
@@ -34,9 +32,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <O> Database object type.
- * @param <D> Distance result type.
  */
-public abstract class AbstractDatabaseDistanceQuery<O, D extends Distance<D>> extends AbstractDistanceQuery<O, D> {
+public abstract class AbstractDatabaseDistanceQuery<O> extends AbstractDistanceQuery<O> {
   /**
    * Constructor.
    * 
@@ -47,25 +44,25 @@ public abstract class AbstractDatabaseDistanceQuery<O, D extends Distance<D>> ex
   }
 
   @Override
-  public D distance(O o1, DBIDRef id2) {
-    if(o1 instanceof DBID) {
-      return distance((DBID) o1, id2);
+  public double distance(O o1, DBIDRef id2) {
+    if(o1 instanceof DBIDRef) {
+      return distance((DBIDRef) o1, id2);
     }
     throw new UnsupportedOperationException("This distance function is only defined for known DBIDs.");
   }
 
   @Override
-  public D distance(DBIDRef id1, O o2) {
-    if(o2 instanceof DBID) {
-      return distance(id1, (DBID) o2);
+  public double distance(DBIDRef id1, O o2) {
+    if(o2 instanceof DBIDRef) {
+      return distance(id1, (DBIDRef) o2);
     }
     throw new UnsupportedOperationException("This distance function is only defined for known DBIDs.");
   }
 
   @Override
-  public D distance(O o1, O o2) {
-    if(o1 instanceof DBID && o2 instanceof DBID) {
-      return distance((DBID) o1, (DBID) o2);
+  public double distance(O o1, O o2) {
+    if(o1 instanceof DBIDRef && o2 instanceof DBIDRef) {
+      return distance((DBIDRef) o1, (DBIDRef) o2);
     }
     throw new UnsupportedOperationException("This distance function is only defined for known DBIDs.");
   }

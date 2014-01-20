@@ -45,29 +45,29 @@ import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout.Edge;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractLayout3DPC<N extends Layout.Node> implements SimilarityBasedLayouter3DPC<NumberVector<?>> {
+public abstract class AbstractLayout3DPC<N extends Layout.Node> implements SimilarityBasedLayouter3DPC<NumberVector> {
   /**
    * Similarity measure
    */
-  DimensionSimilarity<? super NumberVector<?>> sim = CovarianceDimensionSimilarity.STATIC;
+  DimensionSimilarity<? super NumberVector> sim = CovarianceDimensionSimilarity.STATIC;
 
   /**
    * Constructor.
    * 
    * @param sim Similarity measure
    */
-  public AbstractLayout3DPC(DimensionSimilarity<? super NumberVector<?>> sim) {
+  public AbstractLayout3DPC(DimensionSimilarity<? super NumberVector> sim) {
     super();
     this.sim = sim;
   }
 
   @Override
-  public DimensionSimilarity<? super NumberVector<?>> getSimilarity() {
+  public DimensionSimilarity<? super NumberVector> getSimilarity() {
     return sim;
   }
 
   @Override
-  public Layout layout(Database database, Relation<? extends NumberVector<?>> rel) {
+  public Layout layout(Database database, Relation<? extends NumberVector> rel) {
     int dim = RelationUtil.dimensionality(rel);
     DimensionSimilarityMatrix mat = DimensionSimilarityMatrix.make(dim);
     sim.computeDimensionSimilarites(database, rel, rel.getDBIDs(), mat);
@@ -282,12 +282,12 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
     /**
      * Similarity measure
      */
-    DimensionSimilarity<NumberVector<?>> sim;
+    DimensionSimilarity<NumberVector> sim;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DimensionSimilarity<NumberVector<?>>> simP = new ObjectParameter<>(SIM_ID, DimensionSimilarity.class, CovarianceDimensionSimilarity.class);
+      ObjectParameter<DimensionSimilarity<NumberVector>> simP = new ObjectParameter<>(SIM_ID, DimensionSimilarity.class, CovarianceDimensionSimilarity.class);
       if (config.grab(simP)) {
         sim = simP.instantiateClass(config);
       }

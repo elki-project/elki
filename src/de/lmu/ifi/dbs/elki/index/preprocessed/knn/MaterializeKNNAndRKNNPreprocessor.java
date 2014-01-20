@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
@@ -40,22 +39,19 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.PreprocessorRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -70,12 +66,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Elke Achtert
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
- * @param <D> the type of distance the used distance function will return
+ * @param the type of distance the used distance function will return
  */
 // TODO: rewrite the double optimization. Maybe use a specialized subclass?
 @Title("Materialize kNN and RkNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors and the reverse k nearest neighbors of objects of a database.")
-public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends MaterializeKNNPreprocessor<O, D> implements RKNNIndex<O> {
+public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreprocessor<O> implements RKNNIndex<O> {
   /**
    * Logger to use.
    */
@@ -84,12 +80,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
   /**
    * Additional data storage for RkNN.
    */
-  private WritableDataStore<TreeSet<DistanceDBIDPair<D>>> materialized_RkNN;
-
-  /**
-   * Use optimizations for double values
-   */
-  protected boolean doubleOptimize;
+  private WritableDataStore<TreeSet<DoubleDBIDPair>> materialized_RkNN;
 
   /**
    * Constructor.
@@ -98,9 +89,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @param distanceFunction the distance function to use
    * @param k query k
    */
-  public MaterializeKNNAndRKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+  public MaterializeKNNAndRKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
     super(relation, distanceFunction, k);
-    this.doubleOptimize = DistanceUtil.isDoubleDistanceFunction(distanceFunction);
   }
 
   @Override
@@ -118,21 +108,20 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    */
   private void materializeKNNAndRKNNs(ArrayDBIDs ids, FiniteProgress progress) {
     // add an empty list to each rknn
-    Comparator<? super DistanceDBIDPair<D>> comp = DistanceDBIDResultUtil.distanceComparator();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       if(materialized_RkNN.get(iter) == null) {
-        materialized_RkNN.put(iter, new TreeSet<>(comp));
+        materialized_RkNN.put(iter, new TreeSet<DoubleDBIDPair>());
       }
     }
 
     // knn query
-    List<? extends KNNList<D>> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
+    List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
     int i = 0;
     for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
-      KNNList<D> kNNs = kNNList.get(i);
+      KNNList kNNs = kNNList.get(i);
       storage.put(id, kNNs);
-      for(DistanceDBIDListIter<D> iter = kNNs.iter(); iter.valid(); iter.advance()) {
-        TreeSet<DistanceDBIDPair<D>> rknns = materialized_RkNN.get(iter);
+      for(DoubleDBIDListIter iter = kNNs.iter(); iter.valid(); iter.advance()) {
+        TreeSet<DoubleDBIDPair> rknns = materialized_RkNN.get(iter);
         rknns.add(makePair(iter, id));
       }
       if(progress != null) {
@@ -145,12 +134,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private DistanceDBIDPair<D> makePair(DistanceDBIDListIter<D> iter, DBIDIter id) {
-    if(doubleOptimize) {
-      return (DistanceDBIDPair<D>) DBIDUtil.newDistancePair(((DoubleDistanceDBIDPair) iter.getDistancePair()).doubleDistance(), id);
-    }
-    return DBIDUtil.newDistancePair(iter.getDistance(), id);
+  private DoubleDBIDPair makePair(DoubleDBIDListIter iter, DBIDIter id) {
+    return DBIDUtil.newPair(iter.getPair().doubleValue(), id);
   }
 
   @Override
@@ -193,13 +178,13 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for(DBIDIter id = oldids.iter(); id.valid(); id.advance()) {
-      KNNList<D> oldkNNs = storage.get(id);
-      D knnDist = oldkNNs.getKNNDistance();
+      KNNList oldkNNs = storage.get(id);
+      double knnDist = oldkNNs.getKNNDistance();
       // look for new kNNs
-      KNNHeap<D> heap = null;
+      KNNHeap heap = null;
       for(DBIDIter newid = ids.iter(); newid.valid(); newid.advance()) {
-        D dist = distanceQuery.distance(id, newid);
-        if(dist.compareTo(knnDist) <= 0) {
+        double dist = distanceQuery.distance(id, newid);
+        if(dist <= knnDist) {
           // New id changes the kNNs of oldid.
           if(heap == null) {
             heap = DBIDUtil.newHeap(oldkNNs);
@@ -209,18 +194,18 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
       }
       // kNNs for oldid have changed:
       if(heap != null) {
-        KNNList<D> newkNNs = heap.toKNNList();
+        KNNList newkNNs = heap.toKNNList();
         storage.put(id, newkNNs);
 
         // get the difference
         int i = 0;
         int j = 0;
-        GenericDistanceDBIDList<D> added = new GenericDistanceDBIDList<>();
-        GenericDistanceDBIDList<D> removed = new GenericDistanceDBIDList<>();
+        ModifiableDoubleDBIDList added = DBIDUtil.newDistanceDBIDList();
+        ModifiableDoubleDBIDList removed = DBIDUtil.newDistanceDBIDList();
         // TODO: use iterators.
         while(i < oldkNNs.size() && j < newkNNs.size()) {
-          DistanceDBIDPair<D> drp1 = oldkNNs.get(i);
-          DistanceDBIDPair<D> drp2 = newkNNs.get(j);
+          DoubleDBIDPair drp1 = oldkNNs.get(i);
+          DoubleDBIDPair drp2 = newkNNs.get(j);
           // NOTE: we assume that on ties they are ordered the same way!
           if(!DBIDUtil.equal(drp1, drp2)) {
             added.add(drp2);
@@ -240,13 +225,13 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
           }
         }
         // add new RkNN
-        for(DistanceDBIDListIter<D> newnn = added.iter(); newnn.valid(); newnn.advance()) {
-          TreeSet<DistanceDBIDPair<D>> rknns = materialized_RkNN.get(newnn);
+        for(DoubleDBIDListIter newnn = added.iter(); newnn.valid(); newnn.advance()) {
+          TreeSet<DoubleDBIDPair> rknns = materialized_RkNN.get(newnn);
           rknns.add(makePair(newnn, id));
         }
         // remove old RkNN
-        for(DistanceDBIDListIter<D> oldnn = removed.iter(); oldnn.valid(); oldnn.advance()) {
-          TreeSet<DistanceDBIDPair<D>> rknns = materialized_RkNN.get(oldnn);
+        for(DoubleDBIDListIter oldnn = removed.iter(); oldnn.valid(); oldnn.advance()) {
+          TreeSet<DoubleDBIDPair> rknns = materialized_RkNN.get(oldnn);
           rknns.remove(makePair(oldnn, id));
         }
 
@@ -266,8 +251,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
       stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs and RkNNs.", getLogger());
     }
     // Temporary storage of removed lists
-    List<KNNList<D>> kNNs = new ArrayList<>(ids.size());
-    List<TreeSet<DistanceDBIDPair<D>>> rkNNs = new ArrayList<>(ids.size());
+    List<KNNList> kNNs = new ArrayList<>(ids.size());
+    List<TreeSet<DoubleDBIDPair>> rkNNs = new ArrayList<>(ids.size());
     for(DBIDIter iter = aids.iter(); iter.valid(); iter.advance()) {
       kNNs.add(storage.get(iter));
       storage.delete(iter);
@@ -284,11 +269,11 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     }
     // Recompute the kNN for affected objects (in rkNN lists)
     {
-      List<? extends KNNList<D>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
+      List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
       int i = 0;
       for(DBIDIter reknn = rkNN_ids.iter(); reknn.valid(); reknn.advance(), i++) {
         storage.put(reknn, kNNList.get(i));
-        for(DistanceDBIDListIter<D> it = kNNList.get(i).iter(); it.valid(); it.advance()) {
+        for(DoubleDBIDListIter it = kNNList.get(i).iter(); it.valid(); it.advance()) {
           materialized_RkNN.get(it).add(makePair(it, reknn));
         }
       }
@@ -297,8 +282,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     {
       SetDBIDs idsSet = DBIDUtil.ensureSet(ids);
       for(DBIDIter nn = kNN_ids.iter(); nn.valid(); nn.advance()) {
-        TreeSet<DistanceDBIDPair<D>> rkNN = materialized_RkNN.get(nn);
-        for(Iterator<DistanceDBIDPair<D>> it = rkNN.iterator(); it.hasNext();) {
+        TreeSet<DoubleDBIDPair> rkNN = materialized_RkNN.get(nn);
+        for(Iterator<DoubleDBIDPair> it = rkNN.iterator(); it.hasNext();) {
           if(idsSet.contains(it.next())) {
             it.remove();
           }
@@ -324,9 +309,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @param remove the ids to remove
    * @return the DBIDs in the given collection
    */
-  protected ArrayDBIDs affectedkNN(List<? extends KNNList<D>> extraxt, DBIDs remove) {
+  protected ArrayDBIDs affectedkNN(List<? extends KNNList> extraxt, DBIDs remove) {
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet();
-    for(KNNList<D> drps : extraxt) {
+    for(KNNList drps : extraxt) {
       for(DBIDIter iter = drps.iter(); iter.valid(); iter.advance()) {
         ids.add(iter);
       }
@@ -343,10 +328,10 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @param remove the ids to remove
    * @return the DBIDs in the given collection
    */
-  protected ArrayDBIDs affectedRkNN(List<? extends Collection<DistanceDBIDPair<D>>> extraxt, DBIDs remove) {
+  protected ArrayDBIDs affectedRkNN(List<? extends Collection<DoubleDBIDPair>> extraxt, DBIDs remove) {
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet();
-    for(Collection<DistanceDBIDPair<D>> drps : extraxt) {
-      for(DistanceDBIDPair<D> drp : drps) {
+    for(Collection<DoubleDBIDPair> drps : extraxt) {
+      for(DoubleDBIDPair drp : drps) {
         ids.add(drp);
       }
     }
@@ -361,7 +346,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @param id the query id
    * @return the kNNs
    */
-  public KNNList<D> getKNN(DBID id) {
+  public KNNList getKNN(DBID id) {
     return storage.get(id);
   }
 
@@ -371,22 +356,21 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @param id the query id
    * @return the RkNNs
    */
-  public GenericDistanceDBIDList<D> getRKNN(DBIDRef id) {
-    TreeSet<DistanceDBIDPair<D>> rKNN = materialized_RkNN.get(id);
+  public DoubleDBIDList getRKNN(DBIDRef id) {
+    TreeSet<DoubleDBIDPair> rKNN = materialized_RkNN.get(id);
     if(rKNN == null) {
       return null;
     }
-    GenericDistanceDBIDList<D> ret = new GenericDistanceDBIDList<>(rKNN.size());
-    for(DistanceDBIDPair<D> pair : rKNN) {
+    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList(rKNN.size());
+    for(DoubleDBIDPair pair : rKNN) {
       ret.add(pair);
     }
     ret.sort();
     return ret;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
+  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
       return null;
     }
@@ -399,7 +383,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         break;
       }
     }
-    return new PreprocessorRKNNQuery<>(relation, (MaterializeKNNAndRKNNPreprocessor<O, S>) this);
+    return new PreprocessorRKNNQuery<>(relation, (MaterializeKNNAndRKNNPreprocessor<O>) this);
   }
 
   @Override
@@ -423,22 +407,22 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @author Elke Achtert
    * 
    * @param <O> The object type
-   * @param <D> The distance type
+   * @param The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory<O, D> {
+  public static class Factory<O> extends MaterializeKNNPreprocessor.Factory<O> {
     /**
      * Constructor.
      * 
      * @param k k
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super O, D> distanceFunction) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction) {
       super(k, distanceFunction);
     }
 
     @Override
-    public MaterializeKNNAndRKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
-      MaterializeKNNAndRKNNPreprocessor<O, D> instance = new MaterializeKNNAndRKNNPreprocessor<>(relation, distanceFunction, k);
+    public MaterializeKNNAndRKNNPreprocessor<O> instantiate(Relation<O> relation) {
+      MaterializeKNNAndRKNNPreprocessor<O> instance = new MaterializeKNNAndRKNNPreprocessor<>(relation, distanceFunction, k);
       return instance;
     }
 
@@ -449,9 +433,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O, D extends Distance<D>> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       @Override
-      protected Factory<O, D> makeInstance() {
+      protected Factory<O> makeInstance() {
         return new Factory<>(k, distanceFunction);
       }
     }

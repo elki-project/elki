@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -99,7 +99,7 @@ public final class TypeUtil {
   /**
    * A list of neighbors.
    */
-  public static final SimpleTypeInformation<DistanceDBIDList<?>> NEIGHBORLIST = new SimpleTypeInformation<>(DistanceDBIDList.class);
+  public static final SimpleTypeInformation<DoubleDBIDList> NEIGHBORLIST = new SimpleTypeInformation<>(DoubleDBIDList.class);
 
   /**
    * Either class label, object labels or a string - anything that will be
@@ -112,12 +112,12 @@ public final class TypeUtil {
   /**
    * Number vectors of <em>variable</em> length.
    */
-  public static final SimpleTypeInformation<? super NumberVector<?>> NUMBER_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<>(NumberVector.class);
+  public static final SimpleTypeInformation<? super NumberVector> NUMBER_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<>(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    */
-  public static final VectorFieldTypeInformation<NumberVector<?>> NUMBER_VECTOR_FIELD = new VectorFieldTypeInformation<>(NumberVector.class);
+  public static final VectorFieldTypeInformation<NumberVector> NUMBER_VECTOR_FIELD = new VectorFieldTypeInformation<>(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
@@ -141,12 +141,12 @@ public final class TypeUtil {
   /**
    * Sparse float vector field.
    */
-  public static final SimpleTypeInformation<SparseNumberVector<?>> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<>(SparseNumberVector.class);
+  public static final SimpleTypeInformation<SparseNumberVector> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<>(SparseNumberVector.class);
 
   /**
    * Sparse vector field.
    */
-  public static final VectorFieldTypeInformation<SparseNumberVector<?>> SPARSE_VECTOR_FIELD = new VectorFieldTypeInformation<>(SparseNumberVector.class);
+  public static final VectorFieldTypeInformation<SparseNumberVector> SPARSE_VECTOR_FIELD = new VectorFieldTypeInformation<>(SparseNumberVector.class);
 
   /**
    * Sparse float vector field.

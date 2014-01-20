@@ -48,7 +48,7 @@ public class SparseEuclideanDistanceFunction extends SparseLPNormDistanceFunctio
   }
 
   @Override
-  public double doubleDistance(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
+  public double distance(SparseNumberVector v1, SparseNumberVector v2) {
     // Get the bit masks
     double accu = 0.;
     int i1 = v1.iter(), i2 = v2.iter();
@@ -90,7 +90,7 @@ public class SparseEuclideanDistanceFunction extends SparseLPNormDistanceFunctio
   }
 
   @Override
-  public double doubleNorm(SparseNumberVector<?> v1) {
+  public double norm(SparseNumberVector v1) {
     double accu = 0.;
     for(int it = v1.iter(); v1.iterValid(it); it = v1.iterAdvance(it)) {
       final double val = v1.iterDoubleValue(it);

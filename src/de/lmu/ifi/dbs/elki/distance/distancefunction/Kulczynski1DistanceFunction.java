@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
-public class Kulczynski1DistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class Kulczynski1DistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance.
    */
@@ -57,7 +57,7 @@ public class Kulczynski1DistanceFunction extends AbstractSpatialDoubleDistanceFu
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double sumdiff = 0., summin = 0.;
     for (int d = 0; d < dim; d++) {
@@ -69,7 +69,7 @@ public class Kulczynski1DistanceFunction extends AbstractSpatialDoubleDistanceFu
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double sumdiff = 0., summin = 0.;
     for (int d = 0; d < dim; d++) {

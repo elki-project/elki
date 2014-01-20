@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Alias("chisq")
 @Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
-public class ChiSquaredDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class ChiSquaredDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -61,7 +61,7 @@ public class ChiSquaredDistanceFunction extends AbstractSpatialDoubleDistanceFun
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
@@ -77,7 +77,7 @@ public class ChiSquaredDistanceFunction extends AbstractSpatialDoubleDistanceFun
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {

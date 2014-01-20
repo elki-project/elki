@@ -137,7 +137,7 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
     }
 
     @Override
-    public double[] project(NumberVector<?> in) {
+    public double[] project(NumberVector in) {
       double[] buf = new double[dims.length];
       for (int i = 0; i < dims.length; i++) {
         buf[i] = in.doubleValue(dims[i]);

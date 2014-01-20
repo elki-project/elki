@@ -1,13 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.generic;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -30,15 +22,19 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 
 /**
  * Sublist of an existing result to contain only the first k elements.
  * 
  * @author Erich Schubert
- * 
- * @param <D> Distance
  */
-public class KNNSubList<D extends Distance<D>> implements KNNList<D> {
+public class KNNSubList implements KNNList {
   /**
    * Parameter k.
    */
@@ -52,7 +48,7 @@ public class KNNSubList<D extends Distance<D>> implements KNNList<D> {
   /**
    * Wrapped inner result.
    */
-  private final KNNList<D> inner;
+  private final KNNList inner;
 
   /**
    * Constructor.
@@ -60,21 +56,22 @@ public class KNNSubList<D extends Distance<D>> implements KNNList<D> {
    * @param inner Inner instance
    * @param k k value
    */
-  public KNNSubList(KNNList<D> inner, int k) {
+  public KNNSubList(KNNList inner, int k) {
     this.inner = inner;
     this.k = k;
     // Compute list size
-    // TODO: optimize for double distances.
-    {
-      DistanceDBIDPair<D> dist = inner.get(k);
+    if (k < inner.getK()){
+      DoubleDBIDPair dist = inner.get(k);
       int i = k;
-      while (i + 1 < inner.size()) {
-        if (dist.compareByDistance(inner.get(i + 1)) < 0) {
+      while(i + 1 < inner.size()) {
+        if(dist.doubleValue() < inner.get(i + 1).doubleValue()) {
           break;
         }
         i++;
       }
       size = i;
+    } else {
+      size = inner.size();
     }
   }
 
@@ -84,25 +81,25 @@ public class KNNSubList<D extends Distance<D>> implements KNNList<D> {
   }
 
   @Override
-  public DistanceDBIDPair<D> get(int index) {
+  public DoubleDBIDPair get(int index) {
     assert (index < size) : "Access beyond design size of list.";
     return inner.get(index);
   }
 
   @Override
-  public D getKNNDistance() {
-    return inner.get(k).getDistance();
+  public double getKNNDistance() {
+    return inner.get(k).doubleValue();
   }
 
   @Override
-  public DistanceDBIDListIter<D> iter() {
+  public DoubleDBIDListIter iter() {
     return new Itr();
   }
 
   @Override
   public boolean contains(DBIDRef o) {
-    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if (DBIDUtil.equal(iter, o)) {
+    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if(DBIDUtil.equal(iter, o)) {
         return true;
       }
     }
@@ -126,7 +123,7 @@ public class KNNSubList<D extends Distance<D>> implements KNNList<D> {
    * 
    * @apiviz.exclude
    */
-  private class Itr implements DistanceDBIDListIter<D> {
+  private class Itr implements DoubleDBIDListIter {
     /**
      * Current position.
      */
@@ -143,12 +140,12 @@ public class KNNSubList<D extends Distance<D>> implements KNNList<D> {
     }
 
     @Override
-    public D getDistance() {
-      return inner.get(pos).getDistance();
+    public double doubleValue() {
+      return inner.get(pos).doubleValue();
     }
 
     @Override
-    public DistanceDBIDPair<D> getDistancePair() {
+    public DoubleDBIDPair getPair() {
       return inner.get(pos);
     }
 
@@ -164,7 +161,7 @@ public class KNNSubList<D extends Distance<D>> implements KNNList<D> {
 
     @Override
     public void advance(int count) {
-      pos -= count;
+      pos += count;
     }
 
     @Override

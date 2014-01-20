@@ -50,7 +50,7 @@ public class CompactCircularMSTLayout3DPC extends AbstractLayout3DPC<CompactCirc
    * 
    * @param sim Similarity measure
    */
-  public CompactCircularMSTLayout3DPC(DimensionSimilarity<NumberVector<?>> sim) {
+  public CompactCircularMSTLayout3DPC(DimensionSimilarity<NumberVector> sim) {
     super(sim);
   }
 

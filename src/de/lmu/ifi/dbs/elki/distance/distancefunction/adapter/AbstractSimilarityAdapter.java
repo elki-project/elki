@@ -30,8 +30,6 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -51,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> object class to process
  */
-public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDistanceFunction<O, DoubleDistance> {
+public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDistanceFunction<O> {
   /**
    * Parameter to specify the similarity function to derive the distance between
    * database objects from. Must extend
@@ -93,20 +91,15 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
   }
 
   @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
-
-  @Override
-  abstract public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Relation<T> database);
+  abstract public <T extends O> DistanceQuery<T> instantiate(Relation<T> database);
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
     // Same subclass
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
     // Same similarity function
@@ -121,11 +114,11 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * 
    * @param <O> Object type
    */
-  public abstract static class Instance<O> extends AbstractDatabaseDistanceFunction.Instance<O, DoubleDistance> {
+  public abstract static class Instance<O> extends AbstractDatabaseDistanceFunction.Instance<O> {
     /**
      * The similarity query we use.
      */
-    private SimilarityQuery<? super O, ? extends NumberDistance<?, ?>> similarityQuery;
+    private SimilarityQuery<? super O> similarityQuery;
 
     /**
      * Constructor.
@@ -134,7 +127,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
      * @param parent Parent distance function
      * @param similarityQuery Similarity query
      */
-    public Instance(Relation<O> database, DistanceFunction<? super O, DoubleDistance> parent, SimilarityQuery<? super O, ? extends NumberDistance<?, ?>> similarityQuery) {
+    public Instance(Relation<O> database, DistanceFunction<? super O> parent, SimilarityQuery<? super O> similarityQuery) {
       super(database, parent);
       this.similarityQuery = similarityQuery;
     }
@@ -148,14 +141,8 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     public abstract double transform(double similarity);
 
     @Override
-    public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
-      final NumberDistance<?, ?> sim = similarityQuery.similarity(id1, id2);
-      return new DoubleDistance(transform(sim.doubleValue()));
-    }
-
-    @Override
-    public DoubleDistance getDistanceFactory() {
-      return DoubleDistance.FACTORY;
+    public double distance(DBIDRef id1, DBIDRef id2) {
+      return transform(similarityQuery.similarity(id1, id2));
     }
   }
 
@@ -176,7 +163,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final ObjectParameter<NormalizedSimilarityFunction<? super O>> param = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
-      if (config.grab(param)) {
+      if(config.grab(param)) {
         similarityFunction = param.instantiateClass(config);
       }
     }

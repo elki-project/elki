@@ -34,13 +34,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.erich.parallel.mapper.DoubleMinMaxMapper;
-import experimentalcode.erich.parallel.mapper.KDoubleDistanceMapper;
+import experimentalcode.erich.parallel.mapper.KDistanceMapper;
 import experimentalcode.erich.parallel.mapper.KNNMapper;
 import experimentalcode.erich.parallel.mapper.LOFMapper;
 import experimentalcode.erich.parallel.mapper.LRDMapper;
@@ -62,9 +61,8 @@ import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
    */
@@ -76,7 +74,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelLOF(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public ParallelLOF(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -93,21 +91,21 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
 
   public OutlierResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O, D> distq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnq = database.getKNNQuery(distq, k + 1);
+    DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
     // Phase one: KNN and k-dist
     WritableDoubleDataStore kdists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
-    WritableDataStore<KNNList<D>> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
+    WritableDataStore<KNNList> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
     {
       // Compute kNN
-      KNNMapper<O, D> knnm = new KNNMapper<>(k + 1, knnq);
-      SharedObject<KNNList<D>> knnv = new SharedObject<>();
-      WriteDataStoreMapper<KNNList<D>> storek = new WriteDataStoreMapper<>(knns);
+      KNNMapper<O> knnm = new KNNMapper<>(k + 1, knnq);
+      SharedObject<KNNList> knnv = new SharedObject<>();
+      WriteDataStoreMapper<KNNList> storek = new WriteDataStoreMapper<>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
       // Compute k-dist
-      KDoubleDistanceMapper kdistm = new KDoubleDistanceMapper(k + 1);
+      KDistanceMapper kdistm = new KDistanceMapper(k + 1);
       SharedDouble kdistv = new SharedDouble();
       WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(kdists);
       kdistm.connectKNNInput(knnv);
@@ -120,7 +118,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
     // Phase two: lrd
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     {
-      LRDMapper<D> lrdm = new LRDMapper<>(knns, kdists);
+      LRDMapper lrdm = new LRDMapper(knns, kdists);
       SharedDouble lrdv = new SharedDouble();
       WriteDoubleDataStoreMapper storelrd = new WriteDoubleDataStoreMapper(lrds);
 
@@ -166,9 +164,8 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
    * @apiviz.exclude
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * K parameter
      */
@@ -185,7 +182,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
     }
 
     @Override
-    protected ParallelLOF<O, D> makeInstance() {
+    protected ParallelLOF<O> makeInstance() {
       return new ParallelLOF<>(distanceFunction, k);
     }
   }

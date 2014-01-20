@@ -27,10 +27,8 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -50,7 +48,7 @@ public class TestINFLO extends AbstractSimpleAlgorithmTest implements JUnit4Test
     params.addParameter(INFLO.K_ID, 29);
 
     // setup Algorithm
-    INFLO<DoubleVector, DoubleDistance> inflo = ClassGenericsUtil.parameterizeOrAbort(INFLO.class, params);
+    INFLO<DoubleVector> inflo = ClassGenericsUtil.parameterizeOrAbort(INFLO.class, params);
     testParameterizationOk(params);
 
     // run INFLO on database

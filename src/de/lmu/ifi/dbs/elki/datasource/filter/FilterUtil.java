@@ -51,16 +51,16 @@ public final class FilterUtil {
    * @return Factory
    */
   @SuppressWarnings("unchecked")
-  public static <V extends NumberVector<?>> NumberVector.Factory<V, ?> guessFactory(SimpleTypeInformation<V> in) {
-    NumberVector.Factory<V, ?> factory = null;
+  public static <V extends NumberVector> NumberVector.Factory<V>  guessFactory(SimpleTypeInformation<V> in) {
+    NumberVector.Factory<V>  factory = null;
     if(in instanceof VectorFieldTypeInformation) {
-      factory = (NumberVector.Factory<V, ?>) ((VectorFieldTypeInformation<V>) in).getFactory();
+      factory = (NumberVector.Factory<V> ) ((VectorFieldTypeInformation<V>) in).getFactory();
     }
     if(factory == null) {
       // FIXME: hack. Add factories to simple type information, too?
       try {
         Field f = in.getRestrictionClass().getField("FACTORY");
-        factory = (NumberVector.Factory<V, ?>) f.get(null);
+        factory = (NumberVector.Factory<V> ) f.get(null);
       }
       catch(Exception e) {
         LoggingUtil.warning("Cannot determine factory for type " + in.getRestrictionClass(), e);

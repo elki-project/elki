@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -63,11 +62,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Stephan Baier
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  * @param <M> Model type
  */
 @Reference(authors = "M. Steinbach, G. Karypis, V. Kumar", title = "A Comparison of Document Clustering Techniques", booktitle = "KDD workshop on text mining. Vol. 400. No. 1")
-public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M extends MeanModel<V>> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, D, M> {
+public class KMeansBisecting<V extends NumberVector, M extends MeanModel<V>> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
   /**
    * The logger for this class.
    */
@@ -76,7 +74,7 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
   /**
    * Variant of kMeans for the bisecting step.
    */
-  private KMeans<V, D, M> innerkMeans;
+  private KMeans<V, M> innerkMeans;
 
   /**
    * Desired value of k.
@@ -89,7 +87,7 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
    * @param k k parameter - number of result clusters
    * @param innerkMeans KMeans variant parameter - for bisecting step
    */
-  public KMeansBisecting(int k, KMeans<V, D, M> innerkMeans) {
+  public KMeansBisecting(int k, KMeans<V, M> innerkMeans) {
     super();
     this.k = k;
     this.innerkMeans = innerkMeans;
@@ -153,7 +151,7 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
   }
 
   @Override
-  public DistanceFunction<? super V, D> getDistanceFunction() {
+  public DistanceFunction<? super V> getDistanceFunction() {
     return innerkMeans.getDistanceFunction();
   }
 
@@ -163,7 +161,7 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
   }
 
   @Override
-  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction) {
+  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     innerkMeans.setDistanceFunction(distanceFunction);
   }
 
@@ -181,10 +179,9 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
    * @apiviz.exclude
    * 
    * @param <V> Vector type
-   * @param <D> Distance type
    * @param <M> Model type
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<?>, M extends MeanModel<V>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector, M extends MeanModel<V>> extends AbstractParameterizer {
     /**
      * Parameter to specify the kMeans variant.
      */
@@ -193,7 +190,7 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
     /**
      * Variant of kMeans
      */
-    protected KMeans<V, D, M> kMeansVariant;
+    protected KMeans<V, M> kMeansVariant;
 
     /**
      * Desired number of clusters.
@@ -210,7 +207,7 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
         k = kP.intValue();
       }
 
-      ObjectParameter<KMeans<V, D, M>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class, BestOfMultipleKMeans.class);
+      ObjectParameter<KMeans<V, M>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class, BestOfMultipleKMeans.class);
       if (config.grab(kMeansVariantP)) {
         ListParameterization kMeansVariantParameters = new ListParameterization();
 
@@ -224,7 +221,7 @@ public class KMeansBisecting<V extends NumberVector<?>, D extends Distance<?>, M
     }
 
     @Override
-    protected KMeansBisecting<V, D, M> makeInstance() {
+    protected KMeansBisecting<V, M> makeInstance() {
       return new KMeansBisecting<>(k, kMeansVariant);
     }
   }

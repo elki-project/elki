@@ -169,12 +169,10 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
         }
       }
 
-      try {
-        if(LOG.isDebugging()) {
-          LOG.verbose("Loading neighborhood file.");
-        }
-        InputStream in = new FileInputStream(file);
-        in = FileUtil.tryGzipInput(in);
+      if(LOG.isDebugging()) {
+        LOG.verbose("Loading neighborhood file.");
+      }
+      try(InputStream in = FileUtil.tryGzipInput(new FileInputStream(file))) {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         for(String line; (line = br.readLine()) != null;) {
           ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();

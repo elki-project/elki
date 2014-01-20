@@ -33,14 +33,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -81,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2_84")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF" })
-public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -110,7 +109,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @param distanceFunction distance function
    * @param k k Parameter
    */
-  public LDOF(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public LDOF(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -123,8 +122,8 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k);
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k);
 
     // track the maximum value for normalization
     DoubleMinMax ldofminmax = new DoubleMinMax();
@@ -139,19 +138,20 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
     Mean dxp = new Mean(), Dxp = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNList<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
+      KNNList neighbors = knnQuery.getKNNForDBID(iditer, k);
       // skip the point itself
       dxp.reset();
       Dxp.reset();
-      // TODO: optimize for double distances
-      for(DistanceDBIDListIter<D> neighbor1 = neighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
-        if(!DBIDUtil.equal(neighbor1, iditer)) {
-          dxp.put(neighbor1.getDistance().doubleValue());
-          for(DistanceDBIDListIter<D> neighbor2 = neighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
-            if(!DBIDUtil.equal(neighbor1, neighbor2) && !DBIDUtil.equal(neighbor2, iditer)) {
-              Dxp.put(distFunc.distance(neighbor1, neighbor2).doubleValue());
-            }
+      for(DoubleDBIDListIter neighbor1 = neighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
+        if(DBIDUtil.equal(neighbor1, iditer)) {
+          continue;
+        }
+        dxp.put(neighbor1.doubleValue());
+        for(DoubleDBIDListIter neighbor2 = neighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
+          if(DBIDUtil.equal(neighbor1, neighbor2) || DBIDUtil.equal(neighbor2, iditer)) {
+            continue;
           }
+          Dxp.put(distFunc.distance(neighbor1, neighbor2));
         }
       }
       double ldof = dxp.getMean() / Dxp.getMean();
@@ -193,7 +193,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     protected int k = 0;
 
     @Override
@@ -207,7 +207,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
 
     @Override
-    protected LDOF<O, D> makeInstance() {
+    protected LDOF<O> makeInstance() {
       return new LDOF<>(distanceFunction, k);
     }
   }

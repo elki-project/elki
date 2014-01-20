@@ -27,7 +27,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -43,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> {
+public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction {
   // TODO: add seed parameter!
 
   /**
@@ -65,16 +64,16 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
   }
 
   @Override
-  public DoubleDistance distance(DBIDRef o1, DBIDRef o2) {
+  public double distance(DBIDRef o1, DBIDRef o2) {
     final int c = DBIDUtil.compare(o1, o2);
     if(c == 0) {
-      return DoubleDistance.FACTORY.nullDistance();
+      return 0.;
     }
     // Symmetry
     if(c > 0) {
       return distance(o2, o1);
     }
-    return new DoubleDistance(pseudoRandom(seed, Util.mixHashCodes(DBIDUtil.deref(o1).hashCode(), DBIDUtil.deref(o2).hashCode(), (int) seed)));
+    return pseudoRandom(seed, Util.mixHashCodes(DBIDUtil.deref(o1).hashCode(), DBIDUtil.deref(o2).hashCode(), (int) seed));
   }
 
   /**
@@ -102,11 +101,6 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
     final int r2 = (int) (l2 >>> 21); // 48 - 21 = 27
     double random = ((((long) r1) << 27) + r2) / (double) (1L << 53);
     return random;
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   @Override

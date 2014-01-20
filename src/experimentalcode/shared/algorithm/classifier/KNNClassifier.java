@@ -1,26 +1,27 @@
 package experimentalcode.shared.algorithm.classifier;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2013
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,11 +30,10 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -55,12 +55,12 @@ import experimentalcode.arthur.AssociationID;
  */
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
-public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> extends DistanceBasedClassifier<O, D, L, Result> {
+public class KNNClassifier<O, L extends ClassLabel> extends DistanceBasedClassifier<O, L, Result> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(KNNClassifier.class);
-  
+
   /**
    * OptionID for
    * {@link experimentalcode.shared.algorithm.classifier.KNNClassifier#K_PARAM}
@@ -97,7 +97,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
     super(config);
     config = config.descend(this);
     // parameter k
-    if (config.grab(K_PARAM)) {
+    if(config.grab(K_PARAM)) {
       k = K_PARAM.getValue();
     }
   }
@@ -124,10 +124,10 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
       double[] distribution = new double[getLabels().size()];
       int[] occurences = new int[getLabels().size()];
 
-      KNNQuery<O, D> knnq = database.getKNNQuery(getDistanceQuery(), k);
-      KNNList<D> query = knnq.getKNNForObject(instance, k);
+      KNNQuery<O> knnq = database.getKNNQuery(getDistanceQuery(), k);
+      KNNList query = knnq.getKNNForObject(instance, k);
       Relation<ClassLabel> crep = database.getRelation(TypeUtil.CLASSLABEL);
-      for(DistanceDBIDListIter<D> neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
+      for(DoubleDBIDListIter neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
         int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(crep.get(neighbor))));
         if(index >= 0) {
           occurences[index]++;

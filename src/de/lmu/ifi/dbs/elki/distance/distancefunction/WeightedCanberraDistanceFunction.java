@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * 
  * @author Erich Schubert
  */
-public class WeightedCanberraDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Weight array
    */
@@ -47,7 +47,7 @@ public class WeightedCanberraDistanceFunction extends AbstractSpatialDoubleDista
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2, weights.length);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
@@ -61,7 +61,7 @@ public class WeightedCanberraDistanceFunction extends AbstractSpatialDoubleDista
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2, weights.length);
     double agg = 0.0;
     for (int d = 0; d < dim; d++) {

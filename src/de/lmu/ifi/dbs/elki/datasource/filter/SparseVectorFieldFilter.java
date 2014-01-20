@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @param <V> Vector type
  */
-public class SparseVectorFieldFilter<V extends SparseNumberVector<?>> extends AbstractConversionFilter<V, V> {
+public class SparseVectorFieldFilter<V extends SparseNumberVector> extends AbstractConversionFilter<V, V> {
   /**
    * Class logger.
    */
@@ -79,7 +79,7 @@ public class SparseVectorFieldFilter<V extends SparseNumberVector<?>> extends Ab
 
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
-    SparseNumberVector.Factory<V, ?> factory = (SparseNumberVector.Factory<V, ?>) FilterUtil.guessFactory(in);
+    SparseNumberVector.Factory<V>  factory = (SparseNumberVector.Factory<V> ) FilterUtil.guessFactory(in);
     return new VectorFieldTypeInformation<>(factory, maxdim);
   }
 

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  */
-public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Latitude dimension.
    */
@@ -76,25 +76,25 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDou
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
+  public double distance(NumberVector o1, NumberVector o2) {
     return model.distanceDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), o2.doubleValue(dimlat), o2.doubleValue(dimlng));
   }
 
   @Override
   @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1 instanceof NumberVector) {
       if(mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+        return distance((NumberVector) mbr1, (NumberVector) mbr2);
       }
       else {
-        NumberVector<?> o1 = (NumberVector<?>) mbr1;
+        NumberVector o1 = (NumberVector) mbr1;
         return model.minDistDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), mbr2.getMin(dimlat), mbr2.getMin(dimlng), mbr2.getMax(dimlat), mbr2.getMax(dimlng));
       }
     }
     else {
       if(mbr2 instanceof NumberVector) {
-        NumberVector<?> o2 = (NumberVector<?>) mbr2;
+        NumberVector o2 = (NumberVector) mbr2;
         return model.minDistDeg(o2.doubleValue(dimlat), o2.doubleValue(dimlng), mbr1.getMin(dimlat), mbr1.getMin(dimlng), mbr1.getMax(dimlat), mbr1.getMax(dimlng));
       }
       else {
@@ -104,7 +104,7 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDou
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return new VectorFieldTypeInformation<>(NumberVector.class, Math.max(dimlat, dimlng), Integer.MAX_VALUE);
   }
 

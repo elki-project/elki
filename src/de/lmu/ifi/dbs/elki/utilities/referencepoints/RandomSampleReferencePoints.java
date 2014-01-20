@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <V> Vector type
  */
-public class RandomSampleReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
+public class RandomSampleReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
   // TODO: use reproducible Random
 
   /**
@@ -141,7 +141,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<?>> implements R
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #N_ID}.
      */

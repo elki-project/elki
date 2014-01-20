@@ -66,7 +66,7 @@ public class DAFile {
    * @param dimension Dimension of this file
    * @param partitions Number of partitions
    */
-  public DAFile(Relation<? extends NumberVector<?>> relation, int dimension, int partitions) {
+  public DAFile(Relation<? extends NumberVector> relation, int dimension, int partitions) {
     final int size = relation.size();
     this.dimension = dimension;
     this.splitPositions = new double[partitions + 1];

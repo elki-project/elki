@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Interface SimilarityFunction describes the requirements of any similarity
@@ -36,9 +35,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.excludeSubtypes
  * 
  * @param <O> object type
- * @param <D> distance type
  */
-public interface PrimitiveSimilarityFunction<O, D extends Distance<?>> extends SimilarityFunction<O, D> {
+public interface PrimitiveSimilarityFunction<O> extends SimilarityFunction<O> {
   /**
    * Computes the similarity between two given DatabaseObjects according to this
    * similarity function.
@@ -48,7 +46,7 @@ public interface PrimitiveSimilarityFunction<O, D extends Distance<?>> extends S
    * @return the similarity between two given DatabaseObjects according to this
    *         similarity function
    */
-  D similarity(O o1, O o2);
+  double similarity(O o1, O o2);
 
   @Override
   abstract public SimpleTypeInformation<? super O> getInputTypeRestriction();

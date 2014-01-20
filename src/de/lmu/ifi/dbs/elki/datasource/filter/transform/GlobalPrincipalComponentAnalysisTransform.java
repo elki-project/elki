@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Vector type
  */
 @Alias({ "whiten", "whitening", "pca" })
-public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>> extends AbstractVectorConversionFilter<O, O> {
+public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> extends AbstractVectorConversionFilter<O, O> {
   /**
    * Class logger.
    */
@@ -190,7 +190,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**
      * To specify the eigenvectors to keep.
      */

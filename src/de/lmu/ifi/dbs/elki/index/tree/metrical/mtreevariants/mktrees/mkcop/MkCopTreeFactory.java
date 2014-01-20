@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -44,9 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.uses MkCoPTreeIndex oneway - - «create»
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkCoPTreeNode<O, D>, MkCoPEntry, MkCoPTreeIndex<O, D>, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry>> {
+public class MkCopTreeFactory<O> extends AbstractMTreeFactory<O, MkCoPTreeNode<O>, MkCoPEntry, MkCoPTreeIndex<O>, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
   /**
    * Parameter for k
    */
@@ -58,17 +56,17 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public MkCopTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry> settings) {
+  public MkCopTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry> settings) {
     super(pageFileFactory, settings);
   }
 
   @Override
-  public MkCoPTreeIndex<O, D> instantiate(Relation<O> relation) {
-    PageFile<MkCoPTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
+  public MkCoPTreeIndex<O> instantiate(Relation<O> relation) {
+    PageFile<MkCoPTreeNode<O>> pagefile = makePageFile(getNodeClass());
     return new MkCoPTreeIndex<>(relation, pagefile, settings);
   }
 
-  protected Class<MkCoPTreeNode<O, D>> getNodeClass() {
+  protected Class<MkCoPTreeNode<O>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkCoPTreeNode.class);
   }
 
@@ -78,8 +76,10 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkCoPTreeNode<O, D>, MkCoPEntry, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry>> {
+  public static class Parameterizer<O> extends AbstractMTreeFactory.Parameterizer<O, MkCoPTreeNode<O>, MkCoPEntry, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -91,12 +91,12 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     @Override
-    protected MkCopTreeFactory<O, D> makeInstance() {
+    protected MkCopTreeFactory<O> makeInstance() {
       return new MkCopTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry> makeSettings() {
+    protected MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry> makeSettings() {
       return new MkTreeSettings<>();
     }
   }

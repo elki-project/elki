@@ -54,7 +54,7 @@ public interface RandomProjectionFamily {
      * @param in Input vector
      * @return Projected vector
      */
-    double[] project(NumberVector<?> in);
+    double[] project(NumberVector in);
 
     /**
      * Get the output dimensionality.

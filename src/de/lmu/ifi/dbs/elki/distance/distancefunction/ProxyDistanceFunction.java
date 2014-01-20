@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Distance function to proxy computations to another distance (that probably
@@ -34,20 +33,19 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <O> object type
- * @param <D> distance type
  */
-public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBIDDistanceFunction<D> {
+public class ProxyDistanceFunction<O> extends AbstractDBIDDistanceFunction {
   /**
    * Distance query
    */
-  DistanceQuery<O, D> inner;
+  DistanceQuery<O> inner;
 
   /**
    * Constructor
    * 
    * @param inner Inner distance
    */
-  public ProxyDistanceFunction(DistanceQuery<O, D> inner) {
+  public ProxyDistanceFunction(DistanceQuery<O> inner) {
     super();
     this.inner = inner;
   }
@@ -56,22 +54,16 @@ public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBI
    * Static method version.
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    * @param inner Inner distance query
    * @return Proxy object
    */
-  public static <O, D extends Distance<D>> ProxyDistanceFunction<O, D> proxy(DistanceQuery<O, D> inner) {
+  public static <O> ProxyDistanceFunction<O> proxy(DistanceQuery<O> inner) {
     return new ProxyDistanceFunction<>(inner);
   }
 
   @Override
-  public D distance(DBIDRef o1, DBIDRef o2) {
+  public double distance(DBIDRef o1, DBIDRef o2) {
     return inner.distance(o1, o2);
-  }
-
-  @Override
-  public D getDistanceFactory() {
-    return inner.getDistanceFactory();
   }
 
   /**
@@ -79,14 +71,14 @@ public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBI
    * 
    * @return query
    */
-  public DistanceQuery<O, D> getDistanceQuery() {
+  public DistanceQuery<O> getDistanceQuery() {
     return inner;
   }
 
   /**
    * @param inner the inner distance query to set
    */
-  public void setDistanceQuery(DistanceQuery<O, D> inner) {
+  public void setDistanceQuery(DistanceQuery<O> inner) {
     this.inner = inner;
   }
 
@@ -94,14 +86,13 @@ public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBI
    * Helper function, to resolve any wrapped Proxy Distances
    * 
    * @param <V> Object type
-   * @param <D> Distance type
    * @param dfun Distance function to unwrap.
    * @return unwrapped distance function
    */
   @SuppressWarnings("unchecked")
-  public static <V, T extends V, D extends Distance<D>> DistanceFunction<? super V, D> unwrapDistance(DistanceFunction<V, D> dfun) {
+  public static <V, T extends V> DistanceFunction<? super V> unwrapDistance(DistanceFunction<V> dfun) {
     if(ProxyDistanceFunction.class.isInstance(dfun)) {
-      return unwrapDistance(((ProxyDistanceFunction<V, D>) dfun).getDistanceQuery().getDistanceFunction());
+      return unwrapDistance(((ProxyDistanceFunction<V>) dfun).getDistanceQuery().getDistanceFunction());
     }
     return dfun;
   }
@@ -115,7 +106,7 @@ public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBI
     if (!this.getClass().equals(obj.getClass())) {
       return false;
     }
-    ProxyDistanceFunction<?, ?> other = (ProxyDistanceFunction<?, ?>) obj;
+    ProxyDistanceFunction<?> other = (ProxyDistanceFunction<?>) obj;
     return this.inner.equals(other.inner);
   }
 

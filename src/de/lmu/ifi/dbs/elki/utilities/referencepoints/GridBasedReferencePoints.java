@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> Object type
  */
-public class GridBasedReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
+public class GridBasedReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
   // TODO: add "grid sampling" option.
 
   /**
@@ -92,7 +92,7 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
-    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
+    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
 
     int dim = RelationUtil.dimensionality(db);
 
@@ -139,7 +139,7 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #GRID_ID}.
      */

@@ -178,7 +178,7 @@ public class CovarianceMatrix {
    * 
    * @param val Value
    */
-  public void put(NumberVector<?> val) {
+  public void put(NumberVector val) {
     assert (val.getDimensionality() == mean.length);
     final double nwsum = wsum + 1.0;
     // Compute new means
@@ -220,7 +220,7 @@ public class CovarianceMatrix {
    * @param val data
    * @param weight weight
    */
-  public void put(NumberVector<?> val, double weight) {
+  public void put(NumberVector val, double weight) {
     assert (val.getDimensionality() == mean.length);
     final double nwsum = wsum + weight;
     // Compute new means
@@ -263,7 +263,7 @@ public class CovarianceMatrix {
    * @param <F> vector type
    * @return Mean vector
    */
-  public <F extends NumberVector<?>> F getMeanVector(Relation<? extends F> relation) {
+  public <F extends NumberVector> F getMeanVector(Relation<? extends F> relation) {
     return RelationUtil.getNumberVectorFactory(relation).newNumberVector(mean);
   }
 
@@ -363,7 +363,7 @@ public class CovarianceMatrix {
    * @param relation Relation to use.
    * @return Covariance matrix
    */
-  public static CovarianceMatrix make(Relation<? extends NumberVector<?>> relation) {
+  public static CovarianceMatrix make(Relation<? extends NumberVector> relation) {
     CovarianceMatrix c = new CovarianceMatrix(RelationUtil.dimensionality(relation));
     for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       c.put(relation.get(iditer));
@@ -378,7 +378,7 @@ public class CovarianceMatrix {
    * @param ids IDs to add
    * @return Covariance matrix
    */
-  public static CovarianceMatrix make(Relation<? extends NumberVector<?>> relation, DBIDs ids) {
+  public static CovarianceMatrix make(Relation<? extends NumberVector> relation, DBIDs ids) {
     CovarianceMatrix c = new CovarianceMatrix(RelationUtil.dimensionality(relation));
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));

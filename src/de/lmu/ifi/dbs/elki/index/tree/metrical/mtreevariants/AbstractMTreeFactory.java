@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.PagedIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
@@ -48,12 +47,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.excludeSubtypes
  * 
  * @param <O> Object type
- * @param <D> Distance type
  * @param <N> Node type
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMTreeFactory<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, I extends AbstractMTree<O, D, N, E, S> & Index, S extends MTreeSettings<O, D, N, E>> extends PagedIndexFactory<O, I> {
+public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, I extends AbstractMTree<O, N, E, S> & Index, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory<O, I> {
   /**
    * Tree settings.
    */
@@ -82,7 +80,7 @@ public abstract class AbstractMTreeFactory<O, D extends NumberDistance<D, ?>, N 
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, D, N, E>> extends PagedIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory.Parameterizer<O> {
     /**
      * Parameter to specify the distance function to determine the distance
      * between database objects, must extend
@@ -122,15 +120,15 @@ public abstract class AbstractMTreeFactory<O, D extends NumberDistance<D, ?>, N 
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       settings = makeSettings();
-      ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if (config.grab(distanceFunctionP)) {
         settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }
-      ObjectParameter<MTreeSplit<O, D, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MMRadSplit.class);
+      ObjectParameter<MTreeSplit<O, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MMRadSplit.class);
       if (config.grab(splitStrategyP)) {
         settings.splitStrategy = splitStrategyP.instantiateClass(config);
       }
-      ObjectParameter<MTreeInsert<O, D, N, E>> insertStrategyP = new ObjectParameter<>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class);
+      ObjectParameter<MTreeInsert<O, N, E>> insertStrategyP = new ObjectParameter<>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class);
       if (config.grab(insertStrategyP)) {
         settings.insertStrategy = insertStrategyP.instantiateClass(config);
       }
@@ -139,6 +137,6 @@ public abstract class AbstractMTreeFactory<O, D extends NumberDistance<D, ?>, N 
     abstract protected S makeSettings();
 
     @Override
-    protected abstract AbstractMTreeFactory<O, D, N, E, ?, ?> makeInstance();
+    protected abstract AbstractMTreeFactory<O, N, E, ?, ?> makeInstance();
   }
 }

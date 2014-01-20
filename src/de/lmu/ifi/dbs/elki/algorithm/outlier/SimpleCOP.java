@@ -40,13 +40,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -81,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Simple COP: Correlation Outlier Probability")
 @Reference(authors = "Arthur Zimek", title = "Correlation Clustering. PhD thesis, Chapter 18", booktitle = "")
-public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
+public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -95,7 +94,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
   /**
    * Holds the object performing the dependency derivation
    */
-  private DependencyDerivator<V, D> dependencyDerivator;
+  private DependencyDerivator<V> dependencyDerivator;
 
   /**
    * Constructor.
@@ -104,14 +103,14 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
    * @param k k Parameter
    * @param pca PCA runner-
    */
-  public SimpleCOP(DistanceFunction<? super V, D> distanceFunction, int k, PCAFilteredRunner<V> pca) {
+  public SimpleCOP(DistanceFunction<? super V> distanceFunction, int k, PCAFilteredRunner<V> pca) {
     super(distanceFunction);
     this.k = k;
     this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, 0, false);
   }
 
   public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {
-    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(data, getDistanceFunction(), k + 1);
+    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(data, getDistanceFunction(), k + 1);
 
     DBIDs ids = data.getDBIDs();
 
@@ -124,7 +123,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
       FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), LOG) : null;
       double sqrt2 = Math.sqrt(2.0);
       for(DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
-        KNNList<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
+        KNNList neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);
         nids.remove(id);
 
@@ -184,7 +183,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its COP_SCORE, must be an integer greater than
@@ -229,7 +228,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
     }
 
     @Override
-    protected SimpleCOP<V, D> makeInstance() {
+    protected SimpleCOP<V> makeInstance() {
       return new SimpleCOP<>(distanceFunction, k, pca);
     }
   }

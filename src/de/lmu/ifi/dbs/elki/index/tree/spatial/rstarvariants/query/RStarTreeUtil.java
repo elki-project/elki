@@ -29,9 +29,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 
 /**
@@ -44,8 +41,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  * @apiviz.uses AbstractRStarTree
  * @apiviz.uses DoubleDistanceRStarTreeKNNQuery
  * @apiviz.uses DoubleDistanceRStarTreeRangeQuery
- * @apiviz.uses GenericRStarTreeKNNQuery
- * @apiviz.uses GenericRStarTreeRangeQuery
  * @apiviz.has RangeQuery
  * @apiviz.has KNNQuery
  */
@@ -55,24 +50,18 @@ public final class RStarTreeUtil {
    * possible.
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    * @param tree Tree to query
    * @param distanceQuery distance query
    * @param hints Optimizer hints
    * @return Query object
    */
   @SuppressWarnings({ "cast", "unchecked" })
-  public static <O extends SpatialComparable, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery, Object... hints) {
+  public static <O extends SpatialComparable> RangeQuery<O> getRangeQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
-    SpatialPrimitiveDistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
-    // Can we use an optimized query?
-    if(df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) DistanceQuery.class.cast(distanceQuery);
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
-      RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<>(tree, dqc, dfc);
-      return (RangeQuery<O, D>) q;
-    }
-    return new GenericRStarTreeRangeQuery<>(tree, distanceQuery);
+    SpatialPrimitiveDistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
+    DistanceQuery<O> dqc = (DistanceQuery<O>) DistanceQuery.class.cast(distanceQuery);
+    RangeQuery<O> q = new RStarTreeRangeQuery<>(tree, dqc, df);
+    return (RangeQuery<O>) q;
   }
 
   /**
@@ -80,23 +69,17 @@ public final class RStarTreeUtil {
    * possible.
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    * @param tree Tree to query
    * @param distanceQuery distance query
    * @param hints Optimizer hints
    * @return Query object
    */
   @SuppressWarnings({ "cast", "unchecked" })
-  public static <O extends SpatialComparable, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery, Object... hints) {
+  public static <O extends SpatialComparable> KNNQuery<O> getKNNQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
-    SpatialPrimitiveDistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
-    // Can we use an optimized query?
-    if(df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) DistanceQuery.class.cast(distanceQuery);
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
-      KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<>(tree, dqc, dfc);
-      return (KNNQuery<O, D>) q;
-    }
-    return new GenericRStarTreeKNNQuery<>(tree, distanceQuery);
+    SpatialPrimitiveDistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
+    DistanceQuery<O> dqc = (DistanceQuery<O>) DistanceQuery.class.cast(distanceQuery);
+    KNNQuery<O> q = new RStarTreeKNNQuery<>(tree, dqc, df);
+    return (KNNQuery<O>) q;
   }
 }

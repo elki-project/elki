@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
  * 
  * @author Erich Schubert
  */
-public interface IntegerArrayStaticDBIDs extends ArrayStaticDBIDs, IntegerArrayDBIDs {
+interface IntegerArrayStaticDBIDs extends ArrayStaticDBIDs, IntegerArrayDBIDs {
   @Override
   IntegerDBIDArrayIter iter();
 }

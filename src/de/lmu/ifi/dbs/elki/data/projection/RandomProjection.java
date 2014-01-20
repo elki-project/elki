@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector type
  */
-public class RandomProjection<V extends NumberVector<?>> implements Projection<V, V> {
+public class RandomProjection<V extends NumberVector> implements Projection<V, V> {
   /**
    * Class logger.
    */
@@ -58,7 +58,7 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
   /**
    * Vector factory.
    */
-  private NumberVector.Factory<V, ?> factory = null;
+  private NumberVector.Factory<V> factory = null;
 
   /**
    * Output dimensionality.
@@ -87,10 +87,11 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
     this.family = family;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void initialize(SimpleTypeInformation<V> in) {
     final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
-    factory = (NumberVector.Factory<V, ?>) vin.getFactory();
+    factory = (NumberVector.Factory<V>) vin.getFactory();
     int inputdim = vin.getDimensionality();
 
     projection = family.generateProjection(inputdim, dimensionality);
@@ -159,7 +160,7 @@ public class RandomProjection<V extends NumberVector<?>> implements Projection<V
     }
 
     @Override
-    protected RandomProjection<NumberVector<?>> makeInstance() {
+    protected RandomProjection<NumberVector> makeInstance() {
       return new RandomProjection<>(dimensionality, family);
     }
   }

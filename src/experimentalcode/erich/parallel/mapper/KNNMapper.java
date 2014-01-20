@@ -23,9 +23,8 @@ package experimentalcode.erich.parallel.mapper;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import experimentalcode.erich.parallel.MapExecutor;
 import experimentalcode.erich.parallel.SharedObject;
 
@@ -35,9 +34,8 @@ import experimentalcode.erich.parallel.SharedObject;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class KNNMapper<O, D extends Distance<D>> implements Mapper {
+public class KNNMapper<O> implements Mapper {
   /**
    * K parameter
    */
@@ -46,12 +44,12 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
   /**
    * KNN query object
    */
-  KNNQuery<O, D> knnq;
+  KNNQuery<O> knnq;
 
   /**
    * Output channel to write to
    */
-  SharedObject<KNNList<D>> out;
+  SharedObject<KNNList> out;
 
   /**
    * Constructor.
@@ -59,7 +57,7 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
    * @param k K parameter
    * @param knnq Distance query to use
    */
-  public KNNMapper(int k, KNNQuery<O, D> knnq) {
+  public KNNMapper(int k, KNNQuery<O> knnq) {
     super();
     this.k = k;
     this.knnq = knnq;
@@ -70,12 +68,12 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
    * 
    * @param output Output channel
    */
-  public void connectKNNOutput(SharedObject<KNNList<D>> output) {
+  public void connectKNNOutput(SharedObject<KNNList> output) {
     this.out = output;
   }
 
   @Override
-  public Instance<O, D> instantiate(MapExecutor mapper) {
+  public Instance<O> instantiate(MapExecutor mapper) {
     return new Instance<>(k, knnq, out.instantiate(mapper));
   }
 
@@ -89,7 +87,7 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
    * 
    * @author Erich Schubert
    */
-  public static class Instance<O, D extends Distance<D>> implements Mapper.Instance {
+  public static class Instance<O> implements Mapper.Instance {
     /**
      * k Parameter
      */
@@ -98,12 +96,12 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
     /**
      * kNN query
      */
-    KNNQuery<O, D> knnq;
+    KNNQuery<O> knnq;
 
     /**
      * Output data store
      */
-    SharedObject.Instance<KNNList<D>> out;
+    SharedObject.Instance<KNNList> out;
 
     /**
      * Constructor.
@@ -112,7 +110,7 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
      * @param knnq KNN query
      * @param out Output channel to write to
      */
-    protected Instance(int k, KNNQuery<O, D> knnq, SharedObject.Instance<KNNList<D>> out) {
+    protected Instance(int k, KNNQuery<O> knnq, SharedObject.Instance<KNNList> out) {
       super();
       this.k = k;
       this.knnq = knnq;

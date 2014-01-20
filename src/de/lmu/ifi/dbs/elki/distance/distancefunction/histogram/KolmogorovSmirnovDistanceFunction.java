@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.histogram;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class KolmogorovSmirnovDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class KolmogorovSmirnovDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -52,7 +52,7 @@ public class KolmogorovSmirnovDistanceFunction extends AbstractVectorDoubleDista
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double xs = 0., ys = 0., agg = 0.;
     for (int i = 0; i < dim; i++) {

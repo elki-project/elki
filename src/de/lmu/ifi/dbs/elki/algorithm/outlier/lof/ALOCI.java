@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -85,12 +84,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.composedOf ALOCIQuadTree
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
-public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -119,7 +117,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
   /**
    * Distance function
    */
-  private NumberVectorDistanceFunction<D> distFunc;
+  private NumberVectorDistanceFunction distFunc;
 
   /**
    * Constructor.
@@ -130,7 +128,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
    * @param g Number of grids to use
    * @param rnd Random generator.
    */
-  public ALOCI(NumberVectorDistanceFunction<D> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
+  public ALOCI(NumberVectorDistanceFunction distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
     super();
     this.distFunc = distanceFunction;
     this.nmin = nmin;
@@ -211,7 +209,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
             continue;
           }
           // TODO: always use manhattan?
-          if(ci == null || distFunc.distance(ci.getCenter(), obj).compareTo(distFunc.distance(ci2.getCenter(), obj)) > 0) {
+          if(ci == null || distFunc.distance(ci.getCenter(), obj) > distFunc.distance(ci2.getCenter(), obj)) {
             ci = ci2;
           }
         }
@@ -229,7 +227,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
             continue;
           }
           // TODO: always use manhattan?
-          if(cj == null || distFunc.distance(cj.getCenter(), ci.getCenter()).compareTo(distFunc.distance(cj2.getCenter(), ci.getCenter())) > 0) {
+          if(cj == null || distFunc.distance(cj.getCenter(), ci.getCenter()) > distFunc.distance(cj2.getCenter(), ci.getCenter())) {
             cj = cj2;
           }
         }
@@ -336,7 +334,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
     /**
      * Relation indexed.
      */
-    private Relation<? extends NumberVector<?>> relation;
+    private Relation<? extends NumberVector> relation;
 
     /**
      * Constructor.
@@ -347,7 +345,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
      * @param nmin Maximum size for a page to split
      * @param relation Relation to index
      */
-    public ALOCIQuadTree(double[] min, double[] max, double[] shift, int nmin, Relation<? extends NumberVector<?>> relation) {
+    public ALOCIQuadTree(double[] min, double[] max, double[] shift, int nmin, Relation<? extends NumberVector> relation) {
       super();
       assert (min.length <= 32) : "Quadtrees are only supported for up to 32 dimensions";
       this.shift = shift;
@@ -395,11 +393,11 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
       if(dim == 0) {
         DBIDArrayIter iter = ids.iter();
         iter.seek(start);
-        NumberVector<?> first = relation.get(iter);
+        NumberVector first = relation.get(iter);
         iter.advance();
         boolean degenerate = true;
         loop: for(; iter.getOffset() < end; iter.advance()) {
-          NumberVector<?> other = relation.get(iter);
+          NumberVector other = relation.get(iter);
           for(int d = 0; d < lmin.length; d++) {
             if(Math.abs(first.doubleValue(d) - other.doubleValue(d)) > 1E-15) {
               degenerate = false;
@@ -481,7 +479,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
      * @param level Level (controls scaling/wraping!)
      * @return Shifted position
      */
-    private double getShiftedDim(NumberVector<?> obj, int dim, int level) {
+    private double getShiftedDim(NumberVector obj, int dim, int level) {
       double pos = obj.doubleValue(dim) + shift[dim];
       pos = (pos - min[dim]) / width[dim] * (1 + level);
       return pos - Math.floor(pos);
@@ -495,7 +493,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
      * @param tlevel Target level
      * @return Node
      */
-    public Node findClosestNode(NumberVector<?> vec, int tlevel) {
+    public Node findClosestNode(NumberVector vec, int tlevel) {
       Node cur = root;
       for(int level = 0; level <= tlevel; level++) {
         if(cur.children == null) {
@@ -650,7 +648,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter to specify the minimum neighborhood size
      */
@@ -694,13 +692,13 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
     /**
      * The distance function
      */
-    private NumberVectorDistanceFunction<D> distanceFunction;
+    private NumberVectorDistanceFunction distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction<D>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
@@ -730,7 +728,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
     }
 
     @Override
-    protected ALOCI<O, D> makeInstance() {
+    protected ALOCI<O> makeInstance() {
       return new ALOCI<>(distanceFunction, nmin, alpha, g, rnd);
     }
   }

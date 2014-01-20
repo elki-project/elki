@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -47,7 +47,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
   /**
    * Distance function to use for measuring
    */
-  SpatialPrimitiveDoubleDistanceFunction<?> distanceFunction;
+  SpatialPrimitiveDistanceFunction<?> distanceFunction;
 
   /**
    * Constructor.
@@ -55,7 +55,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
    * @param reinsertAmount Relative amount of objects to reinsert.
    * @param distanceFunction Distance function to use
    */
-  public AbstractPartialReinsert(double reinsertAmount, SpatialPrimitiveDoubleDistanceFunction<?> distanceFunction) {
+  public AbstractPartialReinsert(double reinsertAmount, SpatialPrimitiveDistanceFunction<?> distanceFunction) {
     super();
     this.reinsertAmount = reinsertAmount;
     this.distanceFunction = distanceFunction;
@@ -87,7 +87,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
     /**
      * Distance function to use for measuring
      */
-    SpatialPrimitiveDoubleDistanceFunction<?> distanceFunction;
+    SpatialPrimitiveDistanceFunction<?> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -98,7 +98,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
       if(config.grab(reinsertAmountP)) {
         reinsertAmount = reinsertAmountP.getValue();
       }
-      ObjectParameter<SpatialPrimitiveDoubleDistanceFunction<?>> distanceP = new ObjectParameter<>(REINSERT_DISTANCE_ID, SpatialPrimitiveDoubleDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<SpatialPrimitiveDistanceFunction<?>> distanceP = new ObjectParameter<>(REINSERT_DISTANCE_ID, SpatialPrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if(config.grab(distanceP)) {
         distanceFunction = distanceP.instantiateClass(config);
       }

@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
  * 
  * @apiviz.uses NumberVector
  */
-public class AttributeWiseErfNormalization<O extends NumberVector<?>> extends AbstractNormalization<O> {
+public class AttributeWiseErfNormalization<O extends NumberVector> extends AbstractNormalization<O> {
   /**
    * Class logger.
    */

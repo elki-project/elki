@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Alias({ "minimum", "min", "de.lmu.ifi.dbs.elki.distance.distancefunction.MinimumDistanceFunction" })
-public class MinimumDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
+public class MinimumDistanceFunction extends AbstractSpatialNorm {
   /**
    * Static instance. Use this.
    */
@@ -44,7 +44,7 @@ public class MinimumDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
 
   /**
    * Provides a Minimum distance function that can compute the Minimum distance
-   * (that is a DoubleDistance) for FeatureVectors.
+   * (that is a distance) for FeatureVectors.
    * 
    * @deprecated Use static instance!
    */
@@ -54,7 +54,7 @@ public class MinimumDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = Double.POSITIVE_INFINITY;
     for (int d = 0; d < dim; d++) {
@@ -68,7 +68,7 @@ public class MinimumDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> v) {
+  public double norm(NumberVector v) {
     final int dim = v.getDimensionality();
     double agg = Double.POSITIVE_INFINITY;
     for (int d = 0; d < dim; d++) {
@@ -82,11 +82,11 @@ public class MinimumDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Some optimizations for simpler cases.
     if (mbr1 instanceof NumberVector) {
       if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+        return distance((NumberVector) mbr1, (NumberVector) mbr2);
       }
     }
     // TODO: add optimization for point to MBR?

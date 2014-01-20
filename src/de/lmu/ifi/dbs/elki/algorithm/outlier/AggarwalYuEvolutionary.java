@@ -86,7 +86,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
-public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractAggarwalYuOutlier<V> {
+public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAggarwalYuOutlier<V> {
   /**
    * The logger for this class.
    */
@@ -685,7 +685,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractAggarwalYuOutlier.Parameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractAggarwalYuOutlier.Parameterizer {
     /**
      * Parameter to specify the number of solutions must be an integer greater
      * than 1.

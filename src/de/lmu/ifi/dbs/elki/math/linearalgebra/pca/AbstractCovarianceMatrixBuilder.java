@@ -27,10 +27,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  *
  * @param <V> Vector class in use
  */
-public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?>> implements Parameterizable, CovarianceMatrixBuilder<V> {
+public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector> implements Parameterizable, CovarianceMatrixBuilder<V> {
   @Override
   public Matrix processDatabase(Relation<? extends V> database) {
     return processIds(database.getDBIDs(), database);
@@ -52,7 +51,7 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?>>
   public abstract Matrix processIds(DBIDs ids, Relation<? extends V> database);
 
   @Override
-  public <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDList<D> results, Relation<? extends V> database, int k) {
+  public Matrix processQueryResults(DoubleDBIDList results, Relation<? extends V> database, int k) {
     ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
     for(DBIDIter it = results.iter(); it.valid() && have < k; it.advance(), have++) {
@@ -62,7 +61,7 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?>>
   }
 
   @Override
-  public final <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDList<D> results, Relation<? extends V> database) {
+  public final Matrix processQueryResults(DoubleDBIDList results, Relation<? extends V> database) {
     return processQueryResults(results, database, results.size());
   }
 }

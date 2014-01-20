@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @param <V> Object type
  */
-public class StarBasedReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
+public class StarBasedReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
   /**
    * Parameter to specify the grid resolution.
    * <p>
@@ -88,7 +88,7 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
   @Override
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
-    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
+    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
 
     int dim = RelationUtil.dimensionality(db);
 
@@ -145,7 +145,7 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #NOCENTER_ID}.
      */

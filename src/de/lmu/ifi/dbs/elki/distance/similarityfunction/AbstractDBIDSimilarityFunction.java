@@ -25,16 +25,13 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Abstract super class for distance functions needing a preprocessor.
  * 
  * @author Elke Achtert
- * 
- * @param <D> distance type
  */
-public abstract class AbstractDBIDSimilarityFunction<D extends Distance<D>> extends AbstractPrimitiveSimilarityFunction<DBID, D> implements DBIDSimilarityFunction<D> {
+public abstract class AbstractDBIDSimilarityFunction extends AbstractPrimitiveSimilarityFunction<DBID> implements DBIDSimilarityFunction {
   /**
    * The database we work on
    */

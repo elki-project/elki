@@ -37,15 +37,14 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -81,11 +80,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Ahmed Hettab
  * 
  * @param <V> Vector type to use for distances
- * @param <D> Distance function to use
  */
 @Title("GLS-Backward Search")
 @Reference(authors = "F. Chen and C.-T. Lu and A. P. Boedihardjo", title = "GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier Detection", booktitle = "Proc. 16th ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/1835804.1835939")
-public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
+public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -108,7 +106,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
    * @param k number of nearest neighbors to use
    * @param alpha Significance niveau
    */
-  public CTLuGLSBackwardSearchAlgorithm(DistanceFunction<V, D> distanceFunction, int k, double alpha) {
+  public CTLuGLSBackwardSearchAlgorithm(DistanceFunction<V> distanceFunction, int k, double alpha) {
     super(distanceFunction);
     this.alpha = alpha;
     this.k = k;
@@ -122,7 +120,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
    * @param relationy Attribute relation
    * @return Algorithm result
    */
-  public OutlierResult run(Database database, Relation<V> relationx, Relation<? extends NumberVector<?>> relationy) {
+  public OutlierResult run(Database database, Relation<V> relationx, Relation<? extends NumberVector> relationy) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relationx.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax mm = new DoubleMinMax(0.0, 0.0);
 
@@ -163,11 +161,11 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
    * @param relationy Attribute relation
    * @return Top outlier and associated score
    */
-  private Pair<DBIDVar, Double> singleIteration(Relation<V> relationx, Relation<? extends NumberVector<?>> relationy) {
+  private Pair<DBIDVar, Double> singleIteration(Relation<V> relationx, Relation<? extends NumberVector> relationy) {
     final int dim = RelationUtil.dimensionality(relationx);
     final int dimy = RelationUtil.dimensionality(relationy);
     assert (dim == 2);
-    KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relationx, getDistanceFunction(), k + 1);
+    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relationx, getDistanceFunction(), k + 1);
 
     // We need stable indexed DBIDs
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relationx.getDBIDs());
@@ -196,7 +194,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
         }
 
         {
-          final NumberVector<?> vecy = relationy.get(id);
+          final NumberVector vecy = relationy.get(id);
           for(int d = 0; d < dimy; d++) {
             double idy = vecy.doubleValue(d);
             Y.set(i, d, idy);
@@ -205,7 +203,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
 
         // Fill the neighborhood matrix F:
         {
-          KNNList<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
+          KNNList neighbors = knnQuery.getKNNForDBID(id, k + 1);
           ModifiableDBIDs neighborhood = DBIDUtil.newArray(neighbors.size());
           for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(DBIDUtil.equal(id, neighbor)) {
@@ -272,9 +270,8 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
    * @apiviz.exclude
    * 
    * @param <V> Input vector type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Holds the alpha value - significance niveau
      */
@@ -303,7 +300,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
     }
 
     @Override
-    protected CTLuGLSBackwardSearchAlgorithm<V, D> makeInstance() {
+    protected CTLuGLSBackwardSearchAlgorithm<V> makeInstance() {
       return new CTLuGLSBackwardSearchAlgorithm<>(distanceFunction, k, alpha);
     }
 

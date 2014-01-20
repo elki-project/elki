@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.query.similarity;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 
 /**
@@ -34,13 +33,12 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * @author Erich Schubert
  * 
  * @param <O> Database object type.
- * @param <D> Distance result type.
  */
-public class PrimitiveSimilarityQuery<O, D extends Distance<D>> extends AbstractSimilarityQuery<O, D> {
+public class PrimitiveSimilarityQuery<O> extends AbstractSimilarityQuery<O> {
   /**
    * The distance function we use.
    */
-  final protected PrimitiveSimilarityFunction<? super O, D> similarityFunction;
+  final protected PrimitiveSimilarityFunction<? super O> similarityFunction;
 
   /**
    * Constructor.
@@ -48,32 +46,32 @@ public class PrimitiveSimilarityQuery<O, D extends Distance<D>> extends Abstract
    * @param relation Relation to use.
    * @param similarityFunction Our similarity function
    */
-  public PrimitiveSimilarityQuery(Relation<? extends O> relation, PrimitiveSimilarityFunction<? super O, D> similarityFunction) {
+  public PrimitiveSimilarityQuery(Relation<? extends O> relation, PrimitiveSimilarityFunction<? super O> similarityFunction) {
     super(relation);
     this.similarityFunction = similarityFunction;
   }
 
   @Override
-  public D similarity(DBIDRef id1, DBIDRef id2) {
+  public double similarity(DBIDRef id1, DBIDRef id2) {
     O o1 = relation.get(id1);
     O o2 = relation.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
-  public D similarity(O o1, DBIDRef id2) {
+  public double similarity(O o1, DBIDRef id2) {
     O o2 = relation.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
-  public D similarity(DBIDRef id1, O o2) {
+  public double similarity(DBIDRef id1, O o2) {
     O o1 = relation.get(id1);
     return similarity(o1, o2);
   }
 
   @Override
-  public D similarity(O o1, O o2) {
+  public double similarity(O o1, O o2) {
     if (o1 == null) {
       throw new UnsupportedOperationException("This distance function can only be used for object instances.");
     }
@@ -84,12 +82,7 @@ public class PrimitiveSimilarityQuery<O, D extends Distance<D>> extends Abstract
   }
 
   @Override
-  public D getDistanceFactory() {
-    return similarityFunction.getDistanceFactory();
-  }
-
-  @Override
-  public PrimitiveSimilarityFunction<? super O, D> getSimilarityFunction() {
+  public PrimitiveSimilarityFunction<? super O> getSimilarityFunction() {
     return similarityFunction;
   }
 }

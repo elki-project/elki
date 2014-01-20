@@ -40,12 +40,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * K-Means++ initialization for k-means.
@@ -61,10 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
 @Reference(authors = "D. Arthur, S. Vassilvitskii", title = "k-means++: the advantages of careful seeding", booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", url = "http://dx.doi.org/10.1145/1283383.1283494")
-public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
+public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
   /**
    * Constructor.
    * 
@@ -75,14 +71,11 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     // Get a distance query
-    if(!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
-      throw new AbortException("K-Means++ initialization can only be used with numerical distances.");
-    }
     @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super V, D> distF = (PrimitiveDistanceFunction<? super V, D>) distanceFunction;
-    DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, distF);
+    final PrimitiveDistanceFunction<? super V> distF = (PrimitiveDistanceFunction<? super V>) distanceFunction;
+    DistanceQuery<V> distQ = database.getDistanceQuery(relation, distF);
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
@@ -118,14 +111,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
       // Update weights:
       weights.putDouble(it, Double.NaN);
       // Choose optimized version for double distances, if applicable.
-      if(distF instanceof PrimitiveDoubleDistanceFunction) {
-        @SuppressWarnings("unchecked")
-        PrimitiveDoubleDistanceFunction<V> ddist = (PrimitiveDoubleDistanceFunction<V>) distF;
-        weightsum = updateWeights(weights, ids, newmean, ddist, relation);
-      }
-      else {
-        weightsum = updateWeights(weights, ids, newmean, distQ);
-      }
+      weightsum = updateWeights(weights, ids, newmean, distQ);
     }
 
     // Explicitly destroy temporary data.
@@ -135,12 +121,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distQ2) {
-    if(!(distQ2.getDistanceFactory() instanceof NumberDistance)) {
-      throw new AbortException("K-Means++ initialization initialization can only be used with numerical distances.");
-    }
-    @SuppressWarnings("unchecked")
-    DistanceQuery<? super V, D> distQ = (DistanceQuery<? super V, D>) distQ2;
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distQ) {
     @SuppressWarnings("unchecked")
     final Relation<V> rel = (Relation<V>) distQ.getRelation();
 
@@ -190,11 +171,11 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
    * @param distQ Distance query
    * @return Weight sum
    */
-  protected double initialWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<? super V, D> distQ) {
+  protected double initialWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<? super V> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       // Distance will usually already be squared
-      double weight = distQ.distance(latest, it).doubleValue();
+      double weight = distQ.distance(latest, it);
       weights.putDouble(it, weight);
       weightsum += weight;
     }
@@ -210,41 +191,14 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
    * @param distQ Distance query
    * @return Weight sum
    */
-  protected double updateWeights(WritableDoubleDataStore weights, DBIDs ids, V latest, DistanceQuery<? super V, D> distQ) {
+  protected double updateWeights(WritableDoubleDataStore weights, DBIDs ids, V latest, DistanceQuery<? super V> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       double weight = weights.doubleValue(it);
       if(weight != weight) {
         continue; // NaN: already chosen!
       }
-      double newweight = distQ.distance(latest, it).doubleValue();
-      if(newweight < weight) {
-        weights.putDouble(it, newweight);
-        weight = newweight;
-      }
-      weightsum += weight;
-    }
-    return weightsum;
-  }
-
-  /**
-   * Update the weight list.
-   * 
-   * @param weights Weight list
-   * @param ids IDs
-   * @param latest Added ID
-   * @param distF Distance function
-   * @param rel Data relation
-   * @return Weight sum
-   */
-  protected double updateWeights(WritableDoubleDataStore weights, DBIDs ids, V latest, PrimitiveDoubleDistanceFunction<V> distF, Relation<V> rel) {
-    double weightsum = 0.;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      double weight = weights.doubleValue(it);
-      if(weight != weight) {
-        continue; // NaN: already chosen!
-      }
-      double newweight = distF.doubleDistance(latest, rel.get(it));
+      double newweight = distQ.distance(latest, it);
       if(newweight < weight) {
         weights.putDouble(it, newweight);
         weight = newweight;
@@ -261,9 +215,9 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization.Parameterizer<V> {
+  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer<V> {
     @Override
-    protected KMeansPlusPlusInitialMeans<V, D> makeInstance() {
+    protected KMeansPlusPlusInitialMeans<V> makeInstance() {
       return new KMeansPlusPlusInitialMeans<>(rnd);
     }
   }

@@ -94,7 +94,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
    * @param relation Data relation (1d!)
    * @return Outlier detection result
    */
-  public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector<?>> relation) {
+  public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
 
     // Compute the global mean and variance
@@ -145,7 +145,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 1));
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector>(NumberVector.class, 1));
   }
 
   @Override

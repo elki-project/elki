@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Elke Achtert
  */
-public class FloatVector extends AbstractNumberVector<Float> {
+public class FloatVector extends AbstractNumberVector {
   /**
    * Static factory instance.
    */
@@ -143,13 +143,13 @@ public class FloatVector extends AbstractNumberVector<Float> {
    * 
    * @apiviz.has FloatVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<FloatVector, Float> {
+  public static class Factory extends AbstractNumberVector.Factory<FloatVector> {
     @Override
-    public <A> FloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
+    public <A> FloatVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       float[] values = new float[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i);
+        values[i] = adapter.get(array, i).floatValue();
       }
       return new FloatVector(values, true);
     }

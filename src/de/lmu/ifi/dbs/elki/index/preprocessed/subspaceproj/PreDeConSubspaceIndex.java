@@ -26,10 +26,9 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SubspaceProjectionResult;
@@ -49,12 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @apiviz.has SubspaceProjectionResult
  * 
- * @param <D> Distance type
  * @param <V> Vector type
  */
 @Title("PreDeCon Preprocessor")
 @Description("Computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n" + "The variance analysis is based on epsilon range queries.")
-public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex<V, D, SubspaceProjectionResult> {
+public class PreDeConSubspaceIndex<V extends NumberVector> extends AbstractSubspaceProjectionIndex<V, SubspaceProjectionResult> {
   /**
    * The logger for this class.
    */
@@ -79,20 +77,19 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
    * @param minpts Minpts parameter
    * @param delta Delta value
    */
-  public PreDeConSubspaceIndex(Relation<V> relation, D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, double delta) {
+  public PreDeConSubspaceIndex(Relation<V> relation, double epsilon, DistanceFunction<V> rangeQueryDistanceFunction, int minpts, double delta) {
     super(relation, epsilon, rangeQueryDistanceFunction, minpts);
     this.delta = delta;
   }
 
   @Override
-  protected SubspaceProjectionResult computeProjection(DBIDRef id, DistanceDBIDList<D> neighbors, Relation<V> database) {
-    StringBuilder msg = null;
+  protected SubspaceProjectionResult computeProjection(DBIDRef id, DoubleDBIDList neighbors, Relation<V> database) {
+    StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
 
     int referenceSetSize = neighbors.size();
     V obj = database.get(id);
 
-    if(getLogger().isDebugging()) {
-      msg = new StringBuilder();
+    if(msg != null) {
       msg.append("referenceSetSize = ").append(referenceSetSize);
       msg.append("\ndelta = ").append(delta);
     }
@@ -185,9 +182,8 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
    * @apiviz.uses PreDeConSubspaceIndex oneway - - «creates»
    * 
    * @param <V> Vector type
-   * @param <D> Distance type
    */
-  public static class Factory<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory<V, D, PreDeConSubspaceIndex<V, D>> {
+  public static class Factory<V extends NumberVector> extends AbstractSubspaceProjectionIndex.Factory<V, PreDeConSubspaceIndex<V>> {
     /**
      * The default value for delta.
      */
@@ -211,13 +207,13 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
      * @param minpts
      * @param delta
      */
-    public Factory(D epsilon, DistanceFunction<V, D> rangeQueryDistanceFunction, int minpts, double delta) {
+    public Factory(double epsilon, DistanceFunction<V> rangeQueryDistanceFunction, int minpts, double delta) {
       super(epsilon, rangeQueryDistanceFunction, minpts);
       this.delta = delta;
     }
 
     @Override
-    public PreDeConSubspaceIndex<V, D> instantiate(Relation<V> relation) {
+    public PreDeConSubspaceIndex<V> instantiate(Relation<V> relation) {
       return new PreDeConSubspaceIndex<>(relation, epsilon, rangeQueryDistanceFunction, minpts, delta);
     }
 
@@ -228,7 +224,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
+    public static class Parameterizer<V extends NumberVector> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, Factory<V>> {
       /**
        * The threshold for small eigenvalues.
        */
@@ -246,7 +242,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
       }
 
       @Override
-      protected Factory<V, D> makeInstance() {
+      protected Factory<V> makeInstance() {
         return new Factory<>(epsilon, rangeQueryDistanceFunction, minpts, delta);
       }
     }

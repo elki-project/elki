@@ -27,10 +27,8 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -50,7 +48,7 @@ public class TestLOF extends AbstractSimpleAlgorithmTest implements JUnit4Test {
     params.addParameter(LOF.Parameterizer.K_ID, 10);
 
     // setup Algorithm
-    LOF<DoubleVector, DoubleDistance> lof = ClassGenericsUtil.parameterizeOrAbort(LOF.class, params);
+    LOF<DoubleVector> lof = ClassGenericsUtil.parameterizeOrAbort(LOF.class, params);
     testParameterizationOk(params);
 
     // run LOF on database

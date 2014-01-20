@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class IntegerVector extends AbstractNumberVector<Integer> {
+public class IntegerVector extends AbstractNumberVector {
   /**
    * Static instance (object factory).
    */
@@ -165,13 +165,13 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    * 
    * @apiviz.has IntegerVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<IntegerVector, Integer> {
+  public static class Factory extends AbstractNumberVector.Factory<IntegerVector> {
     @Override
-    public <A> IntegerVector newFeatureVector(A array, ArrayAdapter<Integer, A> adapter) {
+    public <A> IntegerVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       int[] values = new int[dim];
       for (int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i);
+        values[i] = adapter.get(array, i).intValue();
       }
       return new IntegerVector(values, true);
     }

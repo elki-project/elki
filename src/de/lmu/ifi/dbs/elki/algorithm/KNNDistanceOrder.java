@@ -23,21 +23,19 @@ package de.lmu.ifi.dbs.elki.algorithm;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import gnu.trove.list.array.TDoubleArrayList;
+
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -53,12 +51,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <D> the type of Distance used by this Algorithm
  */
 // TODO: redundant to kNN outlier detection?
 @Title("KNN-Distance-Order")
 @Description("Assesses the knn distances for a specified k and orders them.")
-public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
+public class KNNDistanceOrder<O> extends AbstractDistanceBasedAlgorithm<O, KNNDistanceOrderResult> {
   /**
    * The logger for this class.
    */
@@ -94,7 +91,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    * @param k k Parameter
    * @param percentage percentage parameter
    */
-  public KNNDistanceOrder(DistanceFunction<O, D> distanceFunction, int k, double percentage) {
+  public KNNDistanceOrder(DistanceFunction<O> distanceFunction, int k, double percentage) {
     super(distanceFunction);
     this.k = k;
     this.percentage = percentage;
@@ -108,20 +105,21 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    * @param relation Relation
    * @return Result
    */
-  public KNNDistanceOrderResult<D> run(Database database, Relation<O> relation) {
-    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
+  public KNNDistanceOrderResult run(Database database, Relation<O> relation) {
+    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     final Random random = new Random();
-    List<D> knnDistances = new ArrayList<>(relation.size());
+    TDoubleArrayList knnDistances = new TDoubleArrayList((int) (relation.size() * percentage * 1.1));
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(random.nextDouble() < percentage) {
-        final KNNList<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
+        final KNNList neighbors = knnQuery.getKNNForDBID(iditer, k);
         knnDistances.add(neighbors.getKNNDistance());
       }
     }
-    Collections.sort(knnDistances, Collections.reverseOrder());
-    return new KNNDistanceOrderResult<>("kNN distance order", "knn-order", knnDistances);
+    knnDistances.sort();
+    knnDistances.reverse();
+    return new KNNDistanceOrderResult("kNN distance order", "knn-order", knnDistances.toArray());
   }
 
   @Override
@@ -141,7 +139,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter k.
      */
@@ -177,7 +175,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
     }
 
     @Override
-    protected KNNDistanceOrder<O, D> makeInstance() {
+    protected KNNDistanceOrder<O> makeInstance() {
       return new KNNDistanceOrder<>(distanceFunction, k, percentage);
     }
   }

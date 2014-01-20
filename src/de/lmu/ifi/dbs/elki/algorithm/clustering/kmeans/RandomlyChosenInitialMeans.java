@@ -54,7 +54,7 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
     List<V> means = new ArrayList<>(k);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -64,7 +64,7 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distanceFunction) {
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distanceFunction) {
     return DBIDUtil.randomSample(distanceFunction.getRelation().getDBIDs(), k, rnd);
   }
 

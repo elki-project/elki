@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @author Arthur Zimek
  * @author Erich Schubert
  */
-public class WeightedPearsonCorrelationDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class WeightedPearsonCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Weights
    */
@@ -76,7 +76,7 @@ public class WeightedPearsonCorrelationDistanceFunction extends AbstractVectorDo
    *         and v2
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     return 1 - MathUtil.weightedPearsonCorrelationCoefficient(v1, v2, weights);
   }
 

@@ -32,14 +32,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -66,16 +66,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
-public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>, D extends Distance<D>, P extends ProjectionResult> extends AbstractPreprocessorIndex<NV, P> implements SubspaceProjectionIndex<NV, P> {
+public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector, P extends ProjectionResult> extends AbstractPreprocessorIndex<NV, P> implements SubspaceProjectionIndex<NV, P> {
   /**
    * Contains the value of parameter epsilon;
    */
-  protected D epsilon;
+  protected double epsilon;
 
   /**
    * The distance function for the variance analysis.
    */
-  protected DistanceFunction<NV, D> rangeQueryDistanceFunction;
+  protected DistanceFunction<NV> rangeQueryDistanceFunction;
 
   /**
    * Holds the value of parameter minpts.
@@ -90,7 +90,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
    * @param rangeQueryDistanceFunction range query
    * @param minpts Minpts
    */
-  public AbstractSubspaceProjectionIndex(Relation<NV> relation, D epsilon, DistanceFunction<NV, D> rangeQueryDistanceFunction, int minpts) {
+  public AbstractSubspaceProjectionIndex(Relation<NV> relation, double epsilon, DistanceFunction<NV> rangeQueryDistanceFunction, int minpts) {
     super(relation);
     this.epsilon = epsilon;
     this.rangeQueryDistanceFunction = rangeQueryDistanceFunction;
@@ -109,19 +109,19 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
     long start = System.currentTimeMillis();
-    RangeQuery<NV, D> rangeQuery = QueryUtil.getRangeQuery(relation, rangeQueryDistanceFunction);
+    RangeQuery<NV> rangeQuery = QueryUtil.getRangeQuery(relation, rangeQueryDistanceFunction);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DistanceDBIDList<D> neighbors = rangeQuery.getRangeForDBID(iditer, epsilon);
+      DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, epsilon);
 
       final P pres;
       if(neighbors.size() >= minpts) {
         pres = computeProjection(iditer, neighbors, relation);
       }
       else {
-        DistanceDBIDPair<D> firstQR = neighbors.iter().getDistancePair();
-        GenericDistanceDBIDList<D> newne = new GenericDistanceDBIDList<>();
+        DoubleDBIDPair firstQR = neighbors.iter().getPair();
+        ModifiableDoubleDBIDList newne = DBIDUtil.newDistanceDBIDList();
         newne.add(firstQR);
         pres = computeProjection(iditer, newne, relation);
       }
@@ -165,7 +165,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
    * 
    * @return local subspace projection
    */
-  protected abstract P computeProjection(DBIDRef id, DistanceDBIDList<D> neighbors, Relation<NV> relation);
+  protected abstract P computeProjection(DBIDRef id, DoubleDBIDList neighbors, Relation<NV> relation);
 
   /**
    * Factory class
@@ -175,16 +175,16 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractSubspaceProjectionIndex oneway - - «create»
    */
-  public abstract static class Factory<NV extends NumberVector<?>, D extends Distance<D>, I extends AbstractSubspaceProjectionIndex<NV, D, ?>> implements SubspaceProjectionIndex.Factory<NV, I>, Parameterizable {
+  public abstract static class Factory<NV extends NumberVector, I extends AbstractSubspaceProjectionIndex<NV, ?>> implements SubspaceProjectionIndex.Factory<NV, I>, Parameterizable {
     /**
      * Contains the value of parameter epsilon;
      */
-    protected D epsilon;
+    protected double epsilon;
 
     /**
      * The distance function for the variance analysis.
      */
-    protected DistanceFunction<NV, D> rangeQueryDistanceFunction;
+    protected DistanceFunction<NV> rangeQueryDistanceFunction;
 
     /**
      * Holds the value of parameter minpts.
@@ -194,11 +194,11 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
     /**
      * Constructor.
      * 
-     * @param epsilon
-     * @param rangeQueryDistanceFunction
-     * @param minpts
+     * @param epsilon Epsilon radius
+     * @param rangeQueryDistanceFunction distance function
+     * @param minpts Minimum number of points
      */
-    public Factory(D epsilon, DistanceFunction<NV, D> rangeQueryDistanceFunction, int minpts) {
+    public Factory(double epsilon, DistanceFunction<NV> rangeQueryDistanceFunction, int minpts) {
       super();
       this.epsilon = epsilon;
       this.rangeQueryDistanceFunction = rangeQueryDistanceFunction;
@@ -220,16 +220,16 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
      * 
      * @apiviz.exclude
      */
-    public abstract static class Parameterizer<NV extends NumberVector<?>, D extends Distance<D>, C> extends AbstractParameterizer {
+    public abstract static class Parameterizer<NV extends NumberVector, C> extends AbstractParameterizer {
       /**
        * Contains the value of parameter epsilon;
        */
-      protected D epsilon = null;
+      protected double epsilon;
 
       /**
        * The distance function for the variance analysis.
        */
-      protected DistanceFunction<NV, D> rangeQueryDistanceFunction = null;
+      protected DistanceFunction<NV> rangeQueryDistanceFunction = null;
 
       /**
        * Holds the value of parameter minpts.
@@ -245,15 +245,14 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
       }
 
       protected void configRangeQueryDistanceFunction(Parameterization config) {
-        ObjectParameter<DistanceFunction<NV, D>> rangeQueryDistanceP = new ObjectParameter<>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        ObjectParameter<DistanceFunction<NV>> rangeQueryDistanceP = new ObjectParameter<>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
         if(config.grab(rangeQueryDistanceP)) {
           rangeQueryDistanceFunction = rangeQueryDistanceP.instantiateClass(config);
         }
       }
 
-      protected void configEpsilon(Parameterization config, DistanceFunction<NV, D> rangeQueryDistanceFunction) {
-        D distanceParser = rangeQueryDistanceFunction != null ? rangeQueryDistanceFunction.getDistanceFactory() : null;
-        DistanceParameter<D> epsilonP = new DistanceParameter<>(AbstractProjectedDBSCAN.EPSILON_ID, distanceParser);
+      protected void configEpsilon(Parameterization config, DistanceFunction<NV> rangeQueryDistanceFunction) {
+        DoubleParameter epsilonP = new DoubleParameter(AbstractProjectedDBSCAN.EPSILON_ID);
         // parameter epsilon
         if(config.grab(epsilonP)) {
           epsilon = epsilonP.getValue();

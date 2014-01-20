@@ -30,7 +30,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 
 /**
@@ -51,7 +51,7 @@ public class TestComputeROC implements JUnit4Test {
     positive.add(DBIDUtil.importInteger(4));
     positive.add(DBIDUtil.importInteger(5));
 
-    final DoubleDistanceDBIDPairList distances = new DoubleDistanceDBIDPairList();
+    final ModifiableDoubleDBIDList distances = DBIDUtil.newDistanceDBIDList();
     // Starting point: ................................ 0.0,0. ++
     distances.add(0.0, DBIDUtil.importInteger(1)); // + 0.0,.2 -- redundant
     distances.add(1.0, DBIDUtil.importInteger(2)); // + 0.0,.4 ++
@@ -63,7 +63,7 @@ public class TestComputeROC implements JUnit4Test {
     distances.add(5.0, DBIDUtil.importInteger(9)); // - 1.0,.8 ++
     distances.add(6.0, DBIDUtil.importInteger(5)); // + 1.0,1. ++
 
-    XYCurve roccurve = ROC.materializeROC(new ROC.DBIDsTest(positive), new ROC.DistanceResultAdapter<>(distances.iter()));
+    XYCurve roccurve = ROC.materializeROC(new ROC.DBIDsTest(positive), new ROC.DistanceResultAdapter(distances.iter()));
     // System.err.println(roccurve);
     Assert.assertEquals("ROC curve too complex", 6, roccurve.size());
 

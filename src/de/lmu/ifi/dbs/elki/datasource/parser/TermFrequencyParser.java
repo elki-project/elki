@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Term frequency parser")
 @Description("Parse a file containing term frequencies. The expected format is 'label term1 <freq> term2 <freq> ...'. Terms must not contain the separator character!")
-public class TermFrequencyParser<V extends SparseNumberVector<?>> extends NumberVectorLabelParser<V> {
+public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVectorLabelParser<V> {
   /**
    * Class logger.
    */
@@ -84,7 +84,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
   /**
    * Same as {@link #factory}, but subtype.
    */
-  private SparseNumberVector.Factory<V, ?> sparsefactory;
+  private SparseNumberVector.Factory<V>  sparsefactory;
 
   /**
    * (Reused) set of values for the number vector.
@@ -105,7 +105,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
    * @param comment Comment pattern
    * @param labelIndices Indices to use as labels
    */
-  public TermFrequencyParser(boolean normalize, Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V, ?> factory) {
+  public TermFrequencyParser(boolean normalize, Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V>  factory) {
     super(colSep, quoteChars, comment, labelIndices, factory);
     this.normalize = normalize;
     this.keymap = new TObjectIntHashMap<>(1001, .5f, -1);
@@ -183,7 +183,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends SparseNumberVector<?>> extends NumberVectorLabelParser.Parameterizer<V> {
+  public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     /**
      * Option ID for normalization.
      */
@@ -205,7 +205,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
 
     @Override
     protected void getFactory(Parameterization config) {
-      ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
+      ObjectParameter<SparseNumberVector.Factory<V> > factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
       if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
@@ -213,7 +213,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
 
     @Override
     protected TermFrequencyParser<V> makeInstance() {
-      return new TermFrequencyParser<>(normalize, colSep, quoteChars, comment, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
+      return new TermFrequencyParser<>(normalize, colSep, quoteChars, comment, labelIndices, (SparseNumberVector.Factory<V> ) factory);
     }
   }
 }

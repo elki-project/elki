@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
@@ -40,10 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @author Erich Schubert
  * 
  * @param <V> Number vector type
- * @param <D> Distance type
  * @param <M> Actual model type
  */
-public interface KMeans<V extends NumberVector<?>, D extends Distance<?>, M extends MeanModel<V>> extends ClusteringAlgorithm<Clustering<M>>, DistanceBasedAlgorithm<V, D> {
+public interface KMeans<V extends NumberVector, M extends MeanModel<V>> extends ClusteringAlgorithm<Clustering<M>>, DistanceBasedAlgorithm<V> {
   /**
    * Parameter to specify the initialization method
    */
@@ -81,11 +79,11 @@ public interface KMeans<V extends NumberVector<?>, D extends Distance<?>, M exte
    * @param k K parameter
    */
   void setK(int k);
-  
+
   /**
    * Set the distance function to use.
    * 
    * @param distanceFunction Distance function.
    */
-  void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction);
+  void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction);
 }

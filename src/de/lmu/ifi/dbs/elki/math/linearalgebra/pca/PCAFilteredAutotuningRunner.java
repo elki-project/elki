@@ -29,15 +29,14 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
@@ -58,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <V> vector type
  */
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAFilteredRunner<V> {
+public class PCAFilteredAutotuningRunner<V extends NumberVector> extends PCAFilteredRunner<V> {
   /**
    * Constructor.
    * 
@@ -76,9 +75,9 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
     // Assume Euclidean distance. In the context of PCA, the neighborhood should
     // be L2-spherical to be unbiased.
     V center = Centroid.make(database, ids).toVector(database);
-    DoubleDistanceDBIDPairList dres = new DoubleDistanceDBIDPairList(ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final double dist = EuclideanDistanceFunction.STATIC.doubleDistance(center, database.get(iter));
+    ModifiableDoubleDBIDList dres = DBIDUtil.newDistanceDBIDList(ids.size());
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      final double dist = EuclideanDistanceFunction.STATIC.distance(center, database.get(iter));
       dres.add(dist, iter);
     }
     dres.sort();
@@ -117,16 +116,16 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
   }
 
   @Override
-  public <D extends NumberDistance<D, ?>> PCAFilteredResult processQueryResult(DistanceDBIDList<D> results, Relation<? extends V> database) {
+  public PCAFilteredResult processQueryResult(DoubleDBIDList results, Relation<? extends V> database) {
     assertSortedByDistance(results);
     final int dim = RelationUtil.dimensionality(database);
 
     List<Matrix> best = new LinkedList<>();
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       best.add(null);
     }
     double[] beststrength = new double[dim];
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       beststrength[i] = -1;
     }
     int[] bestk = new int[dim];
@@ -135,11 +134,11 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
     // TODO: starting parameter shouldn't be hardcoded...
     int smooth = 3;
     int startk = 4;
-    if (startk > results.size() - 1) {
+    if(startk > results.size() - 1) {
       startk = results.size() - 1;
     }
     // TODO: add smoothing options, handle border cases better.
-    for (int k = startk; k < results.size(); k++) {
+    for(int k = startk; k < results.size(); k++) {
       // sorted eigenpairs, eigenvectors, eigenvalues
       Matrix covMat = covarianceMatrixBuilder.processQueryResults(results, database);
       EigenvalueDecomposition evd = new EigenvalueDecomposition(covMat);
@@ -155,23 +154,23 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
 
       prev.add(new Cand(covMat, thisexplain, thisdim));
 
-      if (prev.size() >= 2 * smooth + 1) {
+      if(prev.size() >= 2 * smooth + 1) {
         // all the same dimension?
         boolean samedim = true;
-        for (Iterator<Cand> it = prev.iterator(); it.hasNext();) {
-          if (it.next().dim != thisdim) {
+        for(Iterator<Cand> it = prev.iterator(); it.hasNext();) {
+          if(it.next().dim != thisdim) {
             samedim = false;
           }
         }
-        if (samedim) {
+        if(samedim) {
           // average their explain values
           double avgexplain = 0.0;
-          for (Iterator<Cand> it = prev.iterator(); it.hasNext();) {
+          for(Iterator<Cand> it = prev.iterator(); it.hasNext();) {
             avgexplain += it.next().explain;
           }
           avgexplain /= prev.size();
 
-          if (avgexplain > beststrength[thisdim - 1]) {
+          if(avgexplain > beststrength[thisdim - 1]) {
             beststrength[thisdim - 1] = avgexplain;
             best.set(thisdim - 1, prev.get(smooth).m);
             bestk[thisdim - 1] = k - smooth;
@@ -181,13 +180,13 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
       }
     }
     // Try all dimensions, lowest first.
-    for (int i = 0; i < dim; i++) {
-      if (beststrength[i] > 0.0) {
+    for(int i = 0; i < dim; i++) {
+      if(beststrength[i] > 0.0) {
         // If the best was the lowest or the biggest k, skip it!
-        if (bestk[i] == startk + smooth) {
+        if(bestk[i] == startk + smooth) {
           continue;
         }
-        if (bestk[i] == results.size() - smooth - 1) {
+        if(bestk[i] == results.size() - smooth - 1) {
           continue;
         }
         Matrix covMat = best.get(i);
@@ -212,10 +211,10 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
   private double computeExplainedVariance(FilteredEigenPairs filteredEigenPairs) {
     double strongsum = 0.0;
     double weaksum = 0.0;
-    for (EigenPair ep : filteredEigenPairs.getStrongEigenPairs()) {
+    for(EigenPair ep : filteredEigenPairs.getStrongEigenPairs()) {
       strongsum += ep.getEigenvalue();
     }
-    for (EigenPair ep : filteredEigenPairs.getWeakEigenPairs()) {
+    for(EigenPair ep : filteredEigenPairs.getWeakEigenPairs()) {
       weaksum += ep.getEigenvalue();
     }
     return strongsum / (strongsum / weaksum);
@@ -225,25 +224,26 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
    * Ensure that the results are sorted by distance.
    * 
    * @param results Results to process
-   * @param <D> distance type
    */
-  private <D extends NumberDistance<D, ?>> void assertSortedByDistance(DistanceDBIDList<D> results) {
+  private void assertSortedByDistance(DoubleDBIDList results) {
     // TODO: sort results instead?
     double dist = -1.0;
     boolean sorted = true;
-    for (DistanceDBIDListIter<D> it = results.iter(); it.valid(); it.advance()) {
-      double qr = it.getDistance().doubleValue();
-      if (qr < dist) {
+    for(DoubleDBIDListIter it = results.iter(); it.valid(); it.advance()) {
+      double qr = it.doubleValue();
+      if(qr < dist) {
         sorted = false;
       }
       dist = qr;
     }
-    if (!sorted) {
+    if(!sorted) {
       try {
-        ModifiableDistanceDBIDList.class.cast(results).sort();
-      } catch (ClassCastException e) {
+        ModifiableDoubleDBIDList.class.cast(results).sort();
+      }
+      catch(ClassCastException e) {
         LoggingUtil.warning("WARNING: results not sorted by distance!", e);
-      } catch (UnsupportedOperationException e) {
+      }
+      catch(UnsupportedOperationException e) {
         LoggingUtil.warning("WARNING: results not sorted by distance!", e);
       }
     }
@@ -256,7 +256,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends PCAFilteredRunner.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends PCAFilteredRunner.Parameterizer<V> {
     @Override
     protected PCAFilteredAutotuningRunner<V> makeInstance() {
       return new PCAFilteredAutotuningRunner<>(covarianceMatrixBuilder, eigenPairFilter, big, small);

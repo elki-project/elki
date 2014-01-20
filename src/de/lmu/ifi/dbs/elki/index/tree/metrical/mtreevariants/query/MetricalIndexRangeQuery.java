@@ -24,11 +24,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -40,12 +40,14 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * @author Erich Schubert
  * 
  * @apiviz.uses AbstractMTree
+ * 
+ * @param <O> Object type
  */
-public class MetricalIndexRangeQuery<O, D extends NumberDistance<D, ?>> extends AbstractDistanceRangeQuery<O, D> {
+public class MetricalIndexRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
   /**
    * The index to use
    */
-  protected final AbstractMTree<O, D, ?, ?, ?> index;
+  protected final AbstractMTree<O, ?, ?, ?> index;
 
   /**
    * Constructor.
@@ -53,7 +55,7 @@ public class MetricalIndexRangeQuery<O, D extends NumberDistance<D, ?>> extends 
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexRangeQuery(AbstractMTree<O, D, ?, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+  public MetricalIndexRangeQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
     super(distanceQuery);
     this.index = index;
   }
@@ -65,18 +67,18 @@ public class MetricalIndexRangeQuery<O, D extends NumberDistance<D, ?>> extends 
    * 
    * @param o_p the routing object of the specified node
    * @param node the root of the subtree to be traversed
-   * @param q the id of the query object
+   * @param q the query object
    * @param r_q the query range
    * @param result the list holding the query results
    */
-  private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, O q, D r_q, GenericDistanceDBIDList<D> result) {
+  private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, ?, ?> node, O q, double r_q, ModifiableDoubleDBIDList result) {
     double d1 = 0.;
-    if (o_p != null) {
-      d1 = distanceQuery.distance(o_p, q).doubleValue();
+    if(o_p != null) {
+      d1 = distanceQuery.distance(o_p, q);
       index.statistics.countDistanceCalculation();
     }
-    if (!node.isLeaf()) {
-      for (int i = 0; i < node.getNumEntries(); i++) {
+    if(!node.isLeaf()) {
+      for(int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry entry = node.getEntry(i);
         DBID o_r = entry.getRoutingObjectID();
 
@@ -84,19 +86,20 @@ public class MetricalIndexRangeQuery<O, D extends NumberDistance<D, ?>> extends 
         double d2 = o_p != null ? entry.getParentDistance() : 0.;
         double diff = Math.abs(d1 - d2);
 
-        double sum = r_q.doubleValue() + r_or;
+        double sum = r_q + r_or;
 
-        if (diff <= sum) {
-          D d3 = distanceQuery.distance(o_r, q);
+        if(diff <= sum) {
+          double d3 = distanceQuery.distance(o_r, q);
           index.statistics.countDistanceCalculation();
-          if (d3.doubleValue() <= sum) {
-            AbstractMTreeNode<O, D, ?, ?> child = index.getNode(((DirectoryEntry) entry).getPageID());
+          if(d3 <= sum) {
+            AbstractMTreeNode<O, ?, ?> child = index.getNode(((DirectoryEntry) entry).getPageID());
             doRangeQuery(o_r, child, q, r_q, result);
           }
         }
       }
-    } else {
-      for (int i = 0; i < node.getNumEntries(); i++) {
+    }
+    else {
+      for(int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry entry = node.getEntry(i);
         DBID o_j = entry.getRoutingObjectID();
 
@@ -104,10 +107,10 @@ public class MetricalIndexRangeQuery<O, D extends NumberDistance<D, ?>> extends 
 
         double diff = Math.abs(d1 - d2);
 
-        if (diff <= r_q.doubleValue()) {
-          D d3 = distanceQuery.distance(o_j, q);
+        if(diff <= r_q) {
+          double d3 = distanceQuery.distance(o_j, q);
           index.statistics.countDistanceCalculation();
-          if (d3.compareTo(r_q) <= 0) {
+          if(d3 <= r_q) {
             result.add(d3, o_j);
           }
         }
@@ -116,8 +119,8 @@ public class MetricalIndexRangeQuery<O, D extends NumberDistance<D, ?>> extends 
   }
 
   @Override
-  public DistanceDBIDList<D> getRangeForObject(O obj, D range) {
-    final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+  public DoubleDBIDList getRangeForObject(O obj, double range) {
+    final ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
 
     doRangeQuery(null, index.getRoot(), obj, range, result);
     index.statistics.countRangeQuery();

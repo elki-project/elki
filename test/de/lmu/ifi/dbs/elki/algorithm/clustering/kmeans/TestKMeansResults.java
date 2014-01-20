@@ -27,13 +27,11 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -62,7 +60,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 2);
-    AbstractKMeans<DoubleVector, DoubleDistance, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
+    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
@@ -85,7 +83,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 2);
-    AbstractKMeans<DoubleVector, DoubleDistance, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMacQueen.class, params);
+    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMacQueen.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
@@ -108,7 +106,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 2);
-    AbstractKMeans<DoubleVector, DoubleDistance, ?> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMediansLloyd.class, params);
+    AbstractKMeans<DoubleVector, ?> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMediansLloyd.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database
@@ -130,7 +128,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    KMedoidsPAM<DoubleVector, DoubleDistance> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMedoidsPAM.class, params);
+    KMedoidsPAM<DoubleVector> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMedoidsPAM.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database
@@ -152,7 +150,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    KMedoidsEM<DoubleVector, DoubleDistance> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMedoidsEM.class, params);
+    KMedoidsEM<DoubleVector> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMedoidsEM.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database

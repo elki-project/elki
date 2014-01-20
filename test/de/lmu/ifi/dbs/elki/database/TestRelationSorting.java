@@ -66,7 +66,7 @@ public class TestRelationSorting implements JUnit4Test {
       fail("Parameterization errors.");
     }
     db.initialize();
-    Relation<? extends NumberVector<?>> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<? extends NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rel.getDBIDs());
     final int size = rel.size();

@@ -28,14 +28,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
@@ -52,10 +51,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  * @param <T> Result type
  */
-public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D>, T extends KNNList<D>> extends AbstractPreprocessorIndex<O, T> implements KNNIndex<O> {
+public abstract class AbstractMaterializeKNNPreprocessor<O, T extends KNNList> extends AbstractPreprocessorIndex<O, T> implements KNNIndex<O> {
   /**
    * The query k value.
    */
@@ -64,12 +62,12 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
   /**
    * The distance function to be used.
    */
-  protected final DistanceFunction<? super O, D> distanceFunction;
+  protected final DistanceFunction<? super O> distanceFunction;
 
   /**
    * The distance query we used.
    */
-  protected final DistanceQuery<O, D> distanceQuery;
+  protected final DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
@@ -78,7 +76,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
    * @param distanceFunction Distance function
    * @param k k
    */
-  public AbstractMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k) {
+  public AbstractMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
     super(relation);
     this.k = k;
     this.distanceFunction = distanceFunction;
@@ -86,20 +84,11 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
   }
 
   /**
-   * Get the distance factory.
-   * 
-   * @return distance factory
-   */
-  public D getDistanceFactory() {
-    return distanceFunction.getDistanceFactory();
-  }
-
-  /**
    * The distance query we used.
    * 
    * @return Distance query
    */
-  public DistanceQuery<O, D> getDistanceQuery() {
+  public DistanceQuery<O> getDistanceQuery() {
     return distanceQuery;
   }
 
@@ -123,7 +112,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
    * @param id Object ID
    * @return Neighbors
    */
-  public KNNList<D> get(DBIDRef id) {
+  public KNNList get(DBIDRef id) {
     if(storage == null) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Running kNN preprocessor: " + this.getClass());
@@ -155,7 +144,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distQ, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distQ, Object... hints) {
     if(!this.distanceFunction.equals(distQ.getDistanceFunction())) {
       return null;
     }
@@ -169,8 +158,8 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
       }
     }
     // To make compilers happy:
-    AbstractMaterializeKNNPreprocessor<?, ?, ?> tmp = this;
-    return new PreprocessorKNNQuery<>(relation, (AbstractMaterializeKNNPreprocessor<O, S, KNNList<S>>) tmp);
+    AbstractMaterializeKNNPreprocessor<?, ?> tmp = this;
+    return new PreprocessorKNNQuery<>(relation, (AbstractMaterializeKNNPreprocessor<O, KNNList>) tmp);
   }
 
   /**
@@ -183,9 +172,9 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
    * @apiviz.uses AbstractMaterializeKNNPreprocessor oneway - - «create»
    * 
    * @param <O> The object type
-   * @param <D> The distance type
+   * @param <T> The knn storage type
    */
-  public abstract static class Factory<O, D extends Distance<D>, T extends KNNList<D>> implements IndexFactory<O, KNNIndex<O>> {
+  public abstract static class Factory<O, T extends KNNList> implements IndexFactory<O, KNNIndex<O>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * materialized. must be an integer greater than 1.
@@ -216,7 +205,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
     /**
      * Hold the distance function to be used.
      */
-    protected DistanceFunction<? super O, D> distanceFunction;
+    protected DistanceFunction<? super O> distanceFunction;
 
     /**
      * Index factory.
@@ -224,14 +213,14 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
      * @param k k parameter
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super O, D> distanceFunction) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction) {
       super();
       this.k = k;
       this.distanceFunction = distanceFunction;
     }
 
     @Override
-    public abstract AbstractMaterializeKNNPreprocessor<O, D, T> instantiate(Relation<O> relation);
+    public abstract AbstractMaterializeKNNPreprocessor<O, T> instantiate(Relation<O> relation);
 
     /**
      * Get the distance function.
@@ -239,17 +228,8 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
      * @return Distance function
      */
     // TODO: hide this?
-    public DistanceFunction<? super O, D> getDistanceFunction() {
+    public DistanceFunction<? super O> getDistanceFunction() {
       return distanceFunction;
-    }
-
-    /**
-     * Get the distance factory.
-     * 
-     * @return Distance factory
-     */
-    public D getDistanceFactory() {
-      return distanceFunction.getDistanceFactory();
     }
 
     @Override
@@ -264,7 +244,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
      * 
      * @apiviz.exclude
      */
-    public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
+    public abstract static class Parameterizer<O> extends AbstractParameterizer {
       /**
        * Holds the value of {@link #K_ID}.
        */
@@ -273,7 +253,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
       /**
        * Hold the distance function to be used.
        */
-      protected DistanceFunction<? super O, D> distanceFunction;
+      protected DistanceFunction<? super O> distanceFunction;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -286,14 +266,14 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
         }
 
         // distance function
-        final ObjectParameter<DistanceFunction<? super O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        final ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
         if(config.grab(distanceFunctionP)) {
           distanceFunction = distanceFunctionP.instantiateClass(config);
         }
       }
 
       @Override
-      protected abstract Factory<O, D, ?> makeInstance();
+      protected abstract Factory<O, ?> makeInstance();
     }
   }
 }

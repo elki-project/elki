@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -75,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Longest Common Subsequence distance function")
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/956750.956777")
-public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * PDELTA parameter
    */
@@ -113,10 +112,10 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
    * vectors.
    * 
    * @return the Longest Common Subsequence distance between the given two
-   *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
+   *         vectors as an instance of {@link distance distance}.
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int delta = (int) Math.ceil(v2.getDimensionality() * pDelta);
 
     DoubleMinMax extrema1 = VectorUtil.getRangeDouble(v1);
@@ -184,7 +183,7 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
 
   // TODO: relax this to VectorTypeInformation!
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public VectorFieldTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 

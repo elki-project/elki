@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -90,7 +89,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * The distance function to use
    */
-  private DistanceFunction<? super O, ? extends NumberDistance<?, ?>> distanceFunction;
+  private DistanceFunction<? super O> distanceFunction;
 
   /**
    * Scaling function to use
@@ -109,7 +108,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
    * @param scaling Scaling function to use for contrast
    * @param skipzero Skip zero values when scaling.
    */
-  public ComputeSimilarityMatrixImage(DistanceFunction<? super O, ? extends NumberDistance<?, ?>> distanceFunction, ScalingFunction scaling, boolean skipzero) {
+  public ComputeSimilarityMatrixImage(DistanceFunction<? super O> distanceFunction, ScalingFunction scaling, boolean skipzero) {
     super();
     this.distanceFunction = distanceFunction;
     this.scaling = scaling;
@@ -131,7 +130,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     if(order.size() != relation.size()) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    DistanceQuery<O, ? extends NumberDistance<?, ?>> dq = distanceFunction.instantiate(relation);
+    DistanceQuery<O> dq = distanceFunction.instantiate(relation);
     final int size = order.size();
 
     // When the logging is in the outer loop, it's just 2*size (providing enough
@@ -148,7 +147,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       for(; id1.valid(); id1.advance()) {
         id2.seek(id1.getOffset());
         for(; id2.valid(); id2.advance()) {
-          final double dist = dq.distance(id1, id2).doubleValue();
+          final double dist = dq.distance(id1, id2);
           if(!Double.isNaN(dist) && !Double.isInfinite(dist) /* && dist > 0.0 */) {
             if(!skipzero || dist > 0.0) {
               minmax.put(dist);
@@ -173,7 +172,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       for(int x = 0; x < size && id1.valid(); x++, id1.advance()) {
         id2.seek(id1.getOffset());
         for(int y = x; y < size && id2.valid(); y++, id2.advance()) {
-          double ddist = dq.distance(id1, id2).doubleValue();
+          double ddist = dq.distance(id1, id2);
           if(ddist > 0.0) {
             ddist = scale.getScaled(ddist);
           }
@@ -338,7 +337,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     /**
      * The distance function to use
      */
-    private DistanceFunction<O, ? extends NumberDistance<?, ?>> distanceFunction;
+    private DistanceFunction<O> distanceFunction;
 
     /**
      * Scaling function to use
@@ -353,7 +352,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<O, ? extends NumberDistance<?, ?>>> distanceFunctionP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<O>> distanceFunctionP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

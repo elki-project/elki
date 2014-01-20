@@ -27,8 +27,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 
 /**
@@ -52,8 +50,8 @@ public class ArccosSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
   }
 
   @Override
-  public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    SimilarityQuery<T, ? extends NumberDistance<?, ?>> similarityQuery = similarityFunction.instantiate(database);
+  public <T extends O> DistanceQuery<T> instantiate(Relation<T> database) {
+    SimilarityQuery<T> similarityQuery = similarityFunction.instantiate(database);
     return new Instance<>(database, this, similarityQuery);
   }
 
@@ -72,7 +70,7 @@ public class ArccosSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
      * @param parent Parent distance
      * @param similarityQuery similarity Query to use
      */
-    public Instance(Relation<O> database, DistanceFunction<? super O, DoubleDistance> parent, SimilarityQuery<O, ? extends NumberDistance<?, ?>> similarityQuery) {
+    public Instance(Relation<O> database, DistanceFunction<? super O> parent, SimilarityQuery<O> similarityQuery) {
       super(database, parent, similarityQuery);
     }
 

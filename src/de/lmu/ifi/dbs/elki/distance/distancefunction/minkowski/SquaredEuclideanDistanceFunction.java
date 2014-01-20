@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  */
 @Alias({ "squaredeuclidean", "de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction" })
-public class SquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
+public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
   /**
    * Static instance. Use this!
    */
@@ -44,7 +44,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDista
 
   /**
    * Provides a Euclidean distance function that can compute the Euclidean
-   * distance (that is a DoubleDistance) for FeatureVectors.
+   * distance (that is a distance) for FeatureVectors.
    * 
    * @deprecated Use static instance!
    */
@@ -54,7 +54,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDista
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
@@ -65,7 +65,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDista
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> v) {
+  public double norm(NumberVector v) {
     final int dim = v.getDimensionality();
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
@@ -75,7 +75,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDista
     return agg;
   }
 
-  protected double doubleMinDistObject(NumberVector<?> v, SpatialComparable mbr) {
+  protected double minDistObject(NumberVector v, SpatialComparable mbr) {
     final int dim = dimensionality(mbr, v);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
@@ -97,16 +97,16 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDista
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Some optimizations for simpler cases.
     if (mbr1 instanceof NumberVector) {
       if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+        return distance((NumberVector) mbr1, (NumberVector) mbr2);
       } else {
-        return doubleMinDistObject((NumberVector<?>) mbr1, mbr2);
+        return minDistObject((NumberVector) mbr1, mbr2);
       }
     } else if (mbr2 instanceof NumberVector) {
-      return doubleMinDistObject((NumberVector<?>) mbr2, mbr1);
+      return minDistObject((NumberVector) mbr2, mbr1);
     }
     final int dim = dimensionality(mbr1, mbr2);
 

@@ -261,7 +261,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
 
       selection.clear();
       candidates: for (DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        NumberVector<?> dbTupel = rel.get(iditer);
+        NumberVector dbTupel = rel.get(iditer);
         for (int i = 0; i < dim; i++) {
           if (ranges != null && ranges[i] != null) {
             if (dbTupel.doubleValue(i) < ranges[i].first || dbTupel.doubleValue(i) > ranges[i].second) {

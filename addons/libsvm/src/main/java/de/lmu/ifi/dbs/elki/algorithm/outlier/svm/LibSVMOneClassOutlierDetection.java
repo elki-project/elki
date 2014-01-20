@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * @param V vector type
  */
 @Reference(authors = "B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson", title = "Estimating the support of a high-dimensional distribution", booktitle = "Neural computation 13.7")
-public class LibSVMOneClassOutlierDetection<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -247,7 +247,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector<?>> extends A
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter for kernel function.
      */

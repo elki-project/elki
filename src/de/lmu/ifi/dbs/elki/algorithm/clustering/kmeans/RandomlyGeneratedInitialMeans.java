@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> Vector type
  */
-public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends AbstractKMeansInitialization<V> {
+public class RandomlyGeneratedInitialMeans<V extends NumberVector> extends AbstractKMeansInitialization<V> {
   /**
    * Constructor.
    * 
@@ -55,9 +55,9 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     final int dim = RelationUtil.dimensionality(relation);
-    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
     List<V> means = new ArrayList<>(k);
     final Random random = rnd.getSingleThreadedRandom();
@@ -79,7 +79,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractKMeansInitialization.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractKMeansInitialization.Parameterizer<V> {
     @Override
     protected RandomlyGeneratedInitialMeans<V> makeInstance() {
       return new RandomlyGeneratedInitialMeans<>(rnd);

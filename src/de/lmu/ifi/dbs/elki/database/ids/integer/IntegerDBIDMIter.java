@@ -29,6 +29,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
  * 
  * @author Erich Schubert
  */
-public interface IntegerDBIDMIter extends DBIDMIter, IntegerDBIDIter {
+interface IntegerDBIDMIter extends DBIDMIter, IntegerDBIDIter {
   // Empty.
 }

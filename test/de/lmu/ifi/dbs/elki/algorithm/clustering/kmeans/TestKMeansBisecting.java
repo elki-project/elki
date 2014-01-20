@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -57,7 +56,7 @@ public class TestKMeansBisecting extends AbstractSimpleAlgorithmTest implements 
     params.addParameter(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class);
 
-    KMeansBisecting<DoubleVector, DoubleDistance, MeanModel<DoubleVector>> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
+    KMeansBisecting<DoubleVector, MeanModel<DoubleVector>> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database
@@ -80,7 +79,7 @@ public class TestKMeansBisecting extends AbstractSimpleAlgorithmTest implements 
     params.addParameter(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class);
 
-    KMeansBisecting<DoubleVector, DoubleDistance, MeanModel<DoubleVector>> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
+    KMeansBisecting<DoubleVector, MeanModel<DoubleVector>> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database

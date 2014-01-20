@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -49,7 +48,7 @@ public class TestDBOutlierScore extends AbstractSimpleAlgorithmTest implements J
     params.addParameter(DBOutlierScore.D_ID, 0.175);
 
     // setup Algorithm
-    DBOutlierScore<DoubleVector, DoubleDistance> dbOutlierScore = ClassGenericsUtil.parameterizeOrAbort(DBOutlierScore.class, params);
+    DBOutlierScore<DoubleVector> dbOutlierScore = ClassGenericsUtil.parameterizeOrAbort(DBOutlierScore.class, params);
     testParameterizationOk(params);
 
     // run DBOutlierScore on database

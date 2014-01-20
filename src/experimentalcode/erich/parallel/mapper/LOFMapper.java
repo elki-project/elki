@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import experimentalcode.erich.parallel.MapExecutor;
 import experimentalcode.erich.parallel.SharedDouble;
 
@@ -41,7 +41,7 @@ public class LOFMapper extends AbstractDoubleMapper {
   /**
    * KNN store
    */
-  private DataStore<? extends KNNList<?>> knns;
+  private DataStore<? extends KNNList> knns;
 
   /**
    * LRD store
@@ -60,7 +60,7 @@ public class LOFMapper extends AbstractDoubleMapper {
    * @param kdists k distances
    * @param noself Exclude self from neighbors
    */
-  public LOFMapper(DataStore<? extends KNNList<?>> knns, DoubleDataStore lrds, boolean noself) {
+  public LOFMapper(DataStore<? extends KNNList> knns, DoubleDataStore lrds, boolean noself) {
     super();
     this.knns = knns;
     this.lrds = lrds;
@@ -96,7 +96,7 @@ public class LOFMapper extends AbstractDoubleMapper {
         return;
       }
       // Compute average neighbor density:
-      KNNList<?> knn = knns.get(id);
+      KNNList knn = knns.get(id);
       double avlrd = 0.0;
       int cnt = 0;
       for (DBIDIter n = knn.iter(); n.valid(); n.advance()) {

@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 
 /**
@@ -33,10 +31,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
  * @author Elke Achtert
  * 
  * @apiviz.has RdKNNEntry oneway - - contains
- * 
- * @param <D> Distance type
  */
-public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTreeNode<RdKNNNode<D>, RdKNNEntry<D>> {
+public class RdKNNNode extends AbstractRStarTreeNode<RdKNNNode, RdKNNEntry> {
   private static final long serialVersionUID = 1;
 
   /**
@@ -62,17 +58,17 @@ public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTree
    * 
    * @return the aggregated knn distance of this node
    */
-  protected D kNNDistance() {
-    D result = getEntry(0).getKnnDistance();
+  protected double kNNDistance() {
+    double result = getEntry(0).getKnnDistance();
     for(int i = 1; i < getNumEntries(); i++) {
-      D knnDistance = getEntry(i).getKnnDistance();
-      result = DistanceUtil.max(result, knnDistance);
+      double knnDistance = getEntry(i).getKnnDistance();
+      result = (result < knnDistance) ? knnDistance : result;
     }
     return result;
   }
 
   @Override
-  public boolean adjustEntry(RdKNNEntry<D> entry) {
+  public boolean adjustEntry(RdKNNEntry entry) {
     boolean changed = super.adjustEntry(entry);
     entry.setKnnDistance(kNNDistance());
     return changed;
@@ -86,14 +82,14 @@ public class RdKNNNode<D extends NumberDistance<D, ?>> extends AbstractRStarTree
    * @param index the index of the entry in the parents child array
    */
   @Override
-  protected void integrityCheckParameters(RdKNNNode<D> parent, int index) {
+  protected void integrityCheckParameters(RdKNNNode parent, int index) {
     super.integrityCheckParameters(parent, index);
     // test if knn distance is correctly set
-    RdKNNEntry<D> entry = parent.getEntry(index);
-    D knnDistance = kNNDistance();
-    if(!entry.getKnnDistance().equals(knnDistance)) {
-      String soll = knnDistance.toString();
-      String ist = entry.getKnnDistance().toString();
+    RdKNNEntry entry = parent.getEntry(index);
+    double knnDistance = kNNDistance();
+    if(entry.getKnnDistance() != knnDistance) {
+      double soll = knnDistance;
+      double ist = entry.getKnnDistance();
       throw new RuntimeException("Wrong knnDistance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
   }

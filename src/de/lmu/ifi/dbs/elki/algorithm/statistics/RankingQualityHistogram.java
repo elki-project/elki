@@ -35,12 +35,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -67,11 +66,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * @param <O> Object type
- * @param <D> Distance type
  */
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<DoubleVector>> {
+public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
@@ -93,7 +91,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
    * @param distanceFunction Distance function to evaluate
    * @param numbins Number of bins
    */
-  public RankingQualityHistogram(DistanceFunction<? super O, D> distanceFunction, int numbins) {
+  public RankingQualityHistogram(DistanceFunction<? super O> distanceFunction, int numbins) {
     super(distanceFunction);
     this.numbins = numbins;
   }
@@ -106,8 +104,8 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
    * @return Histogram of ranking qualities
    */
   public HistogramResult<DoubleVector> run(Database database, Relation<O> relation) {
-    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
+    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");
@@ -126,7 +124,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        KNNList<D> knn = knnQuery.getKNNForDBID(iter, relation.size());
+        KNNList knn = knnQuery.getKNNForDBID(iter, relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         mv.put(result);
@@ -168,8 +166,10 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Number of bins.
      */
@@ -186,7 +186,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     }
 
     @Override
-    protected RankingQualityHistogram<O, D> makeInstance() {
+    protected RankingQualityHistogram<O> makeInstance() {
       return new RankingQualityHistogram<>(distanceFunction, numbins);
     }
   }

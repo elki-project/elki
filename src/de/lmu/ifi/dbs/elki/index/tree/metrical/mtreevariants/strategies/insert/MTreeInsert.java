@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @author Erich Schubert
  */
-public interface MTreeInsert<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> {
+public interface MTreeInsert<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> {
   /**
    * Choose the subpath to insert into.
    * 
@@ -46,5 +45,5 @@ public interface MTreeInsert<O, D extends NumberDistance<D, ?>, N extends Abstra
    * @param object Object to insert
    * @return Path to insertion node
    */
-  IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E, ?> tree, E object);
+  IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object);
 }

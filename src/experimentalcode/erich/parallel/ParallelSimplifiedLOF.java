@@ -1,4 +1,5 @@
 package experimentalcode.erich.parallel;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -33,13 +34,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -60,9 +60,8 @@ import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
    */
@@ -74,7 +73,7 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelSimplifiedLOF(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public ParallelSimplifiedLOF(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -91,16 +90,16 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
 
   public OutlierResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O, D> distq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnq = database.getKNNQuery(distq, k + 1);
+    DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
     // Phase one: KNN and k-dist
-    WritableDataStore<KNNList<D>> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
+    WritableDataStore<KNNList> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
     {
       // Compute kNN
-      KNNMapper<O, D> knnm = new KNNMapper<>(k + 1, knnq);
-      SharedObject<KNNList<D>> knnv = new SharedObject<>();
-      WriteDataStoreMapper<KNNList<D>> storek = new WriteDataStoreMapper<>(knns);
+      KNNMapper<O> knnm = new KNNMapper<>(k + 1, knnq);
+      SharedObject<KNNList> knnv = new SharedObject<>();
+      WriteDataStoreMapper<KNNList> storek = new WriteDataStoreMapper<>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
 
@@ -110,7 +109,7 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
     // Phase two: simplified-lrd
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     {
-      SimpleLRDMapper<D> lrdm = new SimpleLRDMapper<>(knns);
+      SimpleLRDMapper lrdm = new SimpleLRDMapper(knns);
       SharedDouble lrdv = new SharedDouble();
       WriteDoubleDataStoreMapper storelrd = new WriteDoubleDataStoreMapper(lrds);
 
@@ -154,9 +153,8 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
    * @apiviz.exclude
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * K parameter
      */
@@ -173,7 +171,7 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
     }
 
     @Override
-    protected ParallelSimplifiedLOF<O, D> makeInstance() {
+    protected ParallelSimplifiedLOF<O> makeInstance() {
       return new ParallelSimplifiedLOF<>(distanceFunction, k);
     }
   }

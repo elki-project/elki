@@ -34,15 +34,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.Mean;
@@ -79,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("INFLO: Influenced Outlierness Factor")
 @Description("Ranking Outliers Using Symmetric Neigborhood Relationship")
 @Reference(authors = "Jin, W., Tung, A., Han, J., and Wang, W", title = "Ranking outliers using symmetric neighborhood relationship", booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_68")
-public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -117,7 +116,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
    * @param m m Parameter
    * @param k k Parameter
    */
-  public INFLO(DistanceFunction<? super O, D> distanceFunction, double m, int k) {
+  public INFLO(DistanceFunction<? super O> distanceFunction, double m, int k) {
     super(distanceFunction);
     this.m = m;
     this.k = k;
@@ -131,7 +130,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 
     ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(relation.size());
     ModifiableDBIDs pruned = DBIDUtil.newHashSet();
@@ -148,26 +147,26 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     }
 
     // TODO: use kNN preprocessor?
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
+    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
 
     for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       // if not visited count=0
       int count = rnns.get(id).size();
       if(!processedIDs.contains(id)) {
         // TODO: use exactly k neighbors?
-        KNNList<D> list = knnQuery.getKNNForDBID(id, k);
+        KNNList list = knnQuery.getKNNForDBID(id, k);
         knns.get(id).addDBIDs(list);
         processedIDs.add(id);
-        density.putDouble(id, 1 / list.getKNNDistance().doubleValue());
+        density.putDouble(id, 1 / list.getKNNDistance());
 
       }
       ModifiableDBIDs s = knns.get(id);
       for(DBIDIter q = knns.get(id).iter(); q.valid(); q.advance()) {
         if(!processedIDs.contains(q)) {
           // TODO: use exactly k neighbors?
-          KNNList<D> listQ = knnQuery.getKNNForDBID(q, k);
+          KNNList listQ = knnQuery.getKNNForDBID(q, k);
           knns.get(q).addDBIDs(listQ);
-          density.putDouble(q, 1 / listQ.getKNNDistance().doubleValue());
+          density.putDouble(q, 1 / listQ.getKNNDistance());
           processedIDs.add(q);
         }
 
@@ -232,7 +231,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     protected double m = 1.0;
 
     protected int k = 0;
@@ -254,7 +253,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     }
 
     @Override
-    protected INFLO<O, D> makeInstance() {
+    protected INFLO<O> makeInstance() {
       return new INFLO<>(distanceFunction, m, k);
     }
   }

@@ -23,12 +23,10 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
@@ -56,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector type
  */
-public class PCARunner<V extends NumberVector<?>> implements Parameterizable {
+public class PCARunner<V extends NumberVector> implements Parameterizable {
   /**
    * Parameter to specify the class to compute the covariance matrix, must be a
    * subclass of {@link CovarianceMatrixBuilder}.
@@ -110,10 +108,9 @@ public class PCARunner<V extends NumberVector<?>> implements Parameterizable {
    * 
    * @param results a collection of QueryResults
    * @param database the database used
-   * @param <D> distance type
    * @return PCA result
    */
-  public <D extends NumberDistance<D, ?>> PCAResult processQueryResult(DistanceDBIDList<D> results, Relation<? extends V> database) {
+  public PCAResult processQueryResult(DoubleDBIDList results, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
@@ -165,7 +162,7 @@ public class PCARunner<V extends NumberVector<?>> implements Parameterizable {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * The covariance computation class.
      */

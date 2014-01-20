@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "D. Guo", title = "Coordinating computational and visual approaches for interactive feature selection and multivariate clustering", booktitle = "Information Visualization, 2(4)", url = "http://dx.doi.org/10.1057/palgrave.ivs.9500053")
-public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
+public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**
    * Static instance.
    */
@@ -77,7 +77,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
 
     // Find a number of bins as recommended by Cheng et al.
@@ -185,7 +185,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
    * @param matrix Matrix for dimension information
    * @return List of sorted objects
    */
-  private ArrayList<ArrayList<DBIDs>> buildPartitions(Relation<? extends NumberVector<?>> relation, DBIDs ids, int depth, DimensionSimilarityMatrix matrix) {
+  private ArrayList<ArrayList<DBIDs>> buildPartitions(Relation<? extends NumberVector> relation, DBIDs ids, int depth, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     ArrayList<ArrayList<DBIDs>> subspaceIndex = new ArrayList<>(dim);
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);

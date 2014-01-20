@@ -127,7 +127,7 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
   /**
    * Try to find a distance adapter.
    * 
-   * @param <D> distance type
+   * @param <E> cluster order entry type
    * @param co ClusterOrderResult
    * @return distance adapter
    */

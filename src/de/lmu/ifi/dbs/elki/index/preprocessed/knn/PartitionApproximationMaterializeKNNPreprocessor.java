@@ -23,20 +23,19 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.HashMap;
-
+import gnu.trove.impl.Constants;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -58,11 +57,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Erich Schubert
  * 
  * @param <O> the type of database objects the preprocessor can be applied to
- * @param <D> the type of distance the used distance function will return
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
-public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNList<D>> {
+public class PartitionApproximationMaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
   /**
    * Logger to use
    */
@@ -87,7 +85,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
    * @param partitions Number of partitions
    * @param rnd Random number generator
    */
-  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, int partitions, RandomFactory rnd) {
+  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, int partitions, RandomFactory rnd) {
     super(relation, distanceFunction, k);
     this.partitions = partitions;
     this.rnd = rnd;
@@ -95,7 +93,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<O> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     MeanVariance ksize = new MeanVariance();
     if(LOG.isVerbose()) {
@@ -109,13 +107,13 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
     for(int part = 0; part < partitions; part++) {
       final ArrayDBIDs ids = parts[part];
       final int size = ids.size();
-      HashMap<DBIDPair, D> cache = new HashMap<>((size * size * 3) >> 3);
+      TObjectDoubleHashMap<DBIDPair> cache = new TObjectDoubleHashMap<>((size * size * 3) >> 3, Constants.DEFAULT_LOAD_FACTOR, Double.NaN);
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        KNNHeap<D> kNN = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
+        KNNHeap kNN = DBIDUtil.newHeap(k);
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           DBIDPair key = DBIDUtil.newPair(iter, iter2);
-          D d = cache.remove(key);
-          if(d != null) {
+          double d = cache.remove(key);
+          if(d == d) { // Not NaN
             // consume the previous result.
             kNN.insert(d, iter2);
           }
@@ -178,9 +176,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
    *              «create»
    * 
    * @param <O> The object type
-   * @param <D> The distance type
    */
-  public static class Factory<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNList<D>> {
+  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
     /**
      * The number of partitions to use
      */
@@ -199,15 +196,15 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
      * @param partitions number of partitions
      * @param rnd
      */
-    public Factory(int k, DistanceFunction<? super O, D> distanceFunction, int partitions, RandomFactory rnd) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction, int partitions, RandomFactory rnd) {
       super(k, distanceFunction);
       this.partitions = partitions;
       this.rnd = rnd;
     }
 
     @Override
-    public PartitionApproximationMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
-      PartitionApproximationMaterializeKNNPreprocessor<O, D> instance = new PartitionApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k, partitions, rnd);
+    public PartitionApproximationMaterializeKNNPreprocessor<O> instantiate(Relation<O> relation) {
+      PartitionApproximationMaterializeKNNPreprocessor<O> instance = new PartitionApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k, partitions, rnd);
       return instance;
     }
 
@@ -218,7 +215,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**
        * Parameter to specify the number of partitions to use for materializing
        * the kNN. Must be an integer greater than 1.
@@ -261,7 +258,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
       }
 
       @Override
-      protected Factory<O, D> makeInstance() {
+      protected Factory<O> makeInstance() {
         return new Factory<>(k, distanceFunction, partitions, rnd);
       }
     }

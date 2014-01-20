@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -54,9 +53,8 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * @apiviz.has DistanceFunction
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>> extends AbstractApplication {
+public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
   /**
    * The logger for this class.
    */
@@ -75,7 +73,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O, D> distance;
+  private DistanceFunction<O> distance;
 
   /**
    * Output file.
@@ -89,7 +87,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceInOnDiskMatrix(InputStep input, DistanceFunction<O, D> distance, File out) {
+  public CacheDoubleDistanceInOnDiskMatrix(InputStep input, DistanceFunction<O> distance, File out) {
     super();
     this.input = input;
     this.distance = distance;
@@ -100,13 +98,13 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
   public void run() {
     Database database = input.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distance);
+    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
 
     int matrixsize = 0;
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       int intid = DBIDUtil.asInteger(iditer);
       matrixsize = Math.max(matrixsize, intid + 1);
-      if (intid < 0) {
+      if(intid < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
       }
     }
@@ -114,23 +112,25 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
     OnDiskUpperTriangleMatrix matrix;
     try {
       matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, 8, matrixsize);
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new AbortException("Error creating output matrix.", e);
     }
 
-    for (DBIDIter id1 = relation.iterDBIDs(); id1.valid(); id1.advance()) {
-      for (DBIDIter id2 = relation.iterDBIDs(); id2.valid(); id2.advance()) {
-        if (DBIDUtil.asInteger(id2) >= DBIDUtil.asInteger(id1)) {
-          double d = distanceQuery.distance(id1, id2).doubleValue();
-          if (debugExtraCheckSymmetry) {
-            double d2 = distanceQuery.distance(id2, id1).doubleValue();
-            if (Math.abs(d - d2) > 0.0000001) {
+    for(DBIDIter id1 = relation.iterDBIDs(); id1.valid(); id1.advance()) {
+      for(DBIDIter id2 = relation.iterDBIDs(); id2.valid(); id2.advance()) {
+        if(DBIDUtil.asInteger(id2) >= DBIDUtil.asInteger(id1)) {
+          double d = distanceQuery.distance(id1, id2);
+          if(debugExtraCheckSymmetry) {
+            double d2 = distanceQuery.distance(id2, id1);
+            if(Math.abs(d - d2) > 0.0000001) {
               LOG.warning("Distance function doesn't appear to be symmetric!");
             }
           }
           try {
             matrix.getRecordBuffer(DBIDUtil.asInteger(id1), DBIDUtil.asInteger(id2)).putDouble(d);
-          } catch (IOException e) {
+          }
+          catch(IOException e) {
             throw new AbortException("Error writing distance record " + DBIDFactory.FACTORY.toString(id1) + "," + DBIDFactory.FACTORY.toString(id2) + " to matrix.", e);
           }
         }
@@ -145,7 +145,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**
      * Parameter that specifies the name of the directory to be re-parsed.
      * <p>
@@ -170,7 +170,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<O, D> distance = null;
+    private DistanceFunction<O> distance = null;
 
     /**
      * Output file.
@@ -182,19 +182,19 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
       super.makeOptions(config);
       input = config.tryInstantiate(InputStep.class);
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
-      if (config.grab(dpar)) {
+      final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
       // Output file parameter
       final FileParameter cpar = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
-      if (config.grab(cpar)) {
+      if(config.grab(cpar)) {
         out = cpar.getValue();
       }
     }
 
     @Override
-    protected CacheDoubleDistanceInOnDiskMatrix<O, D> makeInstance() {
+    protected CacheDoubleDistanceInOnDiskMatrix<O> makeInstance() {
       return new CacheDoubleDistanceInOnDiskMatrix<>(input, distance, out);
     }
   }

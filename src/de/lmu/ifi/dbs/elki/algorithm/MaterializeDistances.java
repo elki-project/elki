@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -51,12 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * Symmetry is assumed.
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
 // TODO: use DBIDPair -> D map?
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
-public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
+public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<CTriple<DBID, DBID, Double>>> {
   /**
    * The logger for this class.
    */
@@ -67,7 +65,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
    * 
    * @param distanceFunction Parameterization
    */
-  public MaterializeDistances(DistanceFunction<? super O, D> distanceFunction) {
+  public MaterializeDistances(DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);
   }
 
@@ -79,7 +77,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
    * @return Distance matrix
    */
   public CollectionResult<CTriple<DBID, DBID, Double>> run(Database database, Relation<O> relation) {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<>(size * (size + 1) >> 1);
@@ -90,7 +88,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
         if(DBIDUtil.compare(iditer2, iditer) > 0) {
           continue;
         }
-        double d = distFunc.distance(iditer, iditer2).doubleValue();
+        double d = distFunc.distance(iditer, iditer2);
         r.add(new CTriple<>(DBIDUtil.deref(iditer), DBIDUtil.deref(iditer2), d));
       }
     }
@@ -114,9 +112,9 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     @Override
-    protected MaterializeDistances<O, D> makeInstance() {
+    protected MaterializeDistances<O> makeInstance() {
       return new MaterializeDistances<>(distanceFunction);
     }
   }

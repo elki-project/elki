@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.composedOf Bit
  */
-public class BitVector extends AbstractNumberVector<Bit> {
+public class BitVector extends AbstractNumberVector {
   /**
    * Static instance.
    */
@@ -201,13 +201,13 @@ public class BitVector extends AbstractNumberVector<Bit> {
    * 
    * @apiviz.has BitVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<BitVector, Bit> {
+  public static class Factory extends AbstractNumberVector.Factory<BitVector> {
     @Override
-    public <A> BitVector newFeatureVector(A array, ArrayAdapter<Bit, A> adapter) {
+    public <A> BitVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       long[] bits = BitsUtil.zero(dim);
       for(int i = 0; i < dim; i++) {
-        if(adapter.get(array, i).bitValue()) {
+        if(adapter.get(array, i).doubleValue() >= 0.5) {
           BitsUtil.setI(bits, i);
         }
       }

@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Distance query for spatial distance functions
@@ -36,35 +35,34 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  * 
  * @param <V> Vector type to use
- * @param <D> Distance result type
  */
-public class SpatialPrimitiveDistanceQuery<V extends SpatialComparable, D extends Distance<D>> extends PrimitiveDistanceQuery<V, D> implements SpatialDistanceQuery<V, D> {
+public class SpatialPrimitiveDistanceQuery<V extends SpatialComparable> extends PrimitiveDistanceQuery<V> implements SpatialDistanceQuery<V> {
   /**
    * The distance function we use.
    */
-  final protected SpatialPrimitiveDistanceFunction<? super V, D> distanceFunction;
+  final protected SpatialPrimitiveDistanceFunction<? super V> distanceFunction;
   
   /**
    * @param relation Representation to use
    * @param distanceFunction Distance function to use
    */
-  public SpatialPrimitiveDistanceQuery(Relation<? extends V> relation, SpatialPrimitiveDistanceFunction<? super V, D> distanceFunction) {
+  public SpatialPrimitiveDistanceQuery(Relation<? extends V> relation, SpatialPrimitiveDistanceFunction<? super V> distanceFunction) {
     super(relation, distanceFunction);
     this.distanceFunction = distanceFunction;
   }
 
   @Override
-  public D minDist(SpatialComparable mbr, V v) {
+  public double minDist(SpatialComparable mbr, V v) {
     return distanceFunction.minDist(mbr, v);
   }
 
   @Override
-  public D minDist(SpatialComparable mbr, DBID id) {
+  public double minDist(SpatialComparable mbr, DBID id) {
     return distanceFunction.minDist(mbr, relation.get(id));
   }
 
   @Override
-  public SpatialPrimitiveDistanceFunction<? super V, D> getDistanceFunction() {
+  public SpatialPrimitiveDistanceFunction<? super V> getDistanceFunction() {
     return distanceFunction;
   }
 }

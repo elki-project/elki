@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Object type
  */
 // TODO: Erich: use reproducible random
-public class RandomGeneratedReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
+public class RandomGeneratedReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
   /**
    * Parameter to specify the number of requested reference points.
    * <p>
@@ -90,7 +90,7 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<?>> implement
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
-    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
+    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
 
     int dim = RelationUtil.dimensionality(db);
 
@@ -123,7 +123,7 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<?>> implement
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #N_ID}.
      */

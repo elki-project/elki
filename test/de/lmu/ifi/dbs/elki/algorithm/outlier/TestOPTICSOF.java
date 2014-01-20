@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -50,7 +49,7 @@ public class TestOPTICSOF extends AbstractSimpleAlgorithmTest implements JUnit4T
     params.addParameter(OPTICS.Parameterizer.MINPTS_ID, 22);
 
     // setup Algorithm
-    OPTICSOF<DoubleVector, DoubleDistance> opticsof = ClassGenericsUtil.parameterizeOrAbort(OPTICSOF.class, params);
+    OPTICSOF<DoubleVector> opticsof = ClassGenericsUtil.parameterizeOrAbort(OPTICSOF.class, params);
     testParameterizationOk(params);
 
     // run OPTICSOF on database

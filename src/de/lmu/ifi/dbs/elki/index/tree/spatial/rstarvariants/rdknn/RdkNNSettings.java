@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 
 /**
@@ -33,9 +32,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSetting
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class RdkNNSettings<O extends NumberVector<?>, D extends Distance<D>> extends AbstractRTreeSettings {
+public class RdkNNSettings<O extends NumberVector> extends AbstractRTreeSettings {
   /**
    * Parameter k.
    */
@@ -44,5 +42,5 @@ public class RdkNNSettings<O extends NumberVector<?>, D extends Distance<D>> ext
   /**
    * The distance function.
    */
-  SpatialPrimitiveDistanceFunction<O, D> distanceFunction;
+  SpatialPrimitiveDistanceFunction<O> distanceFunction;
 }

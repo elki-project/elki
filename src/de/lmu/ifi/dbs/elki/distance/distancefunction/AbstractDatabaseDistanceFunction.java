@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Abstract super class for distance functions needing a database context.
@@ -36,9 +35,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of DatabaseObject to compute the distances in between
- * @param <D> the type of Distance used
  */
-public abstract class AbstractDatabaseDistanceFunction<O, D extends Distance<D>> implements DistanceFunction<O, D> {
+public abstract class AbstractDatabaseDistanceFunction<O> implements DistanceFunction<O> {
   /**
    * Constructor, supporting
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style
@@ -47,9 +45,6 @@ public abstract class AbstractDatabaseDistanceFunction<O, D extends Distance<D>>
   public AbstractDatabaseDistanceFunction() {
     super();
   }
-
-  @Override
-  abstract public D getDistanceFactory();
 
   @Override
   public boolean isMetric() {
@@ -66,11 +61,11 @@ public abstract class AbstractDatabaseDistanceFunction<O, D extends Distance<D>>
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<O, D extends Distance<D>> extends AbstractDatabaseDistanceQuery<O, D> {
+  abstract public static class Instance<O> extends AbstractDatabaseDistanceQuery<O> {
     /**
      * Parent distance
      */
-    DistanceFunction<? super O, D> parent;
+    DistanceFunction<? super O> parent;
     
     /**
      * Constructor.
@@ -78,13 +73,13 @@ public abstract class AbstractDatabaseDistanceFunction<O, D extends Distance<D>>
      * @param database Database
      * @param parent Parent distance
      */
-    public Instance(Relation<O> database, DistanceFunction<? super O, D> parent) {
+    public Instance(Relation<O> database, DistanceFunction<? super O> parent) {
       super(database);
       this.parent = parent;
     }
 
     @Override
-    public DistanceFunction<? super O, D> getDistanceFunction() {
+    public DistanceFunction<? super O> getDistanceFunction() {
       return parent;
     }
   }

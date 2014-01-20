@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -50,10 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  * @param <M> Model type
  */
-public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<?>, M extends MeanModel<V>> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, D, M> {
+public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel<V>> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
   /**
    * The logger for this class.
    */
@@ -67,12 +65,12 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
   /**
    * Variant of kMeans for the bisecting step.
    */
-  private KMeans<V, D, M> innerkMeans;
+  private KMeans<V, M> innerkMeans;
 
   /**
    * Quality measure which should be used.
    */
-  private KMeansQualityMeasure<? super V, ? super D> qualityMeasure;
+  private KMeansQualityMeasure<? super V> qualityMeasure;
 
   /**
    * Constructor.
@@ -81,7 +79,7 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
    * @param innerkMeans K-Means variant to actually use.
    * @param qualityMeasure Quality measure
    */
-  public BestOfMultipleKMeans(int trials, KMeans<V, D, M> innerkMeans, KMeansQualityMeasure<? super V, ? super D> qualityMeasure) {
+  public BestOfMultipleKMeans(int trials, KMeans<V, M> innerkMeans, KMeansQualityMeasure<? super V> qualityMeasure) {
     super();
     this.trials = trials;
     this.innerkMeans = innerkMeans;
@@ -93,7 +91,7 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
     if(!(innerkMeans.getDistanceFunction() instanceof PrimitiveDistanceFunction)) {
       throw new AbortException("K-Means results can only be evaluated for primitive distance functions, got: " + innerkMeans.getDistanceFunction().getClass());
     }
-    final PrimitiveDistanceFunction<? super V, D> df = (PrimitiveDistanceFunction<? super V, D>) innerkMeans.getDistanceFunction();
+    final PrimitiveDistanceFunction<? super V> df = (PrimitiveDistanceFunction<? super V>) innerkMeans.getDistanceFunction();
     Clustering<M> bestResult = null;
     if(trials > 1) {
       double bestCost = Double.POSITIVE_INFINITY;
@@ -131,7 +129,7 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
   }
 
   @Override
-  public DistanceFunction<? super V, D> getDistanceFunction() {
+  public DistanceFunction<? super V> getDistanceFunction() {
     return innerkMeans.getDistanceFunction();
   }
 
@@ -141,7 +139,7 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
   }
 
   @Override
-  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction) {
+  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     innerkMeans.setDistanceFunction(distanceFunction);
   }
 
@@ -159,10 +157,9 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
    * @apiviz.exclude
    * 
    * @param <V> Vector type
-   * @param <D> Distance type
    * @param <M> Model type
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>, M extends MeanModel<V>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector, M extends MeanModel<V>> extends AbstractParameterizer {
     /**
      * Parameter to specify the iterations of the bisecting step.
      */
@@ -186,12 +183,12 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
     /**
      * Variant of kMeans to use.
      */
-    protected KMeans<V, D, M> kMeansVariant;
+    protected KMeans<V, M> kMeansVariant;
 
     /**
      * Quality measure.
      */
-    protected KMeansQualityMeasure<? super V, ? super D> qualityMeasure;
+    protected KMeansQualityMeasure<? super V> qualityMeasure;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -201,19 +198,19 @@ public class BestOfMultipleKMeans<V extends NumberVector<?>, D extends Distance<
         trials = trialsP.intValue();
       }
 
-      ObjectParameter<KMeans<V, D, M>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class);
+      ObjectParameter<KMeans<V, M>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class);
       if(config.grab(kMeansVariantP)) {
         kMeansVariant = kMeansVariantP.instantiateClass(config);
       }
 
-      ObjectParameter<KMeansQualityMeasure<V, ? super D>> qualityMeasureP = new ObjectParameter<>(QUALITYMEASURE_ID, KMeansQualityMeasure.class);
+      ObjectParameter<KMeansQualityMeasure<V>> qualityMeasureP = new ObjectParameter<>(QUALITYMEASURE_ID, KMeansQualityMeasure.class);
       if(config.grab(qualityMeasureP)) {
         qualityMeasure = qualityMeasureP.instantiateClass(config);
       }
     }
 
     @Override
-    protected BestOfMultipleKMeans<V, D, M> makeInstance() {
+    protected BestOfMultipleKMeans<V, M> makeInstance() {
       return new BestOfMultipleKMeans<>(trials, kMeansVariant, qualityMeasure);
     }
   }

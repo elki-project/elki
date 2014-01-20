@@ -41,5 +41,5 @@ public interface KMedoidsInitialization<V> {
    * @param distanceFunction Distance function
    * @return List of chosen means for k-means
    */
-  public abstract DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distanceFunction);
+  public abstract DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distanceFunction);
 }

@@ -3,7 +3,7 @@ package tutorial.distancefunction;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * 
  * @author Erich Schubert
  */
-public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
+public class MultiLPNorm extends AbstractNumberVectorDistanceFunction {
   /**
    * The exponents
    */
@@ -72,7 +72,7 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
+  public double distance(NumberVector o1, NumberVector o2) {
     assert o1.getDimensionality() == ps.length : "Inappropriate dimensionality!";
     assert o2.getDimensionality() == ps.length : "Inappropriate dimensionality!";
 
@@ -87,7 +87,7 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return new VectorFieldTypeInformation<>(NumberVector.class, ps.length);
   }
 

@@ -43,8 +43,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -71,9 +69,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @apiviz.has KMeansModel
  * 
  * @param <V> vector datatype
- * @param <D> distance value type
  */
-public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, KMeansModel<V>> {
+public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V, KMeansModel<V>> {
   /**
    * The logger for this class.
    */
@@ -99,7 +96,7 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
    * @param blocks Number of blocks
    * @param random Random factory used for partitioning.
    */
-  public KMeansBatchedLloyd(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer, int blocks, RandomFactory random) {
+  public KMeansBatchedLloyd(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer, int blocks, RandomFactory random) {
     super(distanceFunction, k, maxiter, initializer);
     this.blocks = blocks;
     this.random = random;
@@ -109,16 +106,16 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
   public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     // Choose initial means
-    List<? extends NumberVector<?>> mvs = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<? extends NumberVector> mvs = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Convert to (modifiable) math vectors.
     List<Vector> means = new ArrayList<>(k);
-    for (NumberVector<?> m : mvs) {
+    for(NumberVector m : mvs) {
       means.add(m.getColumnVector());
     }
 
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
@@ -129,41 +126,41 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
     int[] changesize = new int[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if (prog != null) {
+    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
       boolean changed = false;
       FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Batch", parts.length, LOG) : null;
-      for (int p = 0; p < parts.length; p++) {
+      for(int p = 0; p < parts.length; p++) {
         // Initialize new means scratch space.
-        for (int i = 0; i < k; i++) {
+        for(int i = 0; i < k; i++) {
           Arrays.fill(meanshift[i], 0.);
         }
         Arrays.fill(changesize, 0);
         changed |= assignToNearestCluster(relation, parts[p], means, meanshift, changesize, clusters, assignment);
         // Recompute means.
         updateMeans(means, meanshift, clusters, changesize);
-        if (pprog != null) {
+        if(pprog != null) {
           pprog.incrementProcessed(LOG);
         }
       }
-      if (pprog != null) {
+      if(pprog != null) {
         pprog.ensureCompleted(LOG);
       }
       // Stop if no cluster assignment changed.
-      if (!changed) {
+      if(!changed) {
         break;
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.setCompleted(LOG);
     }
 
     // Wrap result
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for (int i = 0; i < clusters.size(); i++) {
+    for(int i = 0; i < clusters.size(); i++) {
       KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
@@ -183,40 +180,22 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
    * @param assignment Current cluster assignment
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<V> relation, DBIDs ids, List<? extends NumberVector<?>> oldmeans, double[][] meanshift, int[] changesize, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
+  protected boolean assignToNearestCluster(Relation<V> relation, DBIDs ids, List<? extends NumberVector> oldmeans, double[][] meanshift, int[] changesize, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
     boolean changed = false;
 
-    if (getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
-      @SuppressWarnings("unchecked")
-      final PrimitiveDoubleDistanceFunction<? super NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?>>) getDistanceFunction();
-      for (DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-        double mindist = Double.POSITIVE_INFINITY;
-        V fv = relation.get(iditer);
-        int minIndex = 0;
-        for (int i = 0; i < k; i++) {
-          double dist = df.doubleDistance(fv, oldmeans.get(i));
-          if (dist < mindist) {
-            minIndex = i;
-            mindist = dist;
-          }
+    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+      double mindist = Double.POSITIVE_INFINITY;
+      V fv = relation.get(iditer);
+      int minIndex = 0;
+      for(int i = 0; i < k; i++) {
+        double dist = df.distance(fv, oldmeans.get(i));
+        if(dist < mindist) {
+          minIndex = i;
+          mindist = dist;
         }
-        changed |= updateAssignment(iditer, fv, clusters, assignment, meanshift, changesize, minIndex);
       }
-    } else {
-      final PrimitiveDistanceFunction<? super NumberVector<?>, D> df = getDistanceFunction();
-      for (DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-        D mindist = df.getDistanceFactory().infiniteDistance();
-        V fv = relation.get(iditer);
-        int minIndex = 0;
-        for (int i = 0; i < k; i++) {
-          D dist = df.distance(fv, oldmeans.get(i));
-          if (dist.compareTo(mindist) < 0) {
-            minIndex = i;
-            mindist = dist;
-          }
-        }
-        changed |= updateAssignment(iditer, fv, clusters, assignment, meanshift, changesize, minIndex);
-      }
+      changed |= updateAssignment(iditer, fv, clusters, assignment, meanshift, changesize, minIndex);
     }
     return changed;
   }
@@ -235,7 +214,7 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
    */
   protected boolean updateAssignment(DBIDIter id, V fv, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[][] meanshift, int[] changesize, int minIndex) {
     int cur = assignment.intValue(id);
-    if (cur == minIndex) {
+    if(cur == minIndex) {
       return false;
     }
     // Add to new cluster.
@@ -243,16 +222,16 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
       clusters.get(minIndex).add(id);
       changesize[minIndex]++;
       double[] raw = meanshift[minIndex];
-      for (int j = 0; j < fv.getDimensionality(); j++) {
+      for(int j = 0; j < fv.getDimensionality(); j++) {
         raw[j] += fv.doubleValue(j);
       }
     }
     // Remove from previous cluster
-    if (cur >= 0) {
+    if(cur >= 0) {
       clusters.get(cur).remove(id);
       changesize[cur]--;
       double[] raw = meanshift[cur];
-      for (int j = 0; j < fv.getDimensionality(); j++) {
+      for(int j = 0; j < fv.getDimensionality(); j++) {
         raw[j] -= fv.doubleValue(j);
       }
     }
@@ -269,16 +248,16 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
    * @param changesize Size of change (for weighting!)
    */
   protected void updateMeans(List<Vector> means, double[][] meanshift, List<ModifiableDBIDs> clusters, int[] changesize) {
-    for (int i = 0; i < k; i++) {
+    for(int i = 0; i < k; i++) {
       int newsize = clusters.get(i).size(), oldsize = newsize - changesize[i];
-      if (newsize == 0) {
+      if(newsize == 0) {
         continue; // Keep previous mean vector.
       }
-      if (oldsize == 0) {
+      if(oldsize == 0) {
         means.set(i, new Vector(meanshift[i]).times(1. / newsize));
         continue; // Replace with new vector.
       }
-      if (oldsize == newsize) {
+      if(oldsize == newsize) {
         means.get(i).plusTimesEquals(new Vector(meanshift[i]), 1. / (double) newsize);
         continue;
       }
@@ -298,7 +277,7 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     /**
      * Parameter for the number of blocks.
      */
@@ -324,11 +303,11 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
       super.makeOptions(config);
       IntParameter blocksP = new IntParameter(BLOCKS_ID, 10);
       blocksP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if (config.grab(blocksP)) {
+      if(config.grab(blocksP)) {
         blocks = blocksP.intValue();
       }
       RandomParameter randomP = new RandomParameter(RANDOM_ID);
-      if (config.grab(randomP)) {
+      if(config.grab(randomP)) {
         random = randomP.getValue();
       }
     }
@@ -339,7 +318,7 @@ public class KMeansBatchedLloyd<V extends NumberVector<?>, D extends Distance<D>
     }
 
     @Override
-    protected KMeansBatchedLloyd<V, D> makeInstance() {
+    protected KMeansBatchedLloyd<V> makeInstance() {
       return new KMeansBatchedLloyd<>(distanceFunction, k, maxiter, initializer, blocks, random);
     }
   }

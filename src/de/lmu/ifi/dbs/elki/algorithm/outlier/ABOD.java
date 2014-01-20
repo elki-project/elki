@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
@@ -75,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url = "http://dx.doi.org/10.1145/1401890.1401946")
-public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -84,14 +83,14 @@ public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
   /**
    * Store the configured Kernel version.
    */
-  protected SimilarityFunction<? super V, DoubleDistance> kernelFunction;
+  protected SimilarityFunction<? super V> kernelFunction;
 
   /**
    * Constructor for Angle-Based Outlier Detection (ABOD).
    * 
    * @param kernelFunction kernel function to use
    */
-  public ABOD(SimilarityFunction<? super V, DoubleDistance> kernelFunction) {
+  public ABOD(SimilarityFunction<? super V> kernelFunction) {
     super();
     this.kernelFunction = kernelFunction;
   }
@@ -105,7 +104,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
   public OutlierResult run(Database db, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
     // Build a kernel matrix, to make O(n^3) slightly less bad.
-    SimilarityQuery<V, DoubleDistance> sq = db.getSimilarityQuery(relation, kernelFunction);
+    SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
@@ -190,7 +189,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter for the kernel function.
      */
@@ -199,12 +198,12 @@ public class ABOD<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     /**
      * Distance function.
      */
-    protected SimilarityFunction<V, DoubleDistance> kernelFunction = null;
+    protected SimilarityFunction<V> kernelFunction = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<SimilarityFunction<V, DoubleDistance>> param = new ObjectParameter<>(KERNEL_FUNCTION_ID, SimilarityFunction.class, PolynomialKernelFunction.class);
+      final ObjectParameter<SimilarityFunction<V>> param = new ObjectParameter<>(KERNEL_FUNCTION_ID, SimilarityFunction.class, PolynomialKernelFunction.class);
       if (config.grab(param)) {
         kernelFunction = param.instantiateClass(config);
       }

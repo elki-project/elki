@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type.
  */
 @Reference(authors = "Y. Cheng, G. M. Church", title = "Biclustering of expression data", booktitle = "Proc. 8th International Conference on Intelligent Systems for Molecular Biology (ISMB)")
-public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBiclustering<V, BiclusterWithInversionsModel> {
+public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering<V, BiclusterWithInversionsModel> {
   /**
    * The logger for this class.
    */
@@ -805,7 +805,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter to specify the distribution of replacement values when masking
      * a cluster.

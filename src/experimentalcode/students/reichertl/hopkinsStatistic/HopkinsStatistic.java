@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
@@ -45,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, Result> {
+public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveDistanceBasedAlgorithm<V, Result> {
   /**
    * The logger for this class.
    */
@@ -96,7 +95,7 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
    */
   private double[] minima = new double[0];
 
-  public HopkinsStatistic(PrimitiveDistanceFunction<? super V, D> distanceFunction, int samplesize, Long seed, int rep, double[] minima, double[] maxima) {
+  public HopkinsStatistic(PrimitiveDistanceFunction<? super V> distanceFunction, int samplesize, Long seed, int rep, double[] minima, double[] maxima) {
     super(distanceFunction);
     this.sampleSize = samplesize;
     this.seed = seed;
@@ -114,8 +113,8 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
     ArrayList<String> res = new ArrayList<>();
 
     int dim = RelationUtil.dimensionality(relation);
-    final DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<V, D> knnQuery = database.getKNNQuery(distanceQuery, 2);
+    final DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<V> knnQuery = database.getKNNQuery(distanceQuery, 2);
 
     MeanVariance hmean = new MeanVariance();
     MeanVariance umean = new MeanVariance();
@@ -129,17 +128,17 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
       // k= 2 und dann natürlich 2. element aus liste holen sonst nächster
       // nachbar
       // von q immer q
-      double w = knnQuery.getKNNForDBID(iter2, 2).get(1).getDistance().doubleValue();
+      double w = knnQuery.getKNNForDBID(iter2, 2).get(1).doubleValue();
       iter2.advance();
       for(; iter2.valid(); iter2.advance()) {
-        w += knnQuery.getKNNForDBID(iter2, 2).get(1).getDistance().doubleValue();
+        w += knnQuery.getKNNForDBID(iter2, 2).get(1).doubleValue();
       }
       // compute NN distances for randomly created new uniform objects
       Collection<V> uniformObjs = getUniformObjs(relation, masterRandom.nextLong(), sampleSize, this.minima, this.maxima, dim);
       Iterator<V> iter = uniformObjs.iterator();
-      double u = knnQuery.getKNNForObject(iter.next(), 1).get(0).getDistance().doubleValue();
+      double u = knnQuery.getKNNForObject(iter.next(), 1).get(0).doubleValue();
       while(iter.hasNext()) {
-        u += knnQuery.getKNNForObject(iter.next(), 1).get(0).getDistance().doubleValue();
+        u += knnQuery.getKNNForObject(iter.next(), 1).get(0).doubleValue();
       }
       // compute hopkins statistik
       double h = u / (u + w);
@@ -162,7 +161,7 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
       randoms[i] = new Random(random);
     }
 
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     // if no parameter for min max compute min max values for each dimension
     // from dataset
     if(min == null || max == null || min.length == 0 || max.length == 0) {
@@ -229,7 +228,7 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V> {
 
     protected int sampleSize;
 
@@ -288,7 +287,7 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
     }
 
     @Override
-    protected HopkinsStatistic<V, D> makeInstance() {
+    protected HopkinsStatistic<V> makeInstance() {
       return new HopkinsStatistic<>(distanceFunction, sampleSize, seed, rep, minima, maxima);
     }
   }

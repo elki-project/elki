@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 
@@ -37,9 +36,9 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
  * @apiviz.has Instance
  * 
  * @param <O> Database object type
- * @param <D> Distance type
+ * @param <P> Index type
  */
-public interface FilteredLocalPCABasedDistanceFunction<O extends NumberVector<?>, P extends FilteredLocalPCAIndex<? super O>, D extends Distance<D>> extends IndexBasedDistanceFunction<O, D> {
+public interface FilteredLocalPCABasedDistanceFunction<O extends NumberVector, P extends FilteredLocalPCAIndex<? super O>> extends IndexBasedDistanceFunction<O> {
   /**
    * Instantiate with a database to get the actual distance query.
    * 
@@ -47,7 +46,7 @@ public interface FilteredLocalPCABasedDistanceFunction<O extends NumberVector<?>
    * @return Actual distance query.
    */
   @Override
-  public <T extends O> Instance<T, ?, D> instantiate(Relation<T> database);
+  public <T extends O> Instance<T, ?> instantiate(Relation<T> database);
 
   /**
    * Instance produced by the distance function.
@@ -56,9 +55,8 @@ public interface FilteredLocalPCABasedDistanceFunction<O extends NumberVector<?>
    * 
    * @param <T> Database object type
    * @param <I> Index type
-   * @param <D> Distance type
    */
-  public static interface Instance<T extends NumberVector<?>, I extends Index, D extends Distance<D>> extends IndexBasedDistanceFunction.Instance<T, I, D> {
+  public static interface Instance<T extends NumberVector, I extends Index> extends IndexBasedDistanceFunction.Instance<T, I> {
     // No additional restrictions
   }
 }

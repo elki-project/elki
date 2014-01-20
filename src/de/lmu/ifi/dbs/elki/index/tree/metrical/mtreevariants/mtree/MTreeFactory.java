@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
@@ -42,27 +41,26 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @apiviz.uses MTreeIndex oneway - - «create»
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
 @Alias({ "mtree", "m" })
-public class MTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MTreeNode<O, D>, MTreeEntry, MTreeIndex<O, D>, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry>> {
+public class MTreeFactory<O> extends AbstractMTreeFactory<O, MTreeNode<O>, MTreeEntry, MTreeIndex<O>, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public MTreeFactory(PageFileFactory<?> pageFileFactory, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry> settings) {
+  public MTreeFactory(PageFileFactory<?> pageFileFactory, MTreeSettings<O, MTreeNode<O>, MTreeEntry> settings) {
     super(pageFileFactory, settings);
   }
 
   @Override
-  public MTreeIndex<O, D> instantiate(Relation<O> relation) {
-    PageFile<MTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
+  public MTreeIndex<O> instantiate(Relation<O> relation) {
+    PageFile<MTreeNode<O>> pagefile = makePageFile(getNodeClass());
     return new MTreeIndex<>(relation, pagefile, settings);
   }
 
-  protected Class<MTreeNode<O, D>> getNodeClass() {
+  protected Class<MTreeNode<O>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MTreeNode.class);
   }
 
@@ -72,15 +70,17 @@ public class MTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTr
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MTreeNode<O, D>, MTreeEntry, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry>> {
+  public static class Parameterizer<O> extends AbstractMTreeFactory.Parameterizer<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
     @Override
-    protected MTreeFactory<O, D> makeInstance() {
+    protected MTreeFactory<O> makeInstance() {
       return new MTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry> makeSettings() {
+    protected MTreeSettings<O, MTreeNode<O>, MTreeEntry> makeSettings() {
       return new MTreeSettings<>();
     }
   }

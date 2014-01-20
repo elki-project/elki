@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class SquaredPearsonCorrelationDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class SquaredPearsonCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Static instance.
    */
@@ -74,7 +74,7 @@ public class SquaredPearsonCorrelationDistanceFunction extends AbstractVectorDou
    *         vectors v1 and v2
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final double pcc = MathUtil.pearsonCorrelationCoefficient(v1, v2);
     return 1 - pcc * pcc;
   }

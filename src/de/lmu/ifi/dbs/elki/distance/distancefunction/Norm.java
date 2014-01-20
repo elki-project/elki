@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Abstract interface for a mathematical norm.
@@ -31,14 +30,13 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public interface Norm<O, D extends Distance<D>> extends DistanceFunction<O, D> {
+public interface Norm<O> extends PrimitiveDistanceFunction<O> {
   /**
    * Compute the norm of object obj.
    * 
    * @param obj Object
    * @return Norm
    */
-  public D norm(O obj);
+  public double norm(O obj);
 }

@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Query interface for spatial distance queries.
@@ -34,9 +33,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
-public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Distance<D>> extends DistanceQuery<V, D> {
+public interface SpatialDistanceQuery<V extends SpatialComparable> extends DistanceQuery<V> {
   /**
    * Computes the minimum distance between the given MBR and the FeatureVector
    * object according to this distance function.
@@ -46,7 +44,7 @@ public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Dis
    * @return the minimum distance between the given MBR and the FeatureVector
    *         object according to this distance function
    */
-  D minDist(SpatialComparable mbr, V v);
+  double minDist(SpatialComparable mbr, V v);
 
   /**
    * Computes the minimum distance between the given MBR and the FeatureVector
@@ -57,7 +55,7 @@ public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Dis
    * @return the minimum distance between the given MBR and the FeatureVector
    *         object according to this distance function
    */
-  D minDist(SpatialComparable mbr, DBID id);
+  double minDist(SpatialComparable mbr, DBID id);
 
   /**
    * Get the inner distance function.
@@ -65,5 +63,5 @@ public interface SpatialDistanceQuery<V extends SpatialComparable, D extends Dis
    * @return Distance function
    */
   @Override
-  SpatialPrimitiveDistanceFunction<? super V, D> getDistanceFunction();
+  SpatialPrimitiveDistanceFunction<? super V> getDistanceFunction();
 }

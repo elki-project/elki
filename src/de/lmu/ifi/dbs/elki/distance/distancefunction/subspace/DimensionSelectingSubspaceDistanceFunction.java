@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Interface for dimension selecting subspace distance functions.
@@ -31,9 +30,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance value
  */
-public interface DimensionSelectingSubspaceDistanceFunction<O, D extends Distance<D>> extends DistanceFunction<O, D> {
+public interface DimensionSelectingSubspaceDistanceFunction<O> extends DistanceFunction<O> {
   /**
    * Returns a bit set representing the selected dimensions.
    * 

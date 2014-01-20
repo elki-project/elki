@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <O> object type
  */
-public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractIndexBasedDistanceFunction<O, SharedNearestNeighborIndex<O>, DoubleDistance> {
+public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractIndexBasedDistanceFunction<O, SharedNearestNeighborIndex<O>> {
   /**
    * Constructor.
    * 
@@ -73,7 +72,7 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
    * 
    * @param <T> Object type
    */
-  public static class Instance<T> extends AbstractIndexBasedDistanceFunction.Instance<T, SharedNearestNeighborIndex<T>, DoubleDistance, SharedNearestNeighborJaccardDistanceFunction<T>> {
+  public static class Instance<T> extends AbstractIndexBasedDistanceFunction.Instance<T, SharedNearestNeighborIndex<T>, SharedNearestNeighborJaccardDistanceFunction<T>> {
     /**
      * Constructor.
      * 
@@ -124,21 +123,11 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
     }
 
     @Override
-    public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
+    public double distance(DBIDRef id1, DBIDRef id2) {
       DBIDs neighbors1 = index.getNearestNeighborSet(id1);
       DBIDs neighbors2 = index.getNearestNeighborSet(id2);
-      return new DoubleDistance(1.0 - jaccardCoefficient(neighbors1, neighbors2));
+      return 1.0 - jaccardCoefficient(neighbors1, neighbors2);
     }
-
-    @Override
-    public DoubleDistance getDistanceFactory() {
-      return DoubleDistance.FACTORY;
-    }
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   /**

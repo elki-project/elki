@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -56,9 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has MeanModel
  * 
  * @param <V> vector datatype
- * @param <D> distance value type
  */
-public class SingleAssignmentKMeans<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, MeanModel<V>> {
+public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMeans<V, MeanModel<V>> {
   /**
    * The logger for this class.
    */
@@ -71,7 +69,7 @@ public class SingleAssignmentKMeans<V extends NumberVector<?>, D extends Distanc
    * @param k k parameter
    * @param initializer Initialization method
    */
-  public SingleAssignmentKMeans(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, KMeansInitialization<V> initializer) {
+  public SingleAssignmentKMeans(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, -1, initializer);
   }
 
@@ -81,7 +79,7 @@ public class SingleAssignmentKMeans<V extends NumberVector<?>, D extends Distanc
       return new Clustering<>("k-Means Assignment", "kmeans-assignment");
     }
     // Choose initial means
-    List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<? extends NumberVector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -92,7 +90,7 @@ public class SingleAssignmentKMeans<V extends NumberVector<?>, D extends Distanc
     assignToNearestCluster(relation, means, clusters, assignment);
 
     // Wrap result
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<MeanModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       MeanModel<V> model = new MeanModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
@@ -113,7 +111,7 @@ public class SingleAssignmentKMeans<V extends NumberVector<?>, D extends Distanc
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
     protected Logging getLogger() {
       return LOG;
@@ -123,7 +121,7 @@ public class SingleAssignmentKMeans<V extends NumberVector<?>, D extends Distanc
     protected void makeOptions(Parameterization config) {
       // Do NOT invoke super.makeOptions, as we don't want to have the maxiter
       // parameter, nor a warning for other distance functions.
-      ObjectParameter<PrimitiveDistanceFunction<NumberVector<?>, D>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
@@ -141,7 +139,7 @@ public class SingleAssignmentKMeans<V extends NumberVector<?>, D extends Distanc
     }
 
     @Override
-    protected SingleAssignmentKMeans<V, D> makeInstance() {
+    protected SingleAssignmentKMeans<V> makeInstance() {
       return new SingleAssignmentKMeans<>(distanceFunction, k, initializer);
     }
   }

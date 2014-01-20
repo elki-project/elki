@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 
 /**
@@ -32,9 +31,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSetti
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class MkAppTreeSettings<O, D extends NumberDistance<D, ?>> extends MkTreeSettings<O, D, MkAppTreeNode<O, D>, MkAppEntry> {
+public class MkAppTreeSettings<O> extends MkTreeSettings<O, MkAppTreeNode<O>, MkAppEntry> {
   /**
    * Parameter p.
    */

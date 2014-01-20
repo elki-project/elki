@@ -30,18 +30,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * AbstractDistanceFunction provides some methods valid for any extending class.
  * 
  * @author Arthur Zimek
- * 
- * @apiviz.excludeSubtypes
- * 
- * @param <D> the type of Distance used
  */
-public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implements DBIDDistanceFunction<D> {
+public abstract class AbstractDBIDDistanceFunction implements DBIDDistanceFunction {
   /**
    * Provides an abstract DistanceFunction.
    */
@@ -50,10 +45,7 @@ public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implem
   }
 
   @Override
-  abstract public D distance(DBIDRef o1, DBIDRef o2);
-
-  @Override
-  abstract public D getDistanceFactory();
+  abstract public double distance(DBIDRef o1, DBIDRef o2);
 
   @Override
   public boolean isSymmetric() {
@@ -74,7 +66,7 @@ public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implem
 
   @SuppressWarnings("unchecked")
   @Override
-  final public <O extends DBID> DistanceQuery<O, D> instantiate(Relation<O> database) {
-    return (DistanceQuery<O, D>) new DBIDDistanceQuery<>((Relation<DBID>) database, this);
+  final public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
+    return (DistanceQuery<O>) new DBIDDistanceQuery((Relation<DBID>) database, this);
   }
 }

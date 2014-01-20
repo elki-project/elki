@@ -34,11 +34,11 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * @param <I> Input vector type
  * @param <O> Output vector type
  */
-public abstract class AbstractVectorConversionFilter<I, O extends NumberVector<?>> extends AbstractConversionFilter<I, O> {
+public abstract class AbstractVectorConversionFilter<I, O extends NumberVector> extends AbstractConversionFilter<I, O> {
   /**
    * Number vector factory.
    */
-  protected NumberVector.Factory<O, ?> factory;
+  protected NumberVector.Factory<O>  factory;
 
   /**
    * Initialize factory from a data type.

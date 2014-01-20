@@ -36,8 +36,6 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
@@ -51,9 +49,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
+public class MkAppTreeIndex<O> extends MkAppTree<O> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
   /**
    * The relation indexed
    */
@@ -66,7 +63,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    * @param pageFile Page file
    * @param settings Tree settings
    */
-  public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, MkAppTreeSettings<O, D> settings) {
+  public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O>> pageFile, MkAppTreeSettings<O> settings) {
     super(relation, pageFile, settings);
     this.relation = relation;
   }
@@ -95,14 +92,13 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
     insertAll(objs);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
     if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
+    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -115,18 +111,16 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
         return null;
       }
     }
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
-    return (KNNQuery<O, S>) MTreeQueryUtil.getKNNQuery(this, dq, hints);
+    return MTreeQueryUtil.getKNNQuery(this, distanceQuery, hints);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
     if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
+    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -139,14 +133,12 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
         return null;
       }
     }
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
-    return (RangeQuery<O, S>) MTreeQueryUtil.getRangeQuery(this, dq, hints);
+    return MTreeQueryUtil.getRangeQuery(this, distanceQuery, hints);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
-    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
+  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -159,8 +151,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
         return null;
       }
     }
-    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
-    return (RKNNQuery<O, S>) new MkTreeRKNNQuery<>(this, dq);
+    return (RKNNQuery<O>) new MkTreeRKNNQuery<>(this, distanceQuery);
   }
 
   @Override

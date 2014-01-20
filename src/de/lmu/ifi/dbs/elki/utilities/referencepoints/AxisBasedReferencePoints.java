@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> Vector type
  */
-public class AxisBasedReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
+public class AxisBasedReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
   /**
    * Parameter to specify the extra scaling of the space, to allow
    * out-of-data-space reference points.
@@ -76,7 +76,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
-    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
+    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
 
     int dim = RelationUtil.dimensionality(db);
 
@@ -124,7 +124,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #SPACE_SCALE_ID}.
      */

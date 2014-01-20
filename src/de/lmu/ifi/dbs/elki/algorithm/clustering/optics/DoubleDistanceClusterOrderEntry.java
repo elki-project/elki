@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Provides an entry in a cluster order.
@@ -130,17 +129,7 @@ public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<Double
    * 
    * @return the reachability distance of this entry
    */
-  @Deprecated
-  public DoubleDistance getReachability() {
-    return new DoubleDistance(reachability);
-  }
-
-  /**
-   * Returns the reachability distance of this entry
-   * 
-   * @return the reachability distance of this entry
-   */
-  public double doubleReachability() {
+  public double getReachability() {
     return reachability;
   }
 

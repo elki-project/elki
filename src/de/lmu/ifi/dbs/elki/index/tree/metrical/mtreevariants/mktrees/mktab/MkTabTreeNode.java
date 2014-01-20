@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 
@@ -36,9 +35,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
  * @apiviz.has MkTabEntry oneway - - contains
  * 
  * @param <O> object type
- * @param <D> distance type
  */
-class MkTabTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkTabTreeNode<O, D>, MkTabEntry> {
+class MkTabTreeNode<O> extends AbstractMTreeNode<O, MkTabTreeNode<O>, MkTabEntry> {
   private static final long serialVersionUID = 2;
 
   /**
@@ -81,7 +79,7 @@ class MkTabTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
   }
 
   @Override
-  public void adjustEntry(MkTabEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry, ?> mTree) {
+  public void adjustEntry(MkTabEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkTabTreeNode<O>, MkTabEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust knn distances
     entry.setKnnDistances(kNNDistances());
@@ -96,7 +94,7 @@ class MkTabTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
    * @param mTree the underlying M-Tree
    */
   @Override
-  protected void integrityCheckParameters(MkTabEntry parentEntry, MkTabTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry, ?> mTree) {
+  protected void integrityCheckParameters(MkTabEntry parentEntry, MkTabTreeNode<O> parent, int index, AbstractMTree<O, MkTabTreeNode<O>, MkTabEntry, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test knn distances
     MkTabEntry entry = parent.getEntry(index);

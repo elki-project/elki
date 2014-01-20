@@ -45,8 +45,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import experimentalcode.erich.parallel.mapper.KMeansMapper;
@@ -57,16 +55,15 @@ import experimentalcode.erich.parallel.mapper.KMeansMapper;
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
-public class ParallelLloydKMeans<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractKMeans<V, D, KMeansModel<V>> {
+public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<V, KMeansModel<V>> {
   /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelLloydKMeans(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public ParallelLloydKMeans(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -85,14 +82,11 @@ public class ParallelLloydKMeans<V extends NumberVector<?>, D extends NumberDist
     DBIDs ids = relation.getDBIDs();
 
     // Choose initial means
-    List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<? extends NumberVector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
 
     // Store for current cluster assignment.
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-    // FIXME: allow non-double distance functions?
-    @SuppressWarnings("unchecked")
-    final PrimitiveDoubleDistanceFunction<? super NumberVector<?>> dist = (PrimitiveDoubleDistanceFunction<? super NumberVector<?>>) distanceFunction;
-    KMeansMapper<V> kmm = new KMeansMapper<>(relation, dist, assignment);
+    KMeansMapper<V> kmm = new KMeansMapper<>(relation, distanceFunction, assignment);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
@@ -121,7 +115,7 @@ public class ParallelLloydKMeans<V extends NumberVector<?>, D extends NumberDist
       clusters.get(assignment.intValue(iter)).add(iter);
     }
 
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for (int i = 0; i < clusters.size(); i++) {
       KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
@@ -143,16 +137,15 @@ public class ParallelLloydKMeans<V extends NumberVector<?>, D extends NumberDist
    * @apiviz.exclude
    * 
    * @param <V> Vector type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractKMeans.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
     @Override
     protected Logging getLogger() {
       return LOG;
     }
 
     @Override
-    protected ParallelLloydKMeans<V, D> makeInstance() {
+    protected ParallelLloydKMeans<V> makeInstance() {
       return new ParallelLloydKMeans<>(distanceFunction, k, maxiter, initializer);
     }
   }

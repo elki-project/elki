@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @param <O> Object type
  */
 @Alias({"rstar", "r*"})
-public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>, AbstractRTreeSettings> {
+public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>, AbstractRTreeSettings> {
   /**
    * Constructor.
    * 
@@ -73,7 +73,7 @@ public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTr
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
     @Override
     protected RStarTreeFactory<O> makeInstance() {
       return new RStarTreeFactory<>(pageFileFactory, settings);

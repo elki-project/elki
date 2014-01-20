@@ -38,8 +38,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -62,7 +61,7 @@ public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implem
     params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 2);
     params.addParameter(KMeans.INIT_ID, FirstKInitialMeans.class);
-    AbstractKMeans<DoubleVector, DoubleDistance, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
+    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
@@ -70,9 +69,8 @@ public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implem
     Clustering<MeanModel<DoubleVector>> result2 = (Clustering<MeanModel<DoubleVector>>) kmeans.run(db);
 
     // Test Cluster Variance
-    KMeansQualityMeasure<? super DoubleVector, ? super DoubleDistance> variance = new WithinClusterVarianceQualityMeasure();
-    @SuppressWarnings("unchecked")
-    final PrimitiveDoubleDistanceFunction<NumberVector<?>> dist = (PrimitiveDoubleDistanceFunction<NumberVector<?>>) kmeans.getDistanceFunction();
+    KMeansQualityMeasure<? super DoubleVector> variance = new WithinClusterVarianceQualityMeasure();
+    final PrimitiveDistanceFunction<? super NumberVector> dist = kmeans.getDistanceFunction();
 
     final double quality = variance.calculateCost(result2, dist, rel);
     assertEquals("Within cluster variance incorrect", 3.16666666666, quality, 1e-10);
@@ -92,17 +90,16 @@ public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implem
     params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 2);
     params.addParameter(KMeans.INIT_ID, FirstKInitialMeans.class);
-    AbstractKMeans<DoubleVector, DoubleDistance, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
+    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
     @SuppressWarnings("unchecked")
     Clustering<MeanModel<DoubleVector>> result = (Clustering<MeanModel<DoubleVector>>) kmeans.run(db);
-    @SuppressWarnings("unchecked")
-    final PrimitiveDoubleDistanceFunction<NumberVector<?>> dist = (PrimitiveDoubleDistanceFunction<NumberVector<?>>) kmeans.getDistanceFunction();
+    final PrimitiveDistanceFunction<? super NumberVector> dist = kmeans.getDistanceFunction();
 
     // Test Cluster Average Overall Distance
-    KMeansQualityMeasure<? super DoubleVector, ? super DoubleDistance> overall = new WithinClusterMeanDistanceQualityMeasure();
+    KMeansQualityMeasure<? super DoubleVector> overall = new WithinClusterMeanDistanceQualityMeasure();
     final double quality = overall.calculateCost(result, dist, rel);
 
     assertEquals("Avarage overall distance not as expected.", 0.8888888888888888, quality, 1e-10);

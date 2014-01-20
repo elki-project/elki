@@ -27,10 +27,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorDoubleSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorSimilarityFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -45,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Simon Paradies
  */
-public class PolynomialKernelFunction extends AbstractVectorDoubleSimilarityFunction implements PrimitiveDoubleDistanceFunction<NumberVector<?>> {
+public class PolynomialKernelFunction extends AbstractVectorSimilarityFunction implements PrimitiveDistanceFunction<NumberVector> {
   /**
    * The default degree.
    */
@@ -83,8 +82,8 @@ public class PolynomialKernelFunction extends AbstractVectorDoubleSimilarityFunc
   }
 
   @Override
-  public double doubleSimilarity(NumberVector<?> o1, NumberVector<?> o2) {
-    final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(o1, o2);
+  public double similarity(NumberVector o1, NumberVector o2) {
+    final int dim = AbstractNumberVectorDistanceFunction.dimensionality(o1, o2);
     double sim = 0.;
     for(int i = 0; i < dim; i++) {
       sim += o1.doubleValue(i) * o2.doubleValue(i);
@@ -93,22 +92,17 @@ public class PolynomialKernelFunction extends AbstractVectorDoubleSimilarityFunc
   }
 
   @Override
-  public DoubleDistance distance(final NumberVector<?> fv1, final NumberVector<?> fv2) {
-    return new DoubleDistance(doubleDistance(fv1, fv2));
-  }
-
-  @Override
   public boolean isMetric() {
     return true;
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> fv1, NumberVector<?> fv2) {
-    return Math.sqrt(doubleSimilarity(fv1, fv1) + doubleSimilarity(fv2, fv2) - 2 * doubleSimilarity(fv1, fv2));
+  public double distance(NumberVector fv1, NumberVector fv2) {
+    return Math.sqrt(similarity(fv1, fv1) + similarity(fv2, fv2) - 2 * similarity(fv1, fv2));
   }
 
   @Override
-  public <T extends NumberVector<?>> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
+  public <T extends NumberVector> DistanceSimilarityQuery<T> instantiate(Relation<T> database) {
     return new PrimitiveDistanceSimilarityQuery<>(database, this, this);
   }
 

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  */
-public class LngLatDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class LngLatDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Earth model to use.
    */
@@ -56,23 +56,23 @@ public class LngLatDistanceFunction extends AbstractSpatialDoubleDistanceFunctio
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
+  public double distance(NumberVector o1, NumberVector o2) {
     return model.distanceDeg(o1.doubleValue(1), o1.doubleValue(0), o2.doubleValue(1), o2.doubleValue(0));
   }
 
   @Override
   @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if (mbr1 instanceof NumberVector) {
       if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+        return distance((NumberVector) mbr1, (NumberVector) mbr2);
       } else {
-        NumberVector<?> o1 = (NumberVector<?>) mbr1;
+        NumberVector o1 = (NumberVector) mbr1;
         return model.minDistDeg(o1.doubleValue(1), o1.doubleValue(0), mbr2.getMin(1), mbr2.getMin(0), mbr2.getMax(1), mbr2.getMax(0));
       }
     } else {
       if (mbr2 instanceof NumberVector) {
-        NumberVector<?> o2 = (NumberVector<?>) mbr2;
+        NumberVector o2 = (NumberVector) mbr2;
         return model.minDistDeg(o2.doubleValue(1), o2.doubleValue(0), mbr1.getMin(1), mbr1.getMin(0), mbr1.getMax(1), mbr1.getMax(0));
       } else {
         throw new NotImplementedException("This distance function cannot - yet - be used with this algorithm, as the lower bound rectangle to rectangle distances have not yet been formalized for geodetic data.");
@@ -81,7 +81,7 @@ public class LngLatDistanceFunction extends AbstractSpatialDoubleDistanceFunctio
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return new VectorFieldTypeInformation<>(NumberVector.class, 2);
   }
 

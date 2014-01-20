@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
@@ -119,7 +118,6 @@ public class TextWriter {
     writers.insertHandler(Integer[].class, new TextWriterObjectArray<Integer>());
     writers.insertHandler(BitSet.class, trivialwriter);
     writers.insertHandler(Vector.class, new TextWriterVector());
-    writers.insertHandler(Distance.class, trivialwriter);
     writers.insertHandler(SimpleClassLabel.class, trivialwriter);
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
     writers.insertHandler(LabelList.class, trivialwriter);

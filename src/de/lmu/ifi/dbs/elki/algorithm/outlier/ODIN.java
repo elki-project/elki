@@ -32,13 +32,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -66,10 +64,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
 @Reference(authors = "V. Hautamäki and I. Kärkkäinen and P Fränti", title = "Outlier detection using k-nearest neighbour graph", booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", url = "http://dx.doi.org/10.1109/ICPR.2004.1334558")
-public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -86,7 +83,7 @@ public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorit
    * @param distanceFunction Distance function
    * @param k k parameter
    */
-  public ODIN(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public ODIN(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -100,8 +97,8 @@ public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorit
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     // Get the query functions:
-    DistanceQuery<O, D> dq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnq = database.getKNNQuery(dq, k);
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<O> knnq = database.getKNNQuery(dq, k);
 
     // Get the objects to process, and a data storage for counting and output:
     DBIDs ids = relation.getDBIDs();
@@ -112,7 +109,7 @@ public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorit
     // Process all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       // Find the nearest neighbors (using an index, if available!)
-      KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
+      DBIDs neighbors = knnq.getKNNForDBID(iter, k);
       // For each neighbor, except ourselves, increase the in-degree:
       for(DBIDIter nei = neighbors.iter(); nei.valid(); nei.advance()) {
         if(DBIDUtil.equal(iter, nei)) {
@@ -153,9 +150,8 @@ public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorit
    * @apiviz.exclude
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter for the number of nearest neighbors:
      * 
@@ -185,7 +181,7 @@ public class ODIN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorit
     }
 
     @Override
-    protected ODIN<O, D> makeInstance() {
+    protected ODIN<O> makeInstance() {
       return new ODIN<>(distanceFunction, k);
     }
   }

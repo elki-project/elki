@@ -40,17 +40,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -59,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -69,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V extends NumberVector<?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
+public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V extends NumberVector> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -126,7 +124,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
   /**
    * Holds the value of {@link #EPSILON_ID}.
    */
-  protected DoubleDistance epsilon;
+  protected double epsilon;
 
   /**
    * Holds the value of {@link #LAMBDA_ID}.
@@ -161,7 +159,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    * @param distanceFunction Outer distance function
    * @param lambda Lambda value
    */
-  public AbstractProjectedDBSCAN(DoubleDistance epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
+  public AbstractProjectedDBSCAN(double epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
     super();
     this.epsilon = epsilon;
     this.minpts = minpts;
@@ -184,7 +182,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     processedIDs = DBIDUtil.newHashSet(relation.size());
 
     LocallyWeightedDistanceFunction.Instance<V> distFunc = distanceFunction.instantiate(relation);
-    RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
+    RangeQuery<V> rangeQuery = database.getRangeQuery(distFunc);
 
     if(relation.size() >= minpts) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -259,7 +257,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    *        expansion with
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(LocallyWeightedDistanceFunction.Instance<V> distFunc, RangeQuery<V, DoubleDistance> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(LocallyWeightedDistanceFunction.Instance<V> distFunc, RangeQuery<V> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     Integer corrDim = distFunc.getIndex().getLocalProjection(startObjectID).getCorrelationDimension();
 
     if(getLogger().isDebugging()) {
@@ -279,7 +277,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     }
 
     // compute weighted epsilon neighborhood
-    DistanceDBIDList<DoubleDistance> neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
+    DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
     // neighbors < minPts -> noise
     if(neighbors.size() < minpts) {
       noise.add(startObjectID);
@@ -294,7 +292,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
     ModifiableDBIDs seeds = DBIDUtil.newHashSet();
-    for(DistanceDBIDListIter<DoubleDistance> seed = neighbors.iter(); seed.valid(); seed.advance()) {
+    for(DoubleDBIDListIter seed = neighbors.iter(); seed.valid(); seed.advance()) {
       int nextID_corrDim = distFunc.getIndex().getLocalProjection(seed).getCorrelationDimension();
       // nextID is not reachable from start object
       if(nextID_corrDim > lambda) {
@@ -320,11 +318,11 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
         continue;
       }
 
-      DistanceDBIDList<DoubleDistance> reachables = rangeQuery.getRangeForDBID(iter, epsilon);
+      DoubleDBIDList reachables = rangeQuery.getRangeForDBID(iter, epsilon);
       iter.remove();
 
       if(reachables.size() > minpts) {
-        for(DistanceDBIDListIter<DoubleDistance> r = reachables.iter(); r.valid(); r.advance()) {
+        for(DoubleDBIDListIter r = reachables.iter(); r.valid(); r.advance()) {
           int corrDim_r = distFunc.getIndex().getLocalProjection(r).getCorrelationDimension();
           // r is not reachable from q
           if(corrDim_r > lambda) {
@@ -384,10 +382,10 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractParameterizer {
-    protected DistanceFunction<V, D> innerdist;
+  public abstract static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    protected DistanceFunction<V> innerdist;
 
-    protected D epsilon;
+    protected double epsilon;
 
     protected LocallyWeightedDistanceFunction<V> outerdist;
 
@@ -396,15 +394,14 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     protected Integer lambda;
 
     protected void configInnerDistance(Parameterization config) {
-      ObjectParameter<DistanceFunction<V, D>> innerdistP = new ObjectParameter<>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<DistanceFunction<V>> innerdistP = new ObjectParameter<>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(innerdistP)) {
         innerdist = innerdistP.instantiateClass(config);
       }
     }
 
-    protected void configEpsilon(Parameterization config, DistanceFunction<V, D> innerdist) {
-      D distanceParser = innerdist != null ? innerdist.getDistanceFactory() : null;
-      DistanceParameter<D> epsilonP = new DistanceParameter<>(EPSILON_ID, distanceParser);
+    protected void configEpsilon(Parameterization config) {
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -418,7 +415,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
       }
     }
 
-    protected void configOuterDistance(Parameterization config, D epsilon, int minpts, Class<?> preprocessorClass, DistanceFunction<V, D> innerdist) {
+    protected void configOuterDistance(Parameterization config, double epsilon, int minpts, Class<?> preprocessorClass, DistanceFunction<V> innerdist) {
       ObjectParameter<LocallyWeightedDistanceFunction<V>> outerdistP = new ObjectParameter<>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
       if(config.grab(outerdistP)) {
         // parameters for the distance function

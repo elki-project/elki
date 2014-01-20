@@ -25,9 +25,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
@@ -50,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector class to use
  */
-public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
+public class PCAFilteredRunner<V extends NumberVector> extends PCARunner<V> {
   /**
    * Parameter to specify the filter for determination of the strong and weak
    * eigenvectors, must be a subclass of {@link EigenPairFilter}.
@@ -135,11 +134,10 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
    * 
    * @param results a collection of QueryResults
    * @param database the database used
-   * @param <D> distance type
    * @return PCA result
    */
   @Override
-  public <D extends NumberDistance<D, ?>> PCAFilteredResult processQueryResult(DistanceDBIDList<D> results, Relation<? extends V> database) {
+  public PCAFilteredResult processQueryResult(DoubleDBIDList results, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
@@ -185,7 +183,7 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends PCARunner.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends PCARunner.Parameterizer<V> {
     /**
      * Holds the instance of the EigenPairFilter specified by
      * {@link #PCA_EIGENPAIR_FILTER}.

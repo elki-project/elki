@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -104,22 +103,22 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     UpdatableDatabase db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, params);
     db.initialize();
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector, DoubleDistance> distanceQuery = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
 
     // verify data set size.
     assertEquals("Data set size doesn't match parameters.", shoulds, rep.size());
 
     // get linear queries
-    LinearScanDistanceKNNQuery<DoubleVector, DoubleDistance> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
-    LinearScanRKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query = new LinearScanRKNNQuery<>(distanceQuery, lin_knn_query, k);
+    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+    LinearScanRKNNQuery<DoubleVector> lin_rknn_query = new LinearScanRKNNQuery<>(distanceQuery, lin_knn_query, k);
 
     // get preprocessed queries
     ListParameterization config = new ListParameterization();
     config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction());
     config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
-    MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance> preproc = new MaterializeKNNAndRKNNPreprocessor<>(rep, distanceQuery.getDistanceFunction(), k);
-    KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
-    RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
+    MaterializeKNNAndRKNNPreprocessor<DoubleVector> preproc = new MaterializeKNNAndRKNNPreprocessor<>(rep, distanceQuery.getDistanceFunction(), k);
+    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
+    RKNNQuery<DoubleVector> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
     db.addIndex(preproc);
     assertTrue("Preprocessor knn query class incorrect.", !(preproc_knn_query instanceof LinearScanDistanceKNNQuery));
@@ -133,7 +132,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
 
     // insert new objects
     List<DoubleVector> insertions = new ArrayList<>();
-    NumberVector.Factory<DoubleVector, ?> o = RelationUtil.getNumberVectorFactory(rep);
+    NumberVector.Factory<DoubleVector> o = RelationUtil.getNumberVectorFactory(rep);
     int dim = RelationUtil.dimensionality(rep);
     Random random = new Random(seed);
     for(int i = 0; i < updatesize; i++) {
@@ -157,19 +156,19 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     testRKNNQueries(rep, lin_rknn_query, preproc_rknn_query, k);
   }
 
-  private void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector, DoubleDistance> lin_knn_query, KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query, int k) {
+  private void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {
     ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
-    List<? extends KNNList<DoubleDistance>> lin_knn_ids = lin_knn_query.getKNNForBulkDBIDs(sample, k);
-    List<? extends KNNList<DoubleDistance>> preproc_knn_ids = preproc_knn_query.getKNNForBulkDBIDs(sample, k);
+    List<? extends KNNList> lin_knn_ids = lin_knn_query.getKNNForBulkDBIDs(sample, k);
+    List<? extends KNNList> preproc_knn_ids = preproc_knn_query.getKNNForBulkDBIDs(sample, k);
     for(int i = 0; i < rep.size(); i++) {
-      KNNList<DoubleDistance> lin_knn = lin_knn_ids.get(i);
-      KNNList<DoubleDistance> pre_knn = preproc_knn_ids.get(i);
-      DistanceDBIDListIter<DoubleDistance> lin = lin_knn.iter(), pre = pre_knn.iter();
+      KNNList lin_knn = lin_knn_ids.get(i);
+      KNNList pre_knn = preproc_knn_ids.get(i);
+      DoubleDBIDListIter lin = lin_knn.iter(), pre = pre_knn.iter();
       for(; lin.valid() && pre.valid(); lin.advance(), pre.advance(), i++) {
-        if(!DBIDUtil.equal(lin, pre) && lin.getDistance().compareTo(pre.getDistance()) != 0) {
-          System.out.print("LIN kNN #" + i + " " + lin.getDistancePair());
+        if(!DBIDUtil.equal(lin, pre) && lin.doubleValue() != pre.doubleValue()) {
+          System.out.print("LIN kNN #" + i + " " + lin.getPair());
           System.out.print(" <=> ");
-          System.out.print("PRE kNN #" + i + " " + pre.getDistancePair());
+          System.out.print("PRE kNN #" + i + " " + pre.getPair());
           System.out.println();
           break;
         }
@@ -177,23 +176,23 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
       for(int j = 0; j < lin_knn.size(); j++) {
         assertTrue("kNNs of linear scan and preprocessor do not match!", DBIDUtil.equal(lin_knn.get(j), pre_knn.get(j)));
-        assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).getDistance().equals(pre_knn.get(j).getDistance()));
+        assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).doubleValue() == pre_knn.get(j).doubleValue());
       }
     }
     System.out.println("knns ok");
   }
 
-  private void testRKNNQueries(Relation<DoubleVector> rep, RKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query, RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query, int k) {
+  private void testRKNNQueries(Relation<DoubleVector> rep, RKNNQuery<DoubleVector> lin_rknn_query, RKNNQuery<DoubleVector> preproc_rknn_query, int k) {
     ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
-    List<? extends DistanceDBIDList<DoubleDistance>> lin_rknn_ids = lin_rknn_query.getRKNNForBulkDBIDs(sample, k);
-    List<? extends DistanceDBIDList<DoubleDistance>> preproc_rknn_ids = preproc_rknn_query.getRKNNForBulkDBIDs(sample, k);
+    List<? extends DoubleDBIDList> lin_rknn_ids = lin_rknn_query.getRKNNForBulkDBIDs(sample, k);
+    List<? extends DoubleDBIDList> preproc_rknn_ids = preproc_rknn_query.getRKNNForBulkDBIDs(sample, k);
     for(int i = 0; i < rep.size(); i++) {
-      DistanceDBIDList<DoubleDistance> lin_rknn = lin_rknn_ids.get(i);
-      DistanceDBIDList<DoubleDistance> pre_rknn = preproc_rknn_ids.get(i);
+      DoubleDBIDList lin_rknn = lin_rknn_ids.get(i);
+      DoubleDBIDList pre_rknn = preproc_rknn_ids.get(i);
 
-      DistanceDBIDListIter<DoubleDistance> lin = lin_rknn.iter(), pre = pre_rknn.iter();
+      DoubleDBIDListIter lin = lin_rknn.iter(), pre = pre_rknn.iter();
       for(; lin.valid() && pre.valid(); lin.advance(), pre.advance(), i++) {
-        if(!DBIDUtil.equal(lin, pre) || lin.getDistance().compareTo(pre.getDistance()) != 0) {
+        if(!DBIDUtil.equal(lin, pre) || lin.doubleValue() != pre.doubleValue()) {
           System.out.print("LIN RkNN #" + i + " " + lin);
           System.out.print(" <=> ");
           System.out.print("PRE RkNN #" + i + " " + pre);
@@ -204,7 +203,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
       assertEquals("rkNN sizes do not agree for k=" + k, lin_rknn.size(), pre_rknn.size());
       for(int j = 0; j < lin_rknn.size(); j++) {
         assertTrue("rkNNs of linear scan and preprocessor do not match!", DBIDUtil.equal(lin_rknn.get(j), pre_rknn.get(j)));
-        assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).getDistance().equals(pre_rknn.get(j).getDistance()));
+        assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).doubleValue() == pre_rknn.get(j).doubleValue());
       }
     }
     System.out.println("rknns ok");

@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 
 /**
  * Encapsulates the header information of a RDkNN-Tree. This information is

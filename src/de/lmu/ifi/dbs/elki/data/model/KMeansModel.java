@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * 
  * @param <V> Vector type.
  */
-public class KMeansModel<V extends NumberVector<?>> extends MeanModel<V> {
+public class KMeansModel<V extends NumberVector> extends MeanModel<V> {
   /**
    * Constructor with mean.
    * 

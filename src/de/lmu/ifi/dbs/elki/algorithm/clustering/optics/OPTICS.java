@@ -30,16 +30,13 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -50,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
@@ -63,13 +60,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by the algorithm
- * @param <D> the type of Distance used to discern objects
  */
 @Title("OPTICS: Density-Based Hierarchical Clustering")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
 @Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304187")
 @Alias({ "OPTICS", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS" })
-public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, ClusterOrderResult<DoubleDistanceClusterOrderEntry>> implements OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> {
+public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderResult<DoubleDistanceClusterOrderEntry>> implements OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> {
   /**
    * The logger for this class.
    */
@@ -78,7 +74,7 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance,
   /**
    * Hold the value of {@link #EPSILON_ID}.
    */
-  private DoubleDistance epsilon;
+  private double epsilon;
 
   /**
    * Holds the value of {@link #MINPTS_ID}.
@@ -97,9 +93,9 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance,
    * @param epsilon Epsilon value
    * @param minpts Minpts value
    */
-  public OPTICS(DistanceFunction<? super O, DoubleDistance> distanceFunction, DoubleDistance epsilon, int minpts) {
+  public OPTICS(DistanceFunction<? super O> distanceFunction, double epsilon, int minpts) {
     super(distanceFunction);
-    this.epsilon = epsilon != null ? epsilon : DoubleDistance.INFINITE_DISTANCE;
+    this.epsilon = epsilon;
     this.minpts = minpts;
   }
 
@@ -111,7 +107,7 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance,
    * @return Result
    */
   public ClusterOrderResult<DoubleDistanceClusterOrderEntry> run(Relation<O> relation) {
-    RangeQuery<O, DoubleDistance> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction(), epsilon);
+    RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction(), epsilon);
 
     int size = relation.size();
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", size, LOG) : null;
@@ -121,7 +117,7 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance,
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(!processedIDs.contains(iditer)) {
-        expandClusterOrderDouble(clusterOrder, relation, rangeQuery, DBIDUtil.deref(iditer), epsilon, progress);
+        expandClusterOrder(clusterOrder, relation, rangeQuery, DBIDUtil.deref(iditer), epsilon, progress);
       }
     }
     if(progress != null) {
@@ -142,7 +138,7 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance,
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */
-  protected void expandClusterOrderDouble(ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder, Relation<O> database, RangeQuery<O, DoubleDistance> rangeQuery, DBID objectID, DoubleDistance epsilon, FiniteProgress progress) {
+  protected void expandClusterOrder(ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder, Relation<O> database, RangeQuery<O> rangeQuery, DBID objectID, double epsilon, FiniteProgress progress) {
     UpdatableHeap<DoubleDistanceClusterOrderEntry> heap = new UpdatableHeap<>();
     heap.add(new DoubleDistanceClusterOrderEntry(objectID, null, Double.POSITIVE_INFINITY));
 
@@ -151,30 +147,30 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance,
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      DistanceDBIDList<DoubleDistance> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
+      DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
       if(neighbors.size() >= minpts) {
-        final DistanceDBIDPair<DoubleDistance> last = neighbors.get(minpts - 1);
-        if(last instanceof DoubleDistanceDBIDPair) {
-          double coreDistance = ((DoubleDistanceDBIDPair) last).doubleDistance();
+        final DoubleDBIDPair last = neighbors.get(minpts - 1);
+        if(last instanceof DoubleDBIDPair) {
+          double coreDistance = ((DoubleDBIDPair) last).doubleValue();
 
-          for(DistanceDBIDListIter<DoubleDistance> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(processedIDs.contains(neighbor)) {
               continue;
             }
-            double reachability = Math.max(((DoubleDistanceDBIDListIter) neighbor).doubleDistance(), coreDistance);
+            double reachability = Math.max(((DoubleDBIDListIter) neighbor).doubleValue(), coreDistance);
             heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
           }
         }
         else {
           // Actually we have little gains in this situation,
           // Only if we got an optimized result before.
-          double coreDistance = last.getDistance().doubleValue();
+          double coreDistance = last.doubleValue();
 
-          for(DistanceDBIDListIter<DoubleDistance> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(processedIDs.contains(neighbor)) {
               continue;
             }
-            double reachability = Math.max(neighbor.getDistance().doubleValue(), coreDistance);
+            double reachability = Math.max(neighbor.doubleValue(), coreDistance);
             heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
           }
         }
@@ -212,7 +208,7 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance,
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, DoubleDistance> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.
@@ -225,14 +221,15 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance,
      */
     public static final OptionID MINPTS_ID = new OptionID("optics.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
-    protected DoubleDistance epsilon = null;
+    protected double epsilon = Double.POSITIVE_INFINITY;
 
     protected int minpts = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DistanceParameter<DoubleDistance> epsilonP = new DistanceParameter<>(EPSILON_ID, distanceFunction, true);
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID);
+      epsilonP.setOptional(true);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }

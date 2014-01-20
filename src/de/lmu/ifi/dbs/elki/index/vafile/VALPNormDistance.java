@@ -54,7 +54,7 @@ public class VALPNormDistance {
    * @param query Query vector
    * @param queryApprox Query approximation
    */
-  public VALPNormDistance(double p, double[][] splitPositions, NumberVector<?> query, VectorApproximation queryApprox) {
+  public VALPNormDistance(double p, double[][] splitPositions, NumberVector query, VectorApproximation queryApprox) {
     super();
     this.onebyp = 1.0 / p;
     this.queryApprox = queryApprox;
@@ -155,7 +155,7 @@ public class VALPNormDistance {
    * @param query Query vector
    * @param p p
    */
-  private void initializeLookupTable(double[][] splitPositions, NumberVector<?> query, double p) {
+  private void initializeLookupTable(double[][] splitPositions, NumberVector query, double p) {
     final int dimensions = splitPositions.length;
     final int bordercount = splitPositions[0].length;
     lookup = new double[dimensions][bordercount];

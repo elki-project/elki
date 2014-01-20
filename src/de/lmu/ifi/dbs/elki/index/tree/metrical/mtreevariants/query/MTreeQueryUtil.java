@@ -3,10 +3,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 
 /*
@@ -43,23 +39,12 @@ public final class MTreeQueryUtil {
    * possible.
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    * @param tree Tree to query
    * @param distanceQuery distance query
    * @param hints Optimizer hints
    * @return Query object
    */
-  @SuppressWarnings({ "cast", "unchecked" })
-  public static <O, D extends NumberDistance<D, ?>> KNNQuery<O, D> getKNNQuery(AbstractMTree<O, D, ?, ?, ?> tree, DistanceQuery<O, D> distanceQuery, Object... hints) {
-    DistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
-    // Can we use an optimized query?
-    if (df instanceof PrimitiveDoubleDistanceFunction) {
-      PrimitiveDoubleDistanceFunction<? super O> dfc = (PrimitiveDoubleDistanceFunction<? super O>) df;
-      AbstractMTree<O, DoubleDistance, ?, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?, ?>) tree;
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) distanceQuery;
-      KNNQuery<O, ?> q = new DoubleDistanceMetricalIndexKNNQuery<>(treec, dqc, dfc);
-      return (KNNQuery<O, D>) q;
-    }
+  public static <O> KNNQuery<O> getKNNQuery(AbstractMTree<O, ?, ?, ?> tree, DistanceQuery<O> distanceQuery, Object... hints) {
     return new MetricalIndexKNNQuery<>(tree, distanceQuery);
   }
 
@@ -68,23 +53,12 @@ public final class MTreeQueryUtil {
    * possible.
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    * @param tree Tree to query
    * @param distanceQuery distance query
    * @param hints Optimizer hints
    * @return Query object
    */
-  @SuppressWarnings({ "cast", "unchecked" })
-  public static <O, D extends NumberDistance<D, ?>> RangeQuery<O, D> getRangeQuery(AbstractMTree<O, D, ?, ?, ?> tree, DistanceQuery<O, D> distanceQuery, Object... hints) {
-    DistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
-    // Can we use an optimized query?
-    if (df instanceof PrimitiveDoubleDistanceFunction) {
-      PrimitiveDoubleDistanceFunction<? super O> dfc = (PrimitiveDoubleDistanceFunction<? super O>) df;
-      AbstractMTree<O, DoubleDistance, ?, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?, ?>) tree;
-      DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) distanceQuery;
-      RangeQuery<O, ?> q = new DoubleDistanceMetricalIndexRangeQuery<>(treec, dqc, dfc);
-      return (RangeQuery<O, D>) q;
-    }
+  public static <O> RangeQuery<O> getRangeQuery(AbstractMTree<O, ?, ?, ?> tree, DistanceQuery<O> distanceQuery, Object... hints) {
     return new MetricalIndexRangeQuery<>(tree, distanceQuery);
   }
 }

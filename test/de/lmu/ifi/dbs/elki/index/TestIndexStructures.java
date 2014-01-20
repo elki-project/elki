@@ -33,25 +33,24 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.DoubleOptimizedDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.DoubleOptimizedDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.DoubleDistanceMetricalIndexKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.DoubleDistanceMetricalIndexRangeQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeRangeQuery;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy;
@@ -90,7 +89,7 @@ public class TestIndexStructures implements JUnit4Test {
   // and their distances
   double[] shouldd = new double[] { 0.07510351238126374, 0.11780839322826206, 0.11882371989803064, 0.1263282354232315, 0.15347043712184602, 0.1655090505771259, 0.17208323533934652, 0.17933052146586306, 0.19319066655063877, 0.21247795391113142 };
 
-  DoubleDistance eps = new DoubleDistance(0.21247795391113142);
+  double eps = 0.21247795391113142;
 
   /**
    * Test exact query, also to validate the test is correct.
@@ -98,7 +97,7 @@ public class TestIndexStructures implements JUnit4Test {
   @Test
   public void testExact() {
     ListParameterization params = new ListParameterization();
-    testFileBasedDatabaseConnection(params, DoubleOptimizedDistanceKNNQuery.class, DoubleOptimizedDistanceRangeQuery.class);
+    testFileBasedDatabaseConnection(params, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
   }
 
   /**
@@ -109,7 +108,7 @@ public class TestIndexStructures implements JUnit4Test {
     ListParameterization metparams = new ListParameterization();
     metparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, MTreeFactory.class);
     metparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(metparams, DoubleDistanceMetricalIndexKNNQuery.class, DoubleDistanceMetricalIndexRangeQuery.class);
+    testFileBasedDatabaseConnection(metparams, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
   }
 
   /**
@@ -120,7 +119,7 @@ public class TestIndexStructures implements JUnit4Test {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
+    testFileBasedDatabaseConnection(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -157,7 +156,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
     spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
+    testFileBasedDatabaseConnection(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -186,7 +185,7 @@ public class TestIndexStructures implements JUnit4Test {
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);
     db.initialize();
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector, DoubleDistance> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
+    DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
 
     // verify data set size.
     assertTrue(rep.size() == shoulds);
@@ -194,39 +193,39 @@ public class TestIndexStructures implements JUnit4Test {
     {
       // get the 10 next neighbors
       DoubleVector dv = new DoubleVector(querypoint);
-      KNNQuery<DoubleVector, DoubleDistance> knnq = db.getKNNQuery(dist, k);
+      KNNQuery<DoubleVector> knnq = db.getKNNQuery(dist, k);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
-      KNNList<DoubleDistance> ids = knnq.getKNNForObject(dv, k);
+      KNNList ids = knnq.getKNNForObject(dv, k);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.
       int i = 0;
-      for(DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
+      for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
-        assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
+        assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue());
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
+        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 0.00001);
       }
     }
     {
       // Do a range query
       DoubleVector dv = new DoubleVector(querypoint);
-      RangeQuery<DoubleVector, DoubleDistance> rangeq = db.getRangeQuery(dist, eps);
+      RangeQuery<DoubleVector> rangeq = db.getRangeQuery(dist, eps);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
-      DistanceDBIDList<DoubleDistance> ids = rangeq.getRangeForObject(dv, eps);
+      DoubleDBIDList ids = rangeq.getRangeForObject(dv, eps);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.
       int i = 0;
-      for(DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
+      for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
-        assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
+        assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue());
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
+        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 0.00001);
       }
     }
   }

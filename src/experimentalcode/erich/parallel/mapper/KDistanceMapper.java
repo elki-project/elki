@@ -23,9 +23,9 @@ package experimentalcode.erich.parallel.mapper;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import experimentalcode.erich.parallel.MapExecutor;
+import experimentalcode.erich.parallel.SharedDouble;
 import experimentalcode.erich.parallel.SharedObject;
 
 /**
@@ -34,10 +34,8 @@ import experimentalcode.erich.parallel.SharedObject;
  * Needs the k nearest neighbors as input, for example from {@link KNNMapper}.
  * 
  * @author Erich Schubert
- * 
- * @param <D> Distance type
  */
-public class KDistanceMapper<D extends Distance<?>> implements Mapper {
+public class KDistanceMapper extends AbstractDoubleMapper {
   /**
    * K parameter
    */
@@ -56,39 +54,20 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
   /**
    * KNN query object
    */
-  SharedObject<? extends KNNList<? extends D>> input;
-
-  /**
-   * Output channel to write to
-   */
-  SharedObject<D> out;
+  SharedObject<? extends KNNList> input;
 
   /**
    * Connect the input channel.
    * 
    * @param input Input channel
    */
-  public void connectKNNInput(SharedObject<? extends KNNList<? extends D>> input) {
+  public void connectKNNInput(SharedObject<? extends KNNList> input) {
     this.input = input;
   }
 
-  /**
-   * Connect the output channel.
-   * 
-   * @param output Output channel
-   */
-  public void connectDistanceOutput(SharedObject<D> output) {
-    this.out = output;
-  }
-
   @Override
-  public Instance<D> instantiate(MapExecutor mapper) {
-    return new Instance<>(k, input.instantiate(mapper), out.instantiate(mapper));
-  }
-
-  @Override
-  public void cleanup(Mapper.Instance inst) {
-    // Nothing to do.
+  public Instance instantiate(MapExecutor mapper) {
+    return new Instance(k, input.instantiate(mapper), output.instantiate(mapper));
   }
 
   /**
@@ -96,7 +75,7 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
    * 
    * @author Erich Schubert
    */
-  public static class Instance<D extends Distance<?>> implements Mapper.Instance {
+  public static class Instance extends AbstractDoubleMapper.Instance {
     /**
      * k Parameter
      */
@@ -105,12 +84,7 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
     /**
      * kNN query
      */
-    SharedObject.Instance<? extends KNNList<? extends D>> input;
-
-    /**
-     * Output data store
-     */
-    SharedObject.Instance<D> store;
+    SharedObject.Instance<? extends KNNList> input;
 
     /**
      * Constructor.
@@ -119,16 +93,15 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
      * @param knnq KNN query
      * @param store Datastore to write to
      */
-    protected Instance(int k, SharedObject.Instance<? extends KNNList<? extends D>> input, SharedObject.Instance<D> store) {
-      super();
+    protected Instance(int k, SharedObject.Instance<? extends KNNList> input, SharedDouble.Instance store) {
+      super(store);
       this.k = k;
       this.input = input;
-      this.store = store;
     }
 
     @Override
     public void map(DBIDRef id) {
-      store.set(input.get().get(k - 1).getDistance());
+      output.set(input.get().get(k - 1).doubleValue());
     }
   }
 }

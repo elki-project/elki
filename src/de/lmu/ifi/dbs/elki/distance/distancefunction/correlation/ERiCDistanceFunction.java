@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
@@ -49,12 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @apiviz.has Instance
  */
-public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, DoubleDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, DoubleDistance> {
-  /**
-   * Constant distance returned for "do not match."
-   */
-  private static final DoubleDistance ONE_DISTANCE = new DoubleDistance(1.);
-
+public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector, FilteredLocalPCAIndex<NumberVector>> implements FilteredLocalPCABasedDistanceFunction<NumberVector, FilteredLocalPCAIndex<NumberVector>> {
   /**
    * Parameter to specify the threshold for approximate linear dependency: the
    * strong eigenvectors of q are approximately linear dependent from the strong
@@ -79,23 +73,18 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * @param delta Delta parameter
    * @param tau Tau parameter
    */
-  public ERiCDistanceFunction(IndexFactory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>> indexFactory, double delta, double tau) {
+  public ERiCDistanceFunction(IndexFactory<NumberVector, FilteredLocalPCAIndex<NumberVector>> indexFactory, double delta, double tau) {
     super(indexFactory);
     this.delta = delta;
     this.tau = tau;
   }
 
   @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
-
-  @Override
-  public <T extends NumberVector<?>> Instance<T> instantiate(Relation<T> database) {
+  public <T extends NumberVector> Instance<T> instantiate(Relation<T> database) {
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?>>) database);
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector>) database);
     return new Instance<>(database, indexinst, this, delta, tau);
   }
 
@@ -139,7 +128,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public DoubleDistance distance(NumberVector<?> v1, NumberVector<?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
+  public double distance(NumberVector v1, NumberVector v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
     if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
@@ -153,7 +142,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     }
 
     if(!approximatelyLinearDependent) {
-      return ONE_DISTANCE;
+      return 1.;
     }
 
     Vector v1_minus_v2 = v1.getColumnVector().minusEquals(v2.getColumnVector());
@@ -166,10 +155,10 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     }
 
     if(affineDistance > tau) {
-      return ONE_DISTANCE;
+      return 1.;
     }
 
-    return DoubleDistance.ZERO_DISTANCE;
+    return 0.;
   }
 
   @Override
@@ -189,7 +178,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, DoubleDistance, ERiCDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, DoubleDistance> {
+  public static class Instance<V extends NumberVector> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, ERiCDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>> {
     /**
      * Holds the value of {@link #DELTA_ID}.
      */
@@ -220,7 +209,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
      * than the pca of o2.
      */
     @Override
-    public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
+    public double distance(DBIDRef id1, DBIDRef id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
       V v1 = relation.get(id1);
@@ -236,7 +225,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<IndexFactory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>>> {
+  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<IndexFactory<NumberVector, FilteredLocalPCAIndex<NumberVector>>> {
     /**
      * Parameter to specify the threshold for approximate linear dependency: the
      * strong eigenvectors of q are approximately linear dependent from the

@@ -74,9 +74,9 @@ public class ScatterPlotFactory implements ProjectorFactory {
     for(Relation<?> rel : rels) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
-        Relation<NumberVector<?>> vrel = (Relation<NumberVector<?>>) rel;
+        Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
         final int dim = RelationUtil.dimensionality(vrel);
-        ScatterPlotProjector<NumberVector<?>> proj = new ScatterPlotProjector<>(vrel, Math.min(maxdim, dim));
+        ScatterPlotProjector<NumberVector> proj = new ScatterPlotProjector<>(vrel, Math.min(maxdim, dim));
         baseResult.getHierarchy().add(vrel, proj);
       }
     }

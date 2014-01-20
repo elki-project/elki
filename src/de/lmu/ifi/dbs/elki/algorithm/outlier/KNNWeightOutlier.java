@@ -31,16 +31,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -67,12 +64,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.has KNNQuery
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <D> the type of Distance used by this Algorithm
  */
 @Title("KNNWeight outlier detection")
 @Description("Outlier Detection based on the distances of an object to its k nearest neighbors.")
 @Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002", url = "http://dx.doi.org/10.1007/3-540-45681-3_2")
-public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -99,7 +95,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @param distanceFunction Distance function
    * @param k k Parameter
    */
-  public KNNWeightOutlier(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public KNNWeightOutlier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -108,8 +104,8 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
    * Runs the algorithm in the timed evaluation part.
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
+    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     if(LOG.isVerbose()) {
       LOG.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
@@ -124,17 +120,10 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       // compute sum of the distances to the k nearest neighbors
 
-      final KNNList<D> knn = knnQuery.getKNNForDBID(iditer, k);
+      final KNNList knn = knnQuery.getKNNForDBID(iditer, k);
       double skn = 0;
-      if(knn instanceof DoubleDistanceKNNList) {
-        for(DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) knn).iter(); neighbor.valid(); neighbor.advance()) {
-          skn += neighbor.doubleDistance();
-        }
-      }
-      else {
-        for(DistanceDBIDListIter<D> neighbor = knn.iter(); neighbor.valid(); neighbor.advance()) {
-          skn += neighbor.getDistance().doubleValue();
-        }
+      for(DoubleDBIDListIter neighbor = knn.iter(); neighbor.valid(); neighbor.advance()) {
+        skn += neighbor.doubleValue();
       }
       knnw_score.putDouble(iditer, skn);
       minmax.put(skn);
@@ -169,7 +158,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     protected int k = 0;
 
     @Override
@@ -182,7 +171,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     @Override
-    protected KNNWeightOutlier<O, D> makeInstance() {
+    protected KNNWeightOutlier<O> makeInstance() {
       return new KNNWeightOutlier<>(distanceFunction, k);
     }
   }

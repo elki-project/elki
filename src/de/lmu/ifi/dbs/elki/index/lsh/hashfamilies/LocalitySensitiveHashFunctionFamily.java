@@ -61,5 +61,5 @@ public interface LocalitySensitiveHashFunctionFamily<V> {
    * @param df Distance function.
    * @return {@code true} when appropriate.
    */
-  boolean isCompatible(DistanceFunction<?, ?> df);
+  boolean isCompatible(DistanceFunction<?> df);
 }

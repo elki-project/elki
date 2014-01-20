@@ -109,7 +109,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
    * @param relation Data Relation (1 dimensional!)
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?>> relation) {
+  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector> relation) {
     assert (RelationUtil.dimensionality(relation) == 1) : "TrimmedMean can only process one-dimensional data sets.";
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
 
@@ -202,7 +202,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // Get one dimensional attribute for analysis.
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 1));
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector>(NumberVector.class, 1));
   }
 
   /**

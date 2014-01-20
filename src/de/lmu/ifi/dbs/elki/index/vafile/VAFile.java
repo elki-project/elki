@@ -34,9 +34,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -45,8 +46,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -87,7 +86,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  */
 @Title("An approximation based data structure for similarity search")
 @Reference(authors = "Weber, R. and Blott, S.", title = "An approximation based data structure for similarity search", booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf")
-public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
+public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
   /**
    * Logging class.
    */
@@ -244,35 +243,29 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
     return "va-file";
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <D extends Distance<D>> KNNQuery<V, D> getKNNQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
+  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
     for(Object hint : hints) {
       if(hint == DatabaseQuery.HINT_BULK) {
         // FIXME: support bulk?
         return null;
       }
     }
-    DistanceFunction<? super V, ?> df = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
     if(df instanceof LPNormDistanceFunction) {
       double p = ((LPNormDistanceFunction) df).getP();
-      DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
-      KNNQuery<V, ?> dq = new VAFileKNNQuery((DistanceQuery<V, DoubleDistance>) ddq, p);
-      return (KNNQuery<V, D>) dq;
+      return new VAFileKNNQuery(distanceQuery, p);
     }
     // Not supported.
     return null;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <D extends Distance<D>> RangeQuery<V, D> getRangeQuery(DistanceQuery<V, D> distanceQuery, Object... hints) {
-    DistanceFunction<? super V, ?> df = distanceQuery.getDistanceFunction();
+  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
+    DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
     if(df instanceof LPNormDistanceFunction) {
       double p = ((LPNormDistanceFunction) df).getP();
-      DistanceQuery<V, ?> ddq = (DistanceQuery<V, ?>) distanceQuery;
-      RangeQuery<V, ?> dq = new VAFileRangeQuery((DistanceQuery<V, DoubleDistance>) ddq, p);
-      return (RangeQuery<V, D>) dq;
+      return new VAFileRangeQuery(distanceQuery, p);
     }
     // Not supported.
     return null;
@@ -283,7 +276,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
    * 
    * @author Erich Schubert
    */
-  public class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery<DoubleDistance> {
+  public class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery {
     /**
      * LP Norm p parameter.
      */
@@ -296,14 +289,13 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
      * @param p LP norm p
      */
 
-    public VAFileRangeQuery(DistanceQuery<V, DoubleDistance> distanceQuery, double p) {
+    public VAFileRangeQuery(DistanceQuery<V> distanceQuery, double p) {
       super(distanceQuery);
       this.p = p;
     }
 
     @Override
-    public DoubleDistanceDBIDPairList getRangeForObject(V query, DoubleDistance range) {
-      final double eps = range.doubleValue();
+    public DoubleDBIDList getRangeForObject(V query, double eps) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 
@@ -313,7 +305,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       // Count a VA file scan
       scans += 1;
 
-      DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
+      ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
       // Approximation step
       for(int i = 0; i < vectorApprox.size(); i++) {
         VectorApproximation va = vectorApprox.get(i);
@@ -327,7 +319,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
         // interested in the DBID only! But this needs an API change.
 
         // refine the next element
-        final double dist = refine(va.id, query).doubleValue();
+        final double dist = refine(va.id, query);
         if(dist <= eps) {
           result.add(dist, va.id);
         }
@@ -342,7 +334,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
    * 
    * @author Erich Schubert
    */
-  public class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery<DoubleDistance> {
+  public class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery {
     /**
      * LP Norm p parameter.
      */
@@ -354,13 +346,13 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
      * @param distanceQuery Distance query object
      * @param p LP norm p
      */
-    public VAFileKNNQuery(DistanceQuery<V, DoubleDistance> distanceQuery, double p) {
+    public VAFileKNNQuery(DistanceQuery<V> distanceQuery, double p) {
       super(distanceQuery);
       this.p = p;
     }
 
     @Override
-    public DoubleDistanceKNNList getKNNForObject(V query, int k) {
+    public KNNList getKNNForObject(V query, int k) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 
@@ -398,21 +390,21 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       Collections.sort(candidates);
 
       // refinement step
-      DoubleDistanceKNNHeap result = DBIDUtil.newDoubleDistanceHeap(k);
+      KNNHeap result = DBIDUtil.newHeap(k);
 
       // log.fine("candidates size " + candidates.size());
       // retrieve accurate distances
       for(DoubleObjPair<DBID> va : candidates) {
         // Stop when we are sure to have all elements
         if(result.size() >= k) {
-          double kDist = result.doubleKNNDistance();
+          double kDist = result.getKNNDistance();
           if(va.first > kDist) {
             break;
           }
         }
 
         // refine the next element
-        final double dist = refine(va.second, query).doubleValue();
+        final double dist = refine(va.second, query);
         result.insert(dist, va.second);
       }
       if(LOG.isDebuggingFinest()) {
@@ -434,7 +426,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?>> implements IndexFactory<V, VAFile<V>> {
+  public static class Factory<V extends NumberVector> implements IndexFactory<V, VAFile<V>> {
     /**
      * Number of partitions to use in each dimension.
      * 

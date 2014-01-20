@@ -23,10 +23,8 @@ package experimentalcode.erich.parallel.mapper;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import experimentalcode.erich.parallel.MapExecutor;
 import experimentalcode.erich.parallel.SharedDouble;
 import experimentalcode.erich.parallel.SharedObject;
@@ -57,14 +55,14 @@ public class KNNWeightMapper extends AbstractDoubleMapper {
   /**
    * KNN query object
    */
-  SharedObject<? extends KNNList<? extends NumberDistance<?, ?>>> input;
+  SharedObject<? extends KNNList> input;
 
   /**
    * Connect the input channel.
    * 
    * @param input Input channel
    */
-  public void connectKNNInput(SharedObject<? extends KNNList<? extends NumberDistance<?, ?>>> input) {
+  public void connectKNNInput(SharedObject<? extends KNNList> input) {
     this.input = input;
   }
 
@@ -87,7 +85,7 @@ public class KNNWeightMapper extends AbstractDoubleMapper {
     /**
      * kNN query
      */
-    SharedObject.Instance<? extends KNNList<? extends NumberDistance<?, ?>>> input;
+    SharedObject.Instance<? extends KNNList> input;
 
     /**
      * Constructor.
@@ -96,7 +94,7 @@ public class KNNWeightMapper extends AbstractDoubleMapper {
      * @param knnq KNN query
      * @param store Datastore to write to
      */
-    protected Instance(int k, SharedObject.Instance<? extends KNNList<? extends NumberDistance<?, ?>>> input, SharedDouble.Instance store) {
+    protected Instance(int k, SharedObject.Instance<? extends KNNList> input, SharedDouble.Instance store) {
       super(store);
       this.k = k;
       this.input = input;
@@ -104,19 +102,11 @@ public class KNNWeightMapper extends AbstractDoubleMapper {
 
     @Override
     public void map(DBIDRef id) {
-      final KNNList<? extends NumberDistance<?, ?>> list = input.get();
+      final KNNList list = input.get();
       int i = 0;
       double sum = 0;
-      DistanceDBIDListIter<? extends NumberDistance<?, ?>> iter = list.iter();
-      if (iter instanceof DoubleDistanceDBIDListIter) { // Double optimized
-        DoubleDistanceDBIDListIter i2 = (DoubleDistanceDBIDListIter) iter;
-        for (; i2.valid() && i < k; i2.advance(), ++i) {
-          sum += i2.doubleDistance();
-        }
-      } else { // Generic number distance
-        for (; iter.valid() && i < k; iter.advance(), ++i) {
-          sum += iter.getDistance().doubleValue();
-        }
+      for(DoubleDBIDListIter iter = list.iter(); iter.valid() && i < k; iter.advance(), ++i) {
+        sum += iter.doubleValue();
       }
       output.set(sum);
     }

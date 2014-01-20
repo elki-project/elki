@@ -29,10 +29,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -42,11 +41,11 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Elke Achtert
  */
-public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RKNNQuery<O, D> {
+public class PreprocessorRKNNQuery<O> extends AbstractDataBasedQuery<O> implements RKNNQuery<O> {
   /**
    * The last preprocessor result
    */
-  final private MaterializeKNNAndRKNNPreprocessor<O, D> preprocessor;
+  final private MaterializeKNNAndRKNNPreprocessor<O> preprocessor;
 
   /**
    * Warn only once.
@@ -59,7 +58,7 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
    * @param database Database to query
    * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorRKNNQuery(Relation<O> database, MaterializeKNNAndRKNNPreprocessor<O, D> preprocessor) {
+  public PreprocessorRKNNQuery(Relation<O> database, MaterializeKNNAndRKNNPreprocessor<O> preprocessor) {
     super(database);
     this.preprocessor = preprocessor;
   }
@@ -70,12 +69,12 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
    * @param database Database to query
    * @param preprocessor Preprocessor to use
    */
-  public PreprocessorRKNNQuery(Relation<O> database, MaterializeKNNAndRKNNPreprocessor.Factory<O, D> preprocessor) {
+  public PreprocessorRKNNQuery(Relation<O> database, MaterializeKNNAndRKNNPreprocessor.Factory<O> preprocessor) {
     this(database, preprocessor.instantiate(database));
   }
 
   @Override
-  public DistanceDBIDList<D> getRKNNForDBID(DBIDRef id, int k) {
+  public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
     if(!warned && k != preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
@@ -83,16 +82,16 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
   }
   
   @Override
-  public DistanceDBIDList<D> getRKNNForObject(O obj, int k) {
+  public DoubleDBIDList getRKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
   
   @Override
-  public List<? extends DistanceDBIDList<D>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(!warned && k != preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
-    List<DistanceDBIDList<D>> result = new ArrayList<>(ids.size());
+    List<DoubleDBIDList> result = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
       result.add(preprocessor.getRKNN(iter));
     }

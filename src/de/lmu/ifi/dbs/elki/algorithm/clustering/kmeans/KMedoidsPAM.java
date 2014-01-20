@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -75,11 +74,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf KMedoidsInitialization
  * 
  * @param <V> vector datatype
- * @param <D> distance value type
  */
 @Title("Partioning Around Medoids")
 @Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -108,7 +106,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAM(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsPAM(PrimitiveDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -126,7 +124,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     if(relation.size() <= 0) {
       return new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
     }
-    DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
     DBIDs ids = relation.getDBIDs();
     // Choose initial medoids
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, distQ));
@@ -164,8 +162,8 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
           DBIDIter olditer = medoids.iter();
           for(int j = 0; j < k; j++, olditer.advance()) {
             for(DBIDIter iter2 = clusters.get(j).iter(); iter2.valid(); iter2.advance()) {
-              double distcur = distQ.distance(iter2, olditer).doubleValue();
-              double distnew = distQ.distance(iter2, iter).doubleValue();
+              double distcur = distQ.distance(iter2, olditer);
+              double distnew = distQ.distance(iter2, iter);
               if(j == i) {
                 // Cases 1 and 2.
                 double distsec = second.doubleValue(iter2);
@@ -233,7 +231,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
    * @param distQ distance query
    * @return true when any object was reassigned
    */
-  protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore second, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V, D> distQ) {
+  protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore second, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V> distQ) {
     boolean changed = false;
 
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -243,7 +241,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
       {
         int i = 0;
         for(DBIDIter miter = means.iter(); miter.valid(); miter.advance(), i++) {
-          double dist = distQ.distance(iditer, miter).doubleValue();
+          double dist = distQ.distance(iditer, miter);
           if(dist < mindist) {
             minIndex = i;
             mindist2 = mindist;
@@ -288,7 +286,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V> {
     protected int k;
 
     protected int maxiter;
@@ -317,7 +315,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     }
 
     @Override
-    protected KMedoidsPAM<V, D> makeInstance() {
+    protected KMedoidsPAM<V> makeInstance() {
       return new KMedoidsPAM<>(distanceFunction, k, maxiter, initializer);
     }
   }

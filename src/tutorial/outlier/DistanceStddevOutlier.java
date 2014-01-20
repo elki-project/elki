@@ -11,13 +11,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -36,9 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger
    */
@@ -55,7 +53,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
    * @param distanceFunction Distance function to use
    * @param k Number of neighbors to use
    */
-  public DistanceStddevOutlier(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public DistanceStddevOutlier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -69,7 +67,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     // Get a nearest neighbor query on the relation.
-    KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
+    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
     // Output data storage
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     // Track minimum and maximum scores
@@ -77,15 +75,15 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
 
     // Iterate over all objects
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      KNNList<D> neighbors = knnq.getKNNForDBID(iter, k);
+      KNNList neighbors = knnq.getKNNForDBID(iter, k);
       // Aggregate distances
       MeanVariance mv = new MeanVariance();
-      for(DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
         // Skip the object itself. The 0 is not very informative.
         if(DBIDUtil.equal(iter, neighbor)) {
           continue;
         }
-        mv.put(neighbor.getDistance().doubleValue());
+        mv.put(neighbor.doubleValue());
       }
       // Store score
       scores.putDouble(iter, mv.getSampleStddev());
@@ -116,9 +114,8 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
    * @apiviz.exclude
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Option ID for parameterization.
      */
@@ -141,7 +138,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
     }
 
     @Override
-    protected DistanceStddevOutlier<O, D> makeInstance() {
+    protected DistanceStddevOutlier<O> makeInstance() {
       return new DistanceStddevOutlier<>(distanceFunction, k);
     }
   }

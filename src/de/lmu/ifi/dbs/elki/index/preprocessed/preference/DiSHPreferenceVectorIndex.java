@@ -42,15 +42,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
@@ -76,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> Vector type
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
-public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
+public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
   /**
    * Logger to use.
    */
@@ -101,7 +100,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
   /**
    * The epsilon value for each dimension.
    */
-  protected DoubleDistance[] epsilon;
+  protected double[] epsilon;
 
   /**
    * Threshold for minimum number of points in the neighborhood.
@@ -121,7 +120,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @param minpts MinPts value
    * @param strategy Strategy
    */
-  public DiSHPreferenceVectorIndex(Relation<V> relation, DoubleDistance[] epsilon, int minpts, Strategy strategy) {
+  public DiSHPreferenceVectorIndex(Relation<V> relation, double[] epsilon, int minpts, Strategy strategy) {
     super(relation);
     this.epsilon = epsilon;
     this.minpts = minpts;
@@ -150,13 +149,13 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     // only one epsilon value specified
     int dim = RelationUtil.dimensionality(relation);
     if(epsilon.length == 1 && dim != 1) {
-      DoubleDistance eps = epsilon[0];
-      epsilon = new DoubleDistance[dim];
+      double eps = epsilon[0];
+      epsilon = new double[dim];
       Arrays.fill(epsilon, eps);
     }
 
     // epsilons as string
-    RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(relation, dim);
+    RangeQuery<V>[] rangeQueries = initRangeQueries(relation, dim);
 
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       StringBuilder msg = new StringBuilder();
@@ -170,7 +169,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       // determine neighbors in each dimension
       ModifiableDBIDs[] allNeighbors = new ModifiableDBIDs[dim];
       for(int d = 0; d < dim; d++) {
-        DistanceDBIDList<DoubleDistance> qrList = rangeQueries[d].getRangeForDBID(it, epsilon[d]);
+        DoubleDBIDList qrList = rangeQueries[d].getRangeForDBID(it, epsilon[d]);
         allNeighbors[d] = DBIDUtil.newHashSet(qrList);
       }
 
@@ -387,9 +386,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @return the dimension selecting distancefunctions to determine the
    *         preference vectors
    */
-  private RangeQuery<V, DoubleDistance>[] initRangeQueries(Relation<V> relation, int dimensionality) {
-    Class<RangeQuery<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
-    RangeQuery<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
+  private RangeQuery<V>[] initRangeQueries(Relation<V> relation, int dimensionality) {
+    Class<RangeQuery<V>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
+    RangeQuery<V>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {
       rangeQueries[d] = relation.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<>(relation, new DimensionSelectingDistanceFunction(d)));
     }
@@ -426,11 +425,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?>> extends AbstractPreferenceVectorIndex.Factory<V, DiSHPreferenceVectorIndex<V>> {
+  public static class Factory<V extends NumberVector> extends AbstractPreferenceVectorIndex.Factory<V, DiSHPreferenceVectorIndex<V>> {
     /**
      * The default value for epsilon.
      */
-    public static final DoubleDistance DEFAULT_EPSILON = new DoubleDistance(0.001);
+    public static final double DEFAULT_EPSILON = 0.001;
 
     /**
      * A comma separated list of positive doubles specifying the maximum radius
@@ -491,7 +490,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     /**
      * The epsilon value for each dimension.
      */
-    protected DoubleDistance[] epsilon;
+    protected double[] epsilon;
 
     /**
      * Threshold for minimum number of points in the neighborhood.
@@ -510,7 +509,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
      * @param minpts Minpts
      * @param strategy Strategy
      */
-    public Factory(DoubleDistance[] epsilon, int minpts, Strategy strategy) {
+    public Factory(double[] epsilon, int minpts, Strategy strategy) {
       super();
       this.epsilon = epsilon;
       this.minpts = minpts;
@@ -538,11 +537,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
       /**
        * The epsilon value for each dimension.
        */
-      protected DoubleDistance[] epsilon;
+      protected double[] epsilon;
 
       /**
        * Threshold for minimum number of points in the neighborhood.
@@ -566,16 +565,16 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
         // parameter epsilon
         // todo: constraint auf positive werte
         List<Double> defaultEps = new ArrayList<>();
-        defaultEps.add(DEFAULT_EPSILON.doubleValue());
+        defaultEps.add(DEFAULT_EPSILON);
         final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID, true);
         epsilonP.setDefaultValue(defaultEps);
         if(config.grab(epsilonP)) {
           List<Double> eps_list = epsilonP.getValue();
-          epsilon = new DoubleDistance[eps_list.size()];
+          epsilon = new double[eps_list.size()];
 
           for(int d = 0; d < eps_list.size(); d++) {
-            epsilon[d] = new DoubleDistance(eps_list.get(d));
-            if(epsilon[d].doubleValue() < 0) {
+            epsilon[d] = eps_list.get(d);
+            if(epsilon[d] < 0) {
               config.reportError(new WrongParameterValueException(epsilonP, eps_list.toString()));
             }
           }

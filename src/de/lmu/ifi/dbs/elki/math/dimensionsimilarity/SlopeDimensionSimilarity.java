@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Robert Rödler
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
-public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
+public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**
    * Static instance.
    */
@@ -77,7 +77,7 @@ public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVecto
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     final int size = subset.size();
 
@@ -85,9 +85,9 @@ public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVecto
     // sample only.
     double[] off = new double[dim], scale = new double[dim];
     {
-      Pair<? extends NumberVector<?>, ? extends NumberVector<?>> mm = DatabaseUtil.computeMinMax(relation);
-      NumberVector<?> min = mm.first;
-      NumberVector<?> max = mm.second;
+      Pair<? extends NumberVector, ? extends NumberVector> mm = DatabaseUtil.computeMinMax(relation);
+      NumberVector min = mm.first;
+      NumberVector max = mm.second;
       for (int d = 0; d < dim; d++) {
         off[d] = min.doubleValue(matrix.dim(d));
         final double m = max.doubleValue(matrix.dim(d));
@@ -102,7 +102,7 @@ public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVecto
     // Scratch buffer
     double[] vec = new double[dim];
     for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
-      final NumberVector<?> obj = relation.get(id);
+      final NumberVector obj = relation.get(id);
       // Map values to 0..1
       for (int d = 0; d < dim; d++) {
         vec[d] = (obj.doubleValue(matrix.dim(d)) - off[d]) * scale[d];

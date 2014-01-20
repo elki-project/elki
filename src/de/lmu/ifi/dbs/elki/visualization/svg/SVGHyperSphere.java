@@ -28,7 +28,6 @@ import java.util.BitSet;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 
 /**
@@ -56,7 +55,7 @@ public class SVGHyperSphere {
    * @param radius radius
    * @return path element
    */
-  public static Element drawManhattan(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, double radius) {
+  public static Element drawManhattan(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius) {
     final double[] v_mid = mid.getColumnVector().getArrayRef(); // a copy
     final BitSet dims = proj.getVisibleDimensions2D();
 
@@ -101,7 +100,7 @@ public class SVGHyperSphere {
    * @param radius radius
    * @return path element
    */
-  public static Element drawEuclidean(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, double radius) {
+  public static Element drawEuclidean(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius) {
     double[] v_mid = mid.getColumnVector().getArrayRef(); // a copy
     BitSet dims = proj.getVisibleDimensions2D();
 
@@ -152,7 +151,7 @@ public class SVGHyperSphere {
    * @param p L_p value
    * @return path element
    */
-  public static Element drawLp(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, double radius, double p) {
+  public static Element drawLp(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius, double p) {
     final double[] v_mid = mid.getColumnVector().getArrayRef();
     final BitSet dims = proj.getVisibleDimensions2D();
 
@@ -260,15 +259,13 @@ public class SVGHyperSphere {
   /**
    * Wireframe "cross" hypersphere
    * 
-   * @param <D> radius
    * @param svgp SVG Plot
    * @param proj Visualization projection
    * @param mid mean vector
    * @param rad radius
    * @return path element
    */
-  public static <D extends NumberDistance<?, ?>> Element drawCross(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, D rad) {
-    final double radius = rad.doubleValue();
+  public static Element drawCross(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius) {
     final double[] v_mid = mid.getColumnVector().getArrayRef();
     final BitSet dims = proj.getVisibleDimensions2D();
 

@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -41,22 +40,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.excludeSubtypes
  * 
  * @param <O> the type of objects handled by this Algorithm
- * @param <D> the type of Distance used by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
-public abstract class AbstractDistanceBasedAlgorithm<O, D extends Distance<D>, R extends Result> extends AbstractAlgorithm<R> implements DistanceBasedAlgorithm<O, D> {
+public abstract class AbstractDistanceBasedAlgorithm<O, R extends Result> extends AbstractAlgorithm<R> implements DistanceBasedAlgorithm<O> {
   /**
    * Holds the instance of the distance function specified by
    * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}.
    */
-  private DistanceFunction<? super O, D> distanceFunction;
+  private DistanceFunction<? super O> distanceFunction;
 
   /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
    */
-  protected AbstractDistanceBasedAlgorithm(DistanceFunction<? super O, D> distanceFunction) {
+  protected AbstractDistanceBasedAlgorithm(DistanceFunction<? super O> distanceFunction) {
     super();
     this.distanceFunction = distanceFunction;
   }
@@ -67,7 +65,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O, D extends Distance<D>, R
    * @return the distanceFunction
    */
   @Override
-  public DistanceFunction<? super O, D> getDistanceFunction() {
+  public DistanceFunction<? super O> getDistanceFunction() {
     return distanceFunction;
   }
 
@@ -78,16 +76,16 @@ public abstract class AbstractDistanceBasedAlgorithm<O, D extends Distance<D>, R
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * The distance function to use.
      */
-    protected DistanceFunction<O, D> distanceFunction;
+    protected DistanceFunction<O> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

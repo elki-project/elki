@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @param <V> Vector type
  */
-public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> extends AbstractVectorStreamConversionFilter<V, V> {
+public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> {
   /**
    * Keeps the selection of the subspace to project onto.
    */

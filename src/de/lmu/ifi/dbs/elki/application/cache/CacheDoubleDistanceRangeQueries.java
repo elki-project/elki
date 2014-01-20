@@ -33,16 +33,13 @@ import java.nio.channels.FileLock;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -78,7 +75,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O, DoubleDistance> distance;
+  private DistanceFunction<O> distance;
 
   /**
    * Query radius.
@@ -106,7 +103,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
    * @param radius Query radius
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceRangeQueries(InputStep input, DistanceFunction<O, DoubleDistance> distance, double radius, File out) {
+  public CacheDoubleDistanceRangeQueries(InputStep input, DistanceFunction<O> distance, double radius, File out) {
     super();
     this.input = input;
     this.distance = distance;
@@ -118,11 +115,10 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
   public void run() {
     Database database = input.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O, DoubleDistance> distanceQuery = database.getDistanceQuery(relation, distance);
-    DoubleDistance rad = new DoubleDistance(radius);
-    RangeQuery<O, DoubleDistance> rangeQ = database.getRangeQuery(distanceQuery, rad, DatabaseQuery.HINT_HEAVY_USE);
+    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
+    RangeQuery<O> rangeQ = database.getRangeQuery(distanceQuery, radius, DatabaseQuery.HINT_HEAVY_USE);
 
-    LOG.verbose("Performing range queries with radius " + rad);
+    LOG.verbose("Performing range queries with radius " + radius);
 
     // open file.
     try (RandomAccessFile file = new RandomAccessFile(out, "rw");
@@ -139,16 +135,16 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
 
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing range queries", relation.size(), LOG) : null;
 
-      for (DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        final DistanceDBIDList<DoubleDistance> nn = rangeQ.getRangeForDBID(it, rad);
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        final DoubleDBIDList nn = rangeQ.getRangeForDBID(it, radius);
         final int nnsize = nn.size();
 
         // Grow the buffer when needed:
-        if (nnsize * 12 + 10 > bufsize) {
-          while (nnsize * 12 + 10 > bufsize) {
+        if(nnsize * 12 + 10 > bufsize) {
+          while(nnsize * 12 + 10 > bufsize) {
             bufsize <<= 1;
           }
-          LOG.verbose("Resizing buffer to "+bufsize+" to store "+nnsize+" results:");
+          LOG.verbose("Resizing buffer to " + bufsize + " to store " + nnsize + " results:");
           buffer = ByteBuffer.allocateDirect(bufsize);
         }
 
@@ -156,32 +152,26 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
         ByteArrayUtil.writeUnsignedVarint(buffer, it.internalGetIndex());
         ByteArrayUtil.writeUnsignedVarint(buffer, nnsize);
         int c = 0;
-        if (nn instanceof DoubleDistanceDBIDList) {
-          for (DoubleDistanceDBIDListIter ni = ((DoubleDistanceDBIDList) nn).iter(); ni.valid(); ni.advance(), c++) {
-            ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
-            buffer.putDouble(ni.doubleDistance());
-          }
-        } else {
-          for (DistanceDBIDListIter<DoubleDistance> ni = nn.iter(); ni.valid(); ni.advance(), c++) {
-            ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
-            buffer.putDouble(ni.getDistance().doubleValue());
-          }
+        for(DoubleDBIDListIter ni = nn.iter(); ni.valid(); ni.advance(), c++) {
+          ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
+          buffer.putDouble(ni.doubleValue());
         }
-        if (c != nn.size()) {
+        if(c != nn.size()) {
           throw new AbortException("Sizes did not agree. Cache is invalid.");
         }
 
         buffer.flip();
         channel.write(buffer);
-        if (prog != null) {
+        if(prog != null) {
           prog.incrementProcessed(LOG);
         }
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.ensureCompleted(LOG);
       }
       lock.release();
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       LOG.exception(e);
     }
     // FIXME: close!
@@ -227,7 +217,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<O, DoubleDistance> distance = null;
+    private DistanceFunction<O> distance = null;
 
     /**
      * Number of neighbors to precompute.
@@ -244,18 +234,18 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
       super.makeOptions(config);
       input = config.tryInstantiate(InputStep.class);
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<O, DoubleDistance>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
-      if (config.grab(dpar)) {
+      final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
       final DoubleParameter kpar = new DoubleParameter(RADIUS_ID);
       kpar.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if (config.grab(kpar)) {
+      if(config.grab(kpar)) {
         radius = kpar.doubleValue();
       }
       // Output file parameter
       final FileParameter cpar = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
-      if (config.grab(cpar)) {
+      if(config.grab(cpar)) {
         out = cpar.getValue();
       }
     }

@@ -66,9 +66,9 @@ public class HistogramFactory implements ProjectorFactory {
     for(Relation<?> rel : rels) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
-        Relation<NumberVector<?>> vrel = (Relation<NumberVector<?>>) rel;
+        Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
         final int dim = RelationUtil.dimensionality(vrel);
-        HistogramProjector<NumberVector<?>> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
+        HistogramProjector<NumberVector> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
         baseResult.getHierarchy().add(vrel, proj);
       }
     }

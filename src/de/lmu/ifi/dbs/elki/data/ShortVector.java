@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class ShortVector extends AbstractNumberVector<Short> {
+public class ShortVector extends AbstractNumberVector {
   /**
    * Static instance (object factory).
    */
@@ -165,13 +165,13 @@ public class ShortVector extends AbstractNumberVector<Short> {
    * 
    * @apiviz.has ShortVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<ShortVector, Short> {
+  public static class Factory extends AbstractNumberVector.Factory<ShortVector> {
     @Override
-    public <A> ShortVector newFeatureVector(A array, ArrayAdapter<Short, A> adapter) {
+    public <A> ShortVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       short[] values = new short[dim];
       for (int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i);
+        values[i] = adapter.get(array, i).shortValue();
       }
       return new ShortVector(values, true);
     }

@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -62,7 +61,7 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
     ListParameterization params = new ListParameterization();
     params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.04);
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
-    DBSCAN<DoubleVector, DoubleDistance> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
+    DBSCAN<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
     testParameterizationOk(params);
 
     // run DBSCAN on database
@@ -86,7 +85,7 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
     ListParameterization params = new ListParameterization();
     params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 11.5);
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 120);
-    DBSCAN<DoubleVector, DoubleDistance> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
+    DBSCAN<DoubleVector> dbscan = ClassGenericsUtil.parameterizeOrAbort(DBSCAN.class, params);
     testParameterizationOk(params);
 
     // run DBSCAN on database

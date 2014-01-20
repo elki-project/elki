@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Robert Rödler
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
-public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
+public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**
    * Monte-Carlo iterations
    */
@@ -111,7 +111,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final Random random = rnd.getSingleThreadedRandom();
     final int dim = matrix.size();
 
@@ -138,7 +138,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
    * @param matrix Matrix (for dimension subset)
    * @return List of sorted objects
    */
-  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation, DBIDs ids, DimensionSimilarityMatrix matrix) {
+  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector> relation, DBIDs ids, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<>(dim);
 
@@ -165,7 +165,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
    * @param random Random generator
    * @return Contrast
    */
-  private double calculateContrast(Relation<? extends NumberVector<?>> relation, DBIDs subset, ArrayDBIDs subspaceIndex1, ArrayDBIDs subspaceIndex2, int dim1, int dim2, Random random) {
+  private double calculateContrast(Relation<? extends NumberVector> relation, DBIDs subset, ArrayDBIDs subspaceIndex1, ArrayDBIDs subspaceIndex2, int dim1, int dim2, Random random) {
     final double alpha1 = Math.sqrt(alpha);
     final int windowsize = (int) (relation.size() * alpha1);
 

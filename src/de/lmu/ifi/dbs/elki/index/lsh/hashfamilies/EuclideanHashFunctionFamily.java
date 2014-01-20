@@ -54,7 +54,7 @@ public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
   }
 
   @Override
-  public boolean isCompatible(DistanceFunction<?, ?> df) {
+  public boolean isCompatible(DistanceFunction<?> df) {
     return EuclideanDistanceFunction.class.isInstance(df);
   }
 

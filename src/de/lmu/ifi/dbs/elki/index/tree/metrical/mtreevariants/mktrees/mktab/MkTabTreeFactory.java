@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnifiedFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -40,26 +39,25 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @apiviz.uses MkTabTreeIndex oneway - - «create»
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class MkTabTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTreeNode<O, D>, MkTabEntry, MkTabTreeIndex<O, D>, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry>> {
+public class MkTabTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkTabTreeNode<O>, MkTabEntry, MkTabTreeIndex<O>, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry>> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public MkTabTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry> settings) {
+  public MkTabTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry> settings) {
     super(pageFileFactory, settings);
   }
 
   @Override
-  public MkTabTreeIndex<O, D> instantiate(Relation<O> relation) {
-    PageFile<MkTabTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
+  public MkTabTreeIndex<O> instantiate(Relation<O> relation) {
+    PageFile<MkTabTreeNode<O>> pagefile = makePageFile(getNodeClass());
     return new MkTabTreeIndex<>(relation, pagefile, settings);
   }
 
-  protected Class<MkTabTreeNode<O, D>> getNodeClass() {
+  protected Class<MkTabTreeNode<O>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkTabTreeNode.class);
   }
 
@@ -70,14 +68,14 @@ public class MkTabTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkTabTreeNode<O, D>, MkTabEntry, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry>> {
+  public static class Parameterizer<O> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, MkTabTreeNode<O>, MkTabEntry, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry>> {
     @Override
-    protected MkTabTreeFactory<O, D> makeInstance() {
+    protected MkTabTreeFactory<O> makeInstance() {
       return new MkTabTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry> makeSettings() {
+    protected MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry> makeSettings() {
       return new MkTreeSettings<>();
     }
   }

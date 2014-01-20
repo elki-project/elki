@@ -24,17 +24,15 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Base interface for the common case of distance functions defined on numerical vectors.
+ * Base interface for the common case of distance functions defined on numerical
+ * vectors.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- *
- * @param <D> Distance type
  */
-public interface NumberVectorDistanceFunction<D extends Distance<D>> extends PrimitiveDistanceFunction<NumberVector<?>, D> {
+public interface NumberVectorDistanceFunction extends PrimitiveDistanceFunction<NumberVector> {
   // Empty - marker interface
 }

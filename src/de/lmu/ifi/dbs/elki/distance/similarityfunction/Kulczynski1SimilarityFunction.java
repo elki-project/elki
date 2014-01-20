@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
-public class Kulczynski1SimilarityFunction extends AbstractVectorDoubleSimilarityFunction {
+public class Kulczynski1SimilarityFunction extends AbstractVectorSimilarityFunction {
   /**
    * Static instance.
    */
@@ -57,8 +57,8 @@ public class Kulczynski1SimilarityFunction extends AbstractVectorDoubleSimilarit
   }
 
   @Override
-  public double doubleSimilarity(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(v1, v2);
+  public double similarity(NumberVector v1, NumberVector v2) {
+    final int dim = AbstractNumberVectorDistanceFunction.dimensionality(v1, v2);
     double sumdiff = 0., summin = 0.;
     for (int i = 0; i < dim; i++) {
       double xi = v1.doubleValue(i), yi = v2.doubleValue(i);

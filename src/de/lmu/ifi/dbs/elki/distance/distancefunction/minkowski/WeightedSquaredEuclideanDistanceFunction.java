@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
 
 /**
  * Provides the squared Euclidean distance for FeatureVectors. This results in
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistan
  * 
  * @author Arthur Zimek
  */
-public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialDoubleDistanceNorm {
+public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
   /**
    * Weight array
    */
@@ -58,7 +58,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialDou
    *         double value
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2, weights.length);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
@@ -69,7 +69,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialDou
   }
 
   @Override
-  public double doubleNorm(NumberVector<?> obj) {
+  public double norm(NumberVector obj) {
     final int dim = obj.getDimensionality();
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
@@ -80,11 +80,11 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialDou
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Optimization for the simplest case
     if (mbr1 instanceof NumberVector) {
       if (mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+        return distance((NumberVector) mbr1, (NumberVector) mbr2);
       }
     }
     // TODO: optimize for more simpler cases: obj vs. rect?

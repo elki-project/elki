@@ -180,7 +180,7 @@ public class BubbleVisualization extends AbstractVisFactory {
         for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
           final double radius = getScaledForId(objId);
           if(radius > 0.01 && !Double.isInfinite(radius)) {
-            final NumberVector<?> vec = rel.get(objId);
+            final NumberVector vec = rel.get(objId);
             if(vec != null) {
               double[] v = proj.fastProjectDataToRenderSpace(vec);
               if(v[0] != v[0] || v[1] != v[1]) {
@@ -198,7 +198,7 @@ public class BubbleVisualization extends AbstractVisFactory {
         for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
           final double radius = getScaledForId(objId);
           if(radius > 0.01 && !Double.isInfinite(radius)) {
-            final NumberVector<?> vec = rel.get(objId);
+            final NumberVector vec = rel.get(objId);
             if(vec != null) {
               double[] v = proj.fastProjectDataToRenderSpace(vec);
               if(v[0] != v[0] || v[1] != v[1]) {

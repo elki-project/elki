@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
@@ -44,9 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.uses MkAppTreeIndex oneway - - «create»
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkAppTreeNode<O, D>, MkAppEntry, MkAppTreeIndex<O, D>, MkAppTreeSettings<O, D>> {
+public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeIndex<O>, MkAppTreeSettings<O>> {
   /**
    * Parameter for nolog
    */
@@ -68,17 +66,17 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public MkAppTreeFactory(PageFileFactory<?> pageFileFactory, MkAppTreeSettings<O, D> settings) {
+  public MkAppTreeFactory(PageFileFactory<?> pageFileFactory, MkAppTreeSettings<O> settings) {
     super(pageFileFactory, settings);
   }
 
   @Override
-  public MkAppTreeIndex<O, D> instantiate(Relation<O> relation) {
-    PageFile<MkAppTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
+  public MkAppTreeIndex<O> instantiate(Relation<O> relation) {
+    PageFile<MkAppTreeNode<O>> pagefile = makePageFile(getNodeClass());
     return new MkAppTreeIndex<>(relation, pagefile, settings);
   }
 
-  protected Class<MkAppTreeNode<O, D>> getNodeClass() {
+  protected Class<MkAppTreeNode<O>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkAppTreeNode.class);
   }
 
@@ -88,8 +86,10 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkAppTreeNode<O, D>, MkAppEntry, MkAppTreeSettings<O, D>> {
+  public static class Parameterizer<O> extends AbstractMTreeFactory.Parameterizer<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeSettings<O>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -112,12 +112,12 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     @Override
-    protected MkAppTreeFactory<O, D> makeInstance() {
+    protected MkAppTreeFactory<O> makeInstance() {
       return new MkAppTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected MkAppTreeSettings<O, D> makeSettings() {
+    protected MkAppTreeSettings<O> makeSettings() {
       return new MkAppTreeSettings<>();
     }
   }

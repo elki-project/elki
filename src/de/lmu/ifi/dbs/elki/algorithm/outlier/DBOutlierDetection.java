@@ -29,13 +29,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -63,12 +62,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @apiviz.has KNNQuery
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <D> the type of Distance used by this Algorithm
  */
 @Title("DBOD: Distance Based Outlier Detection")
 @Description("If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier")
 @Reference(authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
-public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutlier<O, D> {
+public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   /**
    * The logger for this class.
    */
@@ -92,15 +90,15 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
    * @param d distance query radius
    * @param p percentage parameter
    */
-  public DBOutlierDetection(DistanceFunction<O, D> distanceFunction, D d, double p) {
+  public DBOutlierDetection(DistanceFunction<O> distanceFunction, double d, double p) {
     super(distanceFunction, d);
     this.p = p;
   }
 
   @Override
-  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, D neighborhoodSize) {
-    DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double neighborhoodSize) {
+    DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY);
 
     // maximum number of objects in the D-neighborhood of an outlier
     int m = (int) ((distFunc.getRelation().size()) * (1 - p));
@@ -117,11 +115,11 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     if(knnQuery != null) {
       for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
         counter++;
-        final KNNList<D> knns = knnQuery.getKNNForDBID(iditer, m);
+        final KNNList knns = knnQuery.getKNNForDBID(iditer, m);
         if(LOG.isDebugging()) {
           LOG.debugFine("distance to mth nearest neighbour" + knns.toString());
         }
-        if(knns.get(Math.min(m, knns.size()) - 1).getDistance().compareTo(neighborhoodSize) <= 0) {
+        if(knns.get(Math.min(m, knns.size()) - 1).doubleValue() <= neighborhoodSize) {
           // flag as outlier
           scores.putDouble(iditer, 1.0);
         }
@@ -139,9 +137,9 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
       for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
         counter++;
         int count = 0;
-        for (DBIDIter iterator = distFunc.getRelation().iterDBIDs(); iterator.valid() && count < m; iterator.advance()) {
-          D currentDistance = distFunc.distance(iditer, iterator);
-          if(currentDistance.compareTo(neighborhoodSize) <= 0) {
+        for(DBIDIter iterator = distFunc.getRelation().iterDBIDs(); iterator.valid() && count < m; iterator.advance()) {
+          double currentDistance = distFunc.distance(iditer, iterator);
+          if(currentDistance <= neighborhoodSize) {
             count++;
           }
         }
@@ -170,7 +168,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
     protected double p = 0.0;
 
     @Override
@@ -183,7 +181,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     }
 
     @Override
-    protected DBOutlierDetection<O, D> makeInstance() {
+    protected DBOutlierDetection<O> makeInstance() {
       return new DBOutlierDetection<>(distanceFunction, d, p);
     }
   }

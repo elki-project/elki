@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -58,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")
 @Description("PreDeCon computes clusters of subspace preference weighted connected points. " + "The algorithm searches for local subgroups of a set of feature vectors having " + "a low variance along one or more (but not all) attributes.")
 @Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
-public class PreDeCon<V extends NumberVector<?>> extends AbstractProjectedDBSCAN<Clustering<Model>, V> {
+public class PreDeCon<V extends NumberVector> extends AbstractProjectedDBSCAN<Clustering<Model>, V> {
   /**
    * The logger for this class.
    */
@@ -72,7 +71,7 @@ public class PreDeCon<V extends NumberVector<?>> extends AbstractProjectedDBSCAN
    * @param distanceFunction outer distance function
    * @param lambda Lambda value
    */
-  public PreDeCon(DoubleDistance epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
+  public PreDeCon(double epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
     super(epsilon, minpts, distanceFunction, lambda);
   }
 
@@ -98,12 +97,12 @@ public class PreDeCon<V extends NumberVector<?>> extends AbstractProjectedDBSCAN
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractProjectedDBSCAN.Parameterizer<V, DoubleDistance> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractProjectedDBSCAN.Parameterizer<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configInnerDistance(config);
-      configEpsilon(config, innerdist);
+      configEpsilon(config);
       configMinPts(config);
       configOuterDistance(config, epsilon, minpts, PreDeConSubspaceIndex.Factory.class, innerdist);
       configLambda(config);

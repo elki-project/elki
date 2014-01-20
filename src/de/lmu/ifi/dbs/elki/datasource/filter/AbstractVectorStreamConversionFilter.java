@@ -33,11 +33,11 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * @param <I> Input type
  * @param <O> Output vector type
  */
-public abstract class AbstractVectorStreamConversionFilter<I, O extends NumberVector<?>> extends AbstractStreamConversionFilter<I, O> {
+public abstract class AbstractVectorStreamConversionFilter<I, O extends NumberVector> extends AbstractStreamConversionFilter<I, O> {
   /**
    * Number vector factory.
    */
-  protected NumberVector.Factory<O, ?> factory;
+  protected NumberVector.Factory<O>  factory;
 
   /**
    * Initialize factory from a data type.

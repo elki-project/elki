@@ -41,12 +41,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -84,11 +83,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * @param <V> Vector type
- * @param <D> Distance type
  */
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
@@ -105,7 +103,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
    * @param distanceFunction Distance function
    * @param numbins Number of bins
    */
-  public EvaluateRankingQuality(DistanceFunction<? super V, D> distanceFunction, int numbins) {
+  public EvaluateRankingQuality(DistanceFunction<? super V> distanceFunction, int numbins) {
     super(distanceFunction);
     this.numbins = numbins;
   }
@@ -118,8 +116,8 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
   @Override
   public HistogramResult<DoubleVector> run(Database database) {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
-    final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, relation.size());
+    final DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    final KNNQuery<V> knnQuery = database.getKNNQuery(distQuery, relation.size());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");
@@ -156,7 +154,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
       Collections.sort(cmem);
 
       for(int ind = 0; ind < cmem.size(); ind++) {
-        KNNList<D> knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
+        KNNList knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         hist.put(((double) ind) / clus.size(), result);
@@ -196,8 +194,10 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Number of bins to use.
      */
@@ -214,7 +214,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
     }
 
     @Override
-    protected EvaluateRankingQuality<V, D> makeInstance() {
+    protected EvaluateRankingQuality<V> makeInstance() {
       return new EvaluateRankingQuality<>(distanceFunction, numbins);
     }
   }

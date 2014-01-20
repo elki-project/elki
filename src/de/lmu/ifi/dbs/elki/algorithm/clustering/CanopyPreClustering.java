@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -38,14 +39,13 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Canopy pre-clustering is a simple preprocessing step for clustering.
@@ -62,10 +62,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  * @author Erich Schubert
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
 @Reference(authors = "A. McCallum, K. Nigam, L.H. Ungar", title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145%2F347090.347123")
-public class CanopyPreClustering<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<O, D, Clustering<ClusterModel>> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
+public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<ClusterModel>> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
   /**
    * Class logger.
    */
@@ -74,12 +73,12 @@ public class CanopyPreClustering<O, D extends Distance<D>> extends AbstractDista
   /**
    * Threshold for inclusion
    */
-  private D t1;
+  private double t1;
 
   /**
    * Threshold for removal
    */
-  private D t2;
+  private double t2;
 
   /**
    * Constructor.
@@ -88,7 +87,7 @@ public class CanopyPreClustering<O, D extends Distance<D>> extends AbstractDista
    * @param t1 Inclusion threshold
    * @param t2 Exclusion threshold
    */
-  public CanopyPreClustering(DistanceFunction<? super O, D> distanceFunction, D t1, D t2) {
+  public CanopyPreClustering(DistanceFunction<? super O> distanceFunction, double t1, double t2) {
     super(distanceFunction);
     this.t1 = t1;
     this.t2 = t2;
@@ -101,12 +100,12 @@ public class CanopyPreClustering<O, D extends Distance<D>> extends AbstractDista
    * @param relation Relation to process
    */
   public Clustering<ClusterModel> run(Database database, Relation<O> relation) {
-    DistanceQuery<O, D> dq = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
     ModifiableDBIDs ids = DBIDUtil.newHashSet(relation.getDBIDs());
     ArrayList<Cluster<ClusterModel>> clusters = new ArrayList<>();
     final int size = relation.size();
 
-    if(t1.compareTo(t2) <= 0) {
+    if(t1 <= t2) {
       LOG.warning(Parameterizer.T1_ID.getName() + " must be larger than " + Parameterizer.T2_ID.getName());
     }
 
@@ -126,13 +125,13 @@ public class CanopyPreClustering<O, D extends Distance<D>> extends AbstractDista
 
       // Compare to remaining objects:
       for(; iter.valid(); iter.advance()) {
-        D dist = dq.distance(first, iter);
+        double dist = dq.distance(first, iter);
         // Inclusion threshold:
-        if(t1.compareTo(dist) >= 0) {
+        if(dist <= t1) {
           cids.add(iter);
         }
         // Removal threshold:
-        if(t2.compareTo(dist) >= 0) {
+        if(dist <= t2) {
           iter.remove();
         }
       }
@@ -169,9 +168,8 @@ public class CanopyPreClustering<O, D extends Distance<D>> extends AbstractDista
    * @apiviz.exclude
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter for the inclusion threshold of canopy clustering.
      * 
@@ -201,34 +199,34 @@ public class CanopyPreClustering<O, D extends Distance<D>> extends AbstractDista
     /**
      * Threshold for inclusion
      */
-    private D t1;
+    private double t1;
 
     /**
      * Threshold for removal
      */
-    private D t2;
+    private double t2;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DistanceParameter<D> t1P = new DistanceParameter<>(T1_ID, distanceFunction);
+      DoubleParameter t1P = new DoubleParameter(T1_ID);
       if(config.grab(t1P)) {
         t1 = t1P.getValue();
       }
 
-      DistanceParameter<D> t2P = new DistanceParameter<>(T2_ID, distanceFunction);
+      DoubleParameter t2P = new DoubleParameter(T2_ID);
       // TODO: add distance constraint t1 > t2
       if(config.grab(t2P)) {
         t2 = t2P.getValue();
-        if(t1.compareTo(t2) <= 0) {
+        if(t1 <= t2) {
           config.reportError(new WrongParameterValueException(t2P, T1_ID.getName() + " must be larger than " + T2_ID.getName()));
         }
       }
     }
 
     @Override
-    protected CanopyPreClustering<O, D> makeInstance() {
+    protected CanopyPreClustering<O> makeInstance() {
       return new CanopyPreClustering<>(distanceFunction, t1, t2);
     }
 

@@ -55,7 +55,7 @@ public class ManhattanHashFunctionFamily extends AbstractHashFunctionFamily {
   }
 
   @Override
-  public boolean isCompatible(DistanceFunction<?, ?> df) {
+  public boolean isCompatible(DistanceFunction<?> df) {
     // TODO: also allow HistogramIntersectionDistance?
     return ManhattanDistanceFunction.class.isInstance(df);
   }

@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * 
  * @param <O> Object type
  */
-public class DeLiCluTreeFactory<O extends NumberVector<?>> extends AbstractRStarTreeFactory<O, DeLiCluNode, DeLiCluEntry, DeLiCluTreeIndex<O>, AbstractRTreeSettings> {
+public class DeLiCluTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, DeLiCluNode, DeLiCluEntry, DeLiCluTreeIndex<O>, AbstractRTreeSettings> {
   /**
    * Constructor.
    * 
@@ -69,7 +69,7 @@ public class DeLiCluTreeFactory<O extends NumberVector<?>> extends AbstractRStar
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
     @Override
     protected DeLiCluTreeFactory<O> makeInstance() {
       return new DeLiCluTreeFactory<>(pageFileFactory, settings);

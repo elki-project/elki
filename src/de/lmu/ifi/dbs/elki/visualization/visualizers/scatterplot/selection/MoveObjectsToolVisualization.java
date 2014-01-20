@@ -160,7 +160,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
     private void updateDB(DBIDs dbids, Vector movingVector) {
       throw new AbortException("FIXME: INCOMPLETE TRANSITION");
       /*
-       * NumberVector<?> nv = null; database.accumulateDataStoreEvents();
+       * NumberVector nv = null; database.accumulateDataStoreEvents();
        * Representation<DatabaseObjectMetadata> mrep =
        * database.getMetadataQuery(); for(DBID dbid : dbids) { NV obj =
        * database.get(dbid); // Copy metadata to keep DatabaseObjectMetadata

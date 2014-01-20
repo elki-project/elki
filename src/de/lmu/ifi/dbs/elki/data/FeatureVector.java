@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  * 
- * @param <D> Data type
  */
 public interface FeatureVector<D> {
   /**
@@ -69,7 +68,6 @@ public interface FeatureVector<D> {
    * @author Erich Schubert
    *
    * @param <V> Vector type
-   * @param <D> Data type of vector
    */
   interface Factory<V extends FeatureVector<? extends D>, D> extends Parameterizable {
     /**
@@ -80,7 +78,7 @@ public interface FeatureVector<D> {
      * @param <A> Array type
      * @return a new FeatureVector of V for the given values
      */
-    <A> V newFeatureVector(A array, ArrayAdapter<D, A> adapter);
+    <A> V newFeatureVector(A array, ArrayAdapter<? extends D, A> adapter);
 
     /**
      * Get the default serializer for this type.

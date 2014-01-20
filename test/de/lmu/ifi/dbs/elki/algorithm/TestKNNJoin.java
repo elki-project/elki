@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
@@ -90,18 +89,18 @@ public class TestKNNJoin implements JUnit4Test {
     inputparams.failOnErrors();
 
     db.initialize();
-    Relation<NumberVector<?>> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     // verify data set size.
     org.junit.Assert.assertEquals("Database size does not match.", shoulds, relation.size());
 
     // Euclidean
     {
-      DistanceQuery<NumberVector<?>, DoubleDistance> dq = db.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
-      KNNQuery<NumberVector<?>, DoubleDistance> knnq = QueryUtil.getLinearScanKNNQuery(dq);
+      DistanceQuery<NumberVector> dq = db.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
+      KNNQuery<NumberVector> knnq = QueryUtil.getLinearScanKNNQuery(dq);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        KNNList<DoubleDistance> knnlist = knnq.getKNNForDBID(iditer, 2);
+        KNNList knnlist = knnq.getKNNForDBID(iditer, 2);
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Euclidean mean 2NN", mean2nnEuclid, meansize.getMean(), 0.00001);
@@ -109,12 +108,12 @@ public class TestKNNJoin implements JUnit4Test {
     }
     // Manhattan
     {
-      DistanceQuery<NumberVector<?>, DoubleDistance> dq = db.getDistanceQuery(relation, ManhattanDistanceFunction.STATIC);
-      KNNQuery<NumberVector<?>, DoubleDistance> knnq = QueryUtil.getLinearScanKNNQuery(dq);
+      DistanceQuery<NumberVector> dq = db.getDistanceQuery(relation, ManhattanDistanceFunction.STATIC);
+      KNNQuery<NumberVector> knnq = QueryUtil.getLinearScanKNNQuery(dq);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        KNNList<DoubleDistance> knnlist = knnq.getKNNForDBID(iditer, 2);
+        KNNList knnlist = knnq.getKNNForDBID(iditer, 2);
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Manhattan mean 2NN", mean2nnManhattan, meansize.getMean(), 0.00001);
@@ -181,18 +180,18 @@ public class TestKNNJoin implements JUnit4Test {
     inputparams.failOnErrors();
 
     db.initialize();
-    Relation<NumberVector<?>> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     // verify data set size.
     org.junit.Assert.assertEquals("Database size does not match.", shoulds, relation.size());
 
     // Euclidean
     {
-      KNNJoin<DoubleVector, DoubleDistance, ?, ?> knnjoin = new KNNJoin<DoubleVector, DoubleDistance, RStarTreeNode, SpatialEntry>(EuclideanDistanceFunction.STATIC, 2);
-      DataStore<KNNList<DoubleDistance>> result = knnjoin.run(db);
+      KNNJoin<DoubleVector, ?, ?> knnjoin = new KNNJoin<DoubleVector, RStarTreeNode, SpatialEntry>(EuclideanDistanceFunction.STATIC, 2);
+      DataStore<KNNList> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
-        KNNList<DoubleDistance> knnlist = result.get(id);
+        KNNList knnlist = result.get(id);
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Euclidean mean 2NN set size", mean2nnEuclid, meansize.getMean(), 0.00001);
@@ -200,12 +199,12 @@ public class TestKNNJoin implements JUnit4Test {
     }
     // Manhattan
     {
-      KNNJoin<DoubleVector, DoubleDistance, ?, ?> knnjoin = new KNNJoin<DoubleVector, DoubleDistance, RStarTreeNode, SpatialEntry>(ManhattanDistanceFunction.STATIC, 2);
-      DataStore<KNNList<DoubleDistance>> result = knnjoin.run(db);
+      KNNJoin<DoubleVector, ?, ?> knnjoin = new KNNJoin<DoubleVector, RStarTreeNode, SpatialEntry>(ManhattanDistanceFunction.STATIC, 2);
+      DataStore<KNNList> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
-        KNNList<DoubleDistance> knnlist = result.get(id);
+        KNNList knnlist = result.get(id);
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Manhattan mean 2NN", mean2nnManhattan, meansize.getMean(), 0.00001);

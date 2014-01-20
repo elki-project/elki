@@ -36,21 +36,17 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -93,7 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> vector type
  */
 @Reference(authors = "E. Müller, M. Schiffer, T. Seidl", title = "Adaptive outlierness for subspace outlier ranking", booktitle = "Proc. 19th ACM International Conference on Information and knowledge management")
-public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -176,19 +172,19 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
       final double adjustedEps = kernel.adjustedEps(kernel.dim);
       // Query with a larger window, to also get neighbors of neighbors
       // Subspace euclidean is metric!
-      final DoubleDistance range = new DoubleDistance(adjustedEps * 2.);
-      RangeQuery<V, DoubleDistance> rq = QueryUtil.getRangeQuery(kernel.relation, df, range);
+      final double range = adjustedEps * 2.;
+      RangeQuery<V> rq = QueryUtil.getRangeQuery(kernel.relation, df, range);
 
-      DistanceDBIDList<DoubleDistance> neighc = rq.getRangeForDBID(id, range);
-      DoubleDistanceDBIDList neigh = refineRange(neighc, adjustedEps);
+      DoubleDBIDList neighc = rq.getRangeForDBID(id, range);
+      DoubleDBIDList neigh = refineRange(neighc, adjustedEps);
       if(neigh.size() > 2) {
         // Relevance test
         if(relevantSubspace(subspace, neigh, kernel)) {
           final double density = kernel.subspaceDensity(subspace, neigh);
           // Compute mean and standard deviation for densities of neighbors.
           meanv.reset();
-          for(DoubleDistanceDBIDListIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
-            DoubleDistanceDBIDList n2 = subsetNeighborhoodQuery(neighc, neighbor, df, adjustedEps, kernel);
+          for(DoubleDBIDListIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
+            DoubleDBIDList n2 = subsetNeighborhoodQuery(neighc, neighbor, df, adjustedEps, kernel);
             meanv.put(kernel.subspaceDensity(subspace, n2));
           }
           final double deviation = (meanv.getMean() - density) / (2. * meanv.getSampleStddev());
@@ -212,21 +208,14 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
    * @param adjustedEps New epsilon
    * @return refined list
    */
-  private DoubleDistanceDBIDList refineRange(DistanceDBIDList<DoubleDistance> neighc, double adjustedEps) {
-    ModifiableDoubleDistanceDBIDList n = new DoubleDistanceDBIDPairList(neighc.size());
+  private DoubleDBIDList refineRange(DoubleDBIDList neighc, double adjustedEps) {
+    ModifiableDoubleDBIDList n = DBIDUtil.newDistanceDBIDList(neighc.size());
     // We don't have a guarantee for this list to be sorted
-    for(DistanceDBIDListIter<DoubleDistance> neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
-      DistanceDBIDPair<DoubleDistance> p = neighbor.getDistancePair();
-      if(p instanceof DoubleDistanceDBIDPair) {
-        if(((DoubleDistanceDBIDPair) p).doubleDistance() <= adjustedEps) {
-          n.add((DoubleDistanceDBIDPair) p);
-        }
-      }
-      else {
-        double dist = p.getDistance().doubleValue();
-        if(dist <= adjustedEps) {
-          n.add(dist, p);
-        }
+    for(DoubleDBIDListIter neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
+      DoubleDBIDPair p = neighbor.getPair();
+      double dist = p.doubleValue();
+      if(dist <= adjustedEps) {
+        n.add(dist, p);
       }
     }
     return n;
@@ -242,12 +231,12 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
    * @param kernel Kernel
    * @return Neighbors of neighbor object
    */
-  private DoubleDistanceDBIDList subsetNeighborhoodQuery(DistanceDBIDList<DoubleDistance> neighc, DBIDRef dbid, PrimitiveDoubleDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
-    ModifiableDoubleDistanceDBIDList n = new DoubleDistanceDBIDPairList(neighc.size());
+  private DoubleDBIDList subsetNeighborhoodQuery(DoubleDBIDList neighc, DBIDRef dbid, PrimitiveDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
+    ModifiableDoubleDBIDList n = DBIDUtil.newDistanceDBIDList(neighc.size());
     V query = kernel.relation.get(dbid);
-    for(DistanceDBIDListIter<DoubleDistance> neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
-      DistanceDBIDPair<DoubleDistance> p = neighbor.getDistancePair();
-      double dist = df.doubleDistance(query, kernel.relation.get(p));
+    for(DoubleDBIDListIter neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
+      DoubleDBIDPair p = neighbor.getPair();
+      double dist = df.distance(query, kernel.relation.get(p));
       if(dist <= adjustedEps) {
         n.add(dist, p);
       }
@@ -263,7 +252,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
    * @param kernel Kernel density estimator
    * @return relevance test result
    */
-  protected boolean relevantSubspace(long[] subspace, DoubleDistanceDBIDList neigh, KernelDensityEstimator kernel) {
+  protected boolean relevantSubspace(long[] subspace, DoubleDBIDList neigh, KernelDensityEstimator kernel) {
     Relation<V> relation = kernel.relation;
     final double crit = K_S_CRITICAL001 / Math.sqrt(neigh.size());
 
@@ -348,12 +337,12 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
      * @param neighbors Neighbor distance list
      * @return Density
      */
-    protected double subspaceDensity(long[] subspace, DoubleDistanceDBIDList neighbors) {
+    protected double subspaceDensity(long[] subspace, DoubleDBIDList neighbors) {
       final double bandwidth = optimalBandwidth(BitsUtil.cardinality(subspace));
 
       double density = 0;
-      for(DoubleDistanceDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-        double v = neighbor.doubleDistance() / bandwidth;
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        double v = neighbor.doubleValue() / bandwidth;
         if(v < 1) {
           density += 1 - (v * v);
         }
@@ -408,7 +397,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**
      * Option ID for Epsilon parameter
      */

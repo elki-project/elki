@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @apiviz.uses NumberVector
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
-public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements Normalization<V> {
+public class AttributeWiseMADNormalization<V extends NumberVector> implements Normalization<V> {
   /**
    * Class logger.
    */
@@ -63,7 +63,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector<?>> implements
   /**
    * Number vector factory.
    */
-  protected NumberVector.Factory<V, ?> factory;
+  protected NumberVector.Factory<V>  factory;
 
   /**
    * Stores the median in each dimension.

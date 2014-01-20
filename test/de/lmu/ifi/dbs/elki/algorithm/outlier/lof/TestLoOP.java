@@ -27,10 +27,8 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -50,7 +48,7 @@ public class TestLoOP extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     params.addParameter(LoOP.KCOMP_ID, 15);
 
     // setup Algorithm
-    LoOP<DoubleVector, DoubleDistance> loop = ClassGenericsUtil.parameterizeOrAbort(LoOP.class, params);
+    LoOP<DoubleVector> loop = ClassGenericsUtil.parameterizeOrAbort(LoOP.class, params);
     testParameterizationOk(params);
 
     // run LoOP on database

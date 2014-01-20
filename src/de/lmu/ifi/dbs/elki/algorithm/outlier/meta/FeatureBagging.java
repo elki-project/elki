@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -131,7 +130,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    * @param relation Relation to use
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<NumberVector<?>> relation) {
+  public OutlierResult run(Database database, Relation<NumberVector> relation) {
     final int dbdim = RelationUtil.dimensionality(relation);
     final int mindim = dbdim >> 1;
     final int maxdim = dbdim - 1;
@@ -143,7 +142,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       for(int i = 0; i < num; i++) {
         long[] dimset = randomSubspace(dbdim, mindim, maxdim, rand);
         SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
-        LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, df);
+        LOF<NumberVector> lof = new LOF<>(k, df);
 
         // run LOF and collect the result
         OutlierResult result = lof.run(database, relation);

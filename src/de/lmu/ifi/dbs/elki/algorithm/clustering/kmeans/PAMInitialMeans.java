@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -59,10 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <D> Distance type
  */
 @Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
+public class PAMInitialMeans<V> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
   /**
    * Constructor.
    */
@@ -71,14 +69,11 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     // Get a distance query
-    if(!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
-      throw new AbortException("PAM initialization can only be used with numerical distances.");
-    }
     @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super V, D> distF = (PrimitiveDistanceFunction<? super V, D>) distanceFunction;
-    final DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, distF);
+    final PrimitiveDistanceFunction<? super V> distF = (PrimitiveDistanceFunction<? super V>) distanceFunction;
+    final DistanceQuery<V> distQ = database.getDistanceQuery(relation, distF);
     DBIDs medids = chooseInitialMedoids(k, distQ);
     List<V> medoids = new ArrayList<>(k);
     for(DBIDIter iter = medids.iter(); iter.valid(); iter.advance()) {
@@ -88,12 +83,7 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distQ2) {
-    if(!(distQ2.getDistanceFactory() instanceof NumberDistance)) {
-      throw new AbortException("PAM initialization can only be used with numerical distances.");
-    }
-    @SuppressWarnings("unchecked")
-    DistanceQuery<? super V, D> distQ = (DistanceQuery<? super V, D>) distQ2;
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distQ) {
     final DBIDs ids = distQ.getRelation().getDBIDs();
 
     ArrayModifiableDBIDs medids = DBIDUtil.newArray(k);
@@ -109,7 +99,7 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
         WritableDoubleDataStore newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
         mean.reset();
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          double d = distQ.distance(iter, iter2).doubleValue();
+          double d = distQ.distance(iter, iter2);
           mean.put(d);
           newd.putDouble(iter2, d);
         }
@@ -141,7 +131,7 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
         WritableDoubleDataStore newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
         mean.reset();
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          double dn = distQ.distance(iter, iter2).doubleValue();
+          double dn = distQ.distance(iter, iter2);
           double v = Math.min(dn, mindist.doubleValue(iter2));
           mean.put(v);
           newd.put(iter2, v);
@@ -178,9 +168,9 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V> extends AbstractParameterizer {
     @Override
-    protected PAMInitialMeans<V, D> makeInstance() {
+    protected PAMInitialMeans<V> makeInstance() {
       return new PAMInitialMeans<>();
     }
   }

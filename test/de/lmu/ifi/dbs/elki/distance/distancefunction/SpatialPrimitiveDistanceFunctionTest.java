@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MaximumDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MinimumDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
@@ -59,7 +58,7 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     final int dim = 7;
     final int iters = 10000;
 
-    List<SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?>> dists = new ArrayList<>();
+    List<SpatialPrimitiveDistanceFunction<? super NumberVector>> dists = new ArrayList<>();
     dists.add(EuclideanDistanceFunction.STATIC);
     dists.add(ManhattanDistanceFunction.STATIC);
     dists.add(MaximumDistanceFunction.STATIC);
@@ -93,7 +92,7 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
         double m = rnd.nextDouble();
         d4[d] = m * d2[d] + (1 - m) * d3[d];
       }
-      for(SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?> dis : dists) {
+      for(SpatialPrimitiveDistanceFunction<? super NumberVector> dis : dists) {
         compareDistances(v1, mbr, v2, dis);
       }
     }
@@ -105,7 +104,7 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     final int dim = 7;
     final int iters = 10000;
 
-    List<SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?>> dists = new ArrayList<>();
+    List<SpatialPrimitiveDistanceFunction<? super NumberVector>> dists = new ArrayList<>();
     dists.add(EuclideanDistanceFunction.STATIC);
     dists.add(ManhattanDistanceFunction.STATIC);
     dists.add(MaximumDistanceFunction.STATIC);
@@ -138,17 +137,17 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
         double m = rnd.nextDouble();
         d4[d] = m * d2[d] + (1 - m) * d3[d];
       }
-      for(SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?> dis : dists) {
+      for(SpatialPrimitiveDistanceFunction<? super NumberVector> dis : dists) {
         compareDistances(v1, mbr, v2, dis);
       }
     }
   }
 
-  protected <D extends Distance<D>> void compareDistances(Vector v1, ModifiableHyperBoundingBox mbr, Vector v2, SpatialPrimitiveDistanceFunction<? super NumberVector<?>, D> dist) {
-    D exact = dist.distance(v1, v2);
-    D mind = dist.minDist(v1, v2);
-    D mbrd = dist.minDist(v1, mbr);
-    assertEquals("Not same: " + dist.toString(), exact, mind);
-    assertTrue("Not smaller:" + dist.toString() + " " + mbrd + " > " + exact + " " + mbr + " " + v1, mbrd.compareTo(exact) <= 0);
+  protected void compareDistances(Vector v1, ModifiableHyperBoundingBox mbr, Vector v2, SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
+    double exact = dist.distance(v1, v2);
+    double mind = dist.minDist(v1, v2);
+    double mbrd = dist.minDist(v1, mbr);
+    assertEquals("Not same: " + dist.toString(), exact, mind, 1e-10);
+    assertTrue("Not smaller:" + dist.toString() + " " + mbrd + " > " + exact + " " + mbr + " " + v1, mbrd <= exact);
   }
 }

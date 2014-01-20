@@ -49,5 +49,5 @@ public interface KMeansInitialization<V> {
    * 
    * @return List of chosen means for k-means
    */
-  public abstract List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector<?>, ?> distanceFunction);
+  public abstract List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction);
 }

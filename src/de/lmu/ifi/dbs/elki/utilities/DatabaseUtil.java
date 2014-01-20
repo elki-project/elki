@@ -92,12 +92,12 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Relation<? extends NumberVector<?>> database, NumberVector<?> centroid, DBIDs ids) {
+  public static double[] variances(Relation<? extends NumberVector> database, NumberVector centroid, DBIDs ids) {
     final int size = ids.size();
     double[] variances = new double[centroid.getDimensionality()];
 
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      NumberVector<?> o = database.get(iter);
+      NumberVector o = database.get(iter);
       for (int d = 0; d < centroid.getDimensionality(); d++) {
         final double diff = o.doubleValue(d) - centroid.doubleValue(d);
         variances[d ] += diff * diff / size;
@@ -114,7 +114,7 @@ public final class DatabaseUtil {
    * @param relation the database storing the objects
    * @return Minimum and Maximum vector for the hyperrectangle
    */
-  public static <NV extends NumberVector<?>> Pair<NV, NV> computeMinMax(Relation<NV> relation) {
+  public static <NV extends NumberVector> Pair<NV, NV> computeMinMax(Relation<NV> relation) {
     int dim = RelationUtil.dimensionality(relation);
     double[] mins = new double[dim];
     double[] maxs = new double[dim];
@@ -130,7 +130,7 @@ public final class DatabaseUtil {
         maxs[d] = Math.max(maxs[d], v);
       }
     }
-    NumberVector.Factory<NV, ?> factory = RelationUtil.getNumberVectorFactory(relation);
+    NumberVector.Factory<NV>  factory = RelationUtil.getNumberVectorFactory(relation);
     NV min = factory.newNumberVector(mins);
     NV max = factory.newNumberVector(maxs);
     return new Pair<>(min, max);
@@ -146,7 +146,7 @@ public final class DatabaseUtil {
    * @param numberOfSamples Number of samples to draw
    * @return Median value
    */
-  public static <V extends NumberVector<?>> double quickMedian(Relation<V> relation, ArrayDBIDs ids, int dimension, int numberOfSamples) {
+  public static <V extends NumberVector> double quickMedian(Relation<V> relation, ArrayDBIDs ids, int dimension, int numberOfSamples) {
     final int everyNthItem = (int) Math.max(1, Math.floor(ids.size() / (double) numberOfSamples));
     final double[] vals = new double[numberOfSamples];
     for (int i = 0; i < numberOfSamples; i++) {
@@ -171,7 +171,7 @@ public final class DatabaseUtil {
    * @param dimension Dimensionality
    * @return Median value
    */
-  public static <V extends NumberVector<?>> double exactMedian(Relation<V> relation, DBIDs ids, int dimension) {
+  public static <V extends NumberVector> double exactMedian(Relation<V> relation, DBIDs ids, int dimension) {
     final double[] vals = new double[ids.size()];
     int i = 0;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -390,7 +390,7 @@ public final class DatabaseUtil {
    * @return Database
    */
   @SuppressWarnings("unchecked")
-  public static <V extends NumberVector<?>, T extends NumberVector<?>> Relation<V> relationUglyVectorCast(Relation<T> database) {
+  public static <V extends NumberVector, T extends NumberVector> Relation<V> relationUglyVectorCast(Relation<T> database) {
     return (Relation<V>) database;
   }
 

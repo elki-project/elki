@@ -24,8 +24,6 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  */
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
@@ -36,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @param <O> Object type
  */
-public class InvertedDistanceSimilarityFunction<O> extends AbstractPrimitiveSimilarityFunction<O, DoubleDistance> {
+public class InvertedDistanceSimilarityFunction<O> extends AbstractPrimitiveSimilarityFunction<O> {
   /**
    * Parameter to specify the similarity function to derive the distance between
    * database objects from. Must extend
@@ -54,12 +52,7 @@ public class InvertedDistanceSimilarityFunction<O> extends AbstractPrimitiveSimi
   /**
    * Holds the similarity function.
    */
-  protected PrimitiveDistanceFunction<? super O, ? extends NumberDistance<?, ?>> distanceFunction;
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
-  }
+  protected PrimitiveDistanceFunction<? super O> distanceFunction;
 
   @Override
   public SimpleTypeInformation<? super O> getInputTypeRestriction() {
@@ -67,8 +60,8 @@ public class InvertedDistanceSimilarityFunction<O> extends AbstractPrimitiveSimi
   }
 
   @Override
-  public DoubleDistance similarity(O o1, O o2) {
-    double dist = distanceFunction.distance(o1, o2).doubleValue();
-    return new DoubleDistance(1. / dist);
+  public double similarity(O o1, O o2) {
+    double dist = distanceFunction.distance(o1, o2);
+    return dist > 0. ? 1. / dist : Double.POSITIVE_INFINITY;
   }
 }

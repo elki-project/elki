@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorDoubleSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  */
-public class RationalQuadraticKernelFunction extends AbstractVectorDoubleSimilarityFunction {
+public class RationalQuadraticKernelFunction extends AbstractVectorSimilarityFunction {
   /**
    * Constant term c.
    */
@@ -55,8 +55,8 @@ public class RationalQuadraticKernelFunction extends AbstractVectorDoubleSimilar
   }
 
   @Override
-  public double doubleSimilarity(NumberVector<?> o1, NumberVector<?> o2) {
-    final int dim = AbstractVectorDoubleDistanceFunction.dimensionality(o1, o2);
+  public double similarity(NumberVector o1, NumberVector o2) {
+    final int dim = AbstractNumberVectorDistanceFunction.dimensionality(o1, o2);
     double sim = 0.;
     for(int i = 0; i < dim; i++) {
       final double v = o1.doubleValue(i) - o2.doubleValue(i);

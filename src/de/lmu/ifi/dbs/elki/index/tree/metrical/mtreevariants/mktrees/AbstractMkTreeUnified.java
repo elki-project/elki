@@ -28,10 +28,9 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -48,12 +47,11 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @apiviz.composedOf MkTreeSettings
  * 
  * @param <O> the type of DatabaseObject to be stored in the metrical index
- * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  * @param <S> the type of Settings used.
  */
-public abstract class AbstractMkTreeUnified<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, D, N, E>> extends AbstractMkTree<O, D, N, E, S> {
+public abstract class AbstractMkTreeUnified<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, N, E>> extends AbstractMkTree<O, N, E, S> {
   /**
    * Constructor.
    * 
@@ -92,7 +90,7 @@ public abstract class AbstractMkTreeUnified<O, D extends NumberDistance<D, ?>, N
     }
 
     // do batch nn
-    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, settings.k_max);
+    Map<DBID, KNNList> knnLists = batchNN(getRoot(), ids, settings.k_max);
 
     // adjust the knn distances
     kNNdistanceAdjustment(getRootEntry(), knnLists);
@@ -108,7 +106,7 @@ public abstract class AbstractMkTreeUnified<O, D extends NumberDistance<D, ?>, N
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNList<D>> knnLists);
+  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNList> knnLists);
 
   /**
    * Get the value of k_max.

@@ -33,11 +33,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -72,12 +71,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector handled by this Algorithm
- * @param <D> the type of Distance used by this Algorithm
  */
 @Title("Dependency Derivator: Deriving numerical inter-dependencies on data")
 @Description("Derives an equality-system describing dependencies between attributes in a correlation-cluster")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", title = "Deriving Quantitative Dependencies for Correlation Clusters", booktitle = "Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.", url = "http://dx.doi.org/10.1145/1150402.1150408")
-public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
+public class DependencyDerivator<V extends NumberVector> extends AbstractPrimitiveDistanceBasedAlgorithm<V, CorrelationAnalysisSolution<V>> {
   /**
    * The logger for this class.
    */
@@ -133,7 +131,7 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
    * @param sampleSize sample size
    * @param randomsample flag for random sampling
    */
-  public DependencyDerivator(PrimitiveDistanceFunction<V, D> distanceFunction, NumberFormat nf, PCAFilteredRunner<V> pca, int sampleSize, boolean randomsample) {
+  public DependencyDerivator(PrimitiveDistanceFunction<V> distanceFunction, NumberFormat nf, PCAFilteredRunner<V> pca, int sampleSize, boolean randomsample) {
     super(distanceFunction);
     this.nf = nf;
     this.pca = pca;
@@ -162,8 +160,8 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
         ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, 1L);
       }
       else {
-        DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-        KNNList<D> queryResults = database.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
+        DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+        KNNList queryResults = database.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
         ids = DBIDUtil.newHashSet(queryResults);
       }
     }
@@ -279,7 +277,7 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Output accuracy.
      */
@@ -326,7 +324,7 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
     }
 
     @Override
-    protected DependencyDerivator<V, D> makeInstance() {
+    protected DependencyDerivator<V> makeInstance() {
       NumberFormat nf = NumberFormat.getInstance(Locale.US);
       nf.setMaximumFractionDigits(outputAccuracy);
       nf.setMinimumFractionDigits(outputAccuracy);

@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Mining Hierarchies of Correlation Clusters")
 @Description("Algorithm for detecting hierarchies of correlation clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger, A. Zimek", title = "Mining Hierarchies of Correlation Clusters", booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06), Vienna, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.35")
-public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiCO.HiCOClusterOrderEntry> {
+public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, HiCO.HiCOClusterOrderEntry> {
   /**
    * The logger for this class.
    */
@@ -98,12 +98,12 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiCO.H
   /**
    * Factory to produce
    */
-  private IndexFactory<V, FilteredLocalPCAIndex<NumberVector<?>>> indexfactory;
+  private IndexFactory<V, FilteredLocalPCAIndex<NumberVector>> indexfactory;
 
   /**
    * Instantiated index.
    */
-  private FilteredLocalPCAIndex<NumberVector<?>> index;
+  private FilteredLocalPCAIndex<NumberVector> index;
 
   /**
    * Delta parameter
@@ -116,7 +116,7 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiCO.H
    * @param indexfactory Index factory
    * @param mu Mu parameter
    */
-  public HiCO(IndexFactory<V, FilteredLocalPCAIndex<NumberVector<?>>> indexfactory, int mu, double delta) {
+  public HiCO(IndexFactory<V, FilteredLocalPCAIndex<NumberVector>> indexfactory, int mu, double delta) {
     super(mu);
     this.indexfactory = indexfactory;
     this.delta = delta;
@@ -149,7 +149,7 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiCO.H
       V dv2 = relation.get(iter);
 
       int correlationDistance = correlationDistance(pca1, pca2, dim);
-      double euclideanDistance = EuclideanDistanceFunction.STATIC.doubleDistance(dv1, dv2);
+      double euclideanDistance = EuclideanDistanceFunction.STATIC.distance(dv1, dv2);
 
       result.add(new HiCOClusterOrderEntry(DBIDUtil.deref(iter), id1, correlationDistance, euclideanDistance));
     }
@@ -305,7 +305,7 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiCO.H
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter to specify the smoothing factor, must be an integer greater
      * than 0. The {link {@link #MU_ID}-nearest neighbor is used to compute the
@@ -368,7 +368,7 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiCO.H
     /**
      * Factory to produce
      */
-    private IndexFactory<V, FilteredLocalPCAIndex<NumberVector<?>>> indexfactory;
+    private IndexFactory<V, FilteredLocalPCAIndex<NumberVector>> indexfactory;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -408,7 +408,7 @@ public class HiCO<V extends NumberVector<?>> extends GeneralizedOPTICS<V, HiCO.H
 
       ChainedParameterization chain = new ChainedParameterization(params, config);
       chain.errorsTo(config);
-      final Class<? extends IndexFactory<V, FilteredLocalPCAIndex<NumberVector<?>>>> cls = ClassGenericsUtil.uglyCrossCast(KNNQueryFilteredPCAIndex.Factory.class, IndexFactory.class);
+      final Class<? extends IndexFactory<V, FilteredLocalPCAIndex<NumberVector>>> cls = ClassGenericsUtil.uglyCrossCast(KNNQueryFilteredPCAIndex.Factory.class, IndexFactory.class);
       indexfactory = chain.tryInstantiate(cls);
     }
 

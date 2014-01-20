@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
@@ -46,8 +45,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  * @param <V> the type of NumberVector to compute the distances in between
  */
-// FIXME: implements SpatialPrimitiveDistanceFunction<V, DoubleDistance>
-public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> implements FilteredLocalPCABasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> {
+// FIXME: implements SpatialPrimitiveDistanceFunction<V>
+public class LocallyWeightedDistanceFunction<V extends NumberVector> extends AbstractIndexBasedDistanceFunction<V, FilteredLocalPCAIndex<V>> implements FilteredLocalPCABasedDistanceFunction<V, FilteredLocalPCAIndex<V>> {
   /**
    * Constructor
    * 
@@ -55,11 +54,6 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
    */
   public LocallyWeightedDistanceFunction(LocalProjectionIndex.Factory<V, FilteredLocalPCAIndex<V>> indexFactory) {
     super(indexFactory);
-  }
-
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
   }
 
   @Override
@@ -100,7 +94,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, DoubleDistance, LocallyWeightedDistanceFunction<? super V>> implements FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, DoubleDistance> {
+  public static class Instance<V extends NumberVector> extends AbstractIndexBasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, LocallyWeightedDistanceFunction<? super V>> implements FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>> {
     /**
      * Constructor.
      * 
@@ -122,12 +116,12 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
      *         distance function
      */
     @Override
-    public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
+    public double distance(DBIDRef id1, DBIDRef id2) {
       Matrix m1 = index.getLocalProjection(id1).similarityMatrix();
       Matrix m2 = index.getLocalProjection(id2).similarityMatrix();
 
       if(m1 == null || m2 == null) {
-        return new DoubleDistance(Double.POSITIVE_INFINITY);
+        return Double.POSITIVE_INFINITY;
       }
 
       V v1 = relation.get(id1);
@@ -155,12 +149,12 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
         }
       }
 
-      return new DoubleDistance(Math.max(Math.sqrt(dist1), Math.sqrt(dist2)));
+      return Math.max(Math.sqrt(dist1), Math.sqrt(dist2));
     }
 
     // @Override
     // TODO: re-enable spatial interfaces
-    public DoubleDistance minDistBROKEN(SpatialComparable mbr, V v) {
+    public double minDistBROKEN(SpatialComparable mbr, V v) {
       if(mbr.getDimensionality() != v.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString());
       }
@@ -183,18 +177,18 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
       Vector rv1Mrv2 = v.getColumnVector().minusEquals(new Vector(r));
       double dist = rv1Mrv2.transposeTimesTimes(m, rv1Mrv2);
 
-      return new DoubleDistance(Math.sqrt(dist));
+      return Math.sqrt(dist);
     }
 
     // TODO: Remove?
     // @Override
-    // public DoubleDistance minDist(SpatialComparable mbr, DBID id) {
+    // public double minDist(SpatialComparable mbr, DBID id) {
     // return minDist(mbr, database.get(id));
     // }
 
     // @Override
     // TODO: re-enable spatial interface
-    public DoubleDistance distance(SpatialComparable mbr1, SpatialComparable mbr2) {
+    public double distance(SpatialComparable mbr1, SpatialComparable mbr2) {
       if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
       }
@@ -217,12 +211,12 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
         double manhattanI = m1 - m2;
         sqrDist += manhattanI * manhattanI;
       }
-      return new DoubleDistance(Math.sqrt(sqrDist));
+      return Math.sqrt(sqrDist);
     }
 
     // @Override
     // TODO: re-enable spatial interface
-    public DoubleDistance centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
+    public double centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
       if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of objects\n first argument:  " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
       }
@@ -234,7 +228,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
         final double manhattanI = c1 - c2;
         sqrDist += manhattanI * manhattanI;
       }
-      return new DoubleDistance(Math.sqrt(sqrDist));
+      return Math.sqrt(sqrDist);
     }
   }
 
@@ -245,7 +239,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Parameterizer<LocalProjectionIndex.Factory<V, FilteredLocalPCAIndex<V>>> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractIndexBasedDistanceFunction.Parameterizer<LocalProjectionIndex.Factory<V, FilteredLocalPCAIndex<V>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

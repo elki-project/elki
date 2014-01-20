@@ -29,38 +29,37 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Instance for the query on a particular database.
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractDistanceKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements KNNQuery<O, D> {
+public abstract class AbstractDistanceKNNQuery<O> extends AbstractDataBasedQuery<O> implements KNNQuery<O> {
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceQuery<O, D> distanceQuery;
+  protected DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
    * 
    * @param distanceQuery Distance query used
    */
-  public AbstractDistanceKNNQuery(DistanceQuery<O, D> distanceQuery) {
+  public AbstractDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
     super(distanceQuery.getRelation());
     this.distanceQuery = distanceQuery;
   }
 
   @Override
-  public List<? extends KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // throw new
     // UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
     // TODO: optimize
-    List<KNNList<D>> ret = new ArrayList<>(ids.size());
+    List<KNNList> ret = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       ret.add(getKNNForDBID(iter, k));
     }
@@ -68,10 +67,10 @@ public abstract class AbstractDistanceKNNQuery<O, D extends Distance<D>> extends
   }
 
   @Override
-  public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
+  public KNNList getKNNForDBID(DBIDRef id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  abstract public KNNList<D> getKNNForObject(O obj, int k);
+  abstract public KNNList getKNNForObject(O obj, int k);
 }

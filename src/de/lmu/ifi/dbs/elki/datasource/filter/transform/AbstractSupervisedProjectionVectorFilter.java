@@ -33,7 +33,6 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -60,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <V> Vector type
  */
-public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberVector<?>> implements ObjectFilter {
+public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberVector> implements ObjectFilter {
   /**
    * The dimensionality to which the data should be reduced.
    */
@@ -114,7 +113,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
       List<V> vectorcolumn = (List<V>) column;
       final VectorFieldTypeInformation<?> vtype = (VectorFieldTypeInformation<?>) type;
       @SuppressWarnings("unchecked")
-      NumberVector.Factory<V, ?> factory = (NumberVector.Factory<V, ?>) vtype.getFactory();
+      NumberVector.Factory<V>  factory = (NumberVector.Factory<V> ) vtype.getFactory();
       int dim = vtype.getDimensionality();
 
       if(tdim > dim) {
@@ -155,7 +154,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
    * @param factory Vector factory
    * @return output type restriction
    */
-  protected SimpleTypeInformation<?> convertedType(SimpleTypeInformation<?> in, Factory<V, ?> factory) {
+  protected SimpleTypeInformation<?> convertedType(SimpleTypeInformation<?> in, NumberVector.Factory<V> factory) {
     return new VectorFieldTypeInformation<>(factory, tdim);
   }
 
@@ -206,7 +205,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
    * 
    * @param <V> Vector type
    */
-  public abstract static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * The number of dimensions to keep.
      */

@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector<?>> {
+public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**
    * Random generator to use.
    */
@@ -86,9 +86,9 @@ public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHas
   }
 
   @Override
-  public ArrayList<? extends LocalitySensitiveHashFunction<? super NumberVector<?>>> generateHashFunctions(Relation<? extends NumberVector<?>> relation, int l) {
+  public ArrayList<? extends LocalitySensitiveHashFunction<? super NumberVector>> generateHashFunctions(Relation<? extends NumberVector> relation, int l) {
     int dim = RelationUtil.dimensionality(relation);
-    ArrayList<LocalitySensitiveHashFunction<? super NumberVector<?>>> ps = new ArrayList<>(l);
+    ArrayList<LocalitySensitiveHashFunction<? super NumberVector>> ps = new ArrayList<>(l);
     final Random rnd = random.getSingleThreadedRandom();
     for(int i = 0; i < l; i++) {
       RandomProjectionFamily.Projection mat = proj.generateProjection(dim, k);

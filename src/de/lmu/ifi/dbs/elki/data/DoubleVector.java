@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.landmark
  */
-public class DoubleVector extends AbstractNumberVector<Double> {
+public class DoubleVector extends AbstractNumberVector {
   /**
    * Static factory instance.
    */
@@ -153,18 +153,18 @@ public class DoubleVector extends AbstractNumberVector<Double> {
    * 
    * @apiviz.has DoubleVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<DoubleVector, Double> {
+  public static class Factory extends AbstractNumberVector.Factory<DoubleVector> {
     @Override
     public DoubleVector newNumberVector(double[] values) {
       return new DoubleVector(values);
     }
 
     @Override
-    public <A> DoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
+    public <A> DoubleVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       double[] values = new double[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i);
+        values[i] = adapter.get(array, i).doubleValue();
       }
       return new DoubleVector(values, true);
     }

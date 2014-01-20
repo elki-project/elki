@@ -38,10 +38,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -50,7 +48,6 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -113,12 +110,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.has KNNQuery
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <D> Distance type
  */
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
 @Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url = "http://dx.doi.org/10.1145/342009.335388")
-public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -137,12 +133,12 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
   /**
    * Neighborhood distance function.
    */
-  protected DistanceFunction<? super O, D> referenceDistanceFunction;
+  protected DistanceFunction<? super O> referenceDistanceFunction;
 
   /**
    * Reachability distance function.
    */
-  protected DistanceFunction<? super O, D> reachabilityDistanceFunction;
+  protected DistanceFunction<? super O> reachabilityDistanceFunction;
 
   /**
    * Include object itself in kNN neighborhood.
@@ -160,7 +156,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
    * @param neighborhoodDistanceFunction the neighborhood distance function
    * @param reachabilityDistanceFunction the reachability distance function
    */
-  public FlexibleLOF(int krefer, int kreach, DistanceFunction<? super O, D> neighborhoodDistanceFunction, DistanceFunction<? super O, D> reachabilityDistanceFunction) {
+  public FlexibleLOF(int krefer, int kreach, DistanceFunction<? super O> neighborhoodDistanceFunction, DistanceFunction<? super O> reachabilityDistanceFunction) {
     super();
     this.krefer = krefer + (objectIsInKNN ? 0 : 1);
     this.kreach = kreach + (objectIsInKNN ? 0 : 1);
@@ -178,9 +174,9 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
-    Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, relation, stepprog);
-    KNNQuery<O, D> kNNRefer = pair.getFirst();
-    KNNQuery<O, D> kNNReach = pair.getSecond();
+    Pair<KNNQuery<O>, KNNQuery<O>> pair = getKNNQueries(database, relation, stepprog);
+    KNNQuery<O> kNNRefer = pair.getFirst();
+    KNNQuery<O> kNNReach = pair.getSecond();
     return doRunInTime(relation.getDBIDs(), kNNRefer, kNNReach, stepprog).getResult();
   }
 
@@ -191,30 +187,32 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
    * @param stepprog the progress logger
    * @return the kNN queries for the algorithm
    */
-  private Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
+  private Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
     // "HEAVY" flag for knnReach since it is used more than once
-    KNNQuery<O, D> knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
-    if (!(knnReach instanceof PreprocessorKNNQuery)) {
-      if (stepprog != null) {
-        if (referenceDistanceFunction.equals(reachabilityDistanceFunction)) {
+    if(!(knnReach instanceof PreprocessorKNNQuery)) {
+      if(stepprog != null) {
+        if(referenceDistanceFunction.equals(reachabilityDistanceFunction)) {
           stepprog.beginStep(1, "Materializing neighborhoods w.r.t. reference neighborhood distance function.", LOG);
-        } else {
+        }
+        else {
           stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
         }
       }
       int kpreproc = (referenceDistanceFunction.equals(reachabilityDistanceFunction)) ? Math.max(kreach, krefer) : kreach;
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, reachabilityDistanceFunction, kpreproc);
+      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, reachabilityDistanceFunction, kpreproc);
       database.addIndex(preproc);
-      DistanceQuery<O, D> rdq = database.getDistanceQuery(relation, reachabilityDistanceFunction);
+      DistanceQuery<O> rdq = database.getDistanceQuery(relation, reachabilityDistanceFunction);
       knnReach = preproc.getKNNQuery(rdq, kreach);
     }
 
     // knnReach is only used once
-    KNNQuery<O, D> knnRefer;
-    if (referenceDistanceFunction == reachabilityDistanceFunction || referenceDistanceFunction.equals(reachabilityDistanceFunction)) {
+    KNNQuery<O> knnRefer;
+    if(referenceDistanceFunction == reachabilityDistanceFunction || referenceDistanceFunction.equals(reachabilityDistanceFunction)) {
       knnRefer = knnReach;
-    } else {
+    }
+    else {
       // do not materialize the first neighborhood, since it is used only once
       knnRefer = QueryUtil.getKNNQuery(relation, referenceDistanceFunction, krefer);
     }
@@ -234,23 +232,23 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
    * @param stepprog Progress logger
    * @return LOF result
    */
-  protected LOFResult<O, D> doRunInTime(DBIDs ids, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) {
+  protected LOFResult<O> doRunInTime(DBIDs ids, KNNQuery<O> kNNRefer, KNNQuery<O> kNNReach, StepProgress stepprog) {
     // Assert we got something
-    if (kNNRefer == null) {
+    if(kNNRefer == null) {
       throw new AbortException("No kNN queries supported by database for reference neighborhood distance function.");
     }
-    if (kNNReach == null) {
+    if(kNNReach == null) {
       throw new AbortException("No kNN queries supported by database for reachability distance function.");
     }
 
     // Compute LRDs
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.beginStep(2, "Computing LRDs.", LOG);
     }
     WritableDoubleDataStore lrds = computeLRDs(ids, kNNReach);
 
     // compute LOF_SCORE of each db object
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", LOG);
     }
     Pair<WritableDoubleDataStore, DoubleMinMax> lofsAndMax = computeLOFs(ids, lrds, kNNRefer);
@@ -258,7 +256,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = lofsAndMax.getSecond();
 
-    if (stepprog != null) {
+    if(stepprog != null) {
       stepprog.setCompleted(LOG);
     }
 
@@ -278,45 +276,28 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
    *        reachability distance
    * @return the LRDs of the objects
    */
-  protected WritableDoubleDataStore computeLRDs(DBIDs ids, KNNQuery<O, D> knnReach) {
+  protected WritableDoubleDataStore computeLRDs(DBIDs ids, KNNQuery<O> knnReach) {
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList<D> neighbors = knnReach.getKNNForDBID(iter, kreach);
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      final KNNList neighbors = knnReach.getKNNForDBID(iter, kreach);
       double sum = 0.0;
       int count = 0;
-      if (neighbors instanceof DoubleDistanceKNNList) {
-        // Fast version for double distances
-        for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-          if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            KNNList<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, kreach);
-            final double nkdist;
-            if (neighborsNeighbors instanceof DoubleDistanceKNNList) {
-              nkdist = ((DoubleDistanceKNNList) neighborsNeighbors).doubleKNNDistance();
-            } else {
-              nkdist = neighborsNeighbors.getKNNDistance().doubleValue();
-            }
-            sum += Math.max(neighbor.doubleDistance(), nkdist);
-            count++;
-          }
-        }
-      } else {
-        for (DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            KNNList<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, kreach);
-            sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
-            count++;
-          }
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
+          KNNList neighborsNeighbors = knnReach.getKNNForDBID(neighbor, kreach);
+          sum += Math.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
+          count++;
         }
       }
       // Avoid division by 0
       final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
       lrds.putDouble(iter, lrd);
-      if (lrdsProgress != null) {
+      if(lrdsProgress != null) {
         lrdsProgress.incrementProcessed(LOG);
       }
     }
-    if (lrdsProgress != null) {
+    if(lrdsProgress != null) {
       lrdsProgress.ensureCompleted(LOG);
     }
     return lrds;
@@ -331,41 +312,42 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
    *        reference distance
    * @return the LOFs of the objects and the maximum LOF
    */
-  protected Pair<WritableDoubleDataStore, DoubleMinMax> computeLOFs(DBIDs ids, DoubleDataStore lrds, KNNQuery<O, D> knnRefer) {
+  protected Pair<WritableDoubleDataStore, DoubleMinMax> computeLOFs(DBIDs ids, DoubleDataStore lrds, KNNQuery<O> knnRefer) {
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lrdp = lrds.doubleValue(iter);
       final double lof;
-      if (lrdp > 0 && !Double.isInfinite(lrdp)) {
-        final KNNList<D> neighbors = knnRefer.getKNNForDBID(iter, krefer);
+      if(lrdp > 0 && !Double.isInfinite(lrdp)) {
+        final KNNList neighbors = knnRefer.getKNNForDBID(iter, krefer);
         double sum = 0.0;
         int count = 0;
-        for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
-          if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
+          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             sum += lrds.doubleValue(neighbor);
             count++;
           }
         }
         lof = sum / (count * lrdp);
-      } else {
+      }
+      else {
         lof = 1.0;
       }
       lofs.putDouble(iter, lof);
       // update minimum and maximum
-      if (!Double.isInfinite(lof)) {
+      if(!Double.isInfinite(lof)) {
         lofminmax.put(lof);
       }
 
-      if (progressLOFs != null) {
+      if(progressLOFs != null) {
         progressLOFs.incrementProcessed(LOG);
       }
     }
-    if (progressLOFs != null) {
+    if(progressLOFs != null) {
       progressLOFs.ensureCompleted(LOG);
     }
     return new Pair<>(lofs, lofminmax);
@@ -374,9 +356,10 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     final TypeInformation type;
-    if (reachabilityDistanceFunction.equals(referenceDistanceFunction)) {
+    if(reachabilityDistanceFunction.equals(referenceDistanceFunction)) {
       type = reachabilityDistanceFunction.getInputTypeRestriction();
-    } else {
+    }
+    else {
       type = new CombinedTypeInformation(referenceDistanceFunction.getInputTypeRestriction(), reachabilityDistanceFunction.getInputTypeRestriction());
     }
     return TypeUtil.array(type);
@@ -393,7 +376,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
    * 
    * @author Elke Achtert
    */
-  public static class LOFResult<O, D extends NumberDistance<D, ?>> {
+  public static class LOFResult<O> {
     /**
      * The result of the run of the {@link FlexibleLOF} algorithm.
      */
@@ -402,22 +385,22 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
     /**
      * The kNN query w.r.t. the reference neighborhood distance.
      */
-    private final KNNQuery<O, D> kNNRefer;
+    private final KNNQuery<O> kNNRefer;
 
     /**
      * The kNN query w.r.t. the reachability distance.
      */
-    private final KNNQuery<O, D> kNNReach;
+    private final KNNQuery<O> kNNReach;
 
     /**
      * The RkNN query w.r.t. the reference neighborhood distance.
      */
-    private RKNNQuery<O, D> rkNNRefer;
+    private RKNNQuery<O> rkNNRefer;
 
     /**
      * The rkNN query w.r.t. the reachability distance.
      */
-    private RKNNQuery<O, D> rkNNReach;
+    private RKNNQuery<O> rkNNReach;
 
     /**
      * The LRD values of the objects.
@@ -439,7 +422,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(OutlierResult result, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, WritableDoubleDataStore lrds, WritableDoubleDataStore lofs) {
+    public LOFResult(OutlierResult result, KNNQuery<O> kNNRefer, KNNQuery<O> kNNReach, WritableDoubleDataStore lrds, WritableDoubleDataStore lofs) {
       this.result = result;
       this.kNNRefer = kNNRefer;
       this.kNNReach = kNNReach;
@@ -452,7 +435,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
      * 
      * @return the kNN query w.r.t. the reference neighborhood distance
      */
-    public KNNQuery<O, D> getKNNRefer() {
+    public KNNQuery<O> getKNNRefer() {
       return kNNRefer;
     }
 
@@ -461,7 +444,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
      * 
      * @return the kNN query w.r.t. the reachability distance
      */
-    public KNNQuery<O, D> getKNNReach() {
+    public KNNQuery<O> getKNNReach() {
       return kNNReach;
     }
 
@@ -497,7 +480,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
      * 
      * @param rkNNRefer the query to set
      */
-    public void setRkNNRefer(RKNNQuery<O, D> rkNNRefer) {
+    public void setRkNNRefer(RKNNQuery<O> rkNNRefer) {
       this.rkNNRefer = rkNNRefer;
     }
 
@@ -506,7 +489,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
      * 
      * @return the RkNN query w.r.t. the reference neighborhood distance
      */
-    public RKNNQuery<O, D> getRkNNRefer() {
+    public RKNNQuery<O> getRkNNRefer() {
       return rkNNRefer;
     }
 
@@ -515,7 +498,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
      * 
      * @return the RkNN query w.r.t. the reachability distance
      */
-    public RKNNQuery<O, D> getRkNNReach() {
+    public RKNNQuery<O> getRkNNReach() {
       return rkNNReach;
     }
 
@@ -524,7 +507,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
      * 
      * @param rkNNReach the query to set
      */
-    public void setRkNNReach(RKNNQuery<O, D> rkNNReach) {
+    public void setRkNNReach(RKNNQuery<O> rkNNReach) {
       this.rkNNReach = rkNNReach;
     }
   }
@@ -536,7 +519,7 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * The distance function to determine the reachability distance between
      * database objects.
@@ -569,12 +552,12 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
     /**
      * Neighborhood distance function.
      */
-    protected DistanceFunction<O, D> neighborhoodDistanceFunction = null;
+    protected DistanceFunction<O> neighborhoodDistanceFunction = null;
 
     /**
      * Reachability distance function.
      */
-    protected DistanceFunction<O, D> reachabilityDistanceFunction = null;
+    protected DistanceFunction<O> reachabilityDistanceFunction = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -582,30 +565,32 @@ public class FlexibleLOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgo
 
       final IntParameter pK = new IntParameter(KREF_ID);
       pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if (config.grab(pK)) {
+      if(config.grab(pK)) {
         krefer = pK.intValue();
       }
 
       final IntParameter pK2 = new IntParameter(KREACH_ID);
       pK2.setOptional(true);
       pK2.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if (config.grab(pK2)) {
+      if(config.grab(pK2)) {
         kreach = pK2.intValue();
-      } else {
+      }
+      else {
         kreach = krefer;
       }
 
-      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class);
+      final ObjectParameter<DistanceFunction<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class);
       reachDistP.setOptional(true);
-      if (config.grab(reachDistP)) {
+      if(config.grab(reachDistP)) {
         reachabilityDistanceFunction = reachDistP.instantiateClass(config);
-      } else {
+      }
+      else {
         reachabilityDistanceFunction = distanceFunction;
       }
     }
 
     @Override
-    protected FlexibleLOF<O, D> makeInstance() {
+    protected FlexibleLOF<O> makeInstance() {
       return new FlexibleLOF<>(kreach, krefer, distanceFunction, reachabilityDistanceFunction);
     }
   }

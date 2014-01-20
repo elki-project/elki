@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 
@@ -36,9 +35,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
  * @apiviz.has MkCoPEntry oneway - - contains
  * 
  * @param <O> object type
- * @param <D> distance type
  */
-class MkCoPTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O, D>, MkCoPEntry> {
+class MkCoPTreeNode<O> extends AbstractMTreeNode<O, MkCoPTreeNode<O>, MkCoPEntry> {
   /**
    * Serial version UID
    */
@@ -142,7 +140,7 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
   }
 
   @Override
-  public void adjustEntry(MkCoPEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry, ?> mTree) {
+  public void adjustEntry(MkCoPEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkCoPTreeNode<O>, MkCoPEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust conservative distance approximation
     // int k_max = ((MkCoPTree<O,D>) mTree).getK_max();
@@ -150,11 +148,11 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
   }
 
   @Override
-  protected void integrityCheckParameters(MkCoPEntry parentEntry, MkCoPTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry, ?> mTree) {
+  protected void integrityCheckParameters(MkCoPEntry parentEntry, MkCoPTreeNode<O> parent, int index, AbstractMTree<O, MkCoPTreeNode<O>, MkCoPEntry, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test conservative approximation
     MkCoPEntry entry = parent.getEntry(index);
-    int k_max = ((MkCoPTree<O, D>) mTree).getK_max();
+    int k_max = ((MkCoPTree<O>) mTree).getK_max();
     ApproximationLine approx = conservativeKnnDistanceApproximation(k_max);
     if(!entry.getConservativeKnnDistanceApproximation().equals(approx)) {
       String soll = approx.toString();

@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @param <V> vector type
  */
-public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>> extends AbstractVectorStreamConversionFilter<V, V> {
+public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> {
   /**
    * The selected attributes.
    */

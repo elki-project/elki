@@ -320,7 +320,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        NumberVector.Factory<DoubleVector, ?> factory = (NumberVector.Factory<DoubleVector, ?>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
+        NumberVector.Factory<DoubleVector> factory = (NumberVector.Factory<DoubleVector>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
         // Relation label
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;

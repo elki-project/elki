@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <O> Attribute Vector
  */
 @Reference(authors = "Chang-Tien Lu and Dechang Chen and Yufeng Kou", title = "Detecting Spatial Outliers with Multiple Attributes", booktitle = "Proc. 15th IEEE International Conference on Tools with Artificial Intelligence, 2003", url = "http://dx.doi.org/10.1109/TAI.2003.1250179")
-public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?>> extends AbstractNeighborhoodOutlier<N> {
+public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends AbstractNeighborhoodOutlier<N> {
   /**
    * logger
    */
@@ -146,7 +146,7 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?>> extends Ab
    * @param <N> Neighborhood type
    * @param <O> Attribute object type
    */
-  public static class Parameterizer<N, O extends NumberVector<?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Parameterizer<N, O extends NumberVector> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
     protected CTLuMeanMultipleAttributes<N, O> makeInstance() {
       return new CTLuMeanMultipleAttributes<>(npredf);

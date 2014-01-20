@@ -29,11 +29,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DoubleNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -45,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Elke Achtert
  */
-public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingDoubleDistanceFunction<NumberVector<?>> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>>, DoubleNorm<NumberVector<?>>, NumberVectorDistanceFunction<DoubleDistance> {
+public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingDistanceFunction<NumberVector> implements SpatialPrimitiveDistanceFunction<NumberVector>, Norm<NumberVector>, NumberVectorDistanceFunction {
   /**
    * Value of p
    */
@@ -81,7 +80,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
    *         selected dimensions
    */
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " + "first argument: " + v1 + "\n  " + "second argument: " + v2);
     }
@@ -94,7 +93,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
     return Math.pow(sqrDist, 1. / p);
   }
 
-  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
+  protected double minDistObject(SpatialComparable mbr, NumberVector v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -122,7 +121,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
@@ -150,17 +149,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   }
 
   @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
-  }
-
-  @Override
-  public DoubleDistance norm(NumberVector<?> obj) {
-    return new DoubleDistance(doubleNorm(obj));
-  }
-
-  @Override
-  public double doubleNorm(NumberVector<?> obj) {
+  public double norm(NumberVector obj) {
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       double delta = Math.abs(obj.doubleValue(d));
@@ -170,12 +159,12 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   }
 
   @Override
-  public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
+  public <T extends NumberVector> SpatialPrimitiveDistanceQuery<T> instantiate(Relation<T> database) {
     return new SpatialPrimitiveDistanceQuery<>(database, this);
   }
 
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public VectorFieldTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
@@ -191,7 +180,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractDimensionsSelectingDoubleDistanceFunction.Parameterizer {
+  public static class Parameterizer extends AbstractDimensionsSelectingDistanceFunction.Parameterizer {
     /**
      * Value of p.
      */

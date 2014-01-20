@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @param <O> Object type
  */
-public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree implements KNNIndex<O>, RangeIndex<O>, DynamicIndex {
+public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implements KNNIndex<O>, RangeIndex<O>, DynamicIndex {
   /**
    * The relation we index.
    */
@@ -97,14 +96,14 @@ public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree imp
    * @return the path of node ids from the root to the objects's parent
    */
   public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(DBID id, O obj) {
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debugFine("setHandled " + id + ", " + obj + "\n");
     }
 
     // find the leaf node containing o
     IndexTreePath<DeLiCluEntry> pathToObject = findPathToObject(getRootPath(), obj, id);
 
-    if (pathToObject == null) {
+    if(pathToObject == null) {
       throw new AbortException("Object not found in setHandled.");
     }
 
@@ -113,12 +112,12 @@ public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree imp
     entry.setHasHandled(true);
     entry.setHasUnhandled(false);
 
-    for (IndexTreePath<DeLiCluEntry> path = pathToObject; path.getParentPath() != null; path = path.getParentPath()) {
+    for(IndexTreePath<DeLiCluEntry> path = pathToObject; path.getParentPath() != null; path = path.getParentPath()) {
       DeLiCluEntry parentEntry = path.getParentPath().getLastPathComponent().getEntry();
       DeLiCluNode node = getNode(parentEntry);
       boolean hasHandled = false;
       boolean hasUnhandled = false;
-      for (int i = 0; i < node.getNumEntries(); i++) {
+      for(int i = 0; i < node.getNumEntries(); i++) {
         final DeLiCluEntry nodeEntry = node.getEntry(i);
         hasHandled = hasHandled || nodeEntry.hasHandled();
         hasUnhandled = hasUnhandled || nodeEntry.hasUnhandled();
@@ -154,19 +153,20 @@ public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree imp
    */
   @Override
   public final void insertAll(DBIDs ids) {
-    if (ids.isEmpty() || (ids.size() == 1)) {
+    if(ids.isEmpty() || (ids.size() == 1)) {
       return;
     }
 
     // Make an example leaf
-    if (canBulkLoad()) {
+    if(canBulkLoad()) {
       List<DeLiCluEntry> leafs = new ArrayList<>(ids.size());
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         leafs.add(createNewLeafEntry(DBIDUtil.deref(iter)));
       }
       bulkLoad(leafs);
-    } else {
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    }
+    else {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         insert(iter);
       }
     }
@@ -185,7 +185,7 @@ public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree imp
     // find the leaf node containing o
     O obj = relation.get(id);
     IndexTreePath<DeLiCluEntry> deletionPath = findPathToObject(getRootPath(), obj, id);
-    if (deletionPath == null) {
+    if(deletionPath == null) {
       return false;
     }
     deletePath(deletionPath);
@@ -194,36 +194,36 @@ public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree imp
 
   @Override
   public void deleteAll(DBIDs ids) {
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       delete(DBIDUtil.deref(iter));
     }
   }
 
   @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if (distanceQuery.getRelation() != relation) {
+    if(distanceQuery.getRelation() != relation) {
       return null;
     }
     // Can we support this distance function - spatial distances only!
-    if (!(distanceQuery instanceof SpatialDistanceQuery)) {
+    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
-    SpatialDistanceQuery<O, D> dq = (SpatialDistanceQuery<O, D>) distanceQuery;
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getRangeQuery(this, dq, hints);
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if (distanceQuery.getRelation() != relation) {
+    if(distanceQuery.getRelation() != relation) {
       return null;
     }
     // Can we support this distance function - spatial distances only!
-    if (!(distanceQuery instanceof SpatialDistanceQuery)) {
+    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
-    SpatialDistanceQuery<O, D> dq = (SpatialDistanceQuery<O, D>) distanceQuery;
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getKNNQuery(this, dq, hints);
   }
 

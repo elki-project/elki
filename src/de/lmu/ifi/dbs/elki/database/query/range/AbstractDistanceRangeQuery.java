@@ -24,10 +24,9 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Abstract base class for range queries that use a distance query in their
@@ -36,34 +35,28 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @param <O> Database object type
- * @param <D> Distance type
  */
-public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RangeQuery<O, D> {
+public abstract class AbstractDistanceRangeQuery<O> extends AbstractDataBasedQuery<O> implements RangeQuery<O> {
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceQuery<O, D> distanceQuery;
+  protected DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
    * 
    * @param distanceQuery Distance query
    */
-  public AbstractDistanceRangeQuery(DistanceQuery<O, D> distanceQuery) {
+  public AbstractDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
     super(distanceQuery.getRelation());
     this.distanceQuery = distanceQuery;
   }
 
   @Override
-  public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range) {
+  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
     return getRangeForObject(relation.get(id), range);
   }
 
   @Override
-  abstract public DistanceDBIDList<D> getRangeForObject(O obj, D range);
-
-  @Override
-  public D getDistanceFactory() {
-    return distanceQuery.getDistanceFactory();
-  }
+  abstract public DoubleDBIDList getRangeForObject(O obj, double range);
 }

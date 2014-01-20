@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,15 +33,13 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -95,13 +94,13 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleDistance>(task);
+    return new Instance(task);
   }
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<AbstractMaterializeKNNPreprocessor<?, ?, ?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
-    for(AbstractMaterializeKNNPreprocessor<?, ?, ?> kNN : kNNIndex) {
+    Collection<AbstractMaterializeKNNPreprocessor<?, ?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
+    for(AbstractMaterializeKNNPreprocessor<?, ?> kNN : kNNIndex) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), this);
@@ -118,8 +117,8 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @param kNN kNN preprocessor
    * @return p of LP norm, or NaN
    */
-  public static double getLPNormP(AbstractMaterializeKNNPreprocessor<?, ?, ?> kNN) {
-    DistanceFunction<?, ?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
+  public static double getLPNormP(AbstractMaterializeKNNPreprocessor<?, ?> kNN) {
+    DistanceFunction<?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
     if(LPNormDistanceFunction.class.isInstance(distanceFunction)) {
       return ((LPNormDistanceFunction) distanceFunction).getP();
     }
@@ -132,8 +131,8 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @param kNN kNN preprocessor
    * @return true when angular
    */
-  public static boolean isAngularDistance(AbstractMaterializeKNNPreprocessor<?, ?, ?> kNN) {
-    DistanceFunction<?, ?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
+  public static boolean isAngularDistance(AbstractMaterializeKNNPreprocessor<?, ?> kNN) {
+    DistanceFunction<?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
     if(CosineDistanceFunction.class.isInstance(distanceFunction)) {
       return true;
     }
@@ -152,13 +151,13 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @param angle Opening angle in radians
    * @return path element
    */
-  public static Element drawCosine(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, double angle) {
+  public static Element drawCosine(SVGPlot svgp, Projection2D proj, NumberVector mid, double angle) {
     // Project origin
     double[] pointOfOrigin = proj.fastProjectDataToRenderSpace(new double[proj.getInputDimensionality()]);
-  
+
     // direction of the selected Point
     double[] selPoint = proj.fastProjectDataToRenderSpace(mid);
-  
+
     double[] range1, range2;
     {
       // Rotation plane:
@@ -195,7 +194,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       range1 = proj.fastProjectDataToRenderSpace(r1);
       range2 = proj.fastProjectDataToRenderSpace(r2);
     }
-  
+
     // Continue lines to viewport.
     {
       CanvasSize viewport = proj.estimateViewport();
@@ -213,7 +212,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       VMath.timesEquals(start2, viewport.continueToMargin(range2, start2));
       VMath.plusEquals(start1, range1);
       VMath.plusEquals(start2, range2);
-  
+
       // TODO: add filled variant?
       SVGPath path = new SVGPath();
       path.moveTo(start1);
@@ -233,9 +232,8 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has DBIDSelection oneway - - visualizes
    * 
-   * @param <D> Distance type
    */
-  public class Instance<D extends NumberDistance<D, ?>> extends AbstractScatterplotVisualization implements DataStoreListener {
+  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -249,7 +247,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
     /**
      * The selection result we work on
      */
-    private AbstractMaterializeKNNPreprocessor<? extends NumberVector<?>, D, ?> result;
+    private AbstractMaterializeKNNPreprocessor<? extends NumberVector, ?> result;
 
     /**
      * Constructor
@@ -277,18 +275,18 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
         DBIDs selection = selContext.getSelectedIds();
 
         for(DBIDIter i = selection.iter(); i.valid(); i.advance()) {
-          final KNNList<D> knn = result.get(i);
-          for(DistanceDBIDListIter<D> iter = knn.iter(); iter.valid(); iter.advance()) {
+          final KNNList knn = result.get(i);
+          for(DoubleDBIDListIter iter = knn.iter(); iter.valid(); iter.advance()) {
             try {
               double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
-              if (v[0] != v[0] || v[1] != v[1]) {
+              if(v[0] != v[0] || v[1] != v[1]) {
                 continue; // NaN!
               }
               Element dot = svgp.svgCircle(v[0], v[1], size);
               SVGUtil.addCSSClass(dot, KNNMARKER);
               layer.appendChild(dot);
 
-              Element lbl = svgp.svgText(v[0] + size, v[1] + size, iter.getDistance().toString());
+              Element lbl = svgp.svgText(v[0] + size, v[1] + size, Double.toString(iter.doubleValue()));
               SVGUtil.addCSSClass(lbl, KNNDIST);
               layer.appendChild(lbl);
             }
@@ -297,21 +295,21 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
             }
           }
           // Last element
-          DistanceDBIDPair<D> last = knn.get(knn.size() - 1);
+          DoubleDBIDPair last = knn.get(knn.size() - 1);
           // Draw hypersphere if possible
           {
             final Element dist;
             if(p == 1.0) {
-              dist = SVGHyperSphere.drawManhattan(svgp, proj, rel.get(i), last.getDistance().doubleValue());
+              dist = SVGHyperSphere.drawManhattan(svgp, proj, rel.get(i), last.doubleValue());
             }
             else if(p == 2.0) {
-              dist = SVGHyperSphere.drawEuclidean(svgp, proj, rel.get(i), last.getDistance().doubleValue());
+              dist = SVGHyperSphere.drawEuclidean(svgp, proj, rel.get(i), last.doubleValue());
             }
             else if(!Double.isNaN(p)) {
-              dist = SVGHyperSphere.drawLp(svgp, proj, rel.get(i), last.getDistance().doubleValue(), p);
+              dist = SVGHyperSphere.drawLp(svgp, proj, rel.get(i), last.doubleValue(), p);
             }
             else if(angular) {
-              final NumberVector<?> refvec = rel.get(i);
+              final NumberVector refvec = rel.get(i);
               // Recompute the angle - it could be cosine or arccosine distance
               double maxangle = Math.acos(VectorUtil.cosAngle(refvec, rel.get(last)));
               dist = drawCosine(svgp, proj, refvec, maxangle);

@@ -32,52 +32,35 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 
 /**
  * Class for computing the variance in a clustering result (sum-of-squares).
  * 
  * @author Stephan Baier
  */
-public class WithinClusterVarianceQualityMeasure implements KMeansQualityMeasure<NumberVector<?>, NumberDistance<?, ?>> {
+public class WithinClusterVarianceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector<?>> double calculateCost(Clustering<? extends MeanModel<V>> clustering, PrimitiveDistanceFunction<? super V, ? extends NumberDistance<?, ?>> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel<V>> clustering, PrimitiveDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
     @SuppressWarnings("unchecked")
     final List<Cluster<MeanModel<V>>> clusterList = (List<Cluster<MeanModel<V>>>) (List<?>) clustering.getAllClusters();
 
     boolean squared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
-    if (distanceFunction instanceof PrimitiveDoubleDistanceFunction) {
-      @SuppressWarnings("unchecked")
-      PrimitiveDoubleDistanceFunction<? super V> df = (PrimitiveDoubleDistanceFunction<? super V>) distanceFunction;
-      double variance = 0.0;
-      for (Cluster<MeanModel<V>> cluster : clusterList) {
-        DBIDs ids = cluster.getIDs();
-        V mean = cluster.getModel().getMean();
+    double variance = 0.0;
+    for(Cluster<MeanModel<V>> cluster : clusterList) {
+      DBIDs ids = cluster.getIDs();
+      V mean = cluster.getModel().getMean();
 
-        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          double dist = df.doubleDistance(relation.get(iter), mean);
-          if (squared) {
-            variance += dist;
-          } else {
-            variance += dist * dist;
-          }
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        double dist = distanceFunction.distance(relation.get(iter), mean);
+        if(squared) {
+          variance += dist;
         }
-      }
-      return variance;
-    } else {
-      double variance = 0.0;
-      for (Cluster<MeanModel<V>> cluster : clusterList) {
-        DBIDs ids = cluster.getIDs();
-        V mean = cluster.getModel().getMean();
-
-        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          double dist = distanceFunction.distance(relation.get(iter), mean).doubleValue();
+        else {
           variance += dist * dist;
         }
       }
-      return variance;
     }
+    return variance;
   }
 }

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Storage utility class. Mostly a shorthand for
@@ -123,18 +122,5 @@ public final class DataStoreUtil {
    */
   public static WritableRecordStore makeRecordStorage(DBIDs ids, int hints, Class<?>... dataclasses) {
     return DataStoreFactory.FACTORY.makeRecordStorage(ids, hints, dataclasses);
-  }
-
-  /**
-   * Make a new storage, to associate the given ids with an double valued
-   * distance.
-   * 
-   * @param ids DBIDs to store data for
-   * @param hints Hints for the storage manager
-   * @return new data store
-   */
-  public static WritableDoubleDistanceDataStore makeDoubleDistanceStorage(DBIDs ids, int hints) {
-    // FIXME: this is an ugly work-around.
-    return (WritableDoubleDistanceDataStore) DataStoreFactory.FACTORY.makeStorage(ids, hints, DoubleDistance.class);
   }
 }

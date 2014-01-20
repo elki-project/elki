@@ -23,26 +23,25 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -57,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external text file.")
-public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunction<DoubleDistance> {
+public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunction {
   /**
    * Parameter that specifies the name of the distance matrix file.
    * <p>
@@ -79,7 +78,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
   /**
    * The distance cache
    */
-  private Map<DBIDPair, DoubleDistance> cache;
+  private TObjectDoubleMap<DBIDPair> cache;
 
   /**
    * Constructor.
@@ -87,7 +86,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    * @param parser Parser
    * @param matrixfile input file
    */
-  public FileBasedDoubleDistanceFunction(DistanceParser<DoubleDistance> parser, File matrixfile) {
+  public FileBasedDoubleDistanceFunction(DistanceParser parser, File matrixfile) {
     super();
     try {
       loadCache(parser, matrixfile);
@@ -108,34 +107,42 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
-    if(id1 == null) {
-      return getDistanceFactory().undefinedDistance();
-    }
-    if(id2 == null) {
-      return getDistanceFactory().undefinedDistance();
+  public double distance(DBIDRef id1, DBIDRef id2) {
+    if(id1 == null || id2 == null) {
+      throw new AbortException("Unknown object ID - no precomputed distance available.");
     }
     // the smaller id is the first key
     if(DBIDUtil.compare(id1, id2) > 0) {
       return distance(id2, id1);
     }
-
-    DoubleDistance ret = cache.get(DBIDUtil.newPair(id1, id2));
-    if (ret == null && DBIDUtil.equal(id1, id2)) {
-      return DoubleDistance.ZERO_DISTANCE;
+    double ret = cache.get(DBIDUtil.newPair(id1, id2));
+    if(ret != ret && DBIDUtil.equal(id1, id2)) {
+      return 0.;
     }
     return ret;
   }
 
-  private void loadCache(DistanceParser<DoubleDistance> parser, File matrixfile) throws IOException {
+  private void loadCache(DistanceParser parser, File matrixfile) throws IOException {
     InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
-    DistanceParsingResult<DoubleDistance> res = parser.parse(in);
-    cache = res.getDistanceCache();
-  }
+    cache = new TObjectDoubleHashMap<DBIDPair>();
+    parser.parse(in, new DistanceCacheWriter() {
+      @Override
+      public void put(DBIDRef id1, DBIDRef id2, double distance) {
+        if(DBIDUtil.compare(id1, id2) > 0) {
+          put(id2, id1, distance);
+          return;
+        }
+        cache.put(DBIDUtil.newPair(id1, id2), distance);
+      }
 
-  @Override
-  public DoubleDistance getDistanceFactory() {
-    return DoubleDistance.FACTORY;
+      @Override
+      public boolean containsKey(DBIDRef id1, DBIDRef id2) {
+        if(DBIDUtil.compare(id1, id2) > 0) {
+          return containsKey(id2, id1);
+        }
+        return cache.containsKey(DBIDUtil.newPair(id1, id2));
+      }
+    });
   }
 
   @Override
@@ -160,7 +167,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
   public static class Parameterizer extends AbstractParameterizer {
     protected File matrixfile = null;
 
-    protected DistanceParser<DoubleDistance> parser = null;
+    protected DistanceParser parser = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -170,13 +177,9 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
         matrixfile = MATRIX_PARAM.getValue();
       }
 
-      final ObjectParameter<DistanceParser<DoubleDistance>> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
-        ListParameterization parserConfig = new ListParameterization();
-        parserConfig.addParameter(DistanceParser.DISTANCE_ID, DoubleDistance.class);
-        ChainedParameterization combinedConfig = new ChainedParameterization(parserConfig, config);
-        combinedConfig.errorsTo(config);
-        parser = PARSER_PARAM.instantiateClass(combinedConfig);
+        parser = PARSER_PARAM.instantiateClass(config);
       }
     }
 

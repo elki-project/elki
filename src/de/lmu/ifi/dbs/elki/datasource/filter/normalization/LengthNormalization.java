@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DoubleNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -42,25 +42,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> vector type
  */
-public class LengthNormalization<V extends NumberVector<?>> extends AbstractStreamNormalization<V> {
+public class LengthNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
   /**
    * Norm to use.
    */
-  DoubleNorm<? super V> norm;
+  Norm<? super V> norm;
 
   /**
    * Constructor.
    * 
    * @param norm Norm to use
    */
-  public LengthNormalization(DoubleNorm<? super V> norm) {
+  public LengthNormalization(Norm<? super V> norm) {
     super();
     this.norm = norm;
   }
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    final double d = norm.doubleNorm(featureVector);
+    final double d = norm.norm(featureVector);
     return factory.newNumberVector(featureVector.getColumnVector().timesEquals(1 / d).getArrayRef());
   }
 
@@ -87,7 +87,7 @@ public class LengthNormalization<V extends NumberVector<?>> extends AbstractStre
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Option ID for normalization norm.
      */
@@ -96,12 +96,12 @@ public class LengthNormalization<V extends NumberVector<?>> extends AbstractStre
     /**
      * Norm to use.
      */
-    DoubleNorm<? super V> norm;
+    Norm<? super V> norm;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DoubleNorm<? super V>> normP = new ObjectParameter<>(NORM_ID, DoubleNorm.class, EuclideanDistanceFunction.class);
+      ObjectParameter<Norm<? super V>> normP = new ObjectParameter<>(NORM_ID, Norm.class, EuclideanDistanceFunction.class);
       if(config.grab(normP)) {
         norm = normP.instantiateClass(config);
       }

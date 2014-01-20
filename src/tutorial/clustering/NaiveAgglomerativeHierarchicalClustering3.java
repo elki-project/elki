@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -81,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  */
 @Reference(title = "A Review of Classification", authors = "R. M. Cormack", booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", url = "http://www.jstor.org/stable/2344237")
-public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, Result> {
+public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
   /**
    * Class logger
    */
@@ -168,7 +167,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
    * @param numclusters Number of clusters
    * @param linkage Linkage strategy
    */
-  public NaiveAgglomerativeHierarchicalClustering3(DistanceFunction<? super O, D> distanceFunction, int numclusters, Linkage linkage) {
+  public NaiveAgglomerativeHierarchicalClustering3(DistanceFunction<? super O> distanceFunction, int numclusters, Linkage linkage) {
     super(distanceFunction);
     this.numclusters = numclusters;
     this.linkage = linkage;
@@ -182,14 +181,14 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
    * @return Clustering hierarchy
    */
   public Result run(Database db, Relation<O> relation) {
-    DistanceQuery<O, D> dq = db.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
-    if (size > 0x10000) {
+    if(size > 0x10000) {
       throw new AbortException("This implementation does not scale to data sets larger than " + 0x10000 + " instances (~17 GB RAM), which results in an integer overflow.");
     }
-    if (Linkage.SINGLE.equals(linkage)) {
+    if(Linkage.SINGLE.equals(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
 
@@ -199,12 +198,12 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
     // Position counter - must agree with computeOffset!
     int pos = 0;
     boolean square = Linkage.WARD.equals(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
-    for (int x = 0; ix.valid(); x++, ix.advance()) {
+    for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
-      for (int y = 0; y < x; y++, iy.advance()) {
-        scratch[pos] = dq.distance(ix, iy).doubleValue();
+      for(int y = 0; y < x; y++, iy.advance()) {
+        scratch[pos] = dq.distance(ix, iy);
         // Ward uses variances -- i.e. squared values
-        if (square) {
+        if(square) {
           scratch[pos] *= scratch[pos];
         }
         pos++;
@@ -223,20 +222,20 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
     // Repeat until everything merged, except the desired number of clusters:
     final int stop = size - numclusters;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", stop, LOG) : null;
-    for (int i = 0; i < stop; i++) {
+    for(int i = 0; i < stop; i++) {
       double min = Double.POSITIVE_INFINITY;
       int minx = -1, miny = -1;
-      for (int x = 0; x < size; x++) {
-        if (height[x] < Double.POSITIVE_INFINITY) {
+      for(int x = 0; x < size; x++) {
+        if(height[x] < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int xbase = triangleSize(x);
-        for (int y = 0; y < x; y++) {
-          if (height[y] < Double.POSITIVE_INFINITY) {
+        for(int y = 0; y < x; y++) {
+          if(height[y] < Double.POSITIVE_INFINITY) {
             continue;
           }
           final int idx = xbase + y;
-          if (scratch[idx] < min) {
+          if(scratch[idx] < min) {
             min = scratch[idx];
             minx = x;
             miny = y;
@@ -255,15 +254,17 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
       ModifiableDBIDs cx = clusters.get(minx);
       ModifiableDBIDs cy = clusters.get(miny);
       int sizex = 1, sizey = 1; // cluster sizes, for averaging
-      if (cy == null) {
+      if(cy == null) {
         cy = DBIDUtil.newHashSet();
         cy.add(iy);
-      } else {
+      }
+      else {
         sizey = cy.size();
       }
-      if (cx == null) {
+      if(cx == null) {
         cy.add(ix);
-      } else {
+      }
+      else {
         sizex = cx.size();
         cy.addDBIDs(cx);
         clusters.remove(minx);
@@ -276,8 +277,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
       // hashmap lookup.
       final int xbase = triangleSize(minx), ybase = triangleSize(miny);
       // Write to (y, j), with j < y
-      for (int j = 0; j < miny; j++) {
-        if (height[j] < Double.POSITIVE_INFINITY) {
+      for(int j = 0; j < miny; j++) {
+        if(height[j] < Double.POSITIVE_INFINITY) {
           continue;
         }
         final DBIDs idsj = clusters.get(j);
@@ -285,8 +286,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
         scratch[ybase + j] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[ybase + j], sizej, min);
       }
       // Write to (j, y), with y < j < x
-      for (int j = miny + 1; j < minx; j++) {
-        if (height[j] < Double.POSITIVE_INFINITY) {
+      for(int j = miny + 1; j < minx; j++) {
+        if(height[j] < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int jbase = triangleSize(j);
@@ -295,8 +296,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
         scratch[jbase + miny] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jbase + miny], sizej, min);
       }
       // Write to (j, y), with y < x < j
-      for (int j = minx + 1; j < size; j++) {
-        if (height[j] < Double.POSITIVE_INFINITY) {
+      for(int j = minx + 1; j < size; j++) {
+        if(height[j] < Double.POSITIVE_INFINITY) {
           continue;
         }
         final DBIDs idsj = clusters.get(j);
@@ -304,20 +305,20 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
         final int jbase = triangleSize(j);
         scratch[jbase + miny] = linkage.combine(sizex, scratch[jbase + minx], sizey, scratch[jbase + miny], sizej, min);
       }
-      if (prog != null) {
+      if(prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
-    if (prog != null) {
+    if(prog != null) {
       prog.ensureCompleted(LOG);
     }
 
     // Build the clustering result
     final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");
-    for (int x = 0; x < size; x++) {
-      if (height[x] < Double.POSITIVE_INFINITY) {
+    for(int x = 0; x < size; x++) {
+      if(height[x] < Double.POSITIVE_INFINITY) {
         DBIDs cids = clusters.get(x);
-        if (cids == null) {
+        if(cids == null) {
           ix.seek(x);
           cids = DBIDUtil.deref(ix);
         }
@@ -356,9 +357,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
    * @author Erich Schubert
    * 
    * @param <O> Object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Option ID for linkage parameter.
      */
@@ -379,19 +379,19 @@ public class NaiveAgglomerativeHierarchicalClustering3<O, D extends NumberDistan
       super.makeOptions(config);
       IntParameter numclustersP = new IntParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID);
       numclustersP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if (config.grab(numclustersP)) {
+      if(config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
       }
 
       EnumParameter<Linkage> linkageP = new EnumParameter<>(LINKAGE_ID, Linkage.class);
       linkageP.setDefaultValue(Linkage.WARD);
-      if (config.grab(linkageP)) {
+      if(config.grab(linkageP)) {
         linkage = linkageP.getValue();
       }
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering3<O, D> makeInstance() {
+    protected NaiveAgglomerativeHierarchicalClustering3<O> makeInstance() {
       return new NaiveAgglomerativeHierarchicalClustering3<>(distanceFunction, numclusters, linkage);
     }
   }

@@ -56,7 +56,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
   /**
    * Columns to check.
    */
-  private NumberVector.Factory<?, ?>[] densecols = null;
+  private NumberVector.Factory<?> [] densecols = null;
 
   /**
    * Distribution to generate replacement values with.
@@ -104,7 +104,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
         for (int j = 0; j < densecols.length; j++) {
           Object o = source.data(j);
           if (densecols[j] != null) {
-            NumberVector<?> v = (NumberVector<?>) o;
+            NumberVector v = (NumberVector) o;
             double[] ro = null; // replacement
             if (v != null) {
               for (int i = 0; i < v.getDimensionality(); i++) {
@@ -132,19 +132,19 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
    */
   private void updateMeta(BundleMeta meta) {
     final int cols = meta.size();
-    densecols = new NumberVector.Factory<?, ?>[cols];
+    densecols = new NumberVector.Factory<?> [cols];
     for (int i = 0; i < cols; i++) {
       if (TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
         throw new AbortException("Filtering sparse vectors is not yet supported by this filter. Please contribute.");
       }
       if (TypeUtil.FLOAT_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
         VectorFieldTypeInformation<?> vmeta = (VectorFieldTypeInformation<?>) meta.get(i);
-        densecols[i] = (NumberVector.Factory<?, ?>) vmeta.getFactory();
+        densecols[i] = (NumberVector.Factory<?> ) vmeta.getFactory();
         continue;
       }
       if (TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
         VectorFieldTypeInformation<?> vmeta = (VectorFieldTypeInformation<?>) meta.get(i);
-        densecols[i] = (NumberVector.Factory<?, ?>) vmeta.getFactory();
+        densecols[i] = (NumberVector.Factory<?> ) vmeta.getFactory();
         continue;
       }
     }
@@ -165,7 +165,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
       final Object[] row = objects.getRow(i);
       for (int j = 0; j < densecols.length; j++) {
         if (densecols[j] != null) {
-          NumberVector<?> v = (NumberVector<?>) row[j];
+          NumberVector v = (NumberVector) row[j];
           double[] ro = null; // replacement
           if (v != null) {
             for (int d = 0; d < v.getDimensionality(); d++) {

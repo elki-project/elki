@@ -97,7 +97,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
    * @apiviz.uses SVGSimpleLinearAxis
    */
   // TODO: split into interactive / non-interactive parts?
-  public class Instance extends AbstractParallelVisualization<NumberVector<?>> {
+  public class Instance extends AbstractParallelVisualization<NumberVector> {
     /**
      * Axis label class.
      */

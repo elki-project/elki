@@ -115,7 +115,6 @@ class MkTabLeafEntry extends MTreeLeafEntry implements MkTabEntry {
    *         cannot be found.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     int k_max = in.readInt();
@@ -133,7 +132,6 @@ class MkTabLeafEntry extends MTreeLeafEntry implements MkTabEntry {
    *         and has the same parameter k_max and knnDistances as this entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
     if (this == o) {
       return true;

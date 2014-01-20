@@ -147,7 +147,7 @@ public class JSONWebServer implements HttpHandler {
         // TODO: refactor to JSONFormatters!
         // Format a NumberVector
         if (data instanceof NumberVector) {
-          NumberVector<?> v = (NumberVector<?>) data;
+          NumberVector v = (NumberVector) data;
           re.appendKeyArray(bundle.meta(j));
           for (int i = 0; i < v.getDimensionality(); i++) {
             re.append(v.doubleValue(i));

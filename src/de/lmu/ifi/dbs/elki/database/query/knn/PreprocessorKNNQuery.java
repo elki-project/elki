@@ -30,10 +30,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -43,11 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>> extends AbstractDataBasedQuery<O> implements KNNQuery<O, D> {
+public class PreprocessorKNNQuery<O, T extends KNNList> extends AbstractDataBasedQuery<O> implements KNNQuery<O> {
   /**
    * The last preprocessor result
    */
-  final private AbstractMaterializeKNNPreprocessor<O, D, T> preprocessor;
+  final private AbstractMaterializeKNNPreprocessor<O, T> preprocessor;
 
   /**
    * Warn only once.
@@ -60,7 +59,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>
    * @param database Database to query
    * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorKNNQuery(Relation<O> database, AbstractMaterializeKNNPreprocessor<O, D, T> preprocessor) {
+  public PreprocessorKNNQuery(Relation<O> database, AbstractMaterializeKNNPreprocessor<O, T> preprocessor) {
     super(database);
     this.preprocessor = preprocessor;
   }
@@ -71,22 +70,22 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>
    * @param database Database to query
    * @param preprocessor Preprocessor to use
    */
-  public PreprocessorKNNQuery(Relation<O> database, AbstractMaterializeKNNPreprocessor.Factory<O, D, T> preprocessor) {
+  public PreprocessorKNNQuery(Relation<O> database, AbstractMaterializeKNNPreprocessor.Factory<O, T> preprocessor) {
     this(database, preprocessor.instantiate(database));
   }
 
   @Override
-  public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
+  public KNNList getKNNForDBID(DBIDRef id, int k) {
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
     if(!warned && k < preprocessor.getK()) {
-      KNNList<D> dr = preprocessor.get(id);
+      KNNList dr = preprocessor.get(id);
       int subk = k;
-      D kdist = dr.get(subk - 1).getDistance();
+      double kdist = dr.get(subk - 1).doubleValue();
       while(subk < dr.size()) {
-        D ndist = dr.get(subk).getDistance();
-        if(kdist.equals(ndist)) {
+        double ndist = dr.get(subk).doubleValue();
+        if(kdist == ndist) {
           // Tie - increase subk.
           subk++;
         }
@@ -105,19 +104,19 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>
   }
 
   @Override
-  public List<KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
-    List<KNNList<D>> result = new ArrayList<>(ids.size());
+    List<KNNList> result = new ArrayList<>(ids.size());
     if(k < preprocessor.getK()) {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
-        KNNList<D> dr = preprocessor.get(iter);
+        KNNList dr = preprocessor.get(iter);
         int subk = k;
-        D kdist = dr.get(subk - 1).getDistance();
+        double kdist = dr.get(subk - 1).doubleValue();
         while(subk < dr.size()) {
-          D ndist = dr.get(subk).getDistance();
-          if(kdist.equals(ndist)) {
+          double ndist = dr.get(subk).doubleValue();
+          if(kdist == ndist) {
             // Tie - increase subk.
             subk++;
           }
@@ -142,7 +141,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>
   }
 
   @Override
-  public KNNList<D> getKNNForObject(O obj, int k) {
+  public KNNList getKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
 
@@ -151,7 +150,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>
    * 
    * @return preprocessor instance
    */
-  public AbstractMaterializeKNNPreprocessor<O, D, T> getPreprocessor() {
+  public AbstractMaterializeKNNPreprocessor<O, T> getPreprocessor() {
     return preprocessor;
   }
 }

@@ -29,10 +29,8 @@ import gnu.trove.map.TIntDoubleMap;
  * Combines the SparseFeatureVector and NumberVector.
  * 
  * @author Erich Schubert
- * 
- * @param <N> Number type
  */
-public interface SparseNumberVector<N extends Number> extends NumberVector<N>, SparseFeatureVector<N> {
+public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Number> {
   /**
    * Iterator over non-zero features only, <em>ascendingly</em>.
    * 
@@ -173,9 +171,8 @@ public interface SparseNumberVector<N extends Number> extends NumberVector<N>, S
    * @apiviz.has SparseNumberVector
    * 
    * @param <V> Vector type number type
-   * @param <N> Number type
    */
-  interface Factory<V extends SparseNumberVector<N>, N extends Number> extends NumberVector.Factory<V, N> {
+  interface Factory<V extends SparseNumberVector> extends NumberVector.Factory<V> {
     /**
      * Returns a new NumberVector of N for the given values.
      * 

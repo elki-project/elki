@@ -25,7 +25,7 @@
  * 
  * <h2>Code example</h2>
  * <pre>{@code
- * DistanceQuery<V, DoubleDistance> distanceQuery = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
+ * DistanceQuery<V> distanceQuery = database.getDistanceQuery(EuclideanDistanceFunction.STATIC);
  * }</pre>
  * 
  * @apiviz.exclude de.lmu.ifi.dbs.elki.application.*

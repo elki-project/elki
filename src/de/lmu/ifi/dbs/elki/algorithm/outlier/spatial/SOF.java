@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -65,11 +64,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * @param <N> Neighborhood object type
  * @param <O> Attribute object type
- * @param <D> Distance type
  */
 @Title("Spatial Outlier Factor")
 @Reference(authors = "Huang, T., Qin, X.", title = "Detecting outliers in spatial database", booktitle = "Proc. 3rd International Conference on Image and Graphics", url = "http://dx.doi.org/10.1109/ICIG.2004.53")
-public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier<N, O, D> {
+public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
   /**
    * The logger for this class.
    */
@@ -82,7 +80,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    * @param nonSpatialDistanceFunction Distance function on non-spatial
    *        attributes
    */
-  public SOF(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<O, D> nonSpatialDistanceFunction) {
+  public SOF(NeighborSetPredicate.Factory<N> npred, PrimitiveDistanceFunction<O> nonSpatialDistanceFunction) {
     super(npred, nonSpatialDistanceFunction);
   }
 
@@ -101,7 +99,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    */
   public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
-    DistanceQuery<O, D> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
+    DistanceQuery<O> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
 
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -112,7 +110,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       double avg = 0;
       for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-        avg += distFunc.distance(iditer, iter).doubleValue();
+        avg += distFunc.distance(iditer, iter);
       }
       double lrd = 1 / (avg / neighbors.size());
       if (Double.isNaN(lrd)) {
@@ -159,11 +157,10 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
    * 
    * @param <N> Neighborhood type
    * @param <O> Attribute object type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, O, D> {
+  public static class Parameterizer<N, O> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, O> {
     @Override
-    protected SOF<N, O, D> makeInstance() {
+    protected SOF<N, O> makeInstance() {
       return new SOF<>(npredf, distanceFunction);
     }
   }

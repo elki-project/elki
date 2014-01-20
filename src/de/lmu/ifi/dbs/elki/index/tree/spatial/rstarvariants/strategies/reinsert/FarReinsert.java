@@ -6,7 +6,7 @@ import java.util.Collections;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
@@ -50,7 +50,7 @@ public class FarReinsert extends AbstractPartialReinsert {
    * @param reinsertAmount Amount to reinsert
    * @param distanceFunction Distance function
    */
-  public FarReinsert(double reinsertAmount, SpatialPrimitiveDoubleDistanceFunction<?> distanceFunction) {
+  public FarReinsert(double reinsertAmount, SpatialPrimitiveDistanceFunction<?> distanceFunction) {
     super(reinsertAmount, distanceFunction);
   }
 
@@ -59,7 +59,7 @@ public class FarReinsert extends AbstractPartialReinsert {
     DoubleIntPair[] order = new DoubleIntPair[getter.size(entries)];
     DoubleVector centroid = new DoubleVector(SpatialUtil.centroid(page));
     for(int i = 0; i < order.length; i++) {
-      double distance = distanceFunction.doubleMinDist(new DoubleVector(SpatialUtil.centroid(getter.get(entries, i))), centroid);
+      double distance = distanceFunction.minDist(new DoubleVector(SpatialUtil.centroid(getter.get(entries, i))), centroid);
       order[i] = new DoubleIntPair(distance, i);
     }
     Arrays.sort(order, Collections.reverseOrder());

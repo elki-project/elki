@@ -25,21 +25,15 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceKNNSubList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.KNNSubList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDKNNSubList;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.UnsafeRandom;
@@ -131,7 +125,7 @@ public final class DBIDUtil {
    * @return DBID
    */
   public static DBID deref(DBIDRef ref) {
-    if (ref instanceof DBID) {
+    if(ref instanceof DBID) {
       return (DBID) ref;
     }
     return importInteger(ref.internalGetIndex());
@@ -154,12 +148,12 @@ public final class DBIDUtil {
    * @return String representation
    */
   public static String toString(DBIDs ids) {
-    if (ids instanceof DBID) {
+    if(ids instanceof DBID) {
       return DBIDFactory.FACTORY.toString((DBID) ids);
     }
     StringBuilder buf = new StringBuilder();
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      if (buf.length() > 0) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      if(buf.length() > 0) {
         buf.append(", ");
       }
       buf.append(DBIDFactory.FACTORY.toString(iter));
@@ -308,12 +302,12 @@ public final class DBIDUtil {
    */
   // TODO: optimize better?
   public static ModifiableDBIDs intersection(DBIDs first, DBIDs second) {
-    if (first.size() > second.size()) {
+    if(first.size() > second.size()) {
       return intersection(second, first);
     }
     ModifiableDBIDs inter = newHashSet(first.size());
-    for (DBIDIter it = first.iter(); it.valid(); it.advance()) {
-      if (second.contains(it)) {
+    for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
+      if(second.contains(it)) {
         inter.add(it);
       }
     }
@@ -329,20 +323,22 @@ public final class DBIDUtil {
    */
   public static int intersectionSize(DBIDs first, DBIDs second) {
     // If exactly one is a Set, use it as second parameter.
-    if (second instanceof SetDBIDs) {
-      if (!(first instanceof SetDBIDs)) {
+    if(second instanceof SetDBIDs) {
+      if(!(first instanceof SetDBIDs)) {
         return internalIntersectionSize(first, second);
       }
-    } else {
-      if (first instanceof SetDBIDs) {
+    }
+    else {
+      if(first instanceof SetDBIDs) {
         return internalIntersectionSize(second, first);
       }
     }
     // Both are the same type: both set or both non set.
     // Smaller goes first.
-    if (first.size() <= second.size()) {
+    if(first.size() <= second.size()) {
       return internalIntersectionSize(first, second);
-    } else {
+    }
+    else {
       return internalIntersectionSize(second, first);
     }
   }
@@ -356,8 +352,8 @@ public final class DBIDUtil {
    */
   private static int internalIntersectionSize(DBIDs first, DBIDs second) {
     int c = 0;
-    for (DBIDIter it = first.iter(); it.valid(); it.advance()) {
-      if (second.contains(it)) {
+    for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
+      if(second.contains(it)) {
         c++;
       }
     }
@@ -375,7 +371,7 @@ public final class DBIDUtil {
    */
   // TODO: optimize?
   public static void symmetricIntersection(DBIDs first, DBIDs second, HashSetModifiableDBIDs firstonly, HashSetModifiableDBIDs intersection, HashSetModifiableDBIDs secondonly) {
-    if (first.size() > second.size()) {
+    if(first.size() > second.size()) {
       symmetricIntersection(second, first, secondonly, intersection, firstonly);
       return;
     }
@@ -384,11 +380,12 @@ public final class DBIDUtil {
     assert (secondonly.size() == 0) : "OUTPUT set should be empty!";
     // Initialize with second
     secondonly.addDBIDs(second);
-    for (DBIDIter it = first.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
       // Try to remove
-      if (secondonly.remove(it)) {
+      if(secondonly.remove(it)) {
         intersection.add(it);
-      } else {
+      }
+      else {
         firstonly.add(it);
       }
     }
@@ -428,16 +425,16 @@ public final class DBIDUtil {
    * @return Unmodifiable collection
    */
   public static StaticDBIDs makeUnmodifiable(DBIDs existing) {
-    if (existing instanceof StaticDBIDs) {
+    if(existing instanceof StaticDBIDs) {
       return (StaticDBIDs) existing;
     }
-    if (existing instanceof IntegerArrayDBIDs) {
+    if(existing instanceof IntegerArrayDBIDs) {
       return new UnmodifiableIntegerArrayDBIDs((IntegerArrayDBIDs) existing);
     }
-    if (existing instanceof IntegerDBIDs) {
+    if(existing instanceof IntegerDBIDs) {
       return new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing);
     }
-    if (existing instanceof ArrayDBIDs) {
+    if(existing instanceof ArrayDBIDs) {
       return new UnmodifiableArrayDBIDs((ArrayDBIDs) existing);
     }
     return new UnmodifiableDBIDs(existing);
@@ -450,9 +447,10 @@ public final class DBIDUtil {
    * @return Array DBIDs.
    */
   public static ArrayDBIDs ensureArray(DBIDs ids) {
-    if (ids instanceof ArrayDBIDs) {
+    if(ids instanceof ArrayDBIDs) {
       return (ArrayDBIDs) ids;
-    } else {
+    }
+    else {
       return newArray(ids);
     }
   }
@@ -464,9 +462,10 @@ public final class DBIDUtil {
    * @return Set DBIDs.
    */
   public static SetDBIDs ensureSet(DBIDs ids) {
-    if (ids instanceof SetDBIDs) {
+    if(ids instanceof SetDBIDs) {
       return (SetDBIDs) ids;
-    } else {
+    }
+    else {
       return newHashSet(ids);
     }
   }
@@ -478,13 +477,14 @@ public final class DBIDUtil {
    * @return Modifiable DBIDs.
    */
   public static ModifiableDBIDs ensureModifiable(DBIDs ids) {
-    if (ids instanceof ModifiableDBIDs) {
+    if(ids instanceof ModifiableDBIDs) {
       return (ModifiableDBIDs) ids;
-    } else {
-      if (ids instanceof ArrayDBIDs) {
+    }
+    else {
+      if(ids instanceof ArrayDBIDs) {
         return newArray(ids);
       }
-      if (ids instanceof HashSetDBIDs) {
+      if(ids instanceof HashSetDBIDs) {
         return newHashSet(ids);
       }
       return newArray(ids);
@@ -515,59 +515,25 @@ public final class DBIDUtil {
   }
 
   /**
-   * Make a DistanceDBIDPair.
-   * 
-   * @param dist Distance value
-   * @param id ID
-   * @return new pair
-   */
-  public static <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D dist, DBIDRef id) {
-    return DBIDFactory.FACTORY.newDistancePair(dist, id);
-  }
-
-  /**
-   * Make a DoubleDistanceDBIDPair.
-   * 
-   * @param dist Distance value
-   * @param id ID
-   * @return new pair
-   */
-  public static DoubleDistanceDBIDPair newDistancePair(double dist, DBIDRef id) {
-    return DBIDFactory.FACTORY.newDistancePair(dist, id);
-  }
-
-  /**
    * Create an appropriate heap for the distance type.
    * 
    * This will use a double heap if appropriate.
    * 
    * @param distancetype distance prototype
    * @param k K value
-   * @param <D> distance type
    * @return New heap of size k, appropriate for this distance type.
    */
-  public static <D extends Distance<D>> KNNHeap<D> newHeap(D distancetype, int k) {
-    return DBIDFactory.FACTORY.newHeap(distancetype, k);
-  }
-
-  /**
-   * Create an appropriate heap for double distances.
-   * 
-   * @param k K value
-   * @return New heap of size k, appropriate for this distance type.
-   */
-  public static DoubleDistanceKNNHeap newDoubleDistanceHeap(int k) {
-    return DBIDFactory.FACTORY.newDoubleDistanceHeap(k);
+  public static KNNHeap newHeap(int k) {
+    return DBIDFactory.FACTORY.newHeap(k);
   }
 
   /**
    * Build a new heap from a given list.
    * 
    * @param exist Existing result
-   * @param <D> Distance type
    * @return New heap
    */
-  public static <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist) {
+  public static KNNHeap newHeap(KNNList exist) {
     return DBIDFactory.FACTORY.newHeap(exist);
   }
 
@@ -601,7 +567,7 @@ public final class DBIDUtil {
    * @param limit Shuffling limit.
    */
   public static void randomShuffle(ArrayModifiableDBIDs ids, Random random, final int limit) {
-    for (int i = 1; i < limit; i++) {
+    for(int i = 1; i < limit; i++) {
       ids.swap(i - 1, i + random.nextInt(limit - i));
     }
   }
@@ -627,9 +593,10 @@ public final class DBIDUtil {
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Long seed) {
-    if (seed != null) {
+    if(seed != null) {
       return randomSample(source, k, new Random(seed.longValue()));
-    } else {
+    }
+    else {
       return randomSample(source, k, new Random());
     }
   }
@@ -655,29 +622,31 @@ public final class DBIDUtil {
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Random random) {
-    if (k < 0 || k > source.size()) {
+    if(k < 0 || k > source.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
-    if (random == null) {
-      random = new UnsafeRandom(); // Fast, and we're single-threaded here anyway.
+    if(random == null) {
+      random = new UnsafeRandom(); // Fast, and we're single-threaded here
+                                   // anyway.
     }
-    
+
     // TODO: better balancing for different sizes
     // Two methods: constructive vs. destructive
-    if (k < source.size() >> 1) {
+    if(k < source.size() >> 1) {
       ArrayDBIDs aids = DBIDUtil.ensureArray(source);
       DBIDArrayIter iter = aids.iter();
       HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);
-      while (sample.size() < k) {
+      while(sample.size() < k) {
         iter.seek(random.nextInt(aids.size()));
         sample.add(iter);
       }
       return sample;
-    } else {
+    }
+    else {
       ArrayModifiableDBIDs sample = DBIDUtil.newArray(source);
       randomShuffle(sample, random, k);
       // Delete trailing elements
-      for (int i = sample.size() - 1; i > k; i--) {
+      for(int i = sample.size() - 1; i > k; i--) {
         sample.remove(i);
       }
       return sample;
@@ -703,19 +672,20 @@ public final class DBIDUtil {
    * @param random Random generator
    */
   public static ArrayDBIDs[] randomSplit(DBIDs oids, int p, Random random) {
-    if (random == null) {
-      random = new UnsafeRandom(); // Fast, and we're single-threaded here anyway.
+    if(random == null) {
+      // Fast, and we're single-threaded here anyway.
+      random = new UnsafeRandom();
     }
     ArrayModifiableDBIDs ids = newArray(oids);
     final int size = ids.size();
     ArrayDBIDs[] split = new ArrayDBIDs[p];
     // Shuffle
-    for (int i = 1; i < size; i++) {
+    for(int i = 1; i < size; i++) {
       ids.swap(i - 1, i + random.nextInt(size - i));
     }
     final int minsize = size / p; // Floor.
     final int extra = size % p; // Remainder
-    for (int beg = 0, part = 0; part < p; part++) {
+    for(int beg = 0, part = 0; part < p; part++) {
       // First partitions are smaller, last partitions are larger.
       final int psize = minsize + ((part < extra) ? 1 : 0);
       split[part] = ids.slice(beg, beg + psize);
@@ -729,17 +699,34 @@ public final class DBIDUtil {
    * 
    * @param list Existing list
    * @param k k
-   * @param <D> distance type
    * @return Subset
    */
-  @SuppressWarnings("unchecked")
-  public static <D extends Distance<D>> KNNList<D> subList(KNNList<D> list, int k) {
-    if (k >= list.size()) {
+  public static KNNList subList(KNNList list, int k) {
+    if(k >= list.size()) {
       return list;
     }
-    if (list instanceof DoubleDistanceKNNList) {
-      return (KNNList<D>) new DoubleDistanceKNNSubList((DoubleDistanceKNNList) list, k);
+    if(list instanceof IntegerDBIDKNNList) {
+      return new IntegerDBIDKNNSubList((IntegerDBIDKNNList) list, k);
     }
-    return new KNNSubList<>(list, k);
+    return new KNNSubList(list, k);
+  }
+
+  /**
+   * Create a modifiable list to store distance-DBID pairs.
+   * 
+   * @param size Estimated upper list size
+   * @return Empty list
+   */
+  public static ModifiableDoubleDBIDList newDistanceDBIDList(int size) {
+    return DBIDFactory.FACTORY.newDistanceDBIDList(size);
+  }
+
+  /**
+   * Create a modifiable list to store distance-DBID pairs.
+   * 
+   * @return Empty list
+   */
+  public static ModifiableDoubleDBIDList newDistanceDBIDList() {
+    return DBIDFactory.FACTORY.newDistanceDBIDList();
   }
 }

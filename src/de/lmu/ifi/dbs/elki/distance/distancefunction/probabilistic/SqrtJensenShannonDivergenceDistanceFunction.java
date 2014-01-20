@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "D. M. Endres, J. E. Schindelin", title = "A new metric for probability distributions", booktitle = "IEEE Transactions on Information Theory, 49(7)", url = "http://dx.doi.org/10.1109/TIT.2003.813506")
-public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -58,7 +58,7 @@ public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractVectorD
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
     for(int d = 0; d < dim; d++) {

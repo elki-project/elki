@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class SparseFloatVector extends AbstractNumberVector<Float> implements SparseNumberVector<Float> {
+public class SparseFloatVector extends AbstractNumberVector implements SparseNumberVector {
   /**
    * Static instance.
    */
@@ -350,13 +350,13 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
    * 
    * @apiviz.has SparseFloatVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<SparseFloatVector, Float> implements SparseNumberVector.Factory<SparseFloatVector, Float> {
+  public static class Factory extends AbstractNumberVector.Factory<SparseFloatVector> implements SparseNumberVector.Factory<SparseFloatVector> {
     @Override
-    public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
+    public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       float[] values = new float[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i);
+        values[i] = adapter.get(array, i).floatValue();
       }
       // TODO: inefficient
       return new SparseFloatVector(values);

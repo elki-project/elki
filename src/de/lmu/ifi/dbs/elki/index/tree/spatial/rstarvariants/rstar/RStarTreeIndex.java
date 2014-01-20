@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
@@ -55,7 +54,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @param <O> Object type
  */
-public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
+public class RStarTreeIndex<O extends NumberVector> extends RStarTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   /**
    * The appropriate logger for this index.
    */
@@ -93,7 +92,7 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
     super.initialize();
     insertAll(relation.getDBIDs()); // Will check for actual bulk load!
   }
-  
+
   /**
    * Inserts the specified reel vector object into this index.
    * 
@@ -119,13 +118,13 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
     // Make an example leaf
     if(canBulkLoad()) {
       List<SpatialEntry> leafs = new ArrayList<>(ids.size());
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         leafs.add(createNewLeafEntry(iter));
       }
       bulkLoad(leafs);
     }
     else {
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         insert(DBIDUtil.deref(iter));
       }
     }
@@ -153,13 +152,13 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
 
   @Override
   public void deleteAll(DBIDs ids) {
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       delete(iter);
     }
   }
 
   @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
     if(distanceQuery.getRelation() != relation) {
       return null;
@@ -168,12 +167,12 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
     if(!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
-    SpatialDistanceQuery<O, D> dq = (SpatialDistanceQuery<O, D>) distanceQuery;
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getRangeQuery(this, dq, hints);
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
     if(distanceQuery.getRelation() != relation) {
       return null;
@@ -182,7 +181,7 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
     if(!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
-    SpatialDistanceQuery<O, D> dq = (SpatialDistanceQuery<O, D>) distanceQuery;
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getKNNQuery(this, dq, hints);
   }
 

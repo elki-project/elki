@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.FourCSubspaceIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -57,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("4C: Computing Correlation Connected Clusters")
 @Description("4C identifies local subgroups of data objects sharing a uniform correlation. " + "The algorithm is based on a combination of PCA and density-based clustering (DBSCAN).")
 @Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", title = "Computing Clusters of Correlation Connected Objects", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", url = "http://dx.doi.org/10.1145/1007568.1007620")
-public class FourC<V extends NumberVector<?>> extends AbstractProjectedDBSCAN<Clustering<Model>, V> {
+public class FourC<V extends NumberVector> extends AbstractProjectedDBSCAN<Clustering<Model>, V> {
   /**
    * The logger for this class.
    */
@@ -71,7 +70,7 @@ public class FourC<V extends NumberVector<?>> extends AbstractProjectedDBSCAN<Cl
    * @param distanceFunction Distance function
    * @param lambda Lambda value
    */
-  public FourC(DoubleDistance epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
+  public FourC(double epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
     super(epsilon, minpts, distanceFunction, lambda);
   }
 
@@ -102,12 +101,12 @@ public class FourC<V extends NumberVector<?>> extends AbstractProjectedDBSCAN<Cl
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractProjectedDBSCAN.Parameterizer<O, DoubleDistance> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractProjectedDBSCAN.Parameterizer<O> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configInnerDistance(config);
-      configEpsilon(config, innerdist);
+      configEpsilon(config);
       configMinPts(config);
       configOuterDistance(config, epsilon, minpts, FourCSubspaceIndex.Factory.class, innerdist);
       configLambda(config);

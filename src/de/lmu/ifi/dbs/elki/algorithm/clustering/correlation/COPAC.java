@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistan
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex.Factory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -87,7 +86,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger P., A. Zimek", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
-public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -132,7 +131,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * Holds the instance of the preprocessed distance function
    * {@link #PARTITION_DISTANCE_ID}.
    */
-  private FilteredLocalPCABasedDistanceFunction<V, ?, D> partitionDistanceFunction;
+  private FilteredLocalPCABasedDistanceFunction<V, ?> partitionDistanceFunction;
 
   /**
    * Get the algorithm to run on each partition.
@@ -149,7 +148,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    */
   // FIXME: remove this when migrating to a full Factory pattern!
   // This will not allow concurrent jobs.
-  private FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D> partitionDistanceQuery;
+  private FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>> partitionDistanceQuery;
 
   /**
    * Constructor.
@@ -159,7 +158,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * @param partitionAlgorithmParameters Parameters for Algorithm to run on
    *        partitions
    */
-  public COPAC(FilteredLocalPCABasedDistanceFunction<V, ?, D> partitionDistanceFunction, Class<? extends ClusteringAlgorithm<Clustering<Model>>> partitionAlgorithm, Collection<Pair<OptionID, Object>> partitionAlgorithmParameters) {
+  public COPAC(FilteredLocalPCABasedDistanceFunction<V, ?> partitionDistanceFunction, Class<? extends ClusteringAlgorithm<Clustering<Model>>> partitionAlgorithm, Collection<Pair<OptionID, Object>> partitionAlgorithmParameters) {
     super();
     this.partitionDistanceFunction = partitionDistanceFunction;
     this.partitionAlgorithm = partitionAlgorithm;
@@ -176,7 +175,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
   public Clustering<Model> run(Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
-    partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D>) partitionDistanceFunction.instantiate(relation);
+    partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>>) partitionDistanceFunction.instantiate(relation);
     LocalProjectionIndex<V, ?> preprocin = partitionDistanceQuery.getIndex();
 
     ModifiableDBIDs[] partitions = partitionByCorrelationDimensionality(relation, preprocin, dim);
@@ -231,7 +230,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * @param partitionMap the map of partition IDs to object ids
    * @param query The preprocessor based query function
    */
-  private Clustering<Model> runPartitionAlgorithm(Relation<V> relation, ModifiableDBIDs[] partitionMap, DistanceQuery<V, D> query) {
+  private Clustering<Model> runPartitionAlgorithm(Relation<V> relation, ModifiableDBIDs[] partitionMap, DistanceQuery<V> query) {
     final int dim = RelationUtil.dimensionality(relation);
     Clustering<Model> result = new Clustering<>("COPAC clustering", "copac-clustering");
 
@@ -272,9 +271,9 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * 
    * @return the specified partition algorithm
    */
-  protected ClusteringAlgorithm<Clustering<Model>> instantiatePartitionAlgorithm(DistanceQuery<V, D> query) {
+  protected ClusteringAlgorithm<Clustering<Model>> instantiatePartitionAlgorithm(DistanceQuery<V> query) {
     ListParameterization reconfig = new ListParameterization(partitionAlgorithmParameters);
-    ProxyDistanceFunction<V, D> dist = ProxyDistanceFunction.proxy(query);
+    ProxyDistanceFunction<V> dist = ProxyDistanceFunction.proxy(query);
     reconfig.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, dist);
     ClusteringAlgorithm<Clustering<Model>> instance = reconfig.tryInstantiate(partitionAlgorithm);
     reconfig.failOnErrors();
@@ -288,7 +287,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * 
    * @return distance query
    */
-  public FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D> getPartitionDistanceQuery() {
+  public FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>> getPartitionDistanceQuery() {
     return partitionDistanceQuery;
   }
 
@@ -309,10 +308,10 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     protected LocalProjectionIndex.Factory<V, ?> indexI = null;
 
-    protected FilteredLocalPCABasedDistanceFunction<V, ?, D> pdistI = null;
+    protected FilteredLocalPCABasedDistanceFunction<V, ?> pdistI = null;
 
     protected Class<? extends ClusteringAlgorithm<Clustering<Model>>> algC = null;
 
@@ -326,7 +325,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
         indexI = indexP.instantiateClass(config);
       }
 
-      ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, D>> pdistP = new ObjectParameter<>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+      ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?>> pdistP = new ObjectParameter<>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
       if(config.grab(pdistP)) {
         ListParameterization predefinedDist = new ListParameterization();
         predefinedDist.addParameter(IndexBasedDistanceFunction.INDEX_ID, indexI);
@@ -352,7 +351,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
     }
 
     @Override
-    protected COPAC<V, D> makeInstance() {
+    protected COPAC<V> makeInstance() {
       return new COPAC<>(pdistI, algC, algO);
     }
   }

@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -85,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  */
 @Title("DOC: Density-based Optimal projective Clustering")
 @Reference(authors = "C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali", title = "A Monte Carlo algorithm for fast projective clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", url = "http://dx.doi.org/10.1145/564691.564739")
-public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -230,7 +229,6 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @return a cluster, if one is found, else <code>null</code>.
    */
   private Cluster<SubspaceModel<V>> runDOC(Relation<V> relation, ArrayModifiableDBIDs S, final int d, int n, int m, int r, int minClusterSize) {
-    final DoubleDistance wd = new DoubleDistance(w);
     // Best cluster for the current run.
     DBIDs C = null;
     // Relevant attributes for the best cluster.
@@ -244,8 +242,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Weights for distance (= rectangle query)
     SubspaceMaximumDistanceFunction df = new SubspaceMaximumDistanceFunction(BitsUtil.zero(d));
-    DistanceQuery<V, DoubleDistance> dq = relation.getDatabase().getDistanceQuery(relation, df);
-    RangeQuery<V, DoubleDistance> rq = relation.getDatabase().getRangeQuery(dq);
+    DistanceQuery<V> dq = relation.getDatabase().getDistanceQuery(relation, df);
+    RangeQuery<V> rq = relation.getDatabase().getRangeQuery(dq);
 
     // Inform the user about the progress in the current iteration.
     FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
@@ -274,7 +272,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
           // Get all points in the box.
           df.setSelectedDimensions(nD);
           // TODO: add filtering capabilities into query API!
-          DBIDs nC = DBIDUtil.intersection(S, rq.getRangeForDBID(iter, wd));
+          DBIDs nC = DBIDUtil.intersection(S, rq.getRangeForDBID(iter, w));
 
           if(LOG.isDebuggingFiner()) {
             LOG.finer("Testing a cluster candidate, |C| = " + nC.size() + ", |D| = " + BitsUtil.cardinality(nD));
@@ -394,11 +392,11 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
     // Get all points in the box.
     SubspaceMaximumDistanceFunction df = new SubspaceMaximumDistanceFunction(D);
-    DistanceQuery<V, DoubleDistance> dq = relation.getDatabase().getDistanceQuery(relation, df);
-    RangeQuery<V, DoubleDistance> rq = relation.getDatabase().getRangeQuery(dq, DatabaseQuery.HINT_SINGLE);
+    DistanceQuery<V> dq = relation.getDatabase().getDistanceQuery(relation, df);
+    RangeQuery<V> rq = relation.getDatabase().getRangeQuery(dq, DatabaseQuery.HINT_SINGLE);
 
     // TODO: add filtering capabilities into query API!
-    DBIDs C = DBIDUtil.intersection(S, rq.getRangeForDBID(dV, new DoubleDistance(w)));
+    DBIDs C = DBIDUtil.intersection(S, rq.getRangeForDBID(dV, w));
 
     // If we have a non-empty cluster, return it.
     if(C.size() > 0) {
@@ -481,7 +479,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
      * Relative density threshold parameter Alpha.
      */

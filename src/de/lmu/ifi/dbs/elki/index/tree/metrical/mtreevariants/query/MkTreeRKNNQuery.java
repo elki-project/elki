@@ -27,10 +27,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.AbstractRKNNQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -43,11 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * 
  * @apiviz.uses AbstractMkTree
  */
-public class MkTreeRKNNQuery<O, D extends NumberDistance<D, ?>> extends AbstractRKNNQuery<O, D> {
+public class MkTreeRKNNQuery<O> extends AbstractRKNNQuery<O> {
   /**
    * The index to use
    */
-  protected final AbstractMkTree<O, D, ?, ?, ?> index;
+  protected final AbstractMkTree<O, ?, ?, ?> index;
 
   /**
    * Constructor.
@@ -55,23 +54,23 @@ public class MkTreeRKNNQuery<O, D extends NumberDistance<D, ?>> extends Abstract
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MkTreeRKNNQuery(AbstractMkTree<O, D, ?, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+  public MkTreeRKNNQuery(AbstractMkTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
     super(distanceQuery);
     this.index = index;
   }
 
   @Override
-  public DistanceDBIDList<D> getRKNNForObject(O obj, int k) {
+  public DoubleDBIDList getRKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
 
   @Override
-  public DistanceDBIDList<D> getRKNNForDBID(DBIDRef id, int k) {
+  public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
     return index.reverseKNNQuery(id, k);
   }
 
   @Override
-  public List<? extends DistanceDBIDList<D>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // TODO: implement
     throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }

@@ -32,9 +32,6 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.FlexibleLOF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.OnlineLOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
@@ -51,7 +48,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -100,7 +96,7 @@ public class TestOnlineLOF implements JUnit4Test {
     UpdatableDatabase db = getDatabase();
 
     // 1. Run LOF
-    FlexibleLOF<DoubleVector, DoubleDistance> lof = new FlexibleLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
+    FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
     OutlierResult result1 = lof.run(db);
 
     // 2. Run OnlineLOF (with insertions and removals) on database
@@ -125,14 +121,14 @@ public class TestOnlineLOF implements JUnit4Test {
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
     // setup algorithm
-    OnlineLOF<DoubleVector, DoubleDistance> lof = new OnlineLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
+    OnlineLOF<DoubleVector> lof = new OnlineLOF<>(k, k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
 
     // run OnlineLOF on database
     OutlierResult result = lof.run(db);
 
     // insert new objects
     ArrayList<DoubleVector> insertions = new ArrayList<>();
-    NumberVector.Factory<DoubleVector, ?> o = RelationUtil.getNumberVectorFactory(rep);
+    NumberVector.Factory<DoubleVector> o = RelationUtil.getNumberVectorFactory(rep);
     int dim = RelationUtil.dimensionality(rep);
     Random random = new Random(seed);
     for(int i = 0; i < size; i++) {

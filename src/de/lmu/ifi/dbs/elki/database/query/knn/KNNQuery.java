@@ -27,9 +27,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * The interface of an actual instance.
@@ -40,9 +39,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.has KNNList oneway - - «create»
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
+public interface KNNQuery<O> extends DatabaseQuery {
   /**
    * Get the k nearest neighbors for a particular id.
    * 
@@ -50,7 +48,7 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public KNNList<D> getKNNForDBID(DBIDRef id, int k);
+  public KNNList getKNNForDBID(DBIDRef id, int k);
 
   /**
    * Bulk query method
@@ -59,7 +57,7 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public List<? extends KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k);
+  public List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k);
 
   /**
    * Get the k nearest neighbors for a particular id.
@@ -68,5 +66,5 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public KNNList<D> getKNNForObject(O obj, int k);
+  public KNNList getKNNForObject(O obj, int k);
 }

@@ -134,7 +134,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   @Override
   public void run() {
     final Database database = inputstep.getDatabase();
-    Relation<NumberVector<?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
@@ -145,7 +145,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     // Dimensionality and reference vector
     final int dim = RelationUtil.dimensionality(relation);
-    final NumberVector<?> refvec = relation.get(firstid);
+    final NumberVector refvec = relation.get(firstid);
 
     // Build the truth vector
     ROC.VectorNonZero pos = new ROC.VectorNonZero(refvec);
@@ -163,7 +163,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       double[] buf = new double[2]; // Vote combination buffer.
       int a = 0;
       for (DBIDIter id = ids.iter(); id.valid(); id.advance(), a++) {
-        final NumberVector<?> veca = relation.get(id);
+        final NumberVector veca = relation.get(id);
         // Direct AUC score:
         {
           double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(veca)));
@@ -177,7 +177,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         DBIDArrayIter id2 = ids.iter();
         id2.seek(a + 1);
         for (int b = a + 1; b < size; b++, id2.advance()) {
-          final NumberVector<?> vecb = relation.get(id2);
+          final NumberVector vecb = relation.get(id2);
           double[] combined = new double[dim];
           for (int d = 0; d < dim; d++) {
             buf[0] = veca.doubleValue(d);

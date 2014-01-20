@@ -72,13 +72,13 @@ public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierRe
    * @param relation Relation
    * @return Result
    */
-  public OutlierResult run(Relation<? extends NumberVector<?>> relation) {
+  public OutlierResult run(Relation<? extends NumberVector> relation) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT);
     DoubleMinMax minmax = new DoubleMinMax();
     Mean m = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       m.reset();
-      NumberVector<?> nv = relation.get(iditer);
+      NumberVector nv = relation.get(iditer);
       for (int i = 0; i < nv.getDimensionality(); i++) {
         m.put(nv.doubleValue(i));
       }

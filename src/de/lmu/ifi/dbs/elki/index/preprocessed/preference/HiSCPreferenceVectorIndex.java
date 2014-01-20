@@ -32,12 +32,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
@@ -65,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("HiSC Preprocessor")
 @Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
-public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
+public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
   /**
    * Logger to use.
    */
@@ -107,7 +106,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     long start = System.currentTimeMillis();
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
 
-    KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
+    KNNQuery<V> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
 
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       if(LOG.isDebugging()) {
@@ -116,7 +115,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
         msg.append("\n knns: ");
       }
 
-      KNNList<DoubleDistance> knns = knnQuery.getKNNForDBID(it, k);
+      KNNList knns = knnQuery.getKNNForDBID(it, k);
       long[] preferenceVector = determinePreferenceVector(relation, it, knns, msg);
       storage.put(it, preferenceVector);
 
@@ -203,7 +202,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?>> extends AbstractPreferenceVectorIndex.Factory<V, HiSCPreferenceVectorIndex<V>> {
+  public static class Factory<V extends NumberVector> extends AbstractPreferenceVectorIndex.Factory<V, HiSCPreferenceVectorIndex<V>> {
     /**
      * The default value for alpha.
      */
@@ -275,7 +274,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
       /**
        * Holds the value of parameter {@link #ALPHA_ID}.
        */

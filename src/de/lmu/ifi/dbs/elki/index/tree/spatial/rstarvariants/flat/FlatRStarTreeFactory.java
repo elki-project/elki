@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * 
  * @param <O> Object type
  */
-public class FlatRStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTreeFactory<O, FlatRStarTreeNode, SpatialEntry, FlatRStarTreeIndex<O>, AbstractRTreeSettings> {
+public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, FlatRStarTreeNode, SpatialEntry, FlatRStarTreeIndex<O>, AbstractRTreeSettings> {
   /**
    * Constructor.
    * 
@@ -70,7 +70,7 @@ public class FlatRStarTreeFactory<O extends NumberVector<?>> extends AbstractRSt
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
     @Override
     protected FlatRStarTreeFactory<O> makeInstance() {
       return new FlatRStarTreeFactory<>(pageFileFactory, settings);

@@ -114,7 +114,7 @@ public class Centroid extends Vector {
    * 
    * @param val Value
    */
-  public void put(NumberVector<?> val) {
+  public void put(NumberVector val) {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;
     for (int i = 0; i < elements.length; i++) {
@@ -129,7 +129,7 @@ public class Centroid extends Vector {
    * @param val data
    * @param weight weight
    */
-  public void put(NumberVector<?> val, double weight) {
+  public void put(NumberVector val, double weight) {
     assert (val.getDimensionality() == elements.length);
     if (weight == 0) {
       return; // Skip zero weights.
@@ -150,7 +150,7 @@ public class Centroid extends Vector {
    * @param <F> vector type
    * @return the data
    */
-  public <F extends NumberVector<?>> F toVector(Relation<? extends F> relation) {
+  public <F extends NumberVector> F toVector(Relation<? extends F> relation) {
     return RelationUtil.getNumberVectorFactory(relation).newNumberVector(elements);
   }
 
@@ -176,7 +176,7 @@ public class Centroid extends Vector {
    * @param relation Relation to use
    * @return Centroid of relation
    */
-  public static Centroid make(Relation<? extends NumberVector<?>> relation) {
+  public static Centroid make(Relation<? extends NumberVector> relation) {
     Centroid c = new Centroid(RelationUtil.dimensionality(relation));
     for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       c.put(relation.get(iditer));
@@ -191,7 +191,7 @@ public class Centroid extends Vector {
    * @param ids IDs to use
    * @return Centroid
    */
-  public static Centroid make(Relation<? extends NumberVector<?>> relation, DBIDs ids) {
+  public static Centroid make(Relation<? extends NumberVector> relation, DBIDs ids) {
     Centroid c = new Centroid(RelationUtil.dimensionality(relation));
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));

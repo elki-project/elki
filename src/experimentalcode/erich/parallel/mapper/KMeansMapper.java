@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import experimentalcode.erich.parallel.MapExecutor;
@@ -40,7 +40,7 @@ import experimentalcode.erich.parallel.MapExecutor;
  * 
  * @author Erich Schubert
  */
-public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
+public class KMeansMapper<V extends NumberVector> implements Mapper {
   /**
    * Data relation.
    */
@@ -49,7 +49,7 @@ public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
   /**
    * Distance function.
    */
-  PrimitiveDoubleDistanceFunction<? super NumberVector<?>> distance;
+  PrimitiveDistanceFunction<? super NumberVector> distance;
 
   /**
    * Assignment storage.
@@ -59,7 +59,7 @@ public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
   /**
    * Mean vectors.
    */
-  List<? extends NumberVector<?>> means;
+  List<? extends NumberVector> means;
 
   /**
    * Updated cluster centroids
@@ -84,7 +84,7 @@ public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
    * @param means Initial means
    * @param assignment Cluster assignment
    */
-  public KMeansMapper(Relation<V> relation, PrimitiveDoubleDistanceFunction<? super NumberVector<?>> distance, WritableIntegerDataStore assignment) {
+  public KMeansMapper(Relation<V> relation, PrimitiveDistanceFunction<? super NumberVector> distance, WritableIntegerDataStore assignment) {
     super();
     this.distance = distance;
     this.relation = relation;
@@ -105,7 +105,7 @@ public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
    * 
    * @param means New means.
    */
-  public void nextIteration(List<? extends NumberVector<?>> means) {
+  public void nextIteration(List<? extends NumberVector> means) {
     this.means = means;
     changed = false;
     final int k = means.size();
@@ -147,8 +147,8 @@ public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
    * 
    * @return New means
    */
-  public List<? extends NumberVector<?>> getMeans() {
-    ArrayList<NumberVector<?>> newmeans = new ArrayList<>(centroids.length);
+  public List<? extends NumberVector> getMeans() {
+    ArrayList<NumberVector> newmeans = new ArrayList<>(centroids.length);
     for (int i = 0; i < centroids.length; i++) {
       if (sizes[i] == 0) {
         newmeans.add(means.get(i)); // Keep old mean.
@@ -168,7 +168,7 @@ public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
     /**
      * Distance function.
      */
-    private PrimitiveDoubleDistanceFunction<? super NumberVector<?>> distance;
+    private PrimitiveDistanceFunction<? super NumberVector> distance;
 
     /**
      * Cluster assignment storage.
@@ -203,14 +203,14 @@ public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
      * @param assignment Current assignment
      * @param means Previous mean vectors
      */
-    public Instance(Relation<V> relation, PrimitiveDoubleDistanceFunction<? super NumberVector<?>> distance, WritableIntegerDataStore assignment, List<? extends NumberVector<?>> means) {
+    public Instance(Relation<V> relation, PrimitiveDistanceFunction<? super NumberVector> distance, WritableIntegerDataStore assignment, List<? extends NumberVector> means) {
       super();
       this.relation = relation;
       this.distance = distance;
       this.assignment = assignment;
       final int k = means.size();
       this.means = new Vector[k];
-      Iterator<? extends NumberVector<?>> iter = means.iterator();
+      Iterator<? extends NumberVector> iter = means.iterator();
       for (int i = 0; i < k; i++) {
         this.means[i] = iter.next().getColumnVector(); // Make local copy!
       }
@@ -227,7 +227,7 @@ public class KMeansMapper<V extends NumberVector<?>> implements Mapper {
       double mindist = Double.POSITIVE_INFINITY;
       int minIndex = 0;
       for (int i = 0; i < means.length; i++) {
-        final double dist = distance.doubleDistance(fv, means[i]);
+        final double dist = distance.distance(fv, means[i]);
         if (dist < mindist) {
           minIndex = i;
           mindist = dist;

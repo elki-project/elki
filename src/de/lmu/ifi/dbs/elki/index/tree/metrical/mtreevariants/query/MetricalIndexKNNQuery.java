@@ -25,11 +25,10 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -45,13 +44,12 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
  * @apiviz.uses AbstractMTree
  * 
  * @param <O> Object type
- * @param <D> Distance type
  */
-public class MetricalIndexKNNQuery<O, D extends NumberDistance<D, ?>> extends AbstractDistanceKNNQuery<O, D> {
+public class MetricalIndexKNNQuery<O> extends AbstractDistanceKNNQuery<O> {
   /**
    * The index to use
    */
-  protected final AbstractMTree<O, D, ?, ?, ?> index;
+  protected final AbstractMTree<O, ?, ?, ?> index;
 
   /**
    * Constructor.
@@ -59,41 +57,41 @@ public class MetricalIndexKNNQuery<O, D extends NumberDistance<D, ?>> extends Ab
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexKNNQuery(AbstractMTree<O, D, ?, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+  public MetricalIndexKNNQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
     super(distanceQuery);
     this.index = index;
   }
 
   @Override
-  public KNNList<D> getKNNForObject(O q, int k) {
-    if (k < 1) {
+  public KNNList getKNNForObject(O q, int k) {
+    if(k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
     index.statistics.countKNNQuery();
 
-    KNNHeap<D> knnList = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
-    D d_k = knnList.getKNNDistance();
+    KNNHeap knnList = DBIDUtil.newHeap(k);
+    double d_k = Double.POSITIVE_INFINITY;
 
     final ComparableMinHeap<DoubleMTreeDistanceSearchCandidate> pq = new ComparableMinHeap<>();
 
-    // push root
+    // Push the root node
     pq.add(new DoubleMTreeDistanceSearchCandidate(0., index.getRootID(), null, 0.));
 
     // search in tree
-    while (!pq.isEmpty()) {
+    while(!pq.isEmpty()) {
       DoubleMTreeDistanceSearchCandidate pqNode = pq.poll();
 
-      if (knnList.size() >= k && pqNode.mindist > d_k.doubleValue()) {
+      if(knnList.size() >= k && pqNode.mindist > d_k) {
         break;
       }
 
-      AbstractMTreeNode<?, D, ?, ?> node = index.getNode(pqNode.nodeID);
+      AbstractMTreeNode<?, ?, ?> node = index.getNode(pqNode.nodeID);
       DBID id_p = pqNode.routingObjectID;
       double d1 = pqNode.routingDistance;
 
       // directory node
-      if (!node.isLeaf()) {
-        for (int i = 0; i < node.getNumEntries(); i++) {
+      if(!node.isLeaf()) {
+        for(int i = 0; i < node.getNumEntries(); i++) {
           MTreeEntry entry = node.getEntry(i);
           DBID o_r = entry.getRoutingObjectID();
           double r_or = entry.getCoveringRadius();
@@ -101,13 +99,13 @@ public class MetricalIndexKNNQuery<O, D extends NumberDistance<D, ?>> extends Ab
 
           double diff = Math.abs(d1 - d2);
 
-          double sum = d_k.doubleValue() + r_or;
+          double sum = d_k + r_or;
 
-          if (diff <= sum) {
-            double d3 = distanceQuery.distance(o_r, q).doubleValue();
+          if(diff <= sum) {
+            double d3 = distanceQuery.distance(o_r, q);
             index.statistics.countDistanceCalculation();
             double d_min = Math.max(d3 - r_or, 0.);
-            if (d_min <= d_k.doubleValue()) {
+            if(d_min <= d_k) {
               pq.add(new DoubleMTreeDistanceSearchCandidate(d_min, ((DirectoryEntry) entry).getPageID(), o_r, d3));
             }
           }
@@ -115,7 +113,7 @@ public class MetricalIndexKNNQuery<O, D extends NumberDistance<D, ?>> extends Ab
       }
       // data node
       else {
-        for (int i = 0; i < node.getNumEntries(); i++) {
+        for(int i = 0; i < node.getNumEntries(); i++) {
           MTreeEntry entry = node.getEntry(i);
           DBID o_j = entry.getRoutingObjectID();
 
@@ -123,10 +121,10 @@ public class MetricalIndexKNNQuery<O, D extends NumberDistance<D, ?>> extends Ab
 
           double diff = Math.abs(d1 - d2);
 
-          if (diff <= d_k.doubleValue()) {
-            D d3 = distanceQuery.distance(o_j, q);
+          if(diff <= d_k) {
+            double d3 = distanceQuery.distance(o_j, q);
             index.statistics.countDistanceCalculation();
-            if (d3.compareTo(d_k) <= 0) {
+            if(d3 <= d_k) {
               knnList.insert(d3, o_j);
               d_k = knnList.getKNNDistance();
             }

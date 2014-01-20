@@ -31,6 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
  * 
  * @apiviz.landmark
  */
-public interface IntegerDBIDIter extends IntegerDBIDRef, DBIDIter {
+interface IntegerDBIDIter extends IntegerDBIDRef, DBIDIter {
   // Empty
 }

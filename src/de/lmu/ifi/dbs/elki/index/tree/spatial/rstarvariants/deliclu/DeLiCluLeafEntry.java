@@ -62,7 +62,7 @@ public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEn
    * @param id the unique id of the underlying data object
    * @param vector the vector to store
    */
-  public DeLiCluLeafEntry(DBID id, NumberVector<?> vector) {
+  public DeLiCluLeafEntry(DBID id, NumberVector vector) {
     super(id, vector);
     this.hasHandled = false;
     this.hasUnhandled = true;

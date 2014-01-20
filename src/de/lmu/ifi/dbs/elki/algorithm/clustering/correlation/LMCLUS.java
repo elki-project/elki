@@ -158,7 +158,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * @param relation Relation
    * @return Clustering result
    */
-  public Clustering<Model> run(Database database, Relation<NumberVector<?>> relation) {
+  public Clustering<Model> run(Database database, Relation<NumberVector> relation) {
     Clustering<Model> ret = new Clustering<>("LMCLUS Clustering", "lmclus-clustering");
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters found", LOG) : null;
@@ -264,7 +264,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * @return the overall goodness of the separation. The values origin basis and
    *         threshold are returned indirectly over class variables.
    */
-  private Separation findSeparation(Relation<NumberVector<?>> relation, DBIDs currentids, int dimension, Random r) {
+  private Separation findSeparation(Relation<NumberVector> relation, DBIDs currentids, int dimension, Random r) {
     Separation separation = new Separation();
     // determine the number of samples needed, to secure that with a specific
     // probability

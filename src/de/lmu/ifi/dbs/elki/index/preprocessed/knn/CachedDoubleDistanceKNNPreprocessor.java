@@ -29,17 +29,14 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
-import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceKNNLists;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -54,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @param <O> Object type
  */
-public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O, DoubleDistance, DoubleDistanceKNNList> {
+public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
   /**
    * File to load.
    */
@@ -68,7 +65,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
    * @param k K
    * @param file File to load
    */
-  public CachedDoubleDistanceKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, DoubleDistance> distanceFunction, int k, File file) {
+  public CachedDoubleDistanceKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, File file) {
     super(relation, distanceFunction, k);
     this.filename = file;
   }
@@ -86,28 +83,31 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
         FileChannel channel = file.getChannel()) {
       // check magic header
       int header = file.readInt();
-      if (header != CacheDoubleDistanceKNNLists.KNN_CACHE_MAGIC) {
+      if(header != CacheDoubleDistanceKNNLists.KNN_CACHE_MAGIC) {
         throw new AbortException("Cache magic number does not match.");
       }
       MappedByteBuffer buffer = channel.map(MapMode.READ_ONLY, 4, file.length() - 4);
-      for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         int dbid = ByteArrayUtil.readUnsignedVarint(buffer);
         int nnsize = ByteArrayUtil.readUnsignedVarint(buffer);
-        if (nnsize < k) {
+        if(nnsize < k) {
           throw new AbortException("kNN cache contains fewer than k objects!");
         }
-        ArrayList<DoubleDistanceDBIDPair> col = new ArrayList<>(nnsize);
-        for (int i = 0; i < nnsize; i++) {
+        // FIXME: avoid the KNNHeap to KNNList roundtrip.
+        // FIXME: use a DBIDVar instead of importInteger.
+        KNNHeap knn = DBIDUtil.newHeap(k);
+        for(int i = 0; i < nnsize; i++) {
           int nid = ByteArrayUtil.readUnsignedVarint(buffer);
           double dist = buffer.getDouble();
-          col.add(DBIDUtil.newDistancePair(dist, DBIDUtil.importInteger(nid)));
+          knn.insert(dist, DBIDUtil.importInteger(nid));
         }
-        storage.put(DBIDUtil.importInteger(dbid), new DoubleDistanceDBIDPairKNNList(col, nnsize));
+        storage.put(DBIDUtil.importInteger(dbid), knn.toKNNList());
       }
-      if (buffer.hasRemaining()) {
+      if(buffer.hasRemaining()) {
         LOG.warning("kNN cache has " + buffer.remaining() + " bytes remaining!");
       }
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new AbortException("I/O error in loading kNN cache: " + e.getMessage(), e);
     }
   }
@@ -143,7 +143,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
    * 
    * @param <O> The object type
    */
-  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O, DoubleDistance, DoubleDistanceKNNList> {
+  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
     /**
      * Filename to load.
      */
@@ -156,7 +156,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
      * @param distanceFunction distance function
      * @param filename Cache file
      */
-    public Factory(int k, DistanceFunction<? super O, DoubleDistance> distanceFunction, File filename) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction, File filename) {
       super(k, distanceFunction);
       this.filename = filename;
     }
@@ -174,7 +174,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, DoubleDistance> {
+    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**
        * Option ID for the kNN file.
        */
@@ -191,7 +191,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
 
         // Input file parameter
         final FileParameter cpar = new FileParameter(CACHE_ID, FileParameter.FileType.INPUT_FILE);
-        if (config.grab(cpar)) {
+        if(config.grab(cpar)) {
           filename = cpar.getValue();
         }
       }

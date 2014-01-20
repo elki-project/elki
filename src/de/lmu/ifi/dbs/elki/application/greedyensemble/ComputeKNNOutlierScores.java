@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
@@ -85,9 +84,11 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * </p>
  * 
  * @author Erich Schubert
+ * 
+ * @param <O> Vector type
  */
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
-public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractApplication {
+public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApplication {
   /**
    * Our logger class.
    */
@@ -101,7 +102,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
   /**
    * Distance function to use
    */
-  final DistanceFunction<? super O, D> distf;
+  final DistanceFunction<? super O> distf;
 
   /**
    * Starting value of k.
@@ -145,7 +146,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
    * @param outfile Output file
    * @param scaling Scaling function
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O, D> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling) {
+  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling) {
     super();
     this.distf = distf;
     this.startk = startk;
@@ -163,10 +164,10 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
 
     // If there is no kNN preprocessor already, then precompute.
-    KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);
+    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.verbose("Running preprocessor ...");
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, distf, maxk + 2);
+      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distf, maxk + 2);
       database.addIndex(preproc);
     }
 
@@ -221,7 +222,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        KNNOutlier<O, D> knn = new KNNOutlier<>(distf, k);
+        KNNOutlier<O> knn = new KNNOutlier<>(distf, k);
         OutlierResult knnresult = knn.run(database, relation);
         writeResult(fout, ids, knnresult, scaling, "KNN-" + kstr);
         database.getHierarchy().removeSubtree(knnresult);
@@ -232,7 +233,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        KNNWeightOutlier<O, D> knnw = new KNNWeightOutlier<>(distf, k);
+        KNNWeightOutlier<O> knnw = new KNNWeightOutlier<>(distf, k);
         OutlierResult knnresult = knnw.run(database, relation);
         writeResult(fout, ids, knnresult, scaling, "KNNW-" + kstr);
         database.getHierarchy().removeSubtree(knnresult);
@@ -243,7 +244,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LOF<O, D> lof = new LOF<>(k, distf);
+        LOF<O> lof = new LOF<>(k, distf);
         OutlierResult lofresult = lof.run(database, relation);
         writeResult(fout, ids, lofresult, scaling, "LOF-" + kstr);
         database.getHierarchy().removeSubtree(lofresult);
@@ -254,7 +255,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        SimplifiedLOF<O, D> lof = new SimplifiedLOF<>(k, distf);
+        SimplifiedLOF<O> lof = new SimplifiedLOF<>(k, distf);
         OutlierResult lofresult = lof.run(database, relation);
         writeResult(fout, ids, lofresult, scaling, "Simplified-LOF-" + kstr);
         database.getHierarchy().removeSubtree(lofresult);
@@ -265,7 +266,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LoOP<O, D> loop = new LoOP<>(k, k, distf, distf, 1.0);
+        LoOP<O> loop = new LoOP<>(k, k, distf, distf, 1.0);
         OutlierResult loopresult = loop.run(database, relation);
         writeResult(fout, ids, loopresult, scaling, "LOOP-" + kstr);
         database.getHierarchy().removeSubtree(loopresult);
@@ -278,7 +279,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       runForEachK(new AlgRunner() {
         @Override
         public void run(int k, String kstr) {
-          LDOF<O, D> ldof = new LDOF<>(distf, k + 1);
+          LDOF<O> ldof = new LDOF<>(distf, k + 1);
           OutlierResult ldofresult = ldof.run(database, relation);
           writeResult(fout, ids, ldofresult, scaling, "LDOF-" + kstr);
           database.getHierarchy().removeSubtree(ldofresult);
@@ -290,7 +291,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LDF<O, D> ldf = new LDF<>(k, distf, GaussianKernelDensityFunction.KERNEL, 2, .1);
+        LDF<O> ldf = new LDF<>(k, distf, GaussianKernelDensityFunction.KERNEL, 2, .1);
         OutlierResult ldfresult = ldf.run(database, relation);
         writeResult(fout, ids, ldfresult, scaling, "LDF-" + kstr);
         database.getHierarchy().removeSubtree(ldfresult);
@@ -355,7 +356,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractApplication.Parameterizer {
     /**
      * Option ID for k step size.
      */
@@ -399,7 +400,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     /**
      * Distance function to use
      */
-    DistanceFunction<? super O, D> distf;
+    DistanceFunction<? super O> distf;
 
     /**
      * By label outlier -- reference
@@ -422,7 +423,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      ObjectParameter<DistanceFunction<? super O, D>> distP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<? super O>> distP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
       if(config.grab(distP)) {
         distf = distP.instantiateClass(config);
       }
@@ -457,7 +458,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector<?>, D extends Number
     }
 
     @Override
-    protected ComputeKNNOutlierScores<O, D> makeInstance() {
+    protected ComputeKNNOutlierScores<O> makeInstance() {
       return new ComputeKNNOutlierScores<>(inputstep, distf, startk, stepk, maxk, bylabel, outfile, scaling);
     }
   }

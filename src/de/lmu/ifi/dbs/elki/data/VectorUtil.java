@@ -66,7 +66,7 @@ public final class VectorUtil {
    * @param vec Vector to process.
    * @return [min, max]
    */
-  public static DoubleMinMax getRangeDouble(NumberVector<?> vec) {
+  public static DoubleMinMax getRangeDouble(NumberVector vec) {
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(int i = 0; i < vec.getDimensionality(); i++) {
@@ -85,7 +85,7 @@ public final class VectorUtil {
    * @param <V> vector type
    * @return new instance
    */
-  public static <V extends NumberVector<?>> V randomVector(NumberVector.Factory<V, ?> factory, int dim, Random r) {
+  public static <V extends NumberVector> V randomVector(NumberVector.Factory<V>  factory, int dim, Random r) {
     return factory.newNumberVector(MathUtil.randomDoubleArray(dim, r));
   }
 
@@ -97,7 +97,7 @@ public final class VectorUtil {
    * @param <V> vector type
    * @return new instance
    */
-  public static <V extends NumberVector<?>> V randomVector(NumberVector.Factory<V, ?> factory, int dim) {
+  public static <V extends NumberVector> V randomVector(NumberVector.Factory<V>  factory, int dim) {
     return randomVector(factory, dim, new Random());
   }
 
@@ -108,7 +108,7 @@ public final class VectorUtil {
    * @param v2 Second vector
    * @return angle
    */
-  public static double angleSparse(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
+  public static double angleSparse(SparseNumberVector v1, SparseNumberVector v2) {
     // TODO: exploit precomputed length, when available?
     // Length of first vector
     double l1 = 0., l2 = 0., cross = 0.;
@@ -158,7 +158,7 @@ public final class VectorUtil {
    * @param o Origin
    * @return Angle
    */
-  public static double angle(NumberVector<?> v1, NumberVector<?> v2, Vector o) {
+  public static double angle(NumberVector v1, NumberVector v2, Vector o) {
     final int dim1 = v1.getDimensionality(), dim2 = v1.getDimensionality(), dimo = v1.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
     // Essentially, we want to compute this:
@@ -197,7 +197,7 @@ public final class VectorUtil {
    * @param o Origin
    * @return Angle
    */
-  public static double angle(NumberVector<?> v1, NumberVector<?> v2, NumberVector<?> o) {
+  public static double angle(NumberVector v1, NumberVector v2, NumberVector o) {
     final int dim1 = v1.getDimensionality(), dim2 = v1.getDimensionality(), dimo = o.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
     // Essentially, we want to compute this:
@@ -236,9 +236,9 @@ public final class VectorUtil {
    * @param v2 second vector
    * @return Angle
    */
-  public static double cosAngle(NumberVector<?> v1, NumberVector<?> v2) {
-    if(v1 instanceof SparseNumberVector<?> && v2 instanceof SparseNumberVector<?>) {
-      return angleSparse((SparseNumberVector<?>) v1, (SparseNumberVector<?>) v2);
+  public static double cosAngle(NumberVector v1, NumberVector v2) {
+    if(v1 instanceof SparseNumberVector && v2 instanceof SparseNumberVector) {
+      return angleSparse((SparseNumberVector) v1, (SparseNumberVector) v2);
     }
     final int dim1 = v1.getDimensionality(), dim2 = v1.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
@@ -277,8 +277,8 @@ public final class VectorUtil {
    * @return Angle
    */
   public static double minCosAngle(SpatialComparable v1, SpatialComparable v2) {
-    if(v1 instanceof NumberVector<?> && v2 instanceof NumberVector<?>) {
-      return cosAngle((NumberVector<?>) v1, (NumberVector<?>) v2);
+    if(v1 instanceof NumberVector && v2 instanceof NumberVector) {
+      return cosAngle((NumberVector) v1, (NumberVector) v2);
     }
     final int dim1 = v1.getDimensionality(), dim2 = v1.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
@@ -338,7 +338,7 @@ public final class VectorUtil {
    * @return the scalar product (inner product) of this and the given
    *         DoubleVector
    */
-  public static double scalarProduct(NumberVector<?> d1, NumberVector<?> d2) {
+  public static double scalarProduct(NumberVector d1, NumberVector d2) {
     final int dim = d1.getDimensionality();
     double result = 0.;
     for(int i = 0; i < dim; i++) {
@@ -354,7 +354,7 @@ public final class VectorUtil {
    * @param sample Sample set
    * @return Medoid vector
    */
-  public static Vector computeMedoid(Relation<? extends NumberVector<?>> relation, DBIDs sample) {
+  public static Vector computeMedoid(Relation<? extends NumberVector> relation, DBIDs sample) {
     final int dim = RelationUtil.dimensionality(relation);
     ArrayModifiableDBIDs mids = DBIDUtil.newArray(sample);
     SortDBIDsBySingleDimension s = new SortDBIDsBySingleDimension(relation);
@@ -375,7 +375,7 @@ public final class VectorUtil {
    * @param v Vector
    * @return {@code mat * v}, as double array.
    */
-  public static double[] fastTimes(Matrix mat, NumberVector<?> v) {
+  public static double[] fastTimes(Matrix mat, NumberVector v) {
     final double[][] elements = mat.getArrayRef();
     final int cdim = mat.getColumnDimensionality();
     final double[] X = new double[elements.length];
@@ -407,7 +407,7 @@ public final class VectorUtil {
     /**
      * The relation to sort.
      */
-    private Relation<? extends NumberVector<?>> data;
+    private Relation<? extends NumberVector> data;
 
     /**
      * Constructor.
@@ -415,7 +415,7 @@ public final class VectorUtil {
      * @param data Vector data source
      * @param dim Dimension to sort by
      */
-    public SortDBIDsBySingleDimension(Relation<? extends NumberVector<?>> data, int dim) {
+    public SortDBIDsBySingleDimension(Relation<? extends NumberVector> data, int dim) {
       super();
       this.data = data;
       this.d = dim;
@@ -426,7 +426,7 @@ public final class VectorUtil {
      * 
      * @param data Vector data source
      */
-    public SortDBIDsBySingleDimension(Relation<? extends NumberVector<?>> data) {
+    public SortDBIDsBySingleDimension(Relation<? extends NumberVector> data) {
       super();
       this.data = data;
     };
@@ -462,7 +462,7 @@ public final class VectorUtil {
    * 
    * @apiviz.exclude
    */
-  public static class SortVectorsBySingleDimension implements Comparator<NumberVector<?>> {
+  public static class SortVectorsBySingleDimension implements Comparator<NumberVector> {
     /**
      * Dimension to sort with.
      */
@@ -504,7 +504,7 @@ public final class VectorUtil {
     }
 
     @Override
-    public int compare(NumberVector<?> o1, NumberVector<?> o2) {
+    public int compare(NumberVector o1, NumberVector o2) {
       return Double.compare(o1.doubleValue(d), o2.doubleValue(d));
     }
   }
@@ -518,9 +518,9 @@ public final class VectorUtil {
    * @param <V> Vector type
    * @return a new NumberVector as a projection on the specified attributes
    */
-  public static <V extends NumberVector<?>> V project(V v, BitSet selectedAttributes, NumberVector.Factory<V, ?> factory) {
+  public static <V extends NumberVector> V project(V v, BitSet selectedAttributes, NumberVector.Factory<V>  factory) {
     if(factory instanceof SparseNumberVector.Factory) {
-      final SparseNumberVector.Factory<?, ?> sfactory = (SparseNumberVector.Factory<?, ?>) factory;
+      final SparseNumberVector.Factory<?>  sfactory = (SparseNumberVector.Factory<?> ) factory;
       TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
       for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
         if(v.doubleValue(d) != 0.0) {

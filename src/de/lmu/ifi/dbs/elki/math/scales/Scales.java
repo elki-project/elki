@@ -50,12 +50,11 @@ public final class Scales {
   /**
    * Compute a linear scale for each dimension.
    * 
-   * @param <O> vector type
    * @param db Database
    * @return Scales, indexed starting with 0 (like Vector, not database
    *         objects!)
    */
-  public static <O extends NumberVector<? extends Number>> LinearScale[] calcScales(Relation<O> db) {
+  public static LinearScale[] calcScales(Relation<? extends NumberVector> db) {
     if (db == null) {
       throw new AbortException("No database was given to Scales.calcScales.");
     }
@@ -65,7 +64,7 @@ public final class Scales {
 
     // analyze data
     for (DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      O v = db.get(iditer);
+      NumberVector v = db.get(iditer);
       for (int d = 0; d < dim; d++) {
         final double val = v.doubleValue(d);
         if(val != val) {

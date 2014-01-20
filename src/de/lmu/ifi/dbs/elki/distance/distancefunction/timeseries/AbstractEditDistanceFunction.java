@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Thomas Bernecker
  */
-public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * BANDSIZE parameter
    */
@@ -61,7 +61,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
 
   // TODO: relax this to VectorTypeInformation!
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+  public VectorFieldTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 

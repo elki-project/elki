@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @author Elke Achtert
  */
-public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialEntry, NumberVector<Double> {
+public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialEntry, NumberVector {
   /**
    * Serial version.
    */
@@ -74,7 +74,7 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
    * @param id Object id
    * @param vector Number vector
    */
-  public SpatialPointLeafEntry(DBID id, NumberVector<?> vector) {
+  public SpatialPointLeafEntry(DBID id, NumberVector vector) {
     super(id);
     int dim = vector.getDimensionality();
     this.values = new double[dim];

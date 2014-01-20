@@ -64,13 +64,12 @@ public final class RelationUtil {
    * 
    * @param relation relation
    * @param <V> Vector type
-   * @param <N> Number type
    * @return Vector field type information
    */
-  public static <V extends NumberVector<? extends N>, N extends Number> NumberVector.Factory<V, N> getNumberVectorFactory(Relation<V> relation) {
+  public static <V extends NumberVector> NumberVector.Factory<V> getNumberVectorFactory(Relation<V> relation) {
     final VectorFieldTypeInformation<V> type = assumeVectorField(relation);
     @SuppressWarnings("unchecked")
-    final NumberVector.Factory<V, N> factory = (NumberVector.Factory<V, N>) type.getFactory();
+    final NumberVector.Factory<V> factory = (NumberVector.Factory<V>) type.getFactory();
     return factory;
   }
 
@@ -98,13 +97,13 @@ public final class RelationUtil {
    * @param ids IDs, with well-defined order (i.e. array)
    * @return Data matrix
    */
-  public static double[][] relationAsMatrix(final Relation<? extends NumberVector<?>> relation, ArrayDBIDs ids) {
+  public static double[][] relationAsMatrix(final Relation<? extends NumberVector> relation, ArrayDBIDs ids) {
     final int rowdim = ids.size();
     final int coldim = dimensionality(relation);
     double[][] mat = new double[rowdim][coldim];
     int r = 0;
     for (DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance(), r++) {
-      NumberVector<?> vec = relation.get(iter);
+      NumberVector vec = relation.get(iter);
       double[] row = mat[r];
       for (int c = 0; c < coldim; c++) {
         row[c] = vec.doubleValue(c);

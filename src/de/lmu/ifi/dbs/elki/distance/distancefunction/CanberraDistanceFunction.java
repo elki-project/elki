@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Reference(authors = "G. N. Lance, W. T. Williams", title = "Computer programs for hierarchical polythetic classification (similarity analysis).", booktitle = "Computer Journal, Volume 9, Issue 1", url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
 @Alias({ "canberra" })
-public class CanberraDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class CanberraDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -57,7 +57,7 @@ public class CanberraDistanceFunction extends AbstractSpatialDoubleDistanceFunct
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {
@@ -71,7 +71,7 @@ public class CanberraDistanceFunction extends AbstractSpatialDoubleDistanceFunct
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double agg = 0.;
     for (int d = 0; d < dim; d++) {

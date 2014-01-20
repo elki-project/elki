@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -57,7 +56,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
     params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy<DoubleDistance> c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -80,7 +79,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
-    ExtractFlatClusteringFromHierarchy<DoubleDistance> c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -104,7 +103,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
     params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy<DoubleDistance> c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -128,7 +127,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
     params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy<DoubleDistance> c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database

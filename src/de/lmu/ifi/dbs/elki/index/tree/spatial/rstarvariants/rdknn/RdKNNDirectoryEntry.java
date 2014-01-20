@@ -28,7 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 
 /**
@@ -37,15 +36,15 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
  * underlying RdKNN-Tree node.
  * 
  * @author Elke Achtert
- * @param <D> Distance type
+ * @param Distance type
  */
-public class RdKNNDirectoryEntry<D extends NumberDistance<D, ?>> extends SpatialDirectoryEntry implements RdKNNEntry<D> {
-  private static final long serialVersionUID = 1;
+public class RdKNNDirectoryEntry extends SpatialDirectoryEntry implements RdKNNEntry {
+  private static final long serialVersionUID = 2;
 
   /**
    * The aggregated knn distance of this entry.
    */
-  private D knnDistance;
+  private double knnDistance;
 
   /**
    * Empty constructor for serialization purposes.
@@ -61,18 +60,18 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, ?>> extends Spatial
    * @param mbr the minimum bounding rectangle of the underlying node
    * @param knnDistance the aggregated knn distance of this entry
    */
-  public RdKNNDirectoryEntry(int id, ModifiableHyperBoundingBox mbr, D knnDistance) {
+  public RdKNNDirectoryEntry(int id, ModifiableHyperBoundingBox mbr, double knnDistance) {
     super(id, mbr);
     this.knnDistance = knnDistance;
   }
 
   @Override
-  public D getKnnDistance() {
+  public double getKnnDistance() {
     return knnDistance;
   }
 
   @Override
-  public void setKnnDistance(D knnDistance) {
+  public void setKnnDistance(double knnDistance) {
     this.knnDistance = knnDistance;
   }
 
@@ -86,7 +85,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, ?>> extends Spatial
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeObject(knnDistance);
+    out.writeDouble(knnDistance);
   }
 
   /**
@@ -99,10 +98,9 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, ?>> extends Spatial
    *         cannot be found.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.knnDistance = (D) in.readObject();
+    this.knnDistance = in.readDouble();
   }
 
   /**
@@ -113,7 +111,6 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, ?>> extends Spatial
    *         RDkNNDirectoryEntry and has the same knnDistance as this entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
     if(this == o) {
       return true;
@@ -125,8 +122,8 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, ?>> extends Spatial
       return false;
     }
 
-    final RdKNNDirectoryEntry<D> that = (RdKNNDirectoryEntry<D>) o;
+    final RdKNNDirectoryEntry that = (RdKNNDirectoryEntry) o;
 
-    return knnDistance.equals(that.knnDistance);
+    return knnDistance == that.knnDistance;
   }
 }

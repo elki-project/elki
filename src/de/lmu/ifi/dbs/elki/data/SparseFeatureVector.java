@@ -28,7 +28,6 @@ package de.lmu.ifi.dbs.elki.data;
  * 
  * @author Erich Schubert
  * 
- * @param <D> Data type
  */
 public interface SparseFeatureVector<D> extends FeatureVector<D> {
   /**

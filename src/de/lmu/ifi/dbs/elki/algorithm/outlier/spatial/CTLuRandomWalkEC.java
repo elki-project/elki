@@ -37,13 +37,12 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -78,12 +77,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Ahmed Hettab
  * 
  * @param <N> Spatial Vector type
- * @param <D> Distance to use
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
 @Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010", url = "http://dx.doi.org/10.1145/1869790.1869841")
-public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<N, D, OutlierResult> implements OutlierAlgorithm {
+public class CTLuRandomWalkEC<N> extends AbstractDistanceBasedAlgorithm<N, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger.
    */
@@ -112,7 +110,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
    * @param c C parameter
    * @param k Number of neighbors
    */
-  public CTLuRandomWalkEC(DistanceFunction<N, D> distanceFunction, double alpha, double c, int k) {
+  public CTLuRandomWalkEC(DistanceFunction<N> distanceFunction, double alpha, double c, int k) {
     super(distanceFunction);
     this.alpha = alpha;
     this.c = c;
@@ -126,8 +124,8 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
    * @param relation Attribute value relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<N> spatial, Relation<? extends NumberVector<?>> relation) {
-    DistanceQuery<N, D> distFunc = getDistanceFunction().instantiate(spatial);
+  public OutlierResult run(Relation<N> spatial, Relation<? extends NumberVector> relation) {
+    DistanceQuery<N> distFunc = getDistanceFunction().instantiate(spatial);
     WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
     WritableDataStore<DBIDs> neighbors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, DBIDs.class);
 
@@ -136,7 +134,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
 
     // construct the relation Matrix of the ec-graph
     Matrix E = new Matrix(ids.size(), ids.size());
-    KNNHeap<D> heap = DBIDUtil.newHeap(distFunc.getDistanceFactory(), k);
+    KNNHeap heap = DBIDUtil.newHeap(k);
     {
       int i = 0;
       for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
@@ -148,10 +146,9 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
             continue;
           }
           final double e;
-          final D distance = distFunc.distance(id, n);
+          final double distance = distFunc.distance(id, n);
           heap.insert(distance, n);
-          double dist = distance.doubleValue();
-          if(dist == 0) {
+          if(distance == 0) {
             LOG.warning("Zero distances are not supported - skipping: " + DBIDUtil.toString(id) + " " + DBIDUtil.toString(n));
             e = 0;
           }
@@ -160,7 +157,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
             double exp = Math.exp(Math.pow(diff, alpha));
             // Implementation note: not inverting exp worked a lot better.
             // Therefore we diverge from the article here.
-            e = exp / dist;
+            e = exp / distance;
           }
           E.set(j, i, e);
         }
@@ -232,7 +229,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 1));
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector>(NumberVector.class, 1));
   }
 
   @Override
@@ -248,9 +245,8 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
    * @apiviz.exclude
    * 
    * @param <N> Vector type
-   * @param <D> Distance type
    */
-  public static class Parameterizer<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<N, D> {
+  public static class Parameterizer<N> extends AbstractDistanceBasedAlgorithm.Parameterizer<N> {
     /**
      * Parameter to specify the number of neighbors.
      */
@@ -327,7 +323,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     @Override
-    protected CTLuRandomWalkEC<N, D> makeInstance() {
+    protected CTLuRandomWalkEC<N> makeInstance() {
       return new CTLuRandomWalkEC<>(distanceFunction, alpha, c, k);
     }
   }

@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Title("Color histogram intersection distance")
 @Description("Distance function for color histograms that emphasizes 'strong' bins.")
 @Reference(authors = "M. J. Swain, D. H. Ballard", title = "Color Indexing", booktitle = "International Journal of Computer Vision, 7(1), 32, 1991")
-public class HistogramIntersectionDistanceFunction extends AbstractSpatialDoubleDistanceFunction {
+public class HistogramIntersectionDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance
    */
@@ -60,7 +60,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractSpatialDouble
   }
 
   @Override
-  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
+  public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0., norm1 = 0., norm2 = 0.;
     for (int i = 0; i < dim; i++) {
@@ -74,7 +74,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractSpatialDouble
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double agg = 0., norm1 = 0, norm2 = 0.;
     for (int i = 0; i < dim; i++) {

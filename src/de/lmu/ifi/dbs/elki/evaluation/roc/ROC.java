@@ -29,10 +29,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
@@ -108,17 +107,18 @@ public class ROC {
     // start in bottom left
     curve.add(0.0, 0.0);
 
-    while (iter.valid()) {
+    while(iter.valid()) {
       // positive or negative match?
       do {
-        if (predicate.test(iter)) {
+        if(predicate.test(iter)) {
           ++poscnt;
-        } else {
+        }
+        else {
           ++negcnt;
         }
         iter.advance();
       } // Loop while tied:
-      while (iter.valid() && iter.tiedToPrevious());
+      while(iter.valid() && iter.tiedToPrevious());
       // Add a new point.
       curve.addAndSimplify(negcnt, poscnt);
     }
@@ -202,25 +202,24 @@ public class ROC {
    * 
    * @apiviz.composedOf DistanceDBIDListIter
    * 
-   * @param <D> Distance type
    */
-  public static class DistanceResultAdapter<D extends Distance<D>> implements ScoreIter, DBIDRef {
+  public static class DistanceResultAdapter implements ScoreIter, DBIDRef {
     /**
      * Original Iterator
      */
-    private DistanceDBIDListIter<D> iter;
+    private DoubleDBIDListIter iter;
 
     /**
      * Distance of previous.
      */
-    private D prevDist = null;
+    private double prevDist = Double.NaN;
 
     /**
      * Constructor
      * 
      * @param iter Iterator for distance results
      */
-    public DistanceResultAdapter(DistanceDBIDListIter<D> iter) {
+    public DistanceResultAdapter(DoubleDBIDListIter iter) {
       super();
       this.iter = iter;
     }
@@ -232,7 +231,7 @@ public class ROC {
 
     @Override
     public void advance() {
-      prevDist = iter.getDistance();
+      prevDist = iter.doubleValue();
       iter.advance();
     }
 
@@ -243,7 +242,7 @@ public class ROC {
 
     @Override
     public boolean tiedToPrevious() {
-      return iter.getDistance().equals(prevDist);
+      return iter.doubleValue() == prevDist;
     }
 
     @Deprecated
@@ -348,7 +347,7 @@ public class ROC {
     /**
      * Data vector.
      */
-    private NumberVector<?> vec;
+    private NumberVector vec;
 
     /**
      * Current position.
@@ -360,11 +359,11 @@ public class ROC {
      * 
      * @param vec Vector to iterate over.
      */
-    public DecreasingVectorIter(NumberVector<?> vec) {
+    public DecreasingVectorIter(NumberVector vec) {
       this.vec = vec;
       final int dim = vec.getDimensionality();
       this.sort = new int[dim];
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         sort[d] = d;
       }
       IntegerArrayQuickSort.sort(sort, this);
@@ -431,7 +430,7 @@ public class ROC {
     /**
      * Data vector.
      */
-    private NumberVector<?> vec;
+    private NumberVector vec;
 
     /**
      * Current position.
@@ -443,11 +442,11 @@ public class ROC {
      * 
      * @param vec Vector to iterate over.
      */
-    public IncreasingVectorIter(NumberVector<?> vec) {
+    public IncreasingVectorIter(NumberVector vec) {
       this.vec = vec;
       final int dim = vec.getDimensionality();
       this.sort = new int[dim];
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         sort[d] = d;
       }
       IntegerArrayQuickSort.sort(sort, this);
@@ -512,11 +511,11 @@ public class ROC {
      * 
      * @param vec Reference vector.
      */
-    public VectorNonZero(NumberVector<?> vec) {
+    public VectorNonZero(NumberVector vec) {
       super(vec, 0.);
     }
   }
-  
+
   /**
    * Class that uses a NumberVector as reference, and considers all non-zero
    * values as positive entries.
@@ -529,7 +528,7 @@ public class ROC {
     /**
      * Vector to use as reference
      */
-    NumberVector<?> vec;
+    NumberVector vec;
 
     /**
      * Threshold
@@ -542,7 +541,7 @@ public class ROC {
      * @param vec Reference vector.
      * @param threshold Threshold value.
      */
-    public VectorOverThreshold(NumberVector<?> vec, double threshold) {
+    public VectorOverThreshold(NumberVector vec, double threshold) {
       super();
       this.vec = vec;
       this.threshold = threshold;
@@ -566,14 +565,14 @@ public class ROC {
     /**
      * Vector to use as reference
      */
-    NumberVector<?> vec;
+    NumberVector vec;
 
     /**
      * Constructor.
      * 
      * @param vec Reference vector.
      */
-    public VectorZero(NumberVector<?> vec) {
+    public VectorZero(NumberVector vec) {
       this.vec = vec;
     }
 
@@ -614,13 +613,12 @@ public class ROC {
   /**
    * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
    * 
-   * @param <D> Distance type
    * @param size Database size
    * @param clus Cluster object
    * @param nei Query result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, DistanceDBIDList<D> nei) {
+  public static double computeROCAUCDistanceResult(int size, Cluster<?> clus, DoubleDBIDList nei) {
     // TODO: ensure the collection has efficient "contains".
     return ROC.computeROCAUCDistanceResult(size, clus.getIDs(), nei);
   }
@@ -628,15 +626,14 @@ public class ROC {
   /**
    * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
    * 
-   * @param <D> Distance type
    * @param size Database size
    * @param ids Collection of positive IDs, should support efficient contains()
    * @param nei Query Result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, DistanceDBIDList<D> nei) {
+  public static double computeROCAUCDistanceResult(int size, DBIDs ids, DoubleDBIDList nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    XYCurve roc = materializeROC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter<>(nei.iter()));
+    XYCurve roc = materializeROC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
     return XYCurve.areaUnderCurve(roc);
   }
 

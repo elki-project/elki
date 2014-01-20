@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualizatio
  * 
  * @param <V> Vector type
  */
-public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHierarchicalResult implements Projector {
+public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierarchicalResult implements Projector {
   /**
    * Relation we project.
    */
