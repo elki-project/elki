@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -50,6 +51,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 // TODO: add additional constructors with parameter constraints.
 // TODO: turn restrictionClass into a constraint?
 public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Class<? extends C>> {
+  /**
+   * The class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(ClassParameter.class);
+
   /**
    * The restriction class for this class parameter.
    */
@@ -214,6 +220,9 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class - no usable public constructor.");
       }
       catch(Exception e) {
+        if(LOG.isVerbose()) {
+          LOG.exception("Class initialization failed.", e);
+        }
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
       }
       return instance;

@@ -54,7 +54,7 @@ public class WrongParameterValueException extends ParameterException {
    * @param cause the cause
    */
   public WrongParameterValueException(Parameter<?> parameter, String read, Throwable cause) {
-    this("Wrong value of parameter \"" + parameter.getName() + "\".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + cause.getMessage(), cause);
+    this("Wrong value of parameter \"" + parameter.getName() + "\".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + formatCause(cause), cause);
   }
 
   /**
@@ -66,7 +66,7 @@ public class WrongParameterValueException extends ParameterException {
    * @param cause the cause
    */
   public WrongParameterValueException(Parameter<?> parameter, String read, String reason, Throwable cause) {
-    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + reason + "\n" + cause.getMessage(), cause);
+    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + reason + "\n" + formatCause(cause), cause);
   }
 
   /**
@@ -97,5 +97,22 @@ public class WrongParameterValueException extends ParameterException {
    */
   public WrongParameterValueException(String message, Throwable e) {
     super(message, e);
+  }
+
+  /**
+   * Format the error cause.
+   * 
+   * @param cause Error cause.
+   * @return String representation
+   */
+  private static String formatCause(Throwable cause) {
+    if(cause == null) {
+      return "";
+    }
+    String message = cause.getMessage();
+    if(message != null) {
+      return message;
+    }
+    return cause.toString();
   }
 }

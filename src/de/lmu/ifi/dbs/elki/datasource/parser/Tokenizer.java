@@ -65,7 +65,7 @@ public class Tokenizer implements Iter {
   public Tokenizer(Pattern colSep, String quoteChars) {
     super();
     this.colSep = colSep;
-    this.quoteChars = quoteChars.toCharArray();
+    this.quoteChars = quoteChars != null ? quoteChars.toCharArray() : new char[0];
   }
 
   /**
