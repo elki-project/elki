@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
-public class XTreeIndex<O extends NumberVector<?>> extends XTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
+public class XTreeIndex<O extends NumberVector> extends XTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   private static final Logging LOG = Logging.getLogger(XTreeIndex.class);
 
   private Relation<O> relation;
@@ -125,7 +124,7 @@ public class XTreeIndex<O extends NumberVector<?>> extends XTree implements Rang
   }
 
   @Override
-  public <D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
     if(distanceQuery.getRelation() != relation) {
       return null;
@@ -134,12 +133,12 @@ public class XTreeIndex<O extends NumberVector<?>> extends XTree implements Rang
     if(!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
-    SpatialDistanceQuery<O, D> dq = (SpatialDistanceQuery<O, D>) distanceQuery;
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getRangeQuery(this, dq, hints);
   }
 
   @Override
-  public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     // Query on the relation we index
     if(distanceQuery.getRelation() != relation) {
       return null;
@@ -148,7 +147,7 @@ public class XTreeIndex<O extends NumberVector<?>> extends XTree implements Rang
     if(!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
-    SpatialDistanceQuery<O, D> dq = (SpatialDistanceQuery<O, D>) distanceQuery;
+    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
     return RStarTreeUtil.getKNNQuery(this, dq, hints);
   }
 
