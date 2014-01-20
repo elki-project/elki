@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -151,7 +150,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    */
   private long[] determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs, StringBuilder msg) {
     // variances
-    double[] variances = DatabaseUtil.variances(relation, relation.get(id), neighborIDs);
+    double[] variances = RelationUtil.variances(relation, relation.get(id), neighborIDs);
 
     // preference vector
     long[] preferenceVector = BitsUtil.zero(variances.length);

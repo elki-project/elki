@@ -28,8 +28,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.SinCosTable;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -94,9 +95,8 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
     // sample only.
     double[] off = new double[dim], scale = new double[dim];
     {
-      Pair<? extends NumberVector, ? extends NumberVector> mm = DatabaseUtil.computeMinMax(relation);
-      NumberVector min = mm.first;
-      NumberVector max = mm.second;
+      Pair<Vector, Vector> mm = RelationUtil.computeMinMax(relation);
+      Vector min = mm.first, max = mm.second;
       for (int d = 0; d < dim; d++) {
         off[d] = min.doubleValue(matrix.dim(d));
         final double m = max.doubleValue(matrix.dim(d));

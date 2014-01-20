@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -87,7 +86,7 @@ public class StarBasedReferencePoints<V extends NumberVector> implements Referen
 
   @Override
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
-    Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
+    Relation<V> database = RelationUtil.relationUglyVectorCast(db);
     NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
 
     int dim = RelationUtil.dimensionality(db);

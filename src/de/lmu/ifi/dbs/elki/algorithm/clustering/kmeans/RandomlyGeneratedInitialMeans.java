@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -58,7 +58,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector> extends Abstr
   public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     final int dim = RelationUtil.dimensionality(relation);
     NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
-    Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
+    Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(relation);
     List<V> means = new ArrayList<>(k);
     final Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < k; i++) {

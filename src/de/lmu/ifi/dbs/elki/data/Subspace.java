@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.BitSet;
 import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
@@ -63,6 +64,21 @@ public class Subspace {
    */
   public Subspace(long[] dimensions) {
     this.dimensions = dimensions;
+    dimensionality = BitsUtil.cardinality(dimensions);
+  }
+
+  /**
+   * Creates a new k-dimensional subspace of the original data space.
+   * 
+   * @param dimensions the dimensions building this subspace
+   * 
+   * @deprecated use bitset.toLongArray() to convert to the preferred
+   *             representation; or even better, use the preferred long arrays
+   *             right away.
+   */
+  @Deprecated
+  public Subspace(BitSet bitset) {
+    this.dimensions = bitset.toLongArray();
     dimensionality = BitsUtil.cardinality(dimensions);
   }
 

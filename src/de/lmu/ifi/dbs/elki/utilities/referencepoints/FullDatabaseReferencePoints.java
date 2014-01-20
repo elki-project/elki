@@ -27,7 +27,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 
 /**
  * Strategy to use the complete database as reference points.
@@ -46,6 +46,6 @@ public class FullDatabaseReferencePoints<O extends NumberVector> implements Refe
 
   @Override
   public <T extends O> Collection<O> getReferencePoints(Relation<T> db) {
-    return new DatabaseUtil.CollectionFromRelation<O>(db);
+    return new RelationUtil.CollectionFromRelation<O>(db);
   }
 }

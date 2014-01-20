@@ -105,7 +105,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends MeanModel
    * @param assignment Current cluster assignment
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
+  protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
     boolean changed = false;
     final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

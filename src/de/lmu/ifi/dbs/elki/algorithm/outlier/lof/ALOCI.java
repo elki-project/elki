@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -145,7 +144,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     // Compute extend of dataset.
     double[] min, max;
     {
-      Pair<O, O> hbbs = DatabaseUtil.computeMinMax(relation);
+      Pair<Vector, Vector> hbbs = RelationUtil.computeMinMax(relation);
       double maxd = 0;
       min = new double[dim];
       max = new double[dim];

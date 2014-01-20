@@ -21,9 +21,9 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
@@ -165,13 +165,9 @@ public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveD
     // if no parameter for min max compute min max values for each dimension
     // from dataset
     if(min == null || max == null || min.length == 0 || max.length == 0) {
-      Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
-      min = new double[dim];
-      max = new double[dim];
-      for(int d = 0; d < dim; d++) {
-        min[d] = minmax.first.doubleValue(d);
-        max[d] = minmax.second.doubleValue(d);
-      }
+      Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(relation);
+      min = minmax.first.getArrayRef();
+      max = minmax.second.getArrayRef();
     }
     // if only one value for all dimensions set this value for each dimension
     if(min.length == 1 || max.length == 1) {
