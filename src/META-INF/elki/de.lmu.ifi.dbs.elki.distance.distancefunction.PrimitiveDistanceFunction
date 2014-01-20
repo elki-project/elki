@@ -52,7 +52,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DTWDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.EDRDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.ERPDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.LCSSDistanceFunction
-de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardPrimitiveSimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction
 # tutorial.distancefunction.MultiLPNorm

@@ -88,7 +88,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   /**
    * Same as {@link #factory}, but subtype.
    */
-  private SparseNumberVector.Factory<V>  sparsefactory;
+  protected SparseNumberVector.Factory<V> sparsefactory;
 
   /**
    * (Reused) set of values for the number vector.
@@ -109,7 +109,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
    * @param labelIndices Indices to use as labels
    * @param factory Vector factory
    */
-  public SparseNumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V>  factory) {
+  public SparseNumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V> factory) {
     super(colSep, quoteChars, comment, labelIndices, factory);
     this.sparsefactory = factory;
   }
@@ -118,6 +118,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   protected void parseLineInternal(String line) {
     tokenizer.initialize(line, 0, lengthWithoutLinefeed(line));
     int cardinality = (int) tokenizer.getLongBase10();
+    tokenizer.advance();
 
     values.clear();
     labels.clear();
@@ -176,7 +177,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override
     protected void getFactory(Parameterization config) {
-      ObjectParameter<SparseNumberVector.Factory<V> > factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
+      ObjectParameter<SparseNumberVector.Factory<V>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
       if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
@@ -184,7 +185,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
 
     @Override
     protected SparseNumberVectorLabelParser<V> makeInstance() {
-      return new SparseNumberVectorLabelParser<>(colSep, quoteChars, comment, labelIndices, (SparseNumberVector.Factory<V> ) factory);
+      return new SparseNumberVectorLabelParser<>(colSep, quoteChars, comment, labelIndices, (SparseNumberVector.Factory<V>) factory);
     }
   }
 }
