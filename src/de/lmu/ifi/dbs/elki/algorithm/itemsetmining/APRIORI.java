@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -202,15 +201,6 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     return new AprioriResult("APRIORI", "apriori", solution, meta);
   }
 
-  private void debugDumpCandidates(StringBuilder msg, List<? extends Itemset> candidates, VectorFieldTypeInformation<BitVector> meta) {
-    msg.append(':');
-    for(Itemset itemset : candidates) {
-      msg.append(" [");
-      itemset.appendTo(msg, meta);
-      msg.append(']');
-    }
-  }
-
   /**
    * Build the 1-itemsets.
    * 
@@ -256,7 +246,10 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       BitsUtil.setI(mask, supported.item);
       f1++;
     }
-    TLongIntHashMap map = new TLongIntHashMap(f1 * (int) Math.sqrt(f1));
+    // We quite aggressively size the map, assuming that almost each combination
+    // is present somewhere. If this won't fit into memory, we're likely running
+    // OOM somewhere later anyway!
+    TLongIntHashMap map = new TLongIntHashMap((f1 * (f1 - 1)) >> 1);
     final long[] scratch = BitsUtil.zero(dim);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       long[] bv = relation.get(iditer).getBits();
@@ -350,7 +343,6 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
             break prefix; // Prefix doesn't match
           }
           // Test subsets (re-) using scratch object
-          LOG.debug(FormatUtil.format(ii.indices) + " " + FormatUtil.format(ij.indices) + " " + scratch.indices.length);
           System.arraycopy(ii.indices, 1, scratch.indices, 0, length - 2);
           scratch.indices[length - 2] = ij.indices[length - 2];
           for(int k = length - 3; k >= 0; k--) {
@@ -406,6 +398,22 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       return candidateList;
     }
     throw new AbortException("Unexpected itemset type " + ref.getClass());
+  }
+
+  /**
+   * Debug method: output all itemsets.
+   * 
+   * @param msg Output buffer
+   * @param candidates Itemsets to dump
+   * @param meta Metadata for item labels
+   */
+  private void debugDumpCandidates(StringBuilder msg, List<? extends Itemset> candidates, VectorFieldTypeInformation<BitVector> meta) {
+    msg.append(':');
+    for(Itemset itemset : candidates) {
+      msg.append(" [");
+      itemset.appendTo(msg, meta);
+      msg.append(']');
+    }
   }
 
   @Override
