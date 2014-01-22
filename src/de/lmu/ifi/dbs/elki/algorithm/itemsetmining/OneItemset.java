@@ -47,6 +47,17 @@ public class OneItemset extends Itemset {
     this.item = item;
   }
 
+  /**
+   * Constructor with initial support.
+   * 
+   * @param item Item
+   * @param support Support
+   */
+  public OneItemset(int item, int support) {
+    this.item = item;
+    this.support = support;
+  }
+
   @Override
   public int length() {
     return 1;

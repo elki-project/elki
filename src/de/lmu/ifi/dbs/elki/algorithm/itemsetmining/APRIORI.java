@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TLongIntIterator;
+import gnu.trove.map.hash.TLongIntHashMap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -37,8 +40,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -132,56 +137,152 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   public AprioriResult run(Relation<BitVector> relation) {
     List<Itemset> solution = new ArrayList<>();
     final int size = relation.size();
+    // TODO: we don't strictly require a vector field.
+    // We could work with knowing just the maximum dimensionality beforehand.
     VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
     if(size > 0) {
       final int dim = meta.getDimensionality();
-      // Generate initial candidates of length 1.
-      List<Itemset> candidates = new ArrayList<>(dim);
-      for(int i = 0; i < dim; i++) {
-        candidates.add(new OneItemset(i));
+      Duration timeone = LOG.newDuration("apriori.1-items.time");
+      timeone.begin();
+      List<OneItemset> oneitems = buildFrequentOneItemsets(relation, dim);
+      timeone.end();
+      LOG.statistics(timeone);
+      if(LOG.isVerbose()) {
+        StringBuilder msg = new StringBuilder();
+        msg.append("1-frequentItemsets (").append(oneitems.size()).append(")");
+        if(LOG.isDebuggingFine()) {
+          debugDumpCandidates(msg, oneitems, meta);
+        }
+        msg.append('\n');
+        LOG.verbose(msg);
       }
-      for(int length = 1; candidates.size() > 0; length++) {
-        StringBuilder msg = LOG.isVerbose() ? new StringBuilder() : null;
-        List<Itemset> supported = frequentItemsets(candidates, relation);
-        if(msg != null) {
-          if(LOG.isDebuggingFinest() && length > 2) {
-            msg.append(length).append("-candidates (").append(candidates.size()).append("):");
-            for(Itemset itemset : candidates) {
-              msg.append(" [");
-              itemset.appendTo(msg, meta);
-              msg.append(']');
-            }
-            msg.append('\n');
-          }
-          msg.append(length).append("-frequentItemsets (").append(supported.size()).append(")");
+      solution.addAll(oneitems);
+      if(oneitems.size() >= 2) {
+        Duration timetwo = LOG.newDuration("apriori.2-items.time");
+        timetwo.begin();
+        List<? extends Itemset> candidates = buildFrequentTwoItemsets(oneitems, relation, dim);
+        timetwo.end();
+        LOG.statistics(timetwo);
+        if(LOG.isVerbose()) {
+          StringBuilder msg = new StringBuilder();
+          msg.append("2-frequentItemsets (").append(candidates.size()).append(")");
           if(LOG.isDebuggingFine()) {
-            msg.append(':');
-            for(Itemset itemset : supported) {
-              msg.append(" [");
-              itemset.appendTo(msg, meta);
-              msg.append(']');
-            }
+            debugDumpCandidates(msg, candidates, meta);
           }
           msg.append('\n');
+          LOG.verbose(msg);
         }
-        solution.addAll(supported);
-        // Join to get the new candidates
-        candidates = aprioriGenerate(supported, length + 1, dim);
-        if(msg != null) {
-          if(length > 2 && LOG.isDebuggingFinest()) {
-            msg.append(length).append("candidates after pruning (").append(candidates.size()).append("):");
-            for(Itemset itemset : candidates) {
-              msg.append(" [");
-              itemset.appendTo(msg, meta);
-              msg.append(']');
+        solution.addAll(candidates);
+        for(int length = 3; candidates.size() >= length; length++) {
+          StringBuilder msg = LOG.isVerbose() ? new StringBuilder() : null;
+          Duration timel = LOG.newDuration("apriori." + length + "-items.time");
+          // Join to get the new candidates
+          timel.begin();
+          candidates = aprioriGenerate(candidates, length, dim);
+          if(msg != null) {
+            if(length > 2 && LOG.isDebuggingFinest()) {
+              msg.append(length).append("-candidates after pruning (").append(candidates.size()).append(")");
+              debugDumpCandidates(msg, candidates, meta);
             }
-            msg.append('\n');
           }
-          LOG.verbose(msg.toString());
+          candidates = frequentItemsets(candidates, relation);
+          timel.end();
+          LOG.statistics(timel);
+          if(msg != null) {
+            msg.append(length).append("-frequentItemsets (").append(candidates.size()).append(")");
+            if(LOG.isDebuggingFine()) {
+              debugDumpCandidates(msg, candidates, meta);
+            }
+            LOG.verbose(msg.toString());
+          }
+          solution.addAll(candidates);
         }
       }
     }
     return new AprioriResult("APRIORI", "apriori", solution, meta);
+  }
+
+  private void debugDumpCandidates(StringBuilder msg, List<? extends Itemset> candidates, VectorFieldTypeInformation<BitVector> meta) {
+    msg.append(':');
+    for(Itemset itemset : candidates) {
+      msg.append(" [");
+      itemset.appendTo(msg, meta);
+      msg.append(']');
+    }
+  }
+
+  /**
+   * Build the 1-itemsets.
+   * 
+   * @param relation Data relation
+   * @param dim Maximum dimensionality
+   * @return 1-itemsets
+   */
+  protected List<OneItemset> buildFrequentOneItemsets(final Relation<BitVector> relation, final int dim) {
+    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * relation.size()) : minsupp;
+    // TODO: use TIntList and prefill appropriately to avoid knowing "dim"
+    // beforehand?
+    int[] counts = new int[dim];
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      BitVector bv = relation.get(iditer);
+      long[] bits = bv.getBits();
+      for(int i = BitsUtil.nextSetBit(bits, 0); i >= 0; i = BitsUtil.nextSetBit(bits, i + 1)) {
+        counts[i]++;
+      }
+    }
+    // Generate initial candidates of length 1.
+    List<OneItemset> candidates = new ArrayList<>(dim);
+    for(int i = 0; i < dim; i++) {
+      if(counts[i] >= needed) {
+        candidates.add(new OneItemset(i, counts[i]));
+      }
+    }
+    return candidates;
+  }
+
+  /**
+   * Build the 2-itemsets.
+   * 
+   * @param oneitems Frequent 1-itemsets
+   * @param relation Data relation
+   * @param dim Maximum dimensionality
+   * @return Frequent 2-itemsets
+   */
+  protected List<SparseItemset> buildFrequentTwoItemsets(List<OneItemset> oneitems, final Relation<BitVector> relation, final int dim) {
+    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * relation.size()) : minsupp;
+    int f1 = 0;
+    long[] mask = BitsUtil.zero(dim);
+    for(OneItemset supported : oneitems) {
+      BitsUtil.setI(mask, supported.item);
+      f1++;
+    }
+    TLongIntHashMap map = new TLongIntHashMap(f1 * (int) Math.sqrt(f1));
+    final long[] scratch = BitsUtil.zero(dim);
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      long[] bv = relation.get(iditer).getBits();
+      for(int i = 0; i < scratch.length; i++) {
+        scratch[i] = (i < bv.length) ? (mask[i] & bv[i]) : 0L;
+      }
+      for(int i = BitsUtil.nextSetBit(scratch, 0); i >= 0; i = BitsUtil.nextSetBit(scratch, i + 1)) {
+        for(int j = BitsUtil.nextSetBit(scratch, i + 1); j >= 0; j = BitsUtil.nextSetBit(scratch, j + 1)) {
+          long key = (((long) i) << 32) | j;
+          map.put(key, 1 + map.get(key));
+        }
+      }
+    }
+    // Generate candidates of length 2.
+    List<SparseItemset> candidates = new ArrayList<>(f1 * (int) Math.sqrt(f1));
+    for(TLongIntIterator iter = map.iterator(); iter.hasNext();) {
+      iter.advance(); // Trove style iterator - advance first.
+      if(iter.value() >= needed) {
+        int ii = (int) (iter.key() >>> 32);
+        int ij = (int) (iter.key() & -1L);
+        candidates.add(new SparseItemset(new int[] { ii, ij }, iter.value()));
+      }
+    }
+    // The hashmap may produce them out of order.
+    Collections.sort(candidates);
+    return candidates;
   }
 
   /**
@@ -190,12 +291,14 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * 
    * @param support Support map.
    * @param candidates the candidates to be evaluated
-   * @param database the database to evaluate the candidates on
+   * @param relation the database to evaluate the candidates on
+   * @param mask Bitmask of items that were 1-frequent
    * @return Itemsets with sufficient support
    */
-  protected List<Itemset> frequentItemsets(List<Itemset> candidates, Relation<BitVector> database) {
-    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      BitVector bv = database.get(iditer);
+  protected List<? extends Itemset> frequentItemsets(List<? extends Itemset> candidates, Relation<BitVector> relation) {
+    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * relation.size()) : minsupp;
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      BitVector bv = relation.get(iditer);
       // TODO can we exploit that the candidate set it sorted?
       for(Itemset candidate : candidates) {
         if(candidate.containedIn(bv)) {
@@ -204,9 +307,8 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       }
     }
     // Retain only those with minimum support:
-    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * database.size()) : minsupp;
     List<Itemset> supported = new ArrayList<>(candidates.size());
-    for(Iterator<Itemset> iter = candidates.iterator(); iter.hasNext();) {
+    for(Iterator<? extends Itemset> iter = candidates.iterator(); iter.hasNext();) {
       final Itemset candidate = iter.next();
       if(candidate.getSupport() >= needed) {
         supported.add(candidate);
@@ -224,21 +326,9 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @param dim Dimensionality
    * @return itemsets that cannot be pruned by apriori
    */
-  protected List<Itemset> aprioriGenerate(List<Itemset> supported, int length, int dim) {
+  protected List<Itemset> aprioriGenerate(List<? extends Itemset> supported, int length, int dim) {
     List<Itemset> candidateList = new ArrayList<>();
     if(supported.size() <= 0) {
-      return candidateList;
-    }
-    // At length 2, we don't need to check.
-    if(length == 2) {
-      final int ssize = supported.size();
-      for(int i = 0; i < ssize; i++) {
-        OneItemset ii = (OneItemset) supported.get(i);
-        for(int j = i + 1; j < ssize; j++) {
-          OneItemset ij = (OneItemset) supported.get(j);
-          candidateList.add(new SparseItemset(ii, ij));
-        }
-      }
       return candidateList;
     }
     Itemset ref = supported.get(0);
@@ -260,6 +350,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
             break prefix; // Prefix doesn't match
           }
           // Test subsets (re-) using scratch object
+          LOG.debug(FormatUtil.format(ii.indices) + " " + FormatUtil.format(ij.indices) + " " + scratch.indices.length);
           System.arraycopy(ii.indices, 1, scratch.indices, 0, length - 2);
           scratch.indices[length - 2] = ij.indices[length - 2];
           for(int k = length - 3; k >= 0; k--) {
