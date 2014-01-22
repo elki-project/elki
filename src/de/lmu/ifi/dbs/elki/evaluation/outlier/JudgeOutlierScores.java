@@ -147,12 +147,12 @@ public class JudgeOutlierScores implements Evaluator {
     double negscore = 0.0;
     // fill histogram with values of each object
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double result = or.getScores().get(iter);
+      double result = or.getScores().doubleValue(iter);
       result = innerScaling.getScaled(scaling.getScaled(result));
       posscore += (1.0 - result);
     }
     for (DBIDIter iter = outlierIds.iter(); iter.valid(); iter.advance()) {
-      double result = or.getScores().get(iter);
+      double result = or.getScores().doubleValue(iter);
       result = innerScaling.getScaled(scaling.getScaled(result));
       negscore += result;
     }

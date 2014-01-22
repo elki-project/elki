@@ -42,7 +42,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -203,7 +204,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     else {
       meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     }
-    Relation<Double> scoresult = new MaterializedRelation<>("External Outlier", "external-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    DoubleRelation scoresult = new MaterializedDoubleRelation("External Outlier", "external-outlier", scores, relation.getDBIDs());
     OutlierResult or = new OutlierResult(meta, scoresult);
 
     // Apply scaling
@@ -212,7 +213,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     }
     DoubleMinMax mm = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double val = scoresult.get(iditer);
+      double val = scoresult.doubleValue(iditer);
       val = scaling.getScaled(val);
       scores.putDouble(iditer, val);
       mm.put(val);

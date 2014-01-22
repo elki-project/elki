@@ -35,7 +35,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -118,7 +119,7 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
       emo_score.putDouble(iditer, maxProb);
       globmax = Math.max(maxProb, globmax);
     }
-    Relation<Double> scoreres = new MaterializedRelation<>("EM outlier scores", "em-outlier", TypeUtil.DOUBLE, emo_score, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("EM outlier scores", "em-outlier", emo_score, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0.0, globmax);
     // combine results.
     OutlierResult result = new OutlierResult(meta, scoreres);

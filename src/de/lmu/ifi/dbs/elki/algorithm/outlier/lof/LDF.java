@@ -43,7 +43,8 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -254,7 +255,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Local Density Factor", "ldf-outlier", TypeUtil.DOUBLE, ldfs, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Density Factor", "ldf-outlier", ldfs, ids);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, 1. / c, 1 / (1 + c));
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 

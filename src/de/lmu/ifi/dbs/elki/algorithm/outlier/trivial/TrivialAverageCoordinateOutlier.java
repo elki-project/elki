@@ -32,7 +32,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -86,7 +87,7 @@ public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierRe
       scores.putDouble(iditer, score);
       minmax.put(score);
     }
-    Relation<Double> scoreres = new MaterializedRelation<>("Trivial mean score", "mean-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Trivial mean score", "mean-outlier", scores, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     return new OutlierResult(meta, scoreres);
   }

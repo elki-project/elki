@@ -51,7 +51,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -179,7 +180,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     if(LOG.isVerbose()) {
       LOG.verbose("Number of high-contrast subspaces: " + subspaces.size());
     }
-    List<Relation<Double>> results = new ArrayList<>();
+    List<DoubleRelation> results = new ArrayList<>();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Calculating Outlier scores for high Contrast subspaces", subspaces.size(), LOG) : null;
 
     // run outlier detection and collect the result
@@ -209,9 +210,9 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double sum = 0.0;
-      for(Relation<Double> r : results) {
-        final Double s = r.get(iditer);
-        if(s != null && !Double.isNaN(s)) {
+      for(DoubleRelation r : results) {
+        final double s = r.doubleValue(iditer);
+        if(!Double.isNaN(s)) {
           sum += s;
         }
       }
@@ -219,7 +220,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       minmax.put(sum);
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    Relation<Double> scoreres = new MaterializedRelation<>("HiCS", "HiCS-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("HiCS", "HiCS-outlier", scores, relation.getDBIDs());
 
     return new OutlierResult(meta, scoreres);
   }

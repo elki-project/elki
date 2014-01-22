@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -83,9 +83,9 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     if (pmin == null || pmax == null) {
       DoubleMinMax mm = new DoubleMinMax();
-      Relation<Double> scores = or.getScores();
+      DoubleRelation scores = or.getScores();
       for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = scores.get(id);
+        double val = scores.doubleValue(id);
         if (!Double.isInfinite(val)) {
           mm.put(val);
         }

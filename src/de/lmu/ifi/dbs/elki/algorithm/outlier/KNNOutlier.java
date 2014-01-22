@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -133,7 +134,7 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
     if(progressKNNDistance != null) {
       progressKNNDistance.ensureCompleted(LOG);
     }
-    Relation<Double> scoreres = new MaterializedRelation<>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, knno_score, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", "knn-outlier", knno_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
   }

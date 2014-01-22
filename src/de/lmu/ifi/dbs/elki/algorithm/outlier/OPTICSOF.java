@@ -43,7 +43,8 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -165,7 +166,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
       ofminmax.put(of);
     }
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("OPTICS Outlier Scores", "optics-outlier", TypeUtil.DOUBLE, ofs, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("OPTICS Outlier Scores", "optics-outlier", ofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

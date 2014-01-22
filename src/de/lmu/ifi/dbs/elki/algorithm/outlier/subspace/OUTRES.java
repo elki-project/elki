@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -144,7 +144,7 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
     }
 
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., 1., 1.);
-    OutlierResult outresResult = new OutlierResult(meta, new MaterializedRelation<>("OUTRES", "outres-score", TypeUtil.DOUBLE, ranks, relation.getDBIDs()));
+    OutlierResult outresResult = new OutlierResult(meta, new MaterializedDoubleRelation("OUTRES", "outres-score", ranks, relation.getDBIDs()));
     return outresResult;
   }
 

@@ -42,7 +42,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -255,10 +256,10 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(LOG);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<>("LOCI normalized MDEF", "loci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("LOCI normalized MDEF", "loci-mdef-outlier", mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(new MaterializedRelation<>("LOCI MDEF Radius", "loci-critical-radius", TypeUtil.DOUBLE, mdef_radius, relation.getDBIDs()));
+    result.addChildResult(new MaterializedDoubleRelation("LOCI MDEF Radius", "loci-critical-radius", mdef_radius, relation.getDBIDs()));
     return result;
   }
 

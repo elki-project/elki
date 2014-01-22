@@ -42,7 +42,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -197,7 +198,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector> extends Abst
     // visualizer to find the reference points in the result
     ReferencePointsResult<V> refp = new ReferencePointsResult<>("Reference points", "reference-points", refPoints);
 
-    Relation<Double> scoreResult = new MaterializedRelation<>("Reference-points Outlier Scores", "reference-outlier", TypeUtil.DOUBLE, rbod_score, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Reference-points Outlier Scores", "reference-outlier", rbod_score, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     result.addChildResult(refp);

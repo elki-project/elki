@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -88,7 +88,7 @@ public class OutlierThresholdClustering implements Evaluator {
   }
 
   private Clustering<Model> split(OutlierResult or) {
-    Relation<Double> scores = or.getScores();
+    DoubleRelation scores = or.getScores();
     if(scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) scaling).prepare(or);
     }
@@ -97,7 +97,7 @@ public class OutlierThresholdClustering implements Evaluator {
       idlists.add(DBIDUtil.newHashSet());
     }
     for(DBIDIter iter = scores.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      double score = scores.get(iter);
+      double score = scores.doubleValue(iter);
       if(scaling != null) {
         score = scaling.getScaled(score);
       }

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -312,7 +313,7 @@ public class JSONWebServer implements HttpHandler {
           outlierMetaToJSON(re, meta);
 
           re.appendKeyArray("scores");
-          Relation<Double> scores = or.getScores();
+          DoubleRelation scores = or.getScores();
           DBIDIter iter = or.getOrdering().iter(scores.getDBIDs()).iter();
           for (int i = 0; i < offset && iter.valid(); i++) {
             iter.advance();
@@ -320,8 +321,8 @@ public class JSONWebServer implements HttpHandler {
           for (int i = 0; i < pagesize && iter.valid(); i++, iter.advance()) {
             re.startHash();
             bundleToJSON(re, iter);
-            final Double val = scores.get(iter);
-            if (val != null) {
+            final double val = scores.doubleValue(iter);
+            if (!Double.isNaN(val)) {
               re.appendKeyValue("score", val);
             }
             re.closeHash();

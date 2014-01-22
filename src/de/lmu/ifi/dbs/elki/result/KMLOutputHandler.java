@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -161,7 +162,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
   }
 
   private void writeKMLData(XMLStreamWriter xmlw, OutlierResult outlierResult, Database database) throws XMLStreamException {
-    Relation<Double> scores = outlierResult.getScores();
+    DoubleRelation scores = outlierResult.getScores();
     Relation<PolygonsObject> polys = database.getRelation(TypeUtil.POLYGON_TYPE);
     Relation<String> labels = DatabaseUtil.guessObjectLabelRepresentation(database);
 
@@ -228,10 +229,10 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
       }
     }
     for (DBIDIter iter = outlierResult.getOrdering().iter(ids).iter(); iter.valid(); iter.advance()) {
-      Double score = scores.get(iter);
+      double score = scores.doubleValue(iter);
       PolygonsObject poly = polys.get(iter);
       String label = labels.get(iter);
-      if (score == null) {
+      if (Double.isNaN(score)) {
         LOG.warning("No score for object " + DBIDUtil.toString(iter));
       }
       if (poly == null) {

@@ -29,14 +29,13 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -100,7 +99,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     Result innerresult = algorithm.run(database);
 
     OutlierResult or = getOutlierResult(innerresult);
-    final Relation<Double> scores = or.getScores();
+    final DoubleRelation scores = or.getScores();
     if(scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) scaling).prepare(or);
     }
@@ -109,13 +108,13 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
 
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iditer = scores.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double val = scaling.getScaled(scores.get(iditer));
+      double val = scaling.getScaled(scores.doubleValue(iditer));
       scaledscores.putDouble(iditer, val);
       minmax.put(val);
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), scaling.getMin(), scaling.getMax());
-    Relation<Double> scoresult = new MaterializedRelation<>("Scaled Outlier", "scaled-outlier", TypeUtil.DOUBLE, scaledscores, scores.getDBIDs());
+    DoubleRelation scoresult = new MaterializedDoubleRelation("Scaled Outlier", "scaled-outlier", scaledscores, scores.getDBIDs());
     OutlierResult result = new OutlierResult(meta, scoresult);
     result.addChildResult(innerresult);
 

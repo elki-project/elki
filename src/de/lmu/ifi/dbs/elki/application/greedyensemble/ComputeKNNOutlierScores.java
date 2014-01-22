@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -313,9 +314,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       ((OutlierScalingFunction) scaling).prepare(result);
     }
     out.append(label);
-    Relation<Double> scores = result.getScores();
+    DoubleRelation scores = result.getScores();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double value = scores.get(iter);
+      double value = scores.doubleValue(iter);
       if(scaling != null) {
         value = scaling.getScaled(value);
       }

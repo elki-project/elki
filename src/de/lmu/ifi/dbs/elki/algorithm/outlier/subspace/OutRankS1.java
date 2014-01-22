@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
@@ -134,7 +134,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
       }
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<>("OutRank-S1", "OUTRANK_S1", TypeUtil.DOUBLE, score, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("OutRank-S1", "OUTRANK_S1", score, ids);
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
     OutlierResult res = new OutlierResult(meta, scoreResult);
     res.addChildResult(clustering);

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -44,9 +44,9 @@ public class SimpleScoreDumper implements ResultHandler {
     // Get all new outlier results
     ArrayList<OutlierResult> ors = ResultUtil.filterResults(newResult, OutlierResult.class);
     for (OutlierResult o : ors) {
-      Relation<Double> scores = o.getScores();
+      DoubleRelation scores = o.getScores();
       for (DBIDIter iter = scores.iterDBIDs(); iter.valid(); iter.advance()) {
-        System.out.println(DBIDUtil.toString(iter) + " " + scores.get(iter));
+        System.out.println(DBIDUtil.toString(iter) + " " + scores.doubleValue(iter));
       }
     }
   }

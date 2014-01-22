@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
@@ -189,7 +190,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     }
     // combine results.
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    OutlierResult sodResult = new OutlierResult(meta, new MaterializedRelation<>("Subspace Outlier Degree", "sod-outlier", TypeUtil.DOUBLE, sod_scores, relation.getDBIDs()));
+    OutlierResult sodResult = new OutlierResult(meta, new MaterializedDoubleRelation("Subspace Outlier Degree", "sod-outlier", sod_scores, relation.getDBIDs()));
     if(sod_models != null) {
       Relation<SODModel> models = new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<>(SODModel.class), sod_models, relation.getDBIDs());
       sodResult.addChildResult(models);

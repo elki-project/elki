@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -331,7 +333,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     }
 
     // combine results.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Correlation Outlier Probabilities", COP_SCORES, TypeUtil.DOUBLE, cop_score, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Correlation Outlier Probabilities", COP_SCORES, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     if(models) {

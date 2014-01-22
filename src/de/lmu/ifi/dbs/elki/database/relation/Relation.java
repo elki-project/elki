@@ -96,7 +96,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * <pre>
    * {@code
    * for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-   *    DBID id = iter.getDBID();
+   *    relation.get(iter); // Get the current element
    * }
    * }
    * </pre>

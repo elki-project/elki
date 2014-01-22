@@ -43,7 +43,8 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -194,7 +195,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       minmax.put(dwofs.doubleValue(iter));
     }
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    Relation<Double> rel = new MaterializedRelation<>("Dynamic-Window Outlier Factors", "dwof-outlier", TypeUtil.DOUBLE, dwofs, ids);
+    DoubleRelation rel = new MaterializedDoubleRelation("Dynamic-Window Outlier Factors", "dwof-outlier", dwofs, ids);
     return new OutlierResult(meta, rel);
   }
 

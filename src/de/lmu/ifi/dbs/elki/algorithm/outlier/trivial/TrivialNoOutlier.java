@@ -31,7 +31,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -73,7 +74,7 @@ public class TrivialNoOutlier extends AbstractAlgorithm<OutlierResult> implement
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       scores.putDouble(iditer, 0.0);
     }
-    Relation<Double> scoreres = new MaterializedRelation<>("Trivial no-outlier score", "no-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Trivial no-outlier score", "no-outlier", scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
     return new OutlierResult(meta, scoreres);
   }

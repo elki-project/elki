@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -122,9 +122,9 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
   public void prepare(OutlierResult or) {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
-    Relation<Double> scores = or.getScores();
+    DoubleRelation scores = or.getScores();
     for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double val = scores.get(id);
+      double val = scores.doubleValue(id);
       if (!Double.isNaN(val) && !Double.isInfinite(val)) {
         mv.put(val);
       }
@@ -151,7 +151,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
       // Weighted deviation from previous mean
       double sqsum = 0.0;
       for (int i = 0; i < ids.size(); i++) {
-        double val = or.getScores().get(ids.get(i));
+        double val = or.getScores().doubleValue(ids.get(i));
         // E-Step
         double ti = calcPosterior(val, curAlpha, curMu, curSigma, curLambda);
         // M-Step

@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -149,7 +150,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
       }
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<>("GLSSODBackward", "GLSSODbackward-outlier", TypeUtil.DOUBLE, scores, relationx.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("GLSSODBackward", "GLSSODbackward-outlier", scores, relationx.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

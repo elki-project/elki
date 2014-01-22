@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -171,7 +172,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("LDOF Outlier Score", "ldof-outlier", TypeUtil.DOUBLE, ldofs, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("LDOF Outlier Score", "ldof-outlier", ldofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult);
   }

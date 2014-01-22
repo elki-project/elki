@@ -32,7 +32,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -136,7 +137,7 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Spatial Outlier Factor", "sof-outlier", TypeUtil.DOUBLE, lofs, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Spatial Outlier Factor", "sof-outlier", lofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     or.addChildResult(npred);

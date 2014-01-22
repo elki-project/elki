@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.result.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
@@ -47,7 +47,7 @@ public class OutlierResult extends BasicResult {
   /**
    * Outlier scores.
    */
-  private Relation<Double> scores;
+  private DoubleRelation scores;
 
   /**
    * Outlier ordering.
@@ -60,7 +60,7 @@ public class OutlierResult extends BasicResult {
    * @param meta Outlier score metadata.
    * @param scores Scores result.
    */
-  public OutlierResult(OutlierScoreMeta meta, Relation<Double> scores) {
+  public OutlierResult(OutlierScoreMeta meta, DoubleRelation scores) {
     super(scores.getLongName(), scores.getShortName());
     this.meta = meta;
     this.scores = scores;
@@ -84,7 +84,7 @@ public class OutlierResult extends BasicResult {
    * 
    * @return the scores
    */
-  public Relation<Double> getScores() {
+  public DoubleRelation getScores() {
     return scores;
   }
 

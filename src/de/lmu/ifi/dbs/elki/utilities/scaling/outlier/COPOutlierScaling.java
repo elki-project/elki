@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
@@ -117,11 +117,11 @@ public class COPOutlierScaling implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     double[] s;
     {
-      Relation<Double> scores = or.getScores();
+      DoubleRelation scores = or.getScores();
       s = new double[scores.size()];
       int i = 0;
       for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance(), i++) {
-        s[i] = scores.get(id);
+        s[i] = scores.doubleValue(id);
       }
     }
     Arrays.sort(s);

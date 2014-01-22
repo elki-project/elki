@@ -14,7 +14,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -92,7 +93,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
     // Wrap the result in the standard containers
     // Actual min-max, theoretical min-max!
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
-    Relation<Double> rel = new MaterializedRelation<>(database, TypeUtil.DOUBLE, relation.getDBIDs(), "stddev-outlier", scores);
+    DoubleRelation rel = new MaterializedDoubleRelation(database, relation.getDBIDs(), "stddev-outlier", scores);
     return new OutlierResult(meta, rel);
   }
 

@@ -39,7 +39,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -180,7 +181,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       }
       scores.putDouble(iditer, score);
     }
-    Relation<Double> scoreres = new MaterializedRelation<>("Model outlier scores", "model-outlier", TypeUtil.DOUBLE, scores, models.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Model outlier scores", "model-outlier", scores, models.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0., 1.);
     return new OutlierResult(meta, scoreres);
   }

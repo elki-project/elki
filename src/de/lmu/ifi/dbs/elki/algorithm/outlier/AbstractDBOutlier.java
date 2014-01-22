@@ -28,7 +28,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -84,7 +85,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
     DoubleDataStore dbodscore = computeOutlierScores(database, relation, d);
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Density-Based Outlier Detection", "db-outlier", TypeUtil.DOUBLE, dbodscore, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Density-Based Outlier Detection", "db-outlier", dbodscore, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }

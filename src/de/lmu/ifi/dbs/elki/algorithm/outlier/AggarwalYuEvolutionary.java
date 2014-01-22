@@ -32,14 +32,14 @@ import java.util.Random;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -155,7 +155,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       }
       minmax.put(val);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<>("AggarwalYuEvolutionary", "aggarwal-yu-outlier", TypeUtil.DOUBLE, outlierScore, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("AggarwalYuEvolutionary", "aggarwal-yu-outlier", outlierScore, relation.getDBIDs());
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreResult);
   }

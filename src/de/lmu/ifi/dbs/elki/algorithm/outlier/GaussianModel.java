@@ -30,7 +30,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -136,7 +137,7 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
     else {
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY);
     }
-    Relation<Double> res = new MaterializedRelation<>("Gaussian Model Outlier Score", "gaussian-model-outlier", TypeUtil.DOUBLE, oscores, relation.getDBIDs());
+    DoubleRelation res = new MaterializedDoubleRelation("Gaussian Model Outlier Score", "gaussian-model-outlier", oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 

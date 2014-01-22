@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -128,8 +128,8 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
         double[] scores = new double[num];
         int i = 0;
         for (OutlierResult r : results) {
-          Double score = r.getScores().get(id);
-          if (score != null) {
+          double score = r.getScores().doubleValue(id);
+          if (!Double.isNaN(score)) {
             scores[i] = score;
             i++;
           } else {
@@ -156,7 +156,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    Relation<Double> scores = new MaterializedRelation<>("Simple Outlier Ensemble", "ensemble-outlier", TypeUtil.DOUBLE, sumscore, ids);
+    DoubleRelation scores = new MaterializedDoubleRelation("Simple Outlier Ensemble", "ensemble-outlier", sumscore, ids);
     return new OutlierResult(meta, scores);
   }
 

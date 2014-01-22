@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
@@ -279,7 +279,7 @@ public class ROC {
     /**
      * Outlier score.
      */
-    private Relation<Double> scores;
+    private DoubleRelation scores;
 
     /**
      * Previous value.
@@ -304,13 +304,13 @@ public class ROC {
 
     @Override
     public void advance() {
-      prev = scores.get(iter);
+      prev = scores.doubleValue(iter);
       iter.advance();
     }
 
     @Override
     public boolean tiedToPrevious() {
-      return scores.get(iter) == prev;
+      return scores.doubleValue(iter) == prev;
     }
 
     @Override

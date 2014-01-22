@@ -36,7 +36,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -184,7 +185,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0);
-    Relation<Double> res = new MaterializedRelation<>("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", TypeUtil.DOUBLE, oscores, relation.getDBIDs());
+    DoubleRelation res = new MaterializedDoubleRelation("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 

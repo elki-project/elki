@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -128,7 +129,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     // Wrap the result and add metadata.
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(min, max, 0., inc * (ids.size() - 1), 1);
-    Relation<Double> rel = new MaterializedRelation<>("ODIN In-Degree", "odin", TypeUtil.DOUBLE, scores, ids);
+    DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", "odin", scores, ids);
     return new OutlierResult(meta, rel);
   }
 

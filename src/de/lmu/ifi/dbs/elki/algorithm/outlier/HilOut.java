@@ -41,7 +41,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -270,7 +271,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
         hilout_weight.putDouble(ent.id, ent.ubound);
       }
     }
-    Relation<Double> scoreResult = new MaterializedRelation<>("HilOut weight", "hilout-weight", TypeUtil.DOUBLE, hilout_weight, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("HilOut weight", "hilout-weight", hilout_weight, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;

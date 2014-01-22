@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
@@ -249,7 +250,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(LOG);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<>("aLOCI normalized MDEF", "aloci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("aLOCI normalized MDEF", "aloci-mdef-outlier", mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;

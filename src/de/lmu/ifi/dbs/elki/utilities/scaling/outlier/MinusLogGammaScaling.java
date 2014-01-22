@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
@@ -68,9 +68,9 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     meta = or.getOutlierMeta();
     // Determine Minimum and Maximum.
     DoubleMinMax mm = new DoubleMinMax();
-    Relation<Double> scores = or.getScores();
+    DoubleRelation scores = or.getScores();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double score = scores.get(id);
+      double score = scores.doubleValue(id);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mm.put(score);
       }
@@ -80,7 +80,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double score = scores.get(id);
+      double score = scores.doubleValue(id);
       score = preScale(score);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);

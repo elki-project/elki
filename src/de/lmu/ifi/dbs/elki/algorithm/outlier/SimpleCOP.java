@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -155,7 +157,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
       }
     }
     // combine results.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Original Correlation Outlier Probabilities", "origcop-outlier", TypeUtil.DOUBLE, cop_score, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Original Correlation Outlier Probabilities", "origcop-outlier", cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results

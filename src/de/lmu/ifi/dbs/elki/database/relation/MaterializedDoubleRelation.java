@@ -24,11 +24,12 @@ package de.lmu.ifi.dbs.elki.database.relation;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -41,27 +42,18 @@ import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
  * you are supposed to manage first. I.e. put the new DBID in, then invoke
  * set(), remove the DBID, then delete().
  * 
- * TODO: is this semantic sane?
- * 
  * @author Erich Schubert
- * 
- * @param <O> Data type
  */
-public class MaterializedRelation<O> extends AbstractHierarchicalResult implements Relation<O> {
+public class MaterializedDoubleRelation extends AbstractHierarchicalResult implements DoubleRelation {
   /**
    * Our database
    */
   private final Database database;
 
   /**
-   * The class of objects we store.
-   */
-  private final SimpleTypeInformation<O> type;
-
-  /**
    * Map to hold the objects of the database.
    */
-  private final DataStore<O> content;
+  private final DoubleDataStore content;
 
   /**
    * The DBIDs this is supposed to be defined for.
@@ -87,41 +79,37 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * @param type Type information
    * @param ids IDs
    */
-  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids) {
-    this(database, type, ids, null);
+  public MaterializedDoubleRelation(Database database, DBIDs ids) {
+    this(database, ids, null);
   }
 
   /**
    * Constructor.
    * 
    * @param database Database
-   * @param type Type information
    * @param ids IDs
    * @param name Name
    */
-  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name) {
+  public MaterializedDoubleRelation(Database database, DBIDs ids, String name) {
     // We can't call this() since we'll have generics issues then.
     super();
     this.database = database;
-    this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
-    this.content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, type.getRestrictionClass());
+    this.content = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
   }
 
   /**
    * Constructor.
    * 
    * @param database Database
-   * @param type Type information
    * @param ids IDs
    * @param name Name
    * @param content Content
    */
-  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name, DataStore<O> content) {
+  public MaterializedDoubleRelation(Database database, DBIDs ids, String name, DoubleDataStore content) {
     super();
     this.database = database;
-    this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
     this.content = content;
@@ -132,14 +120,12 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * 
    * @param name Name
    * @param shortname Short name of the result
-   * @param type Type information
    * @param content Content
    * @param ids IDs
    */
-  public MaterializedRelation(String name, String shortname, SimpleTypeInformation<O> type, DataStore<O> content, DBIDs ids) {
+  public MaterializedDoubleRelation(String name, String shortname, DoubleDataStore content, DBIDs ids) {
     super();
     this.database = null;
-    this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
     this.shortname = shortname;
@@ -152,15 +138,28 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   }
 
   @Override
-  public O get(DBIDRef id) {
-    return content.get(id);
+  public Double get(DBIDRef id) {
+    return content.doubleValue(id);
   }
 
   @Override
-  public void set(DBIDRef id, O val) {
+  public double doubleValue(DBIDRef id) {
+    return content.doubleValue(id);
+  }
+
+  @Override
+  public void set(DBIDRef id, double val) {
     assert (ids.contains(id));
-    if(content instanceof WritableDataStore) {
-      ((WritableDataStore<O>) content).put(id, val);
+    if(content instanceof WritableDoubleDataStore) {
+      ((WritableDoubleDataStore) content).putDouble(id, val);
+    }
+  }
+
+  @Override
+  public void set(DBIDRef id, Double val) {
+    assert (ids.contains(id));
+    if(content instanceof WritableDoubleDataStore) {
+      ((WritableDoubleDataStore) content).putDouble(id, val);
     }
   }
 
@@ -172,8 +171,8 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   @Override
   public void delete(DBIDRef id) {
     assert (!ids.contains(id));
-    if(content instanceof WritableDataStore) {
-      ((WritableDataStore<O>) content).delete(id);
+    if(content instanceof WritableDoubleDataStore) {
+      ((WritableDoubleDataStore) content).delete(id);
     }
   }
 
@@ -193,13 +192,13 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   }
 
   @Override
-  public SimpleTypeInformation<O> getDataTypeInformation() {
-    return type;
+  public SimpleTypeInformation<Double> getDataTypeInformation() {
+    return TypeUtil.DOUBLE;
   }
 
   @Override
   public String getLongName() {
-    return (name != null) ? name : type.toString();
+    return (name != null) ? name : "Double";
   }
 
   @Override

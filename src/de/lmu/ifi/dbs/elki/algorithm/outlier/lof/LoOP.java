@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -327,7 +328,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Local Outlier Probabilities", "loop-outlier", TypeUtil.DOUBLE, loops, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Probabilities", "loop-outlier", loops, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }

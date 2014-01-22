@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
@@ -99,9 +99,9 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     if (pmean == null) {
       MeanVarianceMinMax mv = new MeanVarianceMinMax();
-      Relation<Double> scores = or.getScores();
+      DoubleRelation scores = or.getScores();
       for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = scores.get(id);
+        double val = scores.doubleValue(id);
         val = (val <= min) ? 0 : Math.sqrt(val - min);
         mv.put(val);
       }
@@ -112,10 +112,10 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
       mean = pmean;
       double sqsum = 0;
       int cnt = 0;
-      Relation<Double> scores = or.getScores();
+      DoubleRelation scores = or.getScores();
       double mm = Double.POSITIVE_INFINITY;
       for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = scores.get(id);
+        double val = scores.doubleValue(id);
         mm = Math.min(mm, val);
         val = (val <= min) ? 0 : Math.sqrt(val - min);
         sqsum += (val - mean) * (val - mean);

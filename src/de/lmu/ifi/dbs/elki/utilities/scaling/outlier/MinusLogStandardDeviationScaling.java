@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -69,9 +69,9 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   public void prepare(OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
-      Relation<Double> scores = or.getScores();
+      DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = -Math.log(scores.get(id));
+        double val = -Math.log(scores.doubleValue(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
@@ -82,9 +82,9 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
     else {
       mean = fixedmean;
       Mean sqsum = new Mean();
-      Relation<Double> scores = or.getScores();
+      DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = -Math.log(scores.get(id));
+        double val = -Math.log(scores.doubleValue(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum.put((val - mean) * (val - mean));
         }

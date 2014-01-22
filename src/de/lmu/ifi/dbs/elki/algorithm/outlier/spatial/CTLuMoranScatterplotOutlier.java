@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -136,7 +137,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
       scores.putDouble(iditer, score);
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<>("MoranOutlier", "Moran Scatterplot Outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("MoranOutlier", "Moran Scatterplot Outlier", scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     or.addChildResult(npred);

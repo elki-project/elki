@@ -36,7 +36,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
@@ -118,7 +119,7 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Angle-Based Outlier Degree", "abod-outlier", TypeUtil.DOUBLE, abodvalues, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Angle-Based Outlier Degree", "abod-outlier", abodvalues, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }

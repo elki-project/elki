@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -102,9 +102,9 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     meta = or.getOutlierMeta();
     MeanVariance mv = new MeanVariance();
-    Relation<Double> scores = or.getScores();
+    DoubleRelation scores = or.getScores();
     for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double score = scores.get(id);
+      double score = scores.doubleValue(id);
       score = preScale(score);
       if (!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);

@@ -39,7 +39,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -209,7 +210,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Influence Outlier Score", "inflo-outlier", TypeUtil.DOUBLE, inflos, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Influence Outlier Score", "inflo-outlier", inflos, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }

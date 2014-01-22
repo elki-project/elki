@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
@@ -54,14 +54,14 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
   @Override
   public void prepare(OutlierResult or) {
     // collect all outlier scores
-    Relation<Double> oscores = or.getScores();
+    DoubleRelation oscores = or.getScores();
     scores = new double[oscores.size()];
     int pos = 0;
     if(or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
       inverted = true;
     }
     for(DBIDIter iditer = oscores.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      scores[pos] = oscores.get(iditer);
+      scores[pos] = oscores.doubleValue(iditer);
       pos++;
     }
     if(pos != oscores.size()) {

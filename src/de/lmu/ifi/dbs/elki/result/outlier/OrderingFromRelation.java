@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
 /**
@@ -43,7 +43,7 @@ public class OrderingFromRelation implements OrderingResult {
   /**
    * Outlier scores.
    */
-  protected Relation<Double> scores;
+  protected DoubleRelation scores;
 
   /**
    * Factor for ascending (+1) and descending (-1) ordering.
@@ -56,7 +56,7 @@ public class OrderingFromRelation implements OrderingResult {
    * @param scores outlier score result
    * @param ascending Ascending when {@code true}, descending otherwise
    */
-  public OrderingFromRelation(Relation<Double> scores, boolean ascending) {
+  public OrderingFromRelation(DoubleRelation scores, boolean ascending) {
     super();
     this.scores = scores;
     this.ascending = ascending ? +1 : -1;
@@ -67,7 +67,7 @@ public class OrderingFromRelation implements OrderingResult {
    * 
    * @param scores
    */
-  public OrderingFromRelation(Relation<Double> scores) {
+  public OrderingFromRelation(DoubleRelation scores) {
     this(scores, true);
   }
 
@@ -103,11 +103,9 @@ public class OrderingFromRelation implements OrderingResult {
   protected final class ImpliedComparator implements Comparator<DBIDRef> {
     @Override
     public int compare(DBIDRef id1, DBIDRef id2) {
-      Double k1 = scores.get(id1);
-      Double k2 = scores.get(id2);
-      assert (k1 != null);
-      assert (k2 != null);
-      return ascending * k2.compareTo(k1);
+      double k1 = scores.doubleValue(id1);
+      double k2 = scores.doubleValue(id2);
+      return ascending * Double.compare(k2, k1);
     }
   }
 }

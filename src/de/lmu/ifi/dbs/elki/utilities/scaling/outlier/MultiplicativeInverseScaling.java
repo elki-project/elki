@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -70,9 +70,9 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   @Override
   public void prepare(OutlierResult or) {
     double max = Double.MIN_VALUE;
-    Relation<Double> scores = or.getScores();
+    DoubleRelation scores = or.getScores();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double val = scores.get(id);
+      double val = scores.doubleValue(id);
       double inv = Math.abs(1.0 / val);
       if(!Double.isInfinite(inv) && !Double.isNaN(inv)) {
         max = Math.max(max, inv);

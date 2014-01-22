@@ -36,7 +36,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -133,7 +134,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     // By actually specifying theoretical min, max and baseline, we get a better
     // visualization (try it out - or see the screenshots in the tutorial)!
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(min, max, 0., ids.size() - 1, k);
-    Relation<Double> rel = new MaterializedRelation<>("ODIN In-Degree", "odin", TypeUtil.DOUBLE, scores, ids);
+    DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", "odin", scores, ids);
     return new OutlierResult(meta, rel);
   }
 

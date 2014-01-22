@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
@@ -101,13 +101,13 @@ public class OutlierSmROCCurve implements Evaluator {
   }
 
   private SmROCResult computeSmROCResult(SetDBIDs positiveids, OutlierResult or) {
-    Relation<Double> scores = or.getScores();
+    DoubleRelation scores = or.getScores();
     final int size = scores.size();
 
     // Compute mean, for inversion
     double mean = 0.0;
     for(DBIDIter iditer = scores.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      mean += scores.get(iditer) / size;
+      mean += scores.doubleValue(iditer) / size;
     }
 
     SmROCResult curve = new SmROCResult(positiveids.size() + 2);
@@ -120,7 +120,7 @@ public class OutlierSmROCCurve implements Evaluator {
     double x = 0, y = 0;
     for (DBIDIter nei = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter(); nei.valid(); nei.advance()) {
       // Analyze next point
-      final double curscore = scores.get(nei);
+      final double curscore = scores.doubleValue(nei);
       // defer calculation for ties
       if(!Double.isNaN(prevscore) && (Double.compare(prevscore, curscore) == 0)) {
         // positive or negative match?

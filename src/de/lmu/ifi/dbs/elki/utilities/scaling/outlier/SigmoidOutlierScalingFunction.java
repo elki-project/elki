@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -63,9 +63,9 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
-    Relation<Double> scores = or.getScores();
+    DoubleRelation scores = or.getScores();
     for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-      double val = scores.get(id);
+      double val = scores.doubleValue(id);
       mv.put(val);
     }
     double a = 1.0;
@@ -81,7 +81,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
       // E-Step
       it.seek(0);
       for (int i = 0; i < ids.size(); i++, it.advance()) {
-        double val = or.getScores().get(it);
+        double val = or.getScores().doubleValue(it);
         double targ = a * val + b;
         if (targ > 0) {
           if (!t.get(i)) {
@@ -196,7 +196,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
    * @param scores Scores
    * @return new values for A and B.
    */
-  private final double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, BitSet t, Relation<Double> scores) {
+  private final double[] MStepLevenbergMarquardt(double a, double b, ArrayDBIDs ids, BitSet t, DoubleRelation scores) {
     final int prior1 = t.cardinality();
     final int prior0 = ids.size() - prior1;
     DBIDArrayIter iter = ids.iter();
@@ -216,7 +216,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
     double fval = 0.0;
     iter.seek(0);
     for (int i = 0; i < ids.size(); i++, iter.advance()) {
-      final double val = scores.get(iter);
+      final double val = scores.doubleValue(iter);
       final double fApB = val * a + b;
       final double ti = t.get(i) ? hiTarget : loTarget;
       if (fApB >= 0) {
@@ -235,7 +235,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
       double g2 = 0.0;
       iter.seek(0);
       for (int i = 0; i < ids.size(); i++, iter.advance()) {
-        final double val = scores.get(iter);
+        final double val = scores.doubleValue(iter);
         final double fApB = val * a + b;
         final double p;
         final double q;
@@ -270,7 +270,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
         double newf = 0.0;
         iter.seek(0);
         for (int i = 0; i < ids.size(); i++, iter.advance()) {
-          final double val = scores.get(iter);
+          final double val = scores.doubleValue(iter);
           final double fApB = val * newA + newB;
           final double ti = t.get(i) ? hiTarget : loTarget;
           if (fApB >= 0) {

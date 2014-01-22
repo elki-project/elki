@@ -36,7 +36,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -187,7 +188,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       minmax.put(score);
     }
     //
-    Relation<Double> scoreResult = new MaterializedRelation<>("TrimmedMean", "Trimmed Mean Score", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("TrimmedMean", "Trimmed Mean Score", scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     or.addChildResult(npred);

@@ -35,7 +35,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
@@ -236,7 +237,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
       LOG.statistics(new LongStatistic("lb-abod.refinements", refinements));
     }
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<>("Angle-based Outlier Detection", "abod-outlier", TypeUtil.DOUBLE, abodvalues, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Angle-based Outlier Detection", "abod-outlier", abodvalues, ids);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }

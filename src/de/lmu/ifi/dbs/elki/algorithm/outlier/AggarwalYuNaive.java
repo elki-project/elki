@@ -26,13 +26,13 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -165,7 +165,7 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
       }
       minmax.put(val);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<>("AggarwalYuNaive", "aggarwal-yu-outlier", TypeUtil.DOUBLE, sparsity, relation.getDBIDs());
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("AggarwalYuNaive", "aggarwal-yu-outlier", sparsity, relation.getDBIDs());
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreResult);
   }

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
@@ -116,7 +116,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     }
   }
 
-  private XYCurve computePrecisionResult(int size, SetDBIDs ids, DBIDIter iter, Relation<Double> scores) {
+  private XYCurve computePrecisionResult(int size, SetDBIDs ids, DBIDIter iter, DoubleRelation scores) {
     final int postot = ids.size();
     int poscnt = 0, total = 0;
     XYCurve curve = new PRCurve(postot + 2, postot);
@@ -140,7 +140,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
       }
       // defer calculation for ties
       if (scores != null) {
-        double curscore = scores.get(iter);
+        double curscore = scores.doubleValue(iter);
         if (Double.compare(prevscore, curscore) == 0) {
           continue;
         }

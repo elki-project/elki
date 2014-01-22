@@ -270,7 +270,7 @@ public class BubbleVisualization extends AbstractVisFactory {
      *         by the given scales.
      */
     protected double getScaledForId(DBIDRef id) {
-      double d = result.getScores().get(id).doubleValue();
+      double d = result.getScores().doubleValue(id);
       if(Double.isNaN(d) || Double.isInfinite(d)) {
         return 0.0;
       }
