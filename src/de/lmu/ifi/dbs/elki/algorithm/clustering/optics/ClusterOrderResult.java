@@ -28,14 +28,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -46,7 +43,6 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 
 /**
  * Class to store the result of an ordering clustering algorithm such as OPTICS.
@@ -57,12 +53,11 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
  * 
  * @apiviz.has ClusterOrderEntry oneway - - contains
  * @apiviz.composedOf ClusterOrderResult.ClusterOrderAdapter
- * @apiviz.composedOf ClusterOrderResult.ReachabilityDistanceAdapter
  * @apiviz.composedOf ClusterOrderResult.PredecessorAdapter
  * 
  * @param <E> entry type.
  */
-public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicResult implements IterableResult<E> {
+public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicResult implements IterableResult<E>, Relation<E> {
   /**
    * Cluster order storage
    */
@@ -79,20 +74,23 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
   ModifiableDBIDs dbids;
 
   /**
+   * The database.
+   */
+  Database database;
+
+  /**
    * Constructor
    * 
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
    */
-  public ClusterOrderResult(String name, String shortname) {
+  public ClusterOrderResult(Database database, String name, String shortname) {
     super(name, shortname);
     clusterOrder = new ArrayList<>();
     dbids = DBIDUtil.newHashSet();
     map = DataStoreUtil.makeStorage(dbids, DataStoreFactory.HINT_DB, ClusterOrderEntry.class);
 
     addChildResult(new ClusterOrderAdapter(clusterOrder));
-    addChildResult(new ReachabilityDistanceAdapter(map, dbids));
-    addChildResult(new PredecessorAdapter(map, dbids));
   }
 
   /**
@@ -135,6 +133,46 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
     clusterOrder.add(ce);
     map.put(ce.getID(), ce);
     dbids.add(ce.getID());
+  }
+
+  @Override
+  public Database getDatabase() {
+    return database;
+  }
+
+  @Override
+  public SimpleTypeInformation<E> getDataTypeInformation() {
+    return new SimpleTypeInformation<>(ClusterOrderEntry.class);
+  }
+
+  @Override
+  public DBIDs getDBIDs() {
+    return dbids;
+  }
+
+  @Override
+  public DBIDIter iterDBIDs() {
+    return dbids.iter();
+  }
+
+  @Override
+  public int size() {
+    return dbids.size();
+  }
+
+  @Override
+  public E get(DBIDRef id) {
+    return map.get(id);
+  }
+
+  @Override
+  public void set(DBIDRef id, E val) {
+    map.put(id, val);
+  }
+
+  @Override
+  public void delete(DBIDRef id) {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -187,184 +225,6 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
     @Override
     public String getShortName() {
       return "clusterobjectorder";
-    }
-  }
-
-  /**
-   * Result containing the reachability distances.
-   * 
-   * @author Erich Schubert
-   */
-  class ReachabilityDistanceAdapter<D extends Comparable<D>, E2 extends GenericClusterOrderEntry<D>> implements Relation<D>, ResultAdapter {
-    /**
-     * Access reference.
-     */
-    private DataStore<E2> map;
-
-    /**
-     * DBIDs
-     */
-    private DBIDs dbids;
-
-    /**
-     * Constructor.
-     * 
-     * @param map Map that stores the results.
-     * @param dbids DBIDs we are defined for.
-     */
-    public ReachabilityDistanceAdapter(DataStore<E2> map, DBIDs dbids) {
-      super();
-      this.map = map;
-      this.dbids = dbids;
-    }
-
-    @Override
-    public D get(DBIDRef objID) {
-      return map.get(objID).getReachability();
-    }
-
-    @Override
-    public String getLongName() {
-      return "Reachability";
-    }
-
-    @Override
-    public String getShortName() {
-      return "reachability";
-    }
-
-    @Override
-    public DBIDs getDBIDs() {
-      return DBIDUtil.makeUnmodifiable(dbids);
-    }
-
-    @Override
-    public DBIDIter iterDBIDs() {
-      return dbids.iter();
-    }
-
-    @Override
-    public int size() {
-      return dbids.size();
-    }
-
-    @Override
-    public Database getDatabase() {
-      return null; // FIXME
-    }
-
-    @Override
-    public void set(DBIDRef id, D val) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(DBIDRef id) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public SimpleTypeInformation<D> getDataTypeInformation() {
-      return new SimpleTypeInformation<>(Comparable.class);
-    }
-
-    @Override
-    public ResultHierarchy getHierarchy() {
-      return ClusterOrderResult.this.getHierarchy();
-    }
-
-    @Override
-    public void setHierarchy(ResultHierarchy hierarchy) {
-      ClusterOrderResult.this.setHierarchy(hierarchy);
-    }
-  }
-
-  /**
-   * Result containing the predecessor ID.
-   * 
-   * @author Erich Schubert
-   */
-  class PredecessorAdapter implements Relation<DBID>, ResultAdapter {
-    /**
-     * Access reference.
-     */
-    private DataStore<E> map;
-
-    /**
-     * Database IDs
-     */
-    private DBIDs dbids;
-
-    /**
-     * Constructor.
-     * 
-     * @param map Map that stores the results.
-     * @param dbids DBIDs we are defined for
-     */
-    public PredecessorAdapter(DataStore<E> map, DBIDs dbids) {
-      super();
-      this.map = map;
-      this.dbids = dbids;
-    }
-
-    @Override
-    public DBID get(DBIDRef objID) {
-      return map.get(objID).getPredecessorID();
-    }
-
-    @Override
-    public String getLongName() {
-      return "Predecessor";
-    }
-
-    @Override
-    public String getShortName() {
-      return "predecessor";
-    }
-
-    @Override
-    public DBIDs getDBIDs() {
-      return DBIDUtil.makeUnmodifiable(dbids);
-    }
-
-    @Override
-    public DBIDIter iterDBIDs() {
-      return dbids.iter();
-    }
-
-    @Override
-    public int size() {
-      return dbids.size();
-    }
-
-    @Override
-    public Database getDatabase() {
-      return null; // FIXME
-    }
-
-    @Override
-    public void set(DBIDRef id, DBID val) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(DBIDRef id) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public SimpleTypeInformation<DBID> getDataTypeInformation() {
-      return TypeUtil.DBID;
-    }
-
-    @Override
-    public ResultHierarchy getHierarchy() {
-      return ClusterOrderResult.this.getHierarchy();
-    }
-
-    @Override
-    public void setHierarchy(ResultHierarchy hierarchy) {
-      ClusterOrderResult.this.setHierarchy(hierarchy);
     }
   }
 }

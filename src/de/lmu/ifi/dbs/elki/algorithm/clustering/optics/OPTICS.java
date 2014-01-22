@@ -113,7 +113,7 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderRes
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", size, LOG) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
-    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>("OPTICS Clusterorder", "optics-clusterorder");
+    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>(relation.getDatabase(), "OPTICS Clusterorder", "optics-clusterorder");
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(!processedIDs.contains(iditer)) {

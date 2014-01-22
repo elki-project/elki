@@ -82,7 +82,7 @@ public abstract class GeneralizedOPTICS<O, E extends ClusterOrderEntry<E>> exten
     final FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Generalized OPTICS", size, getLogger()) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
-    ClusterOrderResult<E> clusterOrder = new ClusterOrderResult<>("OPTICS Clusterorder", "optics-clusterorder");
+    ClusterOrderResult<E> clusterOrder = new ClusterOrderResult<>(relation.getDatabase(), "OPTICS Clusterorder", "optics-clusterorder");
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(!processedIDs.contains(iditer)) {

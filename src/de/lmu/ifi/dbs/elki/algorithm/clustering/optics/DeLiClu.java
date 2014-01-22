@@ -139,7 +139,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("DeLiClu", relation.size(), LOG) : null;
     final int size = relation.size();
 
-    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>("DeLiClu Clustering", "deliclu-clustering");
+    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>(database, "DeLiClu Clustering", "deliclu-clustering");
     heap = new UpdatableHeap<>();
 
     // add start object to cluster order and (root, root) to priority queue
