@@ -114,7 +114,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
   @Override
   public OutlierResult run(Database db, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-    SimilarityQuery<V> sq = relation.getDatabase().getSimilarityQuery(relation, kernelFunction);
+    SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     // Output storage.

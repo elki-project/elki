@@ -132,7 +132,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       kNNRefer = preproc.getKNNQuery(ndq, krefer, DatabaseQuery.HINT_HEAVY_USE);
       rkNNRefer = preproc.getRKNNQuery(ndq, krefer, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      relation.getDatabase().addIndex(preproc);
+      database.addIndex(preproc);
     } else {
       if (stepprog != null) {
         stepprog.beginStep(1, "Optimized neighborhood w.r.t. reference neighborhood distance function provided by database.", LOG);
