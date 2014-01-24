@@ -24,14 +24,17 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Provides an entry in a cluster order.
  * 
  * @author Elke Achtert
  */
-public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<DoubleDistanceClusterOrderEntry> {
+public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<DoubleDistanceClusterOrderEntry>, TextWriteable {
   /**
    * The id of the entry.
    */
@@ -142,5 +145,11 @@ public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<Double
       return +1;
     }
     return -getID().compareTo(o.getID());
+  }
+
+  @Override
+  public void writeToText(TextWriterStream out, String label) {
+    out.inlinePrint("predecessor=" + DBIDUtil.toString((DBIDRef) predecessorID));
+    out.inlinePrint("reachability=" + reachability);
   }
 }

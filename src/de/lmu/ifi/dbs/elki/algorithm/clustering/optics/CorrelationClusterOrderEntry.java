@@ -24,7 +24,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Cluster order entry for correlation-based OPTICS variants.
@@ -34,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * 
  * @param <SELF> Type self-reference
  */
-public abstract class CorrelationClusterOrderEntry<SELF extends CorrelationClusterOrderEntry<SELF>> implements ClusterOrderEntry<SELF>, Comparable<SELF> {
+public abstract class CorrelationClusterOrderEntry<SELF extends CorrelationClusterOrderEntry<SELF>> implements ClusterOrderEntry<SELF>, Comparable<SELF>, TextWriteable {
   /**
    * The component separator used by correlation distances.
    * 
@@ -156,5 +159,12 @@ public abstract class CorrelationClusterOrderEntry<SELF extends CorrelationClust
    */
   public double getEuclideanValue() {
     return euclideanValue;
+  }
+
+  @Override
+  public void writeToText(TextWriterStream out, String label) {
+    out.inlinePrint("predecessor=" + DBIDUtil.toString((DBIDRef) predecessorID));
+    out.inlinePrint("reach-dim=" + correlationValue);
+    out.inlinePrint("reachability=" + euclideanValue);
   }
 }
