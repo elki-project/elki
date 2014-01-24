@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -78,11 +79,12 @@ public abstract class GeneralizedOPTICS<O, E extends ClusterOrderEntry<E>> exten
    * @return Result
    */
   public ClusterOrderResult<E> run(Relation<O> relation) {
-    int size = relation.size();
+    final DBIDs ids = relation.getDBIDs();
+    final int size = ids.size();
     final FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Generalized OPTICS", size, getLogger()) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
-    ClusterOrderResult<E> clusterOrder = new ClusterOrderResult<>(relation.getDatabase(), "OPTICS Clusterorder", "optics-clusterorder");
+    ClusterOrderResult<E> clusterOrder = new ClusterOrderResult<>(relation.getDatabase(), ids, "OPTICS Clusterorder", "optics-clusterorder");
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(!processedIDs.contains(iditer)) {

@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
@@ -71,7 +70,7 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
   /**
    * The DBIDs we are defined for
    */
-  ModifiableDBIDs dbids;
+  DBIDs ids;
 
   /**
    * The database.
@@ -81,16 +80,18 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
   /**
    * Constructor
    * 
+   * @param database Database to attach the result to
+   * @param ids Object IDs included
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
    */
-  public ClusterOrderResult(Database database, String name, String shortname) {
+  public ClusterOrderResult(Database database, DBIDs ids, String name, String shortname) {
     super(name, shortname);
-    clusterOrder = new ArrayList<>();
-    dbids = DBIDUtil.newHashSet();
-    map = DataStoreUtil.makeStorage(dbids, DataStoreFactory.HINT_DB, ClusterOrderEntry.class);
+    this.ids = ids;
+    this.clusterOrder = new ArrayList<>(ids.size());
+    this.map = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClusterOrderEntry.class);
 
-    addChildResult(new ClusterOrderAdapter(clusterOrder));
+    addChildResult(new ClusterOrderAdapter(this.clusterOrder));
   }
 
   /**
@@ -132,7 +133,6 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
   public void add(E ce) {
     clusterOrder.add(ce);
     map.put(ce.getID(), ce);
-    dbids.add(ce.getID());
   }
 
   @Override
@@ -147,17 +147,17 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
 
   @Override
   public DBIDs getDBIDs() {
-    return dbids;
+    return ids;
   }
 
   @Override
   public DBIDIter iterDBIDs() {
-    return dbids.iter();
+    return ids.iter();
   }
 
   @Override
   public int size() {
-    return dbids.size();
+    return ids.size();
   }
 
   @Override
@@ -198,7 +198,7 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
 
     @Override
     public DBIDs getDBIDs() {
-      return dbids;
+      return ids;
     }
 
     /**

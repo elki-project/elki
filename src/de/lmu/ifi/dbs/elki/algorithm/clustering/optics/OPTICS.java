@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
@@ -108,14 +109,15 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderRes
    */
   public ClusterOrderResult<DoubleDistanceClusterOrderEntry> run(Relation<O> relation) {
     RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction(), epsilon);
+    DBIDs ids = relation.getDBIDs();
 
-    int size = relation.size();
+    int size = ids.size();
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", size, LOG) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
-    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>(relation.getDatabase(), "OPTICS Clusterorder", "optics-clusterorder");
+    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>(relation.getDatabase(), ids, "OPTICS Clusterorder", "optics-clusterorder");
 
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       if(!processedIDs.contains(iditer)) {
         expandClusterOrder(clusterOrder, relation, rangeQuery, DBIDUtil.deref(iditer), epsilon, progress);
       }

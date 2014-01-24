@@ -36,8 +36,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -135,15 +135,16 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
       LOG.verbose("knnJoin...");
     }
     DataStore<KNNList> knns = knnJoin.run(database, relation);
+    DBIDs ids = relation.getDBIDs();
+    final int size = ids.size();
 
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("DeLiClu", relation.size(), LOG) : null;
-    final int size = relation.size();
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("DeLiClu", size, LOG) : null;
 
-    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>(database, "DeLiClu Clustering", "deliclu-clustering");
+    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>(database, ids, "DeLiClu Clustering", "deliclu-clustering");
     heap = new UpdatableHeap<>();
 
     // add start object to cluster order and (root, root) to priority queue
-    DBID startID = getStartObject(relation);
+    DBID startID = DBIDUtil.deref(ids.iter());
     clusterOrder.add(new DoubleDistanceClusterOrderEntry(startID, null, Double.POSITIVE_INFINITY));
     int numHandled = 1;
     index.setHandled(startID, relation.get(startID));
@@ -186,20 +187,6 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
       progress.ensureCompleted(LOG);
     }
     return clusterOrder;
-  }
-
-  /**
-   * Returns the id of the start object for the run method.
-   * 
-   * @param relation the database relation storing the objects
-   * @return the id of the start object for the run method
-   */
-  private DBID getStartObject(Relation<NV> relation) {
-    DBIDIter it = relation.iterDBIDs();
-    if(!it.valid()) {
-      return null;
-    }
-    return DBIDUtil.deref(it);
   }
 
   /**
