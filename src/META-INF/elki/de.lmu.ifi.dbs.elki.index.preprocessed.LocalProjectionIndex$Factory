@@ -1,4 +1,3 @@
 de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.localpca.RangeQueryFilteredPCAIndex$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.FourCSubspaceIndex$Factory
-de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex$Factory

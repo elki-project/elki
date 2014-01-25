@@ -159,7 +159,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     /**
      * The core object property
      */
-    final CorePredicate.Instance<T> corepred;
+    final CorePredicate.Instance<? super T> corepred;
 
     /**
      * Track which objects are "core" objects.
@@ -173,7 +173,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * @param corepred Core object predicate
      * @param coremodel Keep track of core points.
      */
-    public Instance(NeighborPredicate.Instance<T> npred, CorePredicate.Instance<T> corepred, boolean coremodel) {
+    public Instance(NeighborPredicate.Instance<T> npred, CorePredicate.Instance<? super T> corepred, boolean coremodel) {
       super();
       this.npred = npred;
       this.corepred = corepred;

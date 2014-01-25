@@ -27,13 +27,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter;
-import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex.Factory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -64,10 +63,11 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
 
     ListParameterization params = new ListParameterization();
     // PreDeCon
-    // FIXME: These parameters do NOT work...
-    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 50);
-    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 50);
-    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 2);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 60);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 40);
+    params.addParameter(PreDeCon.Settings.Parameterizer.DELTA_ID, 400);
+    params.addParameter(PreDeCon.Settings.Parameterizer.KAPPA_ID, 20.);
+    params.addParameter(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 4);
 
     // setup algorithm
     PreDeCon<DoubleVector> predecon = ClassGenericsUtil.parameterizeOrAbort(PreDeCon.class, params);
@@ -77,8 +77,8 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
     Clustering<Model> result = predecon.run(db);
 
     // FIXME: find working parameters...
-    testFMeasure(db, result, 0.40153);
-    testClusterSizes(result, new int[] { 2500 });
+    testFMeasure(db, result, 0.724752);
+    testClusterSizes(result, new int[] { 43, 93, 108, 611, 638, 1007 });
   }
 
   /**
@@ -94,16 +94,17 @@ public class TestPreDeConResults extends AbstractSimpleAlgorithmTest implements 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     // PreDeCon
-    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 2.0);
-    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 7);
-    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 4);
-    params.addParameter(Factory.DELTA_ID, 0.04);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.3);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 10);
+    params.addParameter(PreDeCon.Settings.Parameterizer.DELTA_ID, 0.012);
+    params.addParameter(PreDeCon.Settings.Parameterizer.KAPPA_ID, 10.);
+    params.addParameter(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 2);
     PreDeCon<DoubleVector> predecon = ClassGenericsUtil.parameterizeOrAbort(PreDeCon.class, params);
     testParameterizationOk(params);
 
     // run PredeCon on database
     Clustering<Model> result = predecon.run(db);
-    testFMeasure(db, result, 0.6470817);
-    testClusterSizes(result, new int[] { 7, 10, 10, 13, 15, 16, 16, 18, 28, 131, 586 });
+    testFMeasure(db, result, 0.74982899);
+    testClusterSizes(result, new int[] { 356, 494 });
   }
 }

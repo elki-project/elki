@@ -32,20 +32,17 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -99,32 +96,17 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector, P
 
   @Override
   public void initialize() {
-    if(relation == null || relation.size() <= 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
-    }
-    if(storage != null) {
-      // Preprocessor was already run.
-      return;
-    }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ProjectionResult.class);
 
-    long start = System.currentTimeMillis();
+    Duration time = getLogger().newDuration(this.getClass().getName() + ".preprocessing-time");
+    time.begin();
     RangeQuery<NV> rangeQuery = QueryUtil.getRangeQuery(relation, rangeQueryDistanceFunction);
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, epsilon);
 
-      final P pres;
-      if(neighbors.size() >= minpts) {
-        pres = computeProjection(iditer, neighbors, relation);
-      }
-      else {
-        DoubleDBIDPair firstQR = neighbors.iter().getPair();
-        ModifiableDoubleDBIDList newne = DBIDUtil.newDistanceDBIDList();
-        newne.add(firstQR);
-        pres = computeProjection(iditer, newne, relation);
-      }
+      final P pres = computeProjection(iditer, neighbors, relation);
       storage.put(iditer, pres);
 
       if(progress != null) {
@@ -135,12 +117,8 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector, P
       progress.ensureCompleted(getLogger());
     }
 
-    long end = System.currentTimeMillis();
-    // TODO: re-add timing code!
-    if(true) {
-      long elapsedTime = end - start;
-      getLogger().verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
+    time.end();
+    getLogger().statistics(time);
   }
 
   @Override

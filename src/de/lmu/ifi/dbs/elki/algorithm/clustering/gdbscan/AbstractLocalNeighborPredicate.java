@@ -25,52 +25,45 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * The default DBSCAN and OPTICS neighbor predicate, using an
- * epsilon-neighborhood.
- * 
- * <p>
- * Reference: <br>
- * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: A Density-Based Algorithm for
- * Discovering Clusters in Large Spatial Databases with Noise. <br>
- * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
- * Portland, OR, 1996.
- * </p>
+ * Abstract local model neighborhood predicate.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has Instance
  * 
  * @param <O> object type
+ * @param <M> model type
  */
-@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
-public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
+public abstract class AbstractLocalNeighborPredicate<O, M> implements NeighborPredicate {
   /**
-   * Range to query with
+   * Range to query with.
    */
   protected double epsilon;
 
   /**
-   * Distance function to use
+   * Distance function to use.
    */
   protected DistanceFunction<? super O> distFunc;
 
@@ -80,23 +73,10 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
    * @param epsilon Epsilon value
    * @param distFunc Distance function to use
    */
-  public EpsilonNeighborPredicate(double epsilon, DistanceFunction<? super O> distFunc) {
+  public AbstractLocalNeighborPredicate(double epsilon, DistanceFunction<? super O> distFunc) {
     super();
     this.epsilon = epsilon;
     this.distFunc = distFunc;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
-    DistanceQuery<O> dq = QueryUtil.getDistanceQuery(database, distFunc);
-    RangeQuery<O> rq = database.getRangeQuery(dq);
-    return (NeighborPredicate.Instance<T>) new Instance(epsilon, rq, dq.getRelation().getDBIDs());
-  }
-
-  @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    return new SimpleTypeInformation<?>[] { TypeUtil.DBIDS, TypeUtil.NEIGHBORLIST };
   }
 
   @Override
@@ -105,53 +85,86 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
   }
 
   /**
+   * Perform the preprocessing step.
+   * 
+   * @param modelcls Class of models
+   * @param relation Data reation
+   * @param query Range query
+   * @return Precomputed models
+   */
+  public DataStore<M> preprocess(Class<? super M> modelcls, Relation<O> relation, RangeQuery<O> query) {
+    WritableDataStore<M> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, modelcls);
+
+    Duration time = getLogger().newDuration(this.getClass().getName() + ".preprocessing-time");
+    time.begin();
+
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DoubleDBIDList neighbors = query.getRangeForDBID(iditer, epsilon);
+      storage.put(iditer, computeLocalModel(iditer, neighbors, relation));
+      if(progress != null) {
+        progress.incrementProcessed(getLogger());
+      }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(getLogger());
+    }
+    time.end();
+    getLogger().statistics(time);
+    return storage;
+  }
+
+  /**
+   * Method to compute the actual data model.
+   * 
+   * @param id Object ID
+   * @param neighbors Neighbors
+   * @param relation Data relation
+   * @return Model for this object.
+   */
+  abstract protected M computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<O> relation);
+
+  /**
+   * Get the class logger.
+   * 
+   * @return Logger
+   */
+  abstract Logging getLogger();
+
+  /**
    * Instance for a particular data set.
    * 
    * @author Erich Schubert
+   * 
+   * @param <N> Neighborhood type
+   * @param <M> model type
    */
-  public static class Instance implements NeighborPredicate.Instance<DoubleDBIDList> {
-    /**
-     * Range to query with
-     */
-    double epsilon;
-
-    /**
-     * Range query to use on the database.
-     */
-    RangeQuery<?> rq;
-
+  public abstract static class Instance<N, M> implements NeighborPredicate.Instance<N> {
     /**
      * DBIDs to process
      */
-    DBIDs ids;
+    protected DBIDs ids;
+
+    /**
+     * Model storage.
+     */
+    protected DataStore<M> storage;
 
     /**
      * Constructor.
      * 
-     * @param epsilon Epsilon
-     * @param rq Range query to use
      * @param ids DBIDs to process
+     * @param storage Model storage
      */
-    public Instance(double epsilon, RangeQuery<?> rq, DBIDs ids) {
+    public Instance(DBIDs ids, DataStore<M> storage) {
       super();
-      this.epsilon = epsilon;
-      this.rq = rq;
       this.ids = ids;
+      this.storage = storage;
     }
 
     @Override
     public DBIDs getIDs() {
       return ids;
-    }
-
-    @Override
-    public DoubleDBIDList getNeighbors(DBIDRef reference) {
-      return rq.getRangeForDBID(reference, epsilon);
-    }
-
-    @Override
-    public void addDBIDs(ModifiableDBIDs ids, DoubleDBIDList neighbors) {
-      ids.addDBIDs(neighbors);
     }
   }
 
@@ -164,7 +177,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
    * 
    * @param <O> object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * Range to query with
      */
@@ -178,21 +191,34 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      configDistance(config);
+      configEpsilon(config);
+    }
+
+    /**
+     * Configure the distance parameter.
+     * 
+     * @param config Parameter source
+     */
+    protected void configDistance(Parameterization config) {
       // Get a distance function.
       ObjectParameter<DistanceFunction<O>> distanceP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceP)) {
         distfun = distanceP.instantiateClass(config);
       }
+    }
+
+    /**
+     * Configure the epsilon parameter.
+     * 
+     * @param config Parameter source
+     */
+    protected void configEpsilon(Parameterization config) {
       // Get the epsilon parameter
       DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
-    }
-
-    @Override
-    protected EpsilonNeighborPredicate<O> makeInstance() {
-      return new EpsilonNeighborPredicate<>(epsilon, distfun);
     }
   }
 }

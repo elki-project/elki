@@ -23,25 +23,29 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
-import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.PreDeConCorePredicate;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.PreDeConNeighborPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * <p/>
+ * <p>
  * PreDeCon computes clusters of subspace preference weighted connected points.
  * The algorithm searches for local subgroups of a set of feature vectors having
  * a low variance along one or more (but not all) attributes.
  * </p>
- * <p/>
+ * <p>
  * Reference: <br>
  * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger: Density Connected Clustering
  * with Local Subspace Preferences. <br>
@@ -57,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")
 @Description("PreDeCon computes clusters of subspace preference weighted connected points. " + "The algorithm searches for local subgroups of a set of feature vectors having " + "a low variance along one or more (but not all) attributes.")
 @Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
-public class PreDeCon<V extends NumberVector> extends AbstractProjectedDBSCAN<Clustering<Model>, V> {
+public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
   /**
    * The logger for this class.
    */
@@ -66,23 +70,10 @@ public class PreDeCon<V extends NumberVector> extends AbstractProjectedDBSCAN<Cl
   /**
    * Constructor.
    * 
-   * @param epsilon Epsilon value
-   * @param minpts MinPts value
-   * @param distanceFunction outer distance function
-   * @param lambda Lambda value
+   * @param settings PreDeCon settings.
    */
-  public PreDeCon(double epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
-    super(epsilon, minpts, distanceFunction, lambda);
-  }
-
-  @Override
-  public String getLongResultName() {
-    return "PreDeCon Clustering";
-  }
-
-  @Override
-  public String getShortResultName() {
-    return "predecon-clustering";
+  public PreDeCon(PreDeCon.Settings settings) {
+    super(new PreDeConNeighborPredicate<>(settings), new PreDeConCorePredicate(settings), false);
   }
 
   @Override
@@ -97,20 +88,170 @@ public class PreDeCon<V extends NumberVector> extends AbstractProjectedDBSCAN<Cl
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractProjectedDBSCAN.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    /**
+     * PreDeConSettings.
+     */
+    protected PreDeCon.Settings settings;
+
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      configInnerDistance(config);
-      configEpsilon(config);
-      configMinPts(config);
-      configOuterDistance(config, epsilon, minpts, PreDeConSubspaceIndex.Factory.class, innerdist);
-      configLambda(config);
+      settings = config.tryInstantiate(PreDeCon.Settings.class);
     }
 
     @Override
     protected PreDeCon<V> makeInstance() {
-      return new PreDeCon<>(epsilon, minpts, outerdist, lambda);
+      return new PreDeCon<>(settings);
+    }
+  }
+
+  /**
+   * Class containing all the PreDeCon settings.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Settings {
+    /**
+     * Query radius parameter epsilon.
+     */
+    public double epsilon;
+  
+    /**
+     * The threshold for small eigenvalues.
+     */
+    public double delta;
+  
+    /**
+     * The kappa penality factor for deviations in preferred dimensions.
+     */
+    public double kappa = Parameterizer.KAPPA_DEFAULT;
+  
+    /**
+     * DBSCAN Minpts parameter, aka "mu".
+     */
+    public int minpts;
+  
+    /**
+     * Lambda: Maximum subspace dimensionality.
+     */
+    public int lambda = Integer.MAX_VALUE;
+  
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      /**
+       * Parameter Delta: maximum variance allowed
+       */
+      public static final OptionID DELTA_ID = new OptionID("predecon.delta", "A double specifying the variance threshold for small Eigenvalues.");
+  
+      /**
+       * Parameter Kappa: penalty for deviations in preferred dimensions.
+       */
+      public static final OptionID KAPPA_ID = new OptionID("predecon.kappa", "Penalty factor for deviations in preferred (low-variance) dimensions.");
+  
+      /**
+       * Default for kappa parameter.
+       */
+      public static final double KAPPA_DEFAULT = 20.;
+  
+      /**
+       * Parameter Lambda: maximum dimensionality allowed.
+       */
+      public static final OptionID LAMBDA_ID = new OptionID("predecon.lambda", "Maximum dimensionality to consider for core points.");
+  
+      /**
+       * Settings to build.
+       */
+      Settings settings;
+  
+      @Override
+      public void makeOptions(Parameterization config) {
+        settings = new Settings();
+        configEpsilon(config);
+        configMinPts(config);
+        configDelta(config);
+        configKappa(config);
+        configLambda(config);
+      }
+  
+      /**
+       * Configure the epsilon radius parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configEpsilon(Parameterization config) {
+        DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+        if(config.grab(epsilonP)) {
+          settings.epsilon = epsilonP.doubleValue();
+        }
+      }
+  
+      /**
+       * Configure the minPts aka "mu" parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configMinPts(Parameterization config) {
+        IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(minptsP)) {
+          settings.minpts = minptsP.intValue();
+        }
+      }
+  
+      /**
+       * Configure the delta parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configDelta(Parameterization config) {
+        DoubleParameter deltaP = new DoubleParameter(DELTA_ID) //
+        .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+        if(config.grab(deltaP)) {
+          settings.delta = deltaP.doubleValue();
+        }
+      }
+  
+      /**
+       * Configure the kappa parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configKappa(Parameterization config) {
+        DoubleParameter kappaP = new DoubleParameter(KAPPA_ID) //
+        .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+        .setDefaultValue(KAPPA_DEFAULT);
+        if(config.grab(kappaP)) {
+          settings.kappa = kappaP.doubleValue();
+        }
+      }
+  
+      /**
+       * Configure the delta parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configLambda(Parameterization config) {
+        IntParameter lambdaP = new IntParameter(LAMBDA_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+        .setOptional(true);
+        if(config.grab(lambdaP)) {
+          settings.lambda = lambdaP.intValue();
+        }
+      }
+  
+      @Override
+      public Settings makeInstance() {
+        return settings;
+      }
     }
   }
 }
