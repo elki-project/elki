@@ -49,8 +49,9 @@ public interface Parameter<T> {
    * Sets the default value of this parameter.
    * 
    * @param defaultValue default value of this parameter
+   * @return the parameter itself, for chaining
    */
-  public abstract void setDefaultValue(T defaultValue);
+  public abstract Parameter<T> setDefaultValue(T defaultValue);
 
   /**
    * Checks if this parameter has a default value.

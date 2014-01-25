@@ -131,10 +131,12 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
     this(optionID, false);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setDefaultValue(T defaultValue) {
+  public THIS setDefaultValue(T defaultValue) {
     this.defaultValue = defaultValue;
     this.optionalParameter = true;
+    return (THIS) this;
   }
 
   @Override
@@ -142,7 +144,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
     return !(defaultValue == null);
   }
 
-  // TODO: can we do this more elegantly?
   @Override
   public void useDefaultValue() {
     setValueInternal(defaultValue);
