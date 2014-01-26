@@ -68,11 +68,11 @@ public final class FileUtil {
    *         <code>null</code>
    */
   public static String getFilenameExtension(String name) {
-    if (name == null) {
+    if(name == null) {
       return null;
     }
     int index = name.lastIndexOf('.');
-    if (index >= name.length() - 1) {
+    if(index >= name.length() - 1) {
       return null;
     }
     return name.substring(name.lastIndexOf('.') + 1).toLowerCase();
@@ -89,11 +89,12 @@ public final class FileUtil {
   public static InputStream openSystemFile(String filename) throws FileNotFoundException {
     try {
       return new FileInputStream(filename);
-    } catch (FileNotFoundException e) {
+    }
+    catch(FileNotFoundException e) {
       // try with classloader
       String resname = filename.replace(File.separatorChar, '/');
       InputStream result = ClassLoader.getSystemResourceAsStream(resname);
-      if (result == null) {
+      if(result == null) {
         throw e;
       }
       return result;
@@ -111,25 +112,24 @@ public final class FileUtil {
    */
   public static InputStream tryGzipInput(InputStream in) throws IOException {
     // try autodetecting gzip compression.
-    if (!in.markSupported()) {
+    if(!in.markSupported()) {
       PushbackInputStream pb = new PushbackInputStream(in, 16);
       in = pb;
       // read a magic from the file header
       byte[] magic = { 0, 0 };
       pb.read(magic);
       pb.unread(magic);
-      if (magic[0] == 31 && magic[1] == -117) {
-        in = new GZIPInputStream(pb);
+      if(magic[0] == 31 && magic[1] == -117) {
+        return new GZIPInputStream(pb);
       }
-    } else {
-      in.mark(16);
-      if (in.read() == 31 && in.read() == -117) {
-        in.reset();
-        in = new GZIPInputStream(in);
-      } else {
-        // just rewind the stream
-        in.reset();
-      }
+      return in;
+    }
+    // Mark is supported.
+    in.mark(16);
+    boolean isgzip = (in.read() == 31 && in.read() == -117);
+    in.reset(); // Rewind
+    if(isgzip) {
+      in = new GZIPInputStream(in);
     }
     return in;
   }
@@ -144,24 +144,24 @@ public final class FileUtil {
   public static File locateFile(String name, String basedir) {
     // Try exact match first.
     File f = new File(name);
-    if (f.exists()) {
+    if(f.exists()) {
       return f;
     }
     // Try with base directory
-    if (basedir != null) {
+    if(basedir != null) {
       f = new File(basedir, name);
       // logger.warning("Trying: "+f.getAbsolutePath());
-      if (f.exists()) {
+      if(f.exists()) {
         return f;
       }
     }
     // try stripping whitespace
     {
       String name2 = name.trim();
-      if (!name.equals(name2)) {
+      if(!name.equals(name2)) {
         // logger.warning("Trying without whitespace.");
         f = locateFile(name2, basedir);
-        if (f != null) {
+        if(f != null) {
           return f;
         }
       }
@@ -169,27 +169,27 @@ public final class FileUtil {
     // try substituting path separators
     {
       String name2 = name.replace('/', File.separatorChar);
-      if (!name.equals(name2)) {
+      if(!name.equals(name2)) {
         // logger.warning("Trying with replaced separators.");
         f = locateFile(name2, basedir);
-        if (f != null) {
+        if(f != null) {
           return f;
         }
       }
       name2 = name.replace('\\', File.separatorChar);
-      if (!name.equals(name2)) {
+      if(!name.equals(name2)) {
         // logger.warning("Trying with replaced separators.");
         f = locateFile(name2, basedir);
-        if (f != null) {
+        if(f != null) {
           return f;
         }
       }
     }
     // try stripping extra characters, such as quotes.
-    if (name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"') {
+    if(name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"') {
       // logger.warning("Trying without quotes.");
       f = locateFile(name.substring(1, name.length() - 1), basedir);
-      if (f != null) {
+      if(f != null) {
         return f;
       }
     }
@@ -207,7 +207,7 @@ public final class FileUtil {
   public static String slurp(InputStream is) throws IOException {
     StringBuilder buf = new StringBuilder();
     final byte[] b = new byte[4096];
-    for (int n; (n = is.read(b)) != -1;) {
+    for(int n; (n = is.read(b)) != -1;) {
       buf.append(new String(b, 0, n));
     }
     is.close();
