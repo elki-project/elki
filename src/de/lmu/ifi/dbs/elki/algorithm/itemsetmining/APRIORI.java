@@ -36,7 +36,10 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -134,8 +137,11 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @return the AprioriResult learned by this APRIORI
    */
   public AprioriResult run(Relation<BitVector> relation) {
+    DBIDs ids = relation.getDBIDs();
     List<Itemset> solution = new ArrayList<>();
-    final int size = relation.size();
+    final int size = ids.size();
+    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * size) : minsupp;
+    
     // TODO: we don't strictly require a vector field.
     // We could work with knowing just the maximum dimensionality beforehand.
     VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
@@ -143,12 +149,13 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       final int dim = meta.getDimensionality();
       Duration timeone = LOG.newDuration("apriori.1-items.time");
       timeone.begin();
-      List<OneItemset> oneitems = buildFrequentOneItemsets(relation, dim);
+      List<OneItemset> oneitems = buildFrequentOneItemsets(relation, dim, needed);
       timeone.end();
       LOG.statistics(timeone);
       if(LOG.isVerbose()) {
         StringBuilder msg = new StringBuilder();
-        msg.append("1-frequentItemsets (").append(oneitems.size()).append(")");
+        msg.append("1-frequentItemsets (itemsets: ").append(oneitems.size()) //
+        .append(") (transactions: ").append(ids.size()).append(")");
         if(LOG.isDebuggingFine()) {
           debugDumpCandidates(msg, oneitems, meta);
         }
@@ -159,12 +166,15 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       if(oneitems.size() >= 2) {
         Duration timetwo = LOG.newDuration("apriori.2-items.time");
         timetwo.begin();
-        List<? extends Itemset> candidates = buildFrequentTwoItemsets(oneitems, relation, dim);
+        ArrayModifiableDBIDs survivors = DBIDUtil.newArray(ids.size());
+        List<? extends Itemset> candidates = buildFrequentTwoItemsets(oneitems, relation, dim, needed, ids, survivors);
+        ids = survivors; // Continue with reduced set of transactions.
         timetwo.end();
         LOG.statistics(timetwo);
         if(LOG.isVerbose()) {
           StringBuilder msg = new StringBuilder();
-          msg.append("2-frequentItemsets (").append(candidates.size()).append(")");
+          msg.append("2-frequentItemsets (itemsets: ").append(candidates.size()) //
+          .append(") (transactions: ").append(ids.size()).append(")");
           if(LOG.isDebuggingFine()) {
             debugDumpCandidates(msg, candidates, meta);
           }
@@ -184,11 +194,14 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
               debugDumpCandidates(msg, candidates, meta);
             }
           }
-          candidates = frequentItemsets(candidates, relation);
+          survivors = DBIDUtil.newArray(ids.size());
+          candidates = frequentItemsets(candidates, relation, needed, ids, survivors);
+          ids = survivors; // Continue with reduced set of transactions.
           timel.end();
           LOG.statistics(timel);
           if(msg != null) {
-            msg.append(length).append("-frequentItemsets (").append(candidates.size()).append(")");
+            msg.append(length).append("-frequentItemsets (itemsets: ").append(candidates.size()) //
+            .append(") (transactions: ").append(ids.size()).append(")");
             if(LOG.isDebuggingFine()) {
               debugDumpCandidates(msg, candidates, meta);
             }
@@ -206,10 +219,10 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * 
    * @param relation Data relation
    * @param dim Maximum dimensionality
+   * @param needed Minimum support needed
    * @return 1-itemsets
    */
-  protected List<OneItemset> buildFrequentOneItemsets(final Relation<BitVector> relation, final int dim) {
-    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * relation.size()) : minsupp;
+  protected List<OneItemset> buildFrequentOneItemsets(final Relation<BitVector> relation, final int dim, final int needed) {
     // TODO: use TIntList and prefill appropriately to avoid knowing "dim"
     // beforehand?
     int[] counts = new int[dim];
@@ -236,10 +249,12 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @param oneitems Frequent 1-itemsets
    * @param relation Data relation
    * @param dim Maximum dimensionality
+   * @param needed Minimum support needed
+   * @param ids Objects to process
+   * @param survivors Output: objects that had at least two 1-frequent items.
    * @return Frequent 2-itemsets
    */
-  protected List<SparseItemset> buildFrequentTwoItemsets(List<OneItemset> oneitems, final Relation<BitVector> relation, final int dim) {
-    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * relation.size()) : minsupp;
+  protected List<SparseItemset> buildFrequentTwoItemsets(List<OneItemset> oneitems, final Relation<BitVector> relation, final int dim, final int needed, DBIDs ids, ArrayModifiableDBIDs survivors) {
     int f1 = 0;
     long[] mask = BitsUtil.zero(dim);
     for(OneItemset supported : oneitems) {
@@ -251,16 +266,21 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     // OOM somewhere later anyway!
     TLongIntHashMap map = new TLongIntHashMap((f1 * (f1 - 1)) >> 1);
     final long[] scratch = BitsUtil.zero(dim);
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       long[] bv = relation.get(iditer).getBits();
       for(int i = 0; i < scratch.length; i++) {
         scratch[i] = (i < bv.length) ? (mask[i] & bv[i]) : 0L;
       }
+      boolean lives = false;
       for(int i = BitsUtil.nextSetBit(scratch, 0); i >= 0; i = BitsUtil.nextSetBit(scratch, i + 1)) {
         for(int j = BitsUtil.nextSetBit(scratch, i + 1); j >= 0; j = BitsUtil.nextSetBit(scratch, j + 1)) {
           long key = (((long) i) << 32) | j;
           map.put(key, 1 + map.get(key));
+          lives = true;
         }
+      }
+      if(lives) {
+        survivors.add(iditer);
       }
     }
     // Generate candidates of length 2.
@@ -285,18 +305,24 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @param support Support map.
    * @param candidates the candidates to be evaluated
    * @param relation the database to evaluate the candidates on
-   * @param mask Bitmask of items that were 1-frequent
+   * @param needed Minimum support needed
+   * @param ids Objects to process
+   * @param survivors Output: objects that had at least two 1-frequent items.
    * @return Itemsets with sufficient support
    */
-  protected List<? extends Itemset> frequentItemsets(List<? extends Itemset> candidates, Relation<BitVector> relation) {
-    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * relation.size()) : minsupp;
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+  protected List<? extends Itemset> frequentItemsets(List<? extends Itemset> candidates, Relation<BitVector> relation, int needed, DBIDs ids, ArrayModifiableDBIDs survivors) {
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       BitVector bv = relation.get(iditer);
-      // TODO can we exploit that the candidate set it sorted?
+      // TODO: exploit that the candidate set it sorted?
+      boolean lives = false;
       for(Itemset candidate : candidates) {
         if(candidate.containedIn(bv)) {
           candidate.increaseSupport();
+          lives = true;
         }
+      }
+      if(lives) {
+        survivors.add(iditer);
       }
     }
     // Retain only those with minimum support:
