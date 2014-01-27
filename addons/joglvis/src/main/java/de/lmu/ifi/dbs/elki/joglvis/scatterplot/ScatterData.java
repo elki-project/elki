@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.joglvis.scatterplot;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,6 +28,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -37,7 +39,12 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to manage the vector data in the GPU.
@@ -126,6 +133,7 @@ public class ScatterData {
 
     // Scan relations for dimensionalities:
     int[] dims = new int[relations.size()];
+    LinearScale[][] scales = new LinearScale[relations.size()][];
     ArrayList<Relation<? extends NumberVector>> vrels = new ArrayList<>(relations.size());
     for(int r = 0; r < relations.size(); r++) {
       Relation<?> rel = relations.get(r);
@@ -135,6 +143,12 @@ public class ScatterData {
         final Relation<? extends NumberVector> vrel = (Relation<? extends NumberVector>) rel;
         final int d = ((VectorFieldTypeInformation<?>) type).getDimensionality();
         dims[r] = d;
+        LinearScale[] rscales = new LinearScale[d];
+        Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(vrel);
+        for(int i = 0; i < d; i++) {
+          rscales[i] = new LinearScale(minmax.first.doubleValue(i), minmax.second.doubleValue(i));
+        }
+        scales[r] = rscales;
         vrels.add(vrel);
         if(vecOffset < 0) {
           vecOffset = dim;
@@ -150,33 +164,36 @@ public class ScatterData {
     if(classOffset < 0) {
       ++dim;
     }
+    LOG.warning("Dimensionalities: " + FormatUtil.format(dims));
 
     // Initialize vertex buffer handles:
     assert (vbos[0] == -1);
     gl.glGenBuffers(1, vbos, 0);
     gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
-    gl.glBufferData(GL.GL_ARRAY_BUFFER, length // Number of lines *
-        * dim * SIZE_FLOAT //
+    gl.glBufferData(GL.GL_ARRAY_BUFFER, length * dim * SIZE_FLOAT //
         + 3 * SIZE_FLOAT // safety padding
     , null, GL2.GL_STATIC_DRAW);
     ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
     FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
 
+    Random rnd = new Random();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       for(int r = 0; r < dims.length; r++) {
         if(dims[r] <= 0) {
           continue;
         }
         final Relation<? extends NumberVector> vrel = vrels.get(r);
+        LinearScale[] rscales = scales[r];
         if(vrel != null) {
           NumberVector vec = vrel.get(iter);
           for(int d = 0; d < dims[r]; d++) {
-            vertices.put(vec.floatValue(d));
+            // vertices.put( rnd.nextFloat());
+            vertices.put((float) rscales[d].getScaled(vec.doubleValue(d)) * 2.f - 1.f);
           }
         }
       }
       if(classOffset < 0) {
-        vertices.put(0.0f);
+        vertices.put(rnd.nextInt(30));
       }
     }
     stride = dim * SIZE_FLOAT;

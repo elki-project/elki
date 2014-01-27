@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.joglvis;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -40,13 +41,15 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 public class ScatterPlot3DVisualization implements GLEventListener {
   private static final Logging LOG = Logging.getLogger(ScatterPlot3DVisualization.class);
 
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true;
 
   ScatterData data;
 
   SimpleCamera3D camera = new SimpleCamera3D();
 
   ScatterPlot scatter = new ScatterPlotOpenGL2Intel945();
+
+  FPSAnimator animator = null;
 
   public ScatterPlot3DVisualization(ScatterData data) {
     this.data = data;
@@ -132,13 +135,16 @@ public class ScatterPlot3DVisualization implements GLEventListener {
     if(DEBUG) {
       gl = new DebugGL2(gl);
     }
+    if(animator != null) {
+      animator.stop();
+    }
     data.free(gl);
     scatter.free(gl);
   }
 
   public void start(GLCanvas canvas) {
+    animator = new FPSAnimator(canvas, 25);
     // FIXME: Auto-start animator for now.
-    final FPSAnimator animator = new FPSAnimator(canvas, 25);
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {

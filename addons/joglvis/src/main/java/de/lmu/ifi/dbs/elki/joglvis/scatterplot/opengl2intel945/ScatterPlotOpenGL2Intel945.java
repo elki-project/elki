@@ -110,7 +110,7 @@ public class ScatterPlotOpenGL2Intel945 implements ScatterPlot {
   }
 
   private TextureData loadTexture(GL2 gl, GLProfile profile, final String filename) {
-    try (InputStream stream = getClass().getResourceAsStream(filename)) {
+    try (InputStream stream = ScatterPlot.class.getResourceAsStream(filename)) {
       return TextureIO.newTextureData(profile, stream, false, "png");
     }
     catch(IOException exc) {
@@ -134,9 +134,9 @@ public class ScatterPlotOpenGL2Intel945 implements ScatterPlot {
     gl.glUniform1f(gl.glGetUniformLocation(st_prog, "size"), 25.f);
     gl.glUniform1i(gl.glGetUniformLocation(st_prog, "texAlpha"), 0); // texture
     gl.glUniform1i(gl.glGetUniformLocation(st_prog, "texColor"), 1); // texture
-    gl.glUniform1f(gl.glGetUniformLocation(st_prog, "alpha"), .4f);
-    gl.glUniform1f(gl.glGetUniformLocation(st_prog, "grid"), (float) texgrid);
-    gl.glUniform1f(gl.glGetUniformLocation(st_prog, "numcolors"), (float) numcolors);
+    gl.glUniform1f(gl.glGetUniformLocation(st_prog, "alpha"), .8f);
+    gl.glUniform1i(gl.glGetUniformLocation(st_prog, "grid"), texgrid);
+    gl.glUniform1i(gl.glGetUniformLocation(st_prog, "numcolors"), numcolors);
   }
 
   @Override

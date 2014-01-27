@@ -2,7 +2,7 @@
 
 uniform sampler2D texAlpha;
 uniform sampler2D texColor;
-uniform float grid; // grid size
+uniform int grid; // grid size
 uniform float alpha; // Alpha adjustment
 
 void main() {
