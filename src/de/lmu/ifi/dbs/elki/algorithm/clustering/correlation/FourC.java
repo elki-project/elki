@@ -23,19 +23,25 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
-import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.FourCCorePredicate;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.FourCNeighborPredicate;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.FourCSubspaceIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * 4C identifies local subgroups of data objects sharing a uniform correlation.
@@ -49,14 +55,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.uses FourCSubspaceIndex
+ * @apiviz.has Settings
  * 
  * @param <V> type of NumberVector handled by this Algorithm
  */
 @Title("4C: Computing Correlation Connected Clusters")
 @Description("4C identifies local subgroups of data objects sharing a uniform correlation. " + "The algorithm is based on a combination of PCA and density-based clustering (DBSCAN).")
 @Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", title = "Computing Clusters of Correlation Connected Objects", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", url = "http://dx.doi.org/10.1145/1007568.1007620")
-public class FourC<V extends NumberVector> extends AbstractProjectedDBSCAN<Clustering<Model>, V> {
+public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
   /**
    * The logger for this class.
    */
@@ -65,23 +71,10 @@ public class FourC<V extends NumberVector> extends AbstractProjectedDBSCAN<Clust
   /**
    * Constructor.
    * 
-   * @param epsilon Epsilon value
-   * @param minpts MinPts value
-   * @param distanceFunction Distance function
-   * @param lambda Lambda value
+   * @param settings FourC settings.
    */
-  public FourC(double epsilon, int minpts, LocallyWeightedDistanceFunction<V> distanceFunction, int lambda) {
-    super(epsilon, minpts, distanceFunction, lambda);
-  }
-
-  @Override
-  public String getLongResultName() {
-    return "4C Clustering";
-  }
-
-  @Override
-  public String getShortResultName() {
-    return "4c-clustering";
+  public FourC(FourC.Settings settings) {
+    super(new FourCNeighborPredicate<V>(settings), new FourCCorePredicate(settings), false);
   }
 
   @Override
@@ -95,26 +88,194 @@ public class FourC<V extends NumberVector> extends AbstractProjectedDBSCAN<Clust
   }
 
   /**
+   * Class wrapping the 4C parameter settings.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Settings {
+    /**
+     * Query radius epsilon.
+     */
+    public double epsilon;
+
+    /**
+     * Use absolute variance, not relative variance.
+     */
+    public boolean absolute = false;
+
+    /**
+     * Delta parameter, for selecting strong Eigenvectors.
+     */
+    public double delta = 0.0;
+
+    /**
+     * Kappa penalty parameter, to punish deviation in low-variance
+     * Eigenvectors.
+     */
+    public double kappa = 50.;
+
+    /**
+     * Maximum subspace dimensionality lambda.
+     */
+    public int lambda = Integer.MAX_VALUE;
+
+    /**
+     * MinPts / mu parameter.
+     */
+    public int minpts;
+
+    /**
+     * Parameterization class for 4C settings.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      /**
+       * The default value for delta.
+       */
+      public static final double DEFAULT_DELTA = .1;
+
+      /**
+       * Parameter Kappa: penalty for deviations in preferred dimensions.
+       */
+      public static final OptionID KAPPA_ID = new OptionID("predecon.kappa", "Penalty factor for deviations in preferred (low-variance) dimensions.");
+
+      /**
+       * Default for kappa parameter.
+       */
+      public static final double KAPPA_DEFAULT = 20.;
+
+      /**
+       * Parameter Lambda: maximum dimensionality allowed.
+       */
+      public static final OptionID LAMBDA_ID = new OptionID("predecon.lambda", "Maximum dimensionality to consider for core points.");
+
+      /**
+       * Settings storage.
+       */
+      Settings settings;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        settings = new Settings();
+        configEpsilon(config);
+        configMinPts(config);
+        configDelta(config);
+        configKappa(config);
+        configLambda(config);
+      }
+
+      /**
+       * Configure the epsilon radius parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configEpsilon(Parameterization config) {
+        DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+        if(config.grab(epsilonP)) {
+          settings.epsilon = epsilonP.doubleValue();
+        }
+      }
+
+      /**
+       * Configure the minPts aka "mu" parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configMinPts(Parameterization config) {
+        IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(minptsP)) {
+          settings.minpts = minptsP.intValue();
+        }
+      }
+
+      /**
+       * Configure the delta parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configDelta(Parameterization config) {
+        // Flag for using absolute variances
+        Flag absoluteF = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
+        if(config.grab(absoluteF)) {
+          settings.absolute = absoluteF.isTrue();
+        }
+
+        // Parameter delta
+        DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+        if(!settings.absolute) {
+          deltaP.setDefaultValue(DEFAULT_DELTA);
+        }
+        else {
+          deltaP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+        }
+        if(config.grab(deltaP)) {
+          settings.delta = deltaP.doubleValue();
+        }
+      }
+
+      /**
+       * Configure the kappa parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configKappa(Parameterization config) {
+        DoubleParameter kappaP = new DoubleParameter(KAPPA_ID) //
+        .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+        .setDefaultValue(KAPPA_DEFAULT);
+        if(config.grab(kappaP)) {
+          settings.kappa = kappaP.doubleValue();
+        }
+      }
+
+      /**
+       * Configure the delta parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configLambda(Parameterization config) {
+        IntParameter lambdaP = new IntParameter(LAMBDA_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+        .setOptional(true);
+        if(config.grab(lambdaP)) {
+          settings.lambda = lambdaP.intValue();
+        }
+      }
+
+      @Override
+      protected Object makeInstance() {
+        return settings;
+      }
+    }
+  }
+
+  /**
    * Parameterization class.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractProjectedDBSCAN.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+    /**
+     * Settings storage.
+     */
+    Settings settings;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      configInnerDistance(config);
-      configEpsilon(config);
-      configMinPts(config);
-      configOuterDistance(config, epsilon, minpts, FourCSubspaceIndex.Factory.class, innerdist);
-      configLambda(config);
+      settings = config.tryInstantiate(FourC.Settings.class);
     }
 
     @Override
     protected FourC<O> makeInstance() {
-      return new FourC<>(epsilon, minpts, outerdist, lambda);
+      return new FourC<>(settings);
     }
   }
 }

@@ -133,7 +133,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector> extends Abs
       double dist2 = v2Mv1.transposeTimesTimes(m2, v2Mv1);
 
       if(dist1 < 0) {
-        if(-dist1 < 0.000000000001) {
+        if(dist1 > -1e-12) {
           dist1 = 0;
         }
         else {
@@ -141,7 +141,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector> extends Abs
         }
       }
       if(dist2 < 0) {
-        if(-dist2 < 0.000000000001) {
+        if(dist2 > -1e-12) {
           dist2 = 0;
         }
         else {

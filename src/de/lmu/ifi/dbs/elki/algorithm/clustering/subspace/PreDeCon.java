@@ -54,7 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Peer Kröger
  * 
- * @apiviz.uses PreDeConSubspaceIndex
+ * @apiviz.has PreDeCon.Settings
+ * @apiviz.composedOf PreDeConNeighborPredicate
+ * @apiviz.composedOf PreDeConCorePredicate
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
@@ -82,35 +84,9 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
   }
 
   /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
-    /**
-     * PreDeConSettings.
-     */
-    protected PreDeCon.Settings settings;
-
-    @Override
-    protected void makeOptions(Parameterization config) {
-      settings = config.tryInstantiate(PreDeCon.Settings.class);
-    }
-
-    @Override
-    protected PreDeCon<V> makeInstance() {
-      return new PreDeCon<>(settings);
-    }
-  }
-
-  /**
    * Class containing all the PreDeCon settings.
    * 
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
    */
   public static class Settings {
     /**
@@ -252,6 +228,30 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
       public Settings makeInstance() {
         return settings;
       }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    /**
+     * PreDeConSettings.
+     */
+    protected PreDeCon.Settings settings;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      settings = config.tryInstantiate(PreDeCon.Settings.class);
+    }
+
+    @Override
+    protected PreDeCon<V> makeInstance() {
+      return new PreDeCon<>(settings);
     }
   }
 }

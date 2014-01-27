@@ -27,11 +27,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -57,9 +58,10 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
 
     // Setup 4C
     ListParameterization params = new ListParameterization();
-    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 0.30);
-    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 20);
-    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 5);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.30);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 50);
+    params.addParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, 0.5);
+    params.addParameter(FourC.Settings.Parameterizer.LAMBDA_ID, 1);
 
     FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);
     testParameterizationOk(params);
@@ -67,8 +69,8 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
     // run 4C on database
     Clustering<Model> result = fourc.run(db);
 
-    testFMeasure(db, result, 0.498048); // Hierarchical pairs scored: 0.79467
-    testClusterSizes(result, new int[] { 5, 595 });
+    testFMeasure(db, result, 0.7052);
+    testClusterSizes(result, new int[] { 218, 382 });
   }
 
   /**
@@ -83,16 +85,17 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     // 4C
-    params.addParameter(AbstractProjectedDBSCAN.EPSILON_ID, 1.2);
-    params.addParameter(AbstractProjectedDBSCAN.MINPTS_ID, 5);
-    params.addParameter(AbstractProjectedDBSCAN.LAMBDA_ID, 3);
+    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 3);
+    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 50);
+    params.addParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, 0.5);
+    params.addParameter(FourC.Settings.Parameterizer.LAMBDA_ID, 3);
 
     FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);
     testParameterizationOk(params);
 
     // run 4C on database
     Clustering<Model> result = fourc.run(db);
-    testFMeasure(db, result, 0.48305405);
-    testClusterSizes(result, new int[] { 65, 70, 515 });
+    testFMeasure(db, result, 0.9073744);
+    testClusterSizes(result, new int[] { 200, 202, 248 });
   }
 }

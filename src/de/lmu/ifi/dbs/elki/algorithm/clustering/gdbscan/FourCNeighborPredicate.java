@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.PreDeConNeighborPredicate.PreDeConModel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -36,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -44,48 +44,63 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
+ * 4C identifies local subgroups of data objects sharing a uniform correlation.
+ * The algorithm is based on a combination of PCA and density-based clustering
+ * (DBSCAN).
  * <p>
- * Reference: <br>
- * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger: Density Connected Clustering
- * with Local Subspace Preferences. <br>
- * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
+ * Reference: Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek:
+ * Computing Clusters of Correlation Connected Objects. <br>
+ * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004.
  * </p>
  * 
- * @author Peer Kröger
+ * @author Arthur Zimek
  * @author Erich Schubert
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
-public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractLocalNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel> {
+@Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", title = "Computing Clusters of Correlation Connected Objects", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", url = "http://dx.doi.org/10.1145/1007568.1007620")
+public class FourCNeighborPredicate<V extends NumberVector> extends AbstractLocalNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(PreDeConNeighborPredicate.class);
+  private static final Logging LOG = Logging.getLogger(FourCNeighborPredicate.class);
+
+  /**
+   * 4C settings class.
+   */
+  private FourC.Settings settings;
 
   /**
    * Tool to help with parameterization.
    */
-  private MeanVariance mvSize = new MeanVariance(), mvVar = new MeanVariance();
+  private MeanVariance mvSize = new MeanVariance(), mvSize2 = new MeanVariance(), mvCorDim = new MeanVariance();
 
   /**
-   * PreDeCon settings class.
+   * The Filtered PCA Runner
    */
-  private PreDeCon.Settings settings;
+  private PCAFilteredRunner<? super V> pca;
 
   /**
    * Constructor.
    * 
-   * @param settings PreDeCon settings
+   * @param settings 4C settings
+   * @param pca PCA runner
    */
-  public PreDeConNeighborPredicate(PreDeCon.Settings settings) {
+  public FourCNeighborPredicate(FourC.Settings settings) {
     super(settings.epsilon, EuclideanDistanceFunction.STATIC);
     this.settings = settings;
+    this.pca = new PCAFilteredRunner<>(new StandardCovarianceMatrixBuilder<V>(), new LimitEigenPairFilter(settings.delta, settings.absolute), settings.kappa, 1);
   }
 
   @SuppressWarnings("unchecked")
@@ -95,11 +110,13 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
     Relation<V> relation = (Relation<V>) dq.getRelation();
     RangeQuery<V> rq = database.getRangeQuery(dq);
     mvSize.reset();
-    mvVar.reset();
+    mvSize2.reset();
+    mvCorDim.reset();
     DataStore<PreDeConModel> storage = preprocess(PreDeConModel.class, relation, rq);
     if(LOG.isVerbose()) {
       LOG.verbose("Average neighborhood size: " + mvSize.toString());
-      LOG.verbose("Average variance size: " + mvVar.toString());
+      LOG.verbose("Average correlation dimensionality: " + mvCorDim.toString());
+      LOG.verbose("Average correlated neighborhood size: " + mvSize2.toString());
       final int dim = RelationUtil.dimensionality(relation);
       if(mvSize.getMean() < 5 * dim) {
         LOG.verbose("The epsilon parameter may be chosen too small.");
@@ -107,10 +124,15 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
       else if(mvSize.getMean() > .5 * relation.size()) {
         LOG.verbose("The epsilon parameter may be chosen too large.");
       }
+      else if(mvSize2.getMean() < 10) {
+        LOG.verbose("The epsilon parameter may be chosen too large, or delta too small.");
+      }
+      else if(mvSize2.getMean() < settings.minpts) {
+        LOG.verbose("The minPts parameter may be chosen too large.");
+      }
       else {
-        LOG.verbose("As a first guess, you can try minPts < " + ((int) mvSize.getMean() / dim) //
-            + " and delta > " + mvVar.getMean() + //
-            ", but you will need to experiment with these parameters and epsilon.");
+        LOG.verbose("As a first guess, you can try minPts < " + ((int) mvSize2.getMean()) //
+            + ", but you will need to experiment with these parameters and epsilon.");
       }
     }
     return (NeighborPredicate.Instance<T>) new Instance(dq.getRelation().getDBIDs(), storage);
@@ -118,98 +140,37 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
 
   @Override
   protected PreDeConModel computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<V> relation) {
-    final int referenceSetSize = neighbors.size();
-    mvSize.put(referenceSetSize);
+    mvSize.put(neighbors.size());
+    PCAFilteredResult pcares = pca.processIds(neighbors, relation);
+    int cordim = pcares.getCorrelationDimension();
+    Matrix m_hat = pcares.similarityMatrix();
 
-    // Shouldn't happen:
-    if(referenceSetSize < 0) {
-      LOG.warning("Empty reference set - should at least include the query point!");
-      return new PreDeConModel(Integer.MAX_VALUE, DBIDUtil.EMPTYDBIDS);
-    }
+    Vector obj = relation.get(id).getColumnVector();
 
-    V obj = relation.get(id);
-    final int dim = obj.getDimensionality();
+    // To save computing the square root below.
+    double sqeps = settings.epsilon * settings.epsilon;
 
-    // Per-dimension variances:
-    double[] s = new double[dim];
-    for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-      V o = relation.get(neighbor);
-      for(int d = 0; d < dim; d++) {
-        final double diff = obj.doubleValue(d) - o.doubleValue(d);
-        s[d] += diff * diff;
+    HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(neighbors.size());
+    for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+      // Compute weighted / projected distance:
+      Vector diff = relation.get(iter).getColumnVector();
+      diff.minusEquals(obj);
+      double dist = diff.transposeTimesTimes(m_hat, diff);
+      if(dist <= sqeps) {
+        survivors.add(iter);
       }
     }
-    // Adjust for sample size
-    for(int d = 0; d < dim; d++) {
-      s[d] /= referenceSetSize;
-      mvVar.put(s[d]);
+    if (cordim <= settings.lambda) {
+      mvSize2.put(survivors.size());
     }
+    mvCorDim.put(cordim);
 
-    // Preference weight vector
-    double[] weights = new double[dim];
-    int pdim = 0;
-    for(int d = 0; d < dim; d++) {
-      if(s[d] <= settings.delta) {
-        weights[d] = settings.kappa;
-        pdim++;
-      }
-      else {
-        weights[d] = 1.;
-      }
-    }
-
-    // Check which neighbors survive
-    HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(referenceSetSize);
-    for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-      V o = relation.get(neighbor);
-      // Weighted Euclidean distance:
-      double dev = 0.;
-      for(int d = 0; d < dim; d++) {
-        final double diff = obj.doubleValue(d) - o.doubleValue(d);
-        dev += weights[d] * diff * diff;
-      }
-      if(Math.sqrt(dev) <= epsilon) {
-        survivors.add(neighbor);
-      }
-    }
-
-    return new PreDeConModel(pdim, survivors);
+    return new PreDeConModel(cordim, survivors);
   }
 
   @Override
   Logging getLogger() {
     return LOG;
-  }
-
-  /**
-   * Model used by PreDeCon for core point property.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class PreDeConModel {
-    /**
-     * Preference dimensionality.
-     */
-    int pdim;
-
-    /**
-     * Neighbor ids.
-     */
-    SetDBIDs ids;
-
-    /**
-     * PreDeCon model.
-     * 
-     * @param pdim Preference dimensionality
-     * @param ids Neighbor ids
-     */
-    public PreDeConModel(int pdim, SetDBIDs ids) {
-      super();
-      this.pdim = pdim;
-      this.ids = ids;
-    }
   }
 
   @Override
@@ -261,18 +222,18 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**
-     * PreDeConSettings.
+     * 4C settings.
      */
-    protected PreDeCon.Settings settings;
+    protected FourC.Settings settings;
 
     @Override
     protected void makeOptions(Parameterization config) {
-      settings = config.tryInstantiate(PreDeCon.Settings.class);
+      settings = config.tryInstantiate(FourC.Settings.class);
     }
 
     @Override
-    protected PreDeConNeighborPredicate<O> makeInstance() {
-      return new PreDeConNeighborPredicate<>(settings);
+    protected FourCNeighborPredicate<O> makeInstance() {
+      return new FourCNeighborPredicate<>(settings);
     }
   }
 }
