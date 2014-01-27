@@ -1,4 +1,26 @@
-package de.lmu.ifi.dbs.elki.joglvis.scatterplot;
+package de.lmu.ifi.dbs.elki.joglvis.scatterplot.opengl2intel945;
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +34,9 @@ import com.jogamp.opengl.util.texture.TextureIO;
 
 import de.lmu.ifi.dbs.elki.joglvis.ShaderUtil;
 import de.lmu.ifi.dbs.elki.joglvis.SimpleCamera3D;
+import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterPlot;
 
-public class ScatterPlotOpenGL2Intel945 {
+public class ScatterPlotOpenGL2Intel945 implements ScatterPlot {
   private int[] textures = new int[2];
 
   private int numcolors;
@@ -26,6 +49,7 @@ public class ScatterPlotOpenGL2Intel945 {
 
   private int[] shaders;
 
+  @Override
   public void initializeShaders(GL2 gl) {
     try {
       shaders = new int[2];
@@ -38,6 +62,7 @@ public class ScatterPlotOpenGL2Intel945 {
     }
   }
 
+  @Override
   public void initializeTextures(GL2 gl, GLProfile profile) {
     // Initialize textures
     gl.glGenTextures(2, textures, 0);
@@ -93,6 +118,7 @@ public class ScatterPlotOpenGL2Intel945 {
     }
   }
 
+  @Override
   public void enableProgram(GL2 gl) {
     gl.glUseProgram(st_prog);
 
@@ -113,10 +139,12 @@ public class ScatterPlotOpenGL2Intel945 {
     gl.glUniform1f(gl.glGetUniformLocation(st_prog, "numcolors"), (float) numcolors);
   }
 
+  @Override
   public void setCamera(SimpleCamera3D camera) {
     this.camera = camera;
   }
 
+  @Override
   public void free(GL2 gl) {
     gl.glDeleteTextures(1, textures, 0);
     for(int shader : shaders) {

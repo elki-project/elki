@@ -1,10 +1,15 @@
-package de.lmu.ifi.dbs.elki.database.lucene;
+package de.lmu.ifi.dbs.elki.joglvis.scatterplot;
+
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLProfile;
+
+import de.lmu.ifi.dbs.elki.joglvis.SimpleCamera3D;
 
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2013
+ Copyright (C) 2014
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,27 +27,17 @@ package de.lmu.ifi.dbs.elki.database.lucene;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import org.apache.lucene.search.DefaultSimilarity;
-import org.apache.lucene.search.Similarity;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+public interface ScatterPlot {
 
-/**
- * Distance function, interfacing back into Lucene.
- * 
- * @author Erich Schubert
- */
-public class LuceneDistanceFunction extends AbstractDBIDDistanceFunction {
-  /**
-   * Lucene similarity.
-   */
-  Similarity sim = new DefaultSimilarity();
+  void initializeShaders(GL2 gl);
 
-  @Override
-  public double distance(DBIDRef id1, DBIDRef id2) {
-    // FIXME: how to compute the same similarity value that lucene uses?
-    throw new AbortException("Manual distance computations are not yet implemented!");
-  }
+  void initializeTextures(GL2 gl, GLProfile profile);
+
+  void enableProgram(GL2 gl);
+
+  void setCamera(SimpleCamera3D camera);
+
+  void free(GL2 gl);
+
 }

@@ -1,4 +1,26 @@
 package de.lmu.ifi.dbs.elki.joglvis.scatterplot;
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -89,7 +111,7 @@ public class ScatterData {
 
   public ScatterData(DBIDs ids) {
     this.ids = ids;
-    this.relations = new ArrayList<Relation<?>>();
+    this.relations = new ArrayList<>();
   }
 
   public void addRelation(Relation<?> rel) {
@@ -104,13 +126,13 @@ public class ScatterData {
 
     // Scan relations for dimensionalities:
     int[] dims = new int[relations.size()];
-    ArrayList<Relation<? extends NumberVector<?>>> vrels = new ArrayList<>(relations.size());
+    ArrayList<Relation<? extends NumberVector>> vrels = new ArrayList<>(relations.size());
     for(int r = 0; r < relations.size(); r++) {
       Relation<?> rel = relations.get(r);
       final SimpleTypeInformation<?> type = rel.getDataTypeInformation();
       if(type instanceof VectorFieldTypeInformation) {
         @SuppressWarnings("unchecked")
-        final Relation<? extends NumberVector<?>> vrel = (Relation<? extends NumberVector<?>>) rel;
+        final Relation<? extends NumberVector> vrel = (Relation<? extends NumberVector>) rel;
         final int d = ((VectorFieldTypeInformation<?>) type).getDimensionality();
         dims[r] = d;
         vrels.add(vrel);
@@ -145,9 +167,9 @@ public class ScatterData {
         if(dims[r] <= 0) {
           continue;
         }
-        final Relation<? extends NumberVector<?>> vrel = vrels.get(r);
+        final Relation<? extends NumberVector> vrel = vrels.get(r);
         if(vrel != null) {
-          NumberVector<?> vec = vrel.get(iter);
+          NumberVector vec = vrel.get(iter);
           for(int d = 0; d < dims[r]; d++) {
             vertices.put(vec.floatValue(d));
           }

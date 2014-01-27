@@ -37,11 +37,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleIntegerDBIDKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID, DoubleDistance> {
+public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID> {
   /**
    * Lucene search function.
    */
@@ -70,7 +69,7 @@ public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID, Doubl
    * 
    * @param distanceQuery Distance query
    */
-  public LuceneDistanceKNNQuery(DistanceQuery<DBID, DoubleDistance> distanceQuery, IndexReader ir, DBIDRange range) {
+  public LuceneDistanceKNNQuery(DistanceQuery<DBID> distanceQuery, IndexReader ir, DBIDRange range) {
     super(distanceQuery);
     this.range = range;
     this.mlt = new MoreLikeThis(ir);
@@ -79,27 +78,28 @@ public class LuceneDistanceKNNQuery extends AbstractDistanceKNNQuery<DBID, Doubl
   }
 
   @Override
-  public KNNList<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
+  public KNNList getKNNForDBID(DBIDRef id, int k) {
     try {
       Query query = mlt.like(range.getOffset(id));
       TopDocs topDocs = is.search(query, k);
 
       int rk = topDocs.scoreDocs.length;
-      DoubleDistanceIntegerDBIDKNNList res = new DoubleDistanceIntegerDBIDKNNList(k, rk);
+      DoubleIntegerDBIDKNNList res = new DoubleIntegerDBIDKNNList(k, rk);
       DBIDArrayIter it = range.iter();
-      for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+      for(ScoreDoc scoreDoc : topDocs.scoreDocs) {
         double dist = (scoreDoc.score > 0.) ? (1. / scoreDoc.score) : Double.POSITIVE_INFINITY;
         it.seek(scoreDoc.doc);
         res.add(dist, it);
       }
       return res;
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new AbortException("I/O error in lucene.", e);
     }
   }
 
   @Override
-  public KNNList<DoubleDistance> getKNNForObject(DBID obj, int k) {
+  public KNNList getKNNForObject(DBID obj, int k) {
     return getKNNForDBID((DBIDRef) obj, k);
   }
 }

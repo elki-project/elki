@@ -39,8 +39,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -111,28 +109,30 @@ public class LuceneDatabase extends AbstractDatabase {
       getHierarchy().add(this, docrep);
 
       eventManager.fireObjectsInserted(ids);
-    } catch (CorruptIndexException e) {
+    }
+    catch(CorruptIndexException e) {
       throw new AbortException("Index is corrupt.", e);
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new AbortException("I/O error reading index.", e);
     }
   }
-  
+
   @Override
-  public <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if (distanceQuery.getDistanceFunction() instanceof LuceneDistanceFunction) {
+  public <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    if(distanceQuery.getDistanceFunction() instanceof LuceneDistanceFunction) {
       @SuppressWarnings("unchecked")
-      final RangeQuery<O, D> rq = (RangeQuery<O, D>) new LuceneDistanceRangeQuery((DistanceQuery<DBID, DoubleDistance>) distanceQuery, reader, ids);
+      final RangeQuery<O> rq = (RangeQuery<O>) new LuceneDistanceRangeQuery((DistanceQuery<DBID>) distanceQuery, reader, ids);
       return rq;
     }
     return super.getRangeQuery(distanceQuery, hints);
   }
 
   @Override
-  public <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    if (distanceQuery.getDistanceFunction() instanceof LuceneDistanceFunction) {
+  public <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    if(distanceQuery.getDistanceFunction() instanceof LuceneDistanceFunction) {
       @SuppressWarnings("unchecked")
-      final KNNQuery<O, D> kq = (KNNQuery<O, D>) new LuceneDistanceKNNQuery((DistanceQuery<DBID, DoubleDistance>) distanceQuery, reader, ids);
+      final KNNQuery<O> kq = (KNNQuery<O>) new LuceneDistanceKNNQuery((DistanceQuery<DBID>) distanceQuery, reader, ids);
       return kq;
     }
     return super.getKNNQuery(distanceQuery, hints);
@@ -163,7 +163,7 @@ public class LuceneDatabase extends AbstractDatabase {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       FileParameter fileP = new FileParameter(INDEX_DIR_ID, FileParameter.FileType.INPUT_FILE);
-      if (config.grab(fileP)) {
+      if(config.grab(fileP)) {
         idir = fileP.getValue();
       }
     }
@@ -172,7 +172,8 @@ public class LuceneDatabase extends AbstractDatabase {
     protected LuceneDatabase makeInstance() {
       try {
         return new LuceneDatabase(FSDirectory.open(idir));
-      } catch (IOException e) {
+      }
+      catch(IOException e) {
         throw new AbortException("I/O error opening index.", e);
       }
     }

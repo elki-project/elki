@@ -39,7 +39,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -211,7 +212,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
         mm.put(score);
       }
     }
-    Relation<Double> scoreResult = new MaterializedRelation<>("One-Class SVM Decision", "svm-outlier", TypeUtil.DOUBLE, scores, ids);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("One-Class SVM Decision", "svm-outlier", scores, ids);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(scoreMeta, scoreResult);
   }

@@ -37,12 +37,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -50,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID, DoubleDistance> {
+public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID> {
   /**
    * Lucene search function.
    */
@@ -71,7 +70,7 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID, D
    * 
    * @param distanceQuery Distance query
    */
-  public LuceneDistanceRangeQuery(DistanceQuery<DBID, DoubleDistance> distanceQuery, IndexReader ir, DBIDRange ids) {
+  public LuceneDistanceRangeQuery(DistanceQuery<DBID> distanceQuery, IndexReader ir, DBIDRange ids) {
     super(distanceQuery);
     this.ids = ids;
     this.mlt = new MoreLikeThis(ir);
@@ -80,19 +79,20 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID, D
   }
 
   @Override
-  public DistanceDBIDList<DoubleDistance> getRangeForDBID(DBIDRef id, DoubleDistance range) {
+  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
     try {
       Query query = mlt.like(ids.getOffset(id));
-      ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDKNNList();
-      is.search(query, new DocumentsCollector(ids, result, range.doubleValue()));
+      ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
+      is.search(query, new DocumentsCollector(ids, result, range));
       return result;
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new AbortException("I/O error in lucene.", e);
     }
   }
 
   @Override
-  public DistanceDBIDList<DoubleDistance> getRangeForObject(DBID obj, DoubleDistance range) {
+  public DoubleDBIDList getRangeForObject(DBID obj, double range) {
     return getRangeForDBID(obj, range);
   }
 
@@ -120,7 +120,7 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID, D
     /**
      * Result collector.
      */
-    final private ModifiableDoubleDistanceDBIDList result;
+    final private ModifiableDoubleDBIDList result;
 
     /**
      * Threshold range.
@@ -134,7 +134,7 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID, D
      * @param result Result collection
      * @param range Radius
      */
-    public DocumentsCollector(DBIDRange ids, ModifiableDoubleDistanceDBIDList result, double range) {
+    public DocumentsCollector(DBIDRange ids, ModifiableDoubleDBIDList result, double range) {
       super();
       this.iter = ids.iter();
       this.result = result;
@@ -150,7 +150,7 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID, D
     public void collect(int docid) throws IOException {
       double score = scorer.score();
       double dist = (score > 0.) ? (1. / score) : Double.POSITIVE_INFINITY;
-      if (dist <= range) {
+      if(dist <= range) {
         iter.seek(docBase + docid);
         result.add(dist, iter);
       }

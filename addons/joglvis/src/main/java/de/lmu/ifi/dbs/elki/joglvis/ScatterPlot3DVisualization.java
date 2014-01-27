@@ -1,4 +1,26 @@
 package de.lmu.ifi.dbs.elki.joglvis;
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import javax.media.opengl.DebugGL2;
 import javax.media.opengl.GL;
@@ -11,7 +33,8 @@ import javax.swing.SwingUtilities;
 import com.jogamp.opengl.util.FPSAnimator;
 
 import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterData;
-import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterPlotOpenGL2Intel945;
+import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterPlot;
+import de.lmu.ifi.dbs.elki.joglvis.scatterplot.opengl2intel945.ScatterPlotOpenGL2Intel945;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 public class ScatterPlot3DVisualization implements GLEventListener {
@@ -23,7 +46,7 @@ public class ScatterPlot3DVisualization implements GLEventListener {
 
   SimpleCamera3D camera = new SimpleCamera3D();
 
-  ScatterPlotOpenGL2Intel945 scatter = new ScatterPlotOpenGL2Intel945();
+  ScatterPlot scatter = new ScatterPlotOpenGL2Intel945();
 
   public ScatterPlot3DVisualization(ScatterData data) {
     this.data = data;

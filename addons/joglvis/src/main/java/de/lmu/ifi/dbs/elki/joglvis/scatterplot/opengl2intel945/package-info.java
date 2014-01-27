@@ -1,4 +1,6 @@
-package de.lmu.ifi.dbs.elki.database.lucene;
+/**
+ * This version only requires OpenGL2 and can run on older Intel graphics boards.
+ */
 
 /*
  This file is part of ELKI:
@@ -22,27 +24,4 @@ package de.lmu.ifi.dbs.elki.database.lucene;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import org.apache.lucene.search.DefaultSimilarity;
-import org.apache.lucene.search.Similarity;
-
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-
-/**
- * Distance function, interfacing back into Lucene.
- * 
- * @author Erich Schubert
- */
-public class LuceneDistanceFunction extends AbstractDBIDDistanceFunction {
-  /**
-   * Lucene similarity.
-   */
-  Similarity sim = new DefaultSimilarity();
-
-  @Override
-  public double distance(DBIDRef id1, DBIDRef id2) {
-    // FIXME: how to compute the same similarity value that lucene uses?
-    throw new AbortException("Manual distance computations are not yet implemented!");
-  }
-}
+package de.lmu.ifi.dbs.elki.joglvis.scatterplot.opengl2intel945;
