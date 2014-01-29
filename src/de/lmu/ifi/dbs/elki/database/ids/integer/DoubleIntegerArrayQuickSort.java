@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -68,17 +69,8 @@ class DoubleIntegerArrayQuickSort {
    */
   private static void quickSort(double[] keys, int[] vals, final int start, final int end) {
     final int len = end - start;
-    if (len < INSERTION_THRESHOLD) {
-      // Classic insertion sort.
-      for (int i = start + 1; i < end; i++) {
-        for (int j = i; j > start; j--) {
-          if (keys[j] < keys[j - 1]) {
-            swap(keys, vals, j, j - 1);
-          } else {
-            break;
-          }
-        }
-      }
+    if(len < INSERTION_THRESHOLD) {
+      insertionSort(keys, vals, start, end);
       return;
     }
 
@@ -91,35 +83,7 @@ class DoubleIntegerArrayQuickSort {
     final int m5 = m4 + seventh;
 
     // Mixture of insertion and merge sort:
-    if (keys[m1] > keys[m2]) {
-      swap(keys, vals, m1, m2);
-    }
-    if (keys[m3] > keys[m4]) {
-      swap(keys, vals, m3, m4);
-    }
-    // Merge 1+2 and 3+4
-    if (keys[m2] > keys[m4]) {
-      swap(keys, vals, m2, m4);
-    }
-    if (keys[m1] > keys[m3]) {
-      swap(keys, vals, m1, m3);
-    }
-    if (keys[m2] > keys[m3]) {
-      swap(keys, vals, m2, m3);
-    }
-    // Insertion sort m5:
-    if (keys[m4] > keys[m5]) {
-      swap(keys, vals, m4, m5);
-      if (keys[m3] > keys[m4]) {
-        swap(keys, vals, m3, m4);
-        if (keys[m2] > keys[m3]) {
-          swap(keys, vals, m2, m3);
-          if (keys[m1] > keys[m1]) {
-            swap(keys, vals, m1, m2);
-          }
-        }
-      }
-    }
+    sort5(keys, vals, m1, m2, m3, m4, m5);
 
     // Move pivot to the front.
     double pivotkey = keys[m3];
@@ -132,14 +96,14 @@ class DoubleIntegerArrayQuickSort {
     int right = end - 1;
 
     // This is the classic QuickSort loop:
-    while (true) {
-      while (left <= right && keys[left] <= pivotkey) {
+    while(true) {
+      while(left <= right && keys[left] <= pivotkey) {
         left++;
       }
-      while (left <= right && pivotkey <= keys[right]) {
+      while(left <= right && pivotkey <= keys[right]) {
         right--;
       }
-      if (right <= left) {
+      if(right <= left) {
         break;
       }
       swap(keys, vals, left, right);
@@ -154,11 +118,87 @@ class DoubleIntegerArrayQuickSort {
     vals[right] = pivotval;
 
     // Recursion:
-    if (start + 1 < right) {
-      quickSort(keys, vals, start, right);
+    int lend = right;
+    // Avoid recursing on duplicates.
+    while (lend > start && keys[lend - 1] >= keys[right]) {
+      lend--;
     }
-    if (right + 2 < end) {
-      quickSort(keys, vals, right + 1, end);
+    if(start + 1 < lend) {
+      quickSort(keys, vals, start, lend);
+    }
+    int rstart = right + 1;
+    // Avoid recursing on duplicates.
+    while (rstart + 1 < end && keys[rstart] <= keys[right]) {
+      rstart++;
+    }
+    if(rstart + 1 < end) {
+      quickSort(keys, vals, rstart, end);
+    }
+  }
+
+  /**
+   * An explicit sort, for the five pivot candidates.
+   * 
+   * Note that this <em>must</em> only be used with
+   * {@code m1 < m2 < m3 < m4 < m5}.
+   * 
+   * @param keys Keys
+   * @param vals Values
+   * @param m1 Pivot candidate position
+   * @param m2 Pivot candidate position
+   * @param m3 Pivot candidate position
+   * @param m4 Pivot candidate position
+   * @param m5 Pivot candidate position
+   */
+  private static void sort5(double[] keys, int[] vals, final int m1, final int m2, final int m3, final int m4, final int m5) {
+    if(keys[m1] > keys[m2]) {
+      swap(keys, vals, m1, m2);
+    }
+    if(keys[m3] > keys[m4]) {
+      swap(keys, vals, m3, m4);
+    }
+    // Merge 1+2 and 3+4
+    if(keys[m2] > keys[m4]) {
+      swap(keys, vals, m2, m4);
+    }
+    if(keys[m1] > keys[m3]) {
+      swap(keys, vals, m1, m3);
+    }
+    if(keys[m2] > keys[m3]) {
+      swap(keys, vals, m2, m3);
+    }
+    // Insertion sort m5:
+    if(keys[m4] > keys[m5]) {
+      swap(keys, vals, m4, m5);
+      if(keys[m3] > keys[m4]) {
+        swap(keys, vals, m3, m4);
+        if(keys[m2] > keys[m3]) {
+          swap(keys, vals, m2, m3);
+          if(keys[m1] > keys[m1]) {
+            swap(keys, vals, m1, m2);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Sort via insertion sort.
+   * 
+   * @param keys Keys
+   * @param vals Values
+   * @param start Interval start
+   * @param end Interval end
+   */
+  private static void insertionSort(double[] keys, int[] vals, final int start, final int end) {
+    // Classic insertion sort.
+    for(int i = start + 1; i < end; i++) {
+      for(int j = i; j > start; j--) {
+        if(keys[j] >= keys[j - 1]) {
+          break;
+        }
+        swap(keys, vals, j, j - 1);
+      }
     }
   }
 
