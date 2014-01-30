@@ -380,7 +380,7 @@ public class ROC {
 
     @Override
     public boolean valid() {
-      return pos < vec.getDimensionality();
+      return pos < vec.getDimensionality() && pos >= 0;
     }
 
     @Override

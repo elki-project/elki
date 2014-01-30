@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -73,6 +72,7 @@ class DoubleIntegerArrayQuickSort {
       insertionSort(keys, vals, start, end);
       return;
     }
+    final int last = end - 1;
 
     // Choose pivots by looking at five candidates.
     final int seventh = (len >> 3) + (len >> 6) + 1;
@@ -92,12 +92,13 @@ class DoubleIntegerArrayQuickSort {
     vals[m3] = vals[start];
 
     // The interval to pivotize
-    int left = start + 1;
-    int right = end - 1;
+    int left = start + 1; // Without pivot
+    int right = last; // inclusive
 
     // This is the classic QuickSort loop:
     while(true) {
-      while(left <= right && keys[left] <= pivotkey) {
+      // Move duplicates to right partition, i.e. < here, <= below.
+      while(left <= right && keys[left] < pivotkey) {
         left++;
       }
       while(left <= right && pivotkey <= keys[right]) {
@@ -110,28 +111,24 @@ class DoubleIntegerArrayQuickSort {
       left++;
       right--;
     }
-
+    // right now points to the last element smaller than the pivot.
     // Move pivot back into the appropriate place
     keys[start] = keys[right];
     vals[start] = vals[right];
     keys[right] = pivotkey;
     vals[right] = pivotval;
 
-    // Recursion:
-    int lend = right;
-    // Avoid recursing on duplicates.
-    while (lend > start && keys[lend - 1] >= keys[right]) {
-      lend--;
-    }
-    if(start + 1 < lend) {
-      quickSort(keys, vals, start, lend);
+    // Recursion when more than one element only:
+    if(start + 1 < right) {
+      quickSort(keys, vals, start, right);
     }
     int rstart = right + 1;
-    // Avoid recursing on duplicates.
-    while (rstart + 1 < end && keys[rstart] <= keys[right]) {
+    // Avoid recursing on duplicates of the pivot:
+    while(rstart < last && keys[rstart] <= keys[right]) {
       rstart++;
     }
-    if(rstart + 1 < end) {
+    // Recurse when _more_ than 1 element only
+    if(rstart < last) {
       quickSort(keys, vals, rstart, end);
     }
   }

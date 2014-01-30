@@ -241,7 +241,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
 
     @Override
     public boolean valid() {
-      return pos < size;
+      return pos < size && pos >= 0;
     }
 
     @Override

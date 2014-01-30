@@ -60,7 +60,7 @@ public class ArrayListIter<O> implements ArrayIter {
 
   @Override
   public boolean valid() {
-    return pos < data.size();
+    return pos < data.size() && pos >= 0;
   }
 
   @Override

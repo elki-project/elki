@@ -133,7 +133,7 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
 
     @Override
     public boolean valid() {
-      return pos < size;
+      return pos < size && pos >= 0;
     }
 
     @Override

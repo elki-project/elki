@@ -173,51 +173,51 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBID
    * @apiviz.exclude
    */
   private class Itr implements DoubleDBIDListIter, IntegerDBIDArrayIter {
-    int offset = 0;
+    int pos = 0;
 
     @Override
     public boolean valid() {
-      return offset < size;
+      return pos < size && pos >= 0;
     }
 
     @Override
     public void advance() {
-      ++offset;
+      ++pos;
     }
 
     @Override
     public int getOffset() {
-      return offset;
+      return pos;
     }
 
     @Override
     public void advance(int count) {
-      offset += count;
+      pos += count;
     }
 
     @Override
     public void retract() {
-      offset--;
+      pos--;
     }
 
     @Override
     public void seek(int off) {
-      offset = off;
+      pos = off;
     }
 
     @Override
     public int internalGetIndex() {
-      return data[offset].internalGetIndex();
+      return data[pos].internalGetIndex();
     }
 
     @Override
     public double doubleValue() {
-      return data[offset].doubleValue();
+      return data[pos].doubleValue();
     }
 
     @Override
     public DoubleDBIDPair getPair() {
-      return data[offset];
+      return data[pos];
     }
   }
 }

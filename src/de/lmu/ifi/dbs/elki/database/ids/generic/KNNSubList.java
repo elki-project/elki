@@ -131,7 +131,7 @@ public class KNNSubList implements KNNList {
 
     @Override
     public boolean valid() {
-      return pos < size;
+      return pos < size && pos >= 0;
     }
 
     @Override

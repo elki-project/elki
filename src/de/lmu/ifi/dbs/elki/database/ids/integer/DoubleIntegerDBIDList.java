@@ -241,7 +241,7 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
     /**
      * Current offset.
      */
-    int offset = 0;
+    int pos = 0;
 
     /**
      * Constructor.
@@ -252,47 +252,47 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
 
     @Override
     public boolean valid() {
-      return offset < size;
+      return pos < size && pos >= 0;
     }
 
     @Override
     public void advance() {
-      ++offset;
+      ++pos;
     }
 
     @Override
     public int getOffset() {
-      return offset;
+      return pos;
     }
 
     @Override
     public void advance(int count) {
-      offset += count;
+      pos += count;
     }
 
     @Override
     public void retract() {
-      --offset;
+      --pos;
     }
 
     @Override
     public void seek(int off) {
-      offset = off;
+      pos = off;
     }
 
     @Override
     public int internalGetIndex() {
-      return ids[offset];
+      return ids[pos];
     }
 
     @Override
     public double doubleValue() {
-      return dists[offset];
+      return dists[pos];
     }
 
     @Override
     public DoubleDBIDPair getPair() {
-      return new DoubleIntegerDBIDPair(dists[offset], ids[offset]);
+      return new DoubleIntegerDBIDPair(dists[pos], ids[pos]);
     }
   }
 }
