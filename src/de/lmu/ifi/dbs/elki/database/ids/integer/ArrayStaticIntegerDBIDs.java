@@ -123,23 +123,27 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
     }
 
     @Override
-    public void advance() {
+    public Itr advance() {
       pos++;
+      return this;
     }
 
     @Override
-    public void advance(int count) {
+    public Itr advance(int count) {
       pos += 0;
+      return this;
     }
 
     @Override
-    public void retract() {
+    public Itr retract() {
       pos--;
+      return this;
     }
 
     @Override
-    public void seek(int off) {
+    public Itr seek(int off) {
       pos = off;
+      return this;
     }
 
     @Override
@@ -262,8 +266,9 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
       }
 
       @Override
-      public void advance() {
+      public SliceItr advance() {
         ++pos;
+        return this;
       }
 
       @Override
@@ -272,18 +277,21 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
       }
 
       @Override
-      public void advance(int count) {
+      public SliceItr advance(int count) {
         pos += count;
+        return this;
       }
 
       @Override
-      public void retract() {
+      public SliceItr retract() {
         --pos;
+        return this;
       }
 
       @Override
-      public void seek(int off) {
+      public SliceItr seek(int off) {
         pos = begin + off;
+        return this;
       }
 
       @Override

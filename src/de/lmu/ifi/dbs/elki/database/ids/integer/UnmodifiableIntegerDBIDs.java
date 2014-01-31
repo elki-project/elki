@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
@@ -107,8 +108,9 @@ public class UnmodifiableIntegerDBIDs implements StaticDBIDs, IntegerDBIDs {
     }
 
     @Override
-    public void advance() {
+    public DBIDIter advance() {
       it.advance();
+      return this;
     }
 
     @Override

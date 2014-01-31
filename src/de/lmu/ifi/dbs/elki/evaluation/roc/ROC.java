@@ -163,8 +163,9 @@ public class ROC {
     }
 
     @Override
-    public void advance() {
+    public SimpleAdapter advance() {
       iter.advance();
+      return this;
     }
 
     @Override
@@ -230,9 +231,10 @@ public class ROC {
     }
 
     @Override
-    public void advance() {
+    public DistanceResultAdapter advance() {
       prevDist = iter.doubleValue();
       iter.advance();
+      return this;
     }
 
     @Override
@@ -303,9 +305,10 @@ public class ROC {
     }
 
     @Override
-    public void advance() {
+    public OutlierScoreAdapter advance() {
       prev = scores.doubleValue(iter);
       iter.advance();
+      return this;
     }
 
     @Override
@@ -384,8 +387,9 @@ public class ROC {
     }
 
     @Override
-    public void advance() {
+    public DecreasingVectorIter advance() {
       ++pos;
+      return this;
     }
 
     @Override
@@ -399,18 +403,21 @@ public class ROC {
     }
 
     @Override
-    public void advance(int count) {
+    public DecreasingVectorIter advance(int count) {
       pos += count;
+      return this;
     }
 
     @Override
-    public void retract() {
+    public DecreasingVectorIter retract() {
       pos--;
+      return this;
     }
 
     @Override
-    public void seek(int off) {
+    public DecreasingVectorIter seek(int off) {
       pos = off;
+      return this;
     }
   }
 
@@ -467,8 +474,9 @@ public class ROC {
     }
 
     @Override
-    public void advance() {
+    public IncreasingVectorIter advance() {
       ++pos;
+      return this;
     }
 
     @Override
@@ -482,18 +490,21 @@ public class ROC {
     }
 
     @Override
-    public void advance(int count) {
+    public IncreasingVectorIter advance(int count) {
       pos += count;
+      return this;
     }
 
     @Override
-    public void retract() {
+    public IncreasingVectorIter retract() {
       pos--;
+      return this;
     }
 
     @Override
-    public void seek(int off) {
+    public IncreasingVectorIter seek(int off) {
       pos = off;
+      return this;
     }
   }
 

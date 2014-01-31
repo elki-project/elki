@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.index.vafile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -35,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
@@ -60,7 +60,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Vector-approximation file (VAFile)
@@ -363,7 +362,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
       DoubleMaxHeap minMaxHeap = new DoubleMaxHeap(k + 1);
       double minMaxDist = Double.POSITIVE_INFINITY;
       // Candidates with minDist <= kth maxDist
-      ArrayList<DoubleObjPair<DBID>> candidates = new ArrayList<>(vectorApprox.size());
+      ModifiableDoubleDBIDList candidates = DBIDUtil.newDistanceDBIDList(vectorApprox.size());
 
       // Count a VA file scan
       scans += 1;
@@ -378,7 +377,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
         if(minDist > minMaxDist) {
           continue;
         }
-        candidates.add(new DoubleObjPair<>(minDist, va.id));
+        candidates.add(minDist, va.id);
 
         // Update candidate pruning heap
         minMaxHeap.add(maxDist, k);
@@ -387,25 +386,25 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
         }
       }
       // sort candidates by lower bound (minDist)
-      Collections.sort(candidates);
+      candidates.sort();
 
       // refinement step
       KNNHeap result = DBIDUtil.newHeap(k);
 
       // log.fine("candidates size " + candidates.size());
       // retrieve accurate distances
-      for(DoubleObjPair<DBID> va : candidates) {
+      for(DoubleDBIDListIter iter = candidates.iter(); iter.valid(); iter.advance()) {
         // Stop when we are sure to have all elements
         if(result.size() >= k) {
           double kDist = result.getKNNDistance();
-          if(va.first > kDist) {
+          if(iter.doubleValue() > kDist) {
             break;
           }
         }
 
         // refine the next element
-        final double dist = refine(va.second, query);
-        result.insert(dist, va.second);
+        final double dist = refine(iter, query);
+        result.insert(dist, iter);
       }
       if(LOG.isDebuggingFinest()) {
         LOG.finest("query = (" + query + ")");

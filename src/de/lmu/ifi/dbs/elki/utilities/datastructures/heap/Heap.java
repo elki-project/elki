@@ -442,8 +442,9 @@ public class Heap<E> {
     }
 
     @Override
-    public void advance() {
+    public UnorderedIter advance() {
       pos++;
+      return this;
     }
 
     /**

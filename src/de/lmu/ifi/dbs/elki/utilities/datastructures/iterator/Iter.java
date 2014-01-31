@@ -62,10 +62,12 @@ public interface Iter {
    * 
    * @return a <code>boolean</code> value, whether the position is valid.
    */
-  public boolean valid();
+  boolean valid();
 
   /**
    * Moves the iterator forward to the next entry.
+   * 
+   * @return The iterator itself.
    */
-  public void advance();
+  Iter advance();
 }

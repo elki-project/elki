@@ -39,11 +39,11 @@ public class TestSortingDuplicates implements JUnit4Test {
   public void testDuplicateKeys() {
     // We need an ide, but no real data.
     DBID id = DBIDUtil.importInteger(1);
-    int size = 10000;
+    int size = 100000;
 
     ModifiableDoubleDBIDList list = DBIDUtil.newDistanceDBIDList(size);
     for(int i = 0; i < size; i++) {
-      double distance = 0.;
+      double distance = 0. + (i % 2);
       list.add(distance, id);
     }
     list.sort();

@@ -109,7 +109,7 @@ public class Tokenizer implements Iter {
   }
 
   @Override
-  public void advance() {
+  public Tokenizer advance() {
     char inquote = isQuote(index);
     while(m.find()) {
       // Quoted code path vs. regular code path
@@ -119,7 +119,7 @@ public class Tokenizer implements Iter {
           this.start = index + 1;
           this.end = m.start() - 1;
           this.index = m.end();
-          return;
+          return this;
         }
         continue;
       }
@@ -127,7 +127,7 @@ public class Tokenizer implements Iter {
         this.start = index;
         this.end = m.start();
         this.index = m.end();
-        return;
+        return this;
       }
     }
     // Add tail after last separator.
@@ -144,6 +144,7 @@ public class Tokenizer implements Iter {
         LOG.warning("Invalid quoted line in input: no closing quote found in: " + input);
       }
     }
+    return this;
   }
 
   /**

@@ -109,8 +109,9 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
     }
 
     @Override
-    public void advance() {
+    public DBIDIter advance() {
       it.advance();
+      return this;
     }
 
     @Override

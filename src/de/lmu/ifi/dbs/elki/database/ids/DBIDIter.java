@@ -54,9 +54,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * </ul>
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.landmark
  */
 public interface DBIDIter extends DBIDRef, Iter {
-  // Empty - use as DBIDRef or Iter
+  @Override
+  DBIDIter advance();
 }

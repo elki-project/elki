@@ -184,8 +184,9 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
     }
 
     @Override
-    public void advance() {
+    public IntegerDBIDMIter advance() {
       it.advance();
+      return this;
     }
 
     @Override
@@ -237,8 +238,9 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
       }
 
       @Override
-      public void advance() {
+      public Iter advance() {
         this._index = nextIndex();
+        return this;
       }
 
       @Override

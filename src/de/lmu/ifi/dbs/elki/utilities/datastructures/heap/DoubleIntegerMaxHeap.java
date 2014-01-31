@@ -249,8 +249,9 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
     }
 
     @Override
-    public void advance() {
+    public de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter advance() {
       pos++;
+      return this;
     }
 
     @Override

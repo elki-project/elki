@@ -64,8 +64,9 @@ public class ArrayListIter<O> implements ArrayIter {
   }
 
   @Override
-  public void advance() {
+  public ArrayIter advance() {
     pos++;
+    return this;
   }
 
   @Override
@@ -74,18 +75,21 @@ public class ArrayListIter<O> implements ArrayIter {
   }
 
   @Override
-  public void advance(int count) {
+  public ArrayIter advance(int count) {
     pos += count;
+    return this;
   }
 
   @Override
-  public void retract() {
+  public ArrayIter retract() {
     pos--;
+    return this;
   }
 
   @Override
-  public void seek(int off) {
+  public ArrayIter seek(int off) {
     pos = off;
+    return this;
   }
 
   /**

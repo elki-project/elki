@@ -353,8 +353,9 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
       }
 
       @Override
-      public void advance() {
+      public Iter<O> advance() {
         pos++;
+        return this;
       }
 
       @SuppressWarnings("unchecked")
@@ -380,8 +381,9 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
       }
 
       @Override
-      public void advance() {
+      public Iter<O> advance() {
         pos++;
+        return this;
       }
 
       @SuppressWarnings("unchecked")
@@ -425,7 +427,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     }
 
     @Override
-    public void advance() {
+    public Iter<O> advance() {
       if (subiter == null) { // Not yet descended
         assert (childiter.valid());
         subiter = iterDescendants(childiter.get());
@@ -433,11 +435,12 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
         subiter.advance();
       }
       if (subiter.valid()) {
-        return;
+        return this;
       }
       // Proceed to next child.
       childiter.advance();
       subiter = null;
+      return this;
     }
 
     @Override
@@ -485,7 +488,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     }
 
     @Override
-    public void advance() {
+    public Iter<O> advance() {
       if (subiter == null) { // Not yet descended
         assert (parentiter.valid());
         subiter = iterAncestors(parentiter.get());
@@ -493,11 +496,12 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
         subiter.advance();
       }
       if (subiter.valid()) {
-        return;
+        return this;
       }
       // Proceed to next child.
       parentiter.advance();
       subiter = null;
+      return this;
     }
 
     @Override
@@ -544,12 +548,13 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     }
 
     @Override
-    public void advance() {
+    public Iter<O> advance() {
       if (iter.hasNext()) {
         cur = iter.next();
       } else {
         cur = null;
       }
+      return this;
     }
 
     @Override
@@ -568,7 +573,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     }
 
     @Override
-    public void advance() {
+    public Iter<Object> advance() {
       throw new UnsupportedOperationException("Empty iterators must not be advanced.");
     }
 

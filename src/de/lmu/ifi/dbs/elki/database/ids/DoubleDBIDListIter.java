@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -54,4 +55,16 @@ public interface DoubleDBIDListIter extends DBIDArrayIter {
    * @return object pair
    */
   public DoubleDBIDPair getPair();
+
+  @Override
+  DoubleDBIDListIter advance();
+
+  @Override
+  DoubleDBIDListIter advance(int count);
+
+  @Override
+  DoubleDBIDListIter retract();
+
+  @Override
+  DoubleDBIDListIter seek(int off);
 }

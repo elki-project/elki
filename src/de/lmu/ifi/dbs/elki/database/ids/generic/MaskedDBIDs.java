@@ -139,8 +139,9 @@ public class MaskedDBIDs implements DBIDs {
     }
 
     @Override
-    public void advance() {
+    public DBIDIter advance() {
       pos = bits.nextSetBit(pos + 1);
+      return this;
     }
 
     @Override
@@ -182,8 +183,9 @@ public class MaskedDBIDs implements DBIDs {
     }
 
     @Override
-    public void advance() {
+    public DBIDIter advance() {
       pos = bits.nextClearBit(pos + 1);
+      return this;
     }
 
     @Override

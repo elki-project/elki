@@ -113,5 +113,8 @@ public interface Hierarchy<O> {
      * @return Current object
      */
     O get();
+
+    @Override
+    Iter<O> advance();
   }
 }

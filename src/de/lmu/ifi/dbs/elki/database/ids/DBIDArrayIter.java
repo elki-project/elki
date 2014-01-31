@@ -30,5 +30,15 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
  * @author Erich Schubert
  */
 public interface DBIDArrayIter extends DBIDIter, ArrayIter {
-  // Nothing added - see {@link ArrayIter}!
+  @Override
+  DBIDArrayIter advance();
+
+  @Override
+  DBIDArrayIter advance(int count);
+
+  @Override
+  DBIDArrayIter retract();
+
+  @Override
+  DBIDArrayIter seek(int off);
 }

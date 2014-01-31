@@ -245,8 +245,9 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
     }
 
     @Override
-    public void advance() {
+    public Itr advance() {
       pos++;
+      return this;
     }
 
     @Override
@@ -265,18 +266,21 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
     }
 
     @Override
-    public void advance(int count) {
+    public Itr advance(int count) {
       pos += count;
+      return this;
     }
 
     @Override
-    public void retract() {
+    public Itr retract() {
       --pos;
+      return this;
     }
 
     @Override
-    public void seek(int off) {
+    public Itr seek(int off) {
       pos = off;
+      return this;
     }
   }
 }

@@ -161,12 +161,13 @@ public class Clustering<M extends Model> extends BasicResult {
       }
 
       @Override
-      public void advance() {
+      public Iter<Cluster<M>> advance() {
         if (iter.hasNext()) {
           cur = iter.next();
         } else {
           cur = null;
         }
+        return this;
       }
 
       @Override

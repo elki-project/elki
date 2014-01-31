@@ -99,8 +99,9 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     }
 
     @Override
-    public void advance() {
+    public EmptyDBIDIterator advance() {
       assert (false) : "Misplaced call to advance()";
+      return this;
     }
 
     @Override
@@ -122,18 +123,21 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     }
 
     @Override
-    public void advance(int count) {
+    public EmptyDBIDIterator advance(int count) {
       assert (count != 0) : "Misplaced call to advance()";
+      return this;
     }
 
     @Override
-    public void retract() {
+    public EmptyDBIDIterator retract() {
       assert (false) : "Misplaced call to retract()";
+      return this;
     }
 
     @Override
-    public void seek(int off) {
+    public EmptyDBIDIterator seek(int off) {
       // Ignore
+      return this;
     }
 
     @Override

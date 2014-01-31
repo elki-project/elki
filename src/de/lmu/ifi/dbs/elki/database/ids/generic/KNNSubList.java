@@ -60,7 +60,7 @@ public class KNNSubList implements KNNList {
     this.inner = inner;
     this.k = k;
     // Compute list size
-    if (k < inner.getK()){
+    if(k < inner.getK()) {
       DoubleDBIDPair dist = inner.get(k);
       int i = k;
       while(i + 1 < inner.size()) {
@@ -70,7 +70,8 @@ public class KNNSubList implements KNNList {
         i++;
       }
       size = i;
-    } else {
+    }
+    else {
       size = inner.size();
     }
   }
@@ -135,8 +136,9 @@ public class KNNSubList implements KNNList {
     }
 
     @Override
-    public void advance() {
+    public Itr advance() {
       pos++;
+      return this;
     }
 
     @Override
@@ -160,18 +162,21 @@ public class KNNSubList implements KNNList {
     }
 
     @Override
-    public void advance(int count) {
+    public Itr advance(int count) {
       pos += count;
+      return this;
     }
 
     @Override
-    public void retract() {
+    public Itr retract() {
       --pos;
+      return this;
     }
 
     @Override
-    public void seek(int off) {
+    public Itr seek(int off) {
       pos = off;
+      return this;
     }
   }
 }

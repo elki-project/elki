@@ -249,8 +249,9 @@ public class DoubleLongMinHeap implements DoubleLongHeap {
     }
 
     @Override
-    public void advance() {
+    public de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter advance() {
       pos++;
+      return this;
     }
 
     @Override

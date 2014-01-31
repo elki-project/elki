@@ -131,8 +131,9 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
     }
 
     @Override
-    public void advance() {
+    public DBIDArrayIter advance() {
       it.advance();
+      return this;
     }
 
     @Override
@@ -141,18 +142,21 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
     }
 
     @Override
-    public void advance(int count) {
+    public DBIDArrayIter advance(int count) {
       it.advance(count);
+      return this;
     }
 
     @Override
-    public void retract() {
+    public DBIDArrayIter retract() {
       it.retract();
+      return this;
     }
 
     @Override
-    public void seek(int off) {
+    public DBIDArrayIter seek(int off) {
       it.seek(off);
+      return this;
     }
 
     @Override

@@ -193,8 +193,9 @@ public abstract class AbstractStaticHistogram implements Histogram {
     }
 
     @Override
-    public void advance() {
+    public Iter advance() {
       bin++;
+      return this;
     }
 
     @Override
@@ -203,18 +204,21 @@ public abstract class AbstractStaticHistogram implements Histogram {
     }
 
     @Override
-    public void advance(int count) {
+    public Iter advance(int count) {
       bin += count;
+      return this;
     }
 
     @Override
-    public void retract() {
+    public Iter retract() {
       bin--;
+      return this;
     }
 
     @Override
-    public void seek(int off) {
+    public Iter seek(int off) {
       bin = off;
+      return this;
     }
   }
 }

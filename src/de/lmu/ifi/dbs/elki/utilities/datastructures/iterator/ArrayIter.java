@@ -31,29 +31,36 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
  * @apiviz.excludeSubtypes
  */
 public interface ArrayIter extends Iter {
-  /**
-   * Get current iterator offset.
-   * 
-   * @return Iterator position
-   */
-  public int getOffset();
+  @Override
+  ArrayIter advance();
 
   /**
    * Moves the iterator forward or backward by the given offset.
    * 
    * @param count offset to move forward or backwards
+   * @return Iterator
    */
-  public void advance(int count);
+  ArrayIter advance(int count);
 
   /**
    * Moves the iterator backward to the previous entry.
+   * 
+   * @return Iterator
    */
-  public void retract();
+  ArrayIter retract();
 
   /**
    * Moves the iterator to the given position
    * 
    * @param off Seek offset
+   * @return Iterator
    */
-  public void seek(int off);
+  ArrayIter seek(int off);
+
+  /**
+   * Get current iterator offset.
+   * 
+   * @return Iterator position
+   */
+  int getOffset();
 }
