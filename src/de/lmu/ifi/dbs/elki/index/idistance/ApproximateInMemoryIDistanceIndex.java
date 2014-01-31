@@ -346,7 +346,7 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
         while(true) {
           double kdist = heap.getKNNDistance();
           // Handle NaN carefully.
-          if(kdist < Double.POSITIVE_INFINITY && !(lbfwd <= kdist) && !(lbbwd <= kdist)) {
+          if(!(lbfwd <= kdist) && !(lbbwd <= kdist)) {
             break;
           }
           // Careful: NaN handling: not NaN and not worse than fwd (may be NaN).
