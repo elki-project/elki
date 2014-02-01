@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -60,17 +59,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 
 /**
- * Approximate In-memory iDistance index, using a reference point embedding.
+ * In-memory iDistance index, a metric indexing method using a reference point
+ * embedding.
  * 
- * <b>Important note:</b> this currently is an approximative index using
- * incremental computation. The original publication discusses an exact indexing
- * method based on repeated radius queries. As such, we use a substantially
- * different but likely faster query strategy. We also do not use a B+-tree as
+ * <b>Important note:</b> we are currently using a different query strategy. The
+ * original publication discusses queries based on repeated <em>radius</em>
+ * queries. We use a strategy based on shrinking spheres, iteratively refined
+ * starting with the closes reference point. We also do not use a B+-tree as
  * data structure, but simple in-memory lists. Therefore, we cannot report page
  * accesses needed.
- * 
- * <b>Important note:</b> the current implementation <em>may</em> return less
- * than k neighbors, if you use many reference points.
  * 
  * Feel free to contribute improved query strategies. All the code is
  * essentially here, you only need to query every reference point list, not just
@@ -95,11 +92,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @param <O> Object type
  */
 @Reference(authors = "C. Yu, B. C. Ooi, K. L. Tan, H. V. Jagadish", title = "Indexing the distance: An efficient method to knn processing", booktitle = "In Proceedings of the 27th International Conference on Very Large Data Bases", url = "http://www.vldb.org/conf/2001/P421.pdf")
-public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implements RangeIndex<O>, KNNIndex<O> {
+public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(ApproximateInMemoryIDistanceIndex.class);
+  private static final Logging LOG = Logging.getLogger(InMemoryIDistanceIndex.class);
 
   /**
    * Distance query.
@@ -114,7 +111,7 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
   /**
    * Number of reference points.
    */
-  private int k;
+  private int numref;
 
   /**
    * Reference points.
@@ -138,13 +135,13 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
    * @param relation Data relation
    * @param distance Distance
    * @param initialization Initialization method
-   * @param k Number of reference points
+   * @param numref Number of reference points
    */
-  public ApproximateInMemoryIDistanceIndex(Relation<O> relation, DistanceQuery<O> distance, KMedoidsInitialization<O> initialization, int k) {
+  public InMemoryIDistanceIndex(Relation<O> relation, DistanceQuery<O> distance, KMedoidsInitialization<O> initialization, int numref) {
     super(relation);
     this.distanceQuery = distance;
     this.initialization = initialization;
-    this.k = k;
+    this.numref = numref;
     if(!distance.getDistanceFunction().isMetric()) {
       LOG.warning("iDistance assumes metric distance functions.\n" //
           + distance.getDistanceFunction().getClass() + " does not report itself as metric.\n" //
@@ -154,7 +151,7 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
 
   @Override
   public void initialize() {
-    referencepoints = DBIDUtil.ensureArray(initialization.chooseInitialMedoids(k, distanceQuery));
+    referencepoints = DBIDUtil.ensureArray(initialization.chooseInitialMedoids(numref, distanceQuery));
     final int k = referencepoints.size(); // should be the same k anyway.
     index = new ModifiableDoubleDBIDList[k];
     for(int i = 0; i < k; i++) {
@@ -195,13 +192,7 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
       }
       return null;
     }
-    for(Object hint : hints) {
-      // Approximative querys only, for now. (TODO)
-      if(DatabaseQuery.HINT_EXACT.equals(hint)) {
-        return null;
-      }
-    }
-    return new ApproximateIDistanceKNNQuery(distanceQuery);
+    return new IDistanceKNNQuery(distanceQuery);
   }
 
   @Override
@@ -248,12 +239,12 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
   public void logStatistics() {
     super.logStatistics();
     MeanVarianceMinMax mm = new MeanVarianceMinMax();
-    for(int i = 0; i < k; i++) {
+    for(int i = 0; i < index.length; i++) {
       mm.put(index[i].size());
     }
-    LOG.statistics(new LongStatistic(ApproximateInMemoryIDistanceIndex.class.getName() + ".size.min", (int) mm.getMin()));
-    LOG.statistics(new DoubleStatistic(ApproximateInMemoryIDistanceIndex.class.getName() + ".size.mean", mm.getMean()));
-    LOG.statistics(new LongStatistic(ApproximateInMemoryIDistanceIndex.class.getName() + ".size.max", (int) mm.getMax()));
+    LOG.statistics(new LongStatistic(InMemoryIDistanceIndex.class.getName() + ".size.min", (int) mm.getMin()));
+    LOG.statistics(new DoubleStatistic(InMemoryIDistanceIndex.class.getName() + ".size.mean", mm.getMean()));
+    LOG.statistics(new LongStatistic(InMemoryIDistanceIndex.class.getName() + ".size.max", (int) mm.getMax()));
   }
 
   /**
@@ -285,19 +276,23 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
    */
   protected static void binarySearch(ModifiableDoubleDBIDList index, DoubleDBIDListIter iter, double val) {
     // Binary search. TODO: move this into the DoubleDBIDList class.
-    int left = 0, right = index.size() - 1;
-    while(left <= right) {
+    int left = 0, right = index.size();
+    while(left < right) {
       final int mid = (left + right) >>> 1;
       final double curd = iter.seek(mid).doubleValue();
       if(val < curd) {
-        right = mid - 1;
+        right = mid;
       }
       else if(val > curd) {
         left = mid + 1;
       }
       else {
+        left = mid;
         break;
       }
+    }
+    if(left >= index.size()) {
+      --left;
     }
     iter.seek(left);
   }
@@ -309,13 +304,13 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
    * 
    * @apiviz.exclude
    */
-  protected class ApproximateIDistanceKNNQuery extends AbstractRefiningIndex<O>.AbstractKNNQuery {
+  protected class IDistanceKNNQuery extends AbstractRefiningIndex<O>.AbstractKNNQuery {
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query
      */
-    public ApproximateIDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
+    public IDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
       super(distanceQuery);
     }
 
@@ -327,44 +322,40 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
 
       for(DoubleIntPair pair : priority) {
         final ModifiableDoubleDBIDList nindex = index[pair.second];
-        final double bestd = pair.first;
+        final double refd = pair.first;
 
         final DoubleDBIDListIter ifwd = nindex.iter(), ibwd = nindex.iter();
-        binarySearch(nindex, ibwd, bestd);
+        binarySearch(nindex, ibwd, refd);
         ifwd.seek(ibwd.getOffset() + 1);
-        // LOG.debug((ibwd.valid() ? ibwd.doubleValue() : 0.) + " <= " + bestd + " <= " + (ifwd.valid() ? ifwd.doubleValue() : Double.POSITIVE_INFINITY));
 
         // This assumes a metric, as we exploit triangle inequality:
         // Lower bound for candidates further from the reference object:
-        // d(query, reference) <= d(query, candidate) + d(candidate, reference)
-        // d(query, reference) - d(candidate, reference) <= d(query, candidate)
-        double lbfwd = ifwd.valid() ? (bestd - ifwd.doubleValue()) : Double.NaN;
-        // Lower bound for candidates closer to the reference object:
         // d(candidate, reference) <= d(candidate, query) + d(query, reference)
         // d(candidate, reference) - d(query, reference) <= d(candidate, query)
-        double lbbwd = ibwd.valid() ? (ibwd.doubleValue() - bestd) : Double.NaN;
+        double lbfwd = ifwd.valid() ? Math.abs(ifwd.doubleValue() - refd) : Double.NaN;
+        // Lower bound for candidates closer to the reference object:
+        // d(query, reference) <= d(query, candidate) + d(candidate, reference)
+        // d(query, reference) - d(candidate, reference) <= d(query, candidate)
+        double lbbwd = ibwd.valid() ? Math.abs(ibwd.doubleValue() - refd) : Double.NaN;
         while(true) {
-          double kdist = heap.getKNNDistance();
+          final double kdist = heap.getKNNDistance();
           // Handle NaN carefully.
           if(!(lbfwd <= kdist) && !(lbbwd <= kdist)) {
             break;
           }
           // Careful: NaN handling: not NaN and not worse than fwd (may be NaN).
-          if(lbfwd <= kdist) {
+          if(lbfwd <= kdist && !(lbfwd > lbbwd)) {
             heap.insert(refine(ifwd, obj), ifwd);
             // Advance iterator:
             ifwd.advance();
-            lbfwd = ifwd.valid() ? (bestd - ifwd.doubleValue()) : Double.NaN;
+            lbfwd = ifwd.valid() ? Math.abs(ifwd.doubleValue() - refd) : Double.NaN;
           }
-          if(lbbwd <= kdist) {
+          if(lbbwd <= kdist && !(lbbwd > lbfwd)) {
             heap.insert(refine(ibwd, obj), ibwd);
             // Retract iterator:
             ibwd.retract();
-            lbbwd = ibwd.valid() ? (ibwd.doubleValue() - bestd) : Double.NaN;
+            lbbwd = ibwd.valid() ? Math.abs(ibwd.doubleValue() - refd) : Double.NaN;
           }
-        }
-        if(heap.size() >= k) {
-          break; // Stop searching
         }
       }
 
@@ -395,38 +386,38 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
       ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
       for(DoubleIntPair pair : priority) {
         final ModifiableDoubleDBIDList nindex = index[pair.second];
-        final double bestd = pair.first;
+        final double refd = pair.first;
 
         DoubleDBIDListIter ifwd = nindex.iter(), ibwd = nindex.iter();
-        binarySearch(nindex, ifwd, bestd);
-        ibwd.seek(ifwd.getOffset() + 1);
+        binarySearch(nindex, ibwd, refd);
+        ifwd.seek(ibwd.getOffset() + 1);
 
         // This assumes a metric, as we exploit triangle inequality:
         // Lower bound for candidates further from the reference object:
         // d(query, reference) <= d(query, candidate) + d(candidate, reference)
         // d(query, reference) - d(candidate, reference) <= d(query, candidate)
-        double lbfwd = ifwd.valid() ? (bestd - ifwd.doubleValue()) : Double.NaN;
+        double lbfwd = ifwd.valid() ? Math.abs(ifwd.doubleValue() - refd) : Double.NaN;
         // Lower bound for candidates closer to the reference object:
         // d(candidate, reference) <= d(candidate, query) + d(query, reference)
         // d(candidate, reference) - d(query, reference) <= d(candidate, query)
-        double lbbwd = ibwd.valid() ? (ibwd.doubleValue() - bestd) : Double.NaN;
+        double lbbwd = ibwd.valid() ? Math.abs(ibwd.doubleValue() - refd) : Double.NaN;
         while(true) {
           // Handle NaN carefully.
           if(!(lbfwd <= range) && !(lbbwd <= range)) {
             break;
           }
           // Careful: NaN handling: not NaN and not worse than fwd (may be NaN).
-          if(lbfwd == lbfwd && !(lbfwd > lbbwd)) {
+          if(lbfwd <= range) {
             result.add(refine(ifwd, obj), ifwd);
             // Advance iterator:
             ifwd.advance();
-            lbfwd = ifwd.valid() ? (bestd - ifwd.doubleValue()) : Double.NaN;
+            lbfwd = ifwd.valid() ? Math.abs(ifwd.doubleValue() - refd) : Double.NaN;
           }
-          if(lbbwd == lbbwd && !(lbbwd > lbfwd)) {
+          if(lbbwd <= range) {
             result.add(refine(ibwd, obj), ibwd);
             // Retract iterator:
             ibwd.retract();
-            lbbwd = ibwd.valid() ? (ibwd.doubleValue() - bestd) : Double.NaN;
+            lbbwd = ibwd.valid() ? Math.abs(ibwd.doubleValue() - refd) : Double.NaN;
           }
         }
       }
@@ -444,7 +435,7 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
    * 
    * @param <V> Data type.
    */
-  public static class Factory<V> implements IndexFactory<V, ApproximateInMemoryIDistanceIndex<V>> {
+  public static class Factory<V> implements IndexFactory<V, InMemoryIDistanceIndex<V>> {
     /**
      * Distance function to use.
      */
@@ -475,8 +466,8 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
     }
 
     @Override
-    public ApproximateInMemoryIDistanceIndex<V> instantiate(Relation<V> relation) {
-      return new ApproximateInMemoryIDistanceIndex<>(relation, distance.instantiate(relation), initialization, k);
+    public InMemoryIDistanceIndex<V> instantiate(Relation<V> relation) {
+      return new InMemoryIDistanceIndex<>(relation, distance.instantiate(relation), initialization, k);
     }
 
     @Override
@@ -545,8 +536,8 @@ public class ApproximateInMemoryIDistanceIndex<O> extends AbstractRefiningIndex<
       }
 
       @Override
-      protected ApproximateInMemoryIDistanceIndex.Factory<V> makeInstance() {
-        return new ApproximateInMemoryIDistanceIndex.Factory<>(distance, initialization, k);
+      protected InMemoryIDistanceIndex.Factory<V> makeInstance() {
+        return new InMemoryIDistanceIndex.Factory<>(distance, initialization, k);
       }
     }
   }
