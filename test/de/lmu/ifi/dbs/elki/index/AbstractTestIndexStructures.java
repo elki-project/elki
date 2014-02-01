@@ -25,9 +25,6 @@ package de.lmu.ifi.dbs.elki.index;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-
-import org.junit.Test;
-
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -38,25 +35,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeQuery;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile;
-import de.lmu.ifi.dbs.elki.index.vafile.VAFile;
-import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -70,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * 
  * @author Erich Schubert
  */
-public class TestIndexStructures implements JUnit4Test {
+public abstract class AbstractTestIndexStructures implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 
@@ -92,93 +74,11 @@ public class TestIndexStructures implements JUnit4Test {
   double eps = 0.21247795391113142;
 
   /**
-   * Test exact query, also to validate the test is correct.
-   */
-  @Test
-  public void testExact() {
-    ListParameterization params = new ListParameterization();
-    testFileBasedDatabaseConnection(params, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
-  }
-
-  /**
-   * Test {@link MTree} using a file based database connection.
-   */
-  @Test
-  public void testMetrical() {
-    ListParameterization metparams = new ListParameterization();
-    metparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, MTreeFactory.class);
-    metparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(metparams, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
-  }
-
-  /**
-   * Test {@link RStarTree} using a file based database connection.
-   */
-  @Test
-  public void testRStarTree() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-  }
-
-  /**
-   * Test {@link VAFile} using a file based database connection.
-   */
-  @Test
-  public void testVAFile() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, VAFile.Factory.class);
-    spatparams.addParameter(VAFile.Factory.PARTITIONS_ID, 4);
-    testFileBasedDatabaseConnection(spatparams, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
-  }
-
-  /**
-   * Test {@link PartialVAFile} using a file based database connection.
-   */
-  @Test
-  public void testPartialVAFile() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, PartialVAFile.Factory.class);
-    spatparams.addParameter(PartialVAFile.Factory.PARTITIONS_ID, 4);
-    testFileBasedDatabaseConnection(spatparams, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
-  }
-
-  /**
-   * Test {@link RStarTree} using a file based database connection. With "fast"
-   * mode enabled on an extreme level (since this should only reduce
-   * performance, not correctness!)
-   */
-  @Test
-  public void testRStarTreeFast() {
-    ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
-    spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testFileBasedDatabaseConnection(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-  }
-
-  /**
-   * Test {@link XTree} using a file based database connection.
-   */
-  // @Test
-  // public void testXTree() {
-  // ListParameterization xtreeparams = new ListParameterization();
-  // xtreeparams.addParameter(StaticArrayDatabase.INDEX_ID,
-  // experimentalcode.shared.index.xtree.XTreeFactory.class);
-  // xtreeparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
-  // testFileBasedDatabaseConnection(xtreeparams,
-  // DoubleDistanceRStarTreeKNNQuery.class,
-  // DoubleDistanceRStarTreeRangeQuery.class);
-  // }
-
-  /**
    * Actual test routine.
    * 
    * @param inputparams
    */
-  void testFileBasedDatabaseConnection(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+  protected void testExactIndex(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
     inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
 
     // get database
