@@ -59,6 +59,12 @@ public class XTreeIndex<O extends NumberVector> extends XTree implements RangeIn
     return new SpatialPointLeafEntry(DBIDUtil.deref(id), relation.get(id));
   }
 
+  @Override
+  public void initialize() {
+    super.initialize();
+    insertAll(relation.getDBIDs()); // Will check for actual bulk load!
+  }
+
   /**
    * Inserts the specified real vector object into this index.
    * 
@@ -85,13 +91,13 @@ public class XTreeIndex<O extends NumberVector> extends XTree implements RangeIn
     if(canBulkLoad()) {
       List<SpatialEntry> leafs = new ArrayList<>(ids.size());
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        leafs.add(createNewLeafEntry(DBIDUtil.deref(id)));
+        leafs.add(createNewLeafEntry(id));
       }
       bulkLoad(leafs);
     }
     else {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        insert(DBIDUtil.deref(id));
+        insert(id);
       }
     }
 
@@ -119,7 +125,7 @@ public class XTreeIndex<O extends NumberVector> extends XTree implements RangeIn
   @Override
   public void deleteAll(DBIDs ids) {
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      delete(DBIDUtil.deref(id));
+      delete(id);
     }
   }
 

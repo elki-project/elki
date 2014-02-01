@@ -52,7 +52,7 @@ import experimentalcode.shared.index.xtree.XTreeSettings;
  * 
  * @author Marisa Thoma
  */
-public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, N>, T extends XTreeBase<N, E>> {
+public class XSplitter<E extends SpatialEntry, N extends XNode<E, N>, T extends XTreeBase<N, E>> {
 
   /** Logger object for the XSplitter. */
   private transient Logger logger = Logger.getLogger(XSplitter.class.getName());
@@ -62,7 +62,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   /** The split axis. */
   private int splitAxis = 0;
 
-  private List<ET> entries = null;
+  private List<E> entries = null;
 
   /** Selected maximum overlap strategy. */
   private XTreeSettings.Overlap maxOverlapStrategy = XTreeSettings.Overlap.VOLUME_OVERLAP;
@@ -80,7 +80,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @param entries
    * @param maxOverlapStrategy
    */
-  public XSplitter(T tree, List<ET> entries) {
+  public XSplitter(T tree, List<E> entries) {
     this.tree = tree;
     this.maxOverlapStrategy = tree.get_overlap_type();
     etdc = new EntryTypeDimensionalComparator(0, false, null);
@@ -346,9 +346,9 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
 
     private double d1, d2;
 
-    private List<ET> entries;
+    private List<E> entries;
 
-    public EntryTypeDimensionalComparator(int dimension, boolean lb, List<ET> entries) {
+    public EntryTypeDimensionalComparator(int dimension, boolean lb, List<E> entries) {
       this.dimension = dimension;
       this.lb = lb;
       this.entries = entries;
@@ -370,7 +370,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       return (d1 > d2 ? 1 : (d1 < d2 ? -1 : 0));
     }
 
-    public final void set(int dimension, boolean lb, List<ET> entries) {
+    public final void set(int dimension, boolean lb, List<E> entries) {
       this.lb = lb;
       this.dimension = dimension;
       this.entries = entries;
@@ -388,9 +388,9 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *        dimensions
    * @return common split dimensions
    */
-  private Collection<Integer> getCommonSplitDimensions(Collection<ET> entries) {
+  private Collection<Integer> getCommonSplitDimensions(Collection<E> entries) {
     Collection<SplitHistory> splitHistories = new ArrayList<>(entries.size());
-    for (ET entry : entries) {
+    for (E entry : entries) {
       if (entry instanceof XDirectoryEntry) {
         splitHistories.add(((XDirectoryEntry) entry).getSplitHistory());
       } else {
@@ -488,11 +488,11 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *         <code>null</code>, if the minimum overlap split has a volume which
    *         is larger than the allowed <code>maxOverlap</code> ratio
    */
-  private SplitSorting chooseMinimumOverlapSplit(int splitAxis, int minEntries, int maxEntries, boolean revert) {
+  private SplitSorting<E> chooseMinimumOverlapSplit(int splitAxis, int minEntries, int maxEntries, boolean revert) {
     if (splitAxis != -1) {
       double optXVolume = Double.POSITIVE_INFINITY;
       double optVolume = Double.POSITIVE_INFINITY;
-      SplitSorting optDistribution = null;
+      SplitSorting<E> optDistribution = null;
       HyperBoundingBox[] optMBRs = null;
 
       // generate sortings for the mbr's extrema
@@ -591,12 +591,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return the split distribution for the given sorting and split point
    */
   @SuppressWarnings("unchecked")
-  private List<ET>[] generateDistribution(SplitSorting sorting) {
-    List<ET>[] distibution;
+  private List<E>[] generateDistribution(SplitSorting<E> sorting) {
+    List<E>[] distibution;
     distibution = new List[2];
     distibution[0] = new ArrayList<>();
-    distibution[1] = new ArrayList<ET>();
-    List<ET> sorted_entries = sorting.getSortedEntries();
+    distibution[1] = new ArrayList<>();
+    List<E> sorted_entries = sorting.getSortedEntries();
     for (int i = 0; i < sorting.getSplitPoint(); i++) {
       distibution[0].add(sorted_entries.get(i));
     }
@@ -617,12 +617,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @param limit split point
    * @return the split sorting for the given sorting and split point
    */
-  private SplitSorting generateSplitSorting(Integer[] entrySorting, int limit) {
-    List<ET> sorting = new ArrayList<>();
+  private SplitSorting<E> generateSplitSorting(Integer[] entrySorting, int limit) {
+    List<E> sorting = new ArrayList<>();
     for (int i = 0; i < entries.size(); i++) {
       sorting.add(entries.get(entrySorting[i]));
     }
-    return new SplitSorting(sorting, limit, splitAxis);
+    return new SplitSorting<>(sorting, limit, splitAxis);
   }
 
   /**
@@ -641,7 +641,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * 
    * @return distribution resulting from the minimum overlap split
    */
-  public SplitSorting minimumOverlapSplit() {
+  public SplitSorting<E> minimumOverlapSplit() {
     if (entries.get(0).isLeafEntry()) {
       throw new IllegalArgumentException("The minimum overlap split will only be performed on directory nodes");
     }
@@ -676,12 +676,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
         // avoid duplicate computations of {minEntries, ..., maxEntries}
         double minOverlap = pastOverlap;
         // test {minFanout, ..., minEntries - 1}
-        SplitSorting ret1 = chooseMinimumOverlapSplit(this.splitAxis, minFanout, tree.getDirMinimum() - 1, false);
+        SplitSorting<E> ret1 = chooseMinimumOverlapSplit(this.splitAxis, minFanout, tree.getDirMinimum() - 1, false);
         if (ret1 != null && pastOverlap < minOverlap) {
           minOverlap = pastOverlap; // this is a valid choice
         }
         // test {maxEntries - minEntries + 2, ..., maxEntries - minFanout + 1}
-        SplitSorting ret2 = chooseMinimumOverlapSplit(this.splitAxis, minFanout, tree.getDirMinimum() - 1, true);
+        SplitSorting<E> ret2 = chooseMinimumOverlapSplit(this.splitAxis, minFanout, tree.getDirMinimum() - 1, true);
         if (ret2 == null) {
           // accept first range regardless of whether or not there is one
           pastOverlap = minOverlap;
@@ -717,7 +717,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *         the minimum overlap split has a volume which is larger than the
    *         allowed <code>maxOverlap</code> ratio of #tree
    */
-  public SplitSorting topologicalSplit() {
+  public SplitSorting<E> topologicalSplit() {
     if (entries.size() < 2) {
       throw new IllegalArgumentException("Splitting less than two entries is pointless.");
     }
@@ -821,7 +821,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return the ration of data objects in the intersection volume as value
    *         between 0 and 1
    */
-  public double getRatioOfDataInIntersectionVolume(List<ET>[] split, HyperBoundingBox[] mbrs) {
+  public double getRatioOfDataInIntersectionVolume(List<E>[] split, HyperBoundingBox[] mbrs) {
     final HyperBoundingBox xMBR = getIntersection(mbrs[0], mbrs[1]);
     if (xMBR == null) {
       return 0.;
@@ -904,20 +904,19 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * the determined split point.
    * 
    * @author Marisa Thoma
-   * 
    */
-  public class SplitSorting {
-    private List<ET> sortedEntries;
+  public static class SplitSorting<E> {
+    private List<E> sortedEntries;
 
     private int splitPoint, splitAxis;
 
-    public SplitSorting(List<ET> sortedEntries, int splitPoint, int splitAxis) {
+    public SplitSorting(List<E> sortedEntries, int splitPoint, int splitAxis) {
       this.sortedEntries = sortedEntries;
       this.splitPoint = splitPoint;
       this.splitAxis = splitAxis;
     }
 
-    public List<ET> getSortedEntries() {
+    public List<E> getSortedEntries() {
       return sortedEntries;
     }
 
