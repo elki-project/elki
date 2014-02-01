@@ -22,16 +22,15 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * Class storing the contingency table and related data on two clusterings.
@@ -59,14 +58,9 @@ public class ClusterContingencyTable {
   protected boolean selfPairing = true;
 
   /**
-   * Number of clusters in first
+   * Number of clusters.
    */
-  protected int size1 = -1;
-
-  /**
-   * Number of clusters in second
-   */
-  protected int size2 = -1;
+  protected int size1 = -1, size2 = -1;
 
   /**
    * Contingency matrix
@@ -76,12 +70,7 @@ public class ClusterContingencyTable {
   /**
    * Noise flags
    */
-  protected BitSet noise1 = null;
-
-  /**
-   * Noise flags
-   */
-  protected BitSet noise2 = null;
+  protected long[] noise1 = null, noise2 = null;
 
   /**
    * Pair counting measures
@@ -135,46 +124,39 @@ public class ClusterContingencyTable {
     size1 = cs1.size();
     size2 = cs2.size();
     contingency = new int[size1 + 2][size2 + 2];
-    noise1 = new BitSet(size1);
-    noise2 = new BitSet(size2);
+    noise1 = BitsUtil.zero(size1);
+    noise2 = BitsUtil.zero(size2);
 
     // Fill main part of matrix
     {
-      {
-        final Iterator<? extends Cluster<?>> it2 = cs2.iterator();
-        for(int i2 = 0; it2.hasNext(); i2++) {
-          final Cluster<?> c2 = it2.next();
-          if(c2.isNoise()) {
-            noise2.set(i2);
-          }
-          contingency[size1 + 1][i2] = c2.size();
-          contingency[size1 + 1][size2] += c2.size();
+      final Iterator<? extends Cluster<?>> it2 = cs2.iterator();
+      for(int i2 = 0; it2.hasNext(); i2++) {
+        final Cluster<?> c2 = it2.next();
+        if(c2.isNoise()) {
+          BitsUtil.setI(noise2, i2);
         }
+        contingency[size1 + 1][i2] = c2.size();
+        contingency[size1 + 1][size2] += c2.size();
       }
-      final Iterator<? extends Cluster<?>> it1 = cs1.iterator();
-      for(int i1 = 0; it1.hasNext(); i1++) {
-        final Cluster<?> c1 = it1.next();
-        if(c1.isNoise()) {
-          noise1.set(i1);
-        }
-        final DBIDs ids = DBIDUtil.ensureSet(c1.getIDs());
-        contingency[i1][size2 + 1] = c1.size();
-        contingency[size1][size2 + 1] += c1.size();
+    }
+    final Iterator<? extends Cluster<?>> it1 = cs1.iterator();
+    for(int i1 = 0; it1.hasNext(); i1++) {
+      final Cluster<?> c1 = it1.next();
+      if(c1.isNoise()) {
+        BitsUtil.setI(noise1, i1);
+      }
+      final DBIDs ids = DBIDUtil.ensureSet(c1.getIDs());
+      contingency[i1][size2 + 1] = c1.size();
+      contingency[size1][size2 + 1] += c1.size();
 
-        final Iterator<? extends Cluster<?>> it2 = cs2.iterator();
-        for(int i2 = 0; it2.hasNext(); i2++) {
-          final Cluster<?> c2 = it2.next();
-          int count = 0;
-          for(DBIDIter iter = c2.getIDs().iter(); iter.valid(); iter.advance()) {
-            if(ids.contains(iter)) {
-              count++;
-            }
-          }
-          contingency[i1][i2] = count;
-          contingency[i1][size2] += count;
-          contingency[size1][i2] += count;
-          contingency[size1][size2] += count;
-        }
+      final Iterator<? extends Cluster<?>> it2 = cs2.iterator();
+      for(int i2 = 0; it2.hasNext(); i2++) {
+        final Cluster<?> c2 = it2.next();
+        int count = DBIDUtil.intersectionSize(ids, c2.getIDs());
+        contingency[i1][i2] = count;
+        contingency[i1][size2] += count;
+        contingency[size1][i2] += count;
+        contingency[size1][size2] += count;
       }
     }
   }
@@ -196,9 +178,6 @@ public class ClusterContingencyTable {
         buf.append('\n');
       }
     }
-    // if(pairconfuse != null) {
-    // buf.append(FormatUtil.format(pairconfuse));
-    // }
     return buf.toString();
   }
 
