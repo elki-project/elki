@@ -305,24 +305,6 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   }
 
   /**
-   * Increases the {@link AbstractStoringPageFile#readAccess readAccess} counter by
-   * one.
-   */
-  @Deprecated
-  public void increaseReadAccess() {
-    countRead();
-  }
-
-  /**
-   * Increases the {@link AbstractStoringPageFile#writeAccess writeAccess} counter by
-   * one.
-   */
-  @Deprecated
-  public void increaseWriteAccess() {
-    countWrite();
-  }
-
-  /**
    * Set the next page id to the given value. If this means that any page ids
    * stored in <code>emptyPages</code> are smaller than
    * <code>next_page_id</code>, they are removed from this file's observation
