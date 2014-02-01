@@ -208,7 +208,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
       }
       return null;
     }
-    return new ExactIDistanceRangeQuery(distanceQuery);
+    return new IDistanceRangeQuery(distanceQuery);
   }
 
   /**
@@ -337,21 +337,30 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
         // d(query, reference) <= d(query, candidate) + d(candidate, reference)
         // d(query, reference) - d(candidate, reference) <= d(query, candidate)
         double lbbwd = ibwd.valid() ? Math.abs(ibwd.doubleValue() - refd) : Double.NaN;
+        // Current query radius.
+        double kdist = heap.getKNNDistance();
         while(true) {
-          final double kdist = heap.getKNNDistance();
           // Handle NaN carefully.
           if(!(lbfwd <= kdist) && !(lbbwd <= kdist)) {
             break;
           }
           // Careful: NaN handling: not NaN and not worse than fwd (may be NaN).
           if(lbfwd <= kdist && !(lbfwd > lbbwd)) {
-            heap.insert(refine(ifwd, obj), ifwd);
+            final double dist = refine(ifwd, obj);
+            if(dist <= kdist) {
+              heap.insert(dist, ifwd);
+              kdist = heap.getKNNDistance();
+            }
             // Advance iterator:
             ifwd.advance();
             lbfwd = ifwd.valid() ? Math.abs(ifwd.doubleValue() - refd) : Double.NaN;
           }
           if(lbbwd <= kdist && !(lbbwd > lbfwd)) {
-            heap.insert(refine(ibwd, obj), ibwd);
+            final double dist = refine(ibwd, obj);
+            if(dist <= kdist) {
+              heap.insert(dist, ibwd);
+              kdist = heap.getKNNDistance();
+            }
             // Retract iterator:
             ibwd.retract();
             lbbwd = ibwd.valid() ? Math.abs(ibwd.doubleValue() - refd) : Double.NaN;
@@ -370,13 +379,13 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @apiviz.exclude
    */
-  protected class ExactIDistanceRangeQuery extends AbstractRefiningIndex<O>.AbstractRangeQuery {
+  protected class IDistanceRangeQuery extends AbstractRefiningIndex<O>.AbstractRangeQuery {
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query
      */
-    public ExactIDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
+    public IDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
       super(distanceQuery);
     }
 
@@ -394,12 +403,12 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
 
         // This assumes a metric, as we exploit triangle inequality:
         // Lower bound for candidates further from the reference object:
-        // d(query, reference) <= d(query, candidate) + d(candidate, reference)
-        // d(query, reference) - d(candidate, reference) <= d(query, candidate)
-        double lbfwd = ifwd.valid() ? Math.abs(ifwd.doubleValue() - refd) : Double.NaN;
-        // Lower bound for candidates closer to the reference object:
         // d(candidate, reference) <= d(candidate, query) + d(query, reference)
         // d(candidate, reference) - d(query, reference) <= d(candidate, query)
+        double lbfwd = ifwd.valid() ? Math.abs(ifwd.doubleValue() - refd) : Double.NaN;
+        // Lower bound for candidates closer to the reference object:
+        // d(query, reference) <= d(query, candidate) + d(candidate, reference)
+        // d(query, reference) - d(candidate, reference) <= d(query, candidate)
         double lbbwd = ibwd.valid() ? Math.abs(ibwd.doubleValue() - refd) : Double.NaN;
         while(true) {
           // Handle NaN carefully.
@@ -407,21 +416,27 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
             break;
           }
           // Careful: NaN handling: not NaN and not worse than fwd (may be NaN).
-          if(lbfwd <= range) {
-            result.add(refine(ifwd, obj), ifwd);
+          if(lbfwd <= range && !(lbfwd > lbbwd)) {
+            final double dist = refine(ifwd, obj);
+            if(dist <= range) {
+              result.add(dist, ifwd);
+            }
             // Advance iterator:
             ifwd.advance();
             lbfwd = ifwd.valid() ? Math.abs(ifwd.doubleValue() - refd) : Double.NaN;
           }
-          if(lbbwd <= range) {
-            result.add(refine(ibwd, obj), ibwd);
+          if(lbbwd <= range && !(lbbwd > lbfwd)) {
+            final double dist = refine(ibwd, obj);
+            if(dist <= range) {
+              result.add(dist, ibwd);
+            }
             // Retract iterator:
             ibwd.retract();
             lbbwd = ibwd.valid() ? Math.abs(ibwd.doubleValue() - refd) : Double.NaN;
           }
         }
       }
-
+      result.sort();
       return result;
     }
   }
