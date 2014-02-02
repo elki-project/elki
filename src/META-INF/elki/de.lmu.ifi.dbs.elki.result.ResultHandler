@@ -1,5 +1,6 @@
 de.lmu.ifi.dbs.elki.result.ResultWriter
 de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer
+de.lmu.ifi.dbs.elki.result.ClusteringVectorDumper
 de.lmu.ifi.dbs.elki.result.DiscardResultHandler
 de.lmu.ifi.dbs.elki.result.KMLOutputHandler
 de.lmu.ifi.dbs.elki.visualization.ExportVisualizations
