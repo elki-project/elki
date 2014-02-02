@@ -8,3 +8,4 @@ de.lmu.ifi.dbs.elki.datasource.parser.BitVectorLabelParser
 de.lmu.ifi.dbs.elki.datasource.parser.SimplePolygonParser
 de.lmu.ifi.dbs.elki.datasource.parser.StringParser
 de.lmu.ifi.dbs.elki.datasource.parser.SimpleTransactionParser
+de.lmu.ifi.dbs.elki.datasource.parser.ClusteringVectorParser

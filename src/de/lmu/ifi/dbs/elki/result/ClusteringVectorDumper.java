@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.parser.ClusteringVectorParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -55,6 +56,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * Class to output a clustering result in a simple and compact ascii format:
  * whitespace separated cluster indexes
  * </p>
+ * 
+ * This format can be read using {@link ClusteringVectorParser} for analysis.
  * 
  * @author Erich Schubert
  */
@@ -145,7 +148,6 @@ public class ClusteringVectorDumper implements ResultHandler {
     DBIDRange ids = null;
     for(Iter<Result> iter = hierarchy.iterParents(c); iter.valid(); iter.advance()) {
       Result parent = iter.get();
-      LOG.warning("Parent :" + parent.getLongName());
       if(parent instanceof Relation) {
         DBIDs pids = ((Relation<?>) parent).getDBIDs();
         if(pids instanceof DBIDRange) {
