@@ -67,5 +67,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedFloatDistanceFun
 de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusterIntersectionSimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusterJaccardSimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarityFunction
 # tutorial.distancefunction.MultiLPNorm
 # tutorial.distancefunction.TutorialDistanceFunction
