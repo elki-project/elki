@@ -207,7 +207,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
           throw new AbortException("Clusterings do not contain the same number of elements!");
         }
         // Build clustering to store in the relation.
-        curclu = new Clustering<Model>(name, name);
+        curclu = new Clustering<>(name, name);
         for(TIntIntIterator iter = csize.iterator(); iter.hasNext();) {
           iter.advance();
           if(iter.value() > 0) {

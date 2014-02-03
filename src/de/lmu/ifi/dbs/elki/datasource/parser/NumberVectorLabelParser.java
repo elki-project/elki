@@ -87,7 +87,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
   /**
    * Vector factory class.
    */
-  protected NumberVector.Factory<V>  factory;
+  protected NumberVector.Factory<V> factory;
 
   /**
    * Buffer reader.
@@ -159,7 +159,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * 
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(NumberVector.Factory<V>  factory) {
+  public NumberVectorLabelParser(NumberVector.Factory<V> factory) {
     this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHARS, Pattern.compile(COMMENT_PATTERN), null, factory);
   }
 
@@ -172,7 +172,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V>  factory) {
+  public NumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V> factory) {
     super(colSep, quoteChars, comment);
     this.labelIndices = labelIndices;
     this.factory = factory;
@@ -282,15 +282,17 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     int i = 0;
     for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance(), i++) {
       if(labelIndices == null || !labelIndices.get(i)) {
-        try {
-          double attribute = tokenizer.getDouble();
-          attributes.add(attribute);
-          continue;
+        if(!tokenizer.isQuoted()) {
+          try {
+            double attribute = tokenizer.getDouble();
+            attributes.add(attribute);
+            continue;
+          }
+          catch(NumberFormatException e) {
+            // Ignore attempt, add to labels below.
+          }
         }
-        catch(NumberFormatException e) {
-          // Ignore attempt, add to labels below.
-          labelcolumns.set(i);
-        }
+        labelcolumns.set(i);
       }
       // Else: labels.
       haslabels = true;
@@ -403,7 +405,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     /**
      * Factory object.
      */
-    protected NumberVector.Factory<V>  factory;
+    protected NumberVector.Factory<V> factory;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -418,7 +420,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
      * @param config Parameterization
      */
     protected void getFactory(Parameterization config) {
-      ObjectParameter<NumberVector.Factory<V> > factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
+      ObjectParameter<NumberVector.Factory<V>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
       if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }

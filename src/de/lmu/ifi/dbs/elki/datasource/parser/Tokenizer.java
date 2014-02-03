@@ -87,6 +87,11 @@ public class Tokenizer implements Iter {
    * Current positions of result and iterator.
    */
   private int start, end, index;
+  
+  /**
+   * Whether the current token is a quoted string.
+   */
+  private boolean quoted;
 
   /**
    * Initialize parser with a new string.
@@ -119,6 +124,7 @@ public class Tokenizer implements Iter {
           this.start = index + 1;
           this.end = m.start() - 1;
           this.index = m.end();
+          this.quoted = true;
           return this;
         }
         continue;
@@ -127,6 +133,7 @@ public class Tokenizer implements Iter {
         this.start = index;
         this.end = m.start();
         this.index = m.end();
+        this.quoted = false;
         return this;
       }
     }
@@ -134,11 +141,13 @@ public class Tokenizer implements Iter {
     this.start = index;
     this.end = send;
     this.index = end + 1;
+    this.quoted = false;
     if(inquote != 0) {
       final int last = send - 1;
       if(input.charAt(last) == inquote) {
         ++this.start;
         --this.end;
+        this.quoted = true;
       }
       else {
         LOG.warning("Invalid quoted line in input: no closing quote found in: " + input);
@@ -209,6 +218,15 @@ public class Tokenizer implements Iter {
       }
     }
     return 0;
+  }
+  
+  /**
+   * Test if the current string was quoted.
+   * 
+   * @return {@code true} when quoted.
+   */
+  public boolean isQuoted() {
+    return quoted;
   }
 
   /**
