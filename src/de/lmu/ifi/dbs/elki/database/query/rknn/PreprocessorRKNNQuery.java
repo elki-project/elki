@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -41,7 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Elke Achtert
  */
-public class PreprocessorRKNNQuery<O> extends AbstractDataBasedQuery<O> implements RKNNQuery<O> {
+public class PreprocessorRKNNQuery<O> implements RKNNQuery<O> {
+  /**
+   * The data to use for this query
+   */
+  final protected Relation<? extends O> relation;
+
   /**
    * The last preprocessor result
    */
@@ -55,11 +59,12 @@ public class PreprocessorRKNNQuery<O> extends AbstractDataBasedQuery<O> implemen
   /**
    * Constructor.
    * 
-   * @param database Database to query
+   * @param relation Relation to query
    * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorRKNNQuery(Relation<O> database, MaterializeKNNAndRKNNPreprocessor<O> preprocessor) {
-    super(database);
+  public PreprocessorRKNNQuery(Relation<O> relation, MaterializeKNNAndRKNNPreprocessor<O> preprocessor) {
+    super();
+    this.relation = relation;
     this.preprocessor = preprocessor;
   }
 
@@ -80,19 +85,19 @@ public class PreprocessorRKNNQuery<O> extends AbstractDataBasedQuery<O> implemen
     }
     return preprocessor.getRKNN(id);
   }
-  
+
   @Override
   public DoubleDBIDList getRKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
-  
+
   @Override
   public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(!warned && k != preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
     List<DoubleDBIDList> result = new ArrayList<>(ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       result.add(preprocessor.getRKNN(iter));
     }
     return result;

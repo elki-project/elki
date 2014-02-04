@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.query.similarity;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
@@ -33,16 +32,22 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * 
  * @author Erich Schubert
  * 
- * @param O Input object type
+ * @param <O> Input object type
  */
-public abstract class AbstractSimilarityQuery<O> extends AbstractDataBasedQuery<O> implements SimilarityQuery<O> {
+public abstract class AbstractSimilarityQuery<O> implements SimilarityQuery<O> {
+  /**
+   * The data to use for this query
+   */
+  final protected Relation<? extends O> relation;
+
   /**
    * Constructor.
    * 
    * @param relation Relation to use.
    */
   public AbstractSimilarityQuery(Relation<? extends O> relation) {
-    super(relation);
+    super();
+    this.relation = relation;
   }
 
   /**
@@ -84,4 +89,9 @@ public abstract class AbstractSimilarityQuery<O> extends AbstractDataBasedQuery<
    */
   @Override
   public abstract double similarity(O o1, O o2);
+
+  @Override
+  public Relation<? extends O> getRelation() {
+    return relation;
+  }
 }

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  */
 import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @param <V> vector type
  */
-public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor<V, KNNList> {
+public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor<V> {
   /**
    * Logging class.
    */
@@ -93,7 +92,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
    * 
    * @param <O> The object type
    */
-  public static class Factory<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
+  public static class Factory<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * Constructor.
      * 

@@ -133,11 +133,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
 
   @Override
   public KNNHeap newHeap(int k) {
-    // TODO: benchmark threshold!
-    if(k > 1000) {
-      return new DoubleIntegerDBIDKNNHeap(k);
-    }
-    return new DoubleIntegerDBIDListKNNHeap(k);
+    return new DoubleIntegerDBIDKNNHeap(k);
   }
 
   @Override

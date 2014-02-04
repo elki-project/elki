@@ -170,15 +170,11 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   @Override
   public DoubleIntegerDBIDPair poll() {
-    final DoubleIntegerDBIDPair ret;
     if(numties > 0) {
-      ret = new DoubleIntegerDBIDPair(kdist, ties[numties - 1]);
-      --numties;
+      return new DoubleIntegerDBIDPair(kdist, ties[--numties]);
     }
-    else {
-      ret = new DoubleIntegerDBIDPair(heap.peekKey(), heap.peekValue());
-      heap.poll();
-    }
+    final DoubleIntegerDBIDPair ret = new DoubleIntegerDBIDPair(heap.peekKey(), heap.peekValue());
+    heap.poll();
     return ret;
   }
 
@@ -209,7 +205,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   @Override
   public boolean isEmpty() {
-    return heap.size() == 0;
+    return heap.isEmpty();
   }
 
   @Override
@@ -233,7 +229,6 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
       heap.poll();
     }
     ret.size = hsize + numties;
-    ret.sort();
     return ret;
   }
 
@@ -243,12 +238,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
    * @return distance
    */
   protected double peekDistance() {
-    if(numties > 0) {
-      return kdist;
-    }
-    else {
-      return heap.peekKey();
-    }
+    return (numties > 0) ? kdist : heap.peekKey();
   }
 
   /**
@@ -257,9 +247,6 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
    * @return internal id
    */
   protected int peekInternalDBID() {
-    if(numties > 0) {
-      return ties[numties - 1];
-    }
-    return heap.peekValue();
+    return (numties > 0) ? ties[numties - 1] : heap.peekValue();
   }
 }

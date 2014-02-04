@@ -25,8 +25,8 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Abstract base class for range queries that use a distance query in their
@@ -36,11 +36,16 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
  * 
  * @param <O> Database object type
  */
-public abstract class AbstractDistanceRangeQuery<O> extends AbstractDataBasedQuery<O> implements RangeQuery<O> {
+public abstract class AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
+  /**
+   * The data to use for this query
+   */
+  final protected Relation<? extends O> relation;
+
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceQuery<O> distanceQuery;
+  final protected DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
@@ -48,7 +53,8 @@ public abstract class AbstractDistanceRangeQuery<O> extends AbstractDataBasedQue
    * @param distanceQuery Distance query
    */
   public AbstractDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
-    super(distanceQuery.getRelation());
+    super();
+    this.relation = distanceQuery.getRelation();
     this.distanceQuery = distanceQuery;
   }
 

@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has PrimitiveSimilarityFunction
+ * 
  * @param <O> Database object type.
  */
 public class PrimitiveSimilarityQuery<O> extends AbstractSimilarityQuery<O> {
@@ -53,31 +55,21 @@ public class PrimitiveSimilarityQuery<O> extends AbstractSimilarityQuery<O> {
 
   @Override
   public double similarity(DBIDRef id1, DBIDRef id2) {
-    O o1 = relation.get(id1);
-    O o2 = relation.get(id2);
-    return similarity(o1, o2);
+    return similarity(relation.get(id1), relation.get(id2));
   }
 
   @Override
   public double similarity(O o1, DBIDRef id2) {
-    O o2 = relation.get(id2);
-    return similarity(o1, o2);
+    return similarity(o1, relation.get(id2));
   }
 
   @Override
   public double similarity(DBIDRef id1, O o2) {
-    O o1 = relation.get(id1);
-    return similarity(o1, o2);
+    return similarity(relation.get(id1), o2);
   }
 
   @Override
   public double similarity(O o1, O o2) {
-    if (o1 == null) {
-      throw new UnsupportedOperationException("This distance function can only be used for object instances.");
-    }
-    if (o2 == null) {
-      throw new UnsupportedOperationException("This distance function can only be used for object instances.");
-    }
     return similarityFunction.similarity(o1, o2);
   }
 

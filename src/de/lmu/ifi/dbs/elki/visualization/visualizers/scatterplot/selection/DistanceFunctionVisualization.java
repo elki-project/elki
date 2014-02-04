@@ -99,8 +99,8 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<AbstractMaterializeKNNPreprocessor<?, ?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
-    for(AbstractMaterializeKNNPreprocessor<?, ?> kNN : kNNIndex) {
+    Collection<AbstractMaterializeKNNPreprocessor<?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
+    for(AbstractMaterializeKNNPreprocessor<?> kNN : kNNIndex) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), this);
@@ -117,7 +117,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @param kNN kNN preprocessor
    * @return p of LP norm, or NaN
    */
-  public static double getLPNormP(AbstractMaterializeKNNPreprocessor<?, ?> kNN) {
+  public static double getLPNormP(AbstractMaterializeKNNPreprocessor<?> kNN) {
     DistanceFunction<?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
     if(LPNormDistanceFunction.class.isInstance(distanceFunction)) {
       return ((LPNormDistanceFunction) distanceFunction).getP();
@@ -131,7 +131,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @param kNN kNN preprocessor
    * @return true when angular
    */
-  public static boolean isAngularDistance(AbstractMaterializeKNNPreprocessor<?, ?> kNN) {
+  public static boolean isAngularDistance(AbstractMaterializeKNNPreprocessor<?> kNN) {
     DistanceFunction<?> distanceFunction = kNN.getDistanceQuery().getDistanceFunction();
     if(CosineDistanceFunction.class.isInstance(distanceFunction)) {
       return true;
@@ -247,7 +247,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
     /**
      * The selection result we work on
      */
-    private AbstractMaterializeKNNPreprocessor<? extends NumberVector, ?> result;
+    private AbstractMaterializeKNNPreprocessor<? extends NumberVector> result;
 
     /**
      * Constructor

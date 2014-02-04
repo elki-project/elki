@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O, KNNList> implements DynamicIndex {
+public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O> implements DynamicIndex {
   /**
    * Logger to use.
    */
@@ -404,7 +404,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
    * 
    * @param <O> The object type
    */
-  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
+  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * Index factory.
      * 

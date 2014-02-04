@@ -30,19 +30,24 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Instance for the query on a particular database.
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractDistanceKNNQuery<O> extends AbstractDataBasedQuery<O> implements KNNQuery<O> {
+public abstract class AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
+  /**
+   * The data to use for this query
+   */
+  final protected Relation<? extends O> relation;
+
   /**
    * Hold the distance function to be used.
    */
-  protected DistanceQuery<O> distanceQuery;
+  final protected DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
@@ -50,7 +55,8 @@ public abstract class AbstractDistanceKNNQuery<O> extends AbstractDataBasedQuery
    * @param distanceQuery Distance query used
    */
   public AbstractDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
-    super(distanceQuery.getRelation());
+    super();
+    this.relation = distanceQuery.getRelation();
     this.distanceQuery = distanceQuery;
   }
 
@@ -60,7 +66,7 @@ public abstract class AbstractDistanceKNNQuery<O> extends AbstractDataBasedQuery
     // UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
     // TODO: optimize
     List<KNNList> ret = new ArrayList<>(ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       ret.add(getKNNForDBID(iter, k));
     }
     return ret;

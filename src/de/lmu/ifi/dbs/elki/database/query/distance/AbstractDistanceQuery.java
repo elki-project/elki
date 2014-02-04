@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
@@ -35,14 +34,20 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * 
  * @param O Input object type
  */
-public abstract class AbstractDistanceQuery<O> extends AbstractDataBasedQuery<O> implements DistanceQuery<O> {
+public abstract class AbstractDistanceQuery<O> implements DistanceQuery<O> {
+  /**
+   * The data to use for this query
+   */
+  final protected Relation<? extends O> relation;
+
   /**
    * Constructor.
    * 
    * @param relation Relation to use.
    */
   public AbstractDistanceQuery(Relation<? extends O> relation) {
-    super(relation);
+    super();
+    this.relation = relation;
   }
 
   /**
@@ -84,4 +89,9 @@ public abstract class AbstractDistanceQuery<O> extends AbstractDataBasedQuery<O>
    */
   @Override
   public abstract double distance(O o1, O o2);
+
+  @Override
+  public Relation<? extends O> getRelation() {
+    return relation;
+  }
 }

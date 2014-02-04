@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <O> Object type
  */
 @Reference(title = "Subsampling for Efficient and Effective Unsupervised Outlier Detection Ensembles", authors = "A. Zimek and M. Gaudet and R. J. G. B. Campello and J. Sander", booktitle = "Proc. 19th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, KDD '13")
-public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
+public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger
    */
@@ -152,7 +152,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
    * 
    * @param <O> The object type
    */
-  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
+  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * Relative share of objects to get
      */

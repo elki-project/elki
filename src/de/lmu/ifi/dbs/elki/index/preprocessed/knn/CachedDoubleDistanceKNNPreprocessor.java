@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceKNNLists;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -51,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @param <O> Object type
  */
-public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
+public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * File to load.
    */
@@ -143,7 +142,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
    * 
    * @param <O> The object type
    */
-  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
+  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * Filename to load.
      */

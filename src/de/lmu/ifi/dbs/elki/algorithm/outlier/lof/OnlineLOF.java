@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -104,8 +103,8 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     // add listener
     KNNListener l = new LOFKNNListener(lofResult);
-    ((MaterializeKNNPreprocessor<O>) ((PreprocessorKNNQuery<O, ? extends KNNList>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
-    ((MaterializeKNNPreprocessor<O>) ((PreprocessorKNNQuery<O, ? extends KNNList>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<O>) ((PreprocessorKNNQuery<O>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<O>) ((PreprocessorKNNQuery<O>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
 
     return lofResult.getResult();
   }
@@ -194,8 +193,8 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     @Override
     public void kNNsChanged(KNNChangeEvent e) {
-      AbstractMaterializeKNNPreprocessor<O, ?> p1 = ((PreprocessorKNNQuery<O, ?>) lofResult.getKNNRefer()).getPreprocessor();
-      AbstractMaterializeKNNPreprocessor<O, ?> p2 = ((PreprocessorKNNQuery<O, ?>) lofResult.getKNNReach()).getPreprocessor();
+      AbstractMaterializeKNNPreprocessor<O> p1 = ((PreprocessorKNNQuery<O>) lofResult.getKNNRefer()).getPreprocessor();
+      AbstractMaterializeKNNPreprocessor<O> p2 = ((PreprocessorKNNQuery<O>) lofResult.getKNNReach()).getPreprocessor();
 
       if (firstEventReceived == null) {
         if (e.getSource().equals(p1) && e.getSource().equals(p2)) {

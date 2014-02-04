@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  */
 @Title("Partitioning Approximate kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database by partitioning and only computing kNN within each partition.")
-public class PartitionApproximationMaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
+public class PartitionApproximationMaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger to use
    */
@@ -177,7 +177,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
    * 
    * @param <O> The object type
    */
-  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O, KNNList> {
+  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * The number of partitions to use
      */
