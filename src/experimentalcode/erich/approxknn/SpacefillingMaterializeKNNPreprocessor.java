@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
-public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor<O, KNNList> {
+public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Class logger
    */
@@ -299,7 +299,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<V, KNNList> {
+  public static class Factory<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<V> {
     /**
      * Spatial curve generators
      */
