@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.data.RationalNumber;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -112,8 +111,8 @@ public class Matrix {
   public Matrix(final int m, final int n, final double s) {
     this.columndimension = n;
     elements = new double[m][n];
-    for (int i = 0; i < m; i++) {
-      for (int j = 0; j < n; j++) {
+    for(int i = 0; i < m; i++) {
+      for(int j = 0; j < n; j++) {
         elements[i][j] = s;
       }
     }
@@ -128,28 +127,12 @@ public class Matrix {
    */
   public Matrix(final double[][] elements) {
     columndimension = elements[0].length;
-    for (int i = 0; i < elements.length; i++) {
-      if (elements[i].length != columndimension) {
+    for(int i = 0; i < elements.length; i++) {
+      if(elements[i].length != columndimension) {
         throw new IllegalArgumentException(ERR_NOTSQUARE);
       }
     }
     this.elements = elements;
-  }
-
-  /**
-   * Constructs a Matrix for a given array of arrays of {@link RationalNumber}s.
-   * 
-   * @param q an array of arrays of RationalNumbers. q is not checked for
-   *        consistency (i.e. whether all rows are of equal length)
-   */
-  public Matrix(final RationalNumber[][] q) {
-    columndimension = q[0].length;
-    elements = new double[q.length][columndimension];
-    for (int row = 0; row < q.length; row++) {
-      for (int col = 0; col < q[row].length; col++) {
-        elements[row][col] = q[row][col].doubleValue();
-      }
-    }
   }
 
   /**
@@ -162,12 +145,12 @@ public class Matrix {
    */
   public Matrix(final double values[], final int m) {
     columndimension = (m != 0 ? values.length / m : 0);
-    if (m * columndimension != values.length) {
+    if(m * columndimension != values.length) {
       throw new IllegalArgumentException("Array length must be a multiple of m.");
     }
     elements = new double[m][columndimension];
-    for (int i = 0; i < m; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < m; i++) {
+      for(int j = 0; j < columndimension; j++) {
         elements[i][j] = values[i + j * m];
       }
     }
@@ -193,8 +176,8 @@ public class Matrix {
     final int m = A.length;
     final int n = A[0].length;
     final Matrix X = new Matrix(m, n);
-    for (int i = 0; i < m; i++) {
-      if (A[i].length != n) {
+    for(int i = 0; i < m; i++) {
+      if(A[i].length != n) {
         throw new IllegalArgumentException(ERR_NOTSQUARE);
       }
       System.arraycopy(A[i], 0, X.elements[i], 0, n);
@@ -210,7 +193,7 @@ public class Matrix {
    */
   public static final Matrix unitMatrix(final int dim) {
     final double[][] e = new double[dim][dim];
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       e[i][i] = 1;
     }
     return new Matrix(e);
@@ -236,8 +219,8 @@ public class Matrix {
    */
   public static final Matrix random(final int m, final int n) {
     final Matrix A = new Matrix(m, n);
-    for (int i = 0; i < m; i++) {
-      for (int j = 0; j < n; j++) {
+    for(int i = 0; i < m; i++) {
+      for(int j = 0; j < n; j++) {
         A.elements[i][j] = Math.random();
       }
     }
@@ -253,7 +236,7 @@ public class Matrix {
    */
   public static final Matrix identity(final int m, final int n) {
     final Matrix A = new Matrix(m, n);
-    for (int i = 0; i < Math.min(m, n); i++) {
+    for(int i = 0; i < Math.min(m, n); i++) {
       A.elements[i][i] = 1.0;
     }
     return A;
@@ -268,7 +251,7 @@ public class Matrix {
    */
   public static final Matrix diagonal(final double[] diagonal) {
     final Matrix result = new Matrix(diagonal.length, diagonal.length);
-    for (int i = 0; i < diagonal.length; i++) {
+    for(int i = 0; i < diagonal.length; i++) {
       result.elements[i][i] = diagonal[i];
     }
     return result;
@@ -283,7 +266,7 @@ public class Matrix {
    */
   public static final Matrix diagonal(final Vector diagonal) {
     final Matrix result = new Matrix(diagonal.elements.length, diagonal.elements.length);
-    for (int i = 0; i < diagonal.elements.length; i++) {
+    for(int i = 0; i < diagonal.elements.length; i++) {
       result.elements[i][i] = diagonal.elements[i];
     }
     return result;
@@ -296,7 +279,7 @@ public class Matrix {
    */
   public final Matrix copy() {
     final Matrix X = new Matrix(elements.length, columndimension);
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       System.arraycopy(elements[i], 0, X.elements[i], 0, columndimension);
     }
     return X;
@@ -326,7 +309,7 @@ public class Matrix {
    */
   public final double[][] getArrayCopy() {
     final double[][] C = new double[elements.length][];
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       C[i] = elements[i].clone();
     }
     return C;
@@ -397,7 +380,7 @@ public class Matrix {
    */
   public final double[] getRowPackedCopy() {
     double[] vals = new double[elements.length * columndimension];
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       System.arraycopy(elements[i], 0, vals, i * columndimension, columndimension);
     }
     return vals;
@@ -410,8 +393,8 @@ public class Matrix {
    */
   public final double[] getColumnPackedCopy() {
     final double[] vals = new double[elements.length * columndimension];
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
         vals[i + j * elements.length] = elements[i][j];
       }
     }
@@ -431,10 +414,11 @@ public class Matrix {
   public final Matrix getMatrix(final int i0, final int i1, final int j0, final int j1) {
     final Matrix X = new Matrix(i1 - i0 + 1, j1 - j0 + 1);
     try {
-      for (int i = i0; i <= i1; i++) {
+      for(int i = i0; i <= i1; i++) {
         System.arraycopy(elements[i], j0, X.elements[i - i0], 0, j1 - j0 + 1);
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
     return X;
@@ -451,12 +435,13 @@ public class Matrix {
   public final Matrix getMatrix(final int[] r, final int[] c) {
     final Matrix X = new Matrix(r.length, c.length);
     try {
-      for (int i = 0; i < r.length; i++) {
-        for (int j = 0; j < c.length; j++) {
+      for(int i = 0; i < r.length; i++) {
+        for(int j = 0; j < c.length; j++) {
           X.elements[i][j] = elements[r[i]][c[j]];
         }
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
     return X;
@@ -474,10 +459,11 @@ public class Matrix {
   public final Matrix getMatrix(final int[] r, final int j0, final int j1) {
     final Matrix X = new Matrix(r.length, j1 - j0 + 1);
     try {
-      for (int i = 0; i < r.length; i++) {
+      for(int i = 0; i < r.length; i++) {
         System.arraycopy(elements[r[i]], j0, X.elements[i], 0, j1 - j0 + 1);
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
     return X;
@@ -495,12 +481,13 @@ public class Matrix {
   public final Matrix getMatrix(final int i0, final int i1, final int[] c) {
     final Matrix X = new Matrix(i1 - i0 + 1, c.length);
     try {
-      for (int i = i0; i <= i1; i++) {
-        for (int j = 0; j < c.length; j++) {
+      for(int i = i0; i <= i1; i++) {
+        for(int j = 0; j < c.length; j++) {
           X.elements[i - i0][j] = elements[i][c[j]];
         }
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
     return X;
@@ -518,10 +505,11 @@ public class Matrix {
    */
   public final void setMatrix(final int i0, final int i1, final int j0, final int j1, final Matrix X) {
     try {
-      for (int i = i0; i <= i1; i++) {
+      for(int i = i0; i <= i1; i++) {
         System.arraycopy(X.elements[i - i0], 0, elements[i], j0, j1 - j0 + 1);
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
   }
@@ -536,12 +524,13 @@ public class Matrix {
    */
   public final void setMatrix(final int[] r, final int[] c, final Matrix X) {
     try {
-      for (int i = 0; i < r.length; i++) {
-        for (int j = 0; j < c.length; j++) {
+      for(int i = 0; i < r.length; i++) {
+        for(int j = 0; j < c.length; j++) {
           elements[r[i]][c[j]] = X.elements[i][j];
         }
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
   }
@@ -557,10 +546,11 @@ public class Matrix {
    */
   public final void setMatrix(final int[] r, final int j0, final int j1, final Matrix X) {
     try {
-      for (int i = 0; i < r.length; i++) {
+      for(int i = 0; i < r.length; i++) {
         System.arraycopy(X.elements[i], 0, elements[r[i]], j0, j1 - j0 + 1);
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
   }
@@ -576,12 +566,13 @@ public class Matrix {
    */
   public final void setMatrix(final int i0, final int i1, final int[] c, final Matrix X) {
     try {
-      for (int i = i0; i <= i1; i++) {
-        for (int j = 0; j < c.length; j++) {
+      for(int i = i0; i <= i1; i++) {
+        for(int j = 0; j < c.length; j++) {
           elements[i][c[j]] = X.elements[i - i0][j];
         }
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
   }
@@ -604,7 +595,7 @@ public class Matrix {
    * @param row the value of the column to be set
    */
   public final void setRow(final int j, final Vector row) {
-    if (row.elements.length != columndimension) {
+    if(row.elements.length != columndimension) {
       throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     System.arraycopy(row.elements, 0, elements[j], 0, columndimension);
@@ -618,7 +609,7 @@ public class Matrix {
    */
   public final Vector getCol(final int j) {
     final Vector v = new Vector(elements.length);
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       v.elements[i] = elements[i][j];
     }
     return v;
@@ -631,10 +622,10 @@ public class Matrix {
    * @param column the value of the column to be set
    */
   public final void setCol(final int j, final Vector column) {
-    if (column.elements.length != elements.length) {
+    if(column.elements.length != elements.length) {
       throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       elements[i][j] = column.elements[i];
     }
   }
@@ -646,8 +637,8 @@ public class Matrix {
    */
   public final Matrix transpose() {
     final Matrix X = new Matrix(columndimension, elements.length);
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
         X.elements[j][i] = elements[i][j];
       }
     }
@@ -683,8 +674,8 @@ public class Matrix {
    */
   public final Matrix plusEquals(final Matrix B) {
     checkMatrixDimensions(B);
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
         elements[i][j] += B.elements[i][j];
       }
     }
@@ -700,8 +691,8 @@ public class Matrix {
    */
   public final Matrix plusTimesEquals(final Matrix B, final double s) {
     checkMatrixDimensions(B);
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
         elements[i][j] += s * B.elements[i][j];
       }
     }
@@ -737,8 +728,8 @@ public class Matrix {
    */
   public final Matrix minusEquals(final Matrix B) {
     checkMatrixDimensions(B);
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
         elements[i][j] -= B.elements[i][j];
       }
     }
@@ -754,8 +745,8 @@ public class Matrix {
    */
   public final Matrix minusTimesEquals(final Matrix B, final double s) {
     checkMatrixDimensions(B);
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
         elements[i][j] -= s * B.elements[i][j];
       }
     }
@@ -779,8 +770,8 @@ public class Matrix {
    * @return replace A by s*A
    */
   public final Matrix timesEquals(final double s) {
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
         elements[i][j] *= s;
       }
     }
@@ -796,22 +787,22 @@ public class Matrix {
    */
   public final Matrix times(final Matrix B) {
     // Optimized implementation, exploiting the storage layout
-    if (B.elements.length != this.columndimension) {
+    if(B.elements.length != this.columndimension) {
       throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Matrix X = new Matrix(this.elements.length, B.columndimension);
     // Optimized ala Jama. jik order.
     final double[] Bcolj = new double[this.columndimension];
-    for (int j = 0; j < X.columndimension; j++) {
+    for(int j = 0; j < X.columndimension; j++) {
       // Make a linear copy of column j from B
-      for (int k = 0; k < this.columndimension; k++) {
+      for(int k = 0; k < this.columndimension; k++) {
         Bcolj[k] = B.elements[k][j];
       }
       // multiply it with each row from A
-      for (int i = 0; i < this.elements.length; i++) {
+      for(int i = 0; i < this.elements.length; i++) {
         final double[] Arowi = this.elements[i];
         double s = 0;
-        for (int k = 0; k < this.columndimension; k++) {
+        for(int k = 0; k < this.columndimension; k++) {
           s += Arowi[k] * Bcolj[k];
         }
         X.elements[i][j] = s;
@@ -828,15 +819,15 @@ public class Matrix {
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final Vector times(final Vector B) {
-    if (B.elements.length != this.columndimension) {
+    if(B.elements.length != this.columndimension) {
       throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Vector X = new Vector(this.elements.length);
     // multiply it with each row from A
-    for (int i = 0; i < this.elements.length; i++) {
+    for(int i = 0; i < this.elements.length; i++) {
       final double[] Arowi = this.elements[i];
       double s = 0;
-      for (int k = 0; k < this.columndimension; k++) {
+      for(int k = 0; k < this.columndimension; k++) {
         s += Arowi[k] * B.elements[k];
       }
       X.elements[i] = s;
@@ -852,14 +843,14 @@ public class Matrix {
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final Vector transposeTimes(final Vector B) {
-    if (B.elements.length != elements.length) {
+    if(B.elements.length != elements.length) {
       throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Vector X = new Vector(this.columndimension);
     // multiply it with each row from A
-    for (int i = 0; i < this.columndimension; i++) {
+    for(int i = 0; i < this.columndimension; i++) {
       double s = 0;
-      for (int k = 0; k < elements.length; k++) {
+      for(int k = 0; k < elements.length; k++) {
         s += elements[k][i] * B.elements[k];
       }
       X.elements[i] = s;
@@ -875,20 +866,20 @@ public class Matrix {
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final Matrix transposeTimes(final Matrix B) {
-    if (B.elements.length != elements.length) {
+    if(B.elements.length != elements.length) {
       throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Matrix X = new Matrix(this.columndimension, B.columndimension);
     final double[] Bcolj = new double[elements.length];
-    for (int j = 0; j < X.columndimension; j++) {
+    for(int j = 0; j < X.columndimension; j++) {
       // Make a linear copy of column j from B
-      for (int k = 0; k < elements.length; k++) {
+      for(int k = 0; k < elements.length; k++) {
         Bcolj[k] = B.elements[k][j];
       }
       // multiply it with each row from A
-      for (int i = 0; i < this.columndimension; i++) {
+      for(int i = 0; i < this.columndimension; i++) {
         double s = 0;
-        for (int k = 0; k < elements.length; k++) {
+        for(int k = 0; k < elements.length; k++) {
           s += elements[k][i] * Bcolj[k];
         }
         X.elements[i][j] = s;
@@ -905,17 +896,17 @@ public class Matrix {
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public final Matrix timesTranspose(final Matrix B) {
-    if (B.columndimension != this.columndimension) {
+    if(B.columndimension != this.columndimension) {
       throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
-    for (int j = 0; j < X.elements.length; j++) {
+    for(int j = 0; j < X.elements.length; j++) {
       final double[] Browj = B.elements[j];
       // multiply it with each row from A
-      for (int i = 0; i < this.elements.length; i++) {
+      for(int i = 0; i < this.elements.length; i++) {
         final double[] Arowi = this.elements[i];
         double s = 0;
-        for (int k = 0; k < this.columndimension; k++) {
+        for(int k = 0; k < this.columndimension; k++) {
           s += Arowi[k] * Browj[k];
         }
         X.elements[i][j] = s;
@@ -933,23 +924,23 @@ public class Matrix {
    */
   public final Matrix transposeTimesTranspose(Matrix B) {
     // Optimized implementation, exploiting the storage layout
-    if (this.elements.length != B.columndimension) {
+    if(this.elements.length != B.columndimension) {
       throw new IllegalArgumentException("Matrix inner dimensions must agree: " + getRowDimensionality() + "," + getColumnDimensionality() + " * " + B.getRowDimensionality() + "," + B.getColumnDimensionality());
     }
     final Matrix X = new Matrix(this.columndimension, B.elements.length);
     // Optimized ala Jama. jik order.
     final double[] Acolj = new double[this.elements.length];
-    for (int j = 0; j < X.elements.length; j++) {
+    for(int j = 0; j < X.elements.length; j++) {
       // Make a linear copy of column j from B
-      for (int k = 0; k < this.elements.length; k++) {
+      for(int k = 0; k < this.elements.length; k++) {
         Acolj[k] = this.elements[k][j];
       }
       final double[] Xrow = X.elements[j];
       // multiply it with each row from A
-      for (int i = 0; i < B.elements.length; i++) {
+      for(int i = 0; i < B.elements.length; i++) {
         final double[] Browi = B.elements[i];
         double s = 0;
-        for (int k = 0; k < B.columndimension; k++) {
+        for(int k = 0; k < B.columndimension; k++) {
           s += Browi[k] * Acolj[k];
         }
         Xrow[i] = s;
@@ -1011,7 +1002,7 @@ public class Matrix {
    */
   public final double trace() {
     double t = 0;
-    for (int i = 0; i < Math.min(elements.length, columndimension); i++) {
+    for(int i = 0; i < Math.min(elements.length, columndimension); i++) {
       t += elements[i][i];
     }
     return t;
@@ -1024,9 +1015,9 @@ public class Matrix {
    */
   public final double norm1() {
     double f = 0;
-    for (int j = 0; j < columndimension; j++) {
+    for(int j = 0; j < columndimension; j++) {
       double s = 0;
-      for (int i = 0; i < elements.length; i++) {
+      for(int i = 0; i < elements.length; i++) {
         s += Math.abs(elements[i][j]);
       }
       f = Math.max(f, s);
@@ -1050,9 +1041,9 @@ public class Matrix {
    */
   public final double normInf() {
     double f = 0;
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       double s = 0;
-      for (int j = 0; j < columndimension; j++) {
+      for(int j = 0; j < columndimension; j++) {
         s += Math.abs(elements[i][j]);
       }
       f = Math.max(f, s);
@@ -1067,8 +1058,8 @@ public class Matrix {
    */
   public final double normF() {
     double f = 0;
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < columndimension; j++) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
         f = MathUtil.fastHypot(f, elements[i][j]);
       }
     }
@@ -1079,14 +1070,14 @@ public class Matrix {
    * Normalizes the columns of this matrix to length of 1.0.
    */
   public final void normalizeColumns() {
-    for (int col = 0; col < columndimension; col++) {
+    for(int col = 0; col < columndimension; col++) {
       double norm = 0.0;
-      for (int row = 0; row < elements.length; row++) {
+      for(int row = 0; row < elements.length; row++) {
         norm = norm + (elements[row][col] * elements[row][col]);
       }
       norm = Math.sqrt(norm);
-      if (norm != 0) {
-        for (int row = 0; row < elements.length; row++) {
+      if(norm != 0) {
+        for(int row = 0; row < elements.length; row++) {
           elements[row][col] /= norm;
         }
       }
@@ -1105,13 +1096,13 @@ public class Matrix {
    *         columns of this matrix
    */
   public final boolean linearlyIndependent(final Matrix columnMatrix) {
-    if (columnMatrix.columndimension != 1) {
+    if(columnMatrix.columndimension != 1) {
       throw new IllegalArgumentException("a.getColumnDimension() != 1");
     }
-    if (this.elements.length != columnMatrix.elements.length) {
+    if(this.elements.length != columnMatrix.elements.length) {
       throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
-    if (this.columndimension + columnMatrix.columndimension > this.elements.length) {
+    if(this.columndimension + columnMatrix.columndimension > this.elements.length) {
       return false;
     }
     final StringBuilder msg = LoggingConfiguration.DEBUG ? new StringBuilder() : null;
@@ -1119,20 +1110,22 @@ public class Matrix {
     final double[][] a = new double[columndimension + 1][elements.length - 1];
     final double[] b = new double[columndimension + 1];
 
-    for (int i = 0; i < a.length; i++) {
-      for (int j = 0; j < a[i].length; j++) {
-        if (i < columndimension) {
+    for(int i = 0; i < a.length; i++) {
+      for(int j = 0; j < a[i].length; j++) {
+        if(i < columndimension) {
           a[i][j] = elements[j][i];
-        } else {
+        }
+        else {
           a[i][j] = columnMatrix.elements[j][0];
         }
       }
     }
 
-    for (int i = 0; i < b.length; i++) {
-      if (i < columndimension) {
+    for(int i = 0; i < b.length; i++) {
+      if(i < columndimension) {
         b[i] = elements[elements.length - 1][i];
-      } else {
+      }
+      else {
         b[i] = columnMatrix.elements[i][0];
       }
     }
@@ -1143,7 +1136,7 @@ public class Matrix {
     final double[][] coefficients = les.getCoefficents();
     final double[] rhs = les.getRHS();
 
-    if (msg != null) {
+    if(msg != null) {
       msg.append("\na' ").append(FormatUtil.format(this.getArrayRef()));
       msg.append("\nb' ").append(FormatUtil.format(columnMatrix.getColumnPackedCopy()));
 
@@ -1152,20 +1145,20 @@ public class Matrix {
       msg.append("\nleq ").append(les.equationsToString(4));
     }
 
-    for (int i = 0; i < coefficients.length; i++) {
+    for(int i = 0; i < coefficients.length; i++) {
       boolean allCoefficientsZero = true;
-      for (int j = 0; j < coefficients[i].length; j++) {
+      for(int j = 0; j < coefficients[i].length; j++) {
         final double value = coefficients[i][j];
-        if (Math.abs(value) > DELTA) {
+        if(Math.abs(value) > DELTA) {
           allCoefficientsZero = false;
           break;
         }
       }
       // allCoefficients=0 && rhs=0 -> linearly dependent
-      if (allCoefficientsZero) {
+      if(allCoefficientsZero) {
         final double value = rhs[i];
-        if (Math.abs(value) < DELTA) {
-          if (msg != null) {
+        if(Math.abs(value) < DELTA) {
+          if(msg != null) {
             msg.append("\nvalue ").append(value).append('[').append(i).append(']');
             msg.append("\nlinearly independent ").append(false);
             Logger.getLogger(this.getClass().getName()).fine(msg.toString());
@@ -1175,122 +1168,11 @@ public class Matrix {
       }
     }
 
-    if (msg != null) {
+    if(msg != null) {
       msg.append("\nlinearly independent ").append(true);
       Logger.getLogger(this.getClass().getName()).fine(msg.toString());
     }
     return true;
-  }
-
-  /**
-   * Returns a matrix derived by Gauss-Jordan-elimination using RationalNumbers
-   * for the transformations.
-   * 
-   * @return a matrix derived by Gauss-Jordan-elimination using RationalNumbers
-   *         for the transformations
-   */
-  public final Matrix exactGaussJordanElimination() {
-    final RationalNumber[][] gauss = exactGaussElimination();
-
-    // reduced form
-    for (int row = gauss.length - 1; row > 0; row--) {
-      int firstCol = -1;
-      for (int col = 0; col < gauss[row].length && firstCol == -1; col++) {
-        // if(gauss.get(row, col) != 0.0) // i.e. == 1
-        if (gauss[row][col].equals(RationalNumber.ONE)) {
-          firstCol = col;
-        }
-      }
-      if (firstCol > -1) {
-        for (int currentRow = row - 1; currentRow >= 0; currentRow--) {
-          RationalNumber multiplier = gauss[currentRow][firstCol].copy();
-          for (int col = firstCol; col < gauss[currentRow].length; col++) {
-            RationalNumber subtrahent = gauss[row][col].times(multiplier);
-            gauss[currentRow][col] = gauss[currentRow][col].minus(subtrahent);
-          }
-        }
-      }
-    }
-    return new Matrix(gauss);
-  }
-
-  /**
-   * Perform an exact Gauss-elimination of this Matrix using RationalNumbers to
-   * yield highest possible accuracy.
-   * 
-   * @return an array of arrays of RationalNumbers representing the
-   *         Gauss-eliminated form of this Matrix
-   */
-  private final RationalNumber[][] exactGaussElimination() {
-    final RationalNumber[][] gauss = new RationalNumber[elements.length][this.columndimension];
-    for (int row = 0; row < elements.length; row++) {
-      for (int col = 0; col < this.columndimension; col++) {
-        gauss[row][col] = new RationalNumber(elements[row][col]);
-      }
-    }
-    return exactGaussElimination(gauss);
-  }
-
-  /**
-   * Perform recursive Gauss-elimination on the given matrix of RationalNumbers.
-   * 
-   * @param gauss an array of arrays of RationalNumber
-   * @return recursive derived Gauss-elimination-form of the given matrix of
-   *         RationalNumbers
-   */
-  private static final RationalNumber[][] exactGaussElimination(final RationalNumber[][] gauss) {
-    int firstCol = -1;
-    int firstRow = -1;
-
-    // 1. find first column unequal to zero
-    for (int col = 0; col < gauss[0].length && firstCol == -1; col++) {
-      for (int row = 0; row < gauss.length && firstCol == -1; row++) {
-        // if(gauss.get(row, col) != 0.0)
-        if (!gauss[row][col].equals(RationalNumber.ZERO)) {
-          firstCol = col;
-          firstRow = row;
-        }
-      }
-    }
-
-    // 2. set row as first row
-    if (firstCol != -1) {
-      if (firstRow != 0) {
-        final RationalNumber[] row = new RationalNumber[gauss[firstRow].length];
-        System.arraycopy(gauss[firstRow], 0, row, 0, gauss[firstRow].length);
-        System.arraycopy(gauss[0], 0, gauss[firstRow], 0, gauss[firstRow].length);
-        System.arraycopy(row, 0, gauss[0], 0, row.length);
-      }
-
-      // 3. create leading 1
-      if (!gauss[0][firstCol].equals(RationalNumber.ONE)) {
-        final RationalNumber inverse = gauss[0][firstCol].multiplicativeInverse();
-        for (int col = 0; col < gauss[0].length; col++) {
-          gauss[0][col] = gauss[0][col].times(inverse);
-        }
-      }
-
-      // 4. eliminate values unequal to zero below leading 1
-      for (int row = 1; row < gauss.length; row++) {
-        final RationalNumber multiplier = gauss[row][firstCol].copy();
-        // if(multiplier != 0.0)
-        if (!multiplier.equals(RationalNumber.ZERO)) {
-          for (int col = firstCol; col < gauss[row].length; col++) {
-            final RationalNumber subtrahent = gauss[0][col].times(multiplier);
-            gauss[row][col] = gauss[row][col].minus(subtrahent);
-          }
-        }
-      }
-
-      // 5. recursion
-      if (gauss.length > 1) {
-        final RationalNumber[][] subMatrix = new RationalNumber[gauss.length - 1][gauss[1].length];
-        System.arraycopy(gauss, 1, subMatrix, 0, gauss.length - 1);
-        final RationalNumber[][] eliminatedSubMatrix = exactGaussElimination(subMatrix);
-        System.arraycopy(eliminatedSubMatrix, 0, gauss, 1, eliminatedSubMatrix.length);
-      }
-    }
-    return gauss;
   }
 
   /**
@@ -1299,12 +1181,12 @@ public class Matrix {
    * @return true, if this matrix is symmetric, false otherwise
    */
   public final boolean isSymmetric() {
-    if (elements.length != columndimension) {
+    if(elements.length != columndimension) {
       return false;
     }
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = i + 1; j < columndimension; j++) {
-        if (elements[i][j] != elements[j][i]) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = i + 1; j < columndimension; j++) {
+        if(elements[i][j] != elements[j][i]) {
           return false;
         }
       }
@@ -1321,16 +1203,17 @@ public class Matrix {
   public final Matrix completeBasis() {
     Matrix basis = copy();
     Matrix result = null;
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       final Matrix e_i = new Matrix(elements.length, 1);
       e_i.elements[0][i] = 1.0;
       final boolean li = basis.linearlyIndependent(e_i);
 
       // TODO: efficiency - appendColumns is expensive.
-      if (li) {
-        if (result == null) {
+      if(li) {
+        if(result == null) {
           result = e_i.copy();
-        } else {
+        }
+        else {
           result = result.appendColumns(e_i);
         }
         basis = basis.appendColumns(e_i);
@@ -1348,16 +1231,17 @@ public class Matrix {
   public final Matrix completeToOrthonormalBasis() {
     Matrix basis = copy();
     Matrix result = null;
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       final Matrix e_i = new Matrix(elements.length, 1);
       e_i.elements[i][0] = 1.0;
       final boolean li = basis.linearlyIndependent(e_i);
 
       // TODO: efficiency - appendColumns is expensive.
-      if (li) {
-        if (result == null) {
+      if(li) {
+        if(result == null) {
           result = e_i.copy();
-        } else {
+        }
+        else {
           result = result.appendColumns(e_i);
         }
         basis = basis.appendColumns(e_i);
@@ -1374,16 +1258,17 @@ public class Matrix {
    * @return the new matrix with the appended columns
    */
   public final Matrix appendColumns(final Matrix columns) {
-    if (elements.length != columns.elements.length) {
+    if(elements.length != columns.elements.length) {
       throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
 
     final Matrix result = new Matrix(elements.length, columndimension + columns.columndimension);
-    for (int i = 0; i < result.columndimension; i++) {
+    for(int i = 0; i < result.columndimension; i++) {
       // FIXME: optimize - excess copying!
-      if (i < columndimension) {
+      if(i < columndimension) {
         result.setCol(i, getCol(i));
-      } else {
+      }
+      else {
         result.setCol(i, columns.getCol(i - columndimension));
       }
     }
@@ -1399,10 +1284,10 @@ public class Matrix {
     Matrix v = copy();
 
     // FIXME: optimize - excess copying!
-    for (int i = 1; i < columndimension; i++) {
+    for(int i = 1; i < columndimension; i++) {
       final Vector u_i = getCol(i);
       final Vector sum = new Vector(elements.length);
-      for (int j = 0; j < i; j++) {
+      for(int j = 0; j < i; j++) {
         final Vector v_j = v.getCol(j);
         double scalar = u_i.transposeTimes(v_j) / v_j.transposeTimes(v_j);
         sum.plusTimesEquals(v_j, scalar);
@@ -1425,7 +1310,7 @@ public class Matrix {
    */
   public final Matrix cheatToAvoidSingularity(final double constant) {
     final Matrix a = this.copy();
-    for (int i = 0; i < a.columndimension && i < a.elements.length; i++) {
+    for(int i = 0; i < a.columndimension && i < a.elements.length; i++) {
       // if(a.get(i, i) < constant)
       {
         a.elements[i][i] += constant;
@@ -1460,40 +1345,40 @@ public class Matrix {
     TDoubleArrayList v = new TDoubleArrayList();
 
     // Ignore initial empty lines
-    while (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
+    while(tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
       // ignore initial empty lines
     }
-    if (tokenizer.ttype == StreamTokenizer.TT_EOF) {
+    if(tokenizer.ttype == StreamTokenizer.TT_EOF) {
       throw new java.io.IOException("Unexpected EOF on matrix read.");
     }
     do {
       v.add(FormatUtil.parseDouble(tokenizer.sval)); // Read & store 1st
       // row.
     }
-    while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
+    while(tokenizer.nextToken() == StreamTokenizer.TT_WORD);
 
     int n = v.size(); // Now we've got the number of columns!
     double row[] = v.toArray();
     ArrayList<double[]> rowV = new ArrayList<>();
     rowV.add(row); // Start storing rows instead of columns.
-    while (tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
+    while(tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
       // While non-empty lines
       rowV.add(row = new double[n]);
       int j = 0;
       do {
-        if (j >= n) {
+        if(j >= n) {
           throw new java.io.IOException("Row " + v.size() + " is too long.");
         }
         row[j++] = FormatUtil.parseDouble(tokenizer.sval);
       }
-      while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
-      if (j < n) {
+      while(tokenizer.nextToken() == StreamTokenizer.TT_WORD);
+      if(j < n) {
         throw new java.io.IOException("Row " + v.size() + " is too short.");
       }
     }
     int m = rowV.size(); // Now we've got the number of rows.
     double[][] A = new double[m][];
-    for (int i = 0; i < m; i++) {
+    for(int i = 0; i < m; i++) {
       A[i] = rowV.get(i);
     }
     return new Matrix(A);
@@ -1503,7 +1388,7 @@ public class Matrix {
    * Check if size(A) == size(B)
    */
   protected void checkMatrixDimensions(Matrix B) {
-    if (B.getRowDimensionality() != getRowDimensionality() || B.getColumnDimensionality() != getColumnDimensionality()) {
+    if(B.getRowDimensionality() != getRowDimensionality() || B.getColumnDimensionality() != getColumnDimensionality()) {
       throw new IllegalArgumentException("Matrix dimensions must agree.");
     }
   }
@@ -1520,25 +1405,25 @@ public class Matrix {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if(getClass() != obj.getClass()) {
       return false;
     }
     final Matrix other = (Matrix) obj;
-    if (this.elements.length != other.elements.length) {
+    if(this.elements.length != other.elements.length) {
       return false;
     }
-    if (this.columndimension != other.columndimension) {
+    if(this.columndimension != other.columndimension) {
       return false;
     }
-    for (int i = 0; i < this.elements.length; i++) {
-      for (int j = 0; j < this.columndimension; j++) {
-        if (this.elements[i][j] != other.elements[i][j]) {
+    for(int i = 0; i < this.elements.length; i++) {
+      for(int j = 0; j < this.columndimension; j++) {
+        if(this.elements[i][j] != other.elements[i][j]) {
           return false;
         }
       }
@@ -1555,25 +1440,25 @@ public class Matrix {
    * @return true if delta smaller than maximum
    */
   public boolean almostEquals(Object obj, double maxdelta) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if(getClass() != obj.getClass()) {
       return false;
     }
     final Matrix other = (Matrix) obj;
-    if (this.elements.length != other.elements.length) {
+    if(this.elements.length != other.elements.length) {
       return false;
     }
-    if (this.columndimension != other.columndimension) {
+    if(this.columndimension != other.columndimension) {
       return false;
     }
-    for (int i = 0; i < this.elements.length; i++) {
-      for (int j = 0; j < this.columndimension; j++) {
-        if (Math.abs(this.elements[i][j] - other.elements[i][j]) > maxdelta) {
+    for(int i = 0; i < this.elements.length; i++) {
+      for(int j = 0; j < this.columndimension; j++) {
+        if(Math.abs(this.elements[i][j] - other.elements[i][j]) > maxdelta) {
           return false;
         }
       }
