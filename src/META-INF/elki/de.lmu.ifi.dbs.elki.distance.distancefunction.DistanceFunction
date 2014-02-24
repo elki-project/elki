@@ -60,6 +60,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DTWDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.EDRDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.ERPDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.LCSSDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DerivativeDTWDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction
