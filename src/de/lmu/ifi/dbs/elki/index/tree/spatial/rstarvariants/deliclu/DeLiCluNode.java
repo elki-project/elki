@@ -61,7 +61,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    *         handled data objects
    */
   public boolean hasHandled() {
-    for(int i = 1; i < getNumEntries(); i++) {
+    for(int i = 0; i < getNumEntries(); i++) {
       boolean handled = getEntry(i).hasHandled();
       if(handled) {
         return true;
@@ -78,7 +78,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    *         unhandled data objects
    */
   public boolean hasUnhandled() {
-    for(int i = 1; i < getNumEntries(); i++) {
+    for(int i = 0; i < getNumEntries(); i++) {
       boolean handled = getEntry(i).hasUnhandled();
       if(handled) {
         return true;
