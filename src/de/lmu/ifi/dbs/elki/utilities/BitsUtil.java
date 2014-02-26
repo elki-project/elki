@@ -1384,7 +1384,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Compute whether two Bitsets intersect.
+   * Test whether two Bitsets intersect.
    * 
    * @param x First bitset
    * @param y Second bitset
@@ -1395,7 +1395,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Compute the intersection size of two Bitsets.
+   * Test whether two Bitsets intersect.
    * 
    * @param x First bitset
    * @param y Second bitset
@@ -1419,7 +1419,7 @@ public final class BitsUtil {
    * @return Intersection size
    */
   public static int intersectionSize(long x, long y) {
-    return cardinality(x & y);
+    return Long.bitCount(x & y);
   }
 
   /**
@@ -1430,10 +1430,11 @@ public final class BitsUtil {
    * @return Intersection size
    */
   public static int intersectionSize(long[] x, long[] y) {
-    final int min = (x.length < y.length) ? x.length : y.length;
+    final int lx = x.length, ly = y.length;
+    final int min = (lx < ly) ? lx: ly;
     int res = 0;
     for(int i = 0; i < min; i++) {
-      res += cardinality(x[i] & y[i]);
+      res += Long.bitCount(x[i] & y[i]);
     }
     return res;
   }
@@ -1446,7 +1447,7 @@ public final class BitsUtil {
    * @return Union size
    */
   public static int unionSize(long x, long y) {
-    return cardinality(x | y);
+    return Long.bitCount(x | y);
   }
 
   /**
@@ -1457,12 +1458,55 @@ public final class BitsUtil {
    * @return Union size
    */
   public static int unionSize(long[] x, long[] y) {
-    final int min = (x.length < y.length) ? x.length : y.length;
-    int res = 0;
-    for(int i = 0; i < min; i++) {
-      res += cardinality(x[i] | y[i]);
+    final int lx = x.length, ly = y.length;
+    final int min = (lx < ly) ? lx: ly;
+    int i = 0, res = 0;
+    for(; i < min; i++) {
+      res += Long.bitCount(x[i] | y[i]);
+    }
+    for(; i < lx; i++) {
+      res += Long.bitCount(x[i]);
+    }
+    for(; i < ly; i++) {
+      res += Long.bitCount(y[i]);
     }
     return res;
+  }
+
+  /**
+   * Compute the Hamming distance (Size of symmetric difference), i.e.
+   * {@code cardinality(a ^ b)}.
+   * 
+   * @param b1 First vector
+   * @param b2 Second vector
+   * @return Cardinality of symmetric difference
+   */
+  public static int hammingDistance(long b1, long b2) {
+    return Long.bitCount(b1 ^ b2);
+  }
+
+  /**
+   * Compute the Hamming distance (Size of symmetric difference), i.e.
+   * {@code cardinality(a ^ b)}.
+   * 
+   * @param x First vector
+   * @param y Second vector
+   * @return Cardinality of symmetric difference
+   */
+  public static int hammingDistance(long[] x, long[] y) {
+    final int lx = x.length, ly = y.length;
+    final int min = (lx < ly) ? lx: ly;
+    int i = 0, h = 0;
+    for(; i < min; i++) {
+      h += Long.bitCount(x[i] ^ y[i]);
+    }
+    for(; i < lx; i++) {
+      h += Long.bitCount(x[i]);
+    }
+    for(; i < ly; i++) {
+      h += Long.bitCount(y[i]);
+    }
+    return h;
   }
 
   /**

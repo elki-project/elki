@@ -149,10 +149,61 @@ public class BitVector extends AbstractNumberVector {
   /**
    * Returns a copy of the bits currently set in this BitVector.
    * 
+   * If possible, use {@link VectorUtil} instead (may save a copy).
+   * 
    * @return a copy of the bits currently set in this BitVector
    */
   public long[] getBits() {
     return bits.clone();
+  }
+
+  /**
+   * Compute the vector cardinality (uncached!)
+   * 
+   * @return Vector cardinality
+   */
+  public int cardinality() {
+    return BitsUtil.cardinality(bits);
+  }
+
+  /**
+   * Compute the Hamming distance of two bit vectors.
+   * 
+   * @param v2 Second bit vector
+   * @return Hamming distance (number of bits difference)
+   */
+  public int hammingDistance(BitVector v2) {
+    return BitsUtil.hammingDistance(bits, v2.bits);
+  }
+
+  /**
+   * Compute the vector intersection size.
+   * 
+   * @param v2 Second bit vector
+   * @return Intersection size (number of bits in both)
+   */
+  public int intersectionSize(BitVector v2) {
+    return BitsUtil.intersectionSize(bits, v2.bits);
+  }
+
+  /**
+   * Compute the vector union size.
+   * 
+   * @param v2 Second bit vector
+   * @return Intersection size (number of bits in both)
+   */
+  public int unionSize(BitVector v2) {
+    return BitsUtil.unionSize(bits, v2.bits);
+  }
+
+  /**
+   * Compute whether two vectors intersect.
+   * 
+   * @param v2 Second bit vector
+   * @return {@code true} if they intersect in at least one bit.
+   */
+  public boolean intersect(BitVector v2) {
+    return BitsUtil.intersect(bits, v2.bits);
   }
 
   /**

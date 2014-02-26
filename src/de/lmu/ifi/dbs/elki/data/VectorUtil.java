@@ -85,7 +85,7 @@ public final class VectorUtil {
    * @param <V> vector type
    * @return new instance
    */
-  public static <V extends NumberVector> V randomVector(NumberVector.Factory<V>  factory, int dim, Random r) {
+  public static <V extends NumberVector> V randomVector(NumberVector.Factory<V> factory, int dim, Random r) {
     return factory.newNumberVector(MathUtil.randomDoubleArray(dim, r));
   }
 
@@ -97,7 +97,7 @@ public final class VectorUtil {
    * @param <V> vector type
    * @return new instance
    */
-  public static <V extends NumberVector> V randomVector(NumberVector.Factory<V>  factory, int dim) {
+  public static <V extends NumberVector> V randomVector(NumberVector.Factory<V> factory, int dim) {
     return randomVector(factory, dim, new Random());
   }
 
@@ -518,9 +518,9 @@ public final class VectorUtil {
    * @param <V> Vector type
    * @return a new NumberVector as a projection on the specified attributes
    */
-  public static <V extends NumberVector> V project(V v, BitSet selectedAttributes, NumberVector.Factory<V>  factory) {
+  public static <V extends NumberVector> V project(V v, BitSet selectedAttributes, NumberVector.Factory<V> factory) {
     if(factory instanceof SparseNumberVector.Factory) {
-      final SparseNumberVector.Factory<?>  sfactory = (SparseNumberVector.Factory<?> ) factory;
+      final SparseNumberVector.Factory<?> sfactory = (SparseNumberVector.Factory<?>) factory;
       TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
       for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
         if(v.doubleValue(d) != 0.0) {
