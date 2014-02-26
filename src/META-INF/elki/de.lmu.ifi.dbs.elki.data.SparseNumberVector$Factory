@@ -3,3 +3,4 @@ de.lmu.ifi.dbs.elki.data.SparseDoubleVector$Factory
 de.lmu.ifi.dbs.elki.data.SparseByteVector$Factory
 de.lmu.ifi.dbs.elki.data.SparseIntegerVector$Factory
 de.lmu.ifi.dbs.elki.data.SparseShortVector$Factory
+de.lmu.ifi.dbs.elki.data.BitVector$Factory

@@ -343,6 +343,22 @@ public final class BitsUtil {
   }
 
   /**
+   * Put o onto v inplace, i.e. v = o
+   * 
+   * @param v Primary object
+   * @param o data to initialize to.
+   * @return v
+   */
+  public static long[] setI(long[] v, long[] o) {
+    assert (o.length <= v.length) : "Bit set sizes do not agree.";
+    final int max = Math.min(v.length, o.length);
+    for(int i = 0; i < max; i++) {
+      v[i] = o[i];
+    }
+    return v;
+  }
+
+  /**
    * Clear bit number "off" in v.
    * 
    * @param v Buffer

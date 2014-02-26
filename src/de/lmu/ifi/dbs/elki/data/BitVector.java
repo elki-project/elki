@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntDoubleIterator;
+import gnu.trove.map.TIntDoubleMap;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -41,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.composedOf Bit
  */
-public class BitVector extends AbstractNumberVector {
+public class BitVector extends AbstractNumberVector implements SparseNumberVector {
   /**
    * Static instance.
    */
@@ -60,7 +63,7 @@ public class BitVector extends AbstractNumberVector {
   /**
    * Dimensionality of this bit vector.
    */
-  private final int dimensionality;
+  private int dimensionality;
 
   /**
    * Provides a new BitVector corresponding to the specified bits and of the
@@ -77,6 +80,11 @@ public class BitVector extends AbstractNumberVector {
   @Override
   public int getDimensionality() {
     return dimensionality;
+  }
+
+  @Override
+  public void setDimensionality(int dimensionality) {
+    this.dimensionality = dimensionality;
   }
 
   /**
@@ -103,6 +111,56 @@ public class BitVector extends AbstractNumberVector {
   @Override
   public long longValue(int dimension) {
     return BitsUtil.get(bits, dimension) ? 1L : 0L;
+  }
+
+  @Override
+  public int iter() {
+    return BitsUtil.nextSetBit(bits, 0);
+  }
+
+  @Override
+  public int iterAdvance(int iter) {
+    return BitsUtil.nextSetBit(bits, iter + 1);
+  }
+
+  @Override
+  public boolean iterValid(int iter) {
+    return iter >= 0;
+  }
+
+  @Override
+  public int iterDim(int iter) {
+    return iter; // Identity
+  }
+
+  @Override
+  public double iterDoubleValue(int iter) {
+    return 1.; // When properly used: always true!
+  }
+
+  @Override
+  public float iterFloatValue(int iter) {
+    return 1.f; // When properly used: always true!
+  }
+
+  @Override
+  public int iterIntValue(int iter) {
+    return 1; // When properly used: always true!
+  }
+
+  @Override
+  public short iterShortValue(int iter) {
+    return 1; // When properly used: always true!
+  }
+
+  @Override
+  public long iterLongValue(int iter) {
+    return 1L; // When properly used: always true!
+  }
+
+  @Override
+  public byte iterByteValue(int iter) {
+    return 1; // When properly used: always true!
   }
 
   /**
@@ -149,11 +207,9 @@ public class BitVector extends AbstractNumberVector {
   /**
    * Returns a copy of the bits currently set in this BitVector.
    * 
-   * If possible, use {@link VectorUtil} instead (may save a copy).
-   * 
    * @return a copy of the bits currently set in this BitVector
    */
-  public long[] getBits() {
+  public long[] cloneBits() {
     return bits.clone();
   }
 
@@ -207,6 +263,33 @@ public class BitVector extends AbstractNumberVector {
   }
 
   /**
+   * Combine onto v using the AND operation, i.e. {@code v &= this}.
+   * 
+   * @param v Existing bit set of same length.
+   */
+  public void andOnto(long[] v) {
+    BitsUtil.andI(v, bits);
+  }
+
+  /**
+   * Combine onto v using the OR operation, i.e. {@code v |= this}.
+   * 
+   * @param v Existing bit set of same length.
+   */
+  public void orOnto(long[] v) {
+    BitsUtil.orI(v, bits);
+  }
+
+  /**
+   * Combine onto v using the XOR operation, i.e. {@code v ^= this}.
+   * 
+   * @param v Existing bit set of same length.
+   */
+  public void xorOnto(long[] v) {
+    BitsUtil.xorI(v, bits);
+  }
+
+  /**
    * Returns a String representation of this BitVector. The representation is
    * suitable to be parsed by
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.BitVectorLabelParser
@@ -252,7 +335,7 @@ public class BitVector extends AbstractNumberVector {
    * 
    * @apiviz.has BitVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<BitVector> {
+  public static class Factory extends AbstractNumberVector.Factory<BitVector> implements SparseNumberVector.Factory<BitVector> {
     @Override
     public <A> BitVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
@@ -275,6 +358,19 @@ public class BitVector extends AbstractNumberVector {
         }
       }
       return new BitVector(bits, dim);
+    }
+
+    @Override
+    public BitVector newNumberVector(TIntDoubleMap values, int maxdim) {
+      long[] bits = BitsUtil.zero(maxdim);
+      // Import and sort the indexes
+      for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
+        iter.advance();
+        if(iter.value() != 0.) {
+          BitsUtil.setI(bits, iter.key());
+        }
+      }
+      return new BitVector(bits, maxdim);
     }
 
     @Override

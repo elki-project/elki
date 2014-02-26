@@ -33,6 +33,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.data.SparseFeatureVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -222,15 +223,14 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @param needed Minimum support needed
    * @return 1-itemsets
    */
-  protected List<OneItemset> buildFrequentOneItemsets(final Relation<BitVector> relation, final int dim, final int needed) {
+  protected List<OneItemset> buildFrequentOneItemsets(final Relation<? extends SparseFeatureVector<?>> relation, final int dim, final int needed) {
     // TODO: use TIntList and prefill appropriately to avoid knowing "dim"
     // beforehand?
     int[] counts = new int[dim];
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      BitVector bv = relation.get(iditer);
-      long[] bits = bv.getBits();
-      for(int i = BitsUtil.nextSetBit(bits, 0); i >= 0; i = BitsUtil.nextSetBit(bits, i + 1)) {
-        counts[i]++;
+      SparseFeatureVector<?> bv = relation.get(iditer);
+      for(int it = bv.iter(); bv.iterValid(it); it = bv.iterAdvance(it)) {
+        counts[bv.iterDim(it)]++;
       }
     }
     // Generate initial candidates of length 1.
@@ -267,10 +267,8 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     TLongIntHashMap map = new TLongIntHashMap((f1 * (f1 - 1)) >> 1);
     final long[] scratch = BitsUtil.zero(dim);
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-      long[] bv = relation.get(iditer).getBits();
-      for(int i = 0; i < scratch.length; i++) {
-        scratch[i] = (i < bv.length) ? (mask[i] & bv[i]) : 0L;
-      }
+      BitsUtil.setI(scratch, mask);
+      relation.get(iditer).andOnto(scratch);
       boolean lives = false;
       for(int i = BitsUtil.nextSetBit(scratch, 0); i >= 0; i = BitsUtil.nextSetBit(scratch, i + 1)) {
         for(int j = BitsUtil.nextSetBit(scratch, i + 1); j >= 0; j = BitsUtil.nextSetBit(scratch, j + 1)) {
