@@ -5,4 +5,5 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBatchedLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
+de.lmu.ifi.dbs.elki.algorithm.statistics.HopkinsStatisticClusteringTendency
 tutorial.clustering.SameSizeKMeansAlgorithm
