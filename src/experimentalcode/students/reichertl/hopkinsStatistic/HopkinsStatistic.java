@@ -40,15 +40,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Lisa Reichert
  * 
- * 
- * @param <O> Database object type
- * @param <D> Distance type
+ * @param <V> Database object type
  */
 public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveDistanceBasedAlgorithm<V, Result> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(HopkinsStatistic.class);
+  private static final Logging LOG = Logging.getLogger(HopkinsStatistic.class);
 
   public static final OptionID SAMPLESIZE_ID = new OptionID("hopkins.samplesize", "List of the size of datasamples");
 
@@ -108,7 +106,6 @@ public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveD
    * Runs the algorithm in the timed evaluation part.
    */
   public HopkinsResult run(Database database, Relation<V> relation) {
-
     final Random masterRandom = (this.seed != null) ? new Random(this.seed) : new Random();
     ArrayList<String> res = new ArrayList<>();
 
@@ -128,15 +125,14 @@ public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveD
       // k= 2 und dann natürlich 2. element aus liste holen sonst nächster
       // nachbar
       // von q immer q
-      double w = knnQuery.getKNNForDBID(iter2, 2).get(1).doubleValue();
-      iter2.advance();
+      double w = 0.;
       for(; iter2.valid(); iter2.advance()) {
         w += knnQuery.getKNNForDBID(iter2, 2).get(1).doubleValue();
       }
       // compute NN distances for randomly created new uniform objects
       Collection<V> uniformObjs = getUniformObjs(relation, masterRandom.nextLong(), sampleSize, this.minima, this.maxima, dim);
       Iterator<V> iter = uniformObjs.iterator();
-      double u = knnQuery.getKNNForObject(iter.next(), 1).get(0).doubleValue();
+      double u = 0.;
       while(iter.hasNext()) {
         u += knnQuery.getKNNForObject(iter.next(), 1).get(0).doubleValue();
       }
@@ -146,14 +142,20 @@ public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveD
       umean.put(u);
       wmean.put(w);
     }
-    String r = "samplesize " + sampleSize + " dim " + dim + " hopkins mean: " + hmean.getMean() + " hopkins variance: " + hmean.getSampleVariance() + " umean " + umean.getMean() + " uvar " + umean.getSampleVariance() + " wmean " + wmean.getMean() + " wvar " + wmean.getSampleVariance();
+    String r = "samplesize " + sampleSize + " dim " + dim + " hopkins mean: " + hmean.getMean() //
+        + ((rep > 1) ? (" hopkins variance: " + hmean.getSampleVariance()) : "") //
+        + " umean " + umean.getMean() //
+        + ((rep > 1) ? (" uvar " + umean.getSampleVariance()) : "") //
+        + " wmean " + wmean.getMean() //
+        + ((rep > 1) ? (" wvar " + wmean.getSampleVariance()) : "");
     res.add(r);
+    LOG.verbose(r);
 
     return new HopkinsResult(res, this.sampleSize + "samples");
   }
 
   public <T extends V> Collection<V> getUniformObjs(Relation<V> relation, Long random, int sampleSize, double[] min, double[] max, int dim) {
-    logger.debug("min" + min.length + "max" + max.length + "dim" + dim);
+    LOG.debug("min" + min.length + "max" + max.length + "dim" + dim);
     ArrayList<V> result = new ArrayList<>(sampleSize);
     double[] vec = new double[dim];
     Random[] randoms = new Random[dim];
@@ -161,7 +163,7 @@ public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveD
       randoms[i] = new Random(random);
     }
 
-    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
+    final NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
     // if no parameter for min max compute min max values for each dimension
     // from dataset
     if(min == null || max == null || min.length == 0 || max.length == 0) {
@@ -196,7 +198,7 @@ public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveD
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override
@@ -205,7 +207,6 @@ public class HopkinsStatistic<V extends NumberVector> extends AbstractPrimitiveD
   }
 
   public static class HopkinsResult extends CollectionResult<String> {
-
     /**
      * Constructor.
      * 
