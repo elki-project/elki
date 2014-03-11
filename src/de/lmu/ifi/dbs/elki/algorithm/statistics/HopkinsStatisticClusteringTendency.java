@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
@@ -61,7 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 // TODO: allow using more than one k
 @Reference(authors = "B. Hopkins and J. G. Skellam", //
 title = "A new method for determining the type of distribution of plant individuals", //
-booktitle = "Annals of Botany, 18(2), 213-227")
+booktitle = "Annals of Botany, 18(2), 213-227", //
+url = "http://aob.oxfordjournals.org/content/18/2/213.short")
 public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector, Result> {
   /**
    * The logger for this class.
@@ -142,7 +144,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanc
     // more stable result
     for(int j = 0; j < this.rep; j++) {
       // Compute NN distances for random objects from within the database
-      double w = computeNNForRealData(knnQuery, relation);
+      double w = computeNNForRealData(knnQuery, relation, dim);
       // Compute NN distances for randomly created new uniform objects
       double u = computeNNForUniformData(knnQuery, min, extend);
       // compute hopkins statistik
@@ -177,16 +179,16 @@ public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanc
    * 
    * @param knnQuery KNN query
    * @param relation Data relation
-   * @return Average 1NN distance
+   * @return Aggregated 1NN distances
    */
-  protected double computeNNForRealData(final KNNQuery<NumberVector> knnQuery, Relation<NumberVector> relation) {
+  protected double computeNNForRealData(final KNNQuery<NumberVector> knnQuery, Relation<NumberVector> relation, final int dim) {
     double w = 0.;
     ModifiableDBIDs dataSampleIds = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, random);
     for(DBIDIter iter = dataSampleIds.iter(); iter.valid(); iter.advance()) {
       final double kdist = knnQuery.getKNNForDBID(iter, k + 1).getKNNDistance();
-      w += kdist * kdist;
+      w += MathUtil.powi(kdist, dim);
     }
-    return w / dataSampleIds.size();
+    return w;
   }
 
   /**
@@ -195,12 +197,13 @@ public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanc
    * @param knnQuery KNN query
    * @param min Data minima
    * @param extend Data extend
-   * @return
+   * @return Aggregated 1NN distances
    */
   protected double computeNNForUniformData(final KNNQuery<NumberVector> knnQuery, final double[] min, final double[] extend) {
     final Random rand = random.getSingleThreadedRandom();
+    final int dim = min.length;
 
-    Vector vec = new Vector(min.length);
+    Vector vec = new Vector(dim);
     double[] buf = vec.getArrayRef(); // Reference!
 
     double u = 0.;
@@ -210,9 +213,9 @@ public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanc
         buf[d] = min[d] + (rand.nextDouble() * extend[d]);
       }
       final double kdist = knnQuery.getKNNForObject(vec, k).getKNNDistance();
-      u += kdist * kdist;
+      u += MathUtil.powi(kdist, dim);
     }
-    return u / sampleSize;
+    return u;
   }
 
   /**
