@@ -76,7 +76,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @param <O> Object type
  */
-// TODO: optimize for double distances.
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
 public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<DoubleVector>> {
