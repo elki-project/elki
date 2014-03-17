@@ -48,12 +48,17 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Outlier Detection based on the distance of an object to its k nearest
  * neighbor.
+ * 
+ * This implementation uses the k-nearest-neighbor definition of a database,
+ * which inclues the query point. Using k=1 is therefore not sensible, as all
+ * objects will have a score of 0 according to this definition.
  * 
  * <p>
  * Reference:<br>
@@ -80,10 +85,12 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
   /**
    * Parameter to specify the k nearest neighbor
    */
-  public static final OptionID K_ID = new OptionID("knno.k", "k nearest neighbor");
+  public static final OptionID K_ID = new OptionID("knno.k", //
+  "The k nearest neighbor, according to the database definition "//
+      + "(where the 1NN is usually the query point, yielding a distance of 0)");
 
   /**
-   * The parameter k
+   * The parameter k (including query point!)
    */
   private int k;
 
@@ -91,7 +98,7 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
    * Constructor for a single kNN query.
    * 
    * @param distanceFunction distance function to use
-   * @param k Value of k
+   * @param k Value of k (including query point!)
    */
   public KNNOutlier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
@@ -162,7 +169,8 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID);
+      final IntParameter kP = new IntParameter(K_ID)//
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }

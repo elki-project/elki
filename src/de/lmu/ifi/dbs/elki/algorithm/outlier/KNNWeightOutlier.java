@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -56,9 +57,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Outlier Detection based on the accumulated distances of a point to its k
  * nearest neighbors.
  * 
- * Based on: F. Angiulli, C. Pizzuti: Fast Outlier Detection in High Dimensional
- * Spaces. In: Proc. European Conference on Principles of Knowledge Discovery
- * and Data Mining (PKDD'02), Helsinki, Finland, 2002.
+ * This implementation uses the k-nearest-neighbor definition of a database,
+ * which inclues the query point. Using k=1 is therefore not sensible, as all
+ * objects will have a score of 0 according to this definition.
+ * 
+ * Furthermore, we report the sum of the k distances, not the average (some
+ * implementations will return the average).
+ * 
+ * Reference:
+ * <p>
+ * F. Angiulli, C. Pizzuti: Fast Outlier Detection in High Dimensional Spaces.
+ * In: Proc. European Conference on Principles of Knowledge Discovery and Data
+ * Mining (PKDD'02), Helsinki, Finland, 2002.
+ * </p>
  * 
  * @author Lisa Reichert
  * 
@@ -76,17 +87,14 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
   private static final Logging LOG = Logging.getLogger(KNNWeightOutlier.class);
 
   /**
-   * Parameter to specify the k nearest neighbor
+   * Parameter to specify the k nearest neighbor.
    */
-  public static final OptionID K_ID = new OptionID("knnwod.k", "k nearest neighbor");
+  public static final OptionID K_ID = new OptionID("knnwod.k", //
+  "The k nearest neighbor, according to the database definition "//
+      + "(where the 1NN is usually the query point, yielding a distance of 0)");
 
   /**
-   * The kNN query used.
-   */
-  public static final OptionID KNNQUERY_ID = new OptionID("knnwod.knnquery", "kNN query to use");
-
-  /**
-   * Holds the value of {@link #K_ID}.
+   * Holds the number of nearest neighbors to query (including query point!)
    */
   private int k;
 
@@ -94,7 +102,7 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
    * Constructor with parameters.
    * 
    * @param distanceFunction Distance function
-   * @param k k Parameter
+   * @param k k Parameter (including query point!)
    */
   public KNNWeightOutlier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
@@ -123,7 +131,8 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
 
       final KNNList knn = knnQuery.getKNNForDBID(iditer, k);
       double skn = 0;
-      for(DoubleDBIDListIter neighbor = knn.iter(); neighbor.valid(); neighbor.advance()) {
+      int i = 0;
+      for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance(), ++i) {
         skn += neighbor.doubleValue();
       }
       knnw_score.putDouble(iditer, skn);
@@ -165,7 +174,8 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID);
+      final IntParameter kP = new IntParameter(K_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
