@@ -117,7 +117,7 @@ public class HistogramVisualization extends AbstractVisFactory {
     double range = xminmax.getMax() - xminmax.getMin();
     double binwidth = range / (size - 1);
 
-    LinearScale xscale = new LinearScale(xminmax.getMin() - binwidth * .5, xminmax.getMax() + binwidth * .5);
+    LinearScale xscale = new LinearScale(xminmax.getMin() - binwidth * .49999, xminmax.getMax() + binwidth * .49999);
     LinearScale yscale = new LinearScale(yminmax.getMin(), yminmax.getMax());
 
     SVGPath[] path = new SVGPath[dim];
