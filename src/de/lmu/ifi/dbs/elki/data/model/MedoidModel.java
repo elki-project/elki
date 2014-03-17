@@ -67,10 +67,7 @@ public class MedoidModel extends BaseModel implements TextWriteable {
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    if(label != null) {
-      out.commentPrintLn(label);
-    }
-    out.commentPrintLn(TextWriterStream.SER_MARKER + " " + getClass().getName());
+    super.writeToText(out, label);
     out.commentPrintLn("Cluster Medoid: " + medoid.toString());
   }
 }

@@ -55,7 +55,6 @@ public class EMModel<V extends FeatureVector<?>> extends MeanModel<V> {
   @Override
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
-    out.commentPrintLn("Mean: " + out.normalizationRestore(this.getMean()).toString());
     out.commentPrintLn("Covariance Matrix: " + this.covarianceMatrix.toString());
   }
 

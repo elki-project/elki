@@ -104,7 +104,7 @@ public class CorrelationModel<V extends FeatureVector<?>> extends BaseModel impl
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    out.commentPrintLn(TextWriterStream.SER_MARKER + " " + CorrelationModel.class.getName());
+    super.writeToText(out, label);
     out.commentPrintLn("Centroid: " + out.normalizationRestore(getCentroid()).toString());
     out.commentPrintLn("Strong Eigenvectors:");
     String strong = getPCAResult().getStrongEigenvectors().toString();

@@ -174,12 +174,13 @@ public class Cluster<M extends Model> implements TextWriteable {
    * @return a name for the cluster
    */
   public String getNameAutomatic() {
-    if (name != null) {
+    if(name != null) {
       return name;
     }
-    if (isNoise()) {
+    if(isNoise()) {
       return "Noise";
-    } else {
+    }
+    else {
       return "Cluster";
     }
   }
@@ -248,28 +249,14 @@ public class Cluster<M extends Model> implements TextWriteable {
   @Override
   public void writeToText(TextWriterStream out, String label) {
     String name = getNameAutomatic();
-    out.commentPrintLn(TextWriterStream.SER_MARKER + " " + Cluster.class.getName());
-    if (name != null) {
-      out.commentPrintLn("Name: " + name);
+    if(name != null) {
+      out.commentPrintLn("Cluster name: " + name);
     }
-    out.commentPrintLn("Noise flag: " + isNoise());
-    out.commentPrintLn("Size: " + ids.size());
-    // print hierarchy information.
-    /*
-     * if (isHierarchical()) { out.commentPrint("Parents: "); for (int i = 0; i
-     * < numParents(); i++) { if (i > 0) { out.commentPrint(", "); }
-     * out.commentPrint(getParents().get(i).getNameAutomatic()); }
-     * out.commentPrintLn(); out.commentPrint("Children: "); for (int i = 0; i <
-     * numChildren(); i++) { if (i > 0) { out.commentPrint(", "); }
-     * out.commentPrint(getChildren().get(i).getNameAutomatic()); }
-     * out.commentPrintLn(); }
-     */
+    out.commentPrintLn("Cluster noise flag: " + isNoise());
+    out.commentPrintLn("Cluster size: " + ids.size());
     // also print model, if any and printable
-    if (getModel() != null) {
-      out.commentPrintLn("Model class: " + getModel().getClass().getName());
-      if (getModel() instanceof TextWriteable) {
-        ((TextWriteable) getModel()).writeToText(out, label);
-      }
+    if(getModel() != null && (getModel() instanceof TextWriteable)) {
+      ((TextWriteable) getModel()).writeToText(out, label);
     }
   }
 
@@ -299,18 +286,18 @@ public class Cluster<M extends Model> implements TextWriteable {
   public static Comparator<Cluster<?>> BY_NAME_SORTER = new Comparator<Cluster<?>>() {
     @Override
     public int compare(Cluster<?> o1, Cluster<?> o2) {
-      if (o1 == o2) {
+      if(o1 == o2) {
         return 0;
       }
       // sort by label if possible
-      if (o1 != null && o1.name != null && o2 != null && o2.name != null) {
+      if(o1 != null && o1.name != null && o2 != null && o2.name != null) {
         int lblresult = o1.name.compareTo(o2.getName());
-        if (lblresult != 0) {
+        if(lblresult != 0) {
           return lblresult;
         }
       }
       int hashresult = o1.hashCode() - o2.hashCode();
-      if (hashresult != 0) {
+      if(hashresult != 0) {
         return hashresult;
       }
       return 0;

@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
-import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -139,19 +138,20 @@ public class TextWriter {
    * @return unique filename
    */
   protected String getFilename(Object result, String filenamepre) {
-    if (filenamepre == null || filenamepre.length() == 0) {
+    if(filenamepre == null || filenamepre.length() == 0) {
       filenamepre = "result";
     }
     int i = 0;
-    while (true) {
+    while(true) {
       String filename;
-      if (i > 0) {
+      if(i > 0) {
         filename = filenamepre + "-" + i;
-      } else {
+      }
+      else {
         filename = filenamepre;
       }
       Object existing = filenames.get(filename);
-      if (existing == null || existing == result) {
+      if(existing == null || existing == result) {
         filenames.put(filename, result);
         return filename;
       }
@@ -181,33 +181,33 @@ public class TextWriter {
     // Split result objects in different known types:
     {
       List<Result> results = ResultUtil.filterResults(r, Result.class);
-      for (Result res : results) {
-        if (filter != null) {
+      for(Result res : results) {
+        if(filter != null) {
           final String nam = res.getShortName();
-          if (nam == null || !filter.matcher(nam).find()) {
+          if(nam == null || !filter.matcher(nam).find()) {
             continue;
           }
         }
-        if (res instanceof Database) {
+        if(res instanceof Database) {
           continue;
         }
-        if (res instanceof Relation) {
+        if(res instanceof Relation) {
           ra.add((Relation<?>) res);
           continue;
         }
-        if (res instanceof OrderingResult) {
+        if(res instanceof OrderingResult) {
           ro.add((OrderingResult) res);
           continue;
         }
-        if (res instanceof Clustering) {
+        if(res instanceof Clustering) {
           rc.add((Clustering<?>) res);
           continue;
         }
-        if (res instanceof IterableResult) {
+        if(res instanceof IterableResult) {
           ri.add((IterableResult<?>) res);
           continue;
         }
-        if (res instanceof SettingsResult) {
+        if(res instanceof SettingsResult) {
           rs.add((SettingsResult) res);
           continue;
         }
@@ -217,19 +217,19 @@ public class TextWriter {
 
     writeSettingsResult(streamOpener, rs);
 
-    for (IterableResult<?> rii : ri) {
+    for(IterableResult<?> rii : ri) {
       writeIterableResult(streamOpener, rii);
     }
-    for (Clustering<?> c : rc) {
+    for(Clustering<?> c : rc) {
       NamingScheme naming = new SimpleEnumeratingScheme(c);
-      for (Cluster<?> clus : c.getAllClusters()) {
+      for(Cluster<?> clus : c.getAllClusters()) {
         writeClusterResult(db, streamOpener, (Clustering<Model>) c, (Cluster<Model>) clus, ra, naming);
       }
     }
-    for (OrderingResult ror : ro) {
+    for(OrderingResult ror : ro) {
       writeOrderingResult(db, streamOpener, ror, ra);
     }
-    for (Result otherr : otherres) {
+    for(Result otherr : otherres) {
       writeOtherResult(streamOpener, otherr);
     }
   }
@@ -237,16 +237,16 @@ public class TextWriter {
   private void printObject(TextWriterStream out, Database db, final DBIDRef objID, List<Relation<?>> ra) throws UnableToComplyException, IOException {
     SingleObjectBundle bundle = db.getBundle(objID);
     // Write database element itself.
-    for (int i = 0; i < bundle.metaLength(); i++) {
+    for(int i = 0; i < bundle.metaLength(); i++) {
       Object obj = bundle.data(i);
-      if (obj != null) {
+      if(obj != null) {
         TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
-        if (owriter == null) {
+        if(owriter == null) {
           throw new UnableToComplyException("No handler for database object itself: " + obj.getClass().getSimpleName());
         }
         String lbl = null;
         // TODO: ugly compatibility hack...
-        if (TypeUtil.DBID.isAssignableFromType(bundle.meta(i))) {
+        if(TypeUtil.DBID.isAssignableFromType(bundle.meta(i))) {
           lbl = "ID";
         }
         owriter.writeObject(out, lbl, obj);
@@ -255,19 +255,19 @@ public class TextWriter {
 
     Collection<Relation<?>> dbrels = db.getRelations();
     // print the annotations
-    if (ra != null) {
-      for (Relation<?> a : ra) {
+    if(ra != null) {
+      for(Relation<?> a : ra) {
         // Avoid duplicated output.
-        if (dbrels.contains(a)) {
+        if(dbrels.contains(a)) {
           continue;
         }
         String label = a.getShortName();
         Object value = a.get(objID);
-        if (value == null) {
+        if(value == null) {
           continue;
         }
         TextWriterWriterInterface<?> writer = out.getWriterFor(value);
-        if (writer == null) {
+        if(writer == null) {
           // Ignore
           continue;
         }
@@ -279,9 +279,10 @@ public class TextWriter {
 
   private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
-    if (naming != null) {
+    if(naming != null) {
       filename = filenameFromLabel(naming.getNameFor(clus));
-    } else {
+    }
+    else {
       filename = "cluster";
     }
 
@@ -290,25 +291,19 @@ public class TextWriter {
 
     // Write cluster information
     out.commentPrintLn("Cluster: " + naming.getNameFor(clus));
-    Model model = clus.getModel();
-    if (model != ClusterModel.CLUSTER && model != null) {
-      TextWriterWriterInterface<?> mwri = out.getWriterFor(model);
-      if (mwri != null) {
-        mwri.writeObject(out, null, model);
-      }
-    }
-    if (clustering.getClusterHierarchy().numParents(clus) > 0) {
+    clus.writeToText(out, null);
+    if(clustering.getClusterHierarchy().numParents(clus) > 0) {
       StringBuilder buf = new StringBuilder();
       buf.append("Parents:");
-      for (Hierarchy.Iter<Cluster<Model>> iter = clustering.getClusterHierarchy().iterParents(clus); iter.valid(); iter.advance()) {
+      for(Hierarchy.Iter<Cluster<Model>> iter = clustering.getClusterHierarchy().iterParents(clus); iter.valid(); iter.advance()) {
         buf.append(' ').append(naming.getNameFor(iter.get()));
       }
       out.commentPrintLn(buf.toString());
     }
-    if (clustering.getClusterHierarchy().numChildren(clus) > 0) {
+    if(clustering.getClusterHierarchy().numChildren(clus) > 0) {
       StringBuilder buf = new StringBuilder();
       buf.append("Children:");
-      for (Hierarchy.Iter<Cluster<Model>> iter = clustering.getClusterHierarchy().iterChildren(clus); iter.valid(); iter.advance()) {
+      for(Hierarchy.Iter<Cluster<Model>> iter = clustering.getClusterHierarchy().iterChildren(clus); iter.valid(); iter.advance()) {
         buf.append(' ').append(naming.getNameFor(iter.get()));
       }
       out.commentPrintLn(buf.toString());
@@ -317,7 +312,7 @@ public class TextWriter {
 
     // print ids.
     DBIDs ids = clus.getIDs();
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       printObject(out, db, iter, ra);
     }
     out.flush();
@@ -329,20 +324,20 @@ public class TextWriter {
     TextWriterStream out = new TextWriterStream(outStream, writers);
 
     // hack to print collectionResult header information
-    if (ri instanceof CollectionResult<?>) {
+    if(ri instanceof CollectionResult<?>) {
       final Collection<String> hdr = ((CollectionResult<?>) ri).getHeader();
-      if (hdr != null) {
-        for (String header : hdr) {
+      if(hdr != null) {
+        for(String header : hdr) {
           out.commentPrintLn(header);
         }
         out.flush();
       }
     }
     Iterator<?> i = ri.iterator();
-    while (i.hasNext()) {
+    while(i.hasNext()) {
       Object o = i.next();
       TextWriterWriterInterface<?> writer = out.getWriterFor(o);
-      if (writer != null) {
+      if(writer != null) {
         writer.writeObject(out, null, o);
       }
       out.flush();
@@ -355,7 +350,7 @@ public class TextWriter {
     PrintStream outStream = streamOpener.openStream(getFilename(or, or.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
 
-    for (DBIDIter i = or.iter(or.getDBIDs()).iter(); i.valid(); i.advance()) {
+    for(DBIDIter i = or.iter(or.getDBIDs()).iter(); i.valid(); i.advance()) {
       printObject(out, db, i, ra);
     }
     out.flush();
@@ -363,7 +358,7 @@ public class TextWriter {
   }
 
   private void writeSettingsResult(StreamFactory streamOpener, List<SettingsResult> rs) throws UnableToComplyException, IOException {
-    if (rs.size() < 1) {
+    if(rs.size() < 1) {
       return;
     }
     SettingsResult r = rs.get(0);
@@ -371,26 +366,28 @@ public class TextWriter {
     TextWriterStream out = new TextWriterStream(outStream, writers);
     // Write settings preamble
     out.commentPrintLn("Settings:");
-    
-    if (rs != null) {
-      for (SettingsResult settings : rs) {
+
+    if(rs != null) {
+      for(SettingsResult settings : rs) {
         Object last = null;
-        for (Pair<Object, Parameter<?>> setting : settings.getSettings()) {
-          if (setting.first != last && setting.first != null) {
-            if (last != null) {
+        for(Pair<Object, Parameter<?>> setting : settings.getSettings()) {
+          if(setting.first != last && setting.first != null) {
+            if(last != null) {
               out.commentPrintLn("");
             }
             String name;
             try {
-              if (setting.first instanceof Class) {
+              if(setting.first instanceof Class) {
                 name = ((Class<?>) setting.first).getName();
-              } else {
+              }
+              else {
                 name = setting.first.getClass().getName();
               }
-              if (ClassParameter.class.isInstance(setting.first)) {
+              if(ClassParameter.class.isInstance(setting.first)) {
                 name = ((ClassParameter<?>) setting.first).getValue().getName();
               }
-            } catch (NullPointerException e) {
+            }
+            catch(NullPointerException e) {
               name = "[null]";
             }
             out.commentPrintLn(name);
@@ -399,10 +396,11 @@ public class TextWriter {
           String name = setting.second.getOptionID().getName();
           String value = "[unset]";
           try {
-            if (setting.second.isDefined()) {
+            if(setting.second.isDefined()) {
               value = setting.second.getValueAsString();
             }
-          } catch (NullPointerException e) {
+          }
+          catch(NullPointerException e) {
             value = "[null]";
           }
           out.commentPrintLn(SerializedParameterization.OPTION_PREFIX + name + " " + value);
@@ -414,11 +412,11 @@ public class TextWriter {
   }
 
   private void writeOtherResult(StreamFactory streamOpener, Result r) throws UnableToComplyException, IOException {
-    if (writers.getHandler(r) != null) {
+    if(writers.getHandler(r) != null) {
       PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
       TextWriterStream out = new TextWriterStream(outStream, writers);
       TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
-      if (owriter == null) {
+      if(owriter == null) {
         throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
       }
       // Write data

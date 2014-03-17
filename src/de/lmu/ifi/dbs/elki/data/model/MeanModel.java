@@ -69,10 +69,7 @@ public class MeanModel<V extends FeatureVector<?>> extends BaseModel implements 
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    if(label != null) {
-      out.commentPrintLn(label);
-    }
-    out.commentPrintLn(TextWriterStream.SER_MARKER + " " + getClass().getName());
+    super.writeToText(out, label);
     out.commentPrintLn("Cluster Mean: " + mean.toString());
   }
 }
