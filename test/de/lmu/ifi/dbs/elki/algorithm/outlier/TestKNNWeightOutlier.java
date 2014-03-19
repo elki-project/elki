@@ -45,7 +45,7 @@ public class TestKNNWeightOutlier extends AbstractSimpleAlgorithmTest implements
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(KNNWeightOutlier.K_ID, 5);
+    params.addParameter(KNNWeightOutlier.Parameterizer.K_ID, 4);
 
     // setup Algorithm
     KNNWeightOutlier<DoubleVector> knnWeightOutlier = ClassGenericsUtil.parameterizeOrAbort(KNNWeightOutlier.class, params);

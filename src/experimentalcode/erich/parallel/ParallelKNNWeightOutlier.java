@@ -23,7 +23,7 @@ package experimentalcode.erich.parallel;
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -89,11 +89,11 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnq = database.getKNNQuery(distq, k);
+    KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
-    KNNMapper<O> knnm = new KNNMapper<>(k, knnq);
+    KNNMapper<O> knnm = new KNNMapper<>(k + 1, knnq);
     SharedObject<KNNList> knnv = new SharedObject<>();
-    KNNWeightMapper kdistm = new KNNWeightMapper(k);
+    KNNWeightMapper kdistm = new KNNWeightMapper(k + 1);
     SharedDouble kdistv = new SharedDouble();
     WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(store);
     DoubleMinMaxMapper mmm = new DoubleMinMaxMapper();
@@ -107,7 +107,7 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
     ParallelMapExecutor.run(ids, knnm, kdistm, storem, mmm);
 
     DoubleMinMax minmax = mmm.getMinMax();
-    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Weight Outlier Score", "knnw-outlier", store, ids);
+    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN weight Outlier Score", "knnw-outlier", store, ids);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
   }
@@ -136,7 +136,7 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       
-      IntParameter kP = new IntParameter(KNNOutlier.K_ID);
+      IntParameter kP = new IntParameter(KNNWeightOutlier.Parameterizer.K_ID);
       if (config.grab(kP)) {
         k = kP.getValue();
       }

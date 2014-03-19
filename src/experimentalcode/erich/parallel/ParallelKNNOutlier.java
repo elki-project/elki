@@ -89,11 +89,11 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnq = database.getKNNQuery(distq, k);
+    KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
-    KNNMapper<O> knnm = new KNNMapper<>(k, knnq);
+    KNNMapper<O> knnm = new KNNMapper<>(k + 1, knnq);
     SharedObject<KNNList> knnv = new SharedObject<>();
-    KDistanceMapper kdistm = new KDistanceMapper(k);
+    KDistanceMapper kdistm = new KDistanceMapper(k + 1);
     SharedDouble kdistv = new SharedDouble();
     WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(store);
     DoubleMinMaxMapper mmm = new DoubleMinMaxMapper();
@@ -136,7 +136,7 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       
-      IntParameter kP = new IntParameter(KNNOutlier.K_ID);
+      IntParameter kP = new IntParameter(KNNOutlier.Parameterizer.K_ID);
       if (config.grab(kP)) {
         k = kP.getValue();
       }

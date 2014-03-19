@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -57,16 +58,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Outlier Detection based on the accumulated distances of a point to its k
  * nearest neighbors.
  * 
- * This implementation uses the k-nearest-neighbor definition of a database,
- * which inclues the query point. Using k=1 is therefore not sensible, as all
- * objects will have a score of 0 according to this definition.
+ * As in the original publication (as far as we could tell from the pseudocode
+ * included), the current point is not included in the nearest neighbors (see
+ * figures in the publication). This matches the intuition common in nearest
+ * neighbor classification, where the evaluated instances are not part of the
+ * training set; but it contrasts to the pseudocode of the kNN outlier method
+ * and the database interpretation (which returns all objects stored in the
+ * database).
  * 
- * Furthermore, we report the sum of the k distances, not the average (some
- * implementations will return the average).
+ * Furthermore, we report the sum of the k distances (called "weight" in the
+ * original publication). Other implementations may return the average distance
+ * instead, and therefore yield different results.
  * 
  * Reference:
  * <p>
- * F. Angiulli, C. Pizzuti: Fast Outlier Detection in High Dimensional Spaces.
+ * F. Angiulli, C. Pizzuti:<br />
+ * Fast Outlier Detection in High Dimensional Spaces.<br />
  * In: Proc. European Conference on Principles of Knowledge Discovery and Data
  * Mining (PKDD'02), Helsinki, Finland, 2002.
  * </p>
@@ -78,20 +85,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 @Title("KNNWeight outlier detection")
-@Description("Outlier Detection based on the distances of an object to its k nearest neighbors.")
-@Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002", url = "http://dx.doi.org/10.1007/3-540-45681-3_2")
+@Description("Outlier detection based on the sum of distances of an object to its k nearest neighbors.")
+@Reference(authors = "F. Angiulli, C. Pizzuti", //
+title = "Fast Outlier Detection in High Dimensional Spaces", //
+booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002", //
+url = "http://dx.doi.org/10.1007/3-540-45681-3_2")
 public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(KNNWeightOutlier.class);
-
-  /**
-   * Parameter to specify the k nearest neighbor.
-   */
-  public static final OptionID K_ID = new OptionID("knnwod.k", //
-  "The k nearest neighbor, according to the database definition "//
-      + "(where the 1NN is usually the query point, yielding a distance of 0)");
 
   /**
    * Holds the number of nearest neighbors to query (including query point!)
@@ -102,7 +105,7 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
    * Constructor with parameters.
    * 
    * @param distanceFunction Distance function
-   * @param k k Parameter (including query point!)
+   * @param k k Parameter (not including query point!)
    */
   public KNNWeightOutlier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
@@ -111,43 +114,47 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
 
   /**
    * Runs the algorithm in the timed evaluation part.
+   * 
+   * @param database Database context
+   * @param relation Data relation
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k);
+    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
 
-    if(LOG.isVerbose()) {
-      LOG.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
-    }
-    FiniteProgress progressKNNWeight = LOG.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", relation.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute kNN weights.", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
-
-    // compute distance to the k nearest neighbor. n objects with the highest
-    // distance are flagged as outliers
     WritableDoubleDataStore knnw_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      // compute sum of the distances to the k nearest neighbors
-
-      final KNNList knn = knnQuery.getKNNForDBID(iditer, k);
-      double skn = 0;
-      int i = 0;
-      for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance(), ++i) {
+      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1);
+      double skn = 0; // sum of the distances to the k nearest neighbors
+      int i = 0; // number of neighbors so far
+      for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance()) {
+        if(DBIDUtil.equal(iditer, neighbor)) {
+          continue;
+        }
         skn += neighbor.doubleValue();
+        ++i;
+      }
+      if(i < k) {
+        // Less than k neighbors found
+        // Approximative index, or k > data set size!
+        skn = Double.POSITIVE_INFINITY;
       }
       knnw_score.putDouble(iditer, skn);
       minmax.put(skn);
 
-      if(progressKNNWeight != null) {
-        progressKNNWeight.incrementProcessed(LOG);
+      if(prog != null) {
+        prog.incrementProcessed(LOG);
       }
     }
-    if(progressKNNWeight != null) {
-      progressKNNWeight.ensureCompleted(LOG);
+    if(prog != null) {
+      prog.ensureCompleted(LOG);
     }
 
-    DoubleRelation res = new MaterializedDoubleRelation("Weighted kNN Outlier Score", "knnw-outlier", knnw_score, relation.getDBIDs());
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
+    DoubleRelation res = new MaterializedDoubleRelation("kNN weight Outlier Score", "knnw-outlier", knnw_score, relation.getDBIDs());
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(meta, res);
   }
 
@@ -169,13 +176,23 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+    /**
+     * Parameter to specify the k nearest neighbor.
+     */
+    public static final OptionID K_ID = new OptionID("knnwod.k", //
+    "The k nearest neighbor, excluding the query point "//
+        + "(i.e. query point is the 0-nearest-neighbor)");
+
+    /**
+     * k parameter
+     */
     protected int k = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }

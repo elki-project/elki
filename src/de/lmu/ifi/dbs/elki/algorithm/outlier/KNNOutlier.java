@@ -56,15 +56,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Outlier Detection based on the distance of an object to its k nearest
  * neighbor.
  * 
- * This implementation uses the k-nearest-neighbor definition of a database,
- * which inclues the query point. Using k=1 is therefore not sensible, as all
- * objects will have a score of 0 according to this definition.
+ * This implementation differs from the original pseudocode: the k nearest
+ * neighbors do not exclude the point that is currently evaluated. I.e. for k=1
+ * the resulting score is the distance to the 1-nearest neighbor that is not the
+ * query point and therefore should match k=2 in the exact pseudocode - a value
+ * of k=1 in the original code does not make sense, as the 1NN distance will be
+ * 0 for every point in the database. If you for any reason want to use the
+ * original algorithm, subtract 1 from the k parameter.
  * 
+ * Reference:
  * <p>
- * Reference:<br>
- * S. Ramaswamy, R. Rastogi, K. Shim: Efficient Algorithms for Mining Outliers
- * from Large Data Sets.</br> In: Proc. of the Int. Conf. on Management of Data,
- * Dallas, Texas, 2000.
+ * S. Ramaswamy, R. Rastogi, K. Shim:<br />
+ * Efficient Algorithms for Mining Outliers from Large Data Sets.<br />
+ * In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.
  * </p>
  * 
  * @author Lisa Reichert
@@ -81,13 +85,6 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(KNNOutlier.class);
-
-  /**
-   * Parameter to specify the k nearest neighbor
-   */
-  public static final OptionID K_ID = new OptionID("knno.k", //
-  "The k nearest neighbor, according to the database definition "//
-      + "(where the 1NN is usually the query point, yielding a distance of 0)");
 
   /**
    * The parameter k (including query point!)
@@ -110,36 +107,28 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k);
+    final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
 
-    if(LOG.isVerbose()) {
-      LOG.verbose("Computing the kNN outlier degree (distance to the k nearest neighbor)");
-    }
-    FiniteProgress progressKNNDistance = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore knno_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     // compute distance to the k nearest neighbor.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       // distance to the kth nearest neighbor
-      final KNNList knns = knnQuery.getKNNForDBID(iditer, k);
-      final double dkn;
-      if(knns instanceof KNNList) {
-        dkn = ((KNNList) knns).getKNNDistance();
-      }
-      else {
-        dkn = knns.getKNNDistance();
-      }
+      // (assuming the query point is always included, with distance 0)
+      final KNNList knns = knnQuery.getKNNForDBID(iditer, k + 1);
+      final double dkn = knns.getKNNDistance();
 
       knno_score.putDouble(iditer, dkn);
       minmax.put(dkn);
 
-      if(progressKNNDistance != null) {
-        progressKNNDistance.incrementProcessed(LOG);
+      if(prog != null) {
+        prog.incrementProcessed(LOG);
       }
     }
-    if(progressKNNDistance != null) {
-      progressKNNDistance.ensureCompleted(LOG);
+    if(prog != null) {
+      prog.ensureCompleted(LOG);
     }
     DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", "knn-outlier", knno_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
@@ -164,13 +153,23 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResu
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+    /**
+     * Parameter to specify the k nearest neighbor
+     */
+    public static final OptionID K_ID = new OptionID("knno.k", //
+    "The k nearest neighbor, excluding the query point "//
+        + "(i.e. query point is the 0-nearest-neighbor)");
+
+    /**
+     * k parameter
+     */
     protected int k = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID)//
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }

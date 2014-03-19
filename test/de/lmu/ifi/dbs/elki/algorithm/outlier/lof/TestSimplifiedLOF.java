@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 /*
  This file is part of ELKI:
@@ -34,27 +34,27 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the KNNOutlier algorithm.
+ * Tests the LOF algorithm.
  * 
- * @author Lucia Cichella
+ * @author Erich Schubert
  */
-public class TestKNNOutlier extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestSimplifiedLOF extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testKNNOutlier() {
-    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+  public void testSimplifiedLOF() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(KNNOutlier.Parameterizer.K_ID, 1);
+    params.addParameter(LOF.Parameterizer.K_ID, 10);
 
     // setup Algorithm
-    KNNOutlier<DoubleVector> knnOutlier = ClassGenericsUtil.parameterizeOrAbort(KNNOutlier.class, params);
+    SimplifiedLOF<DoubleVector> lof = ClassGenericsUtil.parameterizeOrAbort(SimplifiedLOF.class, params);
     testParameterizationOk(params);
 
-    // run KNNOutlier on database
-    OutlierResult result = knnOutlier.run(db);
+    // run LOF on database
+    OutlierResult result = lof.run(db);
 
-    testSingleScore(result, 945, 0.4793554700168577);
-    testAUC(db, "Noise", result, 0.991462962962963);
+    testAUC(db, "Noise", result, 0.8892549019);
+    testSingleScore(result, 1293, 1.3025894);
   }
 }

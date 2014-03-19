@@ -73,10 +73,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * within ELKI we have renamed this parameter to &quot;k&quot;.
  * </p>
  * 
+ * Reference:
  * <p>
- * Reference: <br>
- * M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander: LOF: Identifying
- * Density-Based Local Outliers. <br>
+ * M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander:<br />
+ * LOF: Identifying Density-Based Local Outliers.<br />
  * In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00),
  * Dallas, TX, 2000.
  * </p>
@@ -86,11 +86,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @apiviz.has KNNQuery
  * 
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of data objects handled by this algorithm
  */
 @Title("LOF: Local Outlier Factor")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'k'")
-@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "LOF: Identifying Density-Based Local Outliers", booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", url = "http://dx.doi.org/10.1145/342009.335388")
+@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander",//
+title = "LOF: Identifying Density-Based Local Outliers", //
+booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", //
+url = "http://dx.doi.org/10.1145/342009.335388")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LOF", "outlier.LOF", "LOF" })
 public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
@@ -99,14 +102,15 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
   private static final Logging LOG = Logging.getLogger(LOF.class);
 
   /**
-   * Holds the value of {@link Parameterizer#K_ID}.
+   * The number of neighbors to query (including the query point!)
    */
   protected int k = 2;
 
   /**
    * Constructor.
    * 
-   * @param k the value of k
+   * @param k the number of neighbors to use for comparison (excluding the query
+   *        point)
    * @param distanceFunction the neighborhood distance function
    */
   public LOF(int k, DistanceFunction<? super O> distanceFunction) {
@@ -115,7 +119,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
   }
 
   /**
-   * Performs the Generalized LOF_SCORE algorithm on the given database.
+   * Runs the LOF algorithm on the given database.
    * 
    * @param database Database to query
    * @param relation Data to process
@@ -212,7 +216,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       final double lrdp = lrds.doubleValue(iter);
       final KNNList neighbors = knnq.getKNNForDBID(iter, k);
       if(!Double.isInfinite(lrdp)) {
-        double sum = 0.0;
+        double sum = 0.;
         int count = 0;
         for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
@@ -266,10 +270,10 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its LOF_SCORE, must be an integer greater than
-     * 1.
+     * considered for computing its LOF score, must be an integer greater than
+     * or equal to 1.
      */
-    public static final OptionID K_ID = new OptionID("lof.k", "The number of nearest neighbors of an object to be considered for computing its LOF_SCORE.");
+    public static final OptionID K_ID = new OptionID("lof.k", "The number of nearest neighbors of an object to be considered for computing its LOF score.");
 
     /**
      * The neighborhood size to use.
@@ -281,7 +285,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(K_ID);
-      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      pK.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
         k = pK.getValue();
       }

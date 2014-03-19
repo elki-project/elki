@@ -75,10 +75,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @apiviz.has KNNQuery
  * 
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> the type of data objects handled by this algorithm
  */
-@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", title = "Local outlier detection reconsidered: a generalized view on locality with applications to spatial, video, and network outlier detection", booktitle = "Data Mining and Knowledge Discovery", url = "http://dx.doi.org/10.1007/s10618-012-0300-z")
-@Alias({ "SimpleLOF", "outlier.SimpleLOF", "de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleLOF" })
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel",//
+title = "Local outlier detection reconsidered: a generalized view on locality with applications to spatial, video, and network outlier detection", //
+booktitle = "Data Mining and Knowledge Discovery", //
+url = "http://dx.doi.org/10.1007/s10618-012-0300-z")
+@Alias({ "SimplifiedLOF", "outlier.SimplifiedLOF", "de.lmu.ifi.dbs.elki.algorithm.outlier.SimplifiedLOF" })
 public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -86,7 +89,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
   private static final Logging LOG = Logging.getLogger(SimplifiedLOF.class);
 
   /**
-   * Parameter k.
+   * The number of neighbors to query, excluding the query point.
    */
   protected int k;
 
@@ -108,7 +111,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
    * @return LOF outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    StepProgress stepprog = LOG.isVerbose() ? new StepProgress("SimpleLOF", 3) : null;
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress("SimplifiedLOF", 3) : null;
 
     DBIDs ids = relation.getDBIDs();
 
@@ -130,59 +133,96 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
       stepprog.beginStep(2, "Computing densities.", LOG);
     }
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(it, k);
-      double sum = 0.0;
-      int count = 0;
-      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-        if(DBIDUtil.equal(neighbor, it)) {
-          continue;
-        }
-        sum += neighbor.doubleValue();
-        count++;
-      }
-      // Avoid division by 0
-      final double lrd = (sum > 0) ? (count / sum) : 0;
-      dens.putDouble(it, lrd);
-      if(densProgress != null) {
-        densProgress.incrementProcessed(LOG);
-      }
-    }
-    if(densProgress != null) {
-      densProgress.ensureCompleted(LOG);
-    }
+    computeSimplifiedLRDs(ids, knnq, dens);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing SLOFs.", LOG);
     }
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
-    // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
+    computeSimplifiedLOFs(ids, knnq, dens, lofs, lofminmax);
 
-    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Simple LOF scores.", ids.size(), LOG) : null;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      final double lrdp = dens.doubleValue(it);
+    if(stepprog != null) {
+      stepprog.setCompleted(LOG);
+    }
+
+    // Build result representation.
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Simplified Local Outlier Factor", "simplified-lof-outlier", lofs, ids);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0., Double.POSITIVE_INFINITY, 1.);
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
+
+    return result;
+  }
+
+  /**
+   * Compute the simplified reachability densities.
+   * 
+   * @param ids IDs to process
+   * @param knnq kNN query class
+   * @param lrds Density output
+   */
+  private void computeSimplifiedLRDs(DBIDs ids, KNNQuery<O> knnq, WritableDoubleDataStore lrds) {
+    FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
+      double sum = 0.0;
+      int count = 0;
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        if(DBIDUtil.equal(neighbor, iter)) {
+          continue;
+        }
+        sum += neighbor.doubleValue();
+        count++;
+      }
+      // Avoid division by 0
+      final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
+      lrds.putDouble(iter, lrd);
+      if(lrdsProgress != null) {
+        lrdsProgress.incrementProcessed(LOG);
+      }
+    }
+    if(lrdsProgress != null) {
+      lrdsProgress.ensureCompleted(LOG);
+    }
+  }
+
+  /**
+   * Compute the simplified LOF factors.
+   * 
+   * @param ids IDs to compute for
+   * @param knnq kNN query class
+   * @param slrds Object densities
+   * @param lofs SLOF output storage
+   * @param lofminmax Minimum and maximum scores
+   */
+  private void computeSimplifiedLOFs(DBIDs ids, KNNQuery<O> knnq, WritableDoubleDataStore slrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
+    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Simplified LOF scores.", ids.size(), LOG) : null;
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lof;
-      if(lrdp > 0) {
-        final KNNList neighbors = knnq.getKNNForDBID(it, k);
-        double sum = 0.0;
+      final double lrdp = slrds.doubleValue(iter);
+      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
+      if(!Double.isInfinite(lrdp)) {
+        double sum = 0.;
         int count = 0;
         for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
-          if(DBIDUtil.equal(neighbor, it)) {
+          if(DBIDUtil.equal(neighbor, iter)) {
             continue;
           }
-          sum += dens.doubleValue(neighbor);
+          final double val = slrds.doubleValue(neighbor);
+          sum += val;
           count++;
+          if(Double.isInfinite(val)) {
+            break;
+          }
         }
-        lof = sum / (count * lrdp);
+        lof = sum / (lrdp * count);
       }
       else {
         lof = 1.0;
       }
-      lofs.putDouble(it, lof);
+      lofs.putDouble(iter, lof);
       // update minimum and maximum
       lofminmax.put(lof);
 
@@ -193,17 +233,6 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
     if(progressLOFs != null) {
       progressLOFs.ensureCompleted(LOG);
     }
-
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
-
-    // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Simple Local Outlier Factor", "simple-lof-outlier", lofs, ids);
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-
-    return result;
   }
 
   @Override
@@ -236,7 +265,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID);
-      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      pK.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
         k = pK.getValue();
       }
