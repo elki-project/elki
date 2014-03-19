@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -66,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.workflow.LoggingStep;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
@@ -79,7 +81,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @apiviz.owns ParameterTable
  * @apiviz.owns DynamicParameters
  */
-@Alias({"mini", "minigui"})
+@Alias({ "mini", "minigui" })
 public class MiniGUI extends AbstractApplication {
   /**
    * Filename for saved settings.
@@ -367,6 +369,18 @@ public class MiniGUI extends AbstractApplication {
   }
 
   /**
+   * Auto-load the last task from the history file.
+   */
+  protected void loadLatest() {
+    int size = store.size();
+    if(size > 0) {
+      final Pair<String, ArrayList<String>> pair = store.getElementAt(size - 1);
+      savedSettingsModel.setSelectedItem(pair.first);
+      doSetParameters(pair.second);
+    }
+  }
+
+  /**
    * Do a full run of the KDDTask with the specified parameters.
    */
   protected void startTask() {
@@ -455,12 +469,28 @@ public class MiniGUI extends AbstractApplication {
         try {
           final MiniGUI gui = new MiniGUI();
           gui.run();
+          List<String> params = Collections.emptyList();
           if(args != null && args.length > 0) {
-            gui.doSetParameters(Arrays.asList(args));
+            params = new ArrayList<String>(Arrays.asList(args));
+            // TODO: it would be nicer to use the Parameterization API for this!
+            if(params.remove("-minigui.last")) {
+              javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  gui.loadLatest();
+                }
+              });
+            }
+            if(params.remove("-minigui.autorun")) {
+              javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  gui.startTask();
+                }
+              });
+            }
           }
-          else {
-            gui.doSetParameters(new ArrayList<String>());
-          }
+          gui.doSetParameters(params);
         }
         catch(UnableToComplyException e) {
           LOG.exception(e);
