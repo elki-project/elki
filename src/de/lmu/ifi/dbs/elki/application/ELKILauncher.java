@@ -50,25 +50,28 @@ public class ELKILauncher {
    * @param args Command line arguments.
    */
   public static void main(String[] args) {
-    if (args.length > 0 && args[0].charAt(0) != '-') {
+    if(args.length > 0 && args[0].charAt(0) != '-') {
       try {
         Class<?> cls = findMainClass(args[0]);
         Method m = cls.getMethod("main", String[].class);
         Object a = Arrays.copyOfRange(args, 1, args.length);
         try {
           m.invoke(null, a);
-        } catch (Exception e) {
+        }
+        catch(Exception e) {
           LoggingUtil.exception(e);
         }
         return;
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         // Ignore
       }
     }
     try {
       Method m = DEFAULT_APPLICATION.getMethod("main", String[].class);
       m.invoke(null, (Object) args);
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       LoggingUtil.exception(e);
     }
   }
@@ -80,23 +83,26 @@ public class ELKILauncher {
    * @return Class
    * @throws ClassNotFoundException
    */
-  private static Class<?> findMainClass(String name) throws ClassNotFoundException {
+  public static Class<? extends AbstractApplication> findMainClass(String name) throws ClassNotFoundException {
     try {
-      return Class.forName(name);
-    } catch (ClassNotFoundException e) {
+      return Class.forName(name).asSubclass(AbstractApplication.class);
+    }
+    catch(ClassNotFoundException | ClassCastException e) {
       // pass
     }
     try {
-      return Class.forName(AbstractApplication.class.getPackage().getName() + '.' + name);
-    } catch (ClassNotFoundException e) {
+      return Class.forName(AbstractApplication.class.getPackage().getName() + '.' + name)//
+      .asSubclass(AbstractApplication.class);
+    }
+    catch(ClassNotFoundException | ClassCastException e) {
       // pass
     }
-    for (Class<?> c : InspectionUtil.cachedFindAllImplementations(AbstractApplication.class)) {
-      if (c.isAnnotationPresent(Alias.class)) {
+    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(AbstractApplication.class)) {
+      if(c.isAnnotationPresent(Alias.class)) {
         Alias aliases = c.getAnnotation(Alias.class);
-        for (String alias : aliases.value()) {
-          if (alias.equalsIgnoreCase(name)) {
-            return c;
+        for(String alias : aliases.value()) {
+          if(alias.equalsIgnoreCase(name)) {
+            return c.asSubclass(AbstractApplication.class);
           }
         }
       }

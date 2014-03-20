@@ -53,6 +53,8 @@ import javax.swing.event.TableModelListener;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.application.ELKILauncher;
+import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.gui.GUIUtil;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
 import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
@@ -142,6 +144,11 @@ public class MiniGUI extends AbstractApplication {
    * The "run" button.
    */
   protected JButton runButton;
+
+  /**
+   * Application to configure / run.
+   */
+  private Class<? extends AbstractApplication> maincls = KDDCLIApplication.class;
 
   /**
    * Constructor.
@@ -333,7 +340,7 @@ public class MiniGUI extends AbstractApplication {
     SerializedParameterization config = new SerializedParameterization(params);
     TrackParameters track = new TrackParameters(config);
     track.tryInstantiate(LoggingStep.class);
-    track.tryInstantiate(KDDTask.class);
+    track.tryInstantiate(maincls);
     config.logUnusedParameters();
     // config.logAndClearReportedErrors();
     final boolean hasErrors = (config.getErrors().size() > 0);
@@ -399,7 +406,7 @@ public class MiniGUI extends AbstractApplication {
       public Void doInBackground() {
         SerializedParameterization config = new SerializedParameterization(params);
         config.tryInstantiate(LoggingStep.class);
-        KDDTask task = config.tryInstantiate(KDDTask.class);
+        AbstractApplication task = config.tryInstantiate(maincls);
         try {
           config.logUnusedParameters();
           if(config.getErrors().size() == 0) {
@@ -473,6 +480,14 @@ public class MiniGUI extends AbstractApplication {
           if(args != null && args.length > 0) {
             params = new ArrayList<String>(Arrays.asList(args));
             // TODO: it would be nicer to use the Parameterization API for this!
+            if(params.size() > 0) {
+              try {
+                gui.maincls = ELKILauncher.findMainClass(params.get(0));
+              }
+              catch(ClassNotFoundException e) {
+                // Ignore.
+              }
+            }
             if(params.remove("-minigui.last")) {
               javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 @Override
