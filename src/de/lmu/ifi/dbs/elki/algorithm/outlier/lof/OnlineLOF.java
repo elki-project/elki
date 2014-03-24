@@ -27,6 +27,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -122,8 +124,8 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
     RKNNQuery<O> rkNNRefer = QueryUtil.getRKNNQuery(relation, referenceDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
 
     // No optimized kNN query or RkNN query - use a preprocessor!
-    if (kNNRefer == null || rkNNRefer == null) {
-      if (stepprog != null) {
+    if(kNNRefer == null || rkNNRefer == null) {
+      if(stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", LOG);
       }
       MaterializeKNNAndRKNNPreprocessor<O> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, referenceDistanceFunction, krefer);
@@ -132,16 +134,17 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       rkNNRefer = preproc.getRKNNQuery(ndq, krefer, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
       database.addIndex(preproc);
-    } else {
-      if (stepprog != null) {
+    }
+    else {
+      if(stepprog != null) {
         stepprog.beginStep(1, "Optimized neighborhood w.r.t. reference neighborhood distance function provided by database.", LOG);
       }
     }
 
     KNNQuery<O> kNNReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     RKNNQuery<O> rkNNReach = QueryUtil.getRKNNQuery(relation, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    if (kNNReach == null || rkNNReach == null) {
-      if (stepprog != null) {
+    if(kNNReach == null || rkNNReach == null) {
+      if(stepprog != null) {
         stepprog.beginStep(2, "Materializing neighborhood w.r.t. reachability distance function.", LOG);
       }
       ListParameterization config = new ListParameterization();
@@ -196,20 +199,24 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       AbstractMaterializeKNNPreprocessor<O> p1 = ((PreprocessorKNNQuery<O>) lofResult.getKNNRefer()).getPreprocessor();
       AbstractMaterializeKNNPreprocessor<O> p2 = ((PreprocessorKNNQuery<O>) lofResult.getKNNReach()).getPreprocessor();
 
-      if (firstEventReceived == null) {
-        if (e.getSource().equals(p1) && e.getSource().equals(p2)) {
+      if(firstEventReceived == null) {
+        if(e.getSource().equals(p1) && e.getSource().equals(p2)) {
           kNNsChanged(e, e);
-        } else {
+        }
+        else {
           firstEventReceived = e;
         }
-      } else {
-        if (e.getSource().equals(p1) && firstEventReceived.getSource().equals(p2)) {
+      }
+      else {
+        if(e.getSource().equals(p1) && firstEventReceived.getSource().equals(p2)) {
           kNNsChanged(e, firstEventReceived);
           firstEventReceived = null;
-        } else if (e.getSource().equals(p2) && firstEventReceived.getSource().equals(p1)) {
+        }
+        else if(e.getSource().equals(p2) && firstEventReceived.getSource().equals(p1)) {
           kNNsChanged(firstEventReceived, e);
           firstEventReceived = null;
-        } else {
+        }
+        else {
           throw new UnsupportedOperationException("Event sources do not fit!");
         }
       }
@@ -223,18 +230,20 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
      * @param e2 the change event of the second preprocessor
      */
     private void kNNsChanged(KNNChangeEvent e1, KNNChangeEvent e2) {
-      if (!e1.getType().equals(e2.getType())) {
+      if(!e1.getType().equals(e2.getType())) {
         throw new UnsupportedOperationException("Event types do not fit: " + e1.getType() + " != " + e2.getType());
       }
-      if (!e1.getObjects().equals(e2.getObjects())) {
+      if(!e1.getObjects().equals(e2.getObjects())) {
         throw new UnsupportedOperationException("Objects do not fit: " + e1.getObjects() + " != " + e2.getObjects());
       }
 
-      if (e1.getType().equals(KNNChangeEvent.Type.DELETE)) {
+      if(e1.getType().equals(KNNChangeEvent.Type.DELETE)) {
         kNNsRemoved(e1.getObjects(), e1.getUpdates(), e2.getUpdates(), lofResult);
-      } else if (e1.getType().equals(KNNChangeEvent.Type.INSERT)) {
+      }
+      else if(e1.getType().equals(KNNChangeEvent.Type.INSERT)) {
         kNNsInserted(e1.getObjects(), e1.getUpdates(), e2.getUpdates(), lofResult);
-      } else {
+      }
+      else {
         throw new UnsupportedOperationException("Unsupported event type: " + e1.getType());
       }
     }
@@ -253,25 +262,26 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
 
       // recompute lrds
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.beginStep(1, "Recompute LRDs.", LOG);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
       List<? extends DoubleDBIDList> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, kreach);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
-      WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
-      for (DBIDIter iter = affected_lrd_id_candidates.iter(); iter.valid(); iter.advance()) {
+      WritableDoubleDataStore new_lrds = DataStoreUtil.makeDoubleStorage(affected_lrd_id_candidates, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+      computeLRDs(lofResult.getKNNReach(), affected_lrd_id_candidates, new_lrds);
+      for(DBIDIter iter = affected_lrd_id_candidates.iter(); iter.valid(); iter.advance()) {
         double new_lrd = new_lrds.doubleValue(iter);
         double old_lrd = lofResult.getLrds().doubleValue(iter);
-        if (Double.isNaN(old_lrd) || old_lrd != new_lrd) {
+        if(Double.isNaN(old_lrd) || old_lrd != new_lrd) {
           lofResult.getLrds().putDouble(iter, new_lrd);
           affected_lrd_ids.add(iter);
         }
       }
 
       // recompute lofs
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.beginStep(2, "Recompute LOFS.", LOG);
       }
       List<? extends DoubleDBIDList> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, krefer);
@@ -279,12 +289,12 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       recomputeLOFs(affected_lof_ids, lofResult);
 
       // fire result changed
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.beginStep(3, "Inform listeners.", LOG);
       }
       lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
 
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.setCompleted(LOG);
       }
     }
@@ -303,34 +313,35 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       StepProgress stepprog = LOG.isVerbose() ? new StepProgress(4) : null;
 
       // delete lrds and lofs
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.beginStep(1, "Delete old LRDs and LOFs.", LOG);
       }
-      for (DBIDIter iter = deletions.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = deletions.iter(); iter.valid(); iter.advance()) {
         lofResult.getLrds().delete(iter);
         lofResult.getLofs().delete(iter);
       }
 
       // recompute lrds
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.beginStep(2, "Recompute LRDs.", LOG);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(updates2);
       List<? extends DoubleDBIDList> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, kreach);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
-      WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
-      for (DBIDIter iter = affected_lrd_id_candidates.iter(); iter.valid(); iter.advance()) {
+      WritableDoubleDataStore new_lrds = DataStoreUtil.makeDoubleStorage(affected_lrd_id_candidates, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+      computeLRDs(lofResult.getKNNReach(), affected_lrd_id_candidates, new_lrds);
+      for(DBIDIter iter = affected_lrd_id_candidates.iter(); iter.valid(); iter.advance()) {
         double new_lrd = new_lrds.doubleValue(iter);
         double old_lrd = lofResult.getLrds().doubleValue(iter);
-        if (old_lrd != new_lrd) {
+        if(old_lrd != new_lrd) {
           lofResult.getLrds().putDouble(iter, new_lrd);
           affected_lrd_ids.add(iter);
         }
       }
 
       // recompute lofs
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.beginStep(3, "Recompute LOFS.", LOG);
       }
       List<? extends DoubleDBIDList> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, krefer);
@@ -338,12 +349,12 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       recomputeLOFs(affected_lof_ids, lofResult);
 
       // fire result changed
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.beginStep(4, "Inform listeners.", LOG);
       }
       lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
 
-      if (stepprog != null) {
+      if(stepprog != null) {
         stepprog.setCompleted(LOG);
       }
     }
@@ -358,10 +369,10 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
      */
     private ArrayModifiableDBIDs mergeIDs(List<? extends DoubleDBIDList> queryResults, DBIDs... ids) {
       ModifiableDBIDs result = DBIDUtil.newHashSet();
-      for (DBIDs dbids : ids) {
+      for(DBIDs dbids : ids) {
         result.addDBIDs(dbids);
       }
-      for (DoubleDBIDList queryResult : queryResults) {
+      for(DoubleDBIDList queryResult : queryResults) {
         result.addDBIDs(queryResult);
       }
       return DBIDUtil.newArray(result);
@@ -374,23 +385,22 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
      * @param lofResult the result of the former LOF run
      */
     private void recomputeLOFs(DBIDs ids, LOFResult<O> lofResult) {
-      Pair<WritableDoubleDataStore, DoubleMinMax> lofsAndMax = computeLOFs(ids, lofResult.getLrds(), lofResult.getKNNRefer());
-      WritableDoubleDataStore new_lofs = lofsAndMax.getFirst();
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      WritableDoubleDataStore new_lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+      DoubleMinMax new_lofminmax = new DoubleMinMax();
+      computeLOFs(lofResult.getKNNRefer(), ids, lofResult.getLrds(), new_lofs, new_lofminmax);
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         lofResult.getLofs().putDouble(iter, new_lofs.doubleValue(iter));
       }
-      // track the maximum value for normalization.
-      DoubleMinMax new_lofminmax = lofsAndMax.getSecond();
-
       // Actualize meta info
-      if (new_lofminmax.isValid() && lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) {
-        BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
-        scoreMeta.setActualMaximum(new_lofminmax.getMax());
-      }
-
-      if (new_lofminmax.isValid() && lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin()) {
-        BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
-        scoreMeta.setActualMinimum(new_lofminmax.getMin());
+      if(new_lofminmax.isValid()) {
+        if(lofResult.getResult().getOutlierMeta().getActualMaximum() < new_lofminmax.getMax()) {
+          BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
+          scoreMeta.setActualMaximum(new_lofminmax.getMax());
+        }
+        if(lofResult.getResult().getOutlierMeta().getActualMinimum() > new_lofminmax.getMin()) {
+          BasicOutlierScoreMeta scoreMeta = (BasicOutlierScoreMeta) lofResult.getResult().getOutlierMeta();
+          scoreMeta.setActualMinimum(new_lofminmax.getMin());
+        }
       }
     }
   }

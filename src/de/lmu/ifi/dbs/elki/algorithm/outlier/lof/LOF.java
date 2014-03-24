@@ -151,7 +151,6 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", LOG);
     }
-    DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
@@ -287,7 +286,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       final IntParameter pK = new IntParameter(K_ID);
       pK.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
-        k = pK.getValue();
+        k = pK.intValue();
       }
     }
 

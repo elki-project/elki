@@ -142,14 +142,6 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
   protected DistanceFunction<? super O> reachabilityDistanceFunction;
 
   /**
-   * Include object itself in kNN neighborhood.
-   * 
-   * In the official LOF publication, the point itself is not considered to be
-   * part of its k nearest neighbors.
-   */
-  private static boolean objectIsInKNN = false;
-
-  /**
    * Constructor.
    * 
    * @param krefer The number of neighbors for reference
@@ -159,8 +151,8 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    */
   public FlexibleLOF(int krefer, int kreach, DistanceFunction<? super O> neighborhoodDistanceFunction, DistanceFunction<? super O> reachabilityDistanceFunction) {
     super();
-    this.krefer = krefer + (objectIsInKNN ? 0 : 1);
-    this.kreach = kreach + (objectIsInKNN ? 0 : 1);
+    this.krefer = krefer + 1;
+    this.kreach = kreach + 1;
     this.referenceDistanceFunction = neighborhoodDistanceFunction;
     this.reachabilityDistanceFunction = reachabilityDistanceFunction;
   }
@@ -246,16 +238,17 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     if(stepprog != null) {
       stepprog.beginStep(2, "Computing LRDs.", LOG);
     }
-    WritableDoubleDataStore lrds = computeLRDs(ids, kNNReach);
+    WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+    computeLRDs(kNNReach, ids, lrds);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", LOG);
     }
-    Pair<WritableDoubleDataStore, DoubleMinMax> lofsAndMax = computeLOFs(ids, lrds, kNNRefer);
-    WritableDoubleDataStore lofs = lofsAndMax.getFirst();
+    WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     // track the maximum value for normalization.
-    DoubleMinMax lofminmax = lofsAndMax.getSecond();
+    DoubleMinMax lofminmax = new DoubleMinMax();
+    computeLOFs(kNNRefer, ids, lrds, lofs, lofminmax);
 
     if(stepprog != null) {
       stepprog.setCompleted(LOG);
@@ -265,31 +258,30 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Factor", "lof-outlier", lofs, ids);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-
     return new LOFResult<>(result, kNNRefer, kNNReach, lrds, lofs);
   }
 
   /**
    * Computes the local reachability density (LRD) of the specified objects.
    * 
-   * @param ids the ids of the objects
-   * @param knnReach the precomputed neighborhood of the objects w.r.t. the
+   * @param knnq the precomputed neighborhood of the objects w.r.t. the
    *        reachability distance
-   * @return the LRDs of the objects
+   * @param ids the ids of the objects
+   * @param lrds Reachability storage
    */
-  protected WritableDoubleDataStore computeLRDs(DBIDs ids, KNNQuery<O> knnReach) {
-    WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+  protected void computeLRDs(KNNQuery<O> knnq, DBIDs ids, WritableDoubleDataStore lrds) {
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList neighbors = knnReach.getKNNForDBID(iter, kreach);
+      final KNNList neighbors = knnq.getKNNForDBID(iter, kreach);
       double sum = 0.0;
       int count = 0;
       for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-        if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-          KNNList neighborsNeighbors = knnReach.getKNNForDBID(neighbor, kreach);
-          sum += Math.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
-          count++;
+        if(DBIDUtil.equal(neighbor, iter)) {
+          continue;
         }
+        KNNList neighborsNeighbors = knnq.getKNNForDBID(neighbor, kreach);
+        sum += Math.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
+        count++;
       }
       // Avoid division by 0
       final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
@@ -301,48 +293,47 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     if(lrdsProgress != null) {
       lrdsProgress.ensureCompleted(LOG);
     }
-    return lrds;
   }
 
   /**
    * Computes the Local outlier factor (LOF) of the specified objects.
    * 
-   * @param ids the ids of the objects
-   * @param lrds the LRDs of the objects
-   * @param knnRefer the precomputed neighborhood of the objects w.r.t. the
+   * @param knnq the precomputed neighborhood of the objects w.r.t. the
    *        reference distance
-   * @return the LOFs of the objects and the maximum LOF
+   * @param ids IDs to process
+   * @param lrds Local reachability distances
+   * @param lofs Local outlier factor storage
+   * @param lofminmax Score minimum/maximum tracker
    */
-  protected Pair<WritableDoubleDataStore, DoubleMinMax> computeLOFs(DBIDs ids, DoubleDataStore lrds, KNNQuery<O> knnRefer) {
-    WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
-    // track the maximum value for normalization.
-    DoubleMinMax lofminmax = new DoubleMinMax();
-
+  protected void computeLOFs(KNNQuery<O> knnq, DBIDs ids, DoubleDataStore lrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final double lrdp = lrds.doubleValue(iter);
       final double lof;
-      if(lrdp > 0 && !Double.isInfinite(lrdp)) {
-        final KNNList neighbors = knnRefer.getKNNForDBID(iter, krefer);
-        double sum = 0.0;
+      final double lrdp = lrds.doubleValue(iter);
+      final KNNList neighbors = knnq.getKNNForDBID(iter, krefer);
+      if(!Double.isInfinite(lrdp)) {
+        double sum = 0.;
         int count = 0;
         for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
-          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            sum += lrds.doubleValue(neighbor);
-            count++;
+          if(DBIDUtil.equal(neighbor, iter)) {
+            continue;
+          }
+          final double val = lrds.doubleValue(neighbor);
+          sum += val;
+          count++;
+          if(Double.isInfinite(val)) {
+            break;
           }
         }
-        lof = sum / (count * lrdp);
+        lof = sum / (lrdp * count);
       }
       else {
         lof = 1.0;
       }
       lofs.putDouble(iter, lof);
       // update minimum and maximum
-      if(!Double.isInfinite(lof)) {
-        lofminmax.put(lof);
-      }
+      lofminmax.put(lof);
 
       if(progressLOFs != null) {
         progressLOFs.incrementProcessed(LOG);
@@ -351,7 +342,6 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     if(progressLOFs != null) {
       progressLOFs.ensureCompleted(LOG);
     }
-    return new Pair<>(lofs, lofminmax);
   }
 
   @Override
@@ -529,16 +519,16 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
 
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its LOF_SCORE, must be an integer greater than
-     * 1.
+     * considered for computing its LOF score, must be an integer greater or
+     * equal to 1.
      */
-    public static final OptionID KREF_ID = new OptionID("lof.krefer", "The number of nearest neighbors of an object to be considered for computing its LOF_SCORE.");
+    public static final OptionID KREF_ID = new OptionID("lof.krefer", "The number of nearest neighbors of an object to be considered for computing its LOF score.");
 
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its reachability distance.
      */
-    public static final OptionID KREACH_ID = new OptionID("lof.kreach", "The number of nearest neighbors of an object to be considered for computing its LOF_SCORE.");
+    public static final OptionID KREACH_ID = new OptionID("lof.kreach", "The number of nearest neighbors of an object to be considered for computing its LOF score.");
 
     /**
      * The reference set size to use.
@@ -565,14 +555,14 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(KREF_ID);
-      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      pK.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
         krefer = pK.intValue();
       }
 
       final IntParameter pK2 = new IntParameter(KREACH_ID);
       pK2.setOptional(true);
-      pK2.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      pK2.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK2)) {
         kreach = pK2.intValue();
       }
