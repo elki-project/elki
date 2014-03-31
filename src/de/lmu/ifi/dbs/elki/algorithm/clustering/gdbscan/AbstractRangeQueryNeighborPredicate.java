@@ -95,9 +95,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M> implements Neigh
   public DataStore<M> preprocess(Class<? super M> modelcls, Relation<O> relation, RangeQuery<O> query) {
     WritableDataStore<M> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, modelcls);
 
-    Duration time = getLogger().newDuration(this.getClass().getName() + ".preprocessing-time");
-    time.begin();
-
+    Duration time = getLogger().newDuration(this.getClass().getName() + ".preprocessing-time").begin();
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList neighbors = query.getRangeForDBID(iditer, epsilon);
@@ -109,8 +107,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M> implements Neigh
     if(progress != null) {
       progress.ensureCompleted(getLogger());
     }
-    time.end();
-    getLogger().statistics(time);
+    getLogger().statistics(time.end());
     return storage;
   }
 

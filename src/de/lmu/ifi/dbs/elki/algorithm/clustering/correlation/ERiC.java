@@ -29,47 +29,51 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.CorePredicate;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.ERiCNeighborPredicate;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.MinPtsCorePredicate;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
-import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Performs correlation clustering on the data partitioned according to local
  * correlation dimensionality and builds a hierarchy of correlation clusters
  * that allows multiple inheritance from the clustering result.
+ * 
+ * Reference:
  * <p>
- * Reference: E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek: On
- * Exploring Complex Relationships of Correlation Clusters. <br>
+ * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek:<br />
+ * On Exploring Complex Relationships of Correlation Clusters.<br />
  * In Proc. 19th International Conference on Scientific and Statistical Database
  * Management (SSDBM 2007), Banff, Canada, 2007.
  * </p>
@@ -85,10 +89,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-// TODO: Re-use PCARunner objects somehow?
 @Title("ERiC: Exploring Relationships among Correlation Clusters")
-@Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " + "a hierarchy that allows multiple inheritance from the correlation clustering result.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", title = "On Exploring Complex Relationships of Correlation Clusters", booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
+@Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " //
+    + "a hierarchy that allows multiple inheritance from the correlation clustering result.")
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek",//
+title = "On Exploring Complex Relationships of Correlation Clusters", //
+booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
+url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
 public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>> {
   /**
    * The logger for this class.
@@ -96,18 +103,18 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
   private static final Logging LOG = Logging.getLogger(ERiC.class);
 
   /**
-   * The COPAC clustering algorithm.
+   * ERiC Settings.
    */
-  private COPAC<V> copacAlgorithm;
+  private ERiC.Settings settings;
 
   /**
    * Constructor.
    * 
    * @param copacAlgorithm COPAC to use
    */
-  public ERiC(COPAC<V> copacAlgorithm) {
+  public ERiC(ERiC.Settings settings) {
     super();
-    this.copacAlgorithm = copacAlgorithm;
+    this.settings = settings;
   }
 
   /**
@@ -116,24 +123,25 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * @param relation Relation to process
    * @return Clustering result
    */
-  public Clustering<CorrelationModel<V>> run(Relation<V> relation) {
+  public Clustering<CorrelationModel<V>> run(Database database, Relation<V> relation) {
     final int dimensionality = RelationUtil.dimensionality(relation);
 
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
 
-    // run COPAC
+    // Run Generalized DBSCAN
     if(stepprog != null) {
       stepprog.beginStep(1, "Preprocessing local correlation dimensionalities and partitioning data", LOG);
     }
-    Clustering<Model> copacResult = copacAlgorithm.run(relation);
-
-    DistanceQuery<V> query = copacAlgorithm.getPartitionDistanceQuery();
+    // FIXME: how to ensure we are running on the same relation?
+    ERiCNeighborPredicate<V>.Instance npred = new ERiCNeighborPredicate<V>(settings).instantiate(database, relation);
+    CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate(database, TypeUtil.DBIDS);
+    Clustering<Model> copacResult = new GeneralizedDBSCAN.Instance<>(npred, cpred, false).run();
 
     // extract correlation clusters
     if(stepprog != null) {
       stepprog.beginStep(2, "Extract correlation clusters", LOG);
     }
-    List<List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality);
+    List<List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality, npred);
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder("Step 2: Extract correlation clusters...");
       for(int corrDim = 0; corrDim < clusterMap.size(); corrDim++) {
@@ -162,7 +170,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
       stepprog.beginStep(3, "Building hierarchy", LOG);
     }
     Clustering<CorrelationModel<V>> clustering = new Clustering<>("ERiC clustering", "eric-clustering");
-    buildHierarchy(clustering, clusterMap, query);
+    buildHierarchy(clustering, clusterMap, npred);
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder("Step 3: Build hierarchy");
       for(int corrDim = 0; corrDim < clusterMap.size(); corrDim++) {
@@ -196,13 +204,14 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * correlation dimension. Each cluster is defined by the basis vectors
    * defining the subspace in which the cluster appears.
    * 
-   * @param copacResult
+   * @param dbscanResult
    * 
    * @param database the database containing the objects
    * @param dimensionality the dimensionality of the feature space
+   * @param npred ERiC predicate
    * @return a list of clusters for each dimensionality
    */
-  private List<List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Clustering<Model> copacResult, Relation<V> database, int dimensionality) {
+  private List<List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Clustering<Model> dbscanResult, Relation<V> database, int dimensionality, ERiCNeighborPredicate<V>.Instance npred) {
     // result
     List<List<Cluster<CorrelationModel<V>>>> clusterMap = new ArrayList<>();
     for(int i = 0; i <= dimensionality; i++) {
@@ -213,26 +222,23 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     Cluster<Model> noise = null;
 
     // iterate over correlation dimensions
-    for(Cluster<Model> clus : copacResult.getAllClusters()) {
+    for(Cluster<Model> clus : dbscanResult.getAllClusters()) {
       DBIDs group = clus.getIDs();
-      if(clus.getModel() != null && clus.getModel() instanceof DimensionModel) {
-        int correlationDimension = ((DimensionModel) clus.getModel()).getDimension();
+      int dim = clus.isNoise() ? dimensionality : npred.dimensionality(clus.getIDs().iter());
 
-        ListParameterization parameters = pcaParameters(correlationDimension);
-        Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
-        PCAFilteredRunner<V> pca = parameters.tryInstantiate(cls);
-        parameters.failOnErrors();
+      if(dim < dimensionality) {
+        PCAFilteredRunner pca = new PCAFilteredRunner(new StandardCovarianceMatrixBuilder(), new FirstNEigenPairFilter(dim), 1., 0.);
 
         // get cluster list for this dimension.
-        List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(correlationDimension);
+        List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(dim);
         PCAFilteredResult pcares = pca.processIds(group, database);
 
         V centroid = Centroid.make(database, group).toVector(database);
-        Cluster<CorrelationModel<V>> correlationCluster = new Cluster<>("[" + correlationDimension + "_" + correlationClusters.size() + "]", group, new CorrelationModel<>(pcares, centroid));
+        Cluster<CorrelationModel<V>> correlationCluster = new Cluster<>("[" + dim + "_" + correlationClusters.size() + "]", group, new CorrelationModel<>(pcares, centroid));
         correlationClusters.add(correlationCluster);
       }
       // partition containing noise
-      else if(clus.getModel() != null && clus.isNoise()) {
+      else {
         if(noise == null) {
           noise = clus;
         }
@@ -242,20 +248,12 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
           noise.setIDs(merged);
         }
       }
-      else {
-        throw new IllegalStateException("Unexpected group returned: " + clus.getClass().getName());
-      }
     }
 
     if(noise != null && noise.size() > 0) {
       // get cluster list for this dimension.
       List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(dimensionality);
-      ListParameterization parameters = pcaParameters(dimensionality);
-      Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
-      PCAFilteredRunner<V> pca = parameters.tryInstantiate(cls);
-      for(ParameterException e : parameters.getErrors()) {
-        LOG.warning("Error in internal parameterization: " + e.getMessage());
-      }
+      PCAFilteredRunner pca = new PCAFilteredRunner(new StandardCovarianceMatrixBuilder(), new FirstNEigenPairFilter(dimensionality), 1., 0.);
       PCAFilteredResult pcares = pca.processIds(noise.getIDs(), database);
 
       V centroid = Centroid.make(database, noise.getIDs()).toVector(database);
@@ -274,46 +272,17 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     return clusterMap;
   }
 
-  /**
-   * Returns the parameters for the PCA for the specified correlation dimension.
-   * 
-   * @param correlationDimension the correlation dimension
-   * @return the parameters for the PCA for the specified correlation dimension
-   */
-  private ListParameterization pcaParameters(int correlationDimension) {
-    ListParameterization parameters = new ListParameterization();
-
-    parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class);
-    parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, correlationDimension);
-
-    return parameters;
-  }
-
-  private void buildHierarchy(Clustering<CorrelationModel<V>> clustering, List<List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V> query) {
+  private void buildHierarchy(Clustering<CorrelationModel<V>> clustering, List<List<Cluster<CorrelationModel<V>>>> clusterMap, ERiCNeighborPredicate<V>.Instance npred) {
     StringBuilder msg = LOG.isDebuggingFine() ? new StringBuilder() : null;
     Hierarchy<Cluster<CorrelationModel<V>>> hier = clustering.getClusterHierarchy();
 
-    DBSCAN<V> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.instantiatePartitionAlgorithm(copacAlgorithm.getPartitionDistanceQuery()));
-    if(dbscan == null) {
-      // TODO: appropriate exception class?
-      throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");
-    }
-    DistanceFunction<? super V> dfun = ProxyDistanceFunction.unwrapDistance(dbscan.getDistanceFunction());
-    ERiCDistanceFunction distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dfun);
-    if(distanceFunction == null) {
-      // TODO: appropriate exception class?
-      throw new IllegalArgumentException("ERiC was run without ERiCDistanceFunction as distance function: got " + dfun.getClass());
-    }
     // Find maximum dimensionality found:
     int lambda_max = clusterMap.size() - 1;
 
     for(int childCorrDim = 0; childCorrDim < lambda_max; childCorrDim++) {
       List<Cluster<CorrelationModel<V>>> children = clusterMap.get(childCorrDim);
-      // SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> parentMap =
-      // clusterMap.tailMap(childCorrDim + 1);
       if(msg != null) {
         msg.append("\ncorrdim ").append(childCorrDim);
-        // msg.append("\nparents ").append(parentMap.keySet());
       }
 
       for(Cluster<CorrelationModel<V>> child : children) {
@@ -328,8 +297,8 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
               }
             }
             else {
-              double dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
-              if(dist < 1. && (hier.numParents(child) == 0 || !isParent(distanceFunction, parent, hier.iterParents(child)))) {
+              boolean dist = npred.weakNeighbors(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
+              if(!dist && (hier.numParents(child) == 0 || !isParent(npred, parent, hier.iterParents(child)))) {
                 clustering.addChildCluster(parent, child);
                 if(msg != null) {
                   msg.append('\n').append(parent).append(" is parent of ").append(child);
@@ -349,14 +318,13 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * Returns true, if the specified parent cluster is a parent of one child of
    * the children clusters.
    * 
-   * @param distanceFunction the distance function for distance computation
-   *        between the clusters
+   * @param npred Neighborhood predicate
    * @param parent the parent to be tested
    * @param iter the list of children to be tested
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(ERiCDistanceFunction distanceFunction, Cluster<CorrelationModel<V>> parent, Iter<Cluster<CorrelationModel<V>>> iter) {
+  private boolean isParent(ERiCNeighborPredicate<V>.Instance npred, Cluster<CorrelationModel<V>> parent, Iter<Cluster<CorrelationModel<V>>> iter) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
 
     for(; iter.valid(); iter.advance()) {
@@ -365,11 +333,11 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
         return false;
       }
 
-      double dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
+      boolean dist = npred.weakNeighbors(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
       if(msg != null) {
         msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
       }
-      if(dist < 1.) {
+      if(dist) {
         if(msg != null) {
           LOG.debugFine(msg);
         }
@@ -394,6 +362,163 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
   }
 
   /**
+   * Class to wrap the ERiC settings.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Settings {
+    /**
+     * Neighborhood size.
+     */
+    public int k;
+
+    /**
+     * Class to compute PCA.
+     */
+    public PCAFilteredRunner pca;
+
+    /**
+     * Parameter to specify the threshold for approximate linear dependency: the
+     * strong eigenvectors of q are approximately linear dependent from the
+     * strong eigenvectors p if the following condition holds for all strong
+     * eigenvectors q_i of q (lambda_q < lambda_p): q_i' * M^check_p * q_i <=
+     * delta^2, must be a double equal to or greater than 0.
+     */
+    public double delta;
+
+    /**
+     * Parameter to specify the threshold for the maximum distance between two
+     * approximately linear dependent subspaces of two objects p and q (lambda_q
+     * < lambda_p) before considering them as parallel, must be a double equal
+     * to or greater than 0.
+     */
+    public double tau;
+
+    /**
+     * Minimum neighborhood size (density).
+     */
+    public int minpts;
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      /**
+       * Size for the kNN neighborhood used in the PCA step of ERiC.
+       */
+      public static final OptionID K_ID = new OptionID("eric.k", "Number of neighbors to use for PCA.");
+
+      /**
+       * Parameter to specify the threshold for approximate linear dependency:
+       * the strong eigenvectors of q are approximately linear dependent from
+       * the strong eigenvectors p if the following condition holds for all
+       * strong eigenvectors q_i of q (lambda_q < lambda_p): q_i' * M^check_p *
+       * q_i <= delta^2, must be a double equal to or greater than 0.
+       * <p>
+       * Default value: {@code 0.1}
+       * </p>
+       * <p>
+       * Key: {@code -ericdf.delta}
+       * </p>
+       */
+      public static final OptionID DELTA_ID = new OptionID("ericdf.delta", "Threshold for approximate linear dependency: " + "the strong eigenvectors of q are approximately linear dependent " + "from the strong eigenvectors p if the following condition " + "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " + "q_i' * M^check_p * q_i <= delta^2.");
+
+      /**
+       * Parameter to specify the threshold for the maximum distance between two
+       * approximately linear dependent subspaces of two objects p and q
+       * (lambda_q < lambda_p) before considering them as parallel, must be a
+       * double equal to or greater than 0.
+       * <p>
+       * Default value: {@code 0.1}
+       * </p>
+       * <p>
+       * Key: {@code -ericdf.tau}
+       * </p>
+       */
+      public static final OptionID TAU_ID = new OptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
+
+      /**
+       * Settings to build.
+       */
+      Settings settings;
+
+      @Override
+      public void makeOptions(Parameterization config) {
+        settings = new Settings();
+        configK(config);
+        // TODO: allow using other PCA runners?
+        settings.pca = config.tryInstantiate(PCAFilteredRunner.class);
+        configDelta(config);
+        configTau(config);
+        configMinPts(config);
+      }
+
+      /**
+       * Configure the kNN parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configK(Parameterization config) {
+        IntParameter kP = new IntParameter(K_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(kP)) {
+          settings.k = kP.intValue();
+        }
+      }
+
+      /**
+       * Configure the delta parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configDelta(Parameterization config) {
+        final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.1);
+        deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+        if(config.grab(deltaP)) {
+          settings.delta = deltaP.doubleValue();
+        }
+      }
+
+      /**
+       * Configure the tau parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configTau(Parameterization config) {
+        final DoubleParameter tauP = new DoubleParameter(TAU_ID, 0.1);
+        tauP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+        if(config.grab(tauP)) {
+          settings.tau = tauP.doubleValue();
+        }
+      }
+
+      /**
+       * Configure the minPts aka "mu" parameter.
+       * 
+       * @param config Parameter source
+       */
+      protected void configMinPts(Parameterization config) {
+        IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(minptsP)) {
+          settings.minpts = minptsP.intValue();
+        }
+      }
+
+      @Override
+      public Settings makeInstance() {
+        return settings;
+      }
+    }
+  }
+
+  /**
    * Parameterization class.
    * 
    * @author Erich Schubert
@@ -402,20 +527,19 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
-     * The COPAC instance to use
+     * The settings to use.
      */
-    protected COPAC<V> copac;
+    protected ERiC.Settings settings;
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      copac = config.tryInstantiate(COPAC.class);
+      settings = config.tryInstantiate(ERiC.Settings.class);
     }
 
     @Override
     protected ERiC<V> makeInstance() {
-      return new ERiC<>(copac);
+      return new ERiC<>(settings);
     }
   }
 }

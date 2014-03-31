@@ -32,8 +32,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
@@ -65,20 +63,15 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
 
     // ERiC
     ListParameterization params = new ListParameterization();
-    params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 30);
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0);
     // ERiC Distance function in DBSCAN:
-    params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
-    params.addParameter(ERiCDistanceFunction.Parameterizer.DELTA_ID, 0.20);
-    params.addParameter(ERiCDistanceFunction.Parameterizer.TAU_ID, 0.04);
-    // Preprocessing via Local PCA:
-    params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
-    params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 50);
+    params.addParameter(ERiC.Settings.Parameterizer.DELTA_ID, 0.20);
+    params.addParameter(ERiC.Settings.Parameterizer.TAU_ID, 0.04);
+    params.addParameter(ERiC.Settings.Parameterizer.K_ID, 50);
     // PCA
     params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
     params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
-    params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
+    params.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
     params.addParameter(RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, 1.60);
 
     ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);
@@ -103,20 +96,15 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     // ERiC
-    params.addParameter(COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class);
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 15);
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0);
     // ERiC Distance function in DBSCAN:
-    params.addParameter(COPAC.PARTITION_DISTANCE_ID, ERiCDistanceFunction.class);
-    params.addParameter(ERiCDistanceFunction.Parameterizer.DELTA_ID, 1.0);
-    params.addParameter(ERiCDistanceFunction.Parameterizer.TAU_ID, 1.0);
-    // Preprocessing via Local PCA:
-    params.addParameter(COPAC.PREPROCESSOR_ID, KNNQueryFilteredPCAIndex.Factory.class);
-    params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, 45);
+    params.addParameter(ERiC.Settings.Parameterizer.DELTA_ID, 1.0);
+    params.addParameter(ERiC.Settings.Parameterizer.TAU_ID, 1.0);
+    params.addParameter(ERiC.Settings.Parameterizer.K_ID, 45);
     // PCA
     params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
     params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
-    params.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
+    params.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
     params.addParameter(PercentageEigenPairFilter.ALPHA_ID, 0.6);
 
     ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);

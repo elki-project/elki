@@ -403,7 +403,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, HiCO.HiCO
       // Configure Distance function
       ListParameterization params = new ListParameterization();
       // preprocessor
-      params.addParameter(KNNQueryFilteredPCAIndex.Factory.K_ID, k);
+      params.addParameter(KNNQueryFilteredPCAIndex.Factory.Parameterizer.K_ID, k);
       params.addParameter(PercentageEigenPairFilter.ALPHA_ID, alpha);
 
       ChainedParameterization chain = new ChainedParameterization(params, config);

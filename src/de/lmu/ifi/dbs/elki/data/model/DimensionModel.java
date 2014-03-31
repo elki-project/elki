@@ -41,7 +41,7 @@ public class DimensionModel extends BaseModel implements TextWriteable {
    * Constructor
    * @param dimension number of dimensions
    */
-  public DimensionModel(Integer dimension) {
+  public DimensionModel(int dimension) {
     super();
     this.dimension = dimension;
   }

@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <NV> Vector type
  */
-// TODO: loosen DoubleDistance restriction.
 @Title("Knn Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on k nearest neighbor queries.")
 public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractFilteredPCAIndex<NV> {
@@ -67,7 +66,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
   private final KNNQuery<NV> knnQuery;
 
   /**
-   * Query k.
+   * Number of neighbors to query.
    */
   private final int k;
 
@@ -126,23 +125,9 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
    */
   public static class Factory<V extends NumberVector> extends AbstractFilteredPCAIndex.Factory<V, KNNQueryFilteredPCAIndex<V>> {
     /**
-     * Optional parameter to specify the number of nearest neighbors considered
-     * in the PCA, must be an integer greater than 0. If this parameter is not
-     * set, k is set to three times of the dimensionality of the database
-     * objects.
-     * <p>
-     * Key: {@code -localpca.k}
-     * </p>
-     * <p>
-     * Default value: three times of the dimensionality of the database objects
-     * </p>
+     * Number of neighbors to query.
      */
-    public static final OptionID K_ID = new OptionID("localpca.k", "The number of nearest neighbors considered in the PCA. " + "If this parameter is not set, k ist set to three " + "times of the dimensionality of the database objects.");
-
-    /**
-     * Holds the value of {@link #K_ID}.
-     */
-    private Integer k = null;
+    private int k;
 
     /**
      * Constructor.
@@ -151,7 +136,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
      * @param pca PCA class
      * @param k k
      */
-    public Factory(DistanceFunction<V> pcaDistanceFunction, PCAFilteredRunner pca, Integer k) {
+    public Factory(DistanceFunction<V> pcaDistanceFunction, PCAFilteredRunner pca, int k) {
       super(pcaDistanceFunction, pca);
       this.k = k;
     }
@@ -171,15 +156,33 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
      * @apiviz.exclude
      */
     public static class Parameterizer<NV extends NumberVector> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
+      /**
+       * Optional parameter to specify the number of nearest neighbors
+       * considered in the PCA, must be an integer greater than 0. If this
+       * parameter is not set, k is set to three times of the dimensionality of
+       * the database objects.
+       * <p>
+       * Key: {@code -localpca.k}
+       * </p>
+       * <p>
+       * Default value: three times of the dimensionality of the database
+       * objects
+       * </p>
+       */
+      public static final OptionID K_ID = new OptionID("localpca.k", "The number of nearest neighbors considered in the PCA. " + "If this parameter is not set, k ist set to three " + "times of the dimensionality of the database objects.");
+
+      /**
+       * Number of neighbors to query.
+       */
       protected int k = 0;
 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter kP = new IntParameter(K_ID);
-        kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        final IntParameter kP = new IntParameter(K_ID) //
+        .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
         if(config.grab(kP)) {
-          k = kP.getValue();
+          k = kP.intValue();
         }
       }
 

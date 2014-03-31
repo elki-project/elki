@@ -140,7 +140,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    * @apiviz.composedOf CorePredicate.Instance
    * @apiviz.composedOf NeighborPredicate.Instance
    */
-  public class Instance<T> {
+  public static class Instance<T> {
     /**
      * Unprocessed IDs
      */
