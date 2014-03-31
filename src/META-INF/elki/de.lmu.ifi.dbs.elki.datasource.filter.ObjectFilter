@@ -8,6 +8,7 @@ de.lmu.ifi.dbs.elki.datasource.filter.ByLabelFilter
 de.lmu.ifi.dbs.elki.datasource.filter.RandomSamplingStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SortByLabelFilter
+de.lmu.ifi.dbs.elki.datasource.filter.VectorDimensionalityFilter
 de.lmu.ifi.dbs.elki.datasource.filter.DropNaNFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ReplaceNaNWithRandomFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoMissingValuesFilter
@@ -18,6 +19,7 @@ de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormali
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMADNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseCDFNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseBetaNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.LengthNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.RankTieNormalization

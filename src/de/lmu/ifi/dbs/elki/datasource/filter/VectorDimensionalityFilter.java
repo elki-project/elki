@@ -32,6 +32,10 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Filter to remove all vectors that do not have the desired dimensionality.
@@ -63,9 +67,13 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
 
   /**
    * Constructor.
+   * 
+   * @param dim Dimensionality to enforce (use -1 to use the dimensionality of
+   *        the first vector in the data set)
    */
-  public VectorDimensionalityFilter() {
+  public VectorDimensionalityFilter(int dim) {
     super();
+    this.dim = dim;
   }
 
   @Override
@@ -156,7 +164,7 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
           @SuppressWarnings("unchecked")
           final VectorTypeInformation<V> castType = (VectorTypeInformation<V>) type;
           if(dim != -1) {
-            meta.add(new VectorFieldTypeInformation<V>(FilterUtil.guessFactory(castType), dim, dim, castType.getSerializer()));
+            meta.add(new VectorFieldTypeInformation<>(FilterUtil.guessFactory(castType), dim, dim, castType.getSerializer()));
           }
           else {
             LOG.warning("No dimensionality yet for column " + i);
@@ -180,9 +188,28 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
    * @param <V> Vector type
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    /**
+     * Parameter for specifying the dimensionality.
+     */
+    private static final OptionID DIM_P = new OptionID("filter.dim", "Dimensionality of vectors to retain.");
+
+    /**
+     * Desired dimensionality.
+     */
+    int dim = -1;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter dimP = new IntParameter(DIM_P)//
+      .setOptional(true)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      dim = config.grab(dimP) ? dimP.intValue() : -1;
+    }
+
     @Override
     protected VectorDimensionalityFilter<V> makeInstance() {
-      return new VectorDimensionalityFilter<>();
+      return new VectorDimensionalityFilter<>(dim);
     }
   }
 }
