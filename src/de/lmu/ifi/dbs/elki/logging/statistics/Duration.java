@@ -34,12 +34,12 @@ public interface Duration extends Statistic {
   /**
    * Start the timer.
    */
-  void begin();
+  Duration begin();
 
   /**
    * Finish the timer.
    */
-  void end();
+  Duration end();
 
   /**
    * Get the begin of the interval.

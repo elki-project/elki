@@ -44,13 +44,15 @@ public class NanoDuration extends AbstractStatistic implements Duration {
   }
 
   @Override
-  public void begin() {
+  public NanoDuration begin() {
     begin = System.nanoTime();
+    return this;
   }
 
   @Override
-  public void end() {
+  public NanoDuration end() {
     end = System.nanoTime();
+    return this;
   }
 
   @Override

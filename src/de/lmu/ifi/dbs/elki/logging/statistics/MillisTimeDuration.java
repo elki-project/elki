@@ -44,13 +44,15 @@ public class MillisTimeDuration extends AbstractStatistic implements Duration {
   }
 
   @Override
-  public void begin() {
+  public MillisTimeDuration begin() {
     begin = System.currentTimeMillis();
+    return this;
   }
 
   @Override
-  public void end() {
+  public MillisTimeDuration end() {
     end = System.currentTimeMillis();
+    return this;
   }
 
   @Override
