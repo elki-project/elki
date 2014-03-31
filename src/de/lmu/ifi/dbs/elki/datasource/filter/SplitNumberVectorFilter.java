@@ -143,7 +143,7 @@ public class SplitNumberVectorFilter<V extends NumberVector> implements ObjectFi
     for(int i = 1; i < dims.length; i++) {
       m = Math.max(dims[i], m);
     }
-    return new VectorFieldTypeInformation<>(NumberVector.class, m, Integer.MAX_VALUE);
+    return VectorFieldTypeInformation.typeRequest(NumberVector.class, m, Integer.MAX_VALUE);
   }
 
   /**

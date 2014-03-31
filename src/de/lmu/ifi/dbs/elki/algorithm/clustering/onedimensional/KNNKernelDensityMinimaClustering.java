@@ -278,7 +278,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new VectorFieldTypeInformation<>(NumberVector.class, dim + 1, Integer.MAX_VALUE));
+    return TypeUtil.array(VectorFieldTypeInformation.typeRequest(NumberVector.class, dim + 1, Integer.MAX_VALUE));
   }
 
   @Override

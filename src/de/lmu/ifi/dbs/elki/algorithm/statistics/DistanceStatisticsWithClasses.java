@@ -391,6 +391,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
    * @return Exact maximum and minimum
    */
   private DoubleMinMax exactMinMax(Relation<O> relation, DistanceQuery<O> distFunc) {
+    final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Exact fitting distance computations", relation.size(), LOG) : null;
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -402,6 +403,12 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
         double d = distFunc.distance(iditer, iditer2);
         minmax.put(d);
       }
+      if(progress != null) {
+        progress.incrementProcessed(LOG);
+      }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(LOG);
     }
     return minmax;
   }

@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.data.projection;
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
@@ -76,7 +77,7 @@ public class LatLngToECEFProjection<V extends NumberVector> implements Projectio
 
   @Override
   public SimpleTypeInformation<? super V> getInputDataTypeInformation() {
-    return new VectorFieldTypeInformation<>(NumberVector.class, 2, 2);
+    return TypeUtil.NUMBER_VECTOR_FIELD_2D;
   }
 
   @Override

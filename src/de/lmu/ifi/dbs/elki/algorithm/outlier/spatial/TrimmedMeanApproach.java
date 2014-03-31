@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPre
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -203,7 +202,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // Get one dimensional attribute for analysis.
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector>(NumberVector.class, 1));
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
   }
 
   /**

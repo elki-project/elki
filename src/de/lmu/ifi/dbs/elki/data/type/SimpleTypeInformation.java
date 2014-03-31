@@ -43,12 +43,12 @@ public class SimpleTypeInformation<T> implements TypeInformation {
   /**
    * Type label.
    */
-  private String label = null;
+  private String label;
 
   /**
    * Type serializer.
    */
-  private ByteBufferSerializer<? super T> serializer = null;
+  private ByteBufferSerializer<? super T> serializer;
 
   /**
    * Constructor.
@@ -58,6 +58,8 @@ public class SimpleTypeInformation<T> implements TypeInformation {
   public SimpleTypeInformation(Class<? super T> cls) {
     super();
     this.cls = cls;
+    this.label = null;
+    this.serializer = null;
   }
 
   /**
@@ -70,6 +72,7 @@ public class SimpleTypeInformation<T> implements TypeInformation {
     super();
     this.cls = cls;
     this.label = label;
+    this.serializer = null;
   }
 
   /**
@@ -81,6 +84,7 @@ public class SimpleTypeInformation<T> implements TypeInformation {
   public SimpleTypeInformation(Class<? super T> cls, ByteBufferSerializer<? super T> serializer) {
     super();
     this.cls = cls;
+    this.label = null;
     this.serializer = serializer;
   }
 
@@ -109,7 +113,7 @@ public class SimpleTypeInformation<T> implements TypeInformation {
 
   @Override
   public boolean isAssignableFromType(TypeInformation type) {
-    if (!(type instanceof SimpleTypeInformation)) {
+    if(!(type instanceof SimpleTypeInformation)) {
       return false;
     }
     final SimpleTypeInformation<?> simpleType = (SimpleTypeInformation<?>) type;

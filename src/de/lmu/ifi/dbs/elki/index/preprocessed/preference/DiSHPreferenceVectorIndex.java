@@ -236,7 +236,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
     // database for apriori
     UpdatableDatabase apriori_db = new HashmapDatabase();
-    SimpleTypeInformation<?> bitmeta = new VectorFieldTypeInformation<>(BitVector.class, dimensionality);
+    SimpleTypeInformation<?> bitmeta = VectorFieldTypeInformation.typeRequest(BitVector.class, dimensionality, dimensionality);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       long[] bits = BitsUtil.zero(dimensionality);
       boolean allFalse = true;

@@ -194,6 +194,6 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
 
   @Override
   public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<>(NumberVector.class, 0, weights.length);
+    return VectorFieldTypeInformation.typeRequest(NumberVector.class, 0, weights.length);
   }
 }

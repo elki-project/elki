@@ -35,6 +35,28 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  */
 public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends VectorTypeInformation<V> {
   /**
+   * Constructor for a type request without dimensionality constraints.
+   * 
+   * @param cls Class constraint
+   * @param <V> vector type
+   */
+  public static <V extends FeatureVector<?>> VectorFieldTypeInformation<V> typeRequest(Class<? super V> cls) {
+    return new VectorFieldTypeInformation<V>(cls, -1, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Constructor for a type request with dimensionality constraints.
+   * 
+   * @param cls Class constraint
+   * @param mindim Minimum dimensionality
+   * @param maxdim Maximum dimensionality
+   * @param <V> vector type
+   */
+  public static <V extends FeatureVector<?>> VectorFieldTypeInformation<V> typeRequest(Class<? super V> cls, int mindim, int maxdim) {
+    return new VectorFieldTypeInformation<V>(cls, mindim, maxdim);
+  }
+
+  /**
    * Object factory for producing new instances.
    */
   private final FeatureVector.Factory<V, ?> factory;
@@ -105,8 +127,9 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param mindim Minimum dimensionality request
    * @param maxdim Maximum dimensionality request
    */
+  @Deprecated
   public VectorFieldTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
-    super(cls, mindim, maxdim);
+    super(cls, null, mindim, maxdim);
     this.factory = null;
   }
 
@@ -127,18 +150,9 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param cls Vector restriction class.
    * @param dim Dimensionality request
    */
+  @Deprecated
   public VectorFieldTypeInformation(Class<? super V> cls, int dim) {
-    super(cls, dim, dim);
-    this.factory = null;
-  }
-
-  /**
-   * Constructor for a request without fixed dimensionality.
-   * 
-   * @param cls Vector restriction class.
-   */
-  public VectorFieldTypeInformation(Class<? super V> cls) {
-    super(cls);
+    super(cls, null, dim, dim);
     this.factory = null;
   }
 

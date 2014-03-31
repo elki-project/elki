@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.geo;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
@@ -82,7 +82,7 @@ public class LatLngDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<>(NumberVector.class, 2);
+    return TypeUtil.NUMBER_VECTOR_FIELD_2D;
   }
 
   @Override

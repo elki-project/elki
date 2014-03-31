@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamConversionFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
@@ -70,7 +71,7 @@ public class LatLngToECEFFilter<V extends NumberVector> extends AbstractStreamCo
 
   @Override
   protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<>(NumberVector.class, 2, 2);
+    return TypeUtil.NUMBER_VECTOR_FIELD_2D;
   }
 
   @Override

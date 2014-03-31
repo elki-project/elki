@@ -61,6 +61,6 @@ public class WeightedDistanceFunction extends AbstractNumberVectorDistanceFuncti
 
   @Override
   public VectorFieldTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<>(NumberVector.class, weightMatrix.getColumnDimensionality());
+    return VectorFieldTypeInformation.typeRequest(NumberVector.class, weightMatrix.getColumnDimensionality(), weightMatrix.getColumnDimensionality());
   }
 }

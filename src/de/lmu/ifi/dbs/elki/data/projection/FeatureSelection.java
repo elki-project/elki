@@ -125,7 +125,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
   public TypeInformation getInputDataTypeInformation() {
     @SuppressWarnings("unchecked")
     final Class<V> cls = (Class<V>) factory.getRestrictionClass();
-    return new VectorTypeInformation<>(cls, mindim, Integer.MAX_VALUE);
+    return VectorTypeInformation.typeRequest(cls, mindim, Integer.MAX_VALUE);
   }
 
   /**

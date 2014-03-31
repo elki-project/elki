@@ -24,7 +24,7 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param cls
    */
   public MultiVectorTypeInformation(Class<? super V> cls) {
-    super(cls);
+    super(cls, null, -1, Integer.MAX_VALUE);
     multiplicity= -1;
   }
 

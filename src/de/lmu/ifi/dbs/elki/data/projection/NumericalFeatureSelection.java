@@ -110,7 +110,7 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
 
   @Override
   public TypeInformation getInputDataTypeInformation() {
-    return new VectorTypeInformation<>(NumberVector.class, mindim, Integer.MAX_VALUE);
+    return VectorTypeInformation.typeRequest(NumberVector.class, mindim, Integer.MAX_VALUE);
   }
 
   /**

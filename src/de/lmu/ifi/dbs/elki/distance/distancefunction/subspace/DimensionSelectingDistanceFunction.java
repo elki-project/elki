@@ -141,7 +141,7 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialNorm impl
 
   @Override
   public VectorTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<>(NumberVector.class, dim, Integer.MAX_VALUE);
+    return VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, Integer.MAX_VALUE);
   }
 
   @Override

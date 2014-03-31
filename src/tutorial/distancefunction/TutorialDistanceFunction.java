@@ -25,7 +25,7 @@ package tutorial.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 
 /**
@@ -47,6 +47,6 @@ public class TutorialDistanceFunction extends AbstractNumberVectorDistanceFuncti
 
   @Override
   public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<>(NumberVector.class, 2);
+    return TypeUtil.NUMBER_VECTOR_FIELD_2D;
   }
 }

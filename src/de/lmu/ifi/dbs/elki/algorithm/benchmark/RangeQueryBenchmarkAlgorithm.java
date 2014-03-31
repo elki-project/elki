@@ -202,7 +202,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
     int dim = RelationUtil.dimensionality(relation);
 
     // Separate query set.
-    TypeInformation res = new VectorFieldTypeInformation<NumberVector>(NumberVector.class, dim + 1);
+    TypeInformation res = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim + 1, dim + 1);
     MultipleObjectsBundle bundle = queries.loadData();
     int col = -1;
     for(int i = 0; i < bundle.metaLength(); i++) {
@@ -277,7 +277,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     if(queries == null) {
-      return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector>(NumberVector.class, 1));
+      return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
     }
     else {
       return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());

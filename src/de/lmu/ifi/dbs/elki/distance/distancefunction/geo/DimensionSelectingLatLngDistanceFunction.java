@@ -105,7 +105,7 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDis
 
   @Override
   public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<>(NumberVector.class, Math.max(dimlat, dimlng), Integer.MAX_VALUE);
+    return VectorFieldTypeInformation.typeRequest(NumberVector.class, Math.max(dimlat, dimlng), Integer.MAX_VALUE);
   }
 
   @Override

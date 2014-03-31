@@ -37,6 +37,28 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  */
 public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTypeInformation<V> {
   /**
+   * Constructor for a type request without dimensionality constraints.
+   * 
+   * @param cls Class constraint
+   * @param <V> vector type
+   */
+  public static <V extends FeatureVector<?>> VectorTypeInformation<V> typeRequest(Class<? super V> cls) {
+    return new VectorTypeInformation<V>(cls, null, -1, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Constructor for a type request with dimensionality constraints.
+   * 
+   * @param cls Class constraint
+   * @param mindim Minimum dimensionality
+   * @param maxdim Maximum dimensionality
+   * @param <V> vector type
+   */
+  public static <V extends FeatureVector<?>> VectorTypeInformation<V> typeRequest(Class<? super V> cls, int mindim, int maxdim) {
+    return new VectorTypeInformation<V>(cls, null, mindim, maxdim);
+  }
+
+  /**
    * Minimum dimensionality.
    */
   protected final int mindim;
@@ -45,7 +67,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
    * Maximum dimensionality.
    */
   protected final int maxdim;
-  
+
   /**
    * Constructor for an actual type.
    * 
@@ -59,26 +81,6 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
     assert (this.mindim <= this.maxdim);
     this.mindim = mindim;
     this.maxdim = maxdim;
-  }
-
-  /**
-   * Constructor for a type request.
-   * 
-   * @param cls base class
-   * @param mindim Minimum dimensionality
-   * @param maxdim Maximum dimensionality
-   */
-  public VectorTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
-    this(cls, null, mindim, maxdim);
-  }
-
-  /**
-   * Constructor for a type request without dimensionality constraints.
-   * 
-   * @param cls Class constraint
-   */
-  public VectorTypeInformation(Class<? super V> cls) {
-    this(cls, null, -1, Integer.MAX_VALUE);
   }
 
   @Override

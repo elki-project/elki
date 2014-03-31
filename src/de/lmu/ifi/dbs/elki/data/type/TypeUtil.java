@@ -112,55 +112,65 @@ public final class TypeUtil {
   /**
    * Number vectors of <em>variable</em> length.
    */
-  public static final SimpleTypeInformation<? super NumberVector> NUMBER_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<>(NumberVector.class);
+  public static final VectorTypeInformation<? super NumberVector> NUMBER_VECTOR_VARIABLE_LENGTH = VectorTypeInformation.typeRequest(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    */
-  public static final VectorFieldTypeInformation<NumberVector> NUMBER_VECTOR_FIELD = new VectorFieldTypeInformation<>(NumberVector.class);
+  public static final VectorFieldTypeInformation<NumberVector> NUMBER_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(NumberVector.class);
+
+  /**
+   * Type request for two-dimensional number vectors
+   */
+  public static final VectorFieldTypeInformation<? super NumberVector> NUMBER_VECTOR_FIELD_1D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 1, 1);
+
+  /**
+   * Type request for two-dimensional number vectors
+   */
+  public static final VectorFieldTypeInformation<? super NumberVector> NUMBER_VECTOR_FIELD_2D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 2, 2);
 
   /**
    * Input type for algorithms that require number vector fields.
    * 
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
-  public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = new VectorFieldTypeInformation<>(DoubleVector.class);
+  public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(DoubleVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    * 
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
-  public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = new VectorFieldTypeInformation<>(FloatVector.class);
+  public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(FloatVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    */
-  public static final VectorFieldTypeInformation<BitVector> BIT_VECTOR_FIELD = new VectorFieldTypeInformation<>(BitVector.class);
+  public static final VectorFieldTypeInformation<BitVector> BIT_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(BitVector.class);
 
   /**
    * Sparse float vector field.
    */
-  public static final SimpleTypeInformation<SparseNumberVector> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<>(SparseNumberVector.class);
+  public static final VectorTypeInformation<SparseNumberVector> SPARSE_VECTOR_VARIABLE_LENGTH = VectorTypeInformation.typeRequest(SparseNumberVector.class);
 
   /**
    * Sparse vector field.
    */
-  public static final VectorFieldTypeInformation<SparseNumberVector> SPARSE_VECTOR_FIELD = new VectorFieldTypeInformation<>(SparseNumberVector.class);
+  public static final VectorFieldTypeInformation<SparseNumberVector> SPARSE_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(SparseNumberVector.class);
 
   /**
    * Sparse float vector field.
    * 
    * If possible, please use {@link #SPARSE_VECTOR_FIELD} instead!
    */
-  public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = new VectorFieldTypeInformation<>(SparseFloatVector.class);
+  public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = VectorFieldTypeInformation.typeRequest(SparseFloatVector.class);
 
   /**
    * Sparse double vector field.
    * 
    * If possible, please use {@link #SPARSE_VECTOR_FIELD} instead!
    */
-  public static final VectorFieldTypeInformation<SparseDoubleVector> SPARSE_DOUBLE_FIELD = new VectorFieldTypeInformation<>(SparseDoubleVector.class);
+  public static final VectorFieldTypeInformation<SparseDoubleVector> SPARSE_DOUBLE_FIELD = VectorFieldTypeInformation.typeRequest(SparseDoubleVector.class);
 
   /**
    * External ID type.
