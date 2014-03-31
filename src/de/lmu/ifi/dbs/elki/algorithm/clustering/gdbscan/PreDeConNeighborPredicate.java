@@ -49,10 +49,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
+ * Neighborhood predicate used by PreDeCon.
+ * 
+ * Reference:
  * <p>
- * Reference: <br>
- * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger: Density Connected Clustering
- * with Local Subspace Preferences. <br>
+ * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger:<br />
+ * Density Connected Clustering with Local Subspace Preferences. <br>
  * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
  * </p>
  * 
@@ -159,6 +161,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
     }
 
     // Check which neighbors survive
+    final double epsilonsq = epsilon * epsilon;
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(referenceSetSize);
     for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
       V o = relation.get(neighbor);
@@ -168,7 +171,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
         final double diff = obj.doubleValue(d) - o.doubleValue(d);
         dev += weights[d] * diff * diff;
       }
-      if(Math.sqrt(dev) <= epsilon) {
+      if(dev <= epsilonsq) {
         survivors.add(neighbor);
       }
     }

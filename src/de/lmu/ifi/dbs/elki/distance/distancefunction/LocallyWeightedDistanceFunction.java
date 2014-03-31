@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  * @param <V> the type of NumberVector to compute the distances in between
  */
-// FIXME: implements SpatialPrimitiveDistanceFunction<V>
 public class LocallyWeightedDistanceFunction<V extends NumberVector> extends AbstractIndexBasedDistanceFunction<V, FilteredLocalPCAIndex<V>> implements FilteredLocalPCABasedDistanceFunction<V, FilteredLocalPCAIndex<V>> {
   /**
    * Constructor
