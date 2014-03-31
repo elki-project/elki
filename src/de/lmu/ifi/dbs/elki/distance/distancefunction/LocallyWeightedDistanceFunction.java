@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
@@ -117,20 +116,17 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector> extends Abs
      */
     @Override
     public double distance(DBIDRef id1, DBIDRef id2) {
-      Matrix m1 = index.getLocalProjection(id1).similarityMatrix();
-      Matrix m2 = index.getLocalProjection(id2).similarityMatrix();
+      Matrix m1 = index.getLocalProjection(id1).similarityMatrix(), m2 = index.getLocalProjection(id2).similarityMatrix();
 
       if(m1 == null || m2 == null) {
         return Double.POSITIVE_INFINITY;
       }
 
-      V v1 = relation.get(id1);
-      V v2 = relation.get(id2);
-      Vector v1Mv2 = v1.getColumnVector().minusEquals(v2.getColumnVector());
-      Vector v2Mv1 = v2.getColumnVector().minusEquals(v1.getColumnVector());
+      V v1 = relation.get(id1), v2 = relation.get(id2);
+      Vector diff = v1.getColumnVector().minusEquals(v2.getColumnVector());
 
-      double dist1 = v1Mv2.transposeTimesTimes(m1, v1Mv2);
-      double dist2 = v2Mv1.transposeTimesTimes(m2, v2Mv1);
+      double dist1 = diff.transposeTimesTimes(m1, diff);
+      double dist2 = diff.transposeTimesTimes(m2, diff);
 
       if(dist1 < 0) {
         if(dist1 > -1e-12) {
@@ -149,86 +145,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector> extends Abs
         }
       }
 
-      return Math.max(Math.sqrt(dist1), Math.sqrt(dist2));
-    }
-
-    // @Override
-    // TODO: re-enable spatial interfaces
-    public double minDistBROKEN(SpatialComparable mbr, V v) {
-      if(mbr.getDimensionality() != v.getDimensionality()) {
-        throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString());
-      }
-
-      double[] r = new double[v.getDimensionality()];
-      for(int d = 0; d < v.getDimensionality(); d++) { 
-        double value = v.doubleValue(d);
-        if(value < mbr.getMin(d)) {
-          r[d] = mbr.getMin(d);
-        }
-        else if(value > mbr.getMax(d)) {
-          r[d] = mbr.getMax(d);
-        }
-        else {
-          r[d] = value;
-        }
-      }
-
-      Matrix m = null; // index.getLocalProjection(v.getID()).similarityMatrix();
-      Vector rv1Mrv2 = v.getColumnVector().minusEquals(new Vector(r));
-      double dist = rv1Mrv2.transposeTimesTimes(m, rv1Mrv2);
-
-      return Math.sqrt(dist);
-    }
-
-    // TODO: Remove?
-    // @Override
-    // public double minDist(SpatialComparable mbr, DBID id) {
-    // return minDist(mbr, database.get(id));
-    // }
-
-    // @Override
-    // TODO: re-enable spatial interface
-    public double distance(SpatialComparable mbr1, SpatialComparable mbr2) {
-      if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
-        throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
-      }
-
-      double sqrDist = 0;
-      for(int d = 0; d < mbr1.getDimensionality(); d++) {
-        double m1, m2;
-        if(mbr1.getMax(d) < mbr2.getMin(d)) {
-          m1 = mbr2.getMin(d);
-          m2 = mbr1.getMax(d);
-        }
-        else if(mbr1.getMin(d) > mbr2.getMax(d)) {
-          m1 = mbr1.getMin(d);
-          m2 = mbr2.getMax(d);
-        }
-        else { // The mbrs intersect!
-          m1 = 0;
-          m2 = 0;
-        }
-        double manhattanI = m1 - m2;
-        sqrDist += manhattanI * manhattanI;
-      }
-      return Math.sqrt(sqrDist);
-    }
-
-    // @Override
-    // TODO: re-enable spatial interface
-    public double centerDistance(SpatialComparable mbr1, SpatialComparable mbr2) {
-      if(mbr1.getDimensionality() != mbr2.getDimensionality()) {
-        throw new IllegalArgumentException("Different dimensionality of objects\n first argument:  " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
-      }
-
-      double sqrDist = 0;
-      for(int d = 0; d < mbr1.getDimensionality(); d++) {
-        final double c1 = .5 * (mbr1.getMin(d) + mbr1.getMax(d));
-        final double c2 = .5 * (mbr2.getMin(d) + mbr2.getMax(d));
-        final double manhattanI = c1 - c2;
-        sqrDist += manhattanI * manhattanI;
-      }
-      return Math.sqrt(sqrDist);
+      return Math.sqrt(Math.max(dist1, dist2));
     }
   }
 

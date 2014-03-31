@@ -56,7 +56,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * q_i of q (lambda_q < lambda_p): q_i' * M^check_p * q_i <= delta^2, must be
    * a double equal to or greater than 0.
    */
-  private double delta;
+  private double delta, deltasq;
 
   /**
    * Parameter to specify the threshold for the maximum distance between two
@@ -77,6 +77,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     super(indexFactory);
     this.delta = delta;
     this.tau = tau;
+    this.deltasq = delta * delta;
   }
 
   @Override
@@ -105,10 +106,10 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
       Vector v2_i = v2_strong.getCol(i);
       // check, if distance of v2_i to the space of pca_1 > delta
       // (i.e., if v2_i spans up a new dimension)
-      double dist = Math.sqrt(v2_i.transposeTimes(v2_i) - v2_i.transposeTimesTimes(m1_czech, v2_i));
+      double distsq = v2_i.transposeTimes(v2_i) - v2_i.transposeTimesTimes(m1_czech, v2_i);
 
       // if so, return false
-      if(dist > delta) {
+      if(distsq > deltasq) {
         return false;
       }
     }
@@ -210,10 +211,8 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
      */
     @Override
     public double distance(DBIDRef id1, DBIDRef id2) {
-      PCAFilteredResult pca1 = index.getLocalProjection(id1);
-      PCAFilteredResult pca2 = index.getLocalProjection(id2);
-      V v1 = relation.get(id1);
-      V v2 = relation.get(id2);
+      PCAFilteredResult pca1 = index.getLocalProjection(id1), pca2 = index.getLocalProjection(id2);
+      V v1 = relation.get(id1), v2 = relation.get(id2);
       return parent.distance(v1, v2, pca1, pca2);
     }
   }
