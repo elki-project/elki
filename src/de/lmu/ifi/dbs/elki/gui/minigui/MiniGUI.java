@@ -478,7 +478,7 @@ public class MiniGUI extends AbstractApplication {
           gui.run();
           List<String> params = Collections.emptyList();
           if(args != null && args.length > 0) {
-            params = new ArrayList<String>(Arrays.asList(args));
+            params = new ArrayList<>(Arrays.asList(args));
             // TODO: it would be nicer to use the Parameterization API for this!
             if(params.size() > 0) {
               try {

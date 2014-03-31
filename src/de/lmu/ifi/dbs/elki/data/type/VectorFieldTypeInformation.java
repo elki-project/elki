@@ -41,7 +41,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param <V> vector type
    */
   public static <V extends FeatureVector<?>> VectorFieldTypeInformation<V> typeRequest(Class<? super V> cls) {
-    return new VectorFieldTypeInformation<V>(cls, -1, Integer.MAX_VALUE);
+    return new VectorFieldTypeInformation<>(cls, -1, Integer.MAX_VALUE);
   }
 
   /**
@@ -53,7 +53,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param <V> vector type
    */
   public static <V extends FeatureVector<?>> VectorFieldTypeInformation<V> typeRequest(Class<? super V> cls, int mindim, int maxdim) {
-    return new VectorFieldTypeInformation<V>(cls, mindim, maxdim);
+    return new VectorFieldTypeInformation<>(cls, mindim, maxdim);
   }
 
   /**
@@ -127,8 +127,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param mindim Minimum dimensionality request
    * @param maxdim Maximum dimensionality request
    */
-  @Deprecated
-  public VectorFieldTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
+  private VectorFieldTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
     super(cls, null, mindim, maxdim);
     this.factory = null;
   }
