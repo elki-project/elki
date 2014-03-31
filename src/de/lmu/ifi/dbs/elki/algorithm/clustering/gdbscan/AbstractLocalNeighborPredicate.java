@@ -88,7 +88,7 @@ public abstract class AbstractLocalNeighborPredicate<O, M> implements NeighborPr
    * Perform the preprocessing step.
    * 
    * @param modelcls Class of models
-   * @param relation Data reation
+   * @param relation Data relation
    * @param query Range query
    * @return Precomputed models
    */

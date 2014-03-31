@@ -64,7 +64,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
   protected int l;
 
   /**
-   * The euclidean distance function.
+   * The Euclidean distance function.
    */
   private DistanceFunction<? super V> distanceFunction = EuclideanDistanceFunction.STATIC;
 
