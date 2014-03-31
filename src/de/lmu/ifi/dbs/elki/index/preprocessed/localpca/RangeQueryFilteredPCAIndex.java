@@ -76,7 +76,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector> extends Abstrac
    * @param rangeQuery Range Query to use
    * @param epsilon Query range
    */
-  public RangeQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner<NV> pca, RangeQuery<NV> rangeQuery, double epsilon) {
+  public RangeQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner pca, RangeQuery<NV> rangeQuery, double epsilon) {
     super(database, pca);
     this.rangeQuery = rangeQuery;
     this.epsilon = epsilon;
@@ -137,7 +137,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector> extends Abstrac
      * @param pca PCA
      * @param epsilon range value
      */
-    public Factory(DistanceFunction<V> pcaDistanceFunction, PCAFilteredRunner<V> pca, double epsilon) {
+    public Factory(DistanceFunction<V> pcaDistanceFunction, PCAFilteredRunner pca, double epsilon) {
       super(pcaDistanceFunction, pca);
       this.epsilon = epsilon;
     }

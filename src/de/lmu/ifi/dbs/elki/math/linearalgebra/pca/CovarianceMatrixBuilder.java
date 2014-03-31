@@ -33,17 +33,15 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Interface for computing covariance matrixes on a data set.
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector base type
  */
-public interface CovarianceMatrixBuilder<V extends NumberVector> {
+public interface CovarianceMatrixBuilder {
   /**
    * Compute Covariance Matrix for a complete database.
    * 
    * @param database the database used
    * @return Covariance Matrix
    */
-  Matrix processDatabase(Relation<? extends V> database);
+  Matrix processDatabase(Relation<? extends NumberVector> database);
 
   /**
    * Compute Covariance Matrix for a collection of database IDs.
@@ -52,7 +50,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector> {
    * @param database the database used
    * @return Covariance Matrix
    */
-  Matrix processIds(DBIDs ids, Relation<? extends V> database);
+  Matrix processIds(DBIDs ids, Relation<? extends NumberVector> database);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection.
@@ -64,7 +62,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector> {
    * @param k the number of entries to process
    * @return Covariance Matrix
    */
-  Matrix processQueryResults(DoubleDBIDList results, Relation<? extends V> database, int k);
+  Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection.
@@ -75,5 +73,5 @@ public interface CovarianceMatrixBuilder<V extends NumberVector> {
    * @param database the database used
    * @return Covariance Matrix
    */
-  Matrix processQueryResults(DoubleDBIDList results, Relation<? extends V> database);
+  Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database);
 }

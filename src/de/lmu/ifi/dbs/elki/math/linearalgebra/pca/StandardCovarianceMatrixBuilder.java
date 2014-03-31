@@ -36,10 +36,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * @author Erich Schubert
  * 
  * @apiviz.uses CovarianceMatrix
- *
- * @param <V> Vector class to use.
  */
-public class StandardCovarianceMatrixBuilder<V extends NumberVector> extends AbstractCovarianceMatrixBuilder<V> {
+public class StandardCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuilder {
   /**
    * Compute Covariance Matrix for a complete database.
    * 
@@ -47,7 +45,7 @@ public class StandardCovarianceMatrixBuilder<V extends NumberVector> extends Abs
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processDatabase(Relation<? extends V> database) {
+  public Matrix processDatabase(Relation<? extends NumberVector> database) {
     return CovarianceMatrix.make(database).destroyToNaiveMatrix();
   }
 
@@ -59,7 +57,7 @@ public class StandardCovarianceMatrixBuilder<V extends NumberVector> extends Abs
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processIds(DBIDs ids, Relation<? extends V> database) {
+  public Matrix processIds(DBIDs ids, Relation<? extends NumberVector> database) {
     return CovarianceMatrix.make(database, ids).destroyToNaiveMatrix();
   }
 }

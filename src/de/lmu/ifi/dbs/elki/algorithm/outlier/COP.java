@@ -164,7 +164,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
   /**
    * Holds the PCA runner.
    */
-  private PCARunner<V> pca;
+  private PCARunner pca;
 
   /**
    * Expected amount of outliers.
@@ -209,7 +209,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    * @param dist Distance distribution model (ChiSquared, Gamma)
    * @param models Report models
    */
-  public COP(DistanceFunction<? super V> distanceFunction, int k, PCARunner<V> pca, double expect, DistanceDist dist, boolean models) {
+  public COP(DistanceFunction<? super V> distanceFunction, int k, PCARunner pca, double expect, DistanceDist dist, boolean models) {
     super(distanceFunction);
     this.k = k;
     this.pca = pca;
@@ -415,7 +415,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     /**
      * Holds the object performing the dependency derivation.
      */
-    PCARunner<V> pca;
+    PCARunner pca;
 
     /**
      * Distance distributution assumption.
@@ -450,7 +450,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       if(config.grab(expectP)) {
         expect = expectP.doubleValue();
       }
-      ObjectParameter<PCARunner<V>> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
+      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
       if(config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
       }

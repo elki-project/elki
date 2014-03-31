@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -54,10 +55,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * exhibit the clearest correlation.
  * 
  * @author Erich Schubert
- * @param <V> vector type
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class PCAFilteredAutotuningRunner<V extends NumberVector> extends PCAFilteredRunner<V> {
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms",//
+booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008",//
+url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
+public class PCAFilteredAutotuningRunner extends PCAFilteredRunner {
   /**
    * Constructor.
    * 
@@ -66,15 +69,15 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector> extends PCAFilt
    * @param big Replacement for large values
    * @param small Replacement for small values
    */
-  public PCAFilteredAutotuningRunner(CovarianceMatrixBuilder<V> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
+  public PCAFilteredAutotuningRunner(CovarianceMatrixBuilder covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
     super(covarianceMatrixBuilder, eigenPairFilter, big, small);
   }
 
   @Override
-  public PCAFilteredResult processIds(DBIDs ids, Relation<? extends V> database) {
+  public PCAFilteredResult processIds(DBIDs ids, Relation<? extends NumberVector> database) {
     // Assume Euclidean distance. In the context of PCA, the neighborhood should
     // be L2-spherical to be unbiased.
-    V center = Centroid.make(database, ids).toVector(database);
+    Vector center = Centroid.make(database, ids);
     ModifiableDoubleDBIDList dres = DBIDUtil.newDistanceDBIDList(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double dist = EuclideanDistanceFunction.STATIC.distance(center, database.get(iter));
@@ -116,7 +119,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector> extends PCAFilt
   }
 
   @Override
-  public PCAFilteredResult processQueryResult(DoubleDBIDList results, Relation<? extends V> database) {
+  public PCAFilteredResult processQueryResult(DoubleDBIDList results, Relation<? extends NumberVector> database) {
     assertSortedByDistance(results);
     final int dim = RelationUtil.dimensionality(database);
 
@@ -256,10 +259,10 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector> extends PCAFilt
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends PCAFilteredRunner.Parameterizer<V> {
+  public static class Parameterizer extends PCAFilteredRunner.Parameterizer {
     @Override
-    protected PCAFilteredAutotuningRunner<V> makeInstance() {
-      return new PCAFilteredAutotuningRunner<>(covarianceMatrixBuilder, eigenPairFilter, big, small);
+    protected PCAFilteredAutotuningRunner makeInstance() {
+      return new PCAFilteredAutotuningRunner(covarianceMatrixBuilder, eigenPairFilter, big, small);
     }
   }
 }

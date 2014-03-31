@@ -105,7 +105,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * @param k k Parameter
    * @param pca PCA runner-
    */
-  public SimpleCOP(DistanceFunction<? super V> distanceFunction, int k, PCAFilteredRunner<V> pca) {
+  public SimpleCOP(DistanceFunction<? super V> distanceFunction, int k, PCAFilteredRunner pca) {
     super(distanceFunction);
     this.k = k;
     this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, 0, false);
@@ -213,7 +213,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Holds the object performing the dependency derivation
      */
-    protected PCAFilteredRunner<V> pca;
+    protected PCAFilteredRunner pca;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -223,7 +223,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
       if(config.grab(kP)) {
         k = kP.intValue();
       }
-      ObjectParameter<PCAFilteredRunner<V>> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
+      ObjectParameter<PCAFilteredRunner> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
       if(config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
       }

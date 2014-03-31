@@ -102,7 +102,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
   /**
    * The PCA utility object.
    */
-  private PCARunner<V> pca;
+  private PCARunner pca;
 
   /**
    * Java constructor.
@@ -114,7 +114,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param rnd Random generator
    * @param pca PCA runner
    */
-  public ORCLUS(int k, int k_i, int l, double alpha, RandomFactory rnd, PCARunner<V> pca) {
+  public ORCLUS(int k, int k_i, int l, double alpha, RandomFactory rnd, PCARunner pca) {
     super(k, k_i, l);
     this.alpha = alpha;
     this.rnd = rnd;
@@ -574,7 +574,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
 
     protected RandomFactory rnd;
 
-    protected PCARunner<V> pca = null;
+    protected PCARunner pca = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -586,7 +586,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
       configSeed(config);
 
       // TODO: make configurable, to allow using stabilized PCA
-      Class<PCARunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCARunner.class);
+      Class<PCARunner> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCARunner.class);
       pca = config.tryInstantiate(cls);
     }
 

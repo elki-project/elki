@@ -187,7 +187,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
       addCSSClasses(svgp);
 
       // PCARunner
-      PCARunner<NV> pcarun = ClassGenericsUtil.parameterizeOrAbort(PCARunner.class, new EmptyParameterization());
+      PCARunner pcarun = ClassGenericsUtil.parameterizeOrAbort(PCARunner.class, new EmptyParameterization());
 
       Iterator<Cluster<EMModel<NV>>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {

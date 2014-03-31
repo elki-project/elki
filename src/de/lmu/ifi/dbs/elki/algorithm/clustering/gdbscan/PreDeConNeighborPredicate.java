@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -63,8 +63,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
-public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractLocalNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel> {
+@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger",//
+title = "Density Connected Clustering with Local Subspace Preferences",//
+booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004",//
+url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
+public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel> {
   /**
    * The logger for this class.
    */
@@ -86,7 +89,8 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
    * @param settings PreDeCon settings
    */
   public PreDeConNeighborPredicate(PreDeCon.Settings settings) {
-    super(settings.epsilon, EuclideanDistanceFunction.STATIC);
+    // Note: we use squared epsilon!
+    super(settings.epsilon * settings.epsilon, SquaredEuclideanDistanceFunction.STATIC);
     this.settings = settings;
   }
 
@@ -161,7 +165,6 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
     }
 
     // Check which neighbors survive
-    final double epsilonsq = epsilon * epsilon;
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(referenceSetSize);
     for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
       V o = relation.get(neighbor);
@@ -171,7 +174,8 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
         final double diff = obj.doubleValue(d) - o.doubleValue(d);
         dev += weights[d] * diff * diff;
       }
-      if(dev <= epsilonsq) {
+      // Note: epsilon was squared - this saves us the sqrt here:
+      if(dev <= epsilon) {
         survivors.add(neighbor);
       }
     }
@@ -225,7 +229,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
    * 
    * @author Erich Schubert
    */
-  public static class Instance extends AbstractLocalNeighborPredicate.Instance<PreDeConModel, PreDeConModel> {
+  public static class Instance extends AbstractRangeQueryNeighborPredicate.Instance<PreDeConModel, PreDeConModel> {
     /**
      * Constructor.
      * 
@@ -262,9 +266,9 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
-     * PreDeConSettings.
+     * PreDeCon settings.
      */
     protected PreDeCon.Settings settings;
 
@@ -274,7 +278,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractL
     }
 
     @Override
-    protected PreDeConNeighborPredicate<O> makeInstance() {
+    protected PreDeConNeighborPredicate<V> makeInstance() {
       return new PreDeConNeighborPredicate<>(settings);
     }
   }

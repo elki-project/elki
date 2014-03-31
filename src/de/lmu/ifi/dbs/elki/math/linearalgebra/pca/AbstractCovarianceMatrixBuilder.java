@@ -38,20 +38,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * Mostly the specification of an interface.
  * 
  * @author Erich Schubert
- *
- * @param <V> Vector class in use
  */
-public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector> implements Parameterizable, CovarianceMatrixBuilder<V> {
+public abstract class AbstractCovarianceMatrixBuilder implements Parameterizable, CovarianceMatrixBuilder {
   @Override
-  public Matrix processDatabase(Relation<? extends V> database) {
+  public Matrix processDatabase(Relation<? extends NumberVector> database) {
     return processIds(database.getDBIDs(), database);
   }
 
   @Override
-  public abstract Matrix processIds(DBIDs ids, Relation<? extends V> database);
+  public abstract Matrix processIds(DBIDs ids, Relation<? extends NumberVector> database);
 
   @Override
-  public Matrix processQueryResults(DoubleDBIDList results, Relation<? extends V> database, int k) {
+  public Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k) {
     ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
     for(DBIDIter it = results.iter(); it.valid() && have < k; it.advance(), have++) {
@@ -61,7 +59,7 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector> im
   }
 
   @Override
-  public final Matrix processQueryResults(DoubleDBIDList results, Relation<? extends V> database) {
+  public final Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database) {
     return processQueryResults(results, database, results.size());
   }
 }

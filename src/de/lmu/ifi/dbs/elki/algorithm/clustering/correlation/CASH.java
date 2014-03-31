@@ -84,9 +84,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Provides the CASH algorithm, an subspace clustering algorithm based on the
  * Hough transform.
  * 
+ * Reference:
  * <p>
- * Reference: E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek: Robust
- * clustering in arbitrarily oriented subspaces. <br>
+ * E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek:<br />
+ * Robust clustering in arbitrarily oriented subspaces. <br>
  * In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008
  * </p>
  * 
@@ -101,7 +102,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 // todo elke hierarchy (later)
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the Hough transform.")
-@Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
+@Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", //
+title = "Robust clustering in arbitraily oriented subspaces",//
+booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008",//
+url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
 public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -705,7 +709,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     // set the parameters
     ListParameterization parameters = new ListParameterization();
-    parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+    parameters.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
     parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
     DependencyDerivator<DoubleVector> derivator = null;
     Class<DependencyDerivator<DoubleVector>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
@@ -778,7 +782,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       Database derivatorDB = buildDerivatorDB(relation, ids);
 
       ListParameterization parameters = new ListParameterization();
-      parameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+      parameters.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
       parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
       DependencyDerivator<DoubleVector> derivator = null;
       Class<DependencyDerivator<DoubleVector>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);

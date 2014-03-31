@@ -110,7 +110,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
   /**
    * Holds the object performing the pca.
    */
-  private final PCAFilteredRunner<V> pca;
+  private final PCAFilteredRunner pca;
 
   /**
    * Number format for output of solution.
@@ -131,7 +131,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
    * @param sampleSize sample size
    * @param randomsample flag for random sampling
    */
-  public DependencyDerivator(PrimitiveDistanceFunction<V> distanceFunction, NumberFormat nf, PCAFilteredRunner<V> pca, int sampleSize, boolean randomsample) {
+  public DependencyDerivator(PrimitiveDistanceFunction<V> distanceFunction, NumberFormat nf, PCAFilteredRunner pca, int sampleSize, boolean randomsample) {
     super(distanceFunction);
     this.nf = nf;
     this.pca = pca;
@@ -296,7 +296,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
     /**
      * Class to compute PCA with
      */
-    protected PCAFilteredRunner<V> pca = null;
+    protected PCAFilteredRunner pca = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -319,7 +319,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
       if(config.grab(randomSampleF)) {
         randomSample = randomSampleF.getValue();
       }
-      Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+      Class<PCAFilteredRunner> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
       pca = config.tryInstantiate(cls);
     }
 

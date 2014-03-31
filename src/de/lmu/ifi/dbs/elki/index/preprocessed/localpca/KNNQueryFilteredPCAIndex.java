@@ -79,7 +79,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
    * @param knnQuery KNN Query to use
    * @param k k value
    */
-  public KNNQueryFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner<NV> pca, KNNQuery<NV> knnQuery, int k) {
+  public KNNQueryFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner pca, KNNQuery<NV> knnQuery, int k) {
     super(relation, pca);
     this.knnQuery = knnQuery;
     this.k = k;
@@ -151,7 +151,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
      * @param pca PCA class
      * @param k k
      */
-    public Factory(DistanceFunction<V> pcaDistanceFunction, PCAFilteredRunner<V> pca, Integer k) {
+    public Factory(DistanceFunction<V> pcaDistanceFunction, PCAFilteredRunner pca, Integer k) {
       super(pcaDistanceFunction, pca);
       this.k = k;
     }

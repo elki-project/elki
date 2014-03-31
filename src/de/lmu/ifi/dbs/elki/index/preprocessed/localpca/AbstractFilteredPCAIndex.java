@@ -64,7 +64,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
   /**
    * PCA utility object.
    */
-  protected final PCAFilteredRunner<NV> pca;
+  protected final PCAFilteredRunner pca;
 
   /**
    * Constructor.
@@ -72,7 +72,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
    * @param relation Relation to use
    * @param pca PCA runner to use
    */
-  public AbstractFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner<NV> pca) {
+  public AbstractFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner pca) {
     super(relation);
     this.pca = pca;
   }
@@ -160,7 +160,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
     /**
      * PCA utility object.
      */
-    protected PCAFilteredRunner<NV> pca;
+    protected PCAFilteredRunner pca;
 
     /**
      * Constructor.
@@ -168,7 +168,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
      * @param pcaDistanceFunction distance Function
      * @param pca PCA runner
      */
-    public Factory(DistanceFunction<NV> pcaDistanceFunction, PCAFilteredRunner<NV> pca) {
+    public Factory(DistanceFunction<NV> pcaDistanceFunction, PCAFilteredRunner pca) {
       super();
       this.pcaDistanceFunction = pcaDistanceFunction;
       this.pca = pca;
@@ -199,7 +199,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
       /**
        * PCA utility object.
        */
-      protected PCAFilteredRunner<NV> pca;
+      protected PCAFilteredRunner pca;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -210,7 +210,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
           pcaDistanceFunction = pcaDistanceFunctionP.instantiateClass(config);
         }
 
-        Class<PCAFilteredRunner<NV>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+        Class<PCAFilteredRunner> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
         pca = config.tryInstantiate(cls);
       }
     }

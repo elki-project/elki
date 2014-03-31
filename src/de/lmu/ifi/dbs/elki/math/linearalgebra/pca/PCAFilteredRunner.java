@@ -46,59 +46,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.landmark
  * @apiviz.has PCAFilteredResult oneway - - «create»
  * @apiviz.composedOf EigenPairFilter
- * 
- * @param <V> Vector class to use
  */
-public class PCAFilteredRunner<V extends NumberVector> extends PCARunner<V> {
-  /**
-   * Parameter to specify the filter for determination of the strong and weak
-   * eigenvectors, must be a subclass of {@link EigenPairFilter}.
-   * <p>
-   * Default value: {@link PercentageEigenPairFilter}
-   * </p>
-   * <p>
-   * Key: {@code -pca.filter}
-   * </p>
-   */
-  public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter", "Filter class to determine the strong and weak eigenvectors.");
-
-  /**
-   * Parameter to specify a constant big value to reset high eigenvalues, must
-   * be a double greater than 0.
-   * <p>
-   * Default value: {@code 1.0}
-   * </p>
-   * <p>
-   * Key: {@code -pca.big}
-   * </p>
-   */
-  public static final OptionID BIG_ID = new OptionID("pca.big", "A constant big value to reset high eigenvalues.");
-
-  /**
-   * Parameter to specify a constant small value to reset low eigenvalues, must
-   * be a double greater than 0.
-   * <p>
-   * Default value: {@code 0.0}
-   * </p>
-   * <p>
-   * Key: {@code -pca.small}
-   * </p>
-   */
-  public static final OptionID SMALL_ID = new OptionID("pca.small", "A constant small value to reset low eigenvalues.");
-
+public class PCAFilteredRunner extends PCARunner {
   /**
    * Holds the instance of the EigenPairFilter specified by
-   * {@link #PCA_EIGENPAIR_FILTER}.
+   * {@link Parameterizer#PCA_EIGENPAIR_FILTER}.
    */
   private EigenPairFilter eigenPairFilter;
 
   /**
-   * Holds the value of {@link #BIG_ID}.
+   * Holds the value of {@link Parameterizer#BIG_ID}.
    */
   private double big;
 
   /**
-   * Holds the value of {@link #SMALL_ID}.
+   * Holds the value of {@link Parameterizer#SMALL_ID}.
    */
   private double small;
 
@@ -110,7 +72,7 @@ public class PCAFilteredRunner<V extends NumberVector> extends PCARunner<V> {
    * @param big Replacement for large eigenvalues
    * @param small Replacement for small eigenvalues
    */
-  public PCAFilteredRunner(CovarianceMatrixBuilder<V> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
+  public PCAFilteredRunner(CovarianceMatrixBuilder covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
     super(covarianceMatrixBuilder);
     this.eigenPairFilter = eigenPairFilter;
     this.big = big;
@@ -125,7 +87,7 @@ public class PCAFilteredRunner<V extends NumberVector> extends PCARunner<V> {
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processIds(DBIDs ids, Relation<? extends V> database) {
+  public PCAFilteredResult processIds(DBIDs ids, Relation<? extends NumberVector> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
 
@@ -137,7 +99,7 @@ public class PCAFilteredRunner<V extends NumberVector> extends PCARunner<V> {
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(DoubleDBIDList results, Relation<? extends V> database) {
+  public PCAFilteredResult processQueryResult(DoubleDBIDList results, Relation<? extends NumberVector> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
@@ -183,7 +145,43 @@ public class PCAFilteredRunner<V extends NumberVector> extends PCARunner<V> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends PCARunner.Parameterizer<V> {
+  public static class Parameterizer extends PCARunner.Parameterizer {
+    /**
+     * Parameter to specify the filter for determination of the strong and weak
+     * eigenvectors, must be a subclass of {@link EigenPairFilter}.
+     * <p>
+     * Default value: {@link PercentageEigenPairFilter}
+     * </p>
+     * <p>
+     * Key: {@code -pca.filter}
+     * </p>
+     */
+    public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter", "Filter class to determine the strong and weak eigenvectors.");
+
+    /**
+     * Parameter to specify a constant big value to reset high eigenvalues, must
+     * be a double greater than 0.
+     * <p>
+     * Default value: {@code 1.0}
+     * </p>
+     * <p>
+     * Key: {@code -pca.big}
+     * </p>
+     */
+    public static final OptionID BIG_ID = new OptionID("pca.big", "A constant big value to reset high eigenvalues.");
+
+    /**
+     * Parameter to specify a constant small value to reset low eigenvalues, must
+     * be a double greater than 0.
+     * <p>
+     * Default value: {@code 0.0}
+     * </p>
+     * <p>
+     * Key: {@code -pca.small}
+     * </p>
+     */
+    public static final OptionID SMALL_ID = new OptionID("pca.small", "A constant small value to reset low eigenvalues.");
+
     /**
      * Holds the instance of the EigenPairFilter specified by
      * {@link #PCA_EIGENPAIR_FILTER}.
@@ -226,8 +224,8 @@ public class PCAFilteredRunner<V extends NumberVector> extends PCARunner<V> {
     }
 
     @Override
-    protected PCAFilteredRunner<V> makeInstance() {
-      return new PCAFilteredRunner<>(covarianceMatrixBuilder, eigenPairFilter, big, small);
+    protected PCAFilteredRunner makeInstance() {
+      return new PCAFilteredRunner(covarianceMatrixBuilder, eigenPairFilter, big, small);
     }
   }
 }

@@ -72,11 +72,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector type
  */
-@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", title = "Outlier Detection in Arbitrarily Oriented Subspaces", booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
-public class RANSACCovarianceMatrixBuilder<V extends NumberVector> extends AbstractCovarianceMatrixBuilder<V> {
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
+booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
+public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuilder {
   /**
    * Number of iterations to perform
    */
@@ -101,7 +101,7 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector> extends Abstr
 
   @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url = "http://dx.doi.org/10.1145/358669.358692")
   @Override
-  public Matrix processIds(DBIDs ids, Relation<? extends V> relation) {
+  public Matrix processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
     DBIDs best = DBIDUtil.EMPTYDBIDS;
@@ -144,10 +144,8 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector> extends Abstr
    * @author Erich Schubert
    * 
    * @apiviz.exclude
-   * 
-   * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Number of iterations.
      */
@@ -183,8 +181,8 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector> extends Abstr
     }
 
     @Override
-    protected RANSACCovarianceMatrixBuilder<V> makeInstance() {
-      return new RANSACCovarianceMatrixBuilder<>(iterations, rnd);
+    protected RANSACCovarianceMatrixBuilder makeInstance() {
+      return new RANSACCovarianceMatrixBuilder(iterations, rnd);
     }
   }
 }

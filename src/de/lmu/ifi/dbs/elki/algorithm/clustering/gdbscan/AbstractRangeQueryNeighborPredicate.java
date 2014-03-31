@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> object type
  * @param <M> model type
  */
-public abstract class AbstractLocalNeighborPredicate<O, M> implements NeighborPredicate {
+public abstract class AbstractRangeQueryNeighborPredicate<O, M> implements NeighborPredicate {
   /**
    * Range to query with.
    */
@@ -73,7 +73,7 @@ public abstract class AbstractLocalNeighborPredicate<O, M> implements NeighborPr
    * @param epsilon Epsilon value
    * @param distFunc Distance function to use
    */
-  public AbstractLocalNeighborPredicate(double epsilon, DistanceFunction<? super O> distFunc) {
+  public AbstractRangeQueryNeighborPredicate(double epsilon, DistanceFunction<? super O> distFunc) {
     super();
     this.epsilon = epsilon;
     this.distFunc = distFunc;

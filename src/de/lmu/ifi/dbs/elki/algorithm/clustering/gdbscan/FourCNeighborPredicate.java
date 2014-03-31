@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", title = "Computing Clusters of Correlation Connected Objects", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", url = "http://dx.doi.org/10.1145/1007568.1007620")
-public class FourCNeighborPredicate<V extends NumberVector> extends AbstractLocalNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel> {
+public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel> {
   /**
    * The logger for this class.
    */
@@ -89,7 +89,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractLoca
   /**
    * The Filtered PCA Runner
    */
-  private PCAFilteredRunner<? super V> pca;
+  private PCAFilteredRunner pca;
 
   /**
    * Constructor.
@@ -100,7 +100,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractLoca
   public FourCNeighborPredicate(FourC.Settings settings) {
     super(settings.epsilon, EuclideanDistanceFunction.STATIC);
     this.settings = settings;
-    this.pca = new PCAFilteredRunner<>(new StandardCovarianceMatrixBuilder<V>(), new LimitEigenPairFilter(settings.delta, settings.absolute), settings.kappa, 1);
+    this.pca = new PCAFilteredRunner(new StandardCovarianceMatrixBuilder(), new LimitEigenPairFilter(settings.delta, settings.absolute), settings.kappa, 1);
   }
 
   @SuppressWarnings("unchecked")
@@ -183,7 +183,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractLoca
    * 
    * @author Erich Schubert
    */
-  public static class Instance extends AbstractLocalNeighborPredicate.Instance<PreDeConModel, PreDeConModel> {
+  public static class Instance extends AbstractRangeQueryNeighborPredicate.Instance<PreDeConModel, PreDeConModel> {
     /**
      * Constructor.
      * 
