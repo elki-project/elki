@@ -1165,7 +1165,7 @@ public final class FormatUtil {
 
     // Reads exponent.
     int exp = 0;
-    if((pos < end) && ((cur == 'E') || (cur == 'e'))) {
+    if((pos + 1 < end) && ((cur == 'E') || (cur == 'e'))) {
       cur = str.charAt(++pos);
       final boolean isNegativeExp = (cur == '-');
       if((isNegativeExp || (cur == '+')) && (++pos < end)) {

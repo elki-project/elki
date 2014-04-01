@@ -34,10 +34,27 @@ public class TestFormatUtil implements JUnit4Test {
   @Test
   public void testParseDouble() {
     assertEquals(0., FormatUtil.parseDouble("0"), 0.);
-    assertEquals(1., FormatUtil.parseDouble("1"), 0.);
-    assertEquals(-1., FormatUtil.parseDouble("-1"), 0.);
     assertEquals(0., FormatUtil.parseDouble("0.0"), 0.);
+    assertEquals(0., FormatUtil.parseDouble("0."), 0.);
+    assertEquals(0., FormatUtil.parseDouble("0e10"), 0.);
+    assertEquals(0., FormatUtil.parseDouble("0E10"), 0.);
+    assertEquals(0., FormatUtil.parseDouble("0e-10"), 0.);
+    assertEquals(0., FormatUtil.parseDouble("0E-10"), 0.);
+    assertEquals(1., FormatUtil.parseDouble("1"), 0.);
     assertEquals(1., FormatUtil.parseDouble("1.0"), 0.);
+    assertEquals(1., FormatUtil.parseDouble("1."), 0.);
+    assertEquals(1., FormatUtil.parseDouble("1e0"), 0.);
+    assertEquals(1., FormatUtil.parseDouble("1E0"), 0.);
+    assertEquals(1., FormatUtil.parseDouble("1e-0"), 0.);
+    assertEquals(1., FormatUtil.parseDouble("1E-0"), 0.);
+    assertEquals(2., FormatUtil.parseDouble("2"), 0.);
+    assertEquals(2., FormatUtil.parseDouble("2.0"), 0.);
+    assertEquals(2., FormatUtil.parseDouble("2."), 0.);
+    assertEquals(2., FormatUtil.parseDouble("2e0"), 0.);
+    assertEquals(2., FormatUtil.parseDouble("2E0"), 0.);
+    assertEquals(2., FormatUtil.parseDouble("2e-0"), 0.);
+    assertEquals(2., FormatUtil.parseDouble("2E-0"), 0.);
+    assertEquals(-1., FormatUtil.parseDouble("-1"), 0.);
     assertEquals(-1., FormatUtil.parseDouble("-1.0"), 0.);
     assertEquals(.2, FormatUtil.parseDouble("0.2"), 0.);
     assertEquals(-.2, FormatUtil.parseDouble("-0.2"), 0.);
@@ -80,5 +97,15 @@ public class TestFormatUtil implements JUnit4Test {
   @Test(expected = NumberFormatException.class)
   public void textTooManyDigits() {
     FormatUtil.parseDouble("123456789012345678901234567890");
+  }
+
+  @Test(expected = NumberFormatException.class)
+  public void textNoExponent() {
+    FormatUtil.parseDouble("1e");
+  }
+
+  @Test(expected = NumberFormatException.class)
+  public void textNoExponentMinus() {
+    FormatUtil.parseDouble("1e-");
   }
 }
