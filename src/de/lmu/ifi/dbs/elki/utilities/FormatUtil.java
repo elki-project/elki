@@ -1025,6 +1025,18 @@ public final class FormatUtil {
   /**
    * Preallocated exceptions.
    */
+  private static final NumberFormatException EMPTY_STRING = new NumberFormatException("Parser called on an empty string.") {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this;
+    }
+  };
+
+  /**
+   * Preallocated exceptions.
+   */
   private static final NumberFormatException EXPONENT_OVERFLOW = new NumberFormatException("Precision overflow for double exponent.") {
     private static final long serialVersionUID = 1L;
 
@@ -1111,6 +1123,9 @@ public final class FormatUtil {
    * @return Double value
    */
   public static double parseDouble(final CharSequence str, final int start, final int end) {
+    if(start >= end) {
+      throw EMPTY_STRING;
+    }
     // Current position and character.
     int pos = start;
     char cur = str.charAt(pos);

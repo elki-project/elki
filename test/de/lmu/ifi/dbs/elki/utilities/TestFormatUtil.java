@@ -108,4 +108,9 @@ public class TestFormatUtil implements JUnit4Test {
   public void textNoExponentMinus() {
     FormatUtil.parseDouble("1e-");
   }
+
+  @Test(expected = NumberFormatException.class)
+  public void textEmptyString() {
+    FormatUtil.parseDouble("");
+  }
 }
