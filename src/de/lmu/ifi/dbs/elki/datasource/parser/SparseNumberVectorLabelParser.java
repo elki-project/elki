@@ -131,6 +131,9 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
           tokenizer.advance();
           // Respect labelIndices.
           if(labelIndices == null || !labelIndices.get(index)) {
+            if(!tokenizer.valid()) {
+              throw new AbortException("Parser expected double value, but line ended too early: " + line);
+            }
             double attribute = tokenizer.getDouble();
             thismax = Math.max(thismax, index + 1);
             values.put(index, attribute);
