@@ -426,7 +426,7 @@ public class XSplitter<E extends SpatialEntry, N extends XNode<E, N>, T extends 
 
     int numOfEntries = entries.size();
 
-    assert minEntries >= 1 && minEntries < maxEntries && maxEntries <= numOfEntries;
+    assert minEntries >= 1 && minEntries <= maxEntries && maxEntries <= numOfEntries;
 
     double optSurfaceSum = Double.POSITIVE_INFINITY;
     int optAxis = -1;
