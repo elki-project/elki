@@ -84,8 +84,7 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
   }
 
   protected List<ArrayList<SpatialRef>> initializeCurves(Relation<NumberVector> rel, DBIDs ids, final int numcurves) {
-    Duration proj = new MillisTimeDuration("approxnn.project");
-    proj.begin();
+    Duration proj = new MillisTimeDuration("approxnn.project").begin();
     List<ArrayList<SpatialRef>> curves = allocateCurves(rel, ids, numcurves);
     Random random = new Random(0);
 
@@ -161,8 +160,7 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
       }
     }
     // End all projections:
-    proj.end();
-    getLogger().statistics(proj);
+    getLogger().statistics(proj.end());
     return curves;
   }
 
@@ -184,10 +182,8 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
   }
 
   protected void sortSpatially(String name, SpatialSorter spatialSorter, ArrayList<SpatialRef> c, double[] mms, int[] dims) {
-    Duration dur = new MillisTimeDuration("approxnn.sort-" + name);
-    dur.begin();
+    Duration dur = new MillisTimeDuration("approxnn.sort-" + name).begin();
     spatialSorter.sort(c, 0, c.size(), mms, dims);
-    dur.end();
-    getLogger().statistics(dur);
+    getLogger().statistics(dur.end());
   }
 }

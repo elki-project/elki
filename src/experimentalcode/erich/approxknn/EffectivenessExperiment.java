@@ -66,16 +66,14 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
 
   @Override
   public void run() {
-    Duration load = new MillisTimeDuration("approxknn.load");
-    load.begin();
+    Duration load = new MillisTimeDuration("approxknn.load").begin();
     Database database = LoadImageNet.loadDatabase("ImageNet-Haralick-1", true);
     // Database database = LoadALOI.loadALOI("hsb-7x2x2", true);
     Relation<NumberVector> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
-    load.end();
+    LOG.statistics(load.end());
     LOG.statistics(new LongStatistic("approxknn.dataset.numobj", ids.size()));
     LOG.statistics(new LongStatistic("approxknn.dataset.dims", RelationUtil.dimensionality(rel)));
-    LOG.statistics(load);
 
     final int numcurves = 9;
     List<ArrayList<SpatialRef>> curves = initializeCurves(rel, ids, numcurves);
@@ -126,8 +124,7 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
     assert (sfc_names.length == sfc_masks.length);
     final int numvars = sfc_masks.length * halfwins.length;
 
-    Duration qtime = new MillisTimeDuration("approxnn.querytime");
-    qtime.begin();
+    Duration qtime = new MillisTimeDuration("approxnn.querytime").begin();
     MeanVariance[] distcmv = MeanVariance.newArray(numvars + 1);
     MeanVariance[] recallmv = MeanVariance.newArray(numvars);
     MeanVariance[] kdistmv = MeanVariance.newArray(numvars);
@@ -184,8 +181,7 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
         }
       }
     }
-    qtime.end();
-    LOG.statistics(qtime);
+    LOG.statistics(qtime.end());
     LOG.statistics(new LongStatistic("approxnn.query.size", ids.size()));
     LOG.statistics(new DoubleStatistic("approxnn.query.time.average", qtime.getDuration() / (double) ids.size()));
     for (int c = 0; c < sfc_masks.length; c++) {

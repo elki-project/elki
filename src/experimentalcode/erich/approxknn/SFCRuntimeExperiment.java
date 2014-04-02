@@ -61,15 +61,13 @@ public class SFCRuntimeExperiment extends AbstractSFCExperiment {
   @Override
   public void run() {
     // final int samplesize = 1000000;
-    Duration load = new MillisTimeDuration("approxknn.load");
-    load.begin();
+    Duration load = new MillisTimeDuration("approxknn.load").begin();
     Database database = LoadImageNet.loadDatabase("ImageNet-Haralick-1", false);
     Relation<NumberVector> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
-    load.end();
+    LOG.statistics(load.end());
     LOG.statistics(new LongStatistic("approxknn.dataset.numobj", ids.size()));
     LOG.statistics(new LongStatistic("approxknn.dataset.dims", RelationUtil.dimensionality(rel)));
-    LOG.statistics(load);
 
     final int numcurves = 9;
     List<ArrayList<SpatialRef>> curves = initializeCurves(rel, ids, numcurves);
@@ -79,8 +77,7 @@ public class SFCRuntimeExperiment extends AbstractSFCExperiment {
     final int k = 50;
     final int halfwin = k; // Half window width
 
-    Duration qtime = new MillisTimeDuration("approxnn.querytime");
-    qtime.begin();
+    Duration qtime = new MillisTimeDuration("approxnn.querytime").begin();
     MeanVariance candmv = new MeanVariance();
     DBIDs subset = ids; // DBIDUtil.randomSample(ids, samplesize, 0L);
     for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
@@ -106,8 +103,7 @@ public class SFCRuntimeExperiment extends AbstractSFCExperiment {
         heap.insert(distanceFunction.distance(qo, rel.get(iter)), id);
       }
     }
-    qtime.end();
-    LOG.statistics(qtime);
+    LOG.statistics(qtime.end());
     LOG.statistics(new LongStatistic("approxnn.query.size", ids.size()));
     LOG.statistics(new DoubleStatistic("approxnn.query.time.average", qtime.getDuration() / (double) ids.size()));
     LOG.statistics(new DoubleStatistic("approxnn.candidates.mean", candmv.getMean()));
