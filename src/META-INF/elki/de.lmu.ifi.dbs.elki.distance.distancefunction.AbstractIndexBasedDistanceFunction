@@ -1,4 +1,2 @@
-de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.SharedNearestNeighborJaccardDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction
 

@@ -15,7 +15,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.ClarkDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.LorentzianDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.SharedNearestNeighborJaccardDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction
@@ -35,7 +34,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersecti
 de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.RGBHistogramQuadraticDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PearsonCorrelationDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.SquaredPearsonCorrelationDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbsolutePearsonCorrelationDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedSquaredPearsonCorrelationDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.DimensionSelectingLatLngDistanceFunction
