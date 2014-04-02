@@ -34,34 +34,19 @@ package de.lmu.ifi.dbs.elki.math;
  */
 public class PearsonCorrelation {
   /**
-   * Sum for XX
+   * Aggregation for squared residuals - we are not using sum-of-squares!
    */
-  private double sumXX = 0;
+  private double sumXX = 0., sumYY = 0., sumXY = 0.;
 
   /**
-   * Sum for YY
+   * Current mean for X and Y.
    */
-  private double sumYY = 0;
+  private double meanX = 0., meanY = 0.;
 
   /**
-   * Sum for XY
+   * Weight sum.
    */
-  private double sumXY = 0;
-
-  /**
-   * Current mean for X
-   */
-  private double meanX = 0;
-
-  /**
-   * Current mean for Y
-   */
-  private double meanY = 0;
-
-  /**
-   * Weight sum
-   */
-  private double sumWe = 0;
+  private double sumWe = 0.;
 
   /**
    * Constructor.
@@ -78,7 +63,7 @@ public class PearsonCorrelation {
    * @param w Weight
    */
   public void put(double x, double y, double w) {
-    if(sumWe <= 0.0) {
+    if(sumWe <= 0.) {
       meanX = x;
       meanY = y;
       sumWe = w;
@@ -109,22 +94,19 @@ public class PearsonCorrelation {
    * @param y Value in Y
    */
   public void put(double x, double y) {
-    put(x, y, 1.0);
+    put(x, y, 1.);
   }
 
   /**
-   * Get the pearson correlation value.
+   * Get the Pearson correlation value.
    * 
    * @return Correlation value
    */
   public double getCorrelation() {
-    final double popSdX = getNaiveStddevX();
-    final double popSdY = getNaiveStddevY();
-    final double covXY = getNaiveCovariance();
-    if(popSdX == 0 || popSdY == 0) {
-      return 0;
+    if(!(sumXX > 0. && sumYY > 0.)) {
+      return (sumXX == sumYY) ? 1. : 0.;
     }
-    return covXY / (popSdX * popSdY);
+    return sumXY / Math.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -144,7 +126,7 @@ public class PearsonCorrelation {
   public double getMeanX() {
     return meanX;
   }
-  
+
   /**
    * Return mean of Y
    * 
@@ -153,7 +135,7 @@ public class PearsonCorrelation {
   public double getMeanY() {
     return meanY;
   }
-  
+
   /**
    * Get the covariance of X and Y (not taking sampling into account)
    * 
@@ -169,8 +151,8 @@ public class PearsonCorrelation {
    * @return Covariance
    */
   public double getSampleCovariance() {
-    assert (sumWe > 1);
-    return sumXY / (sumWe - 1);
+    assert (sumWe > 1.);
+    return sumXY / (sumWe - 1.);
   }
 
   /**
@@ -190,8 +172,8 @@ public class PearsonCorrelation {
    * @return sample variance
    */
   public double getSampleVarianceX() {
-    assert (sumWe > 1);
-    return sumXX / (sumWe - 1);
+    assert (sumWe > 1.);
+    return sumXX / (sumWe - 1.);
   }
 
   /**
@@ -199,7 +181,7 @@ public class PearsonCorrelation {
    * 
    * Note: usually, you should be using {@link #getSampleStddevX} instead!
    * 
-   * @return stddev
+   * @return standard deviation
    */
   public double getNaiveStddevX() {
     return Math.sqrt(getNaiveVarianceX());
@@ -208,7 +190,7 @@ public class PearsonCorrelation {
   /**
    * Return standard deviation
    * 
-   * @return stddev
+   * @return standard deviation
    */
   public double getSampleStddevX() {
     return Math.sqrt(getSampleVarianceX());
@@ -231,8 +213,8 @@ public class PearsonCorrelation {
    * @return sample variance
    */
   public double getSampleVarianceY() {
-    assert (sumWe > 1);
-    return sumYY / (sumWe - 1);
+    assert (sumWe > 1.);
+    return sumYY / (sumWe - 1.);
   }
 
   /**
@@ -259,11 +241,11 @@ public class PearsonCorrelation {
    * Reset the value.
    */
   public void reset() {
-    sumXX = 0;
-    sumXY = 0;
-    sumYY = 0;
-    meanX = 0;
-    meanY = 0;
-    sumWe = 0;
+    sumXX = 0.;
+    sumXY = 0.;
+    sumYY = 0.;
+    meanX = 0.;
+    meanY = 0.;
+    sumWe = 0.;
   }
 }
