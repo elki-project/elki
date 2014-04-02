@@ -35,15 +35,20 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * @author Erich Schubert
  */
 public class TestSquaredPearsonCorrelationDistanceFunctionTest implements JUnit4Test {
+  /** Test set */
+  final static DoubleVector[] TESTS = TestPearsonCorrelationDistanceFunctionTest.TESTS;
+
+  /** Note, these are not yet adjusted */
+  final static double[][] SCORES = TestPearsonCorrelationDistanceFunctionTest.SCORES;
+
   @Test
   public void testSquaredPearson() {
     SquaredPearsonCorrelationDistanceFunction f = SquaredPearsonCorrelationDistanceFunction.STATIC;
-    DoubleVector[] TESTS = TestPearsonCorrelationDistanceFunctionTest.TESTS;
-    double[][] SCORES = TestPearsonCorrelationDistanceFunctionTest.SCORES;
     for(int i = 0; i < TESTS.length; i++) {
       for(int j = 0; j < TESTS.length; j++) {
         final double dist = f.distance(TESTS[i], TESTS[j]);
-        assertEquals("Distance does not agree: " + TESTS[i] + " <-> " + TESTS[j], 1. - Math.pow(1. - SCORES[i][j], 2.), dist, 1e-15);
+        final double r = 1. - SCORES[i][j];
+        assertEquals("Distance does not agree: " + TESTS[i] + " <-> " + TESTS[j], 1. - r * r, dist, 1e-15);
       }
     }
   }

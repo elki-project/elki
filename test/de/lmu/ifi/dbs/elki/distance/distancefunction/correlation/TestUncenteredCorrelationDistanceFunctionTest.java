@@ -34,21 +34,33 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * 
  * @author Erich Schubert
  */
-public class TestAbsolutePearsonCorrelationDistanceFunctionTest implements JUnit4Test {
-  /** Test set */
+public class TestUncenteredCorrelationDistanceFunctionTest implements JUnit4Test {
+  /** Inherited test data */
   final static DoubleVector[] TESTS = TestPearsonCorrelationDistanceFunctionTest.TESTS;
 
-  /** Note, these are not yet adjusted */
-  final static double[][] SCORES = TestPearsonCorrelationDistanceFunctionTest.SCORES;
+  /** Dissimilarities */
+  static final double C1 = 1.3636363636363638, C2 = 0.23636363636363633,
+      C3 = 0.6363636363636364;
+
+  /**
+   * The associated scores.
+   */
+  static final double[][] SCORES = { //
+  { 0., 0., 2., C1, 1., C2 },//
+  { 0., 0., 2., C1, 1., C2 },//
+  { 2., 2., 0., C3, 1., 2. - C2 },//
+  { C1, C1, C3, 0., 1., 1.6 },//
+  { 1., 1., 1., 1., 0., 1. },//
+  { C2, C2, 2. - C2, 1.6, 1., 0. },//
+  };
 
   @Test
-  public void testAbsolutePearson() {
-    AbsolutePearsonCorrelationDistanceFunction f = AbsolutePearsonCorrelationDistanceFunction.STATIC;
+  public void testUncenteredCorrelation() {
+    UncenteredCorrelationDistanceFunction f = UncenteredCorrelationDistanceFunction.STATIC;
     for(int i = 0; i < TESTS.length; i++) {
       for(int j = 0; j < TESTS.length; j++) {
         final double dist = f.distance(TESTS[i], TESTS[j]);
-        final double r = 1. - SCORES[i][j];
-        assertEquals("Distance does not agree: " + TESTS[i] + " <-> " + TESTS[j], 1. - Math.abs(r), dist, 1e-15);
+        assertEquals("Distance does not agree: " + TESTS[i] + " <-> " + TESTS[j], SCORES[i][j], dist, 1e-15);
       }
     }
   }

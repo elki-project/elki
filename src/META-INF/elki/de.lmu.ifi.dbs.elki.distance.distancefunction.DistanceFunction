@@ -35,6 +35,9 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.RGBHistogramQuadrat
 de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PearsonCorrelationDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.SquaredPearsonCorrelationDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbsolutePearsonCorrelationDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.UncenteredCorrelationDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.SquaredUncenteredCorrelationDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbsoluteUncenteredCorrelationDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedSquaredPearsonCorrelationDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.geo.DimensionSelectingLatLngDistanceFunction

@@ -34,16 +34,16 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * 
  * @author Erich Schubert
  */
-public class TestAbsolutePearsonCorrelationDistanceFunctionTest implements JUnit4Test {
-  /** Test set */
-  final static DoubleVector[] TESTS = TestPearsonCorrelationDistanceFunctionTest.TESTS;
+public class TestAbsoluteUncenteredCorrelationDistanceFunctionTest implements JUnit4Test {
+  /** Inherited test data */
+  final static DoubleVector[] TESTS = TestUncenteredCorrelationDistanceFunctionTest.TESTS;
 
   /** Note, these are not yet adjusted */
-  final static double[][] SCORES = TestPearsonCorrelationDistanceFunctionTest.SCORES;
+  final static double[][] SCORES = TestUncenteredCorrelationDistanceFunctionTest.SCORES;
 
   @Test
-  public void testAbsolutePearson() {
-    AbsolutePearsonCorrelationDistanceFunction f = AbsolutePearsonCorrelationDistanceFunction.STATIC;
+  public void testAbsoluteUncenteredCorrelation() {
+    AbsoluteUncenteredCorrelationDistanceFunction f = AbsoluteUncenteredCorrelationDistanceFunction.STATIC;
     for(int i = 0; i < TESTS.length; i++) {
       for(int j = 0; j < TESTS.length; j++) {
         final double dist = f.distance(TESTS[i], TESTS[j]);

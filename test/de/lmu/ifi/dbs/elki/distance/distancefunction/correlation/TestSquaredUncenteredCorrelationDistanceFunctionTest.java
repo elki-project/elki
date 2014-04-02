@@ -30,25 +30,25 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 
 /**
- * Unit test for Absolute Pearson correlation distance.
+ * Unit test for Squared Pearson correlation distance.
  * 
  * @author Erich Schubert
  */
-public class TestAbsolutePearsonCorrelationDistanceFunctionTest implements JUnit4Test {
-  /** Test set */
-  final static DoubleVector[] TESTS = TestPearsonCorrelationDistanceFunctionTest.TESTS;
+public class TestSquaredUncenteredCorrelationDistanceFunctionTest implements JUnit4Test {
+  /** Inherited test data */
+  final static DoubleVector[] TESTS = TestUncenteredCorrelationDistanceFunctionTest.TESTS;
 
   /** Note, these are not yet adjusted */
-  final static double[][] SCORES = TestPearsonCorrelationDistanceFunctionTest.SCORES;
+  final static double[][] SCORES = TestUncenteredCorrelationDistanceFunctionTest.SCORES;
 
   @Test
-  public void testAbsolutePearson() {
-    AbsolutePearsonCorrelationDistanceFunction f = AbsolutePearsonCorrelationDistanceFunction.STATIC;
+  public void testSquaredUncenteredCorrelation() {
+    SquaredUncenteredCorrelationDistanceFunction f = SquaredUncenteredCorrelationDistanceFunction.STATIC;
     for(int i = 0; i < TESTS.length; i++) {
       for(int j = 0; j < TESTS.length; j++) {
         final double dist = f.distance(TESTS[i], TESTS[j]);
         final double r = 1. - SCORES[i][j];
-        assertEquals("Distance does not agree: " + TESTS[i] + " <-> " + TESTS[j], 1. - Math.abs(r), dist, 1e-15);
+        assertEquals("Distance does not agree: " + TESTS[i] + " <-> " + TESTS[j], 1. - r * r, dist, 1e-15);
       }
     }
   }
