@@ -174,14 +174,10 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
             @SuppressWarnings("unchecked")
             final Relation<Object> orep = (Relation<Object>) relation;
             final Index index = ofact.instantiate(orep);
-            Duration duration = LOG.isStatistics() ? LOG.newDuration(index.getClass().getName() + ".construction") : null;
-            if(duration != null) {
-              duration.begin();
-            }
+            Duration duration = LOG.isStatistics() ? LOG.newDuration(index.getClass().getName() + ".construction").begin() : null;
             index.initialize();
             if(duration != null) {
-              duration.end();
-              LOG.statistics(duration);
+              LOG.statistics(duration.end());
             }
             addIndex(index);
           }

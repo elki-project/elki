@@ -91,14 +91,10 @@ public class AlgorithmStep implements WorkflowStep {
       }
     }
     for (Algorithm algorithm : algorithms) {
-      Duration duration = LOG.isStatistics() ? LOG.newDuration(algorithm.getClass().getName()+".runtime") : null;
-      if (duration != null) {
-        duration.begin();
-      }
+      Duration duration = LOG.isStatistics() ? LOG.newDuration(algorithm.getClass().getName()+".runtime").begin() : null;
       Result res = algorithm.run(database);
       if (duration != null) {
-        duration.end();
-        LOG.statistics(duration);
+        LOG.statistics(duration.end());
       }
       if (LOG.isStatistics() && database.getIndexes().size() > 0) {
         LOG.statistics("Index statistics after running algorithms:");

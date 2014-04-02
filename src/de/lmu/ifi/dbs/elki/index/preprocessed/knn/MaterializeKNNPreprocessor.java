@@ -112,10 +112,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(this.getClass().getName() + ".k", k));
     }
-    Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".precomputation-time") : null;
-    if(duration != null) {
-      duration.begin();
-    }
+    Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".precomputation-time").begin() : null;
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
     // Try bulk
     List<? extends KNNList> kNNList = null;
@@ -144,8 +141,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
       progress.ensureCompleted(getLogger());
     }
     if(duration != null) {
-      duration.end();
-      LOG.statistics(duration);
+      LOG.statistics(duration.end());
     }
   }
 

@@ -148,11 +148,9 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
     if(size > 0) {
       final int dim = meta.getDimensionality();
-      Duration timeone = LOG.newDuration("apriori.1-items.time");
-      timeone.begin();
+      Duration timeone = LOG.newDuration("apriori.1-items.time").begin();
       List<OneItemset> oneitems = buildFrequentOneItemsets(relation, dim, needed);
-      timeone.end();
-      LOG.statistics(timeone);
+      LOG.statistics(timeone.end());
       if(LOG.isVerbose()) {
         StringBuilder msg = new StringBuilder();
         msg.append("1-frequentItemsets (itemsets: ").append(oneitems.size()) //
@@ -165,13 +163,11 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       }
       solution.addAll(oneitems);
       if(oneitems.size() >= 2) {
-        Duration timetwo = LOG.newDuration("apriori.2-items.time");
-        timetwo.begin();
+        Duration timetwo = LOG.newDuration("apriori.2-items.time").begin();
         ArrayModifiableDBIDs survivors = DBIDUtil.newArray(ids.size());
         List<? extends Itemset> candidates = buildFrequentTwoItemsets(oneitems, relation, dim, needed, ids, survivors);
         ids = survivors; // Continue with reduced set of transactions.
-        timetwo.end();
-        LOG.statistics(timetwo);
+        LOG.statistics(timetwo.end());
         if(LOG.isVerbose()) {
           StringBuilder msg = new StringBuilder();
           msg.append("2-frequentItemsets (itemsets: ").append(candidates.size()) //
@@ -185,9 +181,8 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         solution.addAll(candidates);
         for(int length = 3; candidates.size() >= length; length++) {
           StringBuilder msg = LOG.isVerbose() ? new StringBuilder() : null;
-          Duration timel = LOG.newDuration("apriori." + length + "-items.time");
+          Duration timel = LOG.newDuration("apriori." + length + "-items.time").begin();
           // Join to get the new candidates
-          timel.begin();
           candidates = aprioriGenerate(candidates, length, dim);
           if(msg != null) {
             if(length > 2 && LOG.isDebuggingFinest()) {
@@ -198,8 +193,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
           survivors = DBIDUtil.newArray(ids.size());
           candidates = frequentItemsets(candidates, relation, needed, ids, survivors);
           ids = survivors; // Continue with reduced set of transactions.
-          timel.end();
-          LOG.statistics(timel);
+          LOG.statistics(timel.end());
           if(msg != null) {
             msg.append(length).append("-frequentItemsets (itemsets: ").append(candidates.size()) //
             .append(") (transactions: ").append(ids.size()).append(")");

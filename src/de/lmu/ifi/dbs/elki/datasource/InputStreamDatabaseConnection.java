@@ -88,40 +88,28 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
       if(LOG.isDebugging()) {
         LOG.debugFine("Invoking filters.");
       }
-      Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".load") : null;
-      if (duration != null) {
-        duration.begin();
-      }
+      Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".load").begin() : null;
       MultipleObjectsBundle objects = MultipleObjectsBundle.fromStream(invokeFilters(streamParser));
       if (duration != null) {
-        duration.end();
-        LOG.statistics(duration);
+        LOG.statistics(duration.end());
       }
       return objects;
     }
     else {
-      Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".parse") : null;
-      if (duration != null) {
-        duration.begin();
-      }
+      Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".parse").begin() : null;
       MultipleObjectsBundle parsingResult = parser.parse(in);
       if (duration != null) {
-        duration.end();
-        LOG.statistics(duration);
+        LOG.statistics(duration.end());
       }
 
       // normalize objects and transform labels
       if(LOG.isDebugging()) {
         LOG.debugFine("Invoking filters.");
       }
-      Duration fduration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".filter") : null;
-      if (fduration != null) {
-        fduration.begin();
-      }
+      Duration fduration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".filter").begin() : null;
       MultipleObjectsBundle objects = invokeFilters(parsingResult);
       if (fduration != null) {
-        fduration.end();
-        LOG.statistics(fduration);
+        LOG.statistics(fduration.end());
       }
       return objects;
     }
