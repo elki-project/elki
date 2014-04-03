@@ -53,7 +53,7 @@ public class AbsoluteUncenteredCorrelationDistanceFunction extends AbstractNumbe
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    return 1 - Math.abs(UncenteredCorrelationDistanceFunction.uncenteredCorrelation(v1, v2));
+    return 1. - Math.abs(UncenteredCorrelationDistanceFunction.uncenteredCorrelation(v1, v2));
   }
 
   @Override

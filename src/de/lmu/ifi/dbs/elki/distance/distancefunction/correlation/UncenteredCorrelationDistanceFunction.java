@@ -92,7 +92,7 @@ public class UncenteredCorrelationDistanceFunction extends AbstractNumberVectorD
    */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    return 1 - uncenteredCorrelation(v1, v2);
+    return 1. - uncenteredCorrelation(v1, v2);
   }
 
   @Override

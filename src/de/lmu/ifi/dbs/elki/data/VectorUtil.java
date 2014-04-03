@@ -159,7 +159,7 @@ public final class VectorUtil {
    * @return Angle
    */
   public static double angle(NumberVector v1, NumberVector v2, Vector o) {
-    final int dim1 = v1.getDimensionality(), dim2 = v1.getDimensionality(), dimo = v1.getDimensionality();
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(), dimo = o.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
@@ -198,7 +198,7 @@ public final class VectorUtil {
    * @return Angle
    */
   public static double angle(NumberVector v1, NumberVector v2, NumberVector o) {
-    final int dim1 = v1.getDimensionality(), dim2 = v1.getDimensionality(), dimo = o.getDimensionality();
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(), dimo = o.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
@@ -240,7 +240,7 @@ public final class VectorUtil {
     if(v1 instanceof SparseNumberVector && v2 instanceof SparseNumberVector) {
       return angleSparse((SparseNumberVector) v1, (SparseNumberVector) v2);
     }
-    final int dim1 = v1.getDimensionality(), dim2 = v1.getDimensionality();
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
     // Essentially, we want to compute this:
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
@@ -280,7 +280,7 @@ public final class VectorUtil {
     if(v1 instanceof NumberVector && v2 instanceof NumberVector) {
       return cosAngle((NumberVector) v1, (NumberVector) v2);
     }
-    final int dim1 = v1.getDimensionality(), dim2 = v1.getDimensionality();
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
     // Essentially, we want to compute this:
     // absmax(v1.transposeTimes(v2))/(min(v1.euclideanLength())*min(v2.euclideanLength()));

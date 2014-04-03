@@ -54,7 +54,7 @@ public class SquaredUncenteredCorrelationDistanceFunction extends AbstractNumber
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final double pcc = UncenteredCorrelationDistanceFunction.uncenteredCorrelation(v1, v2);
-    return 1 - pcc * pcc;
+    return 1. - pcc * pcc;
   }
 
   @Override
