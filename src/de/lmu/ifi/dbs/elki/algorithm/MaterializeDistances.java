@@ -31,12 +31,15 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
@@ -76,11 +79,11 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
    * @param relation Relation to process
    * @return Distance matrix
    */
-  public CollectionResult<CTriple<DBID, DBID, Double>> run(Database database, Relation<O> relation) {
+  public CollectionResult<DistanceEntry> run(Database database, Relation<O> relation) {
     DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
-    Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<>(size * (size + 1) >> 1);
+    Collection<DistanceEntry> r = new ArrayList<>(size * (size + 1) >> 1);
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
@@ -89,7 +92,7 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
           continue;
         }
         double d = distFunc.distance(iditer, iditer2);
-        r.add(new CTriple<>(DBIDUtil.deref(iditer), DBIDUtil.deref(iditer2), d));
+        r.add(new DistanceEntry(DBIDUtil.newPair(iditer, iditer2), d));
       }
     }
     return new CollectionResult<>("Distance Matrix", "distance-matrix", r);
@@ -103,6 +106,45 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+  }
+
+  /**
+   * Object representing a pairwise distance.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.eclude
+   */
+  public static class DistanceEntry implements TextWriteable {
+    /**
+     * DBIDs compared.
+     */
+    DBIDPair ids;
+
+    /**
+     * Distance of the two objects
+     */
+    double distance;
+
+    /**
+     * Constructor.
+     * 
+     * @param ids IDs
+     * @param distance Distance
+     */
+    public DistanceEntry(DBIDPair ids, double distance) {
+      this.ids = ids;
+      this.distance = distance;
+    }
+
+    @Override
+    public void writeToText(TextWriterStream out, String label) {
+      // TODO: use less memory;
+      // unless Hotspot was shown to optimize well enough!
+      out.inlinePrint(ids.getFirst());
+      out.inlinePrint(ids.getSecond());
+      out.inlinePrint(distance);
+    }
   }
 
   /**
