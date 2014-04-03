@@ -112,14 +112,10 @@ public class RandomSampleKNNExperiment {
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][0] = auc;
-          if(prog != null) {
-            prog.incrementProcessed(LOG);
-          }
+          LOG.incrementProcessed(prog);
         }
 
-        if(prog != null) {
-          prog.ensureCompleted(LOG);
-        }
+        LOG.ensureCompleted(prog);
       }
       {
         FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", iters, LOG) : null;
@@ -130,14 +126,10 @@ public class RandomSampleKNNExperiment {
           XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][3] = auc;
-          if(prog != null) {
-            prog.incrementProcessed(LOG);
-          }
+          LOG.incrementProcessed(prog);
         }
 
-        if(prog != null) {
-          prog.ensureCompleted(LOG);
-        }
+        LOG.ensureCompleted(prog);
       }
 
       // Remove the preprocessor again.
@@ -202,14 +194,10 @@ public class RandomSampleKNNExperiment {
         ppf = null;
         System.gc();
 
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
         System.out.println(k + " " + FormatUtil.format(data[i - 1], " "));
       }
-      if(prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
     }
     for(int i = 1; i < iters; i++) {
       final int k = i * step;
