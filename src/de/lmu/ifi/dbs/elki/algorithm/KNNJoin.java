@@ -86,12 +86,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
   private static final Logging LOG = Logging.getLogger(KNNJoin.class);
 
   /**
-   * Parameter that specifies the k-nearest neighbors to be assigned, must be an
-   * integer greater than 0. Default value: 1.
-   */
-  public static final OptionID K_ID = new OptionID("knnjoin.k", "Specifies the k-nearest neighbors to be assigned.");
-
-  /**
    * The k parameter.
    */
   int k;
@@ -204,11 +198,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     LOG.setCompleted(fprogress);
 
     WritableDataStore<KNNList> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
-    // FiniteProgress progress = logger.isVerbose() ? new
-    // FiniteProgress(this.getClass().getName(), relation.size(), logger) :
-    // null;
     FiniteProgress pageprog = LOG.isVerbose() ? new FiniteProgress("Number of processed data pages", ps_candidates.size(), LOG) : null;
-    // int processed = 0;
     for(int i = 0; i < ps_candidates.size(); i++) {
       N pr = index.getNode(ps_candidates.get(i));
       List<KNNHeap> pr_heaps = heaps.get(i);
@@ -219,16 +209,8 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
       }
       // Forget heaps and pq
       heaps.set(i, null);
-      // processed += pr.getNumEntries();
-
-      // if(progress != null) {
-      // progress.setProcessed(processed, logger);
-      // }
       LOG.incrementProcessed(pageprog);
     }
-    // if(progress != null) {
-    // progress.ensureCompleted(logger);
-    // }
     LOG.ensureCompleted(pageprog);
     return knnLists;
   }
@@ -359,6 +341,11 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V> {
+    /**
+     * Parameter that specifies the k-nearest neighbors to be assigned, must be an
+     * integer greater than 0. Default value: 1.
+     */
+    public static final OptionID K_ID = new OptionID("knnjoin.k", "Specifies the k-nearest neighbors to be assigned.");
     /**
      * K parameter.
      */
