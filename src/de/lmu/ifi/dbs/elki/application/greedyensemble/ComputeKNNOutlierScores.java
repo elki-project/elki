@@ -29,6 +29,8 @@ import java.io.PrintStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.xml.bind.DatatypeConverter;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier;
@@ -57,7 +59,6 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.Base64;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -196,7 +197,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
           md.update(DBIDUtil.toString(iter).getBytes());
         }
         fout.append("# DBID-series MD5:");
-        fout.append(Base64.encodeBase64(md.digest()));
+        fout.append(DatatypeConverter.printBase64Binary(md.digest()));
         fout.append(FormatUtil.NEWLINE);
       }
       catch(NoSuchAlgorithmException e) {
