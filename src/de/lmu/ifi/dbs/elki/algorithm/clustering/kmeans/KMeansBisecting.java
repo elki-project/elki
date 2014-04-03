@@ -126,16 +126,12 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel<V>> ext
       // Add resulting clusters to current result.
       currentClusterList.addAll(innerResult.getAllClusters());
 
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
       if (LOG.isVerbose()) {
         LOG.verbose("Iteration " + j);
       }
     }
-    if (prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     // add all current clusters to the result
     Clustering<M> result = new Clustering<>("Bisecting k-Means Result", "Bisecting-k-means");

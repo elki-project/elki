@@ -75,7 +75,7 @@ public abstract class AbstractProgress implements Progress {
    * @param processed the number of items already processed at a time being
    * @throws IllegalArgumentException if an invalid value was passed.
    */
-  public void setProcessed(int processed) throws IllegalArgumentException {
+  protected void setProcessed(int processed) throws IllegalArgumentException {
     this.processed.set(processed);
   }
 
@@ -119,16 +119,7 @@ public abstract class AbstractProgress implements Progress {
    */
   @Override
   public String toString() {
-    StringBuilder message = new StringBuilder();
-    appendToBuffer(message);
-    return message.toString();
-  }
-
-  /**
-   * Increment the processed counter.
-   */
-  public void incrementProcessed() {
-    this.processed.incrementAndGet();
+    return appendToBuffer(new StringBuilder()).toString();
   }
 
   /**
@@ -137,7 +128,7 @@ public abstract class AbstractProgress implements Progress {
    * @param logger Logger to report to.
    */
   public void incrementProcessed(Logging logger) {
-    incrementProcessed();
+    this.processed.incrementAndGet();
     if(testLoggingRate()) {
       logger.progress(this);
     }

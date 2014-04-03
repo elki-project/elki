@@ -58,6 +58,7 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
     }
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
 
+    final Logging logger = getLogger();
     for(int r = 0; r < objects.metaLength(); r++) {
       @SuppressWarnings("unchecked")
       SimpleTypeInformation<Object> type = (SimpleTypeInformation<Object>) objects.meta(r);
@@ -73,18 +74,14 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
 
       // When necessary, perform an initialization scan
       if(prepareStart(castType)) {
-        FiniteProgress pprog = getLogger().isVerbose() ? new FiniteProgress("Preparing normalization.", objects.dataLength(), getLogger()) : null;
+        FiniteProgress pprog = logger.isVerbose() ? new FiniteProgress("Preparing normalization.", objects.dataLength(), logger) : null;
         for(Object o : column) {
           @SuppressWarnings("unchecked")
           final I obj = (I) o;
           prepareProcessInstance(obj);
-          if (pprog != null) {
-            pprog.incrementProcessed(getLogger());
-          }
+          logger.incrementProcessed(pprog);
         }
-        if (pprog != null) {
-          pprog.ensureCompleted(getLogger());
-        }
+        logger.ensureCompleted(pprog);
         prepareComplete();
       }
 
@@ -93,19 +90,15 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
       bundle.appendColumn(convertedType(castType), castColumn);
 
       // Normalization scan
-      FiniteProgress nprog = getLogger().isVerbose() ? new FiniteProgress("Data normalization.", objects.dataLength(), getLogger()) : null;
+      FiniteProgress nprog = logger.isVerbose() ? new FiniteProgress("Data normalization.", objects.dataLength(), logger) : null;
       for(int i = 0; i < objects.dataLength(); i++) {
         @SuppressWarnings("unchecked")
         final I obj = (I) column.get(i);
         final O normalizedObj = filterSingleObject(obj);
         castColumn.set(i, normalizedObj);
-        if (nprog != null) {
-          nprog.incrementProcessed(getLogger());
-        }
+        logger.incrementProcessed(nprog);
       }
-      if (nprog != null) {
-        nprog.ensureCompleted(getLogger());
-      }
+      logger.ensureCompleted(nprog);
     }
     return bundle;
   }

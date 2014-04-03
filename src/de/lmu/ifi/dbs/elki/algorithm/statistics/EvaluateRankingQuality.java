@@ -159,14 +159,10 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
         hist.put(((double) ind) / clus.size(), result);
 
-        if(rocloop != null) {
-          rocloop.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(rocloop);
       }
     }
-    if(rocloop != null) {
-      rocloop.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(rocloop);
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.

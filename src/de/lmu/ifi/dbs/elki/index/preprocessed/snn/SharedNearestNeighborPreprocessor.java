@@ -123,13 +123,9 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       }
       neighbors.sort();
       storage.put(iditer, neighbors);
-      if(progress != null) {
-        progress.incrementProcessed(getLogger());
-      }
+      getLogger().incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(progress);
   }
 
   @Override

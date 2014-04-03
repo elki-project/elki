@@ -225,9 +225,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       progress.setProcessed(relation.size(), LOG);
       progress.ensureCompleted(LOG);
     }
-    if(cprogress != null) {
-      cprogress.setCompleted(LOG);
-    }
+    LOG.setCompleted(cprogress);
     return ret;
   }
 

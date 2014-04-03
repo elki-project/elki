@@ -555,9 +555,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
         // LOG.verbose("Total number of masked values: " + maskedVals.size() +
         // "\n");
       }
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
     // Add a noise cluster, full-dimensional.
     if(!noise.isEmpty()) {
@@ -565,9 +563,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
       BiclusterWithInversionsModel model = new BiclusterWithInversionsModel(colsBitsetToIDs(allcols), DBIDUtil.EMPTYDBIDS);
       result.addToplevelCluster(new Cluster<>(noise, true, model));
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
     return result;
   }
 

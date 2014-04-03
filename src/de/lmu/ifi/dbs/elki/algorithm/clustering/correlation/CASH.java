@@ -239,9 +239,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("CASH Clustering", fulldatabase.size(), LOG) : null;
     Clustering<Model> result = doRun(fulldatabase, progress);
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
 
     if(LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder();

@@ -187,13 +187,9 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
             table.put(bucket, newbuck);
           }
         }
-        if(progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
-      if(progress != null) {
-        progress.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(progress);
       if(LOG.isStatistics()) {
         int min = Integer.MAX_VALUE, max = 0;
         for(int i = 0; i < numhash; i++) {

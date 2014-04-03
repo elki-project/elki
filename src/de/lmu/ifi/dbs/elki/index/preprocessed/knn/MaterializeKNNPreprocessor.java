@@ -122,9 +122,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
         int i = 0;
         for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
           storage.put(id, kNNList.get(i));
-          if(progress != null) {
-            progress.incrementProcessed(getLogger());
-          }
+          getLogger().incrementProcessed(progress);
         }
       }
     }
@@ -132,14 +130,10 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         KNNList knn = knnQuery.getKNNForDBID(iter, k);
         storage.put(iter, knn);
-        if(progress != null) {
-          progress.incrementProcessed(getLogger());
-        }
+        getLogger().incrementProcessed(progress);
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(progress);
     if(duration != null) {
       LOG.statistics(duration.end());
     }
@@ -182,9 +176,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // materialize the new kNNs
-    if(stepprog != null) {
-      stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 1, "New insertions ocurred, materialize their new kNNs.");
     // Bulk-query kNNs
     List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(aids, k);
     // Store in storage
@@ -194,20 +186,14 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
     }
 
     // update the affected kNNs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "New insertions ocurred, update the affected kNNs.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 2, "New insertions ocurred, update the affected kNNs.");
     ArrayDBIDs rkNN_ids = updateKNNsAfterInsertion(ids);
 
     // inform listener
-    if(stepprog != null) {
-      stepprog.beginStep(3, "New insertions ocurred, inform listeners.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 3, "New insertions ocurred, inform listeners.");
     fireKNNsInserted(ids, rkNN_ids);
 
-    if(stepprog != null) {
-      stepprog.setCompleted(getLogger());
-    }
+    getLogger().setCompleted(stepprog);
   }
 
   /**
@@ -284,28 +270,20 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
     StepProgress stepprog = getLogger().isVerbose() ? new StepProgress(3) : null;
 
     // delete the materialized (old) kNNs
-    if(stepprog != null) {
-      stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 1, "New deletions ocurred, remove their materialized kNNs.");
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       storage.delete(iter);
     }
 
     // update the affected kNNs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "New deletions ocurred, update the affected kNNs.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 2, "New deletions ocurred, update the affected kNNs.");
     ArrayDBIDs rkNN_ids = updateKNNsAfterDeletion(ids);
 
     // inform listener
-    if(stepprog != null) {
-      stepprog.beginStep(3, "New deletions ocurred, inform listeners.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 3, "New deletions ocurred, inform listeners.");
     fireKNNsRemoved(ids, rkNN_ids);
 
-    if(stepprog != null) {
-      stepprog.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(stepprog);
   }
 
   /**

@@ -127,9 +127,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
       boolean changed = false;
       FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Batch", parts.length, LOG) : null;
       for(int p = 0; p < parts.length; p++) {
@@ -141,21 +139,15 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
         changed |= assignToNearestCluster(relation, parts[p], means, meanshift, changesize, clusters, assignment);
         // Recompute means.
         updateMeans(means, meanshift, clusters, changesize);
-        if(pprog != null) {
-          pprog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(pprog);
       }
-      if(pprog != null) {
-        pprog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(pprog);
       // Stop if no cluster assignment changed.
       if(!changed) {
         break;
       }
     }
-    if(prog != null) {
-      prog.setCompleted(LOG);
-    }
+    LOG.setCompleted(prog);
 
     // Wrap result
     final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);

@@ -220,13 +220,9 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
         final int jbase = triangleSize(ij.getOffset());
         scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], sizej, mindist);
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if (prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     return new PointerHierarchyRepresentationResult(ids, pi, lambda);
   }

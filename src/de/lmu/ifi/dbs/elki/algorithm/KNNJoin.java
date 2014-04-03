@@ -166,14 +166,10 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
         else if(minDist <= pr_knn_distance || minDist <= ps_knn_distance) {
           pq.add(new Task(minDist, i, j));
         }
-        if(mprogress != null) {
-          mprogress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(mprogress);
       }
     }
-    if(mprogress != null) {
-      mprogress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(mprogress);
 
     // Process the queue
     FiniteProgress qprogress = LOG.isVerbose() ? new FiniteProgress("Processing queue", pq.size(), LOG) : null;
@@ -200,20 +196,12 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
             processDataPages(distFunction, ps_heaps, null, ps, pr);
           }
         }
-        if(fprogress != null) {
-          fprogress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(fprogress);
       }
-      if(qprogress != null) {
-        qprogress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(qprogress);
     }
-    if(qprogress != null) {
-      qprogress.ensureCompleted(LOG);
-    }
-    if(fprogress != null) {
-      fprogress.setCompleted(LOG);
-    }
+    LOG.ensureCompleted(qprogress);
+    LOG.setCompleted(fprogress);
 
     WritableDataStore<KNNList> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
     // FiniteProgress progress = logger.isVerbose() ? new
@@ -236,16 +224,12 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
       // if(progress != null) {
       // progress.setProcessed(processed, logger);
       // }
-      if(pageprog != null) {
-        pageprog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(pageprog);
     }
     // if(progress != null) {
     // progress.ensureCompleted(logger);
     // }
-    if(pageprog != null) {
-      pageprog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(pageprog);
     return knnLists;
   }
 

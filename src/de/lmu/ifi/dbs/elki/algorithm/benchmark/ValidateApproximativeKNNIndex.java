@@ -202,13 +202,9 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
             misses++;
           }
         }
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
-      if(prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
@@ -286,13 +282,9 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
           // Less than k objects.
           misses++;
         }
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
-      if(prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());

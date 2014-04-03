@@ -215,9 +215,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       }
     }
 
-    if(cprogress != null) {
-      cprogress.setCompleted(LOG);
-    }
+    LOG.setCompleted(cprogress);
 
     // refinement phase
     if(LOG.isVerbose()) {

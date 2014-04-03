@@ -170,13 +170,9 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
       }
       hash = Util.mixHashCodes(hash, ichecksum);
       mv.put(rres.size());
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
     if(LOG.isStatistics()) {
       LOG.statistics("Result hashcode: " + hash);
       LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
@@ -260,13 +256,9 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
       }
       hash = Util.mixHashCodes(hash, ichecksum);
       mv.put(rres.size());
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
     if(LOG.isStatistics()) {
       LOG.statistics("Result hashcode: " + hash);
       LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());

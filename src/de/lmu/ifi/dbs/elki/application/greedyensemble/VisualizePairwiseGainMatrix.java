@@ -169,9 +169,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
           double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(veca)));
           data[a][a] = auc;
           // minmax.put(auc);
-          if (prog != null) {
-            prog.incrementProcessed(LOG);
-          }
+          LOG.incrementProcessed(prog);
         }
         // Compare to others, exploiting symmetry
         DBIDArrayIter id2 = ids.iter();
@@ -191,14 +189,10 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
           data[b][a] = auc;
           commax.put(data[a][b]);
           // minmax.put(auc);
-          if (prog != null) {
-            prog.incrementProcessed(LOG);
-          }
+          LOG.incrementProcessed(prog);
         }
       }
-      if (prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
     }
     for (int a = 0; a < size; a++) {
       for (int b = a + 1; b < size; b++) {

@@ -144,13 +144,9 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
         hash = Util.mixHashCodes(hash, ichecksum);
         mv.put(knns.size());
         mvdist.put(knns.getKNNDistance());
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
-      if(prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics("Result hashcode: " + hash);
         LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
@@ -205,13 +201,9 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
         hash = Util.mixHashCodes(hash, ichecksum);
         mv.put(knns.size());
         mvdist.put(knns.getKNNDistance());
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
-      if(prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics("Result hashcode: " + hash);
         LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());

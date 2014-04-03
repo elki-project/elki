@@ -124,14 +124,10 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
         TreeSet<DoubleDBIDPair> rknns = materialized_RkNN.get(iter);
         rknns.add(makePair(iter, id));
       }
-      if(progress != null) {
-        progress.incrementProcessed(getLogger());
-      }
+      getLogger().incrementProcessed(progress);
     }
 
-    if(progress != null) {
-      progress.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(progress);
   }
 
   private DoubleDBIDPair makePair(DoubleDBIDListIter iter, DBIDIter id) {
@@ -144,26 +140,18 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // materialize the new kNNs and RkNNs
-    if(stepprog != null) {
-      stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs and RkNNs.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 1, "New insertions ocurred, materialize their new kNNs and RkNNs.");
     materializeKNNAndRKNNs(aids, null);
 
     // update the old kNNs and RkNNs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "New insertions ocurred, update the affected kNNs and RkNNs.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 2, "New insertions ocurred, update the affected kNNs and RkNNs.");
     ArrayDBIDs rkNN_ids = updateKNNsAndRkNNs(ids);
 
     // inform listener
-    if(stepprog != null) {
-      stepprog.beginStep(3, "New insertions ocurred, inform listeners.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 3, "New insertions ocurred, inform listeners.");
     fireKNNsInserted(ids, rkNN_ids);
 
-    if(stepprog != null) {
-      stepprog.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(stepprog);
   }
 
   /**
@@ -247,9 +235,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // delete the materialized (old) kNNs and RkNNs
-    if(stepprog != null) {
-      stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs and RkNNs.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 1, "New deletions ocurred, remove their materialized kNNs and RkNNs.");
     // Temporary storage of removed lists
     List<KNNList> kNNs = new ArrayList<>(ids.size());
     List<TreeSet<DoubleDBIDPair>> rkNNs = new ArrayList<>(ids.size());
@@ -264,9 +250,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     ArrayDBIDs rkNN_ids = affectedRkNN(rkNNs, aids);
 
     // update the affected kNNs and RkNNs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "New deletions ocurred, update the affected kNNs and RkNNs.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 2, "New deletions ocurred, update the affected kNNs and RkNNs.");
     // Recompute the kNN for affected objects (in rkNN lists)
     {
       List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
@@ -292,14 +276,10 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     }
 
     // inform listener
-    if(stepprog != null) {
-      stepprog.beginStep(3, "New deletions ocurred, inform listeners.", getLogger());
-    }
+    getLogger().beginStep(stepprog, 3, "New deletions ocurred, inform listeners.");
     fireKNNsRemoved(ids, rkNN_ids);
 
-    if(stepprog != null) {
-      stepprog.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(stepprog);
   }
 
   /**

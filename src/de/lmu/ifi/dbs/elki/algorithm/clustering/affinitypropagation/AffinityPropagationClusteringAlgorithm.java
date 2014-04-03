@@ -195,9 +195,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
         }
       }
       inactive = (changed > 0) ? 0 : (inactive + 1);
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
       if(aprog != null) {
         aprog.setProcessed(size - changed, LOG);
       }
@@ -205,9 +203,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
     if(aprog != null) {
       aprog.setProcessed(aprog.getTotal(), LOG);
     }
-    if(prog != null) {
-      prog.setCompleted(LOG);
-    }
+    LOG.setCompleted(prog);
     // Cluster map, by lead object
     TIntObjectHashMap<ModifiableDBIDs> map = new TIntObjectHashMap<>();
     DBIDArrayIter i1 = ids.iter();

@@ -183,9 +183,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
         }
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
     return clusterOrder;
   }
 

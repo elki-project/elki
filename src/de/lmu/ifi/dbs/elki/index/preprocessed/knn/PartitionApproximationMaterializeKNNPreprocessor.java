@@ -134,13 +134,9 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
           LOG.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
         }
       }
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
     if(LOG.isVerbose()) {
       LOG.verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
     }

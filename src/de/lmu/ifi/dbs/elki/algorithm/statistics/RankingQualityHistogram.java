@@ -130,14 +130,10 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
         mv.put(result);
         hist.increment(result, 1. / relation.size());
 
-        if(progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<>(relation.size());

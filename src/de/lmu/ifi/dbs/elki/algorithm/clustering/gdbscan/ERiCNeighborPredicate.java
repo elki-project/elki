@@ -130,13 +130,9 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList ref = knnq.getKNNForDBID(iditer, settings.k);
       storage.put(iditer, settings.pca.processQueryResult(ref, relation));
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
     LOG.statistics(time.end());
     return new Instance(relation.getDBIDs(), storage, relation);
   }

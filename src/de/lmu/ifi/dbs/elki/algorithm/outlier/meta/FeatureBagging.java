@@ -148,13 +148,9 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         // run LOF and collect the result
         OutlierResult result = lof.run(database, relation);
         results.add(result);
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
-      if(prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
     }
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -193,13 +189,9 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
           }
         }
         // Progress does not take the initial mapping into account.
-        if(cprog != null) {
-          cprog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(cprog);
       }
-      if(cprog != null) {
-        cprog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(cprog);
     }
     else {
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Combining results", relation.size(), LOG) : null;
@@ -213,13 +205,9 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         }
         scores.putDouble(iter, sum);
         minmax.put(sum);
-        if(cprog != null) {
-          cprog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(cprog);
       }
-      if(cprog != null) {
-        cprog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(cprog);
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     DoubleRelation scoreres = new MaterializedDoubleRelation("Feature bagging", "fb-outlier", scores, relation.getDBIDs());

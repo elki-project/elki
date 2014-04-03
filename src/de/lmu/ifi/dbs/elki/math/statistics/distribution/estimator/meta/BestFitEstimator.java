@@ -253,9 +253,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
           LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
     for (MADDistributionEstimator<?> est : madests) {
       try {
@@ -274,9 +272,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
           LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
     for (LMMDistributionEstimator<?> est : lmmests) {
       if (lmm != null) {
@@ -297,9 +293,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
           }
         }
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
     for (LogMOMDistributionEstimator<?> est : logmomests) {
       try {
@@ -318,9 +312,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
           LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
     for (LogMADDistributionEstimator<?> est : logmadests) {
       try {
@@ -339,9 +331,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
           LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
     { // Uniform estimators.
       final UniformMinMaxEstimator est = UniformMinMaxEstimator.STATIC;
@@ -361,9 +351,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
           LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
     { // Uniform estimators.
       final UniformEnhancedMinMaxEstimator est = UniformEnhancedMinMaxEstimator.STATIC;
@@ -383,13 +371,9 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
           LOG.debugFine("Fitting distribution " + est.getClass().getSimpleName() + " failed: " + e.getMessage());
         }
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if (prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     if (LOG.isVeryVerbose()) {
       LOG.veryverbose("Best distribution fit: " + bestscore + " " + best.toString() + " via " + bestest);

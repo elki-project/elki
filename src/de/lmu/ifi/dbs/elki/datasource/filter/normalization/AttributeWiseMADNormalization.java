@@ -121,13 +121,9 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
         }
         // Rescale the true MAD for the best standard deviation estimate:
         madsigma[d] = QuickSelect.median(test) * NormalDistribution.ONEBYPHIINV075;
-        if (dprog != null) {
-          dprog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(dprog);
       }
-      if (dprog != null) {
-        dprog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(dprog);
 
       FiniteProgress nprog = LOG.isVerbose() ? new FiniteProgress("Data normalization.", objects.dataLength(), LOG) : null;
       // Normalization scan
@@ -138,13 +134,9 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
           buf[d] = normalize(d, obj.doubleValue(d));
         }
         castColumn.set(i, factory.newNumberVector(buf));
-        if (nprog != null) {
-          nprog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(nprog);
       }
-      if (nprog != null) {
-        nprog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(nprog);
     }
     return objects;
   }

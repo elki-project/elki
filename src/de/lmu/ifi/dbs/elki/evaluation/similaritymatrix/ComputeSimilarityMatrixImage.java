@@ -154,9 +154,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
             }
           }
         }
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
     }
 
@@ -185,14 +183,10 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
           img.setRGB(x, y, col);
           img.setRGB(y, x, col);
         }
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     return new SimilarityMatrix(img, relation, order);
   }

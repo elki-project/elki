@@ -108,9 +108,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
         processedIDs.add(id);
 
-        if(progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
     }
     else {
@@ -123,15 +121,11 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
         processedIDs.add(id);
 
-        if(progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
     }
 
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
     // We don't need m anymore.
     m.destroy();
     m = null;

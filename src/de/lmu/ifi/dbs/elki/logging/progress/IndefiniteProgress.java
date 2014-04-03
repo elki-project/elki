@@ -37,16 +37,6 @@ public class IndefiniteProgress extends AbstractProgress {
   private boolean completed = false;
   
   /**
-   * Constructor.
-   * 
-   * @param task Task name.
-   */
-  @Deprecated
-  public IndefiniteProgress(String task) {
-    super(task);
-  }
-
-  /**
    * Constructor with logging.
    * 
    * @param task Task name.
@@ -76,14 +66,6 @@ public class IndefiniteProgress extends AbstractProgress {
   @Override
   public boolean isComplete() {
     return completed;
-  }
-
-  /**
-   * Set the completion flag.
-   */
-  @Deprecated
-  public void setCompleted() {
-    this.completed = true;
   }
 
   /**

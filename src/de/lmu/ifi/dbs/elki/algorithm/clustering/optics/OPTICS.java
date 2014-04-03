@@ -122,9 +122,7 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderRes
         expandClusterOrder(clusterOrder, relation, rangeQuery, DBIDUtil.deref(iditer), epsilon, progress);
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
 
     return clusterOrder;
   }

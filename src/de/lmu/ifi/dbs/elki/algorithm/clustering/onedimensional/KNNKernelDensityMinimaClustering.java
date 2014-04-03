@@ -138,9 +138,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
 
     StepProgress sprog = LOG.isVerbose() ? new StepProgress("Clustering steps", 2) : null;
 
-    if(sprog != null) {
-      sprog.beginStep(1, "Kernel density estimation.", LOG);
-    }
+    LOG.beginStep(sprog, 1, "Kernel density estimation.");
     {
       double[] scratch = new double[2 * k];
       iter.seek(0);
@@ -216,9 +214,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
       }
     }
 
-    if(sprog != null) {
-      sprog.beginStep(2, "Local minima detection.", LOG);
-    }
+    LOG.beginStep(sprog, 2, "Local minima detection.");
     Clustering<ClusterModel> clustering = new Clustering<>("onedimensional-kde-clustering", "One-Dimensional clustering using kernel density estimation.");
     {
       double[] scratch = new double[2 * minwindow + 1];
@@ -270,9 +266,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
       clustering.addToplevelCluster(new Cluster<>(cids, ClusterModel.CLUSTER));
     }
 
-    if(sprog != null) {
-      sprog.setCompleted(LOG);
-    }
+    LOG.ensureCompleted(sprog);
     return clustering;
   }
 

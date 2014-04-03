@@ -148,9 +148,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnq instanceof PreprocessorKNNQuery)) {
-      if(stepprog != null) {
-        stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
-      }
+      LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       database.addIndex(preproc);
       DistanceQuery<O> rdq = database.getDistanceQuery(relation, getDistanceFunction());
@@ -158,9 +156,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     }
 
     // Compute LDEs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "Computing LDEs.", LOG);
-    }
+    LOG.beginStep(stepprog, 2, "Computing LDEs.");
     WritableDoubleDataStore ldes = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
@@ -205,18 +201,12 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
         }
       }
       ldes.putDouble(it, sum / count);
-      if(densProgress != null) {
-        densProgress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(densProgress);
     }
-    if(densProgress != null) {
-      densProgress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(densProgress);
 
     // Compute local density factors.
-    if(stepprog != null) {
-      stepprog.beginStep(3, "Computing LDFs.", LOG);
-    }
+    LOG.beginStep(stepprog, 3, "Computing LDFs.");
     WritableDoubleDataStore ldfs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
@@ -242,17 +232,11 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       // update minimum and maximum
       lofminmax.put(ldf);
 
-      if(progressLOFs != null) {
-        progressLOFs.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressLOFs);
     }
-    if(progressLOFs != null) {
-      progressLOFs.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressLOFs);
 
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Density Factor", "ldf-outlier", ldfs, ids);

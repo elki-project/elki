@@ -181,13 +181,9 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       }
 
       interestingDistances.put(iditer, cdist);
-      if(progressPreproc != null) {
-        progressPreproc.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressPreproc);
     }
-    if(progressPreproc != null) {
-      progressPreproc.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressPreproc);
     // LOCI main step
     FiniteProgress progressLOCI = LOG.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), LOG) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -249,13 +245,9 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       mdef_norm.putDouble(iditer, maxmdefnorm);
       mdef_radius.putDouble(iditer, maxnormr);
       minmax.put(maxmdefnorm);
-      if(progressLOCI != null) {
-        progressLOCI.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressLOCI);
     }
-    if(progressLOCI != null) {
-      progressLOCI.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressLOCI);
     DoubleRelation scoreResult = new MaterializedDoubleRelation("LOCI normalized MDEF", "loci-mdef-outlier", mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);

@@ -324,13 +324,9 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
         cop_dim.putInt(id, dim + 1 - vdim);
       }
 
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     // combine results.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Correlation Outlier Probabilities", COP_SCORES, cop_score, ids);

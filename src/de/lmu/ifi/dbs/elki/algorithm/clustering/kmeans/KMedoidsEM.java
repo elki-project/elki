@@ -137,9 +137,7 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
     // Swap phase
     boolean changed = true;
     while(changed) {
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
       changed = false;
       // Try to swap the medoid with a better cluster member:
       int i = 0;
@@ -170,9 +168,7 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
         assignToNearestCluster(medoids, mdists, clusters, distQ);
       }
     }
-    if(prog != null) {
-      prog.setCompleted(LOG);
-    }
+    LOG.setCompleted(prog);
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");

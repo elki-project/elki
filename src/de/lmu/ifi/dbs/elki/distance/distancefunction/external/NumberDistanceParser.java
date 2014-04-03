@@ -77,9 +77,7 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
         // Skip empty lines and comments
         if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
           continue;
@@ -131,9 +129,7 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    if(prog != null) {
-      prog.setCompleted(LOG);
-    }
+    LOG.setCompleted(prog);
 
     // check if all distance values are specified
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {

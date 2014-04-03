@@ -167,9 +167,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(dimensionality) : null;
 
     // Generate all 1-dimensional clusters
-    if(stepprog != null) {
-      stepprog.beginStep(1, "Generate all 1-dimensional clusters.", LOG);
-    }
+    LOG.beginStep(stepprog, 1, "Generate all 1-dimensional clusters.");
 
     // mapping of dimensionality to set of subspaces
     HashMap<Integer, List<Subspace>> subspaceMap = new HashMap<>();
@@ -267,9 +265,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
       }
     }
 
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
     return result;
   }
 

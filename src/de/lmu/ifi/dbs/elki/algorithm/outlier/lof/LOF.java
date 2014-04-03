@@ -132,33 +132,25 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnq instanceof PreprocessorKNNQuery)) {
-      if(stepprog != null) {
-        stepprog.beginStep(1, "Materializing LOF neighborhoods.", LOG);
-      }
+      LOG.beginStep(stepprog, 1, "Materializing LOF neighborhoods.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       knnq = preproc.getKNNQuery(dq, k);
     }
     DBIDs ids = relation.getDBIDs();
 
     // Compute LRDs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "Computing LRDs.", LOG);
-    }
+    LOG.beginStep(stepprog, 2, "Computing LRDs.");
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     computeLRDs(knnq, ids, lrds);
 
     // compute LOF_SCORE of each db object
-    if(stepprog != null) {
-      stepprog.beginStep(3, "Computing LOFs.", LOG);
-    }
+    LOG.beginStep(stepprog, 3, "Computing LOFs.");
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
     computeLOFScores(knnq, ids, lrds, lofs, lofminmax);
 
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Factor", "lof-outlier", lofs, ids);
@@ -190,13 +182,9 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       // Avoid division by 0
       final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
       lrds.putDouble(iter, lrd);
-      if(lrdsProgress != null) {
-        lrdsProgress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(lrdsProgress);
     }
-    if(lrdsProgress != null) {
-      lrdsProgress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(lrdsProgress);
   }
 
   /**
@@ -238,13 +226,9 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       // update minimum and maximum
       lofminmax.put(lof);
 
-      if(progressLOFs != null) {
-        progressLOFs.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressLOFs);
     }
-    if(progressLOFs != null) {
-      progressLOFs.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressLOFs);
   }
 
   @Override

@@ -185,25 +185,19 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
       knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
       // No optimized kNN query - use a preprocessor!
       if(knnComp == null) {
-        if(stepprog != null) {
-          stepprog.beginStep(1, "Materializing neighborhoods with respect to reference neighborhood distance function.", LOG);
-        }
+        LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
         MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, comparisonDistanceFunction, kcomp);
         database.addIndex(preproc);
         DistanceQuery<O> cdq = database.getDistanceQuery(relation, comparisonDistanceFunction);
         knnComp = preproc.getKNNQuery(cdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
       }
       else {
-        if(stepprog != null) {
-          stepprog.beginStep(1, "Optimized neighborhoods provided by database.", LOG);
-        }
+        LOG.beginStep(stepprog, 1, "Optimized neighborhoods provided by database.");
       }
       knnReach = knnComp;
     }
     else {
-      if(stepprog != null) {
-        stepprog.beginStep(1, "Not materializing distance functions, since we request each DBID once only.", LOG);
-      }
+      LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
       knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, kreach);
       knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kcomp);
     }
@@ -238,9 +232,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     WritableDoubleDataStore pdists = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     Mean mean = new Mean();
     {// computing PRDs
-      if(stepprog != null) {
-        stepprog.beginStep(3, "Computing pdists", LOG);
-      }
+      LOG.beginStep(stepprog, 3, "Computing pdists");
       FiniteProgress prdsProgress = LOG.isVerbose() ? new FiniteProgress("pdists", relation.size(), LOG) : null;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         final KNNList neighbors = knnReach.getKNNForDBID(iditer, kreach);
@@ -259,18 +251,14 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         }
         double pdist = lambda * Math.sqrt(mean.getMean());
         pdists.putDouble(iditer, pdist);
-        if(prdsProgress != null) {
-          prdsProgress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prdsProgress);
       }
     }
     // Compute PLOF values.
     WritableDoubleDataStore plofs = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     MeanVariance mvplof = new MeanVariance();
     {// compute LOOP_SCORE of each db object
-      if(stepprog != null) {
-        stepprog.beginStep(4, "Computing PLOF", LOG);
-      }
+      LOG.beginStep(stepprog, 4, "Computing PLOF");
 
       FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
       MeanVariance mv = new MeanVariance();
@@ -295,9 +283,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         plofs.putDouble(iditer, plof);
         mvplof.put((plof - 1.0) * (plof - 1.0));
 
-        if(progressPLOFs != null) {
-          progressPLOFs.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progressPLOFs);
       }
     }
 
@@ -309,23 +295,17 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     // Compute final LoOP values.
     WritableDoubleDataStore loops = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     {// compute LOOP_SCORE of each db object
-      if(stepprog != null) {
-        stepprog.beginStep(5, "Computing LoOP scores", LOG);
-      }
+      LOG.beginStep(stepprog, 5, "Computing LoOP scores");
 
       FiniteProgress progressLOOPs = LOG.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), LOG) : null;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         loops.putDouble(iditer, NormalDistribution.erf((plofs.doubleValue(iditer) - 1) / (nplof * sqrt2)));
 
-        if(progressLOOPs != null) {
-          progressLOOPs.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progressLOOPs);
       }
     }
 
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Probabilities", "loop-outlier", loops, relation.getDBIDs());

@@ -290,9 +290,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
         progress.setProcessed(++processed, LOG);
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
 
     if(LOG.isDebuggingFiner()) {
       int dim = RelationUtil.dimensionality(database);

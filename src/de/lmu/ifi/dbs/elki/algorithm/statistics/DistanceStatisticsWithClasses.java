@@ -156,9 +156,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     MeanVariance modif = new MeanVariance();
     // Histogram
     final ObjHistogram<long[]> histogram;
-    if(stepprog != null) {
-      stepprog.beginStep(1, "Prepare histogram.", LOG);
-    }
+    LOG.beginStep(stepprog, 1, "Prepare histogram.");
     if(exact) {
       gminmax = exactMinMax(relation, distFunc);
       histogram = new LongArrayStaticHistogram(numbin, gminmax.getMin(), gminmax.getMax(), 2);
@@ -203,9 +201,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
       };
     }
 
-    if(stepprog != null) {
-      stepprog.beginStep(2, "Build histogram.", LOG);
-    }
+    LOG.beginStep(stepprog, 2, "Build histogram.");
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Distance computations", relation.size(), LOG) : null;
     // iterate per cluster
     final long[] incFirst = new long[] { 1L, 0L };
@@ -258,21 +254,15 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
         // min/max
         gominmax.put(ominmax.getMin());
         gominmax.put(ominmax.getMax());
-        if(progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
     // Update values (only needed for sampling case).
     gminmax.setFirst(Math.min(giminmax.getMin(), gominmax.getMin()));
     gminmax.setSecond(Math.max(giminmax.getMax(), gominmax.getMax()));
 
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
 
     // count the number of samples we have in the data
     long inum = 0;
@@ -403,13 +393,9 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
         double d = distFunc.distance(iditer, iditer2);
         minmax.put(d);
       }
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
     return minmax;
   }
 

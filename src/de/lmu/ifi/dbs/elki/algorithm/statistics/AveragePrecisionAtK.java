@@ -156,13 +156,9 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
         mvs[i].put(precision);
         i++;
       }
-      if(objloop != null) {
-        objloop.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(objloop);
     }
-    if(objloop != null) {
-      objloop.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(objloop);
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.

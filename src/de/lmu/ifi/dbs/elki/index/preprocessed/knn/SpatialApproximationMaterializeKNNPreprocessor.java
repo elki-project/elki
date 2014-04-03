@@ -145,13 +145,9 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
           getLogger().warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
         }
       }
-      if(progress != null) {
-        progress.incrementProcessed(getLogger());
-      }
+      getLogger().incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(progress);
     if(getLogger().isVerbose()) {
       getLogger().verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getSampleStddev());
       getLogger().verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");

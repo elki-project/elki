@@ -47,13 +47,12 @@ public class FiniteProgress extends AbstractProgress {
   private final int totalLength;
 
   /**
-   * A progress object for a given overall number of items to process.
+   * Constructor.
    * 
    * @param task the name of the task
    * @param total the overall number of items to process
    */
-  @Deprecated
-  public FiniteProgress(String task, int total) {
+  protected FiniteProgress(String task, int total) {
     super(task);
     this.total = total;
     this.totalLength = Integer.toString(total).length();
@@ -81,7 +80,7 @@ public class FiniteProgress extends AbstractProgress {
    *         the overall number of items to process
    */
   @Override
-  public void setProcessed(int processed) throws IllegalArgumentException {
+  protected void setProcessed(int processed) throws IllegalArgumentException {
     if (processed > total) {
       throw new IllegalArgumentException(processed + " exceeds total: " + total);
     }

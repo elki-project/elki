@@ -143,9 +143,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
         prog.setProcessed(size - ids.size(), LOG);
       }
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     return new Clustering<>("Canopy clustering", "canopy-clustering", clusters);
   }

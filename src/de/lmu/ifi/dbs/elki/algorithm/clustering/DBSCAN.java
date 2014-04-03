@@ -150,12 +150,8 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
       }
     }
     // Finish progress logging
-    if(objprog != null) {
-      objprog.ensureCompleted(LOG);
-    }
-    if(clusprog != null) {
-      clusprog.setCompleted(LOG);
-    }
+    LOG.ensureCompleted(objprog);
+    LOG.setCompleted(clusprog);
 
     Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
     for(ModifiableDBIDs res : resultList) {

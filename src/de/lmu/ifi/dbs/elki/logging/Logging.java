@@ -27,8 +27,12 @@ import java.util.HashMap;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.logging.progress.AbstractProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
+import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.MillisTimeDuration;
@@ -140,7 +144,7 @@ public class Logging {
    */
   public synchronized static Logging getLogger(final String name) {
     Logging logger = loggers.get(name);
-    if (logger == null) {
+    if(logger == null) {
       logger = new Logging(Logger.getLogger(name));
       loggers.put(name, logger);
     }
@@ -604,6 +608,67 @@ public class Logging {
    */
   public Duration newDuration(String key) {
     return new MillisTimeDuration(key);
+  }
+
+  /**
+   * Increment a progress (unless {@code null}).
+   * 
+   * @param prog Progress to increment, may be {@code null}.
+   */
+  public void incrementProcessed(AbstractProgress prog) {
+    if(prog != null) {
+      prog.incrementProcessed(this);
+    }
+  }
+
+  /**
+   * Increment a progress (unless {@code null}).
+   * 
+   * @param prog Progress to complete, may be {@code null}.
+   */
+  public void ensureCompleted(FiniteProgress prog) {
+    if(prog != null) {
+      prog.ensureCompleted(this);
+    }
+  }
+
+  /**
+   * Begin a new algorithm step (unless {@code null}).
+   * 
+   * <b>Important:</b> Do not use this method when the parameter are not static.
+   * In these cases, check whether logging is enabled first, to avoid computing
+   * method parameters!
+   * 
+   * @param prog Progress to increment, may be {@code null}.
+   * @param step Step number
+   * @param title Step title
+   */
+  public void beginStep(StepProgress prog, int step, String title) {
+    if(prog != null) {
+      prog.beginStep(step, title, this);
+    }
+  }
+
+  /**
+   * Finish a progress (unless {@code null}).
+   * 
+   * @param prog Progress to complete, may be {@code null}.
+   */
+  public void setCompleted(StepProgress prog) {
+    if(prog != null) {
+      prog.setCompleted(this);
+    }
+  }
+
+  /**
+   * Finish a progress (unless {@code null}).
+   * 
+   * @param prog Progress to complete, may be {@code null}.
+   */
+  public void setCompleted(IndefiniteProgress prog) {
+    if(prog != null) {
+      prog.setCompleted(this);
+    }
   }
 
   /**

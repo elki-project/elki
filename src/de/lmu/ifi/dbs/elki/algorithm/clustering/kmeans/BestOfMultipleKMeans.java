@@ -108,13 +108,9 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel<V>
           bestResult = currentCandidate;
           bestCost = currentCost;
         }
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
-      if(prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
     }
     else {
       bestResult = innerkMeans.run(database);

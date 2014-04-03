@@ -122,9 +122,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if (!(knnq instanceof PreprocessorKNNQuery)) {
-      if (stepprog != null) {
-        stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
-      }
+      LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       database.addIndex(preproc);
       DistanceQuery<O> rdq = database.getDistanceQuery(relation, getDistanceFunction());
@@ -132,9 +130,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     }
 
     // Compute LRDs
-    if (stepprog != null) {
-      stepprog.beginStep(2, "Computing densities.", LOG);
-    }
+    LOG.beginStep(stepprog, 2, "Computing densities.");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
@@ -165,18 +161,12 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
       }
       final double density = sum / count;
       dens.putDouble(it, density);
-      if (densProgress != null) {
-        densProgress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(densProgress);
     }
-    if (densProgress != null) {
-      densProgress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(densProgress);
 
     // compute LOF_SCORE of each db object
-    if (stepprog != null) {
-      stepprog.beginStep(3, "Computing KLOFs.", LOG);
-    }
+    LOG.beginStep(stepprog, 3, "Computing KLOFs.");
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
@@ -205,17 +195,11 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
       // update minimum and maximum
       lofminmax.put(lof);
 
-      if (progressLOFs != null) {
-        progressLOFs.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressLOFs);
     }
-    if (progressLOFs != null) {
-      progressLOFs.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressLOFs);
 
-    if (stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Kernel Density Local Outlier Factor", "kernel-density-slof-outlier", lofs, ids);

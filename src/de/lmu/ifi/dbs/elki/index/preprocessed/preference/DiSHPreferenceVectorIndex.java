@@ -187,13 +187,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
         LOG.debugFine(msg.toString());
       }
 
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
 
     long end = System.currentTimeMillis();
     // TODO: re-add timing code!

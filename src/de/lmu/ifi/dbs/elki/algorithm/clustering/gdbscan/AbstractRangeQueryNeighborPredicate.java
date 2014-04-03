@@ -100,13 +100,9 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M> implements Neigh
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList neighbors = query.getRangeForDBID(iditer, epsilon);
       storage.put(iditer, computeLocalModel(iditer, neighbors, relation));
-      if(progress != null) {
-        progress.incrementProcessed(getLogger());
-      }
+      getLogger().incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(progress);
     getLogger().statistics(time.end());
     return storage;
   }

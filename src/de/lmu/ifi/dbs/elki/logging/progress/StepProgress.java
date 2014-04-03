@@ -42,7 +42,6 @@ public class StepProgress extends FiniteProgress {
    * 
    * @param total Total number of steps.
    */
-  @SuppressWarnings("deprecation")
   public StepProgress(int total) {
     super("Step", total);
   }
@@ -54,7 +53,6 @@ public class StepProgress extends FiniteProgress {
    * @param task Task title
    * @param total Total number of steps.
    */
-  @SuppressWarnings("deprecation")
   public StepProgress(String task, int total) {
     super(task, total);
   }
@@ -75,18 +73,6 @@ public class StepProgress extends FiniteProgress {
   }
 
   /**
-   * Do a new step.
-   * 
-   * @param step Step number
-   * @param stepTitle Step title
-   */
-  @Deprecated
-  public void beginStep(int step, String stepTitle) {
-    setProcessed(step - 1);
-    this.stepTitle = stepTitle;
-  }
-
-  /**
    * Do a new step and log it
    * 
    * @param step Step number
@@ -97,14 +83,6 @@ public class StepProgress extends FiniteProgress {
     setProcessed(step - 1);
     this.stepTitle = stepTitle;
     logger.progress(this);
-  }
-
-  /**
-   * Mark the progress as completed.
-   */
-  @Deprecated
-  public void setCompleted() {
-    setProcessed(getTotal());
   }
 
   /**

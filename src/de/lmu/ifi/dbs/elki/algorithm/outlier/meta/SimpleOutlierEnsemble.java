@@ -111,13 +111,9 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
           results.add(or);
           ids.addDBIDs(or.getScores().getDBIDs());
         }
-        if (prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
-      if (prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
     }
     // Combine
     WritableDoubleDataStore sumscore = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
@@ -147,13 +143,9 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
         } else {
           LOG.warning("DBID " + id + " was not given any score at all.");
         }
-        if (cprog != null) {
-          cprog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(cprog);
       }
-      if (cprog != null) {
-        cprog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(cprog);
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     DoubleRelation scores = new MaterializedDoubleRelation("Simple Outlier Ensemble", "ensemble-outlier", sumscore, ids);

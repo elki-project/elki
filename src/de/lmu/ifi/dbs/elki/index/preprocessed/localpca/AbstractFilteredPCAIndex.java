@@ -102,13 +102,9 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
 
       storage.put(iditer, pcares);
 
-      if(progress != null) {
-        progress.incrementProcessed(getLogger());
-      }
+      getLogger().incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(progress);
 
     long end = System.currentTimeMillis();
     if(getLogger().isVerbose()) {

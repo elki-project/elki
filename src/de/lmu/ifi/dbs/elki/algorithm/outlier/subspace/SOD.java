@@ -152,9 +152,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     }
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progress);
       DBIDs neighborhood = getNearestNeighbors(relation, snnInstance, iter);
 
       Vector center;
@@ -185,9 +183,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
       sod_scores.putDouble(iter, sod);
       minmax.put(sod);
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
     // combine results.
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new MaterializedDoubleRelation("Subspace Outlier Degree", "sod-outlier", sod_scores, relation.getDBIDs()));

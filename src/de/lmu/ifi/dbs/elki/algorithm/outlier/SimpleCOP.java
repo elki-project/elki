@@ -148,13 +148,9 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
         cop_sol.put(id, depsol);
 
-        if(progressLocalPCA != null) {
-          progressLocalPCA.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progressLocalPCA);
       }
-      if(progressLocalPCA != null) {
-        progressLocalPCA.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(progressLocalPCA);
     }
     // combine results.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Original Correlation Outlier Probabilities", "origcop-outlier", cop_score, ids);

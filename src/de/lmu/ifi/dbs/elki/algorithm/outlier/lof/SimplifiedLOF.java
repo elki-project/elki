@@ -119,9 +119,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
     KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnq instanceof PreprocessorKNNQuery)) {
-      if(stepprog != null) {
-        stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
-      }
+      LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       database.addIndex(preproc);
       DistanceQuery<O> rdq = database.getDistanceQuery(relation, getDistanceFunction());
@@ -129,23 +127,17 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
     }
 
     // Compute LRDs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "Computing densities.", LOG);
-    }
+    LOG.beginStep(stepprog, 2, "Computing densities.");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     computeSimplifiedLRDs(ids, knnq, dens);
 
     // compute LOF_SCORE of each db object
-    if(stepprog != null) {
-      stepprog.beginStep(3, "Computing SLOFs.", LOG);
-    }
+    LOG.beginStep(stepprog, 3, "Computing SLOFs.");
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     DoubleMinMax lofminmax = new DoubleMinMax();
     computeSimplifiedLOFs(ids, knnq, dens, lofs, lofminmax);
 
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Simplified Local Outlier Factor", "simplified-lof-outlier", lofs, ids);
@@ -178,13 +170,9 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
       // Avoid division by 0
       final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
       lrds.putDouble(iter, lrd);
-      if(lrdsProgress != null) {
-        lrdsProgress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(lrdsProgress);
     }
-    if(lrdsProgress != null) {
-      lrdsProgress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(lrdsProgress);
   }
 
   /**
@@ -226,13 +214,9 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
       // update minimum and maximum
       lofminmax.put(lof);
 
-      if(progressLOFs != null) {
-        progressLOFs.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressLOFs);
     }
-    if(progressLOFs != null) {
-      progressLOFs.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressLOFs);
   }
 
   @Override

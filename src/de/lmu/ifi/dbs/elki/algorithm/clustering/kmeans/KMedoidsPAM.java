@@ -143,9 +143,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     // Swap phase
     boolean changed = true;
     while(changed) {
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
       changed = false;
       // Try to swap the medoid with a better cluster member:
       double best = 0;
@@ -194,9 +192,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
           }
         }
       }
-      if(prog != null) {
-        prog.setCompleted(LOG);
-      }
+      LOG.setCompleted(prog);
       if(LOG.isDebugging()) {
         LOG.debug("Best cost: " + best);
       }

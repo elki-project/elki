@@ -156,13 +156,9 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
           todo = ntodo;
         }
         store.put(iter, res);
-        if(progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
-      if(progress != null) {
-        progress.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(progress);
 
       return store;
     }

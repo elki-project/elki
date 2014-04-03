@@ -266,9 +266,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       }
 
       // Decrement counter
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progress);
     }
     final Clustering<DendrogramModel> dendrogram;
     switch(outputmode){
@@ -366,9 +364,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
         }
 
         // Decrement counter
-        if(progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
       assert (root != null);
       // attach root
@@ -396,9 +392,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
         }
 
         // Decrement counter
-        if(progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
       break;
     }
@@ -406,9 +400,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       throw new AbortException("Unsupported output mode.");
     }
 
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
 
     return dendrogram;
   }

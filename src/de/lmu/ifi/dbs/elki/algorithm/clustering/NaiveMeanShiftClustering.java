@@ -194,13 +194,9 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
         }
         position = newvec;
       }
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     ArrayList<Cluster<MeanModel<V>>> cs = new ArrayList<>(clusters.size());
     for(Pair<V, ModifiableDBIDs> pair : clusters) {

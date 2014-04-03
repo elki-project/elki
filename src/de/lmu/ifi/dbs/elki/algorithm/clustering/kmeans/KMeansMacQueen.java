@@ -103,17 +103,13 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     // Refine result
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
       boolean changed = macQueenIterate(relation, means, clusters, assignment);
       if(!changed) {
         break;
       }
     }
-    if(prog != null) {
-      prog.setCompleted(LOG);
-    }
+    LOG.setCompleted(prog);
 
     final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");

@@ -118,13 +118,9 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       long[] preferenceVector = determinePreferenceVector(relation, it, knns, msg);
       storage.put(it, preferenceVector);
 
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
 
     if(LOG.isDebugging()) {
       LOG.debugFine(msg.toString());

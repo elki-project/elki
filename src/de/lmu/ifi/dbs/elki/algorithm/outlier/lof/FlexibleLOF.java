@@ -235,24 +235,18 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     }
 
     // Compute LRDs
-    if(stepprog != null) {
-      stepprog.beginStep(2, "Computing LRDs.", LOG);
-    }
+    LOG.beginStep(stepprog, 2, "Computing LRDs.");
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     computeLRDs(kNNReach, ids, lrds);
 
     // compute LOF_SCORE of each db object
-    if(stepprog != null) {
-      stepprog.beginStep(3, "Computing LOFs.", LOG);
-    }
+    LOG.beginStep(stepprog, 3, "Computing LOFs.");
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
     computeLOFs(kNNRefer, ids, lrds, lofs, lofminmax);
 
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Factor", "lof-outlier", lofs, ids);
@@ -286,13 +280,9 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
       // Avoid division by 0
       final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
       lrds.putDouble(iter, lrd);
-      if(lrdsProgress != null) {
-        lrdsProgress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(lrdsProgress);
     }
-    if(lrdsProgress != null) {
-      lrdsProgress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(lrdsProgress);
   }
 
   /**
@@ -335,13 +325,9 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
       // update minimum and maximum
       lofminmax.put(lof);
 
-      if(progressLOFs != null) {
-        progressLOFs.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressLOFs);
     }
-    if(progressLOFs != null) {
-      progressLOFs.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressLOFs);
   }
 
   @Override

@@ -100,9 +100,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
       boolean changed = assignToNearestCluster(relation, means, clusters, assignment);
       // Stop if no cluster assignment changed.
       if(!changed) {
@@ -111,9 +109,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
       // Recompute means.
       means = means(clusters, means, relation);
     }
-    if(prog != null) {
-      prog.setCompleted(LOG);
-    }
+    LOG.setCompleted(prog);
 
     // Wrap result
     final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);

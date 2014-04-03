@@ -90,9 +90,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
       kmm.nextIteration(means);
       ParallelMapExecutor.run(ids, kmm);
       // Stop if no cluster assignment changed.
@@ -101,9 +99,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
       }
       means = kmm.getMeans();
     }
-    if (prog != null) {
-      prog.setCompleted(LOG);
-    }
+    LOG.setCompleted(prog);
 
     // Wrap result
     List<ModifiableDBIDs> clusters = new ArrayList<>();

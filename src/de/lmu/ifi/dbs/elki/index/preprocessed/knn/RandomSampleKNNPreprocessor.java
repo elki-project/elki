@@ -111,14 +111,10 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
       }
 
       storage.put(iter, kNN.toKNNList());
-      if(progress != null) {
-        progress.incrementProcessed(getLogger());
-      }
+      getLogger().incrementProcessed(progress);
     }
 
-    if(progress != null) {
-      progress.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(progress);
   }
 
   @Override

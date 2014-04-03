@@ -170,10 +170,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
       }
       assign(relation, distFunc, clusters);
 
-      if(cprogress != null) {
-        cprogress.setProcessed(clusters.size());
-        cprogress.setCompleted(LOG);
-      }
+      LOG.setCompleted(cprogress);
 
       // get the result
       Clustering<Model> r = new Clustering<>("ORCLUS clustering", "orclus-clustering");
@@ -196,7 +193,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    */
   private List<ORCLUSCluster> initialSeeds(Relation<V> database, int k) {
     DBIDs randomSample = DBIDUtil.randomSample(database.getDBIDs(), k, rnd);
-    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
+    NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(database);
     List<ORCLUSCluster> seeds = new ArrayList<>();
     for(DBIDIter iter = randomSample.iter(); iter.valid(); iter.advance()) {
       seeds.add(new ORCLUSCluster(database.get(iter), iter, factory));
@@ -214,7 +211,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    *        assigned to
    */
   private void assign(Relation<V> database, DistanceQuery<V> distFunc, List<ORCLUSCluster> clusters) {
-    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
+    NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(database);
     // clear the current clusters
     for(ORCLUSCluster cluster : clusters) {
       cluster.objectIDs.clear();
@@ -386,7 +383,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
   private ProjectedEnergy projectedEnergy(Relation<V> database, DistanceQuery<V> distFunc, ORCLUSCluster c_i, ORCLUSCluster c_j, int i, int j, int dim) {
     // union of cluster c_i and c_j
     ORCLUSCluster c_ij = union(database, distFunc, c_i, c_j, dim);
-    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
+    NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(database);
 
     double sum = 0.;
     V c_proj = projection(c_ij, c_ij.centroid, factory);
@@ -423,7 +420,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
       c.basis = findBasis(relation, distFunc, c, dim);
     }
     else {
-      NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
+      NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
       Vector cent = c1.centroid.getColumnVector().plusEquals(c2.centroid.getColumnVector()).timesEquals(0.5);
       c.centroid = factory.newNumberVector(cent.getArrayRef());
       double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
@@ -444,7 +441,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param factory Factory object / prototype
    * @return the projection of double vector o in the subspace of cluster c
    */
-  private V projection(ORCLUSCluster c, V o, NumberVector.Factory<V>  factory) {
+  private V projection(ORCLUSCluster c, V o, NumberVector.Factory<V> factory) {
     Matrix o_proj = o.getColumnVector().transposeTimes(c.basis);
     double[] values = o_proj.getColumnPackedCopy();
     return factory.newNumberVector(values);
@@ -496,7 +493,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
      * @param id Object id
      * @param factory Factory object / prototype
      */
-    ORCLUSCluster(V o, DBIDRef id, NumberVector.Factory<V>  factory) {
+    ORCLUSCluster(V o, DBIDRef id, NumberVector.Factory<V> factory) {
       this.objectIDs.add(id);
 
       // initially the basis ist the original axis-system

@@ -129,18 +129,14 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
 
     // Run Generalized DBSCAN
-    if(stepprog != null) {
-      stepprog.beginStep(1, "Preprocessing local correlation dimensionalities and partitioning data", LOG);
-    }
+    LOG.beginStep(stepprog, 1, "Preprocessing local correlation dimensionalities and partitioning data");
     // FIXME: how to ensure we are running on the same relation?
     ERiCNeighborPredicate<V>.Instance npred = new ERiCNeighborPredicate<V>(settings).instantiate(database, relation);
     CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate(database, TypeUtil.DBIDS);
     Clustering<Model> copacResult = new GeneralizedDBSCAN.Instance<>(npred, cpred, false).run();
 
     // extract correlation clusters
-    if(stepprog != null) {
-      stepprog.beginStep(2, "Extract correlation clusters", LOG);
-    }
+    LOG.beginStep(stepprog, 2, "Extract correlation clusters");
     List<List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality, npred);
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder("Step 2: Extract correlation clusters...");
@@ -166,9 +162,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     }
 
     // build hierarchy
-    if(stepprog != null) {
-      stepprog.beginStep(3, "Building hierarchy", LOG);
-    }
+    LOG.beginStep(stepprog, 3, "Building hierarchy");
     Clustering<CorrelationModel<V>> clustering = new Clustering<>("ERiC clustering", "eric-clustering");
     buildHierarchy(clustering, clusterMap, npred);
     if(LOG.isDebugging()) {
@@ -188,9 +182,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
       }
       LOG.debugFine(msg.toString());
     }
-    if(stepprog != null) {
-      stepprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(stepprog);
 
     for(Cluster<CorrelationModel<V>> rc : clusterMap.get(clusterMap.size() - 1)) {
       clustering.addToplevelCluster(rc);

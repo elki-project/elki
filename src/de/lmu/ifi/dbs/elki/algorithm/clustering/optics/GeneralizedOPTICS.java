@@ -91,9 +91,7 @@ public abstract class GeneralizedOPTICS<O, E extends ClusterOrderEntry<E>> exten
         expandClusterOrder(clusterOrder, relation, DBIDUtil.deref(iditer), progress);
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(getLogger());
-    }
+    getLogger().ensureCompleted(progress);
 
     return clusterOrder;
   }

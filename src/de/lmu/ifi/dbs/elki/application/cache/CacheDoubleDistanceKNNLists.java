@@ -157,13 +157,9 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
 
         buffer.flip();
         channel.write(buffer);
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
-      if(prog != null) {
-        prog.ensureCompleted(LOG);
-      }
+      LOG.ensureCompleted(prog);
       lock.release();
     }
     catch(IOException e) {

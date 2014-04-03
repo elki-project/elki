@@ -223,17 +223,11 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
           clustersizes.set(NOISE, clustersizes.get(NOISE) + 1);
         }
         // We've completed this element
-        if (progress != null) {
-          progress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
       // Finish progress logging.
-      if (progress != null) {
-        progress.ensureCompleted(LOG);
-      }
-      if (clusprogress != null) {
-        clusprogress.setCompleted(LOG);
-      }
+      LOG.ensureCompleted(progress);
+      LOG.setCompleted(clusprogress);
 
       // Transform cluster ID mapping into a clustering result:
       ArrayList<ArrayModifiableDBIDs> clusterlists = new ArrayList<>(clusterid);
@@ -310,9 +304,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
             // Non core point cluster member:
             clusterids.putInt(id, -clusterid);
           }
-          if (progress != null) {
-            progress.incrementProcessed(LOG);
-          }
+          LOG.incrementProcessed(progress);
         }
       }
       return clustersize;

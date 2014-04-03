@@ -131,14 +131,10 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
             final O oy = castColumn.get(y);
             double distance = Math.abs(dist.distance(ox, oy));
             imat[x][y] = distance;
-            if (dprog != null) {
-              dprog.incrementProcessed(LOG);
-            }
+            LOG.incrementProcessed(dprog);
           }
         }
-        if (dprog != null) {
-          dprog.ensureCompleted(LOG);
-        }
+        LOG.ensureCompleted(dprog);
       }
       // Adjust distance matrix:
       if (dist instanceof SquaredEuclideanDistanceFunction) {
