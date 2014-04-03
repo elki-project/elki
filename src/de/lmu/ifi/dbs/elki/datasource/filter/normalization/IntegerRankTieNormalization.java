@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.IntegerVector;
@@ -34,21 +33,23 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 
 /**
  * Normalize vectors according to their rank in the attributes.
  * 
- * Note: ranks are multiplied by 2, to be able to give ties an integer rank.
- * (e.g. first two records are tied at "1" then, followed by the next on "4")
+ * Note: <b>ranks are multiplied by 2</b>, to be able to give ties an integer
+ * rank. (e.g. when the first two records are tied, they both have rank "1"
+ * then, followed by the next on "4")
  * 
  * @author Erich Schubert
  */
-public class RankTieNormalization implements ObjectFilter {
+public class IntegerRankTieNormalization implements ObjectFilter {
   /**
    * Constructor.
    */
-  public RankTieNormalization() {
+  public IntegerRankTieNormalization() {
     super();
   }
 
@@ -56,6 +57,12 @@ public class RankTieNormalization implements ObjectFilter {
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
     final int len = objects.dataLength();
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
+
+    int[] order = new int[len];
+    for(int i = 0; i < len; i++) {
+      order[i] = i;
+    }
+    Sorter comparator = new Sorter();
 
     for(int r = 0; r < objects.metaLength(); r++) {
       final SimpleTypeInformation<?> type = objects.meta(r);
@@ -73,29 +80,21 @@ public class RankTieNormalization implements ObjectFilter {
       // Output vectors
       int[][] posvecs = new int[len][dim];
       // Sort for each dimension
-      // TODO: an int[] array would be enough, if we could use a comparator...
-      DoubleIntPair[] sorter = new DoubleIntPair[len];
-      for(int i = 0; i < sorter.length; i++) {
-        sorter[i] = new DoubleIntPair(Double.NaN, -1);
-      }
       for(int d = 0; d < dim; d++) {
-        // fill array
-        for(int i = 0; i < sorter.length; i++) {
-          sorter[i].first = castColumn.get(i).doubleValue(d);
-          sorter[i].second = i;
-        }
         // Sort
-        Arrays.sort(sorter);
+        comparator.setup(castColumn, d);
+        IntegerArrayQuickSort.sort(order, comparator);
         // Transfer positions to output vectors
-        for(int sta = 0; sta < sorter.length;) {
+        for(int sta = 0; sta < order.length;) {
+          double v = castColumn.get(order[sta]).doubleValue(d);
           // Compute ties
           int end = sta + 1;
-          while(end < sorter.length && !(sorter[sta].first < sorter[end].first)) {
+          while(end < order.length && !(v < castColumn.get(order[end]).doubleValue(d))) {
             end++;
           }
           final int pos = (sta + end - 1);
           for(int i = sta; i < end; i++) {
-            posvecs[sorter[i].second][d] = pos;
+            posvecs[order[i]][d] = pos;
           }
           sta = end;
         }
@@ -109,5 +108,41 @@ public class RankTieNormalization implements ObjectFilter {
       bundle.appendColumn(outType, outColumn);
     }
     return bundle;
+  }
+
+  /**
+   * Class to sort an index array by a particular dimension.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private static class Sorter implements IntegerComparator {
+    /**
+     * Column to use for sorting.
+     */
+    List<? extends NumberVector> col;
+
+    /**
+     * Dimension to use for sorting.
+     */
+    int dim;
+
+    /**
+     * Configure the sorting class.
+     * 
+     * @param col Column to read
+     * @param dim Dimension to use.
+     */
+    public void setup(List<? extends NumberVector> col, int dim) {
+      this.col = col;
+      this.dim = dim;
+    }
+
+    @Override
+    public int compare(int x, int y) {
+      final double vx = col.get(x).doubleValue(dim), vy = col.get(y).doubleValue(dim);
+      return (vx < vy) ? -1 : +1;
+    }
   }
 }
