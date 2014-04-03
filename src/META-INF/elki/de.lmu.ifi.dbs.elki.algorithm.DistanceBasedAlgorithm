@@ -1,6 +1,3 @@
-de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder
-de.lmu.ifi.dbs.elki.algorithm.KNNJoin
-de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances
 de.lmu.ifi.dbs.elki.algorithm.clustering.CanopyPreClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
@@ -44,6 +41,9 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.ValidateApproximativeKNNIndex
+de.lmu.ifi.dbs.elki.algorithm.KNNDistancesSampler
+de.lmu.ifi.dbs.elki.algorithm.KNNJoin
+de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering1
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering2
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering3
