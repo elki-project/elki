@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -717,7 +717,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     Matrix weightMatrix = model.getSimilarityMatrix();
     DoubleVector centroid = new DoubleVector(model.getCentroid());
-    DistanceQuery<DoubleVector> df = QueryUtil.getDistanceQuery(derivatorDB, new WeightedDistanceFunction(weightMatrix));
+    DistanceQuery<DoubleVector> df = QueryUtil.getDistanceQuery(derivatorDB, new MatrixWeightedDistanceFunction(weightMatrix));
     double eps = .25;
 
     ids.addDBIDs(interval.getIDs());

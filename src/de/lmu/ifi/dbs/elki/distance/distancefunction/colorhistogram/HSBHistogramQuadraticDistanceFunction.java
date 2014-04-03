@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Erich Schubert
  */
 @Reference(authors = "J. R. Smith, S. F. Chang", title = "VisualSEEk: a fully automated content-based image query system", booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", url = "http://dx.doi.org/10.1145/244130.244151")
-public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunction {
+public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanceFunction {
   /**
    * Parameter for the kernel dimensionality.
    */

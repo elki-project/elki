@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  */
 @Reference(authors = "J. Hafner, H. S.Sawhney, W. Equits, M. Flickner, W. Niblack", title = "Efficient Color Histogram Indexing for Quadratic Form Distance Functions", booktitle = "IEEE Trans. on Pattern Analysis and Machine Intelligence, Vol. 17, No. 7, July 1995", url = "http://dx.doi.org/10.1109/34.391417")
-public class RGBHistogramQuadraticDistanceFunction extends WeightedDistanceFunction {
+public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanceFunction {
   /**
    * Parameter for the kernel dimensionality.
    */

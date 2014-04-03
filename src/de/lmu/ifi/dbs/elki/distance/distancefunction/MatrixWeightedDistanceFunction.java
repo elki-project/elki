@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @author Elke Achtert
  */
 // TODO: Factory with parameterizable weight matrix?
-public class WeightedDistanceFunction extends AbstractNumberVectorDistanceFunction {
+public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * The weight matrix.
    */
@@ -46,7 +46,7 @@ public class WeightedDistanceFunction extends AbstractNumberVectorDistanceFuncti
    * 
    * @param weightMatrix weight matrix
    */
-  public WeightedDistanceFunction(Matrix weightMatrix) {
+  public MatrixWeightedDistanceFunction(Matrix weightMatrix) {
     super();
     this.weightMatrix = weightMatrix;
     assert (weightMatrix.getColumnDimensionality() == weightMatrix.getRowDimensionality());
