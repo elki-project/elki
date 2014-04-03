@@ -197,13 +197,9 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       // run LOF and collect the result
       OutlierResult result = outlierAlgorithm.run(pdb);
       results.add(result.getScores());
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
@@ -274,14 +270,10 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
         ts.set(j);
         calculateContrast(relation, ts, subspaceIndex, random);
         dDimensionalList.add(ts);
-        if(prog != null) {
-          prog.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(prog);
       }
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     IndefiniteProgress qprog = LOG.isVerbose() ? new IndefiniteProgress("Testing subspace candidates", LOG) : null;
     for(int d = 3; !dDimensionalList.isEmpty(); d++) {
@@ -314,9 +306,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
           calculateContrast(relation, joinedSet, subspaceIndex, random);
           dDimensionalList.add(joinedSet);
-          if(qprog != null) {
-            qprog.incrementProcessed(LOG);
-          }
+          LOG.incrementProcessed(qprog);
         }
       }
       // Prune
@@ -329,9 +319,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
         }
       }
     }
-    if(qprog != null) {
-      qprog.setCompleted(LOG);
-    }
+    LOG.setCompleted(qprog);
     if(dprog != null) {
       dprog.setProcessed(dbdim, LOG);
       dprog.ensureCompleted(LOG);
@@ -416,13 +404,9 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
         continue;
       }
       deviationSum += contrast;
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
     subspace.contrast = deviationSum / m;
   }
 

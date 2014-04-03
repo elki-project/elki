@@ -199,13 +199,9 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
         final int jbase = triangleSize(j);
         scratch[jbase + miny] = Math.min(scratch[jbase + minx], scratch[jbase + miny]);
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if (prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     // Build the clustering result
     final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");

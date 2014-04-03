@@ -174,13 +174,9 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
         matrix[j][miny] = Math.min(matrix[j][minx], matrix[j][miny]);
         matrix[miny][j] = Math.min(matrix[minx][j], matrix[miny][j]);
       }
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     // Build the clustering result
     final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");

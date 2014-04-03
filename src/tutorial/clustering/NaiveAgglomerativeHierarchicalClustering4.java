@@ -267,13 +267,9 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
         final int sizej = csize.intValue(ij);
         scratch[jbase + miny] = linkage.combine(sizex, scratch[jbase + minx], sizey, scratch[jbase + miny], sizej, min);
       }
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if(prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     return new PointerHierarchyRepresentationResult(ids, parent, height);
   }

@@ -167,9 +167,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     double[] nshift = new double[dim];
     ALOCIQuadTree qt = new ALOCIQuadTree(min, max, nshift, nmin, relation);
     qts.add(qt);
-    if(progressPreproc != null) {
-      progressPreproc.incrementProcessed(LOG);
-    }
+    LOG.incrementProcessed(progressPreproc);
     /*
      * create the remaining g-1 shifted QuadTrees. This not clearly described in
      * the paper and therefore implemented in a way that achieves good results
@@ -182,13 +180,9 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
       }
       qt = new ALOCIQuadTree(min, max, svec, nmin, relation);
       qts.add(qt);
-      if(progressPreproc != null) {
-        progressPreproc.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressPreproc);
     }
-    if(progressPreproc != null) {
-      progressPreproc.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressPreproc);
 
     // aLOCI main loop: evaluate
     FiniteProgress progressLOCI = LOG.isVerbose() ? new FiniteProgress("Compute aLOCI scores", relation.size(), LOG) : null;
@@ -243,13 +237,9 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
       // Store results
       mdef_norm.putDouble(iditer, maxmdefnorm);
       minmax.put(maxmdefnorm);
-      if(progressLOCI != null) {
-        progressLOCI.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressLOCI);
     }
-    if(progressLOCI != null) {
-      progressLOCI.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressLOCI);
     DoubleRelation scoreResult = new MaterializedDoubleRelation("aLOCI normalized MDEF", "aloci-mdef-outlier", mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);

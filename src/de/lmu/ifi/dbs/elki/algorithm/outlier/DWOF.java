@@ -158,9 +158,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     }
     IndefiniteProgress clusEvalProgress = LOG.isVerbose() ? new IndefiniteProgress("Evaluating DWOFs", LOG) : null;
     while(countUnmerged > 0) {
-      if(clusEvalProgress != null) {
-        clusEvalProgress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(clusEvalProgress);
       // Increase radii
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         radii.putDouble(iter, radii.doubleValue(iter) * delta);
@@ -183,12 +181,8 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
         dwofs.putDouble(iter, dwofs.doubleValue(iter) + newScore);
       }
     }
-    if(clusEvalProgress != null) {
-      clusEvalProgress.setCompleted(LOG);
-    }
-    if(stepProg != null) {
-      stepProg.setCompleted(LOG);
-    }
+    LOG.setCompleted(clusEvalProgress);
+    LOG.setCompleted(stepProg);
     // Build result representation.
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
@@ -242,13 +236,9 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       if(currentMean < minAvgDist) {
         minAvgDist = currentMean;
       }
-      if(avgDistProgress != null) {
-        avgDistProgress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(avgDistProgress);
     }
-    if(avgDistProgress != null) {
-      avgDistProgress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(avgDistProgress);
 
     // Initializing the radii of all objects.
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -280,9 +270,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       ModifiableDBIDs newCluster = DBIDUtil.newArray();
       newCluster.add(iter);
       labels.put(iter, newCluster);
-      if(clustProg != null) {
-        clustProg.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(clustProg);
       // container of the points to be added and their radii neighbors to the
       // cluster
       ModifiableDBIDs nChain = DBIDUtil.newArray();
@@ -299,9 +287,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
             newCluster.add(iter2);
             labels.put(iter2, newCluster);
             nChain.add(iter2);
-            if(clustProg != null) {
-              clustProg.incrementProcessed(LOG);
-            }
+            LOG.incrementProcessed(clustProg);
           }
           else if(labels.get(iter2) != newCluster) {
             ModifiableDBIDs toBeDeleted = labels.get(iter2);
@@ -314,9 +300,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
         }
       }
     }
-    if(clustProg != null) {
-      clustProg.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(clustProg);
   }
 
   /**

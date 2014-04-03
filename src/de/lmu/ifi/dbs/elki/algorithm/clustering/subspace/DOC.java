@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * <p>
  * Reference: <br/>
  * C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali<br />
- * A Monte Carlo algorithm for fast projective clustering. <br/>
+ * A Monte Carlo algorithm for fast projective clustering. <br />
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02).
  * </p>
  * 
@@ -208,11 +208,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       long[] alldims = BitsUtil.ones(d);
       result.addToplevelCluster(new Cluster<>(S, true, new SubspaceModel<>(new Subspace(alldims), Centroid.make(relation, S).toVector(relation))));
     }
-
-    if(cprogress != null) {
-      cprogress.setCompleted(LOG);
-    }
-
+    LOG.setCompleted(cprogress);
     return result;
   }
 
@@ -303,23 +299,12 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
             }
           }
         }
-
-        if(iprogress != null) {
-          iprogress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(iprogress);
       }
     }
+    LOG.ensureCompleted(iprogress);
 
-    if(iprogress != null) {
-      iprogress.ensureCompleted(LOG);
-    }
-
-    if(C != null) {
-      return makeCluster(relation, C, D);
-    }
-    else {
-      return null;
-    }
+    return (C != null) ? makeCluster(relation, C, D) : null;
   }
 
   /**
@@ -374,16 +359,10 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
             break outer;
           }
         }
-
-        if(iprogress != null) {
-          iprogress.incrementProcessed(LOG);
-        }
+        LOG.incrementProcessed(iprogress);
       }
     }
-
-    if(iprogress != null) {
-      iprogress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(iprogress);
 
     // If no relevant dimensions were found, skip it.
     if(D == null || BitsUtil.cardinality(D) == 0) {
@@ -399,12 +378,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     DBIDs C = DBIDUtil.intersection(S, rq.getRangeForDBID(dV, w));
 
     // If we have a non-empty cluster, return it.
-    if(C.size() > 0) {
-      return makeCluster(relation, C, D);
-    }
-    else {
-      return null;
-    }
+    return (C.size() > 0) ? makeCluster(relation, C, D) : null;
   }
 
   /**
@@ -545,26 +519,26 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       super.makeOptions(config);
 
       {
-        DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.2);
-        param.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-        param.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+        DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.2) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+        .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
         if(config.grab(param)) {
           alpha = param.getValue();
         }
       }
 
       {
-        DoubleParameter param = new DoubleParameter(BETA_ID, 0.8);
-        param.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-        param.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+        DoubleParameter param = new DoubleParameter(BETA_ID, 0.8) //
+        .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+        .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
         if(config.grab(param)) {
           beta = param.getValue();
         }
       }
 
       {
-        DoubleParameter param = new DoubleParameter(W_ID, 0.05);
-        param.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+        DoubleParameter param = new DoubleParameter(W_ID, 0.05) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
         if(config.grab(param)) {
           w = param.getValue();
         }
@@ -578,8 +552,8 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       }
 
       if(heuristics) {
-        IntParameter param = new IntParameter(D_ZERO_ID, 5);
-        param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        IntParameter param = new IntParameter(D_ZERO_ID, 5) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(param)) {
           d_zero = param.getValue();
         }

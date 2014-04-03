@@ -294,9 +294,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       }
       lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
 
-      if(stepprog != null) {
-        stepprog.setCompleted(LOG);
-      }
+      LOG.setCompleted(stepprog);
     }
 
     /**
@@ -354,9 +352,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       }
       lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
 
-      if(stepprog != null) {
-        stepprog.setCompleted(LOG);
-      }
+      LOG.setCompleted(stepprog);
     }
 
     /**

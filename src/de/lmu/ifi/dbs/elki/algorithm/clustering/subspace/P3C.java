@@ -223,9 +223,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     }
 
     if(clusterCores.size() == 0) {
-      if(stepProgress != null) {
-        stepProgress.setCompleted(LOG);
-      }
+      LOG.setCompleted(stepProgress);
       Clustering<SubspaceModel<V>> c = new Clustering<>("P3C", "P3C");
       c.addToplevelCluster(new Cluster<SubspaceModel<V>>(relation.getDBIDs(), true));
       return c;
@@ -324,9 +322,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       result.addToplevelCluster(new Cluster<SubspaceModel<V>>(noise, true));
     }
 
-    if(stepProgress != null) {
-      stepProgress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(stepProgress);
 
     return result;
   }

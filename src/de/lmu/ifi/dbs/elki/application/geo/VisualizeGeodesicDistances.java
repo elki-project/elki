@@ -175,13 +175,9 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
         }
         }
       }
-      if (prog != null) {
-        prog.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(prog);
     }
-    if (prog != null) {
-      prog.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(prog);
 
     try {
       ImageIO.write(img, "png", out);

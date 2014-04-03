@@ -164,10 +164,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       }
     }
     // Finish progress logging
-    if(objprog != null && clusprog != null) {
-      objprog.ensureCompleted(LOG);
-      clusprog.setCompleted(LOG);
-    }
+    LOG.ensureCompleted(objprog);
+    LOG.setCompleted(clusprog);
 
     Clustering<Model> result = new Clustering<>("Shared-Nearest-Neighbor Clustering", "snn-clustering");
     for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {

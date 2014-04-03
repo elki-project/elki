@@ -150,9 +150,7 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
         progressOFlags.setProcessed(counter, LOG);
       }
     }
-    if(progressOFlags != null) {
-      progressOFlags.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progressOFlags);
     return scores;
   }
 

@@ -232,9 +232,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
           h.top.add(entry);
         }
       }
-      if(progressHilOut != null) {
-        progressHilOut.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progressHilOut);
     }
     // 2. Phase: Additional Scan if less than n true outliers determined
     if(n_star < n) {

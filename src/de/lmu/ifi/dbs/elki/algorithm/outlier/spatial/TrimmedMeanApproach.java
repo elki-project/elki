@@ -145,13 +145,9 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       // Error: deviation from trimmed mean
       errors.putDouble(iditer, relation.get(iditer).doubleValue(0) - tm);
 
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
+      LOG.incrementProcessed(progress);
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
+    LOG.ensureCompleted(progress);
 
     if(LOG.isVerbose()) {
       LOG.verbose("Computing median error.");
