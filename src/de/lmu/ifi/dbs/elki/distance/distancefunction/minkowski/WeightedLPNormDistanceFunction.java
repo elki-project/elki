@@ -29,13 +29,17 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
  * Weighted version of the Minkowski L_p metrics distance function.
  * 
  * @author Erich Schubert
  */
-public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
+public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction implements WeightedNumberVectorDistanceFunction {
   /**
    * Weight array
    */
@@ -53,7 +57,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   }
 
   private final double preDistance(NumberVector v1, NumberVector v2, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = (xd >= yd) ? xd - yd : yd - xd;
       agg += Math.pow(delta, p) * weights[d];
@@ -62,13 +66,13 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   }
 
   private final double preDistanceVM(NumberVector v, SpatialComparable mbr, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = value - mbr.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += Math.pow(delta, p) * weights[d];
       }
     }
@@ -76,12 +80,12 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   }
 
   private final double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = mbr1.getMin(d) - mbr2.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += Math.pow(delta, p) * weights[d];
       }
     }
@@ -89,7 +93,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   }
 
   private final double preNorm(NumberVector v, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
       final double delta = xd >= 0. ? xd : -xd;
       agg += Math.pow(delta, p) * weights[d];
@@ -98,12 +102,12 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   }
 
   private final double preNormMBR(SpatialComparable mbr, final int start, final int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = -mbr.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += Math.pow(delta, p) * weights[d];
       }
     }
@@ -115,9 +119,10 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = preDistance(v1, v2, 0, mindim, 0.);
-    if (dim1 > mindim) {
+    if(dim1 > mindim) {
       agg = preNorm(v1, mindim, dim1, agg);
-    } else if (dim2 > mindim) {
+    }
+    else if(dim2 > mindim) {
       agg = preNorm(v2, mindim, dim2, agg);
     }
     return Math.pow(agg, invp);
@@ -137,32 +142,37 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     final NumberVector v2 = (mbr2 instanceof NumberVector) ? (NumberVector) mbr2 : null;
 
     double agg = 0.;
-    if (v1 != null) {
-      if (v2 != null) {
+    if(v1 != null) {
+      if(v2 != null) {
         agg = preDistance(v1, v2, 0, mindim, agg);
-      } else {
+      }
+      else {
         agg = preDistanceVM(v1, mbr2, 0, mindim, agg);
       }
-    } else {
-      if (v2 != null) {
+    }
+    else {
+      if(v2 != null) {
         agg = preDistanceVM(v2, mbr1, 0, mindim, agg);
-      } else {
+      }
+      else {
         agg = preDistanceMBR(mbr1, mbr2, 0, mindim, agg);
       }
     }
     // first object has more dimensions.
-    if (dim1 > mindim) {
-      if (v1 != null) {
+    if(dim1 > mindim) {
+      if(v1 != null) {
         agg = preNorm(v1, mindim, dim1, agg);
-      } else {
+      }
+      else {
         agg = preNormMBR(v1, mindim, dim1, agg);
       }
     }
     // second object has more dimensions.
-    if (dim2 > mindim) {
-      if (v2 != null) {
+    if(dim2 > mindim) {
+      if(v2 != null) {
         agg = preNorm(v2, mindim, dim2, agg);
-      } else {
+      }
+      else {
         agg = preNormMBR(mbr2, mindim, dim2, agg);
       }
     }
@@ -171,16 +181,16 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (!(obj instanceof WeightedLPNormDistanceFunction)) {
-      if (obj instanceof LPNormDistanceFunction && super.equals(obj)) {
-        for (double d : weights) {
-          if (d != 1.) {
+    if(!(obj instanceof WeightedLPNormDistanceFunction)) {
+      if(obj instanceof LPNormDistanceFunction && super.equals(obj)) {
+        for(double d : weights) {
+          if(d != 1.) {
             return false;
           }
         }
@@ -195,5 +205,42 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   @Override
   public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
     return VectorFieldTypeInformation.typeRequest(NumberVector.class, 0, weights.length);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends LPNormDistanceFunction.Parameterizer {
+    /**
+     * Weight array
+     */
+    protected double[] weights;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
+      if(config.grab(weightsP)) {
+        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+      }
+    }
+
+    @Override
+    protected WeightedLPNormDistanceFunction makeInstance() {
+      if(p == 1.) {
+        return new WeightedManhattanDistanceFunction(weights);
+      }
+      if(p == 2.) {
+        return new WeightedEuclideanDistanceFunction(weights);
+      }
+      if(p == Double.POSITIVE_INFINITY) {
+        return new WeightedMaximumDistanceFunction(weights);
+      }
+      return new WeightedLPNormDistanceFunction(p, weights);
+    }
   }
 }

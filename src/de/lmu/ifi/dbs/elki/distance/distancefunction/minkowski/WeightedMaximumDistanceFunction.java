@@ -27,6 +27,10 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
  * Weighted version of the Minkowski L_p metrics distance function.
@@ -189,5 +193,33 @@ public class WeightedMaximumDistanceFunction extends WeightedLPNormDistanceFunct
     }
     WeightedMaximumDistanceFunction other = (WeightedMaximumDistanceFunction) obj;
     return Arrays.equals(this.weights, other.weights);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Weight array
+     */
+    protected double[] weights;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
+      if(config.grab(weightsP)) {
+        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+      }
+    }
+
+    @Override
+    protected WeightedMaximumDistanceFunction makeInstance() {
+      return new WeightedMaximumDistanceFunction(weights);
+    }
   }
 }

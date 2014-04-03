@@ -27,13 +27,18 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Provides the Euclidean distance for FeatureVectors.
+ * Provides the weighted Euclidean distance for NumberVectors.
  * 
  * @author Erich Schubert
  */
-public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFunction {
+public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFunction implements WeightedNumberVectorDistanceFunction {
   /**
    * Constructor.
    * 
@@ -189,5 +194,33 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     }
     WeightedEuclideanDistanceFunction other = (WeightedEuclideanDistanceFunction) obj;
     return Arrays.equals(this.weights, other.weights);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Weight array
+     */
+    protected double[] weights;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
+      if(config.grab(weightsP)) {
+        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+      }
+    }
+
+    @Override
+    protected WeightedEuclideanDistanceFunction makeInstance() {
+      return new WeightedEuclideanDistanceFunction(weights);
+    }
   }
 }

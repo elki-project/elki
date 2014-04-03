@@ -24,15 +24,17 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
  * Weighted Canberra distance function, a variation of Manhattan distance.
  * 
- * TODO: add parameterizer. As of now, this can only be used from Java code.
- * 
  * @author Erich Schubert
  */
-public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFunction {
+public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFunction implements WeightedNumberVectorDistanceFunction {
   /**
    * Weight array
    */
@@ -50,10 +52,10 @@ public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFun
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2, weights.length);
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double div = Math.abs(xd) + Math.abs(yd);
-      if (div > 0.) {
+      if(div > 0.) {
         agg += weights[d] * Math.abs(xd - yd) / div;
       }
     }
@@ -64,13 +66,15 @@ public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFun
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2, weights.length);
     double agg = 0.0;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double diff;
-      if (mbr1.getMax(d) < mbr2.getMin(d)) {
+      if(mbr1.getMax(d) < mbr2.getMin(d)) {
         diff = mbr2.getMin(d) - mbr1.getMax(d);
-      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
+      }
+      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
         diff = mbr1.getMin(d) - mbr2.getMax(d);
-      } else { // The mbrs intersect!
+      }
+      else { // The mbrs intersect!
         continue;
       }
       final double a1 = Math.max(-mbr1.getMin(d), mbr1.getMax(d));
@@ -87,5 +91,33 @@ public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFun
     // As this is also reffered to as "canberra metric", it is probably a metric
     // But *maybe* only for positive numbers only?
     return true;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Weight array
+     */
+    protected double[] weights;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
+      if(config.grab(weightsP)) {
+        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+      }
+    }
+
+    @Override
+    protected WeightedCanberraDistanceFunction makeInstance() {
+      return new WeightedCanberraDistanceFunction(weights);
+    }
   }
 }

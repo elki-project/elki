@@ -28,6 +28,11 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
  * Provides the squared Euclidean distance for FeatureVectors. This results in
@@ -35,7 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
  * 
  * @author Arthur Zimek
  */
-public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
+public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNorm implements WeightedNumberVectorDistanceFunction {
   /**
    * Weight array
    */
@@ -61,7 +66,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNor
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2, weights.length);
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double delta = (v1.doubleValue(d) - v2.doubleValue(d));
       agg += delta * delta * weights[d];
     }
@@ -72,7 +77,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNor
   public double norm(NumberVector obj) {
     final int dim = obj.getDimensionality();
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double delta = obj.doubleValue(dim);
       agg += delta * delta * weights[d];
     }
@@ -82,21 +87,23 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNor
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Optimization for the simplest case
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
+    if(mbr1 instanceof NumberVector) {
+      if(mbr2 instanceof NumberVector) {
         return distance((NumberVector) mbr1, (NumberVector) mbr2);
       }
     }
     // TODO: optimize for more simpler cases: obj vs. rect?
     final int dim = dimensionality(mbr1, mbr2, weights.length);
     double agg = 0;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double diff;
-      if (mbr1.getMax(d) < mbr2.getMin(d)) {
+      if(mbr1.getMax(d) < mbr2.getMin(d)) {
         diff = mbr2.getMin(d) - mbr1.getMax(d);
-      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
+      }
+      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
         diff = mbr1.getMin(d) - mbr2.getMax(d);
-      } else { // The mbrs intersect!
+      }
+      else { // The mbrs intersect!
         continue;
       }
       agg += diff * diff * weights[d];
@@ -111,16 +118,16 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNor
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (!(obj instanceof WeightedSquaredEuclideanDistanceFunction)) {
-      if (obj.getClass().equals(SquaredEuclideanDistanceFunction.class)) {
-        for (double d : weights) {
-          if (d != 1.0) {
+    if(!(obj instanceof WeightedSquaredEuclideanDistanceFunction)) {
+      if(obj.getClass().equals(SquaredEuclideanDistanceFunction.class)) {
+        for(double d : weights) {
+          if(d != 1.0) {
             return false;
           }
         }
@@ -130,5 +137,33 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNor
     }
     WeightedSquaredEuclideanDistanceFunction other = (WeightedSquaredEuclideanDistanceFunction) obj;
     return Arrays.equals(this.weights, other.weights);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Weight array
+     */
+    protected double[] weights;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
+      if(config.grab(weightsP)) {
+        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+      }
+    }
+
+    @Override
+    protected WeightedSquaredEuclideanDistanceFunction makeInstance() {
+      return new WeightedSquaredEuclideanDistanceFunction(weights);
+    }
   }
 }

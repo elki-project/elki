@@ -27,7 +27,12 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
  * Squared Pearson correlation distance function for feature vectors.
@@ -47,7 +52,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @author Arthur Zimek
  * @author Erich Schubert
  */
-public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction {
+public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction implements WeightedNumberVectorDistanceFunction {
   /**
    * Weights
    */
@@ -95,5 +100,33 @@ public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractN
       return false;
     }
     return Arrays.equals(this.weights, ((WeightedSquaredPearsonCorrelationDistanceFunction)obj).weights);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Weight array
+     */
+    protected double[] weights;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
+      if(config.grab(weightsP)) {
+        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+      }
+    }
+
+    @Override
+    protected WeightedSquaredPearsonCorrelationDistanceFunction makeInstance() {
+      return new WeightedSquaredPearsonCorrelationDistanceFunction(weights);
+    }
   }
 }
