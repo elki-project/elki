@@ -137,9 +137,8 @@ public class EvaluateSilhouette<O> implements Evaluator {
     MeanVariance msil = new MeanVariance();
     for(Cluster<?> cluster : clusters) {
       if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
-        // Silhouette isn't well defined for singletons!
-        // If we assume that a = +infinity, we obtain -1 for each object:
-        msil.put(-1., cluster.size());
+        // As suggested in Rousseeuw, we use 0 for singletons.
+        msil.put(0., cluster.size());
         continue;
       }
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
