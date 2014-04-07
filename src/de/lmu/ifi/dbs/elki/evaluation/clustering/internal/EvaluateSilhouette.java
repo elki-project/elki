@@ -156,6 +156,9 @@ public class EvaluateSilhouette<O> implements Evaluator {
         // b: other clusters:
         double min = Double.POSITIVE_INFINITY;
         for(Cluster<?> ocluster : clusters) {
+          if(ocluster == /* yes, reference identity */cluster) {
+            continue;
+          }
           if(!mergenoise && ocluster.isNoise()) {
             // Treat noise cluster as singletons:
             for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
