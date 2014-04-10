@@ -313,9 +313,9 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
 
     if(LOG.isDebuggingFiner()) {
       StringBuilder msg = new StringBuilder();
-      msg.append("   minima: ").append(FormatUtil.format(minima, ", ", 2));
-      msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", 2));
-      msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", 2));
+      msg.append("   minima: ").append(FormatUtil.format(minima, ", ", FormatUtil.NF2));
+      msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", FormatUtil.NF2));
+      msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", FormatUtil.NF2));
       LOG.debugFiner(msg.toString());
     }
 

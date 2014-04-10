@@ -118,6 +118,6 @@ public class CorrelationModel<V extends FeatureVector<?>> extends BaseModel impl
       weak = weak.substring(0, weak.length() - 1);
     }
     out.commentPrintLn(weak);
-    out.commentPrintLn("Eigenvalues: " + FormatUtil.format(getPCAResult().getEigenvalues(), " ", 2));
+    out.commentPrintLn("Eigenvalues: " + FormatUtil.format(getPCAResult().getEigenvalues(), " ", FormatUtil.NF2));
   }
 }

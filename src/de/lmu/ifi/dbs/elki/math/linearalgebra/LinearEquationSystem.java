@@ -623,7 +623,7 @@ public class LinearEquationSystem {
 
     StringBuilder msg = new StringBuilder();
     if (LOG.isDebugging()) {
-      msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", 4)).append(']');
+      msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", FormatUtil.NF4)).append(']');
       msg.append("\nbound Indices ").append(boundIndices);
       msg.append("\nfree Indices ").append(freeIndices);
     }
@@ -651,7 +651,7 @@ public class LinearEquationSystem {
     if (LOG.isDebugging()) {
       msg.append("\nU");
       for (double[] anU : u) {
-        msg.append('\n').append(FormatUtil.format(anU, ",", 4));
+        msg.append('\n').append(FormatUtil.format(anU, ",", FormatUtil.NF4));
       }
       LOG.debugFine(msg.toString());
     }

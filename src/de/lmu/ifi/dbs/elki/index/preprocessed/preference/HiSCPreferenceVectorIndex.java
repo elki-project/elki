@@ -159,7 +159,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     if(msg != null && LOG.isDebugging()) {
       msg.append("\nalpha ").append(alpha);
       msg.append("\nvariances ");
-      msg.append(FormatUtil.format(variances, ", ", 4));
+      msg.append(FormatUtil.format(variances, ", ", FormatUtil.NF4));
       msg.append("\npreference ");
       msg.append(BitsUtil.toStringLow(preferenceVector, variances.length));
     }

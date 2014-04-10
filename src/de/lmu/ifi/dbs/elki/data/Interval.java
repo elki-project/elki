@@ -94,7 +94,7 @@ public class Interval implements Comparable<Interval> {
    */
   @Override
   public String toString() {
-    return "d" + (dimension + 1) + "-[" + FormatUtil.format(min, 2) + "; " + FormatUtil.format(max, 2) + "[";
+    return "d" + (dimension + 1) + "-[" + FormatUtil.NF2.format(min) + "; " + FormatUtil.NF2.format(max) + "[";
   }
 
   /**

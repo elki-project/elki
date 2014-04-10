@@ -90,7 +90,7 @@ class MkAppTreeNode<O> extends AbstractMTreeNode<O, MkAppTreeNode<O>, MkAppEntry
 
     if(LoggingConfiguration.DEBUG) {
       StringBuilder msg = new StringBuilder();
-      msg.append("b " + FormatUtil.format(b, 4));
+      msg.append("b " + FormatUtil.format(b, FormatUtil.NF4));
       Logger.getLogger(this.getClass().getName()).fine(msg.toString());
     }
 

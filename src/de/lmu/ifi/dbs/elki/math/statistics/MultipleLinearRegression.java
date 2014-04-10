@@ -144,7 +144,7 @@ public class MultipleLinearRegression {
     msg.append("\ny = ").append(FormatUtil.format(y, 9, 4));
     msg.append("\nb = ").append(FormatUtil.format(b, 9, 4));
     msg.append("\ne = ").append(FormatUtil.format(e, 9, 4));
-    msg.append("error variance = ").append(FormatUtil.format(variance, 4));
+    msg.append("error variance = ").append(FormatUtil.NF4.format(variance));
     return msg.toString();
   }
 

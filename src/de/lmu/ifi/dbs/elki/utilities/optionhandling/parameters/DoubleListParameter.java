@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -59,7 +60,7 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, Doub
 
   @Override
   public String getValueAsString() {
-    return FormatUtil.format(getValue().toArray(new Double[getValue().size()]), LIST_SEP, FormatUtil.NF);
+    return FormatUtil.format(ArrayLikeUtil.toPrimitiveDoubleArray(getValue()), LIST_SEP, FormatUtil.NF);
   }
 
   @SuppressWarnings("unchecked")

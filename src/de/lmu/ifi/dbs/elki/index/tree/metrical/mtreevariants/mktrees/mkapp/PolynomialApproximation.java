@@ -148,6 +148,6 @@ public class PolynomialApproximation implements Externalizable {
    */
   @Override
   public String toString() {
-    return FormatUtil.format(b, 4);
+    return FormatUtil.format(b, FormatUtil.NF4);
   }
 }

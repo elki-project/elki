@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Formatter;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,6 +57,11 @@ public final class FormatUtil {
   public static final NumberFormat NF2 = NumberFormat.getInstance(Locale.US);
 
   /**
+   * Number Formatter (3 digits) for output purposes.
+   */
+  public static final NumberFormat NF3 = NumberFormat.getInstance(Locale.US);
+
+  /**
    * Number Formatter (4 digits) for output purposes.
    */
   public static final NumberFormat NF4 = NumberFormat.getInstance(Locale.US);
@@ -80,6 +86,9 @@ public final class FormatUtil {
     NF2.setMinimumFractionDigits(2);
     NF2.setMaximumFractionDigits(2);
     NF2.setGroupingUsed(false);
+    NF3.setMinimumFractionDigits(3);
+    NF3.setMaximumFractionDigits(3);
+    NF3.setGroupingUsed(false);
     NF4.setMinimumFractionDigits(4);
     NF4.setMaximumFractionDigits(4);
     NF4.setGroupingUsed(false);
@@ -122,18 +131,34 @@ public final class FormatUtil {
   private static final int[] TIME_UNIT_DIGITS = new int[] { 3, 2, 2, 2, 2 };
 
   /**
-   * Formats the double d with the specified fraction digits.
+   * Initialize a number format with ELKI standard options (US locale, no
+   * grouping).
    * 
-   * @param d the double array to be formatted
-   * @param digits the number of fraction digits
-   * @return a String representing the double d
+   * @param digits Number of digits to use
+   * @return Number format
    */
-  public static String format(final double d, int digits) {
+  public static NumberFormat makeNumberFormat(int digits) {
+    // Prefer predefined number formats where applicable.
+    // TODO: cache others, too?
+    switch(digits){
+    case 0:
+      return NF0;
+    case 2:
+      return NF2;
+    case 3:
+      return NF3;
+    case 4:
+      return NF4;
+    case 6:
+      return NF6;
+    case 8:
+      return NF8;
+    }
     final NumberFormat nf = NumberFormat.getInstance(Locale.US);
     nf.setMaximumFractionDigits(digits);
     nf.setMinimumFractionDigits(digits);
     nf.setGroupingUsed(false);
-    return nf.format(d);
+    return nf;
   }
 
   /**
@@ -154,7 +179,7 @@ public final class FormatUtil {
    * @return a String representing the double d
    */
   public static String format(final double d) {
-    return format(d, 2);
+    return NF2.format(d);
   }
 
   /**
@@ -166,37 +191,14 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep) {
-    StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < d.length; i++) {
-      if(i > 0) {
-        buffer.append(sep).append(d[i]);
-      }
-      else {
-        buffer.append(d[i]);
-      }
+    if(d.length == 0) {
+      return "";
     }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the double array d with the specified separator and the specified
-   * fraction digits.
-   * 
-   * @param d the double array to be formatted
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ','
-   * @param digits the number of fraction digits
-   * @return a String representing the double array d
-   */
-  public static String format(double[] d, String sep, int digits) {
     StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < d.length; i++) {
-      if(i < d.length - 1) {
-        buffer.append(format(d[i], digits)).append(sep);
-      }
-      else {
-        buffer.append(format(d[i], digits));
-      }
+    buffer.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buffer.append(sep);
+      buffer.append(d[i]);
     }
     return buffer.toString();
   }
@@ -222,38 +224,26 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep, NumberFormat nf) {
+    if(d.length == 0) {
+      return "";
+    }
     StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < d.length; i++) {
-      if(i < d.length - 1) {
-        buffer.append(format(d[i], nf)).append(sep);
-      }
-      else {
-        buffer.append(format(d[i], nf));
-      }
+    buffer.append(format(d[0], nf));
+    for(int i = 1; i < d.length; i++) {
+      buffer.append(sep);
+      buffer.append(format(d[i], nf));
     }
     return buffer.toString();
   }
 
   /**
-   * Formats the double array d with ',' as separator and 2 fraction digits.
+   * Formats the double array d with ', ' as separator and 2 fraction digits.
    * 
    * @param d the double array to be formatted
    * @return a String representing the double array d
    */
   public static String format(double[] d) {
-    return format(d, ", ", 2);
-  }
-
-  /**
-   * Formats the double array d with ', ' as separator and with the specified
-   * fraction digits.
-   * 
-   * @param d the double array to be formatted
-   * @param digits the number of fraction digits
-   * @return a String representing the double array d
-   */
-  public static String format(double[] d, int digits) {
-    return format(d, ", ", digits);
+    return format(d, ", ", NF2);
   }
 
   /**
@@ -263,11 +253,7 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[][] d) {
-    StringBuilder buffer = new StringBuilder();
-    for(double[] array : d) {
-      buffer.append(format(array, ", ", 2)).append('\n');
-    }
-    return buffer.toString();
+    return format(d, "\n", ", ", NF2);
   }
 
   /**
@@ -277,110 +263,40 @@ public final class FormatUtil {
    * @param d the double array to be formatted
    * @param sep1 the first separator of the outer array
    * @param sep2 the second separator of the inner array
-   * @param digits the number of fraction digits
+   * @param nf the number format to use
    * @return a String representing the double array d
    */
-  public static String format(double[][] d, String sep1, String sep2, int digits) {
-    StringBuilder buffer = new StringBuilder();
-
-    for(int i = 0; i < d.length; i++) {
-      if(i < d.length - 1) {
-        buffer.append(format(d[i], sep2, digits)).append(sep1);
-      }
-      else {
-        buffer.append(format(d[i], sep2, digits));
-      }
+  public static String format(double[][] d, String sep1, String sep2, NumberFormat nf) {
+    if(d.length == 0) {
+      return "";
     }
-
+    StringBuilder buffer = new StringBuilder();
+    buffer.append(format(d[0], sep2, nf));
+    for(int i = 1; i < d.length; i++) {
+      buffer.append(sep1);
+      buffer.append(format(d[i], sep2, nf));
+    }
     return buffer.toString();
   }
 
   /**
-   * Formats the Double array f with the specified separator and the specified
-   * fraction digits.
+   * Formats the double array d with the specified number format.
    * 
-   * @param f the Double array to be formatted
-   * @param sep the separator between the single values of the Double array,
+   * @param d the double array to be formatted
+   * @param sep the separator between the single values of the double array,
    *        e.g. ','
-   * @param digits the number of fraction digits
-   * @return a String representing the Double array f
+   * @param nf the number format to be used for formatting
+   * @return a String representing the double array d
    */
-  public static String format(Double[] f, String sep, int digits) {
-    StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < f.length; i++) {
-      if(i < f.length - 1) {
-        buffer.append(format(f[i].doubleValue(), digits)).append(sep);
-      }
-      else {
-        buffer.append(format(f[i].doubleValue(), digits));
-      }
+  public static String format(float[] d, String sep, NumberFormat nf) {
+    if(d.length == 0) {
+      return "";
     }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the Double array f with ',' as separator and 2 fraction digits.
-   * 
-   * @param f the Double array to be formatted
-   * @return a String representing the Double array f
-   */
-  public static String format(Double[] f) {
-    return format(f, ", ", 2);
-  }
-
-  /**
-   * Formats the Double array f with the specified separator and the specified
-   * fraction digits.
-   * 
-   * @param f the Double array to be formatted
-   * @param sep the separator between the single values of the Double array,
-   *        e.g. ','
-   * @param nf the number format
-   * @return a String representing the Double array f
-   */
-  public static String format(Double[] f, String sep, NumberFormat nf) {
     StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < f.length; i++) {
-      if(i < f.length - 1) {
-        buffer.append(format(f[i].doubleValue(), nf)).append(sep);
-      }
-      else {
-        buffer.append(format(f[i].doubleValue(), nf));
-      }
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the Double array f with ',' as separator and 2 fraction digits.
-   * 
-   * @param f the Double array to be formatted
-   * @param nf the Number format
-   * @return a String representing the Double array f
-   */
-  public static String format(Double[] f, NumberFormat nf) {
-    return format(f, ", ", nf);
-  }
-
-  /**
-   * Formats the float array f with the specified separator and the specified
-   * fraction digits.
-   * 
-   * @param f the float array to be formatted
-   * @param sep the separator between the single values of the float array, e.g.
-   *        ','
-   * @param digits the number of fraction digits
-   * @return a String representing the float array f
-   */
-  public static String format(float[] f, String sep, int digits) {
-    StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < f.length; i++) {
-      if(i < f.length - 1) {
-        buffer.append(format(f[i], digits)).append(sep);
-      }
-      else {
-        buffer.append(format(f[i], digits));
-      }
+    buffer.append(format(d[0], nf));
+    for(int i = 1; i < d.length; i++) {
+      buffer.append(sep);
+      buffer.append(format(d[i], nf));
     }
     return buffer.toString();
   }
@@ -392,7 +308,7 @@ public final class FormatUtil {
    * @return a String representing the float array f
    */
   public static String format(float[] f) {
-    return format(f, ", ", 2);
+    return format(f, ", ", NF2);
   }
 
   /**
@@ -404,14 +320,14 @@ public final class FormatUtil {
    * @return a String representing the int array a
    */
   public static String format(int[] a, String sep) {
+    if(a.length == 0) {
+      return "";
+    }
     StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < a.length; i++) {
-      if(i < a.length - 1) {
-        buffer.append(a[i]).append(sep);
-      }
-      else {
-        buffer.append(a[i]);
-      }
+    buffer.append(a[0]);
+    for(int i = 1; i < a.length; i++) {
+      buffer.append(sep);
+      buffer.append(a[i]);
     }
     return buffer.toString();
   }
@@ -427,51 +343,20 @@ public final class FormatUtil {
   }
 
   /**
-   * Formats the Integer array a for printing purposes.
-   * 
-   * @param a the Integer array to be formatted
-   * @param sep the separator between the single values of the float array, e.g.
-   *        ','
-   * @return a String representing the Integer array a
-   */
-  public static String format(Integer[] a, String sep) {
-    StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < a.length; i++) {
-      if(i < a.length - 1) {
-        buffer.append(a[i]).append(sep);
-      }
-      else {
-        buffer.append(a[i]);
-      }
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the Integer array a for printing purposes.
-   * 
-   * @param a the Integer array to be formatted
-   * @return a String representing the Integer array a
-   */
-  public static String format(Integer[] a) {
-    return format(a, ", ");
-  }
-
-  /**
    * Formats the long array a for printing purposes.
    * 
    * @param a the long array to be formatted
    * @return a String representing the long array a
    */
   public static String format(long[] a) {
+    if(a.length == 0) {
+      return "";
+    }
     StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < a.length; i++) {
-      if(i < a.length - 1) {
-        buffer.append(a[i]).append(", ");
-      }
-      else {
-        buffer.append(a[i]);
-      }
+    buffer.append(a[0]);
+    for(int i = 1; i < a.length; i++) {
+      buffer.append(", ");
+      buffer.append(a[i]);
     }
     return buffer.toString();
   }
@@ -483,14 +368,14 @@ public final class FormatUtil {
    * @return a String representing the byte array a
    */
   public static String format(byte[] a) {
+    if(a.length == 0) {
+      return "";
+    }
     StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < a.length; i++) {
-      if(i < a.length - 1) {
-        buffer.append(a[i]).append(", ");
-      }
-      else {
-        buffer.append(a[i]);
-      }
+    buffer.append(a[0]);
+    for(int i = 1; i < a.length; i++) {
+      buffer.append(", ");
+      buffer.append(a[i]);
     }
     return buffer.toString();
   }
@@ -504,14 +389,14 @@ public final class FormatUtil {
    * @return a String representing the boolean array b
    */
   public static String format(boolean[] b, final String sep) {
+    if(b.length == 0) {
+      return "";
+    }
     StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < b.length; i++) {
-      if(i < b.length - 1) {
-        buffer.append(format(b[i])).append(sep);
-      }
-      else {
-        buffer.append(format(b[i]));
-      }
+    buffer.append(format(b[0]));
+    for(int i = 1; i < b.length; i++) {
+      buffer.append(sep);
+      buffer.append(format(b[i]));
     }
     return buffer.toString();
   }
@@ -523,10 +408,7 @@ public final class FormatUtil {
    * @return a String representing of the boolean b
    */
   public static String format(final boolean b) {
-    if(b) {
-      return "1";
-    }
-    return "0";
+    return b ? "1" : "0";
   }
 
   /**
@@ -539,19 +421,11 @@ public final class FormatUtil {
    */
   public static String format(BitSet bitSet, int dim, String sep) {
     StringBuilder msg = new StringBuilder();
-
-    for(int d = 0; d < dim; d++) {
-      if(d > 0) {
-        msg.append(sep);
-      }
-      if(bitSet.get(d)) {
-        msg.append('1');
-      }
-      else {
-        msg.append('0');
-      }
+    msg.append(bitSet.get(0) ? '1' : '0');
+    for(int d = 1; d < dim; d++) {
+      msg.append(sep);
+      msg.append(bitSet.get(d) ? '1' : '0');
     }
-
     return msg.toString();
   }
 
@@ -583,13 +457,11 @@ public final class FormatUtil {
       return d.iterator().next();
     }
     StringBuilder buffer = new StringBuilder();
-    boolean first = true;
-    for(String str : d) {
-      if(!first) {
-        buffer.append(sep);
-      }
-      buffer.append(str);
-      first = false;
+    Iterator<String> it = d.iterator();
+    buffer.append(it.next());
+    while(it.hasNext()) {
+      buffer.append(sep);
+      buffer.append(it.next());
     }
     return buffer.toString();
   }
