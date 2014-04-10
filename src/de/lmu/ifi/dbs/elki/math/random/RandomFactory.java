@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.math.random;
 
 /*
  This file is part of ELKI:
@@ -94,10 +94,10 @@ public class RandomFactory {
    */
   public Random getSingleThreadedRandom() {
     if(seed != null) {
-      return new UnsafeRandom(seed.longValue());
+      return new FastNonThreadsafeRandom(seed.longValue());
     }
     else {
-      return new UnsafeRandom();
+      return new FastNonThreadsafeRandom();
     }
   }
 }

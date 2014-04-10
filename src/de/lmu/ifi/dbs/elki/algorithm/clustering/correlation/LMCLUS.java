@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleDynamicHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleStaticHistogram.Iter;

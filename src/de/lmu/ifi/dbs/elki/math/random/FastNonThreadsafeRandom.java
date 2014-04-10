@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.math.random;
 
 /*
  This file is part of ELKI:
@@ -30,7 +30,7 @@ import java.util.Random;
  * 
  * @author Erich Schubert
  */
-public class UnsafeRandom extends Random {
+public class FastNonThreadsafeRandom extends Random {
   /**
    * Serial version number.
    */
@@ -49,7 +49,7 @@ public class UnsafeRandom extends Random {
   /**
    * Constructor called only by localRandom.initialValue.
    */
-  public UnsafeRandom() {
+  public FastNonThreadsafeRandom() {
     super();
   }
 
@@ -58,16 +58,10 @@ public class UnsafeRandom extends Random {
    * 
    * @param seed Random generator seed.
    */
-  public UnsafeRandom(long seed) {
+  public FastNonThreadsafeRandom(long seed) {
     this.seed = (seed ^ multiplier) & mask;
   }
 
-  /**
-   * Throws {@code UnsupportedOperationException}. Setting seeds in this
-   * generator is not supported.
-   * 
-   * @throws UnsupportedOperationException always
-   */
   @Override
   public void setSeed(long seed) {
     this.seed = (seed ^ multiplier) & mask;
@@ -75,6 +69,7 @@ public class UnsafeRandom extends Random {
 
   @Override
   protected int next(int bits) {
+    // Linear Congruential Generator:
     seed = (seed * multiplier + addend) & mask;
     return (int) (seed >>> (48 - bits));
   }

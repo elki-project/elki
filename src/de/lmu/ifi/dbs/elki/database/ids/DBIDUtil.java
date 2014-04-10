@@ -34,9 +34,9 @@ import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDKNNSubList;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
+import de.lmu.ifi.dbs.elki.math.random.FastNonThreadsafeRandom;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.UnsafeRandom;
 
 /**
  * DBID Utility functions.
@@ -626,7 +626,7 @@ public final class DBIDUtil {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
     if(random == null) {
-      random = new UnsafeRandom(); // Fast, and we're single-threaded here
+      random = new FastNonThreadsafeRandom(); // Fast, and we're single-threaded here
                                    // anyway.
     }
 
@@ -674,7 +674,7 @@ public final class DBIDUtil {
   public static ArrayDBIDs[] randomSplit(DBIDs oids, int p, Random random) {
     if(random == null) {
       // Fast, and we're single-threaded here anyway.
-      random = new UnsafeRandom();
+      random = new FastNonThreadsafeRandom();
     }
     ArrayModifiableDBIDs ids = newArray(oids);
     final int size = ids.size();

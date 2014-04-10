@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
-import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
