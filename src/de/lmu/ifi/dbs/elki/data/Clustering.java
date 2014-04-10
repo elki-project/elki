@@ -75,6 +75,9 @@ public class Clustering<M extends Model> extends BasicResult {
     super(name, shortname);
     this.toplevelclusters = toplevelclusters;
     this.hierarchy = new HashMapHierarchy<>();
+    for (Cluster<M> clus : toplevelclusters) {
+      hierarchy.add(clus);
+    }
   }
 
   /**

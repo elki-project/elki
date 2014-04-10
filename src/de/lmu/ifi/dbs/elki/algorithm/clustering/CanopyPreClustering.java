@@ -50,8 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 /**
  * Canopy pre-clustering is a simple preprocessing step for clustering.
  * 
+ * Reference:
  * <p>
- * Reference:<br>
  * A. McCallum, K. Nigam, L.H. Ungar<br />
  * Efficient Clustering of High Dimensional Data Sets with Application to
  * Reference Matching<br />
@@ -63,7 +63,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @param <O> Object type
  */
-@Reference(authors = "A. McCallum, K. Nigam, L.H. Ungar", title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145%2F347090.347123")
+@Reference(authors = "A. McCallum, K. Nigam, L.H. Ungar", //
+title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", //
+booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining",//
+url = "http://dx.doi.org/10.1145%2F347090.347123")
 public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<ClusterModel>> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
   /**
    * Class logger.
@@ -171,7 +174,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
     /**
      * Parameter for the inclusion threshold of canopy clustering.
      * 
-     * Note: t1 > t2
+     * Note: t1 >= t2
      * 
      * Syntax:
      * 
@@ -179,12 +182,12 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
      * -canopy.t1 &lt;value&gt;
      * </pre>
      */
-    public static final OptionID T1_ID = new OptionID("canopy.t1", "Inclusion threshold for canopy clustering. t1 > t2!");
+    public static final OptionID T1_ID = new OptionID("canopy.t1", "Inclusion threshold for canopy clustering. t1 >= t2!");
 
     /**
      * Parameter for the removal threshold of canopy clustering.
      * 
-     * Note: t1 > t2
+     * Note: t1 >= t2
      * 
      * Syntax:
      * 
@@ -192,7 +195,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
      * -canopy.t2 &lt;value&gt;
      * </pre>
      */
-    public static final OptionID T2_ID = new OptionID("canopy.t2", "Removal threshold for canopy clustering. t1 > t2!");
+    public static final OptionID T2_ID = new OptionID("canopy.t2", "Removal threshold for canopy clustering. t1 >= t2!");
 
     /**
      * Threshold for inclusion
@@ -210,15 +213,15 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
 
       DoubleParameter t1P = new DoubleParameter(T1_ID);
       if(config.grab(t1P)) {
-        t1 = t1P.getValue();
+        t1 = t1P.doubleValue();
       }
 
       DoubleParameter t2P = new DoubleParameter(T2_ID);
-      // TODO: add distance constraint t1 > t2
+      // TODO: add distance constraint t1 >= t2
       if(config.grab(t2P)) {
-        t2 = t2P.getValue();
-        if(t1 <= t2) {
-          config.reportError(new WrongParameterValueException(t2P, T1_ID.getName() + " must be larger than " + T2_ID.getName()));
+        t2 = t2P.doubleValue();
+        if(!(t1 >= t2)) {
+          config.reportError(new WrongParameterValueException(t2P, T1_ID.getName() + " must be larger or equal " + T2_ID.getName()));
         }
       }
     }
@@ -227,6 +230,5 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
     protected CanopyPreClustering<O> makeInstance() {
       return new CanopyPreClustering<>(distanceFunction, t1, t2);
     }
-
   }
 }
