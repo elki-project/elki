@@ -220,7 +220,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
         if(k < kmin) {
           continue;
         }
-        final double ibw = Math.max(k / (sum * scale), iminbw);
+        final double ibw = Math.min(k / (sum * scale), iminbw);
         final double sca = MathUtil.powi(ibw, dim);
         for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           final double dens = sca * kernel.density(neighbor.doubleValue() * ibw);
