@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -171,7 +172,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     // We need each neighborhood twice - use "HEAVY" flag.
     KNNQuery<O> knnq = database.getKNNQuery(dq, kmax + 1, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
-    if(knnq == null) {
+    if(!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.verbose("Running kNN preprocessor.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(rel, getDistanceFunction(), kmax + 1);
       database.addIndex(preproc);
