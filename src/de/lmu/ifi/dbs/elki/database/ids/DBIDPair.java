@@ -35,10 +35,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  */
 public interface DBIDPair extends PairInterface<DBID, DBID>, DBIDs {
   /**
-   * Getter for first
+   * Getter for first.
    * 
    * @return first element in pair
+   * @deprecated This method can be expensive. The use of a {@link DBIDVar} is
+   *             recommended when many such accesses are needed.
    */
+  @Deprecated
   @Override
   public DBID getFirst();
 
@@ -46,7 +49,10 @@ public interface DBIDPair extends PairInterface<DBID, DBID>, DBIDs {
    * Getter for second element in pair
    * 
    * @return second element in pair
+   * @deprecated This method can be expensive. The use of a {@link DBIDVar} is
+   *             recommended when many such accesses are needed.
    */
+  @Deprecated
   @Override
   public DBID getSecond();
 }

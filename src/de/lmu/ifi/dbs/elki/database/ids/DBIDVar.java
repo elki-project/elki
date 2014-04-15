@@ -39,4 +39,18 @@ public interface DBIDVar extends DBIDRef, ArrayDBIDs, SetDBIDs {
    * @param ref Reference
    */
   void set(DBIDRef ref);
+
+  /**
+   * Assign the first pair member to this variable.
+   * 
+   * @param pair Pair
+   */
+  void setFirst(DBIDPair pair);
+
+  /**
+   * Assign the second pair member to this variable.
+   * 
+   * @param pair Pair
+   */
+  void setSecond(DBIDPair pair);
 }

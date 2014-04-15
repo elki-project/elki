@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
@@ -81,8 +82,20 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   }
 
   @Override
+  public void setFirst(DBIDPair pair) {
+    assert pair instanceof IntegerDBIDPair;
+    id = ((IntegerDBIDPair) pair).first;
+  }
+
+  @Override
+  public void setSecond(DBIDPair pair) {
+    assert pair instanceof IntegerDBIDPair;
+    id = ((IntegerDBIDPair) pair).second;
+  }
+
+  @Override
   public DBID get(int i) {
-    if (i != 0) {
+    if(i != 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
     return new IntegerDBID(i);
@@ -111,9 +124,10 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   @Override
   public void assignVar(int i, DBIDVar var) {
-    if (var instanceof IntegerDBIDVar) {
+    if(var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) var).internalSetIndex(i);
-    } else {
+    }
+    else {
       // Much less efficient:
       var.set(get(i));
     }
@@ -121,9 +135,10 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   @Override
   public ArrayDBIDs slice(int begin, int end) {
-    if (begin == 0 && end == 1) {
+    if(begin == 0 && end == 1) {
       return this;
-    } else {
+    }
+    else {
       return DBIDUtil.EMPTYDBIDS;
     }
   }
@@ -150,60 +165,60 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
      * Iterator position: We use an integer so we can support retract().
      */
     int pos = 0;
-  
+
     @Override
     public Itr advance() {
       pos++;
       return this;
     }
-  
+
     @Override
     public Itr advance(int count) {
       pos += count;
       return this;
     }
-  
+
     @Override
     public Itr retract() {
       pos--;
       return this;
     }
-  
+
     @Override
     public Itr seek(int off) {
       pos = off;
       return this;
     }
-  
+
     @Override
     public int getOffset() {
       return pos;
     }
-  
+
     @Override
     public int internalGetIndex() {
       return IntegerDBIDVar.this.id;
     }
-  
+
     @Override
     public boolean valid() {
       return (pos == 0);
     }
-  
+
     @Override
     public int hashCode() {
       // Override, because we also are overriding equals.
       return super.hashCode();
     }
-  
+
     @Override
     public boolean equals(Object other) {
-      if (other instanceof DBID) {
+      if(other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
     }
-  
+
     @Override
     public String toString() {
       return Integer.toString(internalGetIndex());
