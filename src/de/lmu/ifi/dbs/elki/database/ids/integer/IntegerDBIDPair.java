@@ -23,14 +23,16 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * DBID pair using two ints for storage.
  * 
  * @author Erich Schubert
  */
-class IntegerDBIDPair implements DBIDPair {
+class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
   /**
    * First value in pair
    */
@@ -117,5 +119,69 @@ class IntegerDBIDPair implements DBIDPair {
     result = prime * result + first;
     result = prime * result + second;
     return (int) result;
+  }
+
+  @Override
+  public int size() {
+    return 2;
+  }
+
+  @Override
+  public boolean contains(DBIDRef o) {
+    final int i = o.internalGetIndex();
+    return (i == first) || (i == second);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
+  }
+
+  @Override
+  public IntegerDBIDIter iter() {
+    return new Itr(first, second);
+  }
+
+  /**
+   * Iterator.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private static class Itr implements IntegerDBIDIter {
+    /**
+     * State
+     */
+    int first, second, pos;
+
+    /**
+     * Constructor.
+     * 
+     * @param first First ID
+     * @param second Second ID
+     */
+    public Itr(int first, int second) {
+      super();
+      this.first = first;
+      this.second = second;
+      this.pos = 0;
+    }
+
+    @Override
+    public boolean valid() {
+      return pos < 2;
+    }
+
+    @Override
+    public DBIDIter advance() {
+      ++pos;
+      return this;
+    }
+
+    @Override
+    public int internalGetIndex() {
+      return (pos == 0) ? first : second;
+    }
   }
 }

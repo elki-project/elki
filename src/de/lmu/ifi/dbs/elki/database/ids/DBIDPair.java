@@ -33,8 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBID
  */
-// TODO: implement DBIDs?
-public interface DBIDPair extends PairInterface<DBID, DBID> {
+public interface DBIDPair extends PairInterface<DBID, DBID>, DBIDs {
   /**
    * Getter for first
    * 
