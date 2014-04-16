@@ -113,4 +113,26 @@ public class TestFormatUtil implements JUnit4Test {
   public void textEmptyString() {
     FormatUtil.parseDouble("");
   }
+
+  @Test
+  public void testStringSize() {
+    long[] specialL = new long[] { 0L, 999L, 1001L, Long.MIN_VALUE, Long.MAX_VALUE };
+    int[] specialI = new int[] { 0, 99999, 100001, Integer.MIN_VALUE, Integer.MAX_VALUE };
+
+    // Positives
+    for(long x = 1L; x > 0; x *= 2) {
+      assertEquals("String length does not match for " + x, String.valueOf(x).length(), FormatUtil.stringSize(x));
+    }
+    // Negatives
+    for(long x = -1L; x < 0; x *= 2) {
+      assertEquals("String length does not match for " + x, String.valueOf(x).length(), FormatUtil.stringSize(x));
+    }
+    // Specials
+    for(long x : specialL) {
+      assertEquals("String length does not match for " + x, String.valueOf(x).length(), FormatUtil.stringSize(x));
+    }
+    for(int x : specialI) {
+      assertEquals("String length does not match for " + x, String.valueOf(x).length(), FormatUtil.stringSize(x));
+    }
+  }
 }

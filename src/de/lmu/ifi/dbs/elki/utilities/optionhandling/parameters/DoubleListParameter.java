@@ -60,7 +60,7 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, Doub
 
   @Override
   public String getValueAsString() {
-    return FormatUtil.format(ArrayLikeUtil.toPrimitiveDoubleArray(getValue()), LIST_SEP, FormatUtil.NF);
+    return FormatUtil.format(ArrayLikeUtil.toPrimitiveDoubleArray(getValue()), LIST_SEP);
   }
 
   @SuppressWarnings("unchecked")

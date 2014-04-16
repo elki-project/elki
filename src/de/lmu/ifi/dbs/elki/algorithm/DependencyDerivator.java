@@ -219,7 +219,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
         log.append("Transposed weak Eigenvectors:\n");
         log.append(FormatUtil.format(transposedWeakEigenvectors, nf)).append('\n');
         log.append("Eigenvalues:\n");
-        log.append(FormatUtil.format(pcares.getEigenvalues(), " , ", FormatUtil.NF2));
+        log.append(FormatUtil.format(pcares.getEigenvalues(), ", ", nf));
         LOG.debugFine(log.toString());
       }
       Vector b = transposedWeakEigenvectors.times(centroid);

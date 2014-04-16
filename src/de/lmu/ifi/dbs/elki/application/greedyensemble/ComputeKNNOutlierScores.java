@@ -321,7 +321,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       if(scaling != null) {
         value = scaling.getScaled(value);
       }
-      out.append(' ').append(FormatUtil.NF.format(value));
+      out.append(' ').append(Double.toString(value));
     }
     out.append(FormatUtil.NEWLINE);
   }

@@ -162,27 +162,6 @@ public final class FormatUtil {
   }
 
   /**
-   * Formats the double d with the specified number format.
-   * 
-   * @param d the double array to be formatted
-   * @param nf the number format to be used for formatting
-   * @return a String representing the double d
-   */
-  public static String format(final double d, NumberFormat nf) {
-    return nf.format(d);
-  }
-
-  /**
-   * Formats the double d with 2 fraction digits.
-   * 
-   * @param d the double to be formatted
-   * @return a String representing the double d
-   */
-  public static String format(final double d) {
-    return NF2.format(d);
-  }
-
-  /**
    * Formats the double array d with the specified separator.
    * 
    * @param d the double array to be formatted
@@ -194,13 +173,7 @@ public final class FormatUtil {
     if(d.length == 0) {
       return "";
     }
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(d[0]);
-    for(int i = 1; i < d.length; i++) {
-      buffer.append(sep);
-      buffer.append(d[i]);
-    }
-    return buffer.toString();
+    return formatTo(new StringBuilder(), d, sep).toString();
   }
 
   /**
@@ -227,13 +200,49 @@ public final class FormatUtil {
     if(d.length == 0) {
       return "";
     }
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(format(d[0], nf));
-    for(int i = 1; i < d.length; i++) {
-      buffer.append(sep);
-      buffer.append(format(d[i], nf));
+    return formatTo(new StringBuilder(), d, sep, nf).toString();
+  }
+
+  /**
+   * Formats the double array d with the specified number format.
+   * 
+   * @param d the double array to be formatted
+   * @param sep the separator between the single values of the double array,
+   *        e.g. ','
+   * @param nf the number format to be used for formatting
+   * @return a String representing the double array d
+   */
+  public static StringBuilder formatTo(StringBuilder a, double[] d, String sep) {
+    if(d.length == 0) {
+      return a;
     }
-    return buffer.toString();
+    a.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      a.append(sep);
+      a.append(d[i]);
+    }
+    return a;
+  }
+
+  /**
+   * Formats the double array d with the specified number format.
+   * 
+   * @param d the double array to be formatted
+   * @param sep the separator between the single values of the double array,
+   *        e.g. ','
+   * @param nf the number format to be used for formatting
+   * @return a String representing the double array d
+   */
+  public static StringBuilder formatTo(StringBuilder a, double[] d, String sep, NumberFormat nf) {
+    if(d.length == 0) {
+      return a;
+    }
+    a.append(nf.format(d[0]));
+    for(int i = 1; i < d.length; i++) {
+      a.append(sep);
+      a.append(nf.format(d[i]));
+    }
+    return a;
   }
 
   /**
@@ -243,7 +252,7 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[] d) {
-    return format(d, ", ", NF2);
+    return formatTo(new StringBuilder(), d, ", ").toString();
   }
 
   /**
@@ -271,10 +280,10 @@ public final class FormatUtil {
       return "";
     }
     StringBuilder buffer = new StringBuilder();
-    buffer.append(format(d[0], sep2, nf));
+    formatTo(buffer, d[0], sep2, nf);
     for(int i = 1; i < d.length; i++) {
       buffer.append(sep1);
-      buffer.append(format(d[i], sep2, nf));
+      formatTo(buffer, d[i], sep2, nf);
     }
     return buffer.toString();
   }
@@ -293,10 +302,10 @@ public final class FormatUtil {
       return "";
     }
     StringBuilder buffer = new StringBuilder();
-    buffer.append(format(d[0], nf));
+    buffer.append(nf.format((double) d[0]));
     for(int i = 1; i < d.length; i++) {
       buffer.append(sep);
-      buffer.append(format(d[i], nf));
+      buffer.append(nf.format((double) d[i]));
     }
     return buffer.toString();
   }
@@ -617,7 +626,11 @@ public final class FormatUtil {
    *         given NumberFormat
    */
   public static String format(Vector m, NumberFormat nf) {
-    return "[" + FormatUtil.format(m.getArrayRef(), nf) + "]";
+    StringBuilder buf = new StringBuilder();
+    buf.append('[');
+    formatTo(buf, m.getArrayRef(), ", ", nf);
+    buf.append(']');
+    return buf.toString();
   }
 
   /**
@@ -626,7 +639,7 @@ public final class FormatUtil {
    * @return String representation of this Vector
    */
   public static String format(Vector m) {
-    return format(m, FormatUtil.NF);
+    return format(m.getArrayRef());
   }
 
   /**
@@ -1234,5 +1247,144 @@ public final class FormatUtil {
     }
 
     return isNegative ? -decimal : decimal;
+  }
+
+  /**
+   * Format a boolean value as string "true" or "false".
+   * 
+   * @param b Boolean to Format
+   * @param buf Buffer to append to
+   * @return Same buffer
+   */
+  public static StringBuilder format(boolean b, StringBuilder buf) {
+    return buf.append(b ? "true" : "false");
+  }
+
+  /**
+   * Format a boolean value as string "1" or "0".
+   * 
+   * @param b Boolean to Format
+   * @param buf Buffer to append to
+   * @return Same buffer
+   */
+  public static StringBuilder formatBit(boolean b, StringBuilder buf) {
+    return buf.append(b ? '1' : '0');
+  }
+
+  /**
+   * Format an integer value as decimal.
+   * 
+   * @param i Integer value to format.
+   * @param buf Buffer to append to
+   * @return Same buffer
+   */
+  public static StringBuilder format(int i, StringBuilder buf) {
+    // Int seems to be well optimized
+    return buf.append(i);
+  }
+
+  /**
+   * Format a long value as decimal.
+   * 
+   * @param i Long value to format.
+   * @param buf Buffer to append to
+   * @return Same buffer
+   */
+  public static StringBuilder format(long i, StringBuilder buf) {
+    // Long seems to be well optimized
+    return buf.append(i);
+  }
+
+  /**
+   * Buffer for zero padding.
+   */
+  private static final char[] ZEROPADDING = new char[] { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0' };
+
+  /**
+   * Buffer for whitespace padding.
+   */
+  private static final char[] SPACEPADDING = new char[] { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+
+  /**
+   * Append zeros to a buffer.
+   * 
+   * @param buf Buffer to append to
+   * @param zeros Number of zeros to append.
+   * @return Buffer
+   */
+  public static StringBuilder appendZeros(StringBuilder buf, int zeros) {
+    for(int i = zeros; i > 0; i -= ZEROPADDING.length) {
+      buf.append(ZEROPADDING, 0, i < ZEROPADDING.length ? i : ZEROPADDING.length);
+    }
+    return buf;
+  }
+
+  /**
+   * Append whitespace to a buffer.
+   * 
+   * @param buf Buffer to append to
+   * @param spaces Number of spaces to append.
+   * @return Buffer
+   */
+  public static StringBuilder appendSpace(StringBuilder buf, int spaces) {
+    for(int i = spaces; i > 0; i -= SPACEPADDING.length) {
+      buf.append(SPACEPADDING, 0, i < SPACEPADDING.length ? i : SPACEPADDING.length);
+    }
+    return buf;
+  }
+
+  /**
+   * Compute the number of characters needed to represent the integer x.
+   * 
+   * Reimplementation of {@link Long#stringSize}, but public and without loop.
+   * 
+   * @param x Integer value
+   * @return Number of digits needed
+   */
+  public static int stringSize(int x) {
+    if(x < 0) {
+      // Avoid overflow on extreme negative
+      return (x == Integer.MIN_VALUE) ? 11 : stringSize(-x) + 1;
+    }
+    // This is almost a binary search - 10 cases is not a power of two, and we
+    // assume that the smaller values are more frequent.
+    return //
+    (x < 10000) ? // 1-4 vs. 5-10
+    /**/(x < 100) ? // 1-2 vs. 3-4
+    /*   */((x < 10) ? 1 : 2) : //
+    /*   */((x < 1000) ? 3 : 4) : //
+    /**/(x < 1000000) ? // 5-6 vs. 7-10
+    /*  */((x < 100000) ? 5 : 6) : // 5-6
+    /*  */(x < 100000000) ? // 7-8 vs. 9-10
+    /*    */((x < 10000000) ? 7 : 8) : // 7-8
+    /*    */((x < 1000000000) ? 9 : 10) // 9-10
+    ;
+  }
+
+  /**
+   * Compute the number of characters needed to represent the integer x.
+   * 
+   * Reimplementation of {@link Long#stringSize}, but public and without loop.
+   * 
+   * @param x Integer value
+   * @return Number of digits needed
+   */
+  public static int stringSize(long x) {
+    if(x < 0) {
+      // Avoid overflow on extreme negative
+      return (x == Long.MIN_VALUE) ? 20 : stringSize(-x) + 1;
+    }
+    // This is almost a binary search.
+    return (x <= Integer.MAX_VALUE) ? stringSize((int) x) : //
+    (x < 10000000000000L) ? // 10-13 vs. 14-19
+    /**/(x < 100000000000L) ? // 10-11 vs. 12-13
+    /*   */((x < 10000000000L) ? 10 : 11) : //
+    /*   */((x < 1000000000000L) ? 12 : 13) : //
+    /**/(x < 1000000000000000L) ? // 14-15 vs. 16-19
+    /*  */((x < 100000000000000L) ? 14 : 15) : // 14-15
+    /*  */(x < 100000000000000000L) ? // 16-17 vs. 18-19
+    /*    */((x < 10000000000000000L) ? 16 : 17) : // 16-17
+    /*    */((x < 1000000000000000000L) ? 18 : 19) // 18-19
+    ;
   }
 }

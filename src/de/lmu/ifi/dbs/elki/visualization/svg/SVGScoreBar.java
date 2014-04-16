@@ -125,7 +125,7 @@ public class SVGScoreBar {
 
     // Draw the values:
     if(format != null) {
-      String num = Double.isNaN(fill) ? "NaN" : FormatUtil.format(fill, format);
+      String num = Double.isNaN(fill) ? "NaN" : format.format(fill);
       Element lbl = svgp.svgText(x + 0.05 * width, y + 0.75 * height, num);
       lbl.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + 0.75 * height + "; font-weight: bold");
       barchart.appendChild(lbl);

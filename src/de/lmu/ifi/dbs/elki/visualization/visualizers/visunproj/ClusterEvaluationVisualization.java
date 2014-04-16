@@ -176,7 +176,7 @@ public class ClusterEvaluationVisualization extends AbstractVisFactory {
     ypos = addHeader(svgp, parent, ypos, "Gini measures");
 
     final MeanVariance gini = cont.averageSymmetricGini();
-    ypos = addBarChart(svgp, parent, ypos, "Mean +-" + FormatUtil.format(gini.getCount() > 1. ? gini.getSampleStddev() : 0., FormatUtil.NF4), 1, gini.getMean());
+    ypos = addBarChart(svgp, parent, ypos, "Mean +-" + FormatUtil.NF4.format(gini.getCount() > 1. ? gini.getSampleStddev() : 0.), 1, gini.getMean());
 
     // scale vis
     double cols = 10; // Math.max(10, (int) (i * task.getHeight() /

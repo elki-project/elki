@@ -136,7 +136,7 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
    */
   @Override
   public String toString() {
-    return "[Min(" + FormatUtil.format(min, ",", FormatUtil.NF) + "), Max(" + FormatUtil.format(max, ",", FormatUtil.NF) + ")]";
+    return "[Min(" + FormatUtil.format(min, ",") + "), Max(" + FormatUtil.format(max, ",") + ")]";
   }
 
   /**

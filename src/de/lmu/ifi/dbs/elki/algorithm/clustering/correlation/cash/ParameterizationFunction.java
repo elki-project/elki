@@ -403,7 +403,7 @@ public class ParameterizationFunction {
       if(d != 0) {
         result.append(" + \n").append(FormatUtil.whitespace(offset));
       }
-      result.append(FormatUtil.format(vec.doubleValue(d)));
+      result.append(vec.doubleValue(d));
       for(int j = 0; j < d; j++) {
         result.append(" * sin(a_").append(j + 1).append(')');
       }

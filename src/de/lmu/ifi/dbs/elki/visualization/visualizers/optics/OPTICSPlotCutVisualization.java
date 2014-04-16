@@ -160,7 +160,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
       }
 
       // TODO make the number of digits configurable
-      final String label = (epsilon > 0.0) ? FormatUtil.format(epsilon, FormatUtil.NF4) : "";
+      final String label = (epsilon > 0.0) ? FormatUtil.NF4.format(epsilon) : "";
       // compute absolute y-value of bar
       final double yAct = plotheight - getYFromEpsilon(epsilon);
 

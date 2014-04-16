@@ -101,6 +101,6 @@ public class EigenPair implements Comparable<EigenPair> {
    */
   @Override
   public String toString() {
-    return "(ew = " + FormatUtil.format(eigenvalue) + ", ev = [" + FormatUtil.format(eigenvector) + "])";
+    return "(ew = " + eigenvalue + ", ev = [" + FormatUtil.format(eigenvector) + "])";
   }
 }

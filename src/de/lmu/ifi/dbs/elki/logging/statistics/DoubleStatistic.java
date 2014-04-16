@@ -67,6 +67,6 @@ public class DoubleStatistic extends AbstractStatistic {
 
   @Override
   public String formatValue() {
-    return FormatUtil.NF.format(value);
+    return Double.toString(value);
   }
 }
