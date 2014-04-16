@@ -86,7 +86,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Cluster Hull Visualization";
+  private static final String NAME = "Cluster Hull (Scatterplot)";
 
   /**
    * Settings
@@ -114,13 +114,13 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     // We attach ourselves to the style library, not the clustering, so there is
     // only one hull.
     Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
-    for (StyleResult c : styleres) {
+    for (StyleResult s : styleres) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for (ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
+        final VisualizationTask task = new VisualizationTask(NAME, s, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.initDefaultVisibility(false);
-        baseResult.getHierarchy().add(c, task);
+        baseResult.getHierarchy().add(s, task);
         baseResult.getHierarchy().add(p, task);
       }
     }

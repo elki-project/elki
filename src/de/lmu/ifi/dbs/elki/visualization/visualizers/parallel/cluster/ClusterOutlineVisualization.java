@@ -45,7 +45,10 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
+import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -66,7 +69,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Parallel Cluster Outline";
+  private static final String NAME = "Cluster Hull (Parallel Coordinates)";
 
   /**
    * Currently unused option to enable/disable rounding
@@ -93,18 +96,17 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-    for(Clustering<?> c : clusterings) {
-      if(c.getAllClusters().size() > 0) {
-        Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-        for(ParallelPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-          task.level = VisualizationTask.LEVEL_DATA - 1;
-          task.initDefaultVisibility(false);
-          baseResult.getHierarchy().add(c, task);
-          baseResult.getHierarchy().add(p, task);
-        }
+    // We attach ourselves to the style library, not the clustering, so there is
+    // only one hull.
+    Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
+    for(StyleResult s : styleres) {
+      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
+      for(ParallelPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, s, p.getRelation(), this);
+        task.level = VisualizationTask.LEVEL_DATA - 1;
+        task.initDefaultVisibility(false);
+        baseResult.getHierarchy().add(s, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
   }
@@ -131,7 +133,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
     /**
      * The result we visualize
      */
-    private Clustering<Model> clustering;
+    private StyleResult style;
 
     /**
      * Flag for using rounded shapes
@@ -145,7 +147,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
      */
     public Instance(VisualizationTask task, boolean rounded) {
       super(task);
-      this.clustering = task.getResult();
+      this.style = task.getResult();
       this.rounded = rounded;
       context.addDataStoreListener(this);
       context.addResultListener(this);
@@ -161,7 +163,14 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
-      addCSSClasses(svgp);
+      final StylingPolicy spol = style.getStylingPolicy();
+      if(!(spol instanceof ClusterStylingPolicy)) {
+        return;
+      }
+      final ClusterStylingPolicy cpol = (ClusterStylingPolicy) spol;
+      @SuppressWarnings("unchecked")
+      Clustering<Model> clustering = (Clustering<Model>) cpol.getClustering();
+
       int dim = proj.getVisibleDimensions();
 
       DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
@@ -171,7 +180,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
         Cluster<?> clus = ci.next();
         final DBIDs ids = clus.getIDs();
-        if (ids.size() < 1) {
+        if(ids.size() < 1) {
           continue;
         }
         for(int i = 0; i < dim; i++) {
@@ -225,6 +234,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
         }
 
         Element intervals = path.makeElement(svgp);
+        addCSSClasses(svgp, cpol.getStyleForCluster(clus));
         SVGUtil.addCSSClass(intervals, CLUSTERAREA + cnum);
         layer.appendChild(intervals);
       }
@@ -234,33 +244,22 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
      * Adds the required CSS-Classes
      * 
      * @param svgp SVG-Plot
+     * @param clusterID Cluster ID to style
      */
-    private void addCSSClasses(SVGPlot svgp) {
-      if(!svgp.getCSSClassManager().contains(CLUSTERAREA)) {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
-        ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
-        int clusterID = 0;
+    private void addCSSClasses(SVGPlot svgp, int clusterID) {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
-        for(@SuppressWarnings("unused")
-        Cluster<?> cluster : clustering.getAllClusters()) {
-          CSSClass cls = new CSSClass(this, CLUSTERAREA + clusterID);
-          // cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY,
-          // context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / 2.0);
-          cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.5);
-          final String color;
-          if(clustering.getAllClusters().size() == 1) {
-            color = SVGConstants.CSS_BLACK_VALUE;
-          }
-          else {
-            color = colors.getColor(clusterID);
-          }
-          // cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
-          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+      CSSClass cls = new CSSClass(this, CLUSTERAREA + clusterID);
+      final String color = colors.getColor(clusterID);
 
-          svgp.addCSSClassOrLogError(cls);
-          clusterID++;
-        }
-      }
+      // cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY,
+      // context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / 2.0);
+      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.5);
+      // cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+
+      svgp.addCSSClassOrLogError(cls);
     }
   }
 }
