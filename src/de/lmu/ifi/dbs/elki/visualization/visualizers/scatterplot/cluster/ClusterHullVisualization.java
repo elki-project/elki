@@ -114,9 +114,9 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     // We attach ourselves to the style library, not the clustering, so there is
     // only one hull.
     Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
-    for (StyleResult s : styleres) {
+    for(StyleResult s : styleres) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for (ScatterPlotProjector<?> p : ps) {
+      for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, s, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.initDefaultVisibility(false);
@@ -162,7 +162,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     @Override
     protected void redraw() {
       final StylingPolicy spol = style.getStylingPolicy();
-      if (!(spol instanceof ClusterStylingPolicy)) {
+      if(!(spol instanceof ClusterStylingPolicy)) {
         return;
       }
       final ClusterStylingPolicy cpol = (ClusterStylingPolicy) spol;
@@ -181,20 +181,19 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       double baseopacity = flat ? 0.5 : 0.5;
 
       // Convex hull mode:
-      if (settings.alpha >= Double.POSITIVE_INFINITY) {
+      if(settings.alpha >= Double.POSITIVE_INFINITY) {
         // Build the convex hulls (reusing the hulls of nested clusters!)
         Map<Object, DoubleObjPair<Polygon>> hullmap = new HashMap<>(clusters.size());
-        for (Cluster<Model> clu : topc) {
+        for(Cluster<Model> clu : topc) {
           buildHullsRecursively(clu, hier, hullmap);
         }
 
         // This way, we draw each cluster only once.
         // Unfortunately, not depth ordered (TODO!)
-        for (Cluster<Model> clu : clusters) {
+        for(Cluster<Model> clu : clusters) {
           DoubleObjPair<Polygon> pair = hullmap.get(clu), mpair = hullmap.get(clu.getModel());
-          ;
           // Plot the convex hull:
-          if (pair != null && pair.second != null && pair.second.size() > 1) {
+          if(pair != null && pair.second != null && pair.second.size() > 1) {
             SVGPath path = new SVGPath(pair.second);
             // Approximate area (using bounding box)
             double hullarea = SpatialUtil.volume(pair.second);
@@ -209,7 +208,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
             layer.appendChild(hulls);
           }
           // For core density models, over-plot the core:
-          if (mpair != null && mpair.second != null && mpair.second.size() > 1) {
+          if(mpair != null && mpair.second != null && mpair.second.size() > 1) {
             SVGPath path = new SVGPath(mpair.second);
             // Approximate area (using bounding box)
             double hullarea = SpatialUtil.volume(mpair.second);
@@ -223,25 +222,27 @@ public class ClusterHullVisualization extends AbstractVisFactory {
             layer.appendChild(hulls);
           }
         }
-      } else {
+      }
+      else {
         // Alpha shape mode.
         // For alpha shapes we can't use the shortcut of convex hulls,
         // but have to revisit all child clusters.
-        for (Cluster<Model> clu : clusters) {
+        for(Cluster<Model> clu : clusters) {
           ArrayList<Vector> ps = new ArrayList<>();
           double weight = addRecursively(ps, hier, clu);
           List<Polygon> polys;
-          if (ps.size() < 1) {
+          if(ps.size() < 1) {
             continue;
           }
-          if (ps.size() > 2) {
+          if(ps.size() > 2) {
             polys = (new AlphaShape(ps, settings.alpha * Projection.SCALE)).compute();
-          } else {
+          }
+          else {
             // Trivial polygon. Might still degenerate to a single point though.
             polys = new ArrayList<>(1);
             polys.add(new Polygon(ps));
           }
-          for (Polygon p : polys) {
+          for(Polygon p : polys) {
             SVGPath path = new SVGPath(p);
             Element hulls = path.makeElement(svgp);
             addCSSClasses(svgp, cpol.getStyleForCluster(clu), baseopacity * weight / rel.size());
@@ -264,43 +265,43 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       final DBIDs ids = clu.getIDs();
       boolean coremodel = false;
       DBIDs cids = null;
-      if (model instanceof CoreObjectsModel) {
+      if(model instanceof CoreObjectsModel) {
         cids = ((CoreObjectsModel) model).getCoreObjects();
         coremodel = cids.size() > 0;
       }
 
       GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
       GrahamScanConvexHull2D hull2 = coremodel ? new GrahamScanConvexHull2D() : null;
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         final double[] projv = proj.fastProjectDataToRenderSpace(rel.get(iter));
         if(projv[0] != projv[0] || projv[1] != projv[1]) {
           continue; // NaN!
         }
         Vector projP = new Vector(projv);
         hull.add(projP);
-        if (coremodel && cids.contains(iter)) {
+        if(coremodel && cids.contains(iter)) {
           hull2.add(projP);
         }
       }
       double weight = ids.size(), cweight = coremodel ? cids.size() : 0.0;
-      if (hier != null && hulls != null) {
+      if(hier != null && hulls != null) {
         final int numc = hier.numChildren(clu);
-        if (numc > 0) {
-          for (Iter<Cluster<Model>> iter = hier.iterChildren(clu); iter.valid(); iter.advance()) {
+        if(numc > 0) {
+          for(Iter<Cluster<Model>> iter = hier.iterChildren(clu); iter.valid(); iter.advance()) {
             final Cluster<Model> iclu = iter.get();
             DoubleObjPair<Polygon> poly = hulls.get(iclu);
-            if (poly == null) {
+            if(poly == null) {
               poly = buildHullsRecursively(iclu, hier, hulls);
             }
             // Add inner convex hull to outer convex hull.
-            for (ArrayListIter<Vector> vi = poly.second.iter(); vi.valid(); vi.advance()) {
+            for(ArrayListIter<Vector> vi = poly.second.iter(); vi.valid(); vi.advance()) {
               hull.add(vi.get());
             }
             // For a core model, include the inner core, too.
-            if (coremodel) {
+            if(coremodel) {
               DoubleObjPair<Polygon> ipoly = hulls.get(iclu.getModel());
-              if (ipoly != null) {
-                for (ArrayListIter<Vector> vi = ipoly.second.iter(); vi.valid(); vi.advance()) {
+              if(ipoly != null) {
+                for(ArrayListIter<Vector> vi = ipoly.second.iter(); vi.valid(); vi.advance()) {
                   hull2.add(vi.get());
                 }
                 cweight += ipoly.first / numc;
@@ -312,7 +313,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       }
       DoubleObjPair<Polygon> pair = new DoubleObjPair<>(weight, hull.getHull());
       hulls.put(clu, pair);
-      if (coremodel) {
+      if(coremodel) {
         hulls.put(model, new DoubleObjPair<>(cweight, hull2.getHull()));
       }
       return pair;
@@ -329,14 +330,14 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     private double addRecursively(ArrayList<Vector> hull, Hierarchy<Cluster<Model>> hier, Cluster<Model> clus) {
       final DBIDs ids = clus.getIDs();
       double weight = ids.size();
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
         if(projP[0] != projP[0] || projP[1] != projP[1]) {
           continue; // NaN!
         }
         hull.add(new Vector(projP));
       }
-      for (Iter<Cluster<Model>> iter = hier.iterChildren(clus); iter.valid(); iter.advance()) {
+      for(Iter<Cluster<Model>> iter = hier.iterChildren(clus); iter.valid(); iter.advance()) {
         weight += .5 * addRecursively(hull, hier, iter.get());
       }
       return weight;
@@ -352,7 +353,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       CSSClass cls = new CSSClass(this, CLUSTERHULL + clusterID);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, .5 * style.getLineWidth(StyleLibrary.PLOT));
 
       final String color = colors.getColor(clusterID);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
@@ -389,7 +390,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY);
-      if (config.grab(alphaP)) {
+      if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
     }

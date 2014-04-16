@@ -40,7 +40,11 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -55,6 +59,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterHullVisualization;
 
 /**
  * Generates a SVG-Element that visualizes the area covered by a cluster.
@@ -72,26 +77,23 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   private static final String NAME = "Cluster Hull (Parallel Coordinates)";
 
   /**
-   * Currently unused option to enable/disable rounding
+   * Settings
    */
-  public static final OptionID ROUNDED_ID = new OptionID("parallel.clusteroutline.rounded", "Draw lines rounded");
+  Parameterizer settings;
 
   /**
-   * Currently, always enabled.
+   * Constructor.
+   * 
+   * @param settings Settings
    */
-  private boolean rounded = true;
-
-  /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   */
-  public ClusterOutlineVisualization() {
+  public ClusterOutlineVisualization(Parameterizer settings) {
     super();
+    this.settings = settings;
   }
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task, rounded);
+    return new Instance(task);
   }
 
   @Override
@@ -136,19 +138,13 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
     private StyleResult style;
 
     /**
-     * Flag for using rounded shapes
-     */
-    boolean rounded = true;
-
-    /**
      * Constructor.
      * 
      * @param task VisualizationTask
      */
-    public Instance(VisualizationTask task, boolean rounded) {
+    public Instance(VisualizationTask task) {
       super(task);
       this.style = task.getResult();
-      this.rounded = rounded;
       context.addDataStoreListener(this);
       context.addResultListener(this);
       incrementalRedraw();
@@ -175,6 +171,9 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
       DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
       DoubleMinMax[] midmm = DoubleMinMax.newArray(dim - 1);
+
+      // Heuristic value for transparency:
+      double baseopacity = .5;
 
       Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
@@ -203,7 +202,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
         }
 
         SVGPath path = new SVGPath();
-        if(!rounded) {
+        if(!settings.bend) {
           // Straight lines
           for(int i = 0; i < dim; i++) {
             path.drawTo(getVisibleAxisX(i), mms[i].getMax());
@@ -217,7 +216,6 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
             }
             path.drawTo(getVisibleAxisX(i), mms[i].getMin());
           }
-          path.close();
         }
         else {
           // Maxima
@@ -230,11 +228,19 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
           for(int i = dim - 1; i > 0; i--) {
             path.quadTo(getVisibleAxisX(i - .5), midmm[i - 1].getMin(), getVisibleAxisX(i - 1), mms[i - 1].getMin());
           }
-          path.close();
         }
+        path.close();
+
+        // TODO: improve the visualization by adjusting the opacity by the
+        // cluster extends on each axis (maybe use a horizontal gradient?)
+        double weight = 0.;
+        for(int i = 0; i < dim; i++) {
+          weight += mms[i].getDiff();
+        }
+        weight = (weight > 0.) ? (dim * StyleLibrary.SCALE) / weight : 1.;
 
         Element intervals = path.makeElement(svgp);
-        addCSSClasses(svgp, cpol.getStyleForCluster(clus));
+        addCSSClasses(svgp, cpol.getStyleForCluster(clus), baseopacity * weight * ids.size() / relation.size());
         SVGUtil.addCSSClass(intervals, CLUSTERAREA + cnum);
         layer.appendChild(intervals);
       }
@@ -245,8 +251,9 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
      * 
      * @param svgp SVG-Plot
      * @param clusterID Cluster ID to style
+     * @param opac Opacity
      */
-    private void addCSSClasses(SVGPlot svgp, int clusterID) {
+    private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
       final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
@@ -255,11 +262,54 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
       // cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY,
       // context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / 2.0);
-      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.5);
       // cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+      cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, opac);
 
       svgp.addCSSClassOrLogError(cls);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Option string to draw straight lines for hull.
+     */
+    public static final OptionID STRAIGHT_ID = new OptionID("parallel.clusteroutline.straight", "Draw straight lines");
+
+    /**
+     * Alpha value
+     */
+    double alpha = Double.POSITIVE_INFINITY;
+
+    /**
+     * Use bend curves
+     */
+    private boolean bend = true;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter alphaP = new DoubleParameter(ClusterHullVisualization.Parameterizer.ALPHA_ID, Double.POSITIVE_INFINITY);
+      if(config.grab(alphaP)) {
+        alpha = alphaP.doubleValue();
+      }
+
+      Flag bendP = new Flag(STRAIGHT_ID);
+      if(config.grab(bendP)) {
+        bend = bendP.isFalse();
+      }
+    }
+
+    @Override
+    protected ClusterOutlineVisualization makeInstance() {
+      return new ClusterOutlineVisualization(this);
     }
   }
 }
