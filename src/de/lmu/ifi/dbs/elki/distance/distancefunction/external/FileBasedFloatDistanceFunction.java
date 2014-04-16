@@ -124,7 +124,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
 
   private void loadCache(DistanceParser parser, File matrixfile) throws IOException {
     InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
-    cache = new TObjectFloatHashMap<DBIDPair>();
+    cache = new TObjectFloatHashMap<>();
     parser.parse(in, new DistanceCacheWriter() {
       @Override
       public void put(DBIDRef id1, DBIDRef id2, double distance) {

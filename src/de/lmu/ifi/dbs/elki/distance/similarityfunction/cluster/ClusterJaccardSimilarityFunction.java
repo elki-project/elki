@@ -81,7 +81,7 @@ public class ClusterJaccardSimilarityFunction extends AbstractPrimitiveSimilarit
 
   @Override
   public <T extends Cluster<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation) {
-    return new PrimitiveDistanceSimilarityQuery<T>(relation, this, this);
+    return new PrimitiveDistanceSimilarityQuery<>(relation, this, this);
   }
 
   @Override

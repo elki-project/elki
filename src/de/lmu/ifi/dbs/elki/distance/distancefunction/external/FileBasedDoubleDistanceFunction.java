@@ -124,7 +124,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
 
   private void loadCache(DistanceParser parser, File matrixfile) throws IOException {
     InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
-    cache = new TObjectDoubleHashMap<DBIDPair>();
+    cache = new TObjectDoubleHashMap<>();
     parser.parse(in, new DistanceCacheWriter() {
       @Override
       public void put(DBIDRef id1, DBIDRef id2, double distance) {

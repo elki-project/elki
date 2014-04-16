@@ -72,7 +72,7 @@ public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimi
 
   @Override
   public <T extends Clustering<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation) {
-    return new PrimitiveDistanceSimilarityQuery<T>(relation, this, this);
+    return new PrimitiveDistanceSimilarityQuery<>(relation, this, this);
   }
 
   @Override

@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.logging.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-
 /**
  * Trivial double-valued statistic.
  * 
