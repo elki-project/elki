@@ -13,13 +13,14 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.GaussianUniformMixture
 de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut
 de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.ALOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.FlexibleLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.KDEOS
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOCI
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.OnlineLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF

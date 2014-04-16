@@ -1,4 +1,4 @@
-package experimentalcode.erich.diss;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 /*
  This file is part of ELKI:
