@@ -176,7 +176,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     JMenuBar menubar = new JMenuBar();
     JMenu filemenu = new JMenu("File");
     filemenu.setMnemonic(KeyEvent.VK_F);
-    
+
     // setup buttons
     if(!single) {
       overviewItem = new JMenuItem("Overview");
@@ -201,7 +201,7 @@ public class ResultWindow extends JFrame implements ResultListener {
       }
     });
     filemenu.add(exportItem);
-    
+
     editItem = new JMenuItem("Table View/Edit");
     editItem.setMnemonic(KeyEvent.VK_T);
     editItem.addActionListener(new ActionListener() {
@@ -257,27 +257,18 @@ public class ResultWindow extends JFrame implements ResultListener {
     this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
     // resize listener
-    LazyCanvasResizer listener = new LazyCanvasResizer(this) {
+    LazyCanvasResizer listener = new LazyCanvasResizer(this, 0.1) {
       @Override
       public void executeResize(double newratio) {
-        setRatio(newratio);
+        ResultWindow.this.overview.setRatio(newratio);
       }
     };
-    setRatio(listener.getActiveRatio());
+    this.overview.setRatio(listener.getActiveRatio());
     this.addComponentListener(listener);
 
     context.addResultListener(this);
 
     update();
-  }
-
-  /**
-   * Change the plot ratio. Will only be applied to new plots for now.
-   * 
-   * @param newratio New ratio
-   */
-  protected void setRatio(double newratio) {
-    ResultWindow.this.overview.setRatio(newratio);
   }
 
   @Override
@@ -333,7 +324,7 @@ public class ResultWindow extends JFrame implements ResultListener {
       ((DetailView) svgCanvas.getPlot()).destroy();
     }
     svgCanvas.setPlot(plot);
-    if (overviewItem != null) {
+    if(overviewItem != null) {
       overviewItem.setEnabled(plot != overview);
     }
     exportItem.setEnabled(plot != null);

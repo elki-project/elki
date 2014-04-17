@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
 import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.swing.JSVGCanvas;
 import org.w3c.dom.Document;
-import org.w3c.dom.svg.SVGDocument;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -79,19 +78,6 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   }
 
   /**
-   * Use {@link #setPlot} instead if you need synchronization!
-   * 
-   * @deprecated Document cannot be synchronized - use {@link #setPlot} and a
-   *             {@link SVGPlot} object!
-   */
-  @Override
-  @Deprecated
-  public synchronized void setSVGDocument(SVGDocument doc) {
-    setPlot(null);
-    super.setSVGDocument(doc);
-  }
-
-  /**
    * Choose a new plot to display.
    * 
    * @param newplot New plot to display. May be {@code null}!
@@ -124,7 +110,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
     if(um != null) {
       synchronized(um) {
         if(um.isRunning()) {
-          //LoggingUtil.warning("Scheduling detach: " + this + " " + oldplot);
+          // LoggingUtil.warning("Scheduling detach: " + this + " " + oldplot);
           um.getUpdateRunnableQueue().preemptLater(new Runnable() {
             @Override
             public void run() {
@@ -153,7 +139,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    * @param oldplot Plot to detach from.
    */
   protected void detachPlot(SVGPlot oldplot) {
-    //LoggingUtil.warning("Detaching: " + this + " " + oldplot);
+    // LoggingUtil.warning("Detaching: " + this + " " + oldplot);
     if(oldplot != plot) {
       oldplot.unsynchronizeWith(JSVGSynchronizedCanvas.this.synchronizer);
     }
