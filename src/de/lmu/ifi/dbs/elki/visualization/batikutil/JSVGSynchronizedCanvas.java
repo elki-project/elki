@@ -65,6 +65,15 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   }
 
   /**
+   * Get the currently displayed SVG plot.
+   * 
+   * @return current SVG plot. May be {@code null}!
+   */
+  public SVGPlot getPlot() {
+    return this.plot;
+  }
+
+  /**
    * Use {@link #setPlot} instead if you need synchronization!
    * 
    * @deprecated Document cannot be synchronized - use {@link #setPlot} and a
@@ -84,18 +93,19 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    */
   public void setPlot(final SVGPlot newplot) {
     final SVGPlot oldplot = this.plot;
-
     this.plot = newplot;
-    if(newplot != null) {
-      newplot.synchronizeWith(this.synchronizer);
-      super.setSVGDocument(newplot.getDocument());
-      super.setDisableInteractions(newplot.getDisableInteractions());
-    }
-    else {
+    if(newplot == null) {
       super.setSVGDocument(null);
+      if(oldplot != null) {
+        scheduleDetach(oldplot);
+      }
+      return;
     }
+    newplot.synchronizeWith(this.synchronizer);
+    super.setSVGDocument(newplot.getDocument());
+    super.setDisableInteractions(newplot.getDisableInteractions());
     // We only know we're detached when the synchronizer has run again.
-    if(oldplot != null) {
+    if(oldplot != null && oldplot != newplot) {
       scheduleDetach(oldplot);
     }
   }
@@ -107,30 +117,22 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    */
   private void scheduleDetach(final SVGPlot oldplot) {
     UpdateManager um = this.getUpdateManager();
-    if(um != null) {
-      synchronized(um) {
-        if(um.isRunning()) {
-          // LoggingUtil.warning("Scheduling detach: " + this + " " + oldplot);
-          um.getUpdateRunnableQueue().preemptLater(new Runnable() {
-            @Override
-            public void run() {
-              detachPlot(oldplot);
-            }
-          });
-          return;
-        }
+    if(um == null) {
+      return;
+    }
+    synchronized(um) {
+      if(um.isRunning()) {
+        // LoggingUtil.warning("Scheduling detach: " + this + " " + oldplot);
+        um.getUpdateRunnableQueue().preemptLater(new Runnable() {
+          @Override
+          public void run() {
+            detachPlot(oldplot);
+          }
+        });
+        return;
       }
     }
     detachPlot(oldplot);
-  }
-
-  /**
-   * Get the currently displayed SVG plot.
-   * 
-   * @return current SVG plot. May be {@code null}!
-   */
-  public SVGPlot getPlot() {
-    return this.plot;
   }
 
   /**
@@ -140,11 +142,10 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    */
   protected void detachPlot(SVGPlot oldplot) {
     // LoggingUtil.warning("Detaching: " + this + " " + oldplot);
-    if(oldplot != plot) {
-      oldplot.unsynchronizeWith(JSVGSynchronizedCanvas.this.synchronizer);
+    if(oldplot == plot) {
+      LoggingUtil.warning("Detaching from a plot I'm already attached to again?!?", new Throwable());
+      return;
     }
-    else {
-      LoggingUtil.warning("Detaching from a plot I'm already attached to again?!?");
-    }
+    oldplot.unsynchronizeWith(JSVGSynchronizedCanvas.this.synchronizer);
   }
 }

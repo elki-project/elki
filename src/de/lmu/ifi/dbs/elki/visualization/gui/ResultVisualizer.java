@@ -131,7 +131,6 @@ public class ResultVisualizer implements ResultHandler {
           ResultWindow window = new ResultWindow(title, top, context, single);
           window.setVisible(true);
           window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-          window.showOverview();
         } catch (Throwable e) {
           LOG.exception("Error in starting visualizer window.", e);
         }

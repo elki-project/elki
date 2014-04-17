@@ -125,9 +125,10 @@ public class UpdateRunner {
    * @param newsync Update synchronizer
    */
   public synchronized void synchronizeWith(UpdateSynchronizer newsync) {
-    // LoggingUtil.warning("Synchronizing: " + sync + " " + newsync);
+    // LoggingUtil.warning("Synchronizing: " + sync + " " + newsync, new
+    // Throwable());
     if(synchronizer == newsync) {
-      LoggingUtil.warning("Double-synced to the same plot!");
+      LoggingUtil.warning("Double-synced to the same plot!", new Throwable());
       return;
     }
     if(synchronizer != null) {
@@ -136,7 +137,6 @@ public class UpdateRunner {
     }
     synchronizer = newsync;
     newsync.addUpdateRunner(this);
-
   }
 
   /**
@@ -147,12 +147,11 @@ public class UpdateRunner {
   public synchronized void unsynchronizeWith(UpdateSynchronizer oldsync) {
     if(synchronizer == null) {
       LoggingUtil.warning("Warning: was not synchronized.");
+      return;
     }
-    else {
-      if(synchronizer != oldsync) {
-        LoggingUtil.warning("Warning: was synchronized differently!");
-        return;
-      }
+    if(synchronizer != oldsync) {
+      LoggingUtil.warning("Warning: was synchronized differently!");
+      return;
     }
     // LoggingUtil.warning("Unsynchronizing: " + sync + " " + oldsync);
     synchronizer = null;

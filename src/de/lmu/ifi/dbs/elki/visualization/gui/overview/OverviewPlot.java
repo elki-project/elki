@@ -71,18 +71,26 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @apiviz.has DetailViewSelectedEvent
  * @apiviz.uses DetailView
  */
-// FIXME: there still is a synchronization issue, that causes the initialization
-// to be run twice in parallel.
-public class OverviewPlot extends SVGPlot implements ResultListener {
+public class OverviewPlot implements ResultListener {
   /**
    * Our logging class
    */
   private static final Logging LOG = Logging.getLogger(OverviewPlot.class);
 
   /**
+   * Event when the overview plot was refreshed.
+   */
+  public static final String OVERVIEW_REFRESHED = "Overview refreshed";
+
+  /**
    * Visualizer context
    */
   private VisualizerContext context;
+
+  /**
+   * The SVG plot object.
+   */
+  private SVGPlot plot;
 
   /**
    * Map of coordinates to plots.
@@ -161,26 +169,6 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     this.context = context;
     this.single = single;
 
-    // Add a background element:
-    {
-      CSSClass cls = new CSSClass(this, "background");
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleResult().getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
-      addCSSClassOrLogError(cls);
-      Element background = this.svgElement(SVGConstants.SVG_RECT_TAG);
-      background.setAttribute(SVGConstants.SVG_X_ATTRIBUTE, "0");
-      background.setAttribute(SVGConstants.SVG_Y_ATTRIBUTE, "0");
-      background.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "100%");
-      background.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "100%");
-      SVGUtil.setCSSClass(background, cls.getName());
-      getRoot().appendChild(background);
-    }
-
-    if(single) {
-      setDisableInteractions(true);
-    }
-    SVGEffects.addShadowFilter(this);
-    SVGEffects.addLightGradient(this);
-
     // register context listener
     context.addResultListener(this);
   }
@@ -231,10 +219,20 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   }
 
   /**
+   * Initialize the plot.
+   * 
+   * @param ratio Initial ratio
+   */
+  public void initialize(double ratio) {
+    this.ratio = ratio;
+    reinitialize();
+  }
+
+  /**
    * Refresh the overview plot.
    */
   private void reinitialize() {
-    setupHoverer();
+    initializePlot();
     plotmap = arrangeVisualizations(ratio, 1.0);
     double s = plotmap.relativeFill();
     if(s < 0.9) {
@@ -255,10 +253,8 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     vistoelem = new LayerMap();
 
     // Redo main layers
-    SVGUtil.removeFromParent(plotlayer);
-    SVGUtil.removeFromParent(hoverlayer);
-    plotlayer = this.svgElement(SVGConstants.SVG_G_TAG);
-    hoverlayer = this.svgElement(SVGConstants.SVG_G_TAG);
+    plotlayer = plot.svgElement(SVGConstants.SVG_G_TAG);
+    hoverlayer = plot.svgElement(SVGConstants.SVG_G_TAG);
 
     // Redo the layout
     for(Entry<PlotItem, double[]> e : plotmap.entrySet()) {
@@ -269,7 +265,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
 
         boolean hasDetails = false;
         // Container element for main plot item
-        Element g = this.svgElement(SVGConstants.SVG_G_TAG);
+        Element g = plot.svgElement(SVGConstants.SVG_G_TAG);
         SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + (basex + it.x) + " " + (basey + it.y) + ")");
         plotlayer.appendChild(g);
         vistoelem.put(it, null, g, null);
@@ -282,7 +278,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
           Pair<Element, Visualization> pair = oldlayers.remove(it, task);
           if(pair == null) {
             pair = new Pair<>(null, null);
-            pair.first = svgElement(SVGConstants.SVG_G_TAG);
+            pair.first = plot.svgElement(SVGConstants.SVG_G_TAG);
           }
           if(pair.second == null) {
             pair.second = embedOrThumbnail(thumbsize, it, task, pair.first);
@@ -292,7 +288,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         }
         // When needed, add a hover effect
         if(hasDetails && !single) {
-          Element hover = this.svgRect(basex + it.x, basey + it.y, it.w, it.h);
+          Element hover = plot.svgRect(basex + it.x, basey + it.y, it.w, it.h);
           SVGUtil.addCSSClass(hover, selcss.getName());
           // link hoverer.
           EventTarget targ = (EventTarget) hover;
@@ -310,9 +306,61 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         pair.second.destroy();
       }
     }
-    getRoot().appendChild(plotlayer);
-    getRoot().appendChild(hoverlayer);
-    updateStyleElement();
+    plot.getRoot().appendChild(plotlayer);
+    plot.getRoot().appendChild(hoverlayer);
+    plot.updateStyleElement();
+
+    // Notify listeners.
+    for(ActionListener actionListener : actionListeners) {
+      actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, OVERVIEW_REFRESHED));
+    }
+  }
+
+  /**
+   * Initialize the SVG plot.
+   */
+  private void initializePlot() {
+    if(plot != null) {
+      plot.dispose();
+    }
+    plot = new SVGPlot();
+    { // Add a background element:
+      CSSClass cls = new CSSClass(this, "background");
+      final String bgcol = context.getStyleResult().getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE);
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, bgcol);
+      plot.addCSSClassOrLogError(cls);
+      Element background = plot.svgElement(SVGConstants.SVG_RECT_TAG);
+      background.setAttribute(SVGConstants.SVG_X_ATTRIBUTE, "0");
+      background.setAttribute(SVGConstants.SVG_Y_ATTRIBUTE, "0");
+      background.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "100%");
+      background.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "100%");
+      SVGUtil.setCSSClass(background, cls.getName());
+      // Don't export a white background:
+      if("white".equals(bgcol)) {
+        background.setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);
+      }
+      plot.getRoot().appendChild(background);
+    }
+    { // setup the hover CSS classes.
+      selcss = new CSSClass(this, "s");
+      selcss.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
+      selcss.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+      selcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
+      selcss.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
+      CSSClass hovcss = new CSSClass(this, "h");
+      hovcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.25");
+      plot.addCSSClassOrLogError(selcss);
+      plot.addCSSClassOrLogError(hovcss);
+      // Hover listener.
+      hoverer = new CSSHoverClass(hovcss.getName(), null, true);
+    }
+
+    if(single) {
+      plot.setDisableInteractions(true);
+    }
+    SVGEffects.addShadowFilter(plot);
+    SVGEffects.addLightGradient(plot);
+    plot.updateStyleElement();
   }
 
   /**
@@ -325,21 +373,21 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    */
   private Visualization embedOrThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
     if(single) {
-      VisualizationTask thumbtask = task.clone(this, context, it.proj, it.w, it.h);
+      VisualizationTask thumbtask = task.clone(plot, context, it.proj, it.w, it.h);
       final Visualization vis = thumbtask.getFactory().makeVisualization(thumbtask);
       if(vis.getLayer() == null) {
         LoggingUtil.warning("Visualization returned empty layer: " + vis);
       }
       else {
         if(task.noexport) {
-          vis.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
+          vis.getLayer().setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);
         }
         parent.appendChild(vis.getLayer());
       }
       return vis;
     }
     else {
-      VisualizationTask thumbtask = task.clone(this, context, it.proj, it.w, it.h);
+      VisualizationTask thumbtask = task.clone(plot, context, it.proj, it.w, it.h);
       thumbtask.thumbnail = true;
       thumbtask.thumbsize = thumbsize;
       final Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
@@ -356,7 +404,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Do a refresh (when visibilities have changed).
    */
-  synchronized void refresh() {
+  void refresh() {
     pendingRefresh.set(null); // Clear
     if(reinitOnRefresh) {
       LOG.debug("Reinitialize in thread " + Thread.currentThread().getName());
@@ -364,47 +412,49 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
       reinitOnRefresh = false;
       return;
     }
-    LOG.debug("Incremental refresh");
-    boolean refreshcss = false;
-    final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
-    for(PlotItem pi : plotmap.keySet()) {
-      for(Iterator<PlotItem> iter = pi.itemIterator(); iter.hasNext();) {
-        PlotItem it = iter.next();
+    synchronized(plot) {
+      LOG.debug("Incremental refresh");
+      boolean refreshcss = false;
+      final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
+      for(PlotItem pi : plotmap.keySet()) {
+        for(Iterator<PlotItem> iter = pi.itemIterator(); iter.hasNext();) {
+          PlotItem it = iter.next();
 
-        for(Iterator<VisualizationTask> tit = it.tasks.iterator(); tit.hasNext();) {
-          VisualizationTask task = tit.next();
-          Pair<Element, Visualization> pair = vistoelem.get(it, task);
-          // New task?
-          if(pair == null) {
-            if(visibleInOverview(task)) {
-              pair = new Pair<>(null, null);
-              pair.first = svgElement(SVGConstants.SVG_G_TAG);
-              pair.second = embedOrThumbnail(thumbsize, it, task, pair.first);
-              vistoelem.get(it, null).first.appendChild(pair.first);
-              vistoelem.put(it, task, pair);
-              refreshcss = true;
-            }
-          }
-          else {
-            if(visibleInOverview(task)) {
-              // unhide if hidden.
-              if(pair.first.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
-                pair.first.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
+          for(Iterator<VisualizationTask> tit = it.tasks.iterator(); tit.hasNext();) {
+            VisualizationTask task = tit.next();
+            Pair<Element, Visualization> pair = vistoelem.get(it, task);
+            // New task?
+            if(pair == null) {
+              if(visibleInOverview(task)) {
+                pair = new Pair<>(null, null);
+                pair.first = plot.svgElement(SVGConstants.SVG_G_TAG);
+                pair.second = embedOrThumbnail(thumbsize, it, task, pair.first);
+                vistoelem.get(it, null).first.appendChild(pair.first);
+                vistoelem.put(it, task, pair);
+                refreshcss = true;
               }
             }
             else {
-              // hide if there is anything to hide.
-              if(pair.first != null && pair.first.hasChildNodes()) {
-                pair.first.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+              if(visibleInOverview(task)) {
+                // unhide if hidden.
+                if(pair.first.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
+                  pair.first.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
+                }
               }
+              else {
+                // hide if there is anything to hide.
+                if(pair.first != null && pair.first.hasChildNodes()) {
+                  pair.first.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+                }
+              }
+              // TODO: unqueue pending thumbnails
             }
-            // TODO: unqueue pending thumbnails
           }
         }
       }
-    }
-    if(refreshcss) {
-      updateStyleElement();
+      if(refreshcss) {
+        plot.updateStyleElement();
+      }
     }
   }
 
@@ -430,28 +480,9 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     // Recalculate bounding box.
     String vb = "0 0 " + plotmap.getWidth() + " " + plotmap.getHeight();
     // Reset root bounding box.
-    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
-    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 * plotmap.getHeight() / plotmap.getWidth()) + "cm");
-    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
-  }
-
-  /**
-   * Setup the CSS hover effect.
-   */
-  private void setupHoverer() {
-    // setup the hover CSS classes.
-    selcss = new CSSClass(this, "s");
-    selcss.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-    selcss.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-    selcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
-    selcss.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
-    CSSClass hovcss = new CSSClass(this, "h");
-    hovcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.25");
-    addCSSClassOrLogError(selcss);
-    addCSSClassOrLogError(hovcss);
-    // Hover listener.
-    hoverer = new CSSHoverClass(hovcss.getName(), null, true);
-    updateStyleElement();
+    SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
+    SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 * plotmap.getHeight() / plotmap.getWidth()) + "cm");
+    SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
   }
 
   /**
@@ -515,12 +546,20 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   }
 
   /**
-   * Cancel the overview, i.e. stop the thumbnailer
+   * Destroy this overview plot.
    */
-  @Override
-  public void dispose() {
+  public void destroy() {
     context.removeResultListener(this);
-    super.dispose();
+    plot.dispose();
+  }
+
+  /**
+   * Get the SVGPlot object.
+   * 
+   * @return SVG plot
+   */
+  public SVGPlot getPlot() {
+    return plot;
   }
 
   /**
@@ -534,14 +573,20 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * @param ratio the ratio to set
    */
   public void setRatio(double ratio) {
-    this.ratio = ratio;
-    reinitOnRefresh = true;
+    if(ratio != this.ratio) {
+      this.ratio = ratio;
+      reinitOnRefresh = true;
+      lazyRefresh();
+    }
   }
 
   /**
    * Trigger a redraw, but avoid excessive redraws.
    */
   public final void lazyRefresh() {
+    if(plot == null) {
+      LOG.warning("'lazyRefresh' called before initialized!");
+    }
     LOG.debug("Scheduling refresh.");
     Runnable pr = new Runnable() {
       @Override
@@ -552,7 +597,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
       }
     };
     OverviewPlot.this.pendingRefresh.set(pr);
-    scheduleUpdate(pr);
+    plot.scheduleUpdate(pr);
   }
 
   @Override

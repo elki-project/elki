@@ -244,6 +244,9 @@ public class ResultWindow extends JFrame implements ResultListener {
         if(e instanceof DetailViewSelectedEvent) {
           showSubplot((DetailViewSelectedEvent) e);
         }
+        if(OverviewPlot.OVERVIEW_REFRESHED.equals(e.getActionCommand())) {
+          svgCanvas.setPlot(overview.getPlot());
+        }
       }
     });
 
@@ -260,22 +263,24 @@ public class ResultWindow extends JFrame implements ResultListener {
     LazyCanvasResizer listener = new LazyCanvasResizer(this, 0.1) {
       @Override
       public void executeResize(double newratio) {
-        ResultWindow.this.overview.setRatio(newratio);
+        ResultWindow.this.handleResize(newratio);
       }
     };
-    this.overview.setRatio(listener.getActiveRatio());
+    this.overview.initialize(listener.getCurrentRatio());
+
     this.addComponentListener(listener);
 
     context.addResultListener(this);
 
-    update();
+    // update();
+    updateVisualizerMenus();
   }
 
   @Override
   public void dispose() {
     context.removeResultListener(this);
     svgCanvas.setPlot(null);
-    overview.dispose();
+    overview.destroy();
     if(currentSubplot != null) {
       currentSubplot.dispose();
       currentSubplot = null;
@@ -299,7 +304,7 @@ public class ResultWindow extends JFrame implements ResultListener {
       currentSubplot.destroy();
     }
     currentSubplot = null;
-    showPlot(overview);
+    showPlot(overview.getPlot());
   }
 
   /**
@@ -325,7 +330,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     }
     svgCanvas.setPlot(plot);
     if(overviewItem != null) {
-      overviewItem.setEnabled(plot != overview);
+      overviewItem.setEnabled(plot != overview.getPlot());
     }
     exportItem.setEnabled(plot != null);
   }
@@ -414,6 +419,17 @@ public class ResultWindow extends JFrame implements ResultListener {
     }
 
     return true;
+  }
+
+  /**
+   * Handle a resize event.
+   * 
+   * @param newratio New window size ratio.
+   */
+  protected void handleResize(double newratio) {
+    if(currentSubplot == null) {
+      ResultWindow.this.overview.setRatio(newratio);
+    }
   }
 
   public JMenuItem makeMenuItemForVisualizer(Result r) {

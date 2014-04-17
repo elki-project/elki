@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
  */
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.bridge.UpdateManagerAdapter;
@@ -51,7 +51,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   /**
    * The UpdateRunner we are put into
    */
-  private List<WeakReference<UpdateRunner>> updaterunner = new ArrayList<>();
+  private Set<WeakReference<UpdateRunner>> updaterunner = new CopyOnWriteArraySet<>();
 
   /**
    * Adapter to track component changes
@@ -87,7 +87,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    */
   protected void makeRunnerIfNeeded() {
     // Nothing to do if not connected to a plot
-    if(updaterunner.size() == 0) {
+    if(updaterunner.isEmpty()) {
       return;
     }
     // we don't need to make a SVG runner when there are no pending updates.
@@ -130,6 +130,11 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
 
   @Override
   public void addUpdateRunner(UpdateRunner updateRunner) {
+    for(WeakReference<UpdateRunner> wur : updaterunner) {
+      if(wur.get() == null) {
+        updaterunner.remove(wur);
+      }
+    }
     updaterunner.add(new WeakReference<>(updateRunner));
   }
 
@@ -173,9 +178,10 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
     // Wake up all runners
     for(WeakReference<UpdateRunner> wur : updaterunner) {
       UpdateRunner ur = wur.get();
-      if(ur != null && !ur.isEmpty()) {
-        ur.runQueue();
+      if(ur == null || ur.isEmpty()) {
+        continue;
       }
+      ur.runQueue();
     }
   }
 
