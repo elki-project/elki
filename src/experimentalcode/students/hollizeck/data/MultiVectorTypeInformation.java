@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  */
 public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends VectorTypeInformation<V> {
 
+  public static MultiVectorTypeInformation<FeatureVector<?>> MULTIVECTOR_TYPEINFORMATION = new MultiVectorTypeInformation<>(FeatureVector.class);
+  
   protected final int multiplicity;
 
   /**
@@ -52,5 +54,9 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
   */
  public MultiVectorTypeInformation(Class<? super V> cls, int mindim, int maxdim, int multiplicity) {
    this(cls, null, mindim, maxdim, multiplicity);
+ }
+ 
+ public int getMultiplicity(){
+   return multiplicity;
  }
 }
