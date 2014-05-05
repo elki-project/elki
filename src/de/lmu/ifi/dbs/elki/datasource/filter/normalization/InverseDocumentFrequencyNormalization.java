@@ -102,7 +102,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector>
       final int dim = featureVector.iterDim(it);
       vals.put(dim, featureVector.iterDoubleValue(it) * idf.get(dim));
     }
-    return ((SparseNumberVector.Factory<V> ) factory).newNumberVector(vals, featureVector.getDimensionality());
+    return ((SparseNumberVector.Factory<V>) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override
@@ -112,12 +112,12 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector>
       final int dim = featureVector.iterDim(it);
       vals.put(dim, featureVector.iterDoubleValue(it) / idf.get(dim));
     }
-    return ((SparseNumberVector.Factory<V> ) factory).newNumberVector(vals, featureVector.getDimensionality());
+    return ((SparseNumberVector.Factory<V>) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override
   protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
-    return TypeUtil.SPARSE_VECTOR_FIELD;
+    return TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH;
   }
 
   @Override
