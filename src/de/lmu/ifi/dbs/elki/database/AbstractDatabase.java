@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
+import de.lmu.ifi.dbs.elki.index.DistanceIndex;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -157,6 +158,21 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   public <O> DistanceQuery<O> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O> distanceFunction, Object... hints) {
     if(distanceFunction == null) {
       throw new AbortException("Distance query requested for 'null' distance!");
+    }
+    ListIterator<Index> iter = indexes.listIterator(indexes.size());
+    while(iter.hasPrevious()) {
+      Index idx = iter.previous();
+      if(idx instanceof DistanceIndex) {
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest("Considering index for kNN Query: " + idx);
+        }
+        @SuppressWarnings("unchecked")
+        final DistanceIndex<O> distanceIndex = (DistanceIndex<O>) idx;
+        DistanceQuery<O> q = distanceIndex.getDistanceQuery(distanceFunction, hints);
+        if(q != null) {
+          return q;
+        }
+      }
     }
     return distanceFunction.instantiate(objQuery);
   }
