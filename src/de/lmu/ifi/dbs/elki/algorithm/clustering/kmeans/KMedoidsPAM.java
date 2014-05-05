@@ -154,7 +154,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
           if(DBIDUtil.equal(miter, iter)) {
             continue;
           }
-          // double disti = distQ.distance(id, med).doubleValue();
           double cost = 0;
           DBIDIter olditer = medoids.iter();
           for(int j = 0; j < k; j++, olditer.advance()) {
@@ -191,7 +190,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
           }
         }
       }
-      LOG.setCompleted(prog);
       if(LOG.isDebugging()) {
         LOG.debug("Best cost: " + best);
       }
@@ -205,6 +203,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
         assignToNearestCluster(medoids, ids, second, clusters, distQ);
       }
     }
+    LOG.setCompleted(prog);
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
