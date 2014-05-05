@@ -84,7 +84,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
   /**
    * Same as {@link #factory}, but subtype.
    */
-  private SparseNumberVector.Factory<V>  sparsefactory;
+  private SparseNumberVector.Factory<V> sparsefactory;
 
   /**
    * (Reused) set of values for the number vector.
@@ -105,7 +105,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
    * @param comment Comment pattern
    * @param labelIndices Indices to use as labels
    */
-  public TermFrequencyParser(boolean normalize, Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V>  factory) {
+  public TermFrequencyParser(boolean normalize, Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V> factory) {
     super(colSep, quoteChars, comment, labelIndices, factory);
     this.normalize = normalize;
     this.keymap = new TObjectIntHashMap<>(1001, .5f, -1);
@@ -147,6 +147,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     if(curterm != null) {
       labels.add(curterm);
     }
+    haslabels |= (labels.size() > 0);
     if(normalize) {
       if(Math.abs(len - 1.0) > 1E-10 && len > 1E-10) {
         for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
@@ -205,7 +206,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
 
     @Override
     protected void getFactory(Parameterization config) {
-      ObjectParameter<SparseNumberVector.Factory<V> > factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
+      ObjectParameter<SparseNumberVector.Factory<V>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
       if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
@@ -213,7 +214,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
 
     @Override
     protected TermFrequencyParser<V> makeInstance() {
-      return new TermFrequencyParser<>(normalize, colSep, quoteChars, comment, labelIndices, (SparseNumberVector.Factory<V> ) factory);
+      return new TermFrequencyParser<>(normalize, colSep, quoteChars, comment, labelIndices, (SparseNumberVector.Factory<V>) factory);
     }
   }
 }
