@@ -1,4 +1,4 @@
-package experimentalcode.students.faerman.lsh.clustering.uf;
+package experimentalcode.students.faerman.src.lsh.clustering.uf;
 
 import java.util.Collection;
 /*

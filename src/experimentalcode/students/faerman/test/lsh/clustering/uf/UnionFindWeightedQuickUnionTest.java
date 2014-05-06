@@ -1,12 +1,12 @@
-package experimentalcode.students.faerman.lsh.clustering.test.uf;
+package experimentalcode.students.faerman.test.lsh.clustering.uf;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 
-import experimentalcode.students.faerman.lsh.clustering.uf.UnionFindWeightedQuickUnion;
+import experimentalcode.students.faerman.src.lsh.clustering.uf.UnionFindWeightedQuickUnion;
 
 /*
  This file is part of ELKI:
