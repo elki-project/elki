@@ -54,7 +54,7 @@ public class TestLOCI extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     // run LOCI on database
     OutlierResult result = loci.run(db);
 
-    testAUC(db, "Noise", result, 0.96222222);
+    testAUC(db, "Noise", result, 0.982444);
     testSingleScore(result, 146, 3.8054382);
   }
 }

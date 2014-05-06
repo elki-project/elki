@@ -157,45 +157,49 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     WritableDoubleDataStore mdef_radius = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
+    // Shared instance, to save allocations.
+    MeanVariance mv_n_r_alpha = new MeanVariance();
+
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       final DoubleIntArrayList cdist = interestingDistances.get(iditer);
-      final double maxdist = cdist.getKey(cdist.size() - 1);
-      final int maxneig = cdist.getValue(cdist.size() - 1);
+      final double maxdist = cdist.getDouble(cdist.size() - 1);
+      final int maxneig = cdist.getInt(cdist.size() - 1);
 
       double maxmdefnorm = 0.0;
       double maxnormr = 0;
       if(maxneig >= nmin) {
         // Compute the largest neighborhood we will need.
         DoubleDBIDList maxneighbors = rangeQuery.getRangeForDBID(iditer, maxdist);
-        // TODO: Ensure the set is sorted. Should be a no-op with most indexes.
+        // TODO: Ensure the result is sorted. This is currently implied.
+
         // For any critical distance, compute the normalized MDEF score.
         for(int i = 0, size = cdist.size(); i < size; i++) {
           // Only start when minimum size is fulfilled
-          if(cdist.getValue(i) < nmin) {
+          if(cdist.getInt(i) < nmin) {
             continue;
           }
-          final double r = cdist.getKey(i);
+          final double r = cdist.getDouble(i);
           final double alpha_r = alpha * r;
-          // compute n(p_i, \alpha * r) from list (note: alpha_r is not c!)
-          final int n_alphar = cdist.getValue(cdist.find(alpha_r));
+          // compute n(p_i, \alpha * r) from list (note: alpha_r is not cdist!)
+          final int n_alphar = cdist.getInt(cdist.find(alpha_r));
           // compute \hat{n}(p_i, r, \alpha) and the corresponding \simga_{MDEF}
-          MeanVariance mv_n_r_alpha = new MeanVariance();
+          mv_n_r_alpha.reset();
           for(DoubleDBIDListIter neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
             // Stop at radius r
             if(neighbor.doubleValue() > r) {
               break;
             }
             DoubleIntArrayList cdist2 = interestingDistances.get(neighbor);
-            int rn_alphar = cdist2.getValue(cdist2.find(alpha_r));
+            int rn_alphar = cdist2.getInt(cdist2.find(alpha_r));
             mv_n_r_alpha.put(rn_alphar);
           }
           // We only use the average and standard deviation
           final double nhat_r_alpha = mv_n_r_alpha.getMean();
           final double sigma_nhat_r_alpha = mv_n_r_alpha.getNaiveStddev();
 
-          // Redundant divisions removed.
-          final double mdef = (nhat_r_alpha - n_alphar); // / nhat_r_alpha;
-          final double sigmamdef = sigma_nhat_r_alpha; // / nhat_r_alpha;
+          // Redundant divisions by nhat_r_alpha removed.
+          final double mdef = nhat_r_alpha - n_alphar;
+          final double sigmamdef = sigma_nhat_r_alpha;
           final double mdefnorm = mdef / sigmamdef;
 
           if(mdefnorm > maxmdefnorm) {
@@ -206,7 +210,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       }
       else {
         // FIXME: when nmin was not fulfilled - what is the proper value then?
-        maxmdefnorm = 1.0;
+        maxmdefnorm = Double.POSITIVE_INFINITY;
         maxnormr = maxdist;
       }
       mdef_norm.putDouble(iditer, maxmdefnorm);
@@ -240,34 +244,37 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
         DoubleDBIDListIter ni = neighbors.iter();
         while(ni.valid()) {
           final double curdist = ni.doubleValue();
+          ++i;
           ni.advance();
           // Skip, if tied to the next object:
           if(ni.valid() && curdist == ni.doubleValue()) {
-            ++i;
             continue;
           }
           cdist.append(curdist, i);
           // Scale radius, and reinsert
-          final double ri = curdist / alpha;
-          if(ri <= rmax) {
-            cdist.append(ri, Integer.MIN_VALUE);
+          if(alpha != 1.) {
+            final double ri = curdist / alpha;
+            if(ri <= rmax) {
+              cdist.append(ri, Integer.MIN_VALUE);
+            }
           }
-          ++i;
         }
       }
-
       cdist.sort();
+
       // fill the gaps to have fast lookups of number of neighbors at a given
       // distance.
       int lastk = 0;
       for(int i = 0, size = cdist.size(); i < size; i++) {
-        final int k = cdist.getValue(i);
+        final int k = cdist.getInt(i);
         if(k == Integer.MIN_VALUE) {
           cdist.setValue(i, lastk);
-        } else {
+        }
+        else {
           lastk = k;
         }
       }
+      // TODO: shrink the list, removing duplicate radii?
 
       interestingDistances.put(iditer, cdist);
       LOG.incrementProcessed(progressPreproc);
@@ -322,7 +329,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
      * @param i Position
      * @return Key
      */
-    public double getKey(int i) {
+    public double getDouble(int i) {
       return keys[i];
     }
 
@@ -332,7 +339,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
      * @param i Position
      * @return Value
      */
-    public int getValue(int i) {
+    public int getInt(int i) {
       return vals[i];
     }
 
