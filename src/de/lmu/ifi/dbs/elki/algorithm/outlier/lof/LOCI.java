@@ -23,9 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -54,6 +52,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -61,7 +60,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 
 /**
  * Fast Outlier Detection Using the "Local Correlation Integral".
@@ -151,7 +149,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     DBIDs ids = relation.getDBIDs();
 
     // LOCI preprocessing step
-    WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
+    WritableDataStore<DoubleIntArrayList> interestingDistances = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, DoubleIntArrayList.class);
     precomputeInterestingRadii(ids, rangeQuery, interestingDistances);
     // LOCI main step
     FiniteProgress progressLOCI = LOG.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), LOG) : null;
@@ -160,9 +158,9 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-      final List<DoubleIntPair> cdist = interestingDistances.get(iditer);
-      final double maxdist = cdist.get(cdist.size() - 1).first;
-      final int maxneig = cdist.get(cdist.size() - 1).second;
+      final DoubleIntArrayList cdist = interestingDistances.get(iditer);
+      final double maxdist = cdist.getKey(cdist.size() - 1);
+      final int maxneig = cdist.getValue(cdist.size() - 1);
 
       double maxmdefnorm = 0.0;
       double maxnormr = 0;
@@ -171,15 +169,15 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
         DoubleDBIDList maxneighbors = rangeQuery.getRangeForDBID(iditer, maxdist);
         // TODO: Ensure the set is sorted. Should be a no-op with most indexes.
         // For any critical distance, compute the normalized MDEF score.
-        for(DoubleIntPair c : cdist) {
+        for(int i = 0, size = cdist.size(); i < size; i++) {
           // Only start when minimum size is fulfilled
-          if(c.second < nmin) {
+          if(cdist.getValue(i) < nmin) {
             continue;
           }
-          final double r = c.first;
+          final double r = cdist.getKey(i);
           final double alpha_r = alpha * r;
           // compute n(p_i, \alpha * r) from list (note: alpha_r is not c!)
-          final int n_alphar = elementsAtRadius(cdist, alpha_r);
+          final int n_alphar = cdist.getValue(cdist.find(alpha_r));
           // compute \hat{n}(p_i, r, \alpha) and the corresponding \simga_{MDEF}
           MeanVariance mv_n_r_alpha = new MeanVariance();
           for(DoubleDBIDListIter neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
@@ -187,7 +185,8 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
             if(neighbor.doubleValue() > r) {
               break;
             }
-            int rn_alphar = elementsAtRadius(interestingDistances.get(neighbor), alpha_r);
+            DoubleIntArrayList cdist2 = interestingDistances.get(neighbor);
+            int rn_alphar = cdist2.getValue(cdist2.find(alpha_r));
             mv_n_r_alpha.put(rn_alphar);
           }
           // We only use the average and standard deviation
@@ -230,12 +229,12 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @param rangeQuery Range query
    * @param interestingDistances Distances of interest
    */
-  protected void precomputeInterestingRadii(DBIDs ids, RangeQuery<O> rangeQuery, WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances) {
+  protected void precomputeInterestingRadii(DBIDs ids, RangeQuery<O> rangeQuery, WritableDataStore<DoubleIntArrayList> interestingDistances) {
     FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("LOCI preprocessing", ids.size(), LOG) : null;
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
       // build list of critical distances
-      ArrayList<DoubleIntPair> cdist = new ArrayList<>(neighbors.size() << 1);
+      DoubleIntArrayList cdist = new DoubleIntArrayList(neighbors.size() << 1);
       {
         int i = 0;
         DoubleDBIDListIter ni = neighbors.iter();
@@ -247,25 +246,26 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
             ++i;
             continue;
           }
-          cdist.add(new DoubleIntPair(curdist, i));
+          cdist.append(curdist, i);
           // Scale radius, and reinsert
           final double ri = curdist / alpha;
           if(ri <= rmax) {
-            cdist.add(new DoubleIntPair(ri, Integer.MIN_VALUE));
+            cdist.append(ri, Integer.MIN_VALUE);
           }
           ++i;
         }
       }
-      Collections.sort(cdist);
+
+      cdist.sort();
       // fill the gaps to have fast lookups of number of neighbors at a given
       // distance.
       int lastk = 0;
-      for(DoubleIntPair c : cdist) {
-        if(c.second == Integer.MIN_VALUE) {
-          c.second = lastk;
-        }
-        else {
-          lastk = c.second;
+      for(int i = 0, size = cdist.size(); i < size; i++) {
+        final int k = cdist.getValue(i);
+        if(k == Integer.MIN_VALUE) {
+          cdist.setValue(i, lastk);
+        } else {
+          lastk = k;
         }
       }
 
@@ -276,26 +276,119 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
   }
 
   /**
-   * Get the number of objects for a given radius, from the list of critical
-   * distances, storing (radius, count) pairs.
+   * Array of double-int values.
    * 
-   * @param criticalDistances
-   * @param radius
-   * @return Number of elements at the given radius
+   * @author Erich Schubert
    */
-  protected int elementsAtRadius(List<DoubleIntPair> criticalDistances, final double radius) {
-    int a = 0, b = criticalDistances.size() - 1;
-    while(a <= b) {
-      final int mid = (a + b) >>> 1;
-      final DoubleIntPair pair = criticalDistances.get(mid);
-      if(pair.first > radius) {
-        b = mid - 1;
-      }
-      else { // or equal!
-        a = mid + 1;
-      }
+  protected static class DoubleIntArrayList {
+    /**
+     * Double keys
+     */
+    double[] keys;
+
+    /**
+     * Integer values
+     */
+    int[] vals;
+
+    /**
+     * Used size
+     */
+    int size = 0;
+
+    /**
+     * Constructor.
+     * 
+     * @param alloc Initial allocation.
+     */
+    public DoubleIntArrayList(int alloc) {
+      keys = new double[alloc];
+      vals = new int[alloc];
+      size = 0;
     }
-    return criticalDistances.get(b).second;
+
+    /**
+     * Collection size.
+     * 
+     * @return Size
+     */
+    public int size() {
+      return size;
+    }
+
+    /**
+     * Get the key at the given position.
+     * 
+     * @param i Position
+     * @return Key
+     */
+    public double getKey(int i) {
+      return keys[i];
+    }
+
+    /**
+     * Get the value at the given position.
+     * 
+     * @param i Position
+     * @return Value
+     */
+    public int getValue(int i) {
+      return vals[i];
+    }
+
+    /**
+     * Get the value at the given position.
+     * 
+     * @param i Position
+     * @param val New value
+     */
+    public void setValue(int i, int val) {
+      vals[i] = val;
+    }
+
+    /**
+     * Append a key-value pair.
+     * 
+     * @param key Key to append
+     * @param val Value to append.
+     */
+    public void append(double key, int val) {
+      if(size == keys.length) {
+        keys = Arrays.copyOf(keys, size << 1);
+        vals = Arrays.copyOf(vals, size << 1);
+      }
+      keys[size] = key;
+      vals[size] = val;
+      ++size;
+    }
+
+    /**
+     * Find the last position with a smaller or equal key.
+     * 
+     * @param search Key
+     * @return Position
+     */
+    public int find(final double search) {
+      int a = 0, b = size - 1;
+      while(a <= b) {
+        final int mid = (a + b) >>> 1;
+        final double cur = keys[mid];
+        if(cur > search) {
+          b = mid - 1;
+        }
+        else { // less or equal!
+          a = mid + 1;
+        }
+      }
+      return b;
+    }
+
+    /**
+     * Sort the array list.
+     */
+    public void sort() {
+      DoubleIntegerArrayQuickSort.sort(keys, vals, size);
+    }
   }
 
   @Override
