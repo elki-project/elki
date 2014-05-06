@@ -37,9 +37,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
@@ -66,9 +66,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 /**
  * Fast Outlier Detection Using the "Local Correlation Integral".
  * 
- * Exact implementation only, not aLOCI. See {@link ALOCI}
+ * Exact implementation only, not aLOCI. See {@link ALOCI}.
  * 
  * Outlier detection using multiple epsilon neighborhoods.
+ * 
+ * This implementation has O(n<sup>3</sup> log n) runtime complexity!
  * 
  * Based on: S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos:
  * LOCI: Fast Outlier Detection Using the Local Correlation Integral. In: Proc.
@@ -83,7 +85,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
-@Alias({"de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI"})
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI" })
 public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -146,51 +148,18 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
   public OutlierResult run(Database database, Relation<O> relation) {
     DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     RangeQuery<O> rangeQuery = database.getRangeQuery(distFunc);
+    DBIDs ids = relation.getDBIDs();
 
-    FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("LOCI preprocessing", relation.size(), LOG) : null;
     // LOCI preprocessing step
     WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
-      // build list of critical distances
-      ArrayList<DoubleIntPair> cdist = new ArrayList<>(neighbors.size() << 1);
-      {
-        for(int i = 0; i < neighbors.size(); i++) {
-          DoubleDBIDPair r = neighbors.get(i);
-          if(i + 1 < neighbors.size() && r.doubleValue() == neighbors.get(i + 1).doubleValue()) {
-            continue;
-          }
-          cdist.add(new DoubleIntPair(r.doubleValue(), i));
-          final double ri = r.doubleValue() / alpha;
-          if(ri <= rmax) {
-            cdist.add(new DoubleIntPair(ri, Integer.MIN_VALUE));
-          }
-        }
-      }
-      Collections.sort(cdist);
-      // fill the gaps to have fast lookups of number of neighbors at a given
-      // distance.
-      int lastk = 0;
-      for(DoubleIntPair c : cdist) {
-        if(c.second == Integer.MIN_VALUE) {
-          c.second = lastk;
-        }
-        else {
-          lastk = c.second;
-        }
-      }
-
-      interestingDistances.put(iditer, cdist);
-      LOG.incrementProcessed(progressPreproc);
-    }
-    LOG.ensureCompleted(progressPreproc);
+    precomputeInterestingRadii(ids, rangeQuery, interestingDistances);
     // LOCI main step
     FiniteProgress progressLOCI = LOG.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), LOG) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore mdef_radius = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       final List<DoubleIntPair> cdist = interestingDistances.get(iditer);
       final double maxdist = cdist.get(cdist.size() - 1).first;
       final int maxneig = cdist.get(cdist.size() - 1).second;
@@ -204,17 +173,16 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
         // For any critical distance, compute the normalized MDEF score.
         for(DoubleIntPair c : cdist) {
           // Only start when minimum size is fulfilled
-          if (c.second < nmin) {
+          if(c.second < nmin) {
             continue;
           }
           final double r = c.first;
           final double alpha_r = alpha * r;
-          // compute n(p_i, \alpha * r) from list (note: alpha_r is different from c!)
+          // compute n(p_i, \alpha * r) from list (note: alpha_r is not c!)
           final int n_alphar = elementsAtRadius(cdist, alpha_r);
           // compute \hat{n}(p_i, r, \alpha) and the corresponding \simga_{MDEF}
           MeanVariance mv_n_r_alpha = new MeanVariance();
-          // TODO: optimize for double distances
-          for (DoubleDBIDListIter neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          for(DoubleDBIDListIter neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
             // Stop at radius r
             if(neighbor.doubleValue() > r) {
               break;
@@ -256,6 +224,58 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
   }
 
   /**
+   * Preprocessing step: determine the radii of interest for each point.
+   * 
+   * @param ids IDs to process
+   * @param rangeQuery Range query
+   * @param interestingDistances Distances of interest
+   */
+  protected void precomputeInterestingRadii(DBIDs ids, RangeQuery<O> rangeQuery, WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances) {
+    FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("LOCI preprocessing", ids.size(), LOG) : null;
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+      DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
+      // build list of critical distances
+      ArrayList<DoubleIntPair> cdist = new ArrayList<>(neighbors.size() << 1);
+      {
+        int i = 0;
+        DoubleDBIDListIter ni = neighbors.iter();
+        while(ni.valid()) {
+          final double curdist = ni.doubleValue();
+          ni.advance();
+          // Skip, if tied to the next object:
+          if(ni.valid() && curdist == ni.doubleValue()) {
+            ++i;
+            continue;
+          }
+          cdist.add(new DoubleIntPair(curdist, i));
+          // Scale radius, and reinsert
+          final double ri = curdist / alpha;
+          if(ri <= rmax) {
+            cdist.add(new DoubleIntPair(ri, Integer.MIN_VALUE));
+          }
+          ++i;
+        }
+      }
+      Collections.sort(cdist);
+      // fill the gaps to have fast lookups of number of neighbors at a given
+      // distance.
+      int lastk = 0;
+      for(DoubleIntPair c : cdist) {
+        if(c.second == Integer.MIN_VALUE) {
+          c.second = lastk;
+        }
+        else {
+          lastk = c.second;
+        }
+      }
+
+      interestingDistances.put(iditer, cdist);
+      LOG.incrementProcessed(progressPreproc);
+    }
+    LOG.ensureCompleted(progressPreproc);
+  }
+
+  /**
    * Get the number of objects for a given radius, from the list of critical
    * distances, storing (radius, count) pairs.
    * 
@@ -264,17 +284,18 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @return Number of elements at the given radius
    */
   protected int elementsAtRadius(List<DoubleIntPair> criticalDistances, final double radius) {
-    int n_r = 0;
-    for(DoubleIntPair c2 : criticalDistances) {
-      if(c2.first > radius) {
-        break;
+    int a = 0, b = criticalDistances.size() - 1;
+    while(a <= b) {
+      final int mid = (a + b) >>> 1;
+      final DoubleIntPair pair = criticalDistances.get(mid);
+      if(pair.first > radius) {
+        b = mid - 1;
       }
-      if(c2.second != Integer.MIN_VALUE) {
-        // Update
-        n_r = c2.second;
+      else { // or equal!
+        a = mid + 1;
       }
     }
-    return n_r;
+    return criticalDistances.get(b).second;
   }
 
   @Override
