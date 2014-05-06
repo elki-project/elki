@@ -626,8 +626,8 @@ public final class DBIDUtil {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
     if(random == null) {
-      random = new FastNonThreadsafeRandom(); // Fast, and we're single-threaded here
-                                   // anyway.
+      // Fast, and we're single-threaded here anyway.
+      random = new FastNonThreadsafeRandom();
     }
 
     // TODO: better balancing for different sizes
