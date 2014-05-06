@@ -68,8 +68,8 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
     // run PROCLUS on database
     Clustering<?> result = proclus.run(db);
 
-    testFMeasure(db, result, 0.6946958);
-    testClusterSizes(result, new int[] { 45, 151, 200, 204 });
+    testFMeasure(db, result, 0.775218);
+    testClusterSizes(result, new int[] { 30, 90, 201, 279 });
   }
 
   /**
@@ -93,7 +93,7 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
 
     // run PROCLUS on database
     Clustering<?> result = proclus.run(db);
-    testFMeasure(db, result, 0.7812455);
-    testClusterSizes(result, new int[] { 111, 269, 470 });
+    testFMeasure(db, result, 0.965731);
+    testClusterSizes(result, new int[] { 151, 290, 409 });
   }
 }
