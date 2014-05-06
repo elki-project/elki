@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.integer;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.arrays;
 
 /*
  This file is part of ELKI:
@@ -29,7 +29,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  * 
  * @author Erich Schubert
  */
-class DoubleIntegerArrayQuickSort {
+public class DoubleIntegerArrayQuickSort {
   /**
    * Threshold for using insertion sort.
    */
