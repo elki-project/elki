@@ -122,7 +122,7 @@ public class UnionFindWeightedQuickUnion<K> implements UnionFind<K> {
     LinkedList<K> roots=new LinkedList<>();
     for(int i = 0; i < nextElementIndex; i++) {
       //roots or one element in component
-      if(height[i]!=0||mappingToComponent[i]==i)
+      if(mappingToComponent[i]==i)
       {
         roots.add(fromIndexToElement.get(i));
       }
