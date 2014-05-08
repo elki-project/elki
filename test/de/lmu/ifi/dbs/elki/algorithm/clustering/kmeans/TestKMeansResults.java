@@ -150,6 +150,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
+    params.addParameter(KMeans.INIT_ID, PAMInitialMeans.class);
     KMedoidsEM<DoubleVector> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMedoidsEM.class, params);
     testParameterizationOk(params);
 
