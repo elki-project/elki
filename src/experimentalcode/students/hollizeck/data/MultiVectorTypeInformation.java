@@ -21,8 +21,7 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
   public static MultiVectorTypeInformation<NumberVector> MULTIVECTOR_TYPEINFORMATION = typeRequest(NumberVector.class);
   
   protected final int multiplicity;
-
-  private final DoubleVector.Factory FACTORY;
+  
   /**
    * default constructor
    * <br>
@@ -32,7 +31,6 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
   public MultiVectorTypeInformation(Class<? super V> cls) {
     super(cls, null, -1, Integer.MAX_VALUE);
     multiplicity= -1;
-    FACTORY = new DoubleVector.Factory();
   }
 
 
@@ -48,10 +46,22 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
   public MultiVectorTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim, int multiplicity) {
     super(cls, serializer, mindim, maxdim);
     this.multiplicity = multiplicity;
-
-    FACTORY = new DoubleVector.Factory();
   }
 
+  /**
+   * Constructor for an actual type.
+   *
+   * @param cls base class
+   * @param serializer Serializer
+   * @param mindim Minimum dimensionality
+   * @param maxdim Maximum dimensionality
+   * @param multiplicity
+   */
+  public MultiVectorTypeInformation(FeatureVector.Factory<V, ?> factory,Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim, int multiplicity) {
+    super(factory, serializer, mindim, maxdim);
+    this.multiplicity = multiplicity;
+  }
+  
   /**
   * Constructor for a type request.
   *
@@ -63,6 +73,7 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
    this(cls, null, mindim, maxdim, multiplicity);
  }
  
+
  public int getMultiplicity(){
    return multiplicity;
  }
@@ -79,6 +90,6 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
   * @param <V> vector type
   */
  public static <V extends FeatureVector<?>> MultiVectorTypeInformation<V> typeRequest(Class<? super V> cls) {
-   return new MultiVectorTypeInformation<>(cls);
+   return new MultiVectorTypeInformation<>(cls,1,1,1);
  }
 }
