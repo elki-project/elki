@@ -372,33 +372,25 @@ public class OverviewPlot implements ResultListener {
    * @param parent Parent element to draw to
    */
   private Visualization embedOrThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
-    if(single) {
-      VisualizationTask thumbtask = task.clone(plot, context, it.proj, it.w, it.h);
-      final Visualization vis = thumbtask.getFactory().makeVisualization(thumbtask);
-      if(vis.getLayer() == null) {
-        LoggingUtil.warning("Visualization returned empty layer: " + vis);
-      }
-      else {
-        if(task.noexport) {
-          vis.getLayer().setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);
-        }
-        parent.appendChild(vis.getLayer());
-      }
-      return vis;
-    }
-    else {
-      VisualizationTask thumbtask = task.clone(plot, context, it.proj, it.w, it.h);
+    VisualizationTask thumbtask = task.clone(plot, context, it.proj, it.w, it.h);
+    final Visualization vis;
+    if(!single) {
       thumbtask.thumbnail = true;
       thumbtask.thumbsize = thumbsize;
-      final Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
-      if(vis.getLayer() == null) {
-        LoggingUtil.warning("Visualization returned empty layer: " + vis);
-      }
-      else {
-        parent.appendChild(vis.getLayer());
-      }
+      vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
+    }
+    else {
+      vis = thumbtask.getFactory().makeVisualization(thumbtask);
+    }
+    if(vis.getLayer() == null) {
+      LoggingUtil.warning("Visualization returned empty layer: " + vis);
       return vis;
     }
+    if(task.noexport) {
+      vis.getLayer().setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);
+    }
+    parent.appendChild(vis.getLayer());
+    return vis;
   }
 
   /**
