@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import experimentalcode.students.faerman.src.lsh.clustering.uf.UnionFindWeightedQuickUnion;
 
 /*
@@ -35,40 +37,40 @@ public class UnionFindWeightedQuickUnionTest {
 
   @Test
   public void testTree() {
-    UnionFindWeightedQuickUnion<Integer> uf = new UnionFindWeightedQuickUnion<>();
-    uf.init(8);
-    assertFalse(uf.isConnected(0, 7));
-    uf.union(0, 1);
-    assertTrue(uf.isConnected(0, 1));
+    DBIDRange range = DBIDUtil.generateStaticDBIDRange(8);
+    UnionFindWeightedQuickUnion uf = new UnionFindWeightedQuickUnion(range);
+    assertFalse(uf.isConnected(range.get(0), range.get(7)));
+    uf.union(range.get(0), range.get(1));
+    assertTrue(uf.isConnected(range.get(0),range.get( 1)));
     assertEquals(uf.maxTreeHeight(), 1);
-    uf.union(2, 3);
-    assertFalse(uf.isConnected(0, 2));
-    uf.union(0, 2);
-    assertTrue(uf.isConnected(3, 1));
-    uf.union(4, 5);
-    uf.union(6, 7);
-    uf.union(4, 6);
-    uf.union(0, 4);
+    uf.union(range.get(2), range.get(3));
+    assertFalse(uf.isConnected(range.get(0), range.get(2)));
+    uf.union(range.get(0), range.get(2));
+    assertTrue(uf.isConnected(range.get(3), range.get(1)));
+    uf.union(range.get(4),range.get( 5));
+    uf.union(range.get(6), range.get(7));
+    uf.union(range.get(4),range.get( 6));
+    uf.union(range.get(0),range.get( 4));
     assertEquals(3, uf.maxTreeHeight());
     for(int i = 0; i < 8; i++) {
       for(int j = 0; j < 8; j++) {
-        assertTrue(uf.isConnected(i, j));
+        assertTrue(uf.isConnected(range.get(i), range.get(j)));
       }
     }
   }
   @Test
   public void testRoots() {
-    UnionFindWeightedQuickUnion<Integer> uf = new UnionFindWeightedQuickUnion<>();
-    uf.init(8);
-    uf.union(0, 1);
-    uf.union(2, 3);
-    assertEquals(uf.getRoots().size(),2);
-    uf.union(0, 2);
-    assertEquals(uf.getRoots().size(),1);
-    uf.union(4, 5);
-    uf.union(6, 7);
-    uf.union(4, 6);
-    uf.union(0, 4);
+    DBIDRange range = DBIDUtil.generateStaticDBIDRange(8);
+    UnionFindWeightedQuickUnion uf = new UnionFindWeightedQuickUnion(range);
+    uf.union(range.get(0), range.get(1));
+    uf.union(range.get(2), range.get(3));
+    assertEquals(uf.getRoots().size(),6);
+    uf.union(range.get(0), range.get(2));
+    assertEquals(uf.getRoots().size(),5);
+    uf.union(range.get(4), range.get(5));
+    uf.union(range.get(6), range.get(7));
+    uf.union(range.get(4), range.get(6));
+    uf.union(range.get(0), range.get(4));
     assertEquals(uf.getRoots().size(),1);
    
   }

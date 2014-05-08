@@ -24,9 +24,8 @@ import java.util.Collection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public interface UnionFind<K> {
-  public void init(int numberOfElements);
-  public void union(K p, K q);
-  public boolean isConnected(K p, K q);
-  public Collection<K> getRoots();
+public interface UnionFind<T> {
+  public void union(T p, T q);
+  public boolean isConnected(T p, T q);
+  public Collection<T> getRoots();
 }

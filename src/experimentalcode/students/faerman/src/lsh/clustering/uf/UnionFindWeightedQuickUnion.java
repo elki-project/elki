@@ -6,6 +6,15 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,30 +38,41 @@ import java.util.LinkedList;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class UnionFindWeightedQuickUnion<K> implements UnionFind<K> {
+public class UnionFindWeightedQuickUnion implements UnionFind<DBID> {
 
   private int[] mappingToComponent;
 
   private int[] height;
 
-  private int nextElementIndex;
+  private WritableIntegerDataStore fromElementsToItsIndex;
 
-  private THashMap<K, Integer> fromElementToItsIndex;
-  private TIntObjectHashMap<K> fromIndexToElement;
+  private TIntObjectHashMap<DBID> fromIndexToElement;
 
-  @Override
-  public void init(int numberOfElements) {
-    fromElementToItsIndex = new THashMap<>(numberOfElements);
-    fromIndexToElement=new TIntObjectHashMap<>(numberOfElements);
-    nextElementIndex = 0;
-    mappingToComponent = new int[numberOfElements];
+  private int numberOfElements;
+
+  public UnionFindWeightedQuickUnion(DBIDs elements) {
+    numberOfElements = elements.size();
+    mappingToComponent = new int[elements.size()];
     for(int i = 0; i < mappingToComponent.length; i++) {
       mappingToComponent[i] = i;
     }
-    height = new int[numberOfElements];
+    height = new int[elements.size()];
+    createMappings(elements);
   }
 
-  private int find(K element) {
+  private void createMappings(DBIDs elements) {
+    fromElementsToItsIndex = DataStoreUtil.makeIntegerStorage(elements, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    fromIndexToElement = new TIntObjectHashMap<>(elements.size());
+    int counter=0;
+    for(DBIDIter iter = elements.iter(); iter.valid(); iter.advance()) {
+      DBID currentElement = DBIDUtil.deref(iter);
+      fromIndexToElement.put(counter, currentElement);
+      fromElementsToItsIndex.put(currentElement, counter);
+      counter++;
+    }
+  }
+
+  private int find(DBID element) {
     int componentNumber = getElementIndex(element);
     return find(componentNumber);
   }
@@ -64,21 +84,17 @@ public class UnionFindWeightedQuickUnion<K> implements UnionFind<K> {
     return componentNumber;
   }
 
-  private int getElementIndex(K element) {
-    Integer elementIndex = fromElementToItsIndex.get(element);
-    if(elementIndex == null) {
-      if(nextElementIndex > mappingToComponent.length - 1) {
-        throw new RuntimeException("exceeded number of allowed elements");
-      }
-      elementIndex = nextElementIndex++;
-      fromElementToItsIndex.put(element, elementIndex);
-      fromIndexToElement.put(elementIndex, element);
+  private int getElementIndex(DBID element) {
+    Integer elementIndex = fromElementsToItsIndex.intValue(element);
+    if(elementIndex > numberOfElements - 1) {
+      throw new RuntimeException(element+" element  is not known");
     }
+
     return elementIndex;
   }
 
   @Override
-  public void union(K first, K second) {
+  public void union(DBID first, DBID second) {
     int firstIndex = getElementIndex(first);
     int secondIndex = getElementIndex(second);
     int firstComponent = find(firstIndex);
@@ -86,48 +102,44 @@ public class UnionFindWeightedQuickUnion<K> implements UnionFind<K> {
     if(firstComponent == secondComponent) {
       return;
     }
-    if(height[firstComponent]>height[secondComponent])
-    {
-      mappingToComponent[secondComponent]=firstComponent;
-      height[firstComponent]=Math.max(height[firstComponent], height[secondComponent]+1);
-      //to find the roots
-      height[secondComponent]=0;
+    if(height[firstComponent] > height[secondComponent]) {
+      mappingToComponent[secondComponent] = firstComponent;
+      height[firstComponent] = Math.max(height[firstComponent], height[secondComponent] + 1);
+      // to find the roots
+      height[secondComponent] = 0;
     }
-    else{
-      mappingToComponent[firstComponent]=secondComponent;
-      height[secondComponent]=Math.max(height[secondComponent], height[firstComponent]+1);
-      //to find the roots
-      height[firstComponent]=0;
+    else {
+      mappingToComponent[firstComponent] = secondComponent;
+      height[secondComponent] = Math.max(height[secondComponent], height[firstComponent] + 1);
+      // to find the roots
+      height[firstComponent] = 0;
     }
   }
 
   @Override
-  public boolean isConnected(K first, K second) {
+  public boolean isConnected(DBID first, DBID second) {
     return find(first) == find(second);
   }
 
-  public int maxTreeHeight(){
-    int maxTreeHeight=0;
+  public int maxTreeHeight() {
+    int maxTreeHeight = 0;
     for(int i = 0; i < height.length; i++) {
-      if(height[i]>maxTreeHeight)
-      {
-        maxTreeHeight=height[i];
+      if(height[i] > maxTreeHeight) {
+        maxTreeHeight = height[i];
       }
     }
     return maxTreeHeight;
   }
 
   @Override
-  public Collection<K> getRoots() {
-    LinkedList<K> roots=new LinkedList<>();
-    for(int i = 0; i < nextElementIndex; i++) {
-      //roots or one element in component
-      if(mappingToComponent[i]==i)
-      {
+  public Collection<DBID> getRoots() {
+    LinkedList<DBID> roots = new LinkedList<DBID>();
+    for(int i = 0; i < mappingToComponent.length; i++) {
+      // roots or one element in component
+      if(mappingToComponent[i] == i) {
         roots.add(fromIndexToElement.get(i));
       }
     }
-  return roots;
+    return roots;
   }
-  
 }
