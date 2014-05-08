@@ -57,11 +57,6 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
   }
 
   /**
-   * Object factory for producing new instances.
-   */
-  private final FeatureVector.Factory<V, ?> factory;
-
-  /**
    * Labels.
    */
   private String[] labels = null;
@@ -75,8 +70,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param serializer Serializer
    */
   public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim, String[] labels, ByteBufferSerializer<? super V> serializer) {
-    super(factory.getRestrictionClass(), serializer, dim, dim);
-    this.factory = factory;
+    super(factory, serializer, dim, dim);
     this.labels = labels;
     assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
   }
@@ -90,8 +84,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param serializer Serializer
    */
   public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int mindim, int maxdim, ByteBufferSerializer<? super V> serializer) {
-    super(factory.getRestrictionClass(), serializer, mindim, maxdim);
-    this.factory = factory;
+    super(factory, serializer, mindim, maxdim);
   }
 
   /**
@@ -102,8 +95,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param serializer Serializer
    */
   public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim, ByteBufferSerializer<? super V> serializer) {
-    super(factory.getRestrictionClass(), serializer, dim, dim);
-    this.factory = factory;
+    super(factory, serializer, dim, dim);
   }
 
   /**
@@ -114,8 +106,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param labels Labels
    */
   public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim, String[] labels) {
-    super(factory.getRestrictionClass(), factory.getDefaultSerializer(), dim, dim);
-    this.factory = factory;
+    super(factory, factory.getDefaultSerializer(), dim, dim);
     this.labels = labels;
     assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
   }
@@ -129,7 +120,6 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    */
   private VectorFieldTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
     super(cls, null, mindim, maxdim);
-    this.factory = null;
   }
 
   /**
@@ -139,8 +129,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param dim Dimensionality
    */
   public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim) {
-    super(factory.getRestrictionClass(), factory.getDefaultSerializer(), dim, dim);
-    this.factory = factory;
+    super(factory, factory.getDefaultSerializer(), dim, dim);
   }
 
   /**
@@ -152,7 +141,6 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
   @Deprecated
   public VectorFieldTypeInformation(Class<? super V> cls, int dim) {
     super(cls, null, dim, dim);
-    this.factory = null;
   }
 
   @Override
@@ -179,18 +167,6 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
       throw new UnsupportedOperationException("Requesting dimensionality for a type request without defined dimensionality!");
     }
     return mindim;
-  }
-
-  /**
-   * Get the object type factory.
-   * 
-   * @return the factory
-   */
-  public FeatureVector.Factory<V, ?> getFactory() {
-    if (factory == null) {
-      throw new UnsupportedOperationException("Requesting factory for a type request!");
-    }
-    return factory;
   }
 
   @Override

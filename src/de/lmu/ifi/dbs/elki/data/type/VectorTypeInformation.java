@@ -37,6 +37,11 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  */
 public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTypeInformation<V> {
   /**
+   * Object factory for producing new instances.
+   */
+  private final FeatureVector.Factory<V, ?> factory;
+
+  /**
    * Constructor for a type request without dimensionality constraints.
    * 
    * @param cls Class constraint
@@ -78,6 +83,23 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
    */
   public VectorTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim) {
     super(cls, serializer);
+    this.factory = null;
+    assert (this.mindim <= this.maxdim);
+    this.mindim = mindim;
+    this.maxdim = maxdim;
+  }
+
+  /**
+   * Constructor for an actual type.
+   * 
+   * @param factory Vector factory
+   * @param serializer Serializer
+   * @param mindim Minimum dimensionality
+   * @param maxdim Maximum dimensionality
+   */
+  public VectorTypeInformation(FeatureVector.Factory<V, ?> factory, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim) {
+    super(factory.getRestrictionClass(), serializer);
+    this.factory = factory;
     assert (this.mindim <= this.maxdim);
     this.mindim = mindim;
     this.maxdim = maxdim;
@@ -121,6 +143,18 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
       return false;
     }
     return true;
+  }
+
+  /**
+   * Get the object type factory.
+   * 
+   * @return the factory
+   */
+  public FeatureVector.Factory<V, ?> getFactory() {
+    if (factory == null) {
+      throw new UnsupportedOperationException("Requesting factory for a type request!");
+    }
+    return factory;
   }
 
   /**

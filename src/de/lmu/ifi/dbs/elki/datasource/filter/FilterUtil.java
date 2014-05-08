@@ -27,7 +27,7 @@ import java.lang.reflect.Field;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
@@ -53,8 +53,8 @@ public final class FilterUtil {
   @SuppressWarnings("unchecked")
   public static <V extends NumberVector> NumberVector.Factory<V>  guessFactory(SimpleTypeInformation<V> in) {
     NumberVector.Factory<V>  factory = null;
-    if(in instanceof VectorFieldTypeInformation) {
-      factory = (NumberVector.Factory<V> ) ((VectorFieldTypeInformation<V>) in).getFactory();
+    if(in instanceof VectorTypeInformation) {
+      factory = (NumberVector.Factory<V> ) ((VectorTypeInformation<V>) in).getFactory();
     }
     if(factory == null) {
       // FIXME: hack. Add factories to simple type information, too?
