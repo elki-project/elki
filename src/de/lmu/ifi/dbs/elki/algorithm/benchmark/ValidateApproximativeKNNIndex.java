@@ -186,7 +186,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
           mv.put(knns.size() * k / (double) trueknns.size());
 
           // Put recall:
-          mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / trueknns.size());
+          mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / (double) trueknns.size());
 
           if(knns.size() >= k) {
             double kdist = knns.getKNNDistance();
@@ -267,7 +267,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
         mv.put(knns.size() * k / (double) trueknns.size());
 
         // Put recall:
-        mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / trueknns.size());
+        mvrec.put(DBIDUtil.intersectionSize(knns, trueknns) / (double) trueknns.size());
 
         if(knns.size() >= k) {
           double kdist = knns.getKNNDistance();
