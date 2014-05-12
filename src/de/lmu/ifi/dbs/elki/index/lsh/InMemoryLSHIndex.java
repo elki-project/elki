@@ -78,7 +78,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
   LocalitySensitiveHashFunctionFamily<? super V> family;
 
   /**
-   * Number of hash functions for each table.
+   * Number of hash tables to use.
    */
   int l;
 

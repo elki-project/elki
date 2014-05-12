@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
+public abstract class AbstractProjectedHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**
    * Random generator to use.
    */
@@ -77,7 +77,7 @@ public abstract class AbstractHashFunctionFamily implements LocalitySensitiveHas
    * @param width Bin width
    * @param k Number of projections for each hash function.
    */
-  public AbstractHashFunctionFamily(RandomFactory random, RandomProjectionFamily proj, double width, int k) {
+  public AbstractProjectedHashFunctionFamily(RandomFactory random, RandomProjectionFamily proj, double width, int k) {
     super();
     this.random = random;
     this.proj = proj;

@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  */
 @Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", title = "Locality-sensitive hashing scheme based on p-stable distributions", booktitle = "Proc. 20th annual symposium on Computational geometry", url = "http://dx.doi.org/10.1145/997817.997857")
-public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
+public class EuclideanHashFunctionFamily extends AbstractProjectedHashFunctionFamily {
   /**
    * Constructor.
    * 
@@ -65,7 +65,7 @@ public class EuclideanHashFunctionFamily extends AbstractHashFunctionFamily {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractHashFunctionFamily.Parameterizer {
+  public static class Parameterizer extends AbstractProjectedHashFunctionFamily.Parameterizer {
     @Override
     protected EuclideanHashFunctionFamily makeInstance() {
       return new EuclideanHashFunctionFamily(random, width, k);

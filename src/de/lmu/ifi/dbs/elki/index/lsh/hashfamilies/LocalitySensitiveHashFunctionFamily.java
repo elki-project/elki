@@ -49,10 +49,10 @@ public interface LocalitySensitiveHashFunctionFamily<V> {
    * Generate hash functions for the given relation.
    * 
    * @param relation Relation to index
-   * @param k number of hash functions per table.
+   * @param l Number of hash tables to use
    * @return Family of hash functions
    */
-  ArrayList<? extends LocalitySensitiveHashFunction<? super V>> generateHashFunctions(Relation<? extends V> relation, int k);
+  ArrayList<? extends LocalitySensitiveHashFunction<? super V>> generateHashFunctions(Relation<? extends V> relation, int l);
 
   /**
    * Check whether the given distance function can be accelerated using this
