@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
- * Construct a type information for vector spaces with fixed dimensionality.
+ * 
  *
  * @author Sebastian Hollizeck
  *
@@ -57,7 +57,7 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param maxdim Maximum dimensionality
    * @param multiplicity
    */
-  public MultiVectorTypeInformation(FeatureVector.Factory<V, ?> factory,Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim, int multiplicity) {
+  public MultiVectorTypeInformation(FeatureVector.Factory<V, ?> factory, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim, int multiplicity) {
     super(factory, serializer, mindim, maxdim);
     this.multiplicity = multiplicity;
   }
