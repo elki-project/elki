@@ -1,5 +1,4 @@
-package experimentalcode.erich.parallel;
-
+package experimentalcode.erich.parallel.algorithms;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,14 +23,13 @@ package experimentalcode.erich.parallel;
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
@@ -48,21 +46,22 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import experimentalcode.erich.parallel.ParallelMapExecutor;
+import experimentalcode.erich.parallel.SharedDouble;
+import experimentalcode.erich.parallel.SharedObject;
 import experimentalcode.erich.parallel.mapper.DoubleMinMaxMapper;
 import experimentalcode.erich.parallel.mapper.KNNMapper;
-import experimentalcode.erich.parallel.mapper.LOFMapper;
-import experimentalcode.erich.parallel.mapper.SimpleLRDMapper;
-import experimentalcode.erich.parallel.mapper.WriteDataStoreMapper;
+import experimentalcode.erich.parallel.mapper.KNNWeightMapper;
 import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
 
 /**
- * Parallel implementation of Simplified-LOF Outlier detection using mappers.
+ * Parallel implementation of KNN Weight Outlier detection using mappers.
  * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  */
-public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
    */
@@ -74,7 +73,7 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, 
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelSimplifiedLOF(DistanceFunction<? super O> distanceFunction, int k) {
+  public ParallelKNNWeightOutlier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -82,7 +81,7 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, 
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(ParallelSimplifiedLOF.class);
+  private static final Logging LOG = Logging.getLogger(ParallelKNNWeightOutlier.class);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -91,53 +90,28 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   public OutlierResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
+    WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
-    // Phase one: KNN and k-dist
-    WritableDataStore<KNNList> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
-    {
-      // Compute kNN
-      KNNMapper<O> knnm = new KNNMapper<>(k + 1, knnq);
-      SharedObject<KNNList> knnv = new SharedObject<>();
-      WriteDataStoreMapper<KNNList> storek = new WriteDataStoreMapper<>(knns);
-      knnm.connectKNNOutput(knnv);
-      storek.connectInput(knnv);
+    KNNMapper<O> knnm = new KNNMapper<>(k + 1, knnq);
+    SharedObject<KNNList> knnv = new SharedObject<>();
+    KNNWeightMapper kdistm = new KNNWeightMapper(k + 1);
+    SharedDouble kdistv = new SharedDouble();
+    WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(store);
+    DoubleMinMaxMapper mmm = new DoubleMinMaxMapper();
 
-      ParallelMapExecutor.run(ids, knnm, storek);
-    }
+    knnm.connectKNNOutput(knnv);
+    kdistm.connectKNNInput(knnv);
+    kdistm.connectOutput(kdistv);
+    storem.connectInput(kdistv);
+    mmm.connectInput(kdistv);
 
-    // Phase two: simplified-lrd
-    WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
-    {
-      SimpleLRDMapper lrdm = new SimpleLRDMapper(knns);
-      SharedDouble lrdv = new SharedDouble();
-      WriteDoubleDataStoreMapper storelrd = new WriteDoubleDataStoreMapper(lrds);
+    ParallelMapExecutor.run(ids, knnm, kdistm, storem, mmm);
 
-      lrdm.connectOutput(lrdv);
-      storelrd.connectInput(lrdv);
-      ParallelMapExecutor.run(ids, lrdm, storelrd);
-    }
-
-    // Phase three: Simplified-LOF
-    WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
-    DoubleMinMax minmax;
-    {
-      LOFMapper lofm = new LOFMapper(knns, lrds, true);
-      SharedDouble lofv = new SharedDouble();
-      DoubleMinMaxMapper mmm = new DoubleMinMaxMapper();
-      WriteDoubleDataStoreMapper storelof = new WriteDoubleDataStoreMapper(lofs);
-
-      lofm.connectOutput(lofv);
-      mmm.connectInput(lofv);
-      storelof.connectInput(lofv);
-      ParallelMapExecutor.run(ids, lofm, storelof, mmm);
-
-      minmax = mmm.getMinMax();
-    }
-
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Simplified Local Outlier Factor", "simplified-lof-outlier", lofs, ids);
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
+    DoubleMinMax minmax = mmm.getMinMax();
+    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN weight Outlier Score", "knnw-outlier", store, ids);
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
   }
 
@@ -152,7 +126,7 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
@@ -160,20 +134,20 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, 
      * K parameter
      */
     int k;
-
+    
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      IntParameter kP = new IntParameter(LOF.Parameterizer.K_ID);
-      if(config.grab(kP)) {
+      
+      IntParameter kP = new IntParameter(KNNWeightOutlier.Parameterizer.K_ID);
+      if (config.grab(kP)) {
         k = kP.getValue();
       }
     }
 
     @Override
-    protected ParallelSimplifiedLOF<O> makeInstance() {
-      return new ParallelSimplifiedLOF<>(distanceFunction, k);
+    protected ParallelKNNWeightOutlier<O> makeInstance() {
+      return new ParallelKNNWeightOutlier<>(distanceFunction, k);
     }
   }
 }

@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel;
+package experimentalcode.erich.parallel.algorithms;
 
 /*
  This file is part of ELKI:
@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import experimentalcode.erich.parallel.ParallelMapExecutor;
 import experimentalcode.erich.parallel.mapper.KMeansMapper;
 
 /**

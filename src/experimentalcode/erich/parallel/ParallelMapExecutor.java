@@ -53,31 +53,34 @@ public class ParallelMapExecutor {
   public static final void run(DBIDs ids, Mapper... mapper) {
     // TODO: try different strategies anyway!
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
-    // TODO: use more segments than processors for better handling differences
-    // in the runtime of individual segments?
     ParallelCore core = ParallelCore.getCore();
     try {
-      core.connect();
-      final int numparts = core.getParallelism();
-
       final int size = aids.size();
+      core.connect();
+      int numparts = core.getParallelism();
+      // TODO: are there better heuristics for choosing this?
+      numparts = (size > numparts * numparts * 16) ? numparts * numparts - 1 : numparts;
+
       final int blocksize = (size + (numparts - 1)) / numparts;
       List<Future<ArrayDBIDs>> parts = new ArrayList<>(numparts);
-      for (int i = 0; i < numparts; i++) {
+      for(int i = 0; i < numparts; i++) {
         final int start = i * blocksize;
         final int end = (start + blocksize < size) ? start + blocksize : size;
         Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, start, end, mapper);
         parts.add(core.submit(run));
       }
 
-      for (Future<ArrayDBIDs> fut : parts) {
+      for(Future<ArrayDBIDs> fut : parts) {
         fut.get();
       }
-    } catch (ExecutionException e) {
+    }
+    catch(ExecutionException e) {
       throw new RuntimeException("Mapper execution failed.", e);
-    } catch (InterruptedException e) {
+    }
+    catch(InterruptedException e) {
       throw new RuntimeException("Parallel execution interrupted.");
-    } finally {
+    }
+    finally {
       core.disconnect();
     }
   }
@@ -111,12 +114,7 @@ public class ParallelMapExecutor {
     private Mapper[] mapper;
 
     /**
-     * Mapper
-     */
-    private Mapper.Instance[] instances;
-
-    /**
-     * Channel map
+     * Channel map.
      */
     private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<>();
 
@@ -134,22 +132,23 @@ public class ParallelMapExecutor {
       this.start = start;
       this.end = end;
       this.mapper = mapper;
-      this.instances = new Mapper.Instance[mapper.length];
-      for (int i = 0; i < mapper.length; i++) {
-        this.instances[i] = mapper[i].instantiate(this);
-      }
     }
 
     @Override
     public ArrayDBIDs call() {
+      Mapper.Instance[] instances = new Mapper.Instance[mapper.length];
+      for(int i = 0; i < mapper.length; i++) {
+        instances[i] = mapper[i].instantiate(this);
+      }
+
       DBIDArrayIter iter = ids.iter();
       iter.seek(start);
-      for (int c = end - start; iter.valid() && c >= 0; iter.advance(), c--) {
-        for (int i = 0; i < instances.length; i++) {
+      for(int c = end - start; iter.valid() && c >= 0; iter.advance(), c--) {
+        for(int i = 0; i < instances.length; i++) {
           instances[i].map(iter);
         }
       }
-      for (int i = 0; i < instances.length; i++) {
+      for(int i = 0; i < instances.length; i++) {
         mapper[i].cleanup(instances[i]);
       }
       return ids;
@@ -159,11 +158,7 @@ public class ParallelMapExecutor {
     @Override
     public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls) {
       SharedVariable.Instance<?> inst = channels.get(parent);
-      if (inst == null) {
-        return null;
-      } else {
-        return (I) cls.cast(inst);
-      }
+      return (inst == null) ? null : (I) cls.cast(inst);
     }
 
     @Override
