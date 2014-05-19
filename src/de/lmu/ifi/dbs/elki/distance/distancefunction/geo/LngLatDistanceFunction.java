@@ -39,6 +39,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Distance function for 2D vectors in Longitude, Latitude form.
  * 
+ * The input data must be in degrees (not radians), and the output distance will
+ * be in meters (see {@link EarthModel#distanceDeg}).
+ * 
+ * This implementation allows index accelerated queries using R*-trees (by
+ * providing a point-to-rectangle minimum distance), as published in:
+ * <p>
+ * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+ * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
+ * Advances in Spatial and Temporal Databases - 13th International Symposium,
+ * SSTD 2013, Munich, Germany
+ * </p>
+ * 
  * @author Erich Schubert
  */
 public class LngLatDistanceFunction extends AbstractSpatialDistanceFunction {
@@ -63,18 +75,21 @@ public class LngLatDistanceFunction extends AbstractSpatialDistanceFunction {
   @Override
   @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
+    if(mbr1 instanceof NumberVector) {
+      if(mbr2 instanceof NumberVector) {
         return distance((NumberVector) mbr1, (NumberVector) mbr2);
-      } else {
+      }
+      else {
         NumberVector o1 = (NumberVector) mbr1;
         return model.minDistDeg(o1.doubleValue(1), o1.doubleValue(0), mbr2.getMin(1), mbr2.getMin(0), mbr2.getMax(1), mbr2.getMax(0));
       }
-    } else {
-      if (mbr2 instanceof NumberVector) {
+    }
+    else {
+      if(mbr2 instanceof NumberVector) {
         NumberVector o2 = (NumberVector) mbr2;
         return model.minDistDeg(o2.doubleValue(1), o2.doubleValue(0), mbr1.getMin(1), mbr1.getMin(0), mbr1.getMax(1), mbr1.getMax(0));
-      } else {
+      }
+      else {
         throw new NotImplementedException("This distance function cannot - yet - be used with this algorithm, as the lower bound rectangle to rectangle distances have not yet been formalized for geodetic data.");
       }
     }
@@ -95,21 +110,22 @@ public class LngLatDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if(getClass() != obj.getClass()) {
       return false;
     }
     LngLatDistanceFunction other = (LngLatDistanceFunction) obj;
-    if (model == null) {
-      if (other.model != null) {
+    if(model == null) {
+      if(other.model != null) {
         return false;
       }
-    } else if (!model.equals(other.model)) {
+    }
+    else if(!model.equals(other.model)) {
       return false;
     }
     return true;
@@ -137,7 +153,7 @@ public class LngLatDistanceFunction extends AbstractSpatialDistanceFunction {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-      if (config.grab(modelP)) {
+      if(config.grab(modelP)) {
         model = modelP.instantiateClass(config);
       }
     }

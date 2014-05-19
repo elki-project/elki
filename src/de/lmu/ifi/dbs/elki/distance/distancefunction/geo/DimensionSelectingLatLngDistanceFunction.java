@@ -43,6 +43,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Distance function for 2D vectors in Latitude, Longitude form.
  * 
+ * The input data must be in degrees (not radians), and the output distance will
+ * be in meters (see {@link EarthModel#distanceDeg}).
+ * 
+ * This implementation allows index accelerated queries using R*-trees (by
+ * providing a point-to-rectangle minimum distance), as published in:
+ * <p>
+ * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
+ * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
+ * Advances in Spatial and Temporal Databases - 13th International Symposium,
+ * SSTD 2013, Munich, Germany
+ * </p>
+ * 
  * @author Erich Schubert
  */
 public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDistanceFunction {
