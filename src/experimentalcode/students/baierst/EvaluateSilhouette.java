@@ -112,12 +112,11 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * Distance function to use.
    */
   private DistanceFunction<? super O> distance;
-  
+
   /**
    * Epsilon parameter for alternative silhouette computation.
    */
   private double eps;
-  
 
   /**
    * Constructor.
@@ -239,7 +238,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
      * Parameter for epsilon value of alternative silhouette.
      */
     public static final OptionID EPS_ID = new OptionID("silhouette.alternative_eps", "Epsilon parameter for alternative silhouette.");
-    
+
     /**
      * Distance function to use.
      */
@@ -249,8 +248,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
      * Keep noise "clusters" merged.
      */
     private boolean mergenoise = false;
-    
-  
+
     /**
      * Epsilon for alternative silhouette.
      */
@@ -268,12 +266,12 @@ public class EvaluateSilhouette<O> implements Evaluator {
       if(config.grab(noiseP)) {
         mergenoise = noiseP.isTrue();
       }
-      
-      DoubleParameter epsP = new DoubleParameter(EPS_ID,1e-6);
-      if(config.grab(epsP)){
+
+      DoubleParameter epsP = new DoubleParameter(EPS_ID, 1e-6);
+      if(config.grab(epsP)) {
         eps = epsP.doubleValue();
       }
-      
+
     }
 
     @Override
