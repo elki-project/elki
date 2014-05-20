@@ -60,7 +60,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 	private PrimitiveDistanceFunction<? super NumberVector> distanceFunction;
 
 	/**
-	 * Epsilon parameter for alternative computation.
+	 * Epsilon parameter for alternative silhouette computation.
 	 */
   private double eps;
 	
@@ -185,7 +185,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 	    /**
        * Parameter for epsilon value of alternative silhouette.
        */
-      public static final OptionID EPS_ID = new OptionID("simplified-silhouette.alternative_eps", "Epsilon parameter for alternative computation.");
+      public static final OptionID EPS_ID = new OptionID("simplified-silhouette.alternative_eps", "Epsilon parameter for alternative silhouette.");
 
 	    
 	    /**
