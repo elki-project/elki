@@ -124,6 +124,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 		            continue;
 		          }
 	          
+	          //TODO: calculate each centroid only once!
 	          NumberVector ocentroid = Centroid.make((Relation<? extends NumberVector>) rel, ocluster.getIDs()).toVector(rel); 
 	          
 	          double b = distanceFunction.distance(ocentroid,rel.get(it1));;
