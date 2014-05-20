@@ -26,11 +26,12 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Compute the simplified silhouette of a data set.
+ * Compute the simplified silhouette of a data set and the simplified alternative silhouette.
  * 
  * TODO add Reference
  * 
@@ -57,17 +58,24 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 	 * Distance function to use.
 	 */
 	private PrimitiveDistanceFunction<? super NumberVector> distanceFunction;
+
+	/**
+	 * Epsilon parameter for alternative computation.
+	 */
+  private double eps;
 	
 	/**
 	   * Constructor.
 	   * 
 	   * @param distance Distance function
 	   * @param mergenoise Flag to treat noise as clusters, not singletons
+	   * @param eps Epsilon parameter of alternative silhouette
 	   */
-	  public EvaluateSilhouetteSimplified(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise) {
+	  public EvaluateSilhouetteSimplified(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise, double eps) {
 	    super();
 	    this.distanceFunction = distance;
 	    this.mergenoise = mergenoise;
+	    this.eps = eps;
 	  }
 
 	  /**
@@ -81,6 +89,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 	  public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
 	    List<? extends Cluster<?>> clusters = c.getAllClusters();
 	    MeanVariance mssil = new MeanVariance();
+	    MeanVariance mssilAlt = new MeanVariance();
 	    for(Cluster<?> cluster : clusters) {
 	      if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
 	        // we use 0 for singletons.
@@ -124,14 +133,17 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 	          }
 	        }
 	        mssil.put((min - a) / Math.max(min, a));
+	        mssilAlt.put(min / (a + this.eps));
 	      }
 	    }
 	    if(LOG.isVerbose()) {
 	      LOG.verbose("Mean Simplified Silhouette: " + mssil);
+	      LOG.verbose("Mean Simplified Silhouette Alternative: " + mssilAlt);
 	    }
 	    // Build a primitive result attachment:
 	    Collection<DoubleVector> col = new ArrayList<>();
 	    col.add(new DoubleVector(new double[] { mssil.getMean(), mssil.getSampleStddev() }));
+	    col.add(new DoubleVector(new double[] { mssilAlt.getMean(), mssilAlt.getSampleStddev() }));
 	    db.getHierarchy().add(c, new CollectionResult<>("Simplified Silhouette coefficient", "simplified-silhouette-coefficient", col));
 	  }
 	  
@@ -171,6 +183,12 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 	    public static final OptionID MERGENOISE_ID = new OptionID("simplified-silhouette.noisecluster", "Treat noise as a cluster, not as singletons.");
 
 	    /**
+       * Parameter for epsilon value of alternative silhouette.
+       */
+      public static final OptionID EPS_ID = new OptionID("simplified-silhouette.alternative_eps", "Epsilon parameter for alternative computation.");
+
+	    
+	    /**
 	     * Distance function to use.
 	     */
 	    private PrimitiveDistanceFunction<NumberVector> distance;
@@ -179,6 +197,11 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 	     * Keep noise "clusters" merged.
 	     */
 	    private boolean mergenoise = false;
+	    
+	    /**
+       * Epsilon for alternative silhouette.
+       */
+      private double eps;
 
 	    @Override
 	    protected void makeOptions(Parameterization config) {
@@ -193,11 +216,18 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 	      if(config.grab(noiseP)) {
 	        mergenoise = noiseP.isTrue();
 	      }
+	      
+	      DoubleParameter epsP = new DoubleParameter(EPS_ID,1e-6);
+	      if(config.grab(epsP)){
+	        eps = epsP.doubleValue();
+	      }
+	      
+	      
 	    }
 
 	    @Override
 	    protected EvaluateSilhouetteSimplified<? extends NumberVector> makeInstance() {
-	      return new EvaluateSilhouetteSimplified<>(distance, mergenoise);
+	      return new EvaluateSilhouetteSimplified<>(distance, mergenoise, eps);
 	    }
 	  }
 
