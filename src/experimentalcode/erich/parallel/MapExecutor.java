@@ -1,6 +1,5 @@
 package experimentalcode.erich.parallel;
 
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -34,16 +33,8 @@ public interface MapExecutor {
    * Get a channel for this executor.
    * 
    * @param parent Channel parent
-   * @param cls Channel instance class
-   * @return Instance or {@code null}
+   * @return Channel instance
+   * @param <I> Variable type
    */
-  <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls);
-
-  /**
-   * Add a channel instance to this executor.
-   * 
-   * @param parent Channel parent
-   * @param inst Channel instance
-   */
-  void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst);
+  <I extends SharedVariable.Instance<?>> I getInstance(SharedVariable<I> parent);
 }

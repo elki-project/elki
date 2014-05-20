@@ -62,7 +62,7 @@ public class LRDMapper extends AbstractDoubleMapper {
 
   @Override
   public Instance instantiate(MapExecutor mapper) {
-    return new Instance(output.instantiate(mapper));
+    return new Instance(mapper.getInstance(output));
   }
 
   /**

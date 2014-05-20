@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import experimentalcode.erich.parallel.SharedVariable.Instance;
 import experimentalcode.erich.parallel.mapper.Mapper;
 
 /**
@@ -114,9 +115,9 @@ public class ParallelMapExecutor {
     private Mapper[] mapper;
 
     /**
-     * Channel map.
+     * Variables map.
      */
-    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<>();
+    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> variables = new HashMap<>();
 
     /**
      * Constructor.
@@ -154,16 +155,15 @@ public class ParallelMapExecutor {
       return ids;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls) {
-      SharedVariable.Instance<?> inst = channels.get(parent);
-      return (inst == null) ? null : (I) cls.cast(inst);
-    }
-
-    @Override
-    public void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst) {
-      channels.put(chan, inst);
+    public <I extends Instance<?>> I getInstance(SharedVariable<I> parent) {
+      @SuppressWarnings("unchecked")
+      I inst = (I) variables.get(parent);
+      if (inst == null) {
+        inst = parent.instantiate();
+        variables.put(parent, inst);
+      }
+      return inst;
     }
   }
 }

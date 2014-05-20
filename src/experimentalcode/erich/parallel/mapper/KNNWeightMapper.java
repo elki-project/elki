@@ -68,7 +68,7 @@ public class KNNWeightMapper extends AbstractDoubleMapper {
 
   @Override
   public Instance instantiate(MapExecutor mapper) {
-    return new Instance(k, input.instantiate(mapper), output.instantiate(mapper));
+    return new Instance(k, mapper.getInstance(input), mapper.getInstance(output));
   }
 
   /**

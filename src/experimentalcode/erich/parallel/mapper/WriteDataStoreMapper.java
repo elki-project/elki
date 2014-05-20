@@ -67,7 +67,7 @@ public class WriteDataStoreMapper<T> implements Mapper {
 
   @Override
   public Instance instantiate(MapExecutor mapper) {
-    return new Instance(input.instantiate(mapper));
+    return new Instance(mapper.getInstance(input));
   }
 
   @Override

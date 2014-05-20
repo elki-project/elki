@@ -22,25 +22,20 @@ package experimentalcode.erich.parallel;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Variable to share between different mappers (within one thread only!)
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has SharedObject.Instance
+ * 
  * @param <T> Data type
  */
-public class SharedObject<T> implements SharedVariable<T> {
+public class SharedObject<T> implements SharedVariable<SharedObject.Instance<T>> {
   @Override
-  public Instance<T> instantiate(MapExecutor mapper) {
-    final Class<Instance<T>> cls = ClassGenericsUtil.uglyCastIntoSubclass(Instance.class);
-    Instance<T> instance = mapper.getShared(this, cls);
-    if(instance == null) {
-      instance = new Instance<>();
-      mapper.addShared(this, instance);
-    }
-    return instance;
+  public Instance<T> instantiate() {
+    return new Instance<>();
   }
 
   /**

@@ -26,17 +26,14 @@ package experimentalcode.erich.parallel;
 /**
  * Direct channel connecting two mappers.
  * 
+ * @apiviz.has SharedInteger.Instance
+ * 
  * @author Erich Schubert
  */
-public class SharedInteger implements SharedVariable<Integer> {
+public class SharedInteger implements SharedVariable<SharedInteger.Instance> {
   @Override
-  public Instance instantiate(MapExecutor mapper) {
-    Instance instance = mapper.getShared(this, Instance.class);
-    if (instance == null) {
-      instance = new Instance();
-      mapper.addShared(this, instance);
-    }
-    return instance;
+  public Instance instantiate() {
+    return new Instance();
   }
 
   /**

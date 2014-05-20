@@ -74,7 +74,7 @@ public class KNNMapper<O> implements Mapper {
 
   @Override
   public Instance<O> instantiate(MapExecutor mapper) {
-    return new Instance<>(k, knnq, out.instantiate(mapper));
+    return new Instance<>(k, knnq, mapper.getInstance(out));
   }
 
   @Override

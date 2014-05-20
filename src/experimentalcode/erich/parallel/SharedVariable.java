@@ -28,16 +28,17 @@ package experimentalcode.erich.parallel;
  * 
  * @author Erich Schubert
  * 
- * @param <T> Payload type
+ * @apiviz.has SharedVariable.Instance
+ * 
+ * @param <I> Instance type
  */
-public interface SharedVariable<T> {
+public interface SharedVariable<I extends SharedVariable.Instance<?>> {
   /**
    * Instantiate for an execution thread.
    * 
-   * @param mapper Mapper to instantiate for
-   * @return Instance
+   * @return new Instance
    */
-  Instance<T> instantiate(MapExecutor mapper);
+  I instantiate();
 
   /**
    * Instance for a single execution thread.
@@ -46,7 +47,7 @@ public interface SharedVariable<T> {
    * 
    * @param <T> Payload type
    */
-  interface Instance<T> {
+  public static interface Instance<T> {
     /**
      * Get the current value
      * 
