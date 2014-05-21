@@ -41,6 +41,18 @@ public interface DBIDVar extends DBIDRef, ArrayDBIDs, SetDBIDs {
   void set(DBIDRef ref);
 
   /**
+   * Clear the contents.
+   */
+  void unset();
+
+  /**
+   * Test if the variable is well-defined.
+   * 
+   * @return {@code true} when assigned.
+   */
+  boolean isSet();
+
+  /**
    * Assign the first pair member to this variable.
    * 
    * @param pair Pair

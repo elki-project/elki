@@ -50,7 +50,7 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
    * Constructor.
    */
   protected IntegerDBIDVar() {
-    this.id = -1;
+    this.id = Integer.MIN_VALUE;
   }
 
   /**
@@ -94,6 +94,7 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   }
 
   @Override
+  @Deprecated
   public DBID get(int i) {
     if(i != 0) {
       throw new ArrayIndexOutOfBoundsException();
@@ -103,12 +104,22 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   @Override
   public int size() {
-    return 1;
+    return id < 0 ? 0 : 1;
   }
 
   @Override
   public boolean isEmpty() {
-    return false;
+    return id < 0;
+  }
+
+  @Override
+  public void unset() {
+    id = Integer.MIN_VALUE;
+  }
+
+  @Override
+  public boolean isSet() {
+    return id > 0;
   }
 
   @Override
