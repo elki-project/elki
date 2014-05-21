@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2013
+ Copyright (C) 2014
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,16 +23,18 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Provides the Derivative Dynamic Time Warping distance for number vectors.
+ * Derivative Dynamic Time Warping distance for numerical vectors.
  * 
  * Reference:
  * <p>
- * E. J. Keogh and M. J. Pazzani< br />
+ * E. J. Keogh and M. J. Pazzani<br />
  * Derivative dynamic time warping<br />
  * In the 1st SIAM International Conference on Data Mining (SDM-2001), Chicago,
  * IL, USA.
@@ -41,8 +43,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @author Lara Hirschbeck, Daniel Kolb
  */
 @Title("Derivative dynamic time warping")
-@Reference(authors = "E. J. Keogh and M. J. Pazzani", title = "Derivative dynamic time warping", booktitle = "1st SIAM International Conference on Data Mining (SDM-2001)", url = "https://siam.org/proceedings/datamining/2001/dm01_01KeoghE.pdf")
-public class DerivativeDTWDistanceFunction extends AbstractEditDistanceFunction {
+@Reference(authors = "E. J. Keogh and M. J. Pazzani", //
+title = "Derivative dynamic time warping", //
+booktitle = "1st SIAM International Conference on Data Mining (SDM-2001)", //
+url = "https://siam.org/proceedings/datamining/2001/dm01_01KeoghE.pdf")
+public class DerivativeDTWDistanceFunction extends DTWDistanceFunction {
+  /**
+   * Constructor.
+   */
+  public DerivativeDTWDistanceFunction() {
+    this(Double.POSITIVE_INFINITY);
+  }
+
   /**
    * Constructor.
    * 
@@ -52,73 +64,78 @@ public class DerivativeDTWDistanceFunction extends AbstractEditDistanceFunction 
     super(bandSize);
   }
 
-  /**
-   * Provides the Derivative Dynamic Time Warping distance between the given two
-   * vectors.
-   * 
-   * @return the Derivative Dynamic Time Warping distance between the given two
-   *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
+    // Dimensionality, and last valid value in second vector:
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
-    // Current and previous columns of the matrix
-    double[] curr = new double[dim2];
-    double[] prev = new double[dim2];
+    final int m2 = dim2 - 1;
 
-    // size of edit distance band
-    int band = (int) Math.ceil(dim2 * bandSize);
     // bandsize is the maximum allowed distance to the diagonal
+    final int band = effectiveBandSize(dim1, dim2);
+    // unsatisfiable - lengths too different!
+    if(Math.abs(dim1 - dim2) > band) {
+      return Double.POSITIVE_INFINITY;
+    }
+    // Current and previous columns of the matrix
+    double[] buf = new double[dim2 << 1];
+    Arrays.fill(buf, Double.POSITIVE_INFINITY);
 
-    for(int i = 0; i < dim1; i++) {
-      // Swap current and prev arrays. We'll just overwrite the new curr.
-      {
-        double[] temp = prev;
-        prev = curr;
-        curr = temp;
-      }
-      int l = i - (band + 1);
-      if(l < 0) {
-        l = 0;
-      }
-      int r = i + (band + 1);
-      if(r > (dim2 - 1)) {
-        r = (dim2 - 1);
-      }
+    // Fill first row:
+    firstRow(buf, band, v1, v2, dim2);
 
+    // Active buffer offsets (cur = read, nxt = write)
+    int cur = 0, nxt = dim2;
+    // Fill remaining rows:
+    int i = 1, l = 0, r = Math.min(m2, i + band);
+    while(i < dim1) {
+      final double val1 = derivative(i, v1);
       for(int j = l; j <= r; j++) {
-        if(Math.abs(i - j) <= band) {
-          final double val1 = derivative(i, v1);
-          final double val2 = derivative(j, v2);
-          final double diff = (val1 - val2);
-          // Formally: diff = Math.sqrt(diff * diff);
-
-          double cost = diff * diff;
-
-          if((i + j) != 0) {
-            if((i == 0) || ((j != 0) && ((prev[j - 1] > curr[j - 1]) && (curr[j - 1] < prev[j])))) {
-              // del
-              cost += curr[j - 1];
-            }
-            else if((j == 0) || ((i != 0) && ((prev[j - 1] > prev[j]) && (prev[j] < curr[j - 1])))) {
-              // ins
-              cost += prev[j];
-            }
-            else {
-              // match
-              cost += prev[j - 1];
-            }
+        // Value in previous row (must exist, may be infinite):
+        double min = buf[cur + j];
+        // Diagonal:
+        if(j > 0) {
+          final double pij = buf[cur + j - 1];
+          min = (pij < min) ? pij : min;
+          // Previous in same row:
+          if(j > l) {
+            final double pj = buf[nxt + j - 1];
+            min = (pj < min) ? pj : min;
           }
-
-          curr[j] = cost;
         }
-        else {
-          curr[j] = Double.POSITIVE_INFINITY; // outside band
-        }
+        // Write:
+        buf[nxt + j] = min + delta(val1, derivative(j, v2));
+      }
+      // Swap buffer positions:
+      cur = dim2 - cur;
+      nxt = dim2 - nxt;
+      // Update positions:
+      ++i;
+      if(i > band) {
+        ++l;
+      }
+      if(r < m2) {
+        ++r;
       }
     }
 
-    return Math.sqrt(curr[dim2 - 1]);
+    // TODO: support Euclidean, Manhattan here:
+    return Math.sqrt(buf[cur + dim2 - 1]);
+  }
+
+  @Override
+  protected void firstRow(double[] buf, int band, NumberVector v1, NumberVector v2, int dim2) {
+    // First cell:
+    final double val1 = derivative(0, v1);
+    buf[0] = delta(val1, derivative(0, v2));
+
+    // Width of valid area:
+    final int w = (band >= dim2) ? dim2 - 1 : band;
+    // Fill remaining part of buffer:
+    for(int j = 1; j <= w; j++) {
+      final double val2 = derivative(j, v2);
+      final double diff = delta(val1, val2);
+      buf[j] = buf[j - 1] + diff;
+    }
   }
 
   /**
@@ -129,15 +146,11 @@ public class DerivativeDTWDistanceFunction extends AbstractEditDistanceFunction 
    */
   public double derivative(int i, NumberVector v) {
     final int dim = v.getDimensionality();
-    if(dim <= 3) {
-      throw new IllegalArgumentException("Derivative DTW: Vector Dimensionality too small for doubleDerivative");
+    if(dim == 1) {
+      return 0.;
     }
-    if(i == 0) {
-      return derivative(1, v);
-    }
-    if(i == dim - 1) {
-      return derivative(dim - 2, v);
-    }
+    // Adjust for boundary conditions, as per the article:
+    i = (i == 0) ? 1 : (i == dim - 1) ? dim - 2 : i;
     return (v.doubleValue(i) - v.doubleValue(i - 1) + (v.doubleValue(i + 1) - v.doubleValue(i - 1)) * .5) * .5;
   }
 }

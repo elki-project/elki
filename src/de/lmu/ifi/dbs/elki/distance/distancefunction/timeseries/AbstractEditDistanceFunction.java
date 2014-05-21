@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -39,11 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Thomas Bernecker
  */
 public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorDistanceFunction {
-  /**
-   * BANDSIZE parameter
-   */
-  public static final OptionID BANDSIZE_ID = new OptionID("edit.bandSize", "the band size for Edit Distance alignment (positive double value, 0 <= bandSize <= 1)");
-
   /**
    * Keeps the currently set bandSize.
    */
@@ -59,10 +54,27 @@ public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorD
     this.bandSize = bandSize;
   }
 
-  // TODO: relax this to VectorTypeInformation!
+  /**
+   * Compute the effective band size.
+   * 
+   * @param dim1 First dimensionality
+   * @param dim2 Second dimensionality
+   * @return Effective bandsize
+   */
+  protected int effectiveBandSize(final int dim1, final int dim2) {
+    if(bandSize == Double.POSITIVE_INFINITY) {
+      return (dim1 > dim2) ? dim1 : dim2;
+    }
+    if(bandSize >= 1.) {
+      return (int) bandSize;
+    }
+    // Max * bandSize:
+    return (int) Math.ceil((dim1 >= dim2 ? dim1 : dim2) * bandSize);
+  }
+
   @Override
-  public VectorFieldTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public VectorTypeInformation<? super NumberVector> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 
   @Override
@@ -84,14 +96,25 @@ public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorD
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
-    protected double bandSize = 0.0;
+    /**
+     * Bandsize parameter.
+     */
+    public static final OptionID BANDSIZE_ID = new OptionID("edit.bandsize", //
+    "The band size for time series alignment. By default, no constraint is used. "//
+        + "If the value is larger than 0, it will be considered absolute, otherwise relative to the longer sequence. " //
+        + "Note that 0 does not make sense: use Euclidean distance then instead.");
+
+    /**
+     * Keeps the currently set bandSize.
+     */
+    protected double bandSize = Double.POSITIVE_INFINITY;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID, 0.1);
-      bandSizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      bandSizeP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID) //
+      .setOptional(true) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(bandSizeP)) {
         bandSize = bandSizeP.doubleValue();
       }
