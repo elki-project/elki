@@ -39,8 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.filter.SparseVectorFieldFilter;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.TFIDFNormalization;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseEuclideanDistanceFunction;
@@ -66,24 +64,21 @@ public class TestTermFrequencyParser implements JUnit4Test {
     config.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, DBLP_DATA);
 
     ArrayList<Object> filters = new ArrayList<>();
-    filters.add(TFIDFNormalization.class);
-    // Note: this filter is needed for the non-sparse Euclidean distance below.
-    filters.add(SparseVectorFieldFilter.class);
     config.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, filters);
 
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, config);
 
-    if (config.hasUnusedParameters()) {
+    if(config.hasUnusedParameters()) {
       fail("Unused parameters: " + config.getRemainingParameters());
     }
-    if (config.hasErrors()) {
+    if(config.hasErrors()) {
       config.logAndClearReportedErrors();
       fail("Parameterization errors.");
     }
 
     db.initialize();
 
-    Relation<SparseNumberVector> rel = db.getRelation(TypeUtil.SPARSE_VECTOR_FIELD);
+    Relation<SparseNumberVector> rel = db.getRelation(TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH);
 
     // Get first three objects:
     DBIDIter iter = rel.iterDBIDs();
@@ -121,9 +116,9 @@ public class TestTermFrequencyParser implements JUnit4Test {
     assertEquals("Arccos distance 1-2 not as expected.", 0.1901934493141418, arccos_12, 1e-20);
     assertEquals("Euclidean distance 1-3 not as expected.", 654.9862593978594, euclid1_13, 1e-20);
     assertEquals("Sparse Euclidean distance 1-3 not as expected.", 654.9862593978594, euclid2_13, 1e-20);
-    assertEquals("Arccos distance 1-3 not as expected.", 0.18654347641726107, arccos_13, 1e-20);
+    assertEquals("Arccos distance 1-3 not as expected.", 0.18654347641726046, arccos_13, 1e-20);
     assertEquals("Euclidean distance 2-3 not as expected.", 231.78653972998518, euclid1_23, 1e-20);
     assertEquals("Sparse Euclidean distance 2-3 not as expected.", 231.78653972998518, euclid2_23, 1e-20);
-    assertEquals("Arccos distance 2-3 not as expected.", 0.11138352337990769, arccos_23, 1e-20);
+    assertEquals("Arccos distance 2-3 not as expected.", 0.11138352337990569, arccos_23, 1e-20);
   }
 }
