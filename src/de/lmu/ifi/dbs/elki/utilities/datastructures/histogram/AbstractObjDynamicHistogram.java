@@ -74,12 +74,12 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
   @SuppressWarnings("unchecked")
   void materialize() {
     // already materialized?
-    if (cachefill <= 0) {
+    if(cachefill <= 0) {
       return;
     }
     // Compute minimum and maximum
     double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
-    for (int i = 0; i < cachefill; i++) {
+    for(int i = 0; i < cachefill; i++) {
       min = Math.min(min, cacheposs[i]);
       max = Math.max(max, cacheposs[i]);
     }
@@ -93,14 +93,14 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
     this.binsize = (max - min) / this.destsize;
     // initialize array
     this.data = new Object[this.destsize << 1];
-    for (int i = 0; i < this.destsize; i++) {
+    for(int i = 0; i < this.destsize; i++) {
       this.data[i] = makeObject();
     }
     size = destsize;
     // re-insert data we have
     final int end = cachefill;
     cachefill = -1; // So reinsert works!
-    for (int i = 0; i < end; i++) {
+    for(int i = 0; i < end; i++) {
       putData(cacheposs[i], (T) cachevals[i]);
     }
     // delete cache, signal that we're initialized
@@ -125,21 +125,24 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
   @Override
   public void putData(double coord, T value) {
     // Store in cache
-    if (cachefill >= 0) {
-      if (cachefill < cacheposs.length) {
+    if(cachefill >= 0) {
+      if(cachefill < cacheposs.length) {
         cacheposs[cachefill] = coord;
         cachevals[cachefill] = cloneForCache(value);
         ++cachefill;
         return;
       }
     }
-    if (coord == Double.NEGATIVE_INFINITY) {
+    if(coord == Double.NEGATIVE_INFINITY) {
       aggregateSpecial(value, 0);
-    } else if (coord == Double.POSITIVE_INFINITY) {
+    }
+    else if(coord == Double.POSITIVE_INFINITY) {
       aggregateSpecial(value, 1);
-    } else if (Double.isNaN(coord)) {
+    }
+    else if(Double.isNaN(coord)) {
       aggregateSpecial(value, 2);
-    } else {
+    }
+    else {
       // super class will handle histogram resizing / shifting
       T exist = get(coord);
       data[getBinNr(coord)] = aggregate(exist, value);
@@ -167,17 +170,19 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
   private void testResample(double coord) {
     final int bin = getBinNr(coord);
     final int sizereq, off;
-    if (bin < 0) {
+    if(bin < 0) {
       sizereq = size - bin;
       off = -bin;
-    } else if (bin >= data.length) {
+    }
+    else if(bin >= data.length) {
       sizereq = bin + 1;
       off = 0;
-    } else {
+    }
+    else {
       // Within the designated size - nothing to do.
       return;
     }
-    if (sizereq < data.length) {
+    if(sizereq < data.length) {
       // Accomodate by shifting. Let super do the job in {@link #get}
       return;
     }
@@ -186,31 +191,33 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
     assert (levels > 0) : "No resampling required?!?";
     final int step = 1 << levels;
 
+    // We want to map [i ... i+step[ -> (i+off)/step
+    // Fix point: i = (i+off)/step; i*(step-1)=off; i=off/(step-1)
     final int fixpoint = off / (step - 1);
     {
       // Start positions for in-place bottom-up downsampling.
-      int oup = fixpoint;
+      int oup = (fixpoint >= 0) ? fixpoint : 0;
       int inp = (oup << levels) - off;
       assert (-step < inp && inp <= oup && oup < inp + step) : (inp + " -> " + oup + " s=" + step + " o=" + off + " l=" + levels);
-      for (; inp < size; inp += step, oup++) {
+      for(; inp < size; inp += step, oup++) {
         assert (oup < inp + step && oup < data.length);
         data[oup] = downsample(data, Math.max(0, inp), Math.min(size, inp + step), step);
       }
       // Clean upwards
-      for (; oup < data.length; oup++) {
+      for(; oup < data.length; oup++) {
         data[oup] = null;
       }
     }
-    if (off >= step) {
+    if(off >= step) {
       // Start positions for in-place downsampling top-down:
-      int oup = fixpoint - 1;
+      int oup = (fixpoint - 1 < data.length) ? fixpoint - 1 : data.length - 1;
       int inp = (oup << levels) - off;
       assert (oup > inp) : (inp + " -> " + oup + " s=" + step + " o=" + off + " l=" + levels);
-      for (; inp > -step; inp -= step, oup--) {
+      for(; inp > -step; inp -= step, oup--) {
         assert (oup >= inp && oup >= 0);
         data[oup] = downsample(data, Math.max(0, inp), Math.min(size, inp + step), step);
       }
-      for (; oup >= 0; oup--) {
+      for(; oup >= 0; oup--) {
         data[oup] = makeObject();
       }
     }

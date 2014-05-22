@@ -165,7 +165,7 @@ public class DoubleDynamicHistogram extends DoubleStaticHistogram {
     final int fixpoint = off / (step - 1);
     {
       // Start positions for in-place bottom-up downsampling.
-      int oup = fixpoint;
+      int oup = (fixpoint >= 0) ? fixpoint : 0;
       int inp = (oup << levels) - off;
       assert (-step < inp && inp <= oup && oup < inp + step) : (inp + " -> " + oup + " s=" + step + " o=" + off + " l=" + levels);
       for (; inp < size; inp += step, oup++) {
@@ -179,7 +179,7 @@ public class DoubleDynamicHistogram extends DoubleStaticHistogram {
     }
     if (off > 0) {
       // Start positions for in-place downsampling top-down:
-      int oup = fixpoint - 1;
+      int oup = (fixpoint - 1 < data.length) ? fixpoint - 1 : data.length - 1;
       int inp = (oup << levels) - off;
       assert (oup > inp) : (inp + " -> " + oup + " s=" + step + " o=" + off + " l=" + levels);
       for (; inp > -step; inp -= step, oup--) {
