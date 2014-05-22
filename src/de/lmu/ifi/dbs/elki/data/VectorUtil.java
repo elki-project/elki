@@ -60,23 +60,6 @@ public final class VectorUtil {
   }
 
   /**
-   * Return the range across all dimensions. Useful in particular for time
-   * series.
-   * 
-   * @param vec Vector to process.
-   * @return [min, max]
-   */
-  public static DoubleMinMax getRangeDouble(NumberVector vec) {
-    DoubleMinMax minmax = new DoubleMinMax();
-
-    for(int i = 0; i < vec.getDimensionality(); i++) {
-      minmax.put(vec.doubleValue(i));
-    }
-
-    return minmax;
-  }
-
-  /**
    * Produce a new vector based on random numbers in [0:1].
    * 
    * @param factory Vector factory
