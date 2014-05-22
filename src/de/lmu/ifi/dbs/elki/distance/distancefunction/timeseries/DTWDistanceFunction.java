@@ -144,9 +144,7 @@ public class DTWDistanceFunction extends AbstractEditDistanceFunction {
     final int w = (band >= dim2) ? dim2 - 1 : band;
     // Fill remaining part of buffer:
     for(int j = 1; j <= w; j++) {
-      final double val2 = v2.doubleValue(j);
-      final double diff = delta(val1, val2);
-      buf[j] = buf[j - 1] + diff;
+      buf[j] = buf[j - 1] + delta(val1, v2.doubleValue(j));
     }
   }
 

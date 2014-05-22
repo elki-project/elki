@@ -24,11 +24,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -38,8 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides the Longest Common Subsequence distance for FeatureVectors.
- * 
+ * Longest Common Subsequence distance for numerical vectors.
  * 
  * Adapted for Java, based on Matlab Code by Michalis Vlachos. Original
  * Copyright Notice:
@@ -73,18 +70,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Thomas Bernecker
  */
 @Title("Longest Common Subsequence distance function")
-@Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/956750.956777")
+@Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", //
+title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", //
+booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", //
+url = "http://dx.doi.org/10.1145/956750.956777")
 public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
-  /**
-   * PDELTA parameter
-   */
-  public static final OptionID PDELTA_ID = new OptionID("lcss.pDelta", "the allowed deviation in x direction for LCSS alignment (positive double value, 0 <= pDelta <= 1)");
-
-  /**
-   * PEPSILON parameter
-   */
-  public static final OptionID PEPSILON_ID = new OptionID("lcss.pEpsilon", "the allowed deviation in y directionfor LCSS alignment (positive double value, 0 <= pEpsilon <= 1)");
-
   /**
    * Keeps the currently set pDelta.
    */
@@ -116,86 +106,77 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
    */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    final int delta = (int) Math.ceil(v2.getDimensionality() * pDelta);
-
-    DoubleMinMax extrema1 = VectorUtil.getRangeDouble(v1);
-    DoubleMinMax extrema2 = VectorUtil.getRangeDouble(v2);
-    double range = Math.max(extrema1.getMax(), extrema2.getMax()) - Math.min(extrema1.getMin(), extrema2.getMin());
-    final double epsilon = range * pEpsilon;
-
-    int m = -1;
-    int n = -1;
-    double[] a, b;
-
-    // put shorter vector first
-    if (v1.getDimensionality() < v2.getDimensionality()) {
-      m = v1.getDimensionality();
-      n = v2.getDimensionality();
-      a = new double[m];
-      b = new double[n];
-
-      for (int i = 0; i < v1.getDimensionality(); i++) {
-        a[i] = v1.doubleValue(i);
-      }
-      for (int j = 0; j < v2.getDimensionality(); j++) {
-        b[j] = v2.doubleValue(j);
-      }
-    } else {
-      m = v2.getDimensionality();
-      n = v1.getDimensionality();
-      a = new double[m];
-      b = new double[n];
-
-      for (int i = 0; i < v2.getDimensionality(); i++) {
-        a[i] = v2.doubleValue(i);
-      }
-      for (int j = 0; j < v1.getDimensionality(); j++) {
-        b[j] = v1.doubleValue(j);
-      }
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    if(dim1 > dim2) {
+      return distance(v2, v1);
     }
+    final int delta = (int) Math.ceil(dim2 * pDelta);
 
-    double[] curr = new double[n + 1];
+    // Compute value range, for scaling epsilon:
+    final double epsilon = getRange(v1, dim1, v2, dim2) * pEpsilon;
 
-    for (int i = 0; i < m; i++) {
-      double[] next = new double[n + 1];
-      for (int j = Math.max(0, i - delta); j <= Math.min(n - 1, i + delta); j++) {
-        if ((b[j] + epsilon) >= a[i] && (b[j] - epsilon) <= a[i]) { // match
+    double[] curr = new double[dim2 + 1];
+    double[] next = new double[dim2 + 1];
+
+    for(int i = 0; i < dim1; i++) {
+      final double ai = v1.doubleValue(i);
+      for(int j = Math.max(0, i - delta); j <= Math.min(dim2 - 1, i + delta); j++) {
+        final double bj = v2.doubleValue(j);
+        if((bj + epsilon) >= ai && (bj - epsilon) <= ai) { // match
           next[j + 1] = curr[j] + 1;
-        } else if (curr[j + 1] > next[j]) { // ins
+        }
+        else if(curr[j + 1] > next[j]) { // ins
           next[j + 1] = curr[j + 1];
-        } else { // del
+        }
+        else { // del
           next[j + 1] = next[j];
         }
       }
+      // Swap
+      double[] tmp = curr;
       curr = next;
+      next = tmp;
     }
 
     // search for maximum in the last line
-    double maxEntry = -1;
-    for (int i = 1; i < n + 1; i++) {
-      if (curr[i] > maxEntry) {
-        maxEntry = curr[i];
-      }
+    double maxEntry = curr[1];
+    for(int i = 2; i < dim2 + 1; i++) {
+      maxEntry = (curr[i] > maxEntry) ? curr[i] : maxEntry;
     }
-    double sim = maxEntry / Math.min(m, n);
-    return 1 - sim;
+    final double sim = maxEntry / Math.min(dim1, dim2);
+    return 1. - sim;
   }
 
-  // TODO: relax this to VectorTypeInformation!
+  public double getRange(NumberVector v1, final int dim1, NumberVector v2, final int dim2) {
+    double min = v1.doubleValue(0), max = min;
+    for(int i = 1; i < dim1; i++) {
+      final double v = v1.doubleValue(i);
+      min = (v < min) ? v : min;
+      max = (v > max) ? v : max;
+    }
+    for(int i = 0; i < dim2; i++) {
+      final double v = v2.doubleValue(i);
+      min = (v < min) ? v : min;
+      max = (v > max) ? v : max;
+    }
+    final double range = max - min;
+    return range;
+  }
+
   @Override
-  public VectorFieldTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  public VectorTypeInformation<? super NumberVector> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) {
+    if(obj == this) {
       return true;
     }
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
     return (this.pDelta == ((LCSSDistanceFunction) obj).pDelta) && (this.pEpsilon == ((LCSSDistanceFunction) obj).pEpsilon);
@@ -209,24 +190,40 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    protected double pDelta = 0.0;
+    /**
+     * PDELTA parameter
+     */
+    public static final OptionID PDELTA_ID = new OptionID("lcss.pDelta", "the allowed deviation in x direction for LCSS alignment (positive double value, 0 <= pDelta <= 1)");
 
-    protected double pEpsilon = 0.0;
+    /**
+     * PEPSILON parameter
+     */
+    public static final OptionID PEPSILON_ID = new OptionID("lcss.pEpsilon", "the allowed deviation in y direction for LCSS alignment (positive double value, 0 <= pEpsilon <= 1)");
+
+    /**
+     * Keeps the currently set pDelta.
+     */
+    private double pDelta;
+
+    /**
+     * Keeps the currently set pEpsilon.
+     */
+    private double pEpsilon;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, 0.1);
-      pDeltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      pDeltaP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if (config.grab(pDeltaP)) {
+      final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, 0.1)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
+      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      if(config.grab(pDeltaP)) {
         pDelta = pDeltaP.doubleValue();
       }
 
-      final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, 0.05);
-      pEpsilonP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      pEpsilonP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if (config.grab(pEpsilonP)) {
+      final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, 0.05)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      if(config.grab(pEpsilonP)) {
         pEpsilon = pEpsilonP.doubleValue();
       }
     }
