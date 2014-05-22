@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.clustering;
 
 /*
  This file is part of ELKI:
@@ -22,63 +22,44 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSilhouette;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Compute the silhouette of a data set.
+ * Outlier detection by using the Silhouette Coefficients.
  * 
- * Reference:
+ * Silhouette values are computed as in:
  * <p>
  * P. J. Rousseeuw<br />
  * Silhouettes: A graphical aid to the interpretation and validation of cluster
@@ -86,7 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * In: Journal of Computational and Applied Mathematics Volume 20, November 1987
  * </p>
  * 
- * TODO: keep all silhouette values, and allow visualization!
+ * but then used as outlier scores. To cite this outlier detection approach,
+ * please cite the ELKI version you used.
  * 
  * @author Erich Schubert
  * 
@@ -96,11 +78,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "Silhouettes: A graphical aid to the interpretation and validation of cluster analysis", //
 booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
 url = "http://dx.doi.org/10.1016%2F0377-0427%2887%2990125-7")
-public class EvaluateSilhouette<O> implements Evaluator {
+public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
-   * Logger for debug output.
+   * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
+  private static final Logging LOG = Logging.getLogger(SilhouetteOutlierDetection.class);
+
+  /**
+   * Clustering algorithm to use
+   */
+  ClusteringAlgorithm<?> clusterer;
 
   /**
    * Keep noise "clusters" merged, instead of breaking them into singletons.
@@ -108,38 +95,38 @@ public class EvaluateSilhouette<O> implements Evaluator {
   private boolean mergenoise = false;
 
   /**
-   * Distance function to use.
-   */
-  private DistanceFunction<? super O> distance;
-
-  /**
    * Constructor.
    * 
-   * @param distance Distance function
-   * @param mergenoise Flag to treat noise as clusters, instead of breaking them
-   *        into singletons.
+   * @param distanceFunction Distance function
+   * @param clusterer Clustering algorithm
+   * @param mergenoise Flag to keep "noise" clusters merged, instead of breaking
+   *        them into singletons.
    */
-  public EvaluateSilhouette(DistanceFunction<? super O> distance, boolean mergenoise) {
-    super();
-    this.distance = distance;
+  public SilhouetteOutlierDetection(DistanceFunction<? super O> distanceFunction, ClusteringAlgorithm<?> clusterer, boolean mergenoise) {
+    super(distanceFunction);
+    this.clusterer = clusterer;
     this.mergenoise = mergenoise;
   }
 
-  /**
-   * Evaluate a single clustering.
-   * 
-   * @param db Database
-   * @param rel Data relation
-   * @param dq Distance query
-   * @param c Clustering
-   */
-  public void evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+  @Override
+  public OutlierResult run(Database database) {
+    Relation<O> relation = database.getRelation(getDistanceFunction().getInputTypeRestriction());
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
+
+    // TODO: improve ELKI api to ensure we're using the same DBIDs!
+    Clustering<?> c = clusterer.run(database);
+
+    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
+    DoubleMinMax mm = new DoubleMinMax();
+
     List<? extends Cluster<?>> clusters = c.getAllClusters();
-    MeanVariance msil = new MeanVariance();
     for(Cluster<?> cluster : clusters) {
       if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
         // As suggested in Rousseeuw, we use 0 for singletons.
-        msil.put(0., cluster.size());
+        for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+          scores.put(iter, 0.);
+        }
+        mm.put(0.);
         continue;
       }
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
@@ -180,77 +167,83 @@ public class EvaluateSilhouette<O> implements Evaluator {
             min = b;
           }
         }
-        msil.put((min - a) / Math.max(min, a));
+        final double score = (min - a) / Math.max(min, a);
+        scores.put(it1, score);
+        mm.put(score);
       }
     }
-    if(LOG.isVerbose()) {
-      LOG.verbose("Mean Silhouette: " + msil);
-    }
-    // Build a primitive result attachment:
-    Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { msil.getMean(), msil.getSampleStddev() }));
-    db.getHierarchy().add(c, new CollectionResult<>("Silhouette coefficient", "silhouette-coefficient", col));
+
+    // Build result representation.
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Silhouette Coefficients", "silhouette-outlier", scores, relation.getDBIDs());
+    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), -1., 1., .5);
+    return new OutlierResult(scoreMeta, scoreResult);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
-    if(crs.size() < 1) {
-      return;
+  public TypeInformation[] getInputTypeRestriction() {
+    final TypeInformation dt = getDistanceFunction().getInputTypeRestriction();
+    TypeInformation[] t = clusterer.getInputTypeRestriction();
+    for(TypeInformation i : t) {
+      if(dt.isAssignableFromType(i)) {
+        return t;
+      }
     }
-    Database db = ResultUtil.findDatabase(baseResult);
-    Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
-    for(Clustering<?> c : crs) {
-      evaluateClustering(db, rel, dq, c);
-    }
+    // Prepend distance type:
+    TypeInformation[] t2 = new TypeInformation[t.length + 1];
+    t2[0] = dt;
+    System.arraycopy(t, 0, t2, 1, t.length);
+    return t2;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 
   /**
-   * Parameterization class.
+   * Parameterizer.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
-     * Parameter for choosing the distance function.
+     * Parameter for choosing the clustering algorithm
      */
-    public static final OptionID DISTANCE_ID = new OptionID("silhouette.distance", "Distance function to use for computing the silhouette.");
+    public static final OptionID CLUSTERING_ID = new OptionID("silhouette.clustering", //
+    "Clustering algorithm to use for the silhouette coefficients.");
 
     /**
-     * Parameter to treat noise as a single cluster.
+     * Clustering algorithm to use
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("silhouette.noisecluster", "Treat noise as a cluster, not as singletons.");
+    ClusteringAlgorithm<?> clusterer;
 
     /**
-     * Distance function to use.
-     */
-    private DistanceFunction<? super O> distance;
-
-    /**
-     * Keep noise "clusters" merged.
+     * Keep noise "clusters" merged, instead of breaking them into singletons.
      */
     private boolean mergenoise = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-      if(config.grab(distP)) {
-        distance = distP.instantiateClass(config);
+
+      ObjectParameter<ClusteringAlgorithm<?>> clusterP = new ObjectParameter<>(CLUSTERING_ID, ClusteringAlgorithm.class);
+      if(config.grab(clusterP)) {
+        clusterer = clusterP.instantiateClass(config);
       }
 
-      Flag noiseP = new Flag(MERGENOISE_ID);
+      Flag noiseP = new Flag(EvaluateSilhouette.Parameterizer.MERGENOISE_ID);
       if(config.grab(noiseP)) {
         mergenoise = noiseP.isTrue();
       }
     }
 
     @Override
-    protected EvaluateSilhouette<O> makeInstance() {
-      return new EvaluateSilhouette<>(distance, mergenoise);
+    protected SilhouetteOutlierDetection<O> makeInstance() {
+      return new SilhouetteOutlierDetection<>(distanceFunction, clusterer, mergenoise);
     }
   }
 }
