@@ -112,7 +112,7 @@ public final class TypeUtil {
   /**
    * Number vectors of <em>variable</em> length.
    */
-  public static final VectorTypeInformation<? super NumberVector> NUMBER_VECTOR_VARIABLE_LENGTH = VectorTypeInformation.typeRequest(NumberVector.class);
+  public static final VectorTypeInformation<NumberVector> NUMBER_VECTOR_VARIABLE_LENGTH = VectorTypeInformation.typeRequest(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.

@@ -232,20 +232,22 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     @Override
     public VectorTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
       try {
+        // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        Class<DoubleVector> clz = (Class<DoubleVector>) Class.forName(typename);
+        NumberVector.Factory<DoubleVector> factory = (NumberVector.Factory<DoubleVector>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<DoubleVector> serializer = (ByteBufferSerializer<DoubleVector>) Class.forName(sername).newInstance();
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
-        return new VectorTypeInformation<>(clz, serializer, mindim, maxdim);
+        // FIXME: should/must provide a factory now!
+        return new VectorTypeInformation<>(factory, serializer, mindim, maxdim);
+      } catch (UnableToComplyException e) {
+        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
-      } catch (InstantiationException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: "+e.getMessage(), e);
-      } catch (IllegalAccessException e) {
+      } catch (InstantiationException | IllegalAccessException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: "+e.getMessage(), e);
       }
     }
@@ -265,8 +267,8 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       } catch (SecurityException e) {
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
-      // Type class
-      ByteArrayUtil.writeString(buffer, object.getRestrictionClass().getName());
+      // Use *factory* class!
+      ByteArrayUtil.writeString(buffer, object.getFactory().getClass().getName());
       // Name, or an empty string.
       ByteArrayUtil.writeString(buffer, object.getLabel());
       // Serializer class
@@ -346,9 +348,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
-      } catch (InstantiationException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: "+e.getMessage(), e);
-      } catch (IllegalAccessException e) {
+      } catch (InstantiationException | IllegalAccessException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: "+e.getMessage(), e);
       }
     }

@@ -119,7 +119,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param maxdim Maximum dimensionality request
    */
   private VectorFieldTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
-    super(cls, null, mindim, maxdim);
+    super(cls, mindim, maxdim);
   }
 
   /**
@@ -130,17 +130,6 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    */
   public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim) {
     super(factory, factory.getDefaultSerializer(), dim, dim);
-  }
-
-  /**
-   * Constructor for a request with fixed dimensionality.
-   * 
-   * @param cls Vector restriction class.
-   * @param dim Dimensionality request
-   */
-  @Deprecated
-  public VectorFieldTypeInformation(Class<? super V> cls, int dim) {
-    super(cls, null, dim, dim);
   }
 
   @Override

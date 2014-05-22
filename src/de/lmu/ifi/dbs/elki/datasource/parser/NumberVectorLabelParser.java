@@ -358,7 +358,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     }
     else if(mindim < maxdim) {
       // Variable dimensionality - return non-vector field type
-      return new VectorTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer(), mindim, maxdim);
+      return new VectorTypeInformation<>(factory, factory.getDefaultSerializer(), mindim, maxdim);
     }
     else {
       throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");

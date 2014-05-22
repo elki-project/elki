@@ -48,7 +48,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
    * @param <V> vector type
    */
   public static <V extends FeatureVector<?>> VectorTypeInformation<V> typeRequest(Class<? super V> cls) {
-    return new VectorTypeInformation<>(cls, null, -1, Integer.MAX_VALUE);
+    return new VectorTypeInformation<>(cls, -1, Integer.MAX_VALUE);
   }
 
   /**
@@ -60,7 +60,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
    * @param <V> vector type
    */
   public static <V extends FeatureVector<?>> VectorTypeInformation<V> typeRequest(Class<? super V> cls, int mindim, int maxdim) {
-    return new VectorTypeInformation<>(cls, null, mindim, maxdim);
+    return new VectorTypeInformation<>(cls, mindim, maxdim);
   }
 
   /**
@@ -74,15 +74,15 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
   protected final int maxdim;
 
   /**
-   * Constructor for an actual type.
+   * Constructor for a type request.
    * 
    * @param cls base class
    * @param serializer Serializer
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
    */
-  public VectorTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim) {
-    super(cls, serializer);
+  public VectorTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
+    super(cls);
     this.factory = null;
     assert (this.mindim <= this.maxdim);
     this.mindim = mindim;

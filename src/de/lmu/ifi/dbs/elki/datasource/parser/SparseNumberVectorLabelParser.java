@@ -160,7 +160,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
       return new VectorFieldTypeInformation<>(factory, mindim);
     }
     else if(mindim < maxdim) {
-      return new VectorTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer(), mindim, maxdim);
+      return new VectorTypeInformation<>(factory, factory.getDefaultSerializer(), mindim, maxdim);
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }

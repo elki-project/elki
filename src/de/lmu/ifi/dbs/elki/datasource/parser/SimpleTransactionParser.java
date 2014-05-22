@@ -187,7 +187,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
   public BundleMeta getMeta() {
     if(meta == null) {
       meta = new BundleMeta(1);
-      meta.add(new VectorTypeInformation<>(BitVector.class, BitVector.SHORT_SERIALIZER, 0, numterms));
+      meta.add(new VectorTypeInformation<>(BitVector.FACTORY, BitVector.SHORT_SERIALIZER, 0, numterms));
     }
     return meta;
   }
