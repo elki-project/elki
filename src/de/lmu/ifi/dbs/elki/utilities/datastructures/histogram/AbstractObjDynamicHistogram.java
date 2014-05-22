@@ -210,7 +210,7 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
     }
     if(off >= step) {
       // Start positions for in-place downsampling top-down:
-      int oup = (fixpoint - 1 < data.length) ? fixpoint - 1 : data.length - 1;
+      int oup = (fixpoint - 1 < size) ? fixpoint - 1 : size - 1;
       int inp = (oup << levels) - off;
       assert (oup > inp) : (inp + " -> " + oup + " s=" + step + " o=" + off + " l=" + levels);
       for(; inp > -step; inp -= step, oup--) {

@@ -162,6 +162,8 @@ public class ShortDynamicHistogram extends ShortStaticHistogram {
     assert (levels > 0) : "No resampling required?!? sizereq=" + sizereq + " destsize=" + destsize + " array=" + data.length;
     final int step = 1 << levels;
 
+    // We want to map [i ... i+step[ -> (i+off)/step
+    // Fix point: i = (i+off)/step; i*(step-1)=off; i=off/(step-1)
     final int fixpoint = off / (step - 1);
     {
       // Start positions for in-place bottom-up downsampling.
@@ -177,9 +179,9 @@ public class ShortDynamicHistogram extends ShortStaticHistogram {
         data[oup] = 0;
       }
     }
-    if (off > 0) {
+    if(off >= step) {
       // Start positions for in-place downsampling top-down:
-      int oup = (fixpoint - 1 < data.length) ? fixpoint - 1 : data.length - 1;
+      int oup = (fixpoint - 1 < size) ? fixpoint - 1 : size - 1;
       int inp = (oup << levels) - off;
       assert (oup > inp) : (inp + " -> " + oup + " s=" + step + " o=" + off + " l=" + levels);
       for (; inp > -step; inp -= step, oup--) {
