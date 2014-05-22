@@ -15,6 +15,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS
 de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DeLiClu
+de.lmu.ifi.dbs.elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.COP
 de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore

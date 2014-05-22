@@ -68,7 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * but then used as outlier scores. To cite this outlier detection approach,
- * please cite the ELKI version you used.
+ * please cite the ELKI version you used (use the <a
+ * href="http://elki.dbs.ifi.lmu.de/wiki/Publications">ELKI publication list</a>
+ * for citation information and BibTeX templates).
  * 
  * @author Erich Schubert
  * 
