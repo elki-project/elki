@@ -149,7 +149,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     }
     haslabels |= (labels.size() > 0);
     if(normalize) {
-      if(Math.abs(len - 1.0) > 1E-10 && len > 1E-10) {
+      if(Math.abs(len - 1.0) > Double.MIN_NORMAL) {
         for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
           iter.advance();
           iter.setValue(iter.value() / len);
@@ -167,7 +167,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
       return new VectorFieldTypeInformation<>(factory, mindim);
     }
     else if(mindim < maxdim) {
-      return new VectorTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer(), mindim, maxdim);
+      return new VectorTypeInformation<>(factory, factory.getDefaultSerializer(), mindim, maxdim);
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
@@ -200,7 +200,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
       super.makeOptions(config);
       Flag normF = new Flag(NORMALIZE_FLAG);
       if(config.grab(normF)) {
-        normalize = normF.getValue().booleanValue();
+        normalize = normF.isTrue();
       }
     }
 
