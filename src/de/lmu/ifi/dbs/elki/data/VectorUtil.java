@@ -146,7 +146,7 @@ public final class VectorUtil {
       i2 = v2.iterAdvance(i2);
     }
 
-    final double a = cross / (Math.sqrt(l1) * Math.sqrt(l2));
+    final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a > 1.) ? 1. : a;
   }
 
@@ -166,26 +166,26 @@ public final class VectorUtil {
     // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
     // We can just compute all three in parallel.
     double[] oe = o.getArrayRef();
-    double s = 0, e1 = 0, e2 = 0;
+    double cross = 0., l1 = 0., l2 = 0.;
     for(int k = 0; k < mindim; k++) {
       final double dk = k < dimo ? oe[k] : 0.;
       final double r1 = v1.doubleValue(k) - dk;
       final double r2 = v2.doubleValue(k) - dk;
-      s += r1 * r2;
-      e1 += r1 * r1;
-      e2 += r2 * r2;
+      cross += r1 * r2;
+      l1 += r1 * r1;
+      l2 += r2 * r2;
     }
     for(int k = mindim; k < dim1; k++) {
       final double dk = k < dimo ? oe[k] : 0.;
       final double r1 = v1.doubleValue(k) - dk;
-      e1 += r1 * r1;
+      l1 += r1 * r1;
     }
     for(int k = mindim; k < dim2; k++) {
       final double dk = k < dimo ? oe[k] : 0.;
       final double r2 = v2.doubleValue(k) - dk;
-      e2 += r2 * r2;
+      l2 += r2 * r2;
     }
-    final double a = Math.sqrt((s / e1) * (s / e2));
+    final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a > 1.) ? 1. : a;
   }
 
@@ -245,23 +245,23 @@ public final class VectorUtil {
     // Essentially, we want to compute this:
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
     // We can just compute all three in parallel.
-    double s = 0, e1 = 0, e2 = 0;
+    double cross = 0, l1 = 0, l2 = 0;
     for(int k = 0; k < mindim; k++) {
       final double r1 = v1.doubleValue(k);
       final double r2 = v2.doubleValue(k);
-      s += r1 * r2;
-      e1 += r1 * r1;
-      e2 += r2 * r2;
+      cross += r1 * r2;
+      l1 += r1 * r1;
+      l2 += r2 * r2;
     }
     for(int k = mindim; k < dim1; k++) {
       final double r1 = v1.doubleValue(k);
-      e1 += r1 * r1;
+      l1 += r1 * r1;
     }
     for(int k = mindim; k < dim2; k++) {
       final double r2 = v2.doubleValue(k);
-      e2 += r2 * r2;
+      l2 += r2 * r2;
     }
-    final double a = Math.sqrt((s / e1) * (s / e2));
+    final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a > 1.) ? 1. : a;
   }
 
