@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 /*
  This file is part of ELKI:
@@ -24,52 +24,49 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  */
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Initialize k-means by generating random vectors (within the data sets value
- * range).
+ * Initialize K-means by randomly choosing k exsiting elements as cluster
+ * centers.
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector type
+ * @param <O> Vector type
  */
-public class RandomlyGeneratedInitialMeans<V extends NumberVector> extends AbstractKMeansInitialization<V> {
+public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Constructor.
    * 
    * @param rnd Random generator.
    */
-  public RandomlyGeneratedInitialMeans(RandomFactory rnd) {
+  public RandomlyChosenInitialMeans(RandomFactory rnd) {
     super(rnd);
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
-    final int dim = RelationUtil.dimensionality(relation);
-    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
-    Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(relation);
-    List<V> means = new ArrayList<>(k);
-    final Random random = rnd.getSingleThreadedRandom();
-    for(int i = 0; i < k; i++) {
-      double[] r = MathUtil.randomDoubleArray(dim, random);
-      // Rescale
-      for(int d = 0; d < dim; d++) {
-        r[d] = minmax.first.doubleValue(d) + (minmax.second.doubleValue(d) - minmax.first.doubleValue(d)) * r[d];
-      }
-      means.add(factory.newNumberVector(r));
+  public <V extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+    DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
+    List<Vector> means = new ArrayList<>(k);
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      means.add(relation.get(iter).getColumnVector());
     }
     return means;
+  }
+
+  @Override
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distanceFunction) {
+    return DBIDUtil.randomSample(distanceFunction.getRelation().getDBIDs(), k, rnd);
   }
 
   /**
@@ -79,10 +76,10 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector> extends Abstr
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeansInitialization.Parameterizer<V> {
+  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {
     @Override
-    protected RandomlyGeneratedInitialMeans<V> makeInstance() {
-      return new RandomlyGeneratedInitialMeans<>(rnd);
+    protected RandomlyChosenInitialMeans<V> makeInstance() {
+      return new RandomlyChosenInitialMeans<>(rnd);
     }
   }
 }

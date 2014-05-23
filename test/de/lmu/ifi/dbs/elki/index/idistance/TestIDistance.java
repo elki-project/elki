@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.index.idistance;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FarthestPointsInitialMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FarthestPointsInitialMeans;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.AbstractTestIndexStructures;

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 /*
  This file is part of ELKI:
@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -34,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @param <V> Vector type
  */
-public abstract class AbstractKMeansInitialization<V> implements KMeansInitialization<V> {
+public abstract class AbstractKMeansInitialization<V extends NumberVector> implements KMeansInitialization<V> {
   /**
    * Random number generator
    */
@@ -56,7 +58,7 @@ public abstract class AbstractKMeansInitialization<V> implements KMeansInitializ
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<V> extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Random generator
      */

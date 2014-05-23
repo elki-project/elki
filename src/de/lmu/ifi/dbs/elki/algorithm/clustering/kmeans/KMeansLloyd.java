@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -40,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -89,7 +91,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    List<? extends NumberVector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -113,7 +115,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      KMeansModel model = new KMeansModel(means.get(i).getColumnVector());
+      KMeansModel model = new KMeansModel(means.get(i));
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

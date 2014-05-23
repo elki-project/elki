@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -106,12 +107,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     // Choose initial means
-    List<? extends NumberVector> mvs = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
-    // Convert to (modifiable) math vectors.
-    List<Vector> means = new ArrayList<>(k);
-    for(NumberVector m : mvs) {
-      means.add(m.getColumnVector());
-    }
+    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
 
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();

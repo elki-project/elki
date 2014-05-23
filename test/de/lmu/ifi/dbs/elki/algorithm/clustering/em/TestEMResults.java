@@ -63,7 +63,7 @@ public class TestEMResults extends AbstractSimpleAlgorithmTest implements JUnit4
 
     // run EM on database
     Clustering<?> result = em.run(db);
-    testFMeasure(db, result, 0.7551098);
-    testClusterSizes(result, new int[] { 50, 99, 102, 120, 141, 198 });
+    testFMeasure(db, result, 0.7801225);
+    testClusterSizes(result, new int[] { 2, 5, 28, 170, 200, 305 });
   }
 }

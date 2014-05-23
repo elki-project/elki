@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 /*
  This file is part of ELKI:
@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -41,9 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector type
+ * @param <O> Object type for KMedoids
  */
-public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
+public class FirstKInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
   /**
    * Constructor.
    */
@@ -52,17 +53,17 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <V extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     DBIDIter iter = relation.iterDBIDs();
-    List<V> means = new ArrayList<>(k);
+    List<Vector> means = new ArrayList<>(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {
-      means.add(relation.get(iter));
+      means.add(relation.get(iter).getColumnVector());
     }
     return means;
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distanceFunction) {
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distanceFunction) {
     DBIDIter iter = distanceFunction.getRelation().iterDBIDs();
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {

@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.index.idistance;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;

@@ -1,5 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
-
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,32 +21,25 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 
 /**
- * Interface for initializing K-Means
+ * Interface for initializing K-Medoids. In contrast to k-means initializers,
+ * this initialization will only return members of the original data set.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.landmark
- * 
  * @param <V> Object type
  */
-public interface KMeansInitialization<V> {
+public interface KMedoidsInitialization<V> {
   /**
    * Choose initial means
    * 
-   * @param database Database context
-   * @param relation Relation
    * @param k Parameter k
    * @param distanceFunction Distance function
-   * 
    * @return List of chosen means for k-means
    */
-  public abstract List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction);
+  public abstract DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distanceFunction);
 }

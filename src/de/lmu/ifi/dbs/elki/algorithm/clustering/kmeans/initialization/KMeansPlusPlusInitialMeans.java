@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 /*
  This file is part of ELKI:
@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -60,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <V> Vector type
  */
 @Reference(authors = "D. Arthur, S. Vassilvitskii", title = "k-means++: the advantages of careful seeding", booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", url = "http://dx.doi.org/10.1145/1283383.1283494")
-public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
+public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<V> {
   /**
    * Constructor.
    * 
@@ -71,21 +72,18 @@ public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
-    // Get a distance query
-    @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super V> distF = (PrimitiveDistanceFunction<? super V>) distanceFunction;
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, distF);
+  public <T extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+    DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     // Chose first mean
-    List<V> means = new ArrayList<>(k);
+    List<Vector> means = new ArrayList<>(k);
 
     Random random = rnd.getSingleThreadedRandom();
     DBID first = DBIDUtil.deref(DBIDUtil.randomSample(ids, 1, random).iter());
-    means.add(relation.get(first));
+    means.add(relation.get(first).getColumnVector());
 
     // Initialize weights
     double weightsum = initialWeights(weights, ids, first, distQ);
@@ -106,8 +104,8 @@ public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<
         r -= w;
       }
       // Add new mean:
-      final V newmean = relation.get(it);
-      means.add(newmean);
+      final T newmean = relation.get(it);
+      means.add(newmean.getColumnVector());
       // Update weights:
       weights.putDouble(it, Double.NaN);
       // Choose optimized version for double distances, if applicable.
@@ -171,7 +169,7 @@ public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<
    * @param distQ Distance query
    * @return Weight sum
    */
-  protected double initialWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<? super V> distQ) {
+  protected double initialWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<?> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       // Distance will usually already be squared
@@ -191,7 +189,7 @@ public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<
    * @param distQ Distance query
    * @return Weight sum
    */
-  protected double updateWeights(WritableDoubleDataStore weights, DBIDs ids, V latest, DistanceQuery<? super V> distQ) {
+  protected <T> double updateWeights(WritableDoubleDataStore weights, DBIDs ids, T latest, DistanceQuery<? super T> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       double weight = weights.doubleValue(it);
@@ -215,7 +213,7 @@ public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer<V> {
+  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {
     @Override
     protected KMeansPlusPlusInitialMeans<V> makeInstance() {
       return new KMeansPlusPlusInitialMeans<>(rnd);

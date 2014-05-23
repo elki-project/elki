@@ -59,7 +59,7 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
   /**
    * Mean vectors.
    */
-  List<? extends NumberVector> means;
+  List<Vector> means;
 
   /**
    * Updated cluster centroids
@@ -105,7 +105,7 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
    * 
    * @param means New means.
    */
-  public void nextIteration(List<? extends NumberVector> means) {
+  public void nextIteration(List<Vector> means) {
     this.means = means;
     changed = false;
     final int k = means.size();
@@ -147,8 +147,8 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
    * 
    * @return New means
    */
-  public List<? extends NumberVector> getMeans() {
-    ArrayList<NumberVector> newmeans = new ArrayList<>(centroids.length);
+  public List<Vector> getMeans() {
+    ArrayList<Vector> newmeans = new ArrayList<>(centroids.length);
     for (int i = 0; i < centroids.length; i++) {
       if (sizes[i] == 0) {
         newmeans.add(means.get(i)); // Keep old mean.

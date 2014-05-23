@@ -29,8 +29,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansPlusPlusInitialMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -107,7 +107,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
     // Choose initial means
-    List<? extends NumberVector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -227,7 +227,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param metas Metadata storage
    * @param df Distance function
    */
-  protected void updateDistances(Relation<V> relation, List<? extends NumberVector> means, final WritableDataStore<Meta> metas, PrimitiveDistanceFunction<NumberVector> df) {
+  protected void updateDistances(Relation<V> relation, List<Vector> means, final WritableDataStore<Meta> metas, PrimitiveDistanceFunction<? super NumberVector> df) {
     for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = metas.get(id);
       V fv = relation.get(id);
@@ -255,10 +255,9 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param tids DBIDs array
    * @return final means
    */
-  protected List<? extends NumberVector> refineResult(Relation<V> relation, List<? extends NumberVector> means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
+  protected List<Vector> refineResult(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
     // This is a safe cast - see constructor.
-    @SuppressWarnings("unchecked")
-    PrimitiveDistanceFunction<NumberVector> df = (PrimitiveDistanceFunction<NumberVector>) getDistanceFunction();
+    PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
     // Our desired cluster size:
     final int minsize = tids.size() / k; // rounded down
     final int maxsize = (tids.size() + k - 1) / k; // rounded up

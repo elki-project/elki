@@ -1,0 +1,8 @@
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FirstKInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.SampleKMeansInitialization
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FarthestPointsInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FarthestSumPointsInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans

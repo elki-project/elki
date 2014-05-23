@@ -26,13 +26,14 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Factory for EM with multivariate gaussian models (also known as Gaussian
@@ -57,13 +58,13 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
 
   @Override
   public List<? extends EMClusterModel<EMModel>> buildInitialModels(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> df) {
-    final List<? extends NumberVector> initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
+    final List<Vector> initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
     assert (initialMeans.size() == k);
     final int dimensionality = initialMeans.get(0).getDimensionality();
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
     List<MultivariateGaussianModel> models = new ArrayList<>(k);
-    for(NumberVector nv : initialMeans) {
-      models.add(new MultivariateGaussianModel(1. / k, nv.getColumnVector(), norm));
+    for(Vector nv : initialMeans) {
+      models.add(new MultivariateGaussianModel(1. / k, nv, norm));
     }
     return models;
   }

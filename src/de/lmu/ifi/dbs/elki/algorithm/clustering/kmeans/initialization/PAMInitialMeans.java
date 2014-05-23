@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 /*
  This file is part of ELKI:
@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -57,10 +58,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector type
+ * @param <O> Object type for KMedoids initialization
  */
-@Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class PAMInitialMeans<V> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
+@Reference(title = "Clustering my means of Medoids", //
+authors = "Kaufman, L. and Rousseeuw, P.J.", //
+booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
+public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
   /**
    * Constructor.
    */
@@ -69,21 +72,24 @@ public class PAMInitialMeans<V> implements KMeansInitialization<V>, KMedoidsInit
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <V extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+    // Ugly cast; but better than code duplication.
+    @SuppressWarnings("unchecked")
+    Relation<O> rel = (Relation<O>) relation;
     // Get a distance query
     @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super V> distF = (PrimitiveDistanceFunction<? super V>) distanceFunction;
-    final DistanceQuery<V> distQ = database.getDistanceQuery(relation, distF);
+    final PrimitiveDistanceFunction<? super O> distF = (PrimitiveDistanceFunction<? super O>) distanceFunction;
+    final DistanceQuery<O> distQ = database.getDistanceQuery(rel, distF);
     DBIDs medids = chooseInitialMedoids(k, distQ);
-    List<V> medoids = new ArrayList<>(k);
+    List<Vector> medoids = new ArrayList<>(k);
     for(DBIDIter iter = medids.iter(); iter.valid(); iter.advance()) {
-      medoids.add(relation.get(iter));
+      medoids.add(relation.get(iter).getColumnVector());
     }
     return medoids;
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distQ) {
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distQ) {
     final DBIDs ids = distQ.getRelation().getDBIDs();
 
     ArrayModifiableDBIDs medids = DBIDUtil.newArray(k);

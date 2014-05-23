@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -43,10 +43,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import experimentalcode.erich.parallel.ParallelMapExecutor;
 import experimentalcode.erich.parallel.mapper.KMeansMapper;
 
@@ -57,7 +57,7 @@ import experimentalcode.erich.parallel.mapper.KMeansMapper;
  * 
  * @param <V> Vector type
  */
-public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<V, KMeansModel<V>> {
+public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * Constructor.
    * 
@@ -79,11 +79,11 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
   }
 
   @Override
-  public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
 
     // Choose initial means
-    List<? extends NumberVector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
 
     // Store for current cluster assignment.
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
@@ -112,10 +112,9 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
       clusters.get(assignment.intValue(iter)).add(iter);
     }
 
-    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for (int i = 0; i < clusters.size(); i++) {
-      KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
+      KMeansModel model = new KMeansModel(means.get(i));
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

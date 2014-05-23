@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 /*
  This file is part of ELKI:
@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -53,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector type
+ * @param <O> Object type for kMedoids
  */
-public class FarthestPointsInitialMeans<V> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
+public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Discard the first vector.
    */
@@ -73,21 +74,19 @@ public class FarthestPointsInitialMeans<V> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <V extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     // Get a distance query
-    @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super V> distF = (PrimitiveDistanceFunction<? super V>) distanceFunction;
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, distF);
+    DistanceQuery<V> distQ = database.getDistanceQuery(relation, distanceFunction);
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
 
     // Chose first mean
-    List<V> means = new ArrayList<>(k);
+    List<Vector> means = new ArrayList<>(k);
 
     DBIDRef first = DBIDUtil.randomSample(ids, 1, rnd).iter();
     V prevmean = relation.get(first);
-    means.add(prevmean);
+    means.add(prevmean.getColumnVector());
 
     // Find farthest object each.
     DBIDVar best = DBIDUtil.newVar(first);
@@ -114,19 +113,18 @@ public class FarthestPointsInitialMeans<V> extends AbstractKMeansInitialization<
       }
       store.putDouble(best, Double.NaN); // So it won't be chosen twice.
       prevmean = relation.get(best);
-      means.add(prevmean);
+      means.add(prevmean.getColumnVector());
     }
 
     // Explicitly destroy temporary data.
     store.destroy();
-
     return means;
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distQ) {
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distQ) {
     @SuppressWarnings("unchecked")
-    final Relation<V> relation = (Relation<V>) distQ.getRelation();
+    final Relation<O> relation = (Relation<O>) distQ.getRelation();
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
@@ -135,7 +133,7 @@ public class FarthestPointsInitialMeans<V> extends AbstractKMeansInitialization<
 
     DBIDRef first = DBIDUtil.randomSample(relation.getDBIDs(), 1, rnd).iter();
     means.add(first);
-    V prevmean = relation.get(first);
+    O prevmean = relation.get(first);
 
     DBIDVar best = DBIDUtil.newVar(first);
     for(int i = (dropfirst ? 0 : 1); i < k; i++) {
@@ -175,7 +173,7 @@ public class FarthestPointsInitialMeans<V> extends AbstractKMeansInitialization<
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer<V> {
+  public static class Parameterizer<O> extends AbstractKMeansInitialization.Parameterizer {
     /**
      * Option ID to control the handling of the first object chosen.
      */
@@ -196,7 +194,7 @@ public class FarthestPointsInitialMeans<V> extends AbstractKMeansInitialization<
     }
 
     @Override
-    protected FarthestPointsInitialMeans<V> makeInstance() {
+    protected FarthestPointsInitialMeans<O> makeInstance() {
       return new FarthestPointsInitialMeans<>(rnd, !keepfirst);
     }
   }

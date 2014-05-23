@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -88,10 +89,7 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    List<Vector> means = new ArrayList<>(k);
-    for(NumberVector nv : initializer.chooseInitialMeans(database, relation, k, getDistanceFunction())) {
-      means.add(nv.getColumnVector());
-    }
+    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Initialize cluster and assign objects
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {

@@ -28,6 +28,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
@@ -188,24 +190,23 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends MeanModel
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<NumberVector> medians(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector> medians, Relation<V> database) {
+  protected List<Vector> medians(List<? extends ModifiableDBIDs> clusters, List<Vector> medians, Relation<V> database) {
     final int dim = medians.get(0).getDimensionality();
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
-    List<NumberVector> newMedians = new ArrayList<>(k);
+    List<Vector> newMedians = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
       ArrayModifiableDBIDs list = DBIDUtil.newArray(clusters.get(i));
-      if(list.size() > 0) {
-        Vector mean = new Vector(dim);
-        for(int d = 0; d < dim; d++) {
-          sorter.setDimension(d);
-          DBID id = QuickSelect.median(list, sorter);
-          mean.set(d, database.get(id).doubleValue(d));
-        }
-        newMedians.add(mean);
+      if(list.size() <= 0) {
+        newMedians.add(medians.get(i));
+        continue;
       }
-      else {
-        newMedians.add((NumberVector) medians.get(i));
+      Vector mean = new Vector(dim);
+      for(int d = 0; d < dim; d++) {
+        sorter.setDimension(d);
+        DBID id = QuickSelect.median(list, sorter);
+        mean.set(d, database.get(id).doubleValue(d));
       }
+      newMedians.add(mean);
     }
     return newMedians;
   }

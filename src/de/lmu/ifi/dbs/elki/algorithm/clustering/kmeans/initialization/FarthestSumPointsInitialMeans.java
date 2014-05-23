@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 /*
  This file is part of ELKI:
@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 
 /**
@@ -50,9 +51,9 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector type
+ * @param <O> Object type for kmedoids
  */
-public class FarthestSumPointsInitialMeans<V> extends FarthestPointsInitialMeans<V> {
+public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans<O> {
   /**
    * Constructor.
    * 
@@ -64,21 +65,19 @@ public class FarthestSumPointsInitialMeans<V> extends FarthestPointsInitialMeans
   }
 
   @Override
-  public List<V> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <V extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     // Get a distance query
-    @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super V> distF = (PrimitiveDistanceFunction<? super V>) distanceFunction;
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, distF);
+    DistanceQuery<V> distQ = database.getDistanceQuery(relation, distanceFunction);
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     // Chose first mean
-    List<V> means = new ArrayList<>(k);
+    List<Vector> means = new ArrayList<>(k);
 
     DBIDRef first = DBIDUtil.randomSample(ids, 1, rnd).iter();
     V prevmean = relation.get(first);
-    means.add(prevmean);
+    means.add(prevmean.getColumnVector());
 
     // Find farthest object each.
     DBIDVar best = DBIDUtil.newVar(first);
@@ -105,19 +104,18 @@ public class FarthestSumPointsInitialMeans<V> extends FarthestPointsInitialMeans
       }
       store.putDouble(best, Double.NaN); // So it won't be chosen twice.
       prevmean = relation.get(best);
-      means.add(prevmean);
+      means.add(prevmean.getColumnVector());
     }
 
     // Explicitly destroy temporary data.
     store.destroy();
-
     return means;
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distQ) {
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distQ) {
     @SuppressWarnings("unchecked")
-    final Relation<V> relation = (Relation<V>) distQ.getRelation();
+    final Relation<O> relation = (Relation<O>) distQ.getRelation();
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
@@ -126,7 +124,7 @@ public class FarthestSumPointsInitialMeans<V> extends FarthestPointsInitialMeans
 
     DBIDRef first = DBIDUtil.randomSample(relation.getDBIDs(), 1, rnd).iter();
     means.add(first);
-    V prevmean = relation.get(first);
+    O prevmean = relation.get(first);
 
     DBIDVar best = DBIDUtil.newVar(first);
     for(int i = (dropfirst ? 0 : 1); i < k; i++) {
