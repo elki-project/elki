@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -145,8 +146,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      Vector temp = deltas.get(iditer).minus(mean);
-      final double score = temp.transposeTimesTimes(cmati, temp);
+      final double score = MathUtil.mahalanobisDistance(cmati, deltas.get(iditer), mean);
       minmax.put(score);
       scores.putDouble(iditer, score);
     }

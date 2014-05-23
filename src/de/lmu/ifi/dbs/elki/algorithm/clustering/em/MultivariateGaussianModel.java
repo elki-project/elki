@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
@@ -165,8 +166,11 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(Vector vec) {
+    if (invCovMatr != null) {
+      return VMath.mahalanobisDistance(invCovMatr.getArrayRef(), vec.getArrayRef(), mref);
+    }
     Vector difference = vec.minus(mean);
-    return (invCovMatr != null) ? difference.transposeTimesTimes(invCovMatr, difference) : difference.transposeTimes(difference);
+    return difference.transposeTimes(difference);
   }
 
   /**

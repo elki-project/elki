@@ -251,6 +251,36 @@ public final class MathUtil {
   }
 
   /**
+   * Compute the Mahalanobis distance using the given weight matrix.
+   * 
+   * @param weightMatrix Weight Matrix
+   * @param o1_minus_o2 Delta vector
+   * @return Mahalanobis distance
+   */
+  public static double mahalanobisDistance(Matrix weightMatrix, Vector o1, Vector o2) {
+    double sqrDist = VMath.mahalanobisDistance(weightMatrix.getArrayRef(), o1.getArrayRef(), o2.getArrayRef());
+    if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
+      sqrDist = Math.abs(sqrDist);
+    }
+    return Math.sqrt(sqrDist);
+  }
+
+  /**
+   * Compute the Mahalanobis distance using the given weight matrix.
+   * 
+   * @param weightMatrix Weight Matrix
+   * @param o1_minus_o2 Delta vector
+   * @return Mahalanobis distance
+   */
+  public static double mahalanobisDistance(double[][] weightMatrix, double[] o1, double[] o2) {
+    double sqrDist = VMath.mahalanobisDistance(weightMatrix, o1,  o2);
+    if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
+      sqrDist = Math.abs(sqrDist);
+    }
+    return Math.sqrt(sqrDist);
+  }
+
+  /**
    * <p>
    * Provides the Pearson product-moment correlation coefficient for two
    * NumberVectors.
