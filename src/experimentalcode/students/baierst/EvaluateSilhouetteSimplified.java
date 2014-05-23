@@ -112,11 +112,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
     MeanVariance mssil = new MeanVariance();
     MeanVariance mssilAlt = new MeanVariance();
     for(Cluster<?> cluster : clusters) {
-      if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
-        // simplified silhouette is always one for singletons
-        mssil.put(1);
-        continue;
-      }
+    
 
       NumberVector centroid = Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel);
 
@@ -126,17 +122,21 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
         // a: Distance to own centroid
 
         double a = distanceFunction.distance(centroid, rel.get(it1));
-
+               
+        
         // b: Distance to other clusters centroids:
         double min = Double.POSITIVE_INFINITY;
         for(Cluster<?> ocluster : clusters) {
-          if(ocluster == /* yes, reference identity */cluster) {
+          if(ocluster == /* yes, reference identity */cluster && !cluster.isNoise()) {
             continue;
           }
 
           if(!mergenoise && ocluster.isNoise()) {
             // Treat noise cluster as singletons:
             for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
+              if(it1.internalGetIndex() == it2.internalGetIndex()){
+                continue;
+              }
               double b = distanceFunction.distance(rel.get(it1), rel.get(it2));
               if(b < min) {
                 min = b;
@@ -149,15 +149,27 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
           NumberVector ocentroid = Centroid.make((Relation<? extends NumberVector>) rel, ocluster.getIDs()).toVector(rel);
 
           double b = distanceFunction.distance(ocentroid, rel.get(it1));
-          ;
+        
 
           if(b < min) {
             min = b;
           }
         }
-        mssil.put((min - a) / Math.max(min, a));
+        
+        if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
+          // simplified silhouette is always one for singletons
+          mssil.put(1);                    
+          LOG.verbose("mssil put: " + 1);
+          mssilAlt.put(min / (0 + this.eps));
+          LOG.verbose("mssilAlt put: " + min / (0 + this.eps));
+          
+          continue;
+        }
+        
+        mssil.put((min - a) / Math.max(min, a));  
         LOG.verbose("mssil put: " + (min - a) / Math.max(min, a));
         mssilAlt.put(min / (a + this.eps));
+        LOG.verbose("mssilAlt put: " + min / (a + this.eps));
       }
     }
     if(LOG.isVerbose()) {
