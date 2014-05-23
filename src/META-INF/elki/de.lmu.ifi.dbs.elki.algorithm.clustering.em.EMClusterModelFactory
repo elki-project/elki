@@ -1,1 +1,3 @@
 de.lmu.ifi.dbs.elki.algorithm.clustering.em.MultivariateGaussianModelFactory
+de.lmu.ifi.dbs.elki.algorithm.clustering.em.DiagonalGaussianModelFactory
+de.lmu.ifi.dbs.elki.algorithm.clustering.em.SphericalGaussianModelFactory

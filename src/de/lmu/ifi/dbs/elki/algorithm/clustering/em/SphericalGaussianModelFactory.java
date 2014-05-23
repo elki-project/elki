@@ -36,35 +36,34 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
- * Factory for EM with multivariate gaussian models (with covariance; also known
- * as Gaussian Mixture Modeling, GMM).
+ * Factory for EM with multivariate gaussian models using diagonal matrixes.
  * 
- * These models have individual covariance matrixes, so this corresponds to the
- * {@code 'VVV'} model in Mclust (R).
+ * These models have individual variances, but no covariance, so this
+ * corresponds to the {@code 'VVI'} model in Mclust (R).
  * 
  * @author Erich Schubert
  * 
  * @param <V> vector type
  */
-public class MultivariateGaussianModelFactory<V extends NumberVector> extends AbstractEMModelFactory<V, EMModel> {
+public class SphericalGaussianModelFactory<V extends NumberVector> extends AbstractEMModelFactory<V, EMModel> {
   /**
    * Constructor.
    * 
    * @param initializer Class for choosing the inital seeds.
    */
-  public MultivariateGaussianModelFactory(KMeansInitialization<V> initializer) {
+  public SphericalGaussianModelFactory(KMeansInitialization<V> initializer) {
     super(initializer);
   }
 
   @Override
-  public List<MultivariateGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> df) {
+  public List<SphericalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> df) {
     final List<Vector> initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
     assert (initialMeans.size() == k);
     final int dimensionality = initialMeans.get(0).getDimensionality();
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
-    List<MultivariateGaussianModel> models = new ArrayList<>(k);
+    List<SphericalGaussianModel> models = new ArrayList<>(k);
     for(Vector nv : initialMeans) {
-      models.add(new MultivariateGaussianModel(1. / k, nv, norm));
+      models.add(new SphericalGaussianModel(1. / k, nv, norm));
     }
     return models;
   }
@@ -80,8 +79,8 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractEMModelFactory.Parameterizer<V> {
     @Override
-    protected MultivariateGaussianModelFactory<V> makeInstance() {
-      return new MultivariateGaussianModelFactory<>(initializer);
+    protected SphericalGaussianModelFactory<V> makeInstance() {
+      return new SphericalGaussianModelFactory<>(initializer);
     }
   }
 }
