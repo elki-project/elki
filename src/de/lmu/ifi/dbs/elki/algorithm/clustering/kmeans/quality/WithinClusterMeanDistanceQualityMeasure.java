@@ -42,12 +42,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  */
 public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel<V>> clustering, PrimitiveDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
     @SuppressWarnings("unchecked")
-    final List<Cluster<MeanModel<V>>> clusterList = (List<Cluster<MeanModel<V>>>) (List<?>) clustering.getAllClusters();
+    final List<Cluster<MeanModel>> clusterList = (List<Cluster<MeanModel>>) (List<?>) clustering.getAllClusters();
 
     double clusterDistanceSum = 0;
-    for(Cluster<MeanModel<V>> cluster : clusterList) {
+    for(Cluster<MeanModel> cluster : clusterList) {
       DBIDs ids = cluster.getIDs();
 
       // Compute sum of pairwise distances:

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.clustering;
 
 /*
  This file is part of ELKI:
@@ -24,10 +24,10 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -74,14 +74,14 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
   /**
    * Inner algorithm.
    */
-  private EM<V> emClustering;
+  private EM<V, ?> emClustering;
 
   /**
    * Constructor with an existing em clustering algorithm.
    * 
    * @param emClustering EM clustering algorithm to use.
    */
-  public EMOutlier(EM<V> emClustering) {
+  public EMOutlier(EM<V, ?> emClustering) {
     super();
     this.emClustering = emClustering;
   }
@@ -95,13 +95,13 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
    */
   public OutlierResult run(Database database, Relation<V> relation) {
     emClustering.setSoft(true);
-    Clustering<EMModel<V>> emresult = emClustering.run(database, relation);
+    Clustering<?> emresult = emClustering.run(database, relation);
     Relation<double[]> soft = null;
-    for (Iter<Result> iter = emresult.getHierarchy().iterChildren(emresult); iter.valid(); iter.advance()) {
-      if (!(iter.get() instanceof Relation)) {
+    for(Iter<Result> iter = emresult.getHierarchy().iterChildren(emresult); iter.valid(); iter.advance()) {
+      if(!(iter.get() instanceof Relation)) {
         continue;
       }
-      if (((Relation<?>) iter.get()).getDataTypeInformation() == EM.SOFT_TYPE) {
+      if(((Relation<?>) iter.get()).getDataTypeInformation() == EM.SOFT_TYPE) {
         @SuppressWarnings("unchecked")
         Relation<double[]> rel = (Relation<double[]>) iter.get();
         soft = rel;
@@ -110,10 +110,10 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
 
     double globmax = 0.0;
     WritableDoubleDataStore emo_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double maxProb = Double.POSITIVE_INFINITY;
       double[] probs = soft.get(iditer);
-      for (double prob : probs) {
+      for(double prob : probs) {
         maxProb = Math.min(1. - prob, maxProb);
       }
       emo_score.putDouble(iditer, maxProb);
@@ -146,12 +146,15 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
-    protected EM<V> em = null;
+    /**
+     * EM clustering algorithm to run.
+     */
+    protected EM<V, ?> em;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Class<EM<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(EM.class);
+      Class<EM<V, ?>> cls = ClassGenericsUtil.uglyCastIntoSubclass(EM.class);
       em = config.tryInstantiate(cls);
     }
 

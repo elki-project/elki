@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @param <V> Number vector type
  * @param <M> Actual model type
  */
-public interface KMeans<V extends NumberVector, M extends MeanModel<V>> extends ClusteringAlgorithm<Clustering<M>>, DistanceBasedAlgorithm<V> {
+public interface KMeans<V extends NumberVector, M extends MeanModel> extends ClusteringAlgorithm<Clustering<M>>, DistanceBasedAlgorithm<V> {
   /**
    * Parameter to specify the initialization method
    */

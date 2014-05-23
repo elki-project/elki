@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
@@ -87,10 +88,13 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
 
     innerkMeans.setK(k);
     innerkMeans.setDistanceFunction(distanceFunction);
-    Clustering<? extends MeanModel<V>> clusters = innerkMeans.run(proxydb, proxyv);
+    Clustering<? extends MeanModel> clusters = innerkMeans.run(proxydb, proxyv);
+
+    @SuppressWarnings("unchecked")
+    NumberVector.Factory<V> factory = (NumberVector.Factory<V>) RelationUtil.assumeVectorField(relation).getFactory();
     List<V> means = new ArrayList<>();
-    for(Cluster<? extends MeanModel<V>> cluster : clusters.getAllClusters()) {
-      means.add(cluster.getModel().getMean());
+    for(Cluster<? extends MeanModel> cluster : clusters.getAllClusters()) {
+      means.add(factory.newNumberVector(cluster.getModel().getMean().getArrayRef()));
     }
 
     return means;

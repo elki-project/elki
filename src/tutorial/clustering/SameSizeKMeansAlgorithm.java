@@ -48,11 +48,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -77,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector type
  */
-public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMeans<V, MeanModel<V>> {
+public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
   /**
    * Class logger
    */
@@ -103,7 +103,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @return result
    */
   @Override
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<MeanModel> run(Database database, Relation<V> relation) {
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
     // Choose initial means
@@ -124,11 +124,10 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     means = refineResult(relation, means, clusters, metas, tids);
 
     // Wrap result
-    Clustering<MeanModel<V>> result = new Clustering<>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
-    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
+    Clustering<MeanModel> result = new Clustering<>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      V mean = factory.newNumberVector(means.get(i).getColumnVector().getArrayRef());
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel<>(mean)));
+      Vector mean = means.get(i).getColumnVector();
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel(mean)));
     }
     return result;
   }

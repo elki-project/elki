@@ -34,6 +34,6 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
  * 
  * @param <M> Model type
  */
-public interface SubspaceClusteringAlgorithm<M extends SubspaceModel<?>> extends ClusteringAlgorithm<Clustering<M>> {
+public interface SubspaceClusteringAlgorithm<M extends SubspaceModel> extends ClusteringAlgorithm<Clustering<M>> {
   // No additional constraints
 }

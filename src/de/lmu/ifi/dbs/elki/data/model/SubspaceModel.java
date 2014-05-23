@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
@@ -35,10 +35,8 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Elke Achtert
  * 
  * @apiviz.composedOf Subspace
- * 
- * @param <V> the type of FeatureVector the subspace contains
  */
-public class SubspaceModel<V extends FeatureVector<?>> extends MeanModel<V> implements TextWriteable {
+public class SubspaceModel extends MeanModel implements TextWriteable {
   /**
    * The subspace of the cluster.
    */
@@ -51,7 +49,7 @@ public class SubspaceModel<V extends FeatureVector<?>> extends MeanModel<V> impl
    * @param subspace the subspace of the cluster
    * @param mean the cluster mean
    */
-  public SubspaceModel(Subspace subspace, V mean) {
+  public SubspaceModel(Subspace subspace, Vector mean) {
     super(mean);
     this.subspace = subspace;
   }

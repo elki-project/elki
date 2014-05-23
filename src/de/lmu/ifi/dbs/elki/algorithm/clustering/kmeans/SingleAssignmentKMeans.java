@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -56,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> vector datatype
  */
-public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMeans<V, MeanModel<V>> {
+public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
   /**
    * The logger for this class.
    */
@@ -74,7 +73,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
   }
 
   @Override
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<MeanModel> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Assignment", "kmeans-assignment");
     }
@@ -90,10 +89,9 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     assignToNearestCluster(relation, means, clusters, assignment);
 
     // Wrap result
-    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<MeanModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+    Clustering<MeanModel> result = new Clustering<>("Nearest Centroid Clustering", "nearest-center-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel<V> model = new MeanModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
+      MeanModel model = new MeanModel(means.get(i).getColumnVector());
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

@@ -31,7 +31,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -164,8 +163,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         Model model = clus.getModel();
         double[] mean;
         if(model instanceof MeanModel) {
-          @SuppressWarnings("unchecked")
-          MeanModel<? extends NumberVector> mmodel = (MeanModel<? extends NumberVector>) model;
+          MeanModel mmodel = (MeanModel) model;
           mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
         }
         else if(model instanceof MedoidModel) {
@@ -247,7 +245,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
    */
   private static boolean testMeanModel(Clustering<?> c) {
     Model firstmodel = c.getAllClusters().get(0).getModel();
-    if(firstmodel instanceof MeanModel<?>) {
+    if(firstmodel instanceof MeanModel) {
       return true;
     }
     if(firstmodel instanceof MedoidModel) {

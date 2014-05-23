@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
@@ -32,10 +32,8 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Matrix.
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector type
  */
-public class EMModel<V extends FeatureVector<?>> extends MeanModel<V> {
+public class EMModel extends MeanModel {
   /**
    * Cluster covariance matrix
    */
@@ -47,7 +45,7 @@ public class EMModel<V extends FeatureVector<?>> extends MeanModel<V> {
    * @param mean Mean vector
    * @param covarianceMatrix Covariance matrix
    */
-  public EMModel(V mean, Matrix covarianceMatrix) {
+  public EMModel(Vector mean, Matrix covarianceMatrix) {
     super(mean);
     this.covarianceMatrix = covarianceMatrix;
   }

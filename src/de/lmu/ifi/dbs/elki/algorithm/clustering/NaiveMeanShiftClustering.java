@@ -81,7 +81,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Vector type
  */
 @Reference(authors = "Y. Cheng", title = "Mean shift, mode seeking, and clustering", booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", url = "http://dx.doi.org/10.1109/34.400568")
-public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
    */
@@ -122,7 +122,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * @param relation Data relation
    * @return Clustering result
    */
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<MeanModel> run(Database database, Relation<V> relation) {
     final DistanceQuery<V> distq = database.getDistanceQuery(relation, getDistanceFunction());
     final RangeQuery<V> rangeq = database.getRangeQuery(distq);
     final int dim = RelationUtil.dimensionality(relation);
@@ -198,14 +198,14 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     }
     LOG.ensureCompleted(prog);
 
-    ArrayList<Cluster<MeanModel<V>>> cs = new ArrayList<>(clusters.size());
+    ArrayList<Cluster<MeanModel>> cs = new ArrayList<>(clusters.size());
     for(Pair<V, ModifiableDBIDs> pair : clusters) {
-      cs.add(new Cluster<>(pair.second, new MeanModel<>(pair.first)));
+      cs.add(new Cluster<>(pair.second, new MeanModel(pair.first.getColumnVector())));
     }
     if(noise.size() > 0) {
-      cs.add(new Cluster<MeanModel<V>>(noise, true));
+      cs.add(new Cluster<MeanModel>(noise, true));
     }
-    Clustering<MeanModel<V>> c = new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
+    Clustering<MeanModel> c = new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
     return c;
   }
 

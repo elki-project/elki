@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type
  * @param <M> Cluster model type
  */
-public abstract class AbstractKMeans<V extends NumberVector, M extends MeanModel<V>> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector, Clustering<M>> implements KMeans<V, M>, ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractKMeans<V extends NumberVector, M extends MeanModel> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector, Clustering<M>> implements KMeans<V, M>, ClusteringAlgorithm<Clustering<M>> {
   /**
    * Holds the value of {@link #K_ID}.
    */

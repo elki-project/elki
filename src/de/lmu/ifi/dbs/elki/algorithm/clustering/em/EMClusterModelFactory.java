@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
 /*
  This file is part of ELKI:
@@ -23,30 +23,30 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.Clustering;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 
 /**
- * Interface for computing the quality of a K-Means clustering.
+ * Factory for initializing the EM models.
  * 
  * @author Erich Schubert
  * 
- * @param <O> Input Object restriction type
+ * @param <V> Vector type
  */
-public interface KMeansQualityMeasure<O extends NumberVector> {
+public interface EMClusterModelFactory<V extends NumberVector, M extends MeanModel> {
   /**
-   * Calculates and returns the quality measure.
+   * Build the initial models
    * 
-   * @param clustering Clustering to analyze
-   * @param distanceFunction Distance function to use (usually Euclidean or
-   *        squared Euclidean!)
-   * @param relation Relation for accessing objects
-   * @param <V> Actual vector type (could be a subtype of O!)
-   * 
-   * @return quality measure
+   * @param database Database
+   * @param relation Relation
+   * @param k Number of clusters
+   * @param df Distance function
+   * @return Initial models
    */
-  <V extends O> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation);
+  List<? extends EMClusterModel<M>> buildInitialModels(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> df);
 }

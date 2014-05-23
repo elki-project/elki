@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
 /*
  This file is part of ELKI:
@@ -23,30 +23,59 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 
 /**
- * Interface for computing the quality of a K-Means clustering.
+ * Models useable in EM clustering.
  * 
  * @author Erich Schubert
- * 
- * @param <O> Input Object restriction type
  */
-public interface KMeansQualityMeasure<O extends NumberVector> {
+public interface EMClusterModel<M extends MeanModel> {
   /**
-   * Calculates and returns the quality measure.
-   * 
-   * @param clustering Clustering to analyze
-   * @param distanceFunction Distance function to use (usually Euclidean or
-   *        squared Euclidean!)
-   * @param relation Relation for accessing objects
-   * @param <V> Actual vector type (could be a subtype of O!)
-   * 
-   * @return quality measure
+   * Begin the E step.
    */
-  <V extends O> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation);
+  void beginEStep();
+
+  /**
+   * Update the
+   * 
+   * @param vec Vector to process
+   * @param weight Weight
+   */
+  void updateE(NumberVector vec, double weight);
+
+  /**
+   * Finalize the E step.
+   */
+  void finalizeEStep();
+
+  /**
+   * Estimate the likelihood of a vector.
+   * 
+   * @param vec Vector
+   * @return Likelihood.
+   */
+  double estimateDensity(NumberVector vec);
+
+  /**
+   * Finalize a cluster model.
+   * 
+   * @return Cluster model
+   */
+  M finalizeCluster();  
+
+  /**
+   * Get the cluster weight.
+   * 
+   * @return Cluster weight
+   */
+  double getWeight();
+
+  /**
+   * Set the cluster weight.
+   * 
+   * @param weight Cluster weight
+   */
+  void setWeight(double weight);
 }

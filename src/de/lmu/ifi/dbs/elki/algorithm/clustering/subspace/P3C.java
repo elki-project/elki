@@ -29,7 +29,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.em.EMClusterModel;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.em.MultivariateGaussianModel;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -60,7 +62,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
@@ -102,7 +103,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("P3C: A Robust Projected Clustering Algorithm.")
 @Reference(authors = "Gabriela Moise, Jörg Sander, Martin Ester", title = "P3C: A Robust Projected Clustering Algorithm", booktitle = "Proc. Sixth International Conference on Data Mining (ICDM '06)", url = "http://dx.doi.org/10.1109/ICDM.2006.123")
-public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -155,7 +156,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
   /**
    * Performs the P3C algorithm on the given Database.
    */
-  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Database database, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
     // Overall progress.
@@ -177,7 +178,6 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
 
     // Set markers for each attribute until they're all deemed uniform.
     final long[][] markers = new long[dim][];
-    int numuniform = 0;
     for(int d = 0; d < dim; d++) {
       final SetDBIDs[] parts = partitions[d];
       if(parts == null) {
@@ -190,7 +190,6 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
         // previously marked.
         int bestBin = chiSquaredUniformTest(parts, marked, card);
         if(bestBin < 0) {
-          numuniform++;
           break; // Uniform
         }
         BitsUtil.setI(marked, bestBin);
@@ -224,8 +223,8 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
 
     if(clusterCores.size() == 0) {
       LOG.setCompleted(stepProgress);
-      Clustering<SubspaceModel<V>> c = new Clustering<>("P3C", "P3C");
-      c.addToplevelCluster(new Cluster<SubspaceModel<V>>(relation.getDBIDs(), true));
+      Clustering<SubspaceModel> c = new Clustering<>("P3C", "P3C");
+      c.addToplevelCluster(new Cluster<SubspaceModel>(relation.getDBIDs(), true));
       return c;
     }
 
@@ -237,26 +236,19 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     ModifiableDBIDs noise = DBIDUtil.newHashSet();
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
     int k = clusterCores.size();
-    double[] clusterWeights = new double[k];
-    computeFuzzyMembership(relation, clusterCores, noise, probClusterIGivenX, clusterWeights);
+    List<MultivariateGaussianModel> models = new ArrayList<>(k);
+    computeFuzzyMembership(relation, clusterCores, noise, probClusterIGivenX, models, dim);
 
     // Initial estimate of covariances, to assign noise objects
-    Vector[] means = new Vector[k];
-    Matrix[] covarianceMatrices = new Matrix[k], invCovMatr = new Matrix[k];
-    final double norm = MathUtil.powi(MathUtil.TWOPI, dim);
-    double[] normDistrFactor = new double[k];
-    Arrays.fill(normDistrFactor, 1. / Math.sqrt(norm));
-    EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, means, covarianceMatrices, dim);
-    EM.computeInverseMatrixes(covarianceMatrices, invCovMatr, normDistrFactor, norm);
-    assignUnassigned(relation, probClusterIGivenX, means, invCovMatr, clusterWeights, noise);
+    EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models);
+    assignUnassigned(relation, probClusterIGivenX, models, noise);
 
-    double emNew = EM.assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+    double emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
     for(int it = 1; it <= maxEmIterations || maxEmIterations < 0; it++) {
       final double emOld = emNew;
-      EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, means, covarianceMatrices, dim);
-      EM.computeInverseMatrixes(covarianceMatrices, invCovMatr, normDistrFactor, norm);
+      EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models);
       // reassign probabilities
-      emNew = EM.assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+      emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
       if(LOG.isVerbose()) {
         LOG.verbose("iteration " + it + " - expectation value: " + emNew);
@@ -282,7 +274,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
 
     // Outlier detection. Remove points from clusters that have a Mahalanobis
     // distance larger than the critical value of the ChiSquare distribution.
-    findOutliers(relation, means, invCovMatr, clusterCandidates, dim - numuniform, noise);
+    findOutliers(relation, models, clusterCandidates, noise);
 
     if(stepProgress != null) {
       stepProgress.beginStep(8, "Removing empty clusters.", LOG);
@@ -311,15 +303,15 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     }
 
     // Generate final output.
-    Clustering<SubspaceModel<V>> result = new Clustering<>("P3C", "P3C");
+    Clustering<SubspaceModel> result = new Clustering<>("P3C", "P3C");
     for(int cluster = 0; cluster < clusterCandidates.size(); ++cluster) {
       ClusterCandidate candidate = clusterCandidates.get(cluster);
       CovarianceMatrix cvm = CovarianceMatrix.make(relation, candidate.ids);
-      result.addToplevelCluster(new Cluster<>(candidate.ids, new SubspaceModel<>(new Subspace(candidate.dimensions), cvm.getMeanVector(relation))));
+      result.addToplevelCluster(new Cluster<>(candidate.ids, new SubspaceModel(new Subspace(candidate.dimensions), cvm.getMeanVector())));
     }
     LOG.verbose("Noise size: " + noise.size());
     if(noise.size() > 0) {
-      result.addToplevelCluster(new Cluster<SubspaceModel<V>>(noise, true));
+      result.addToplevelCluster(new Cluster<SubspaceModel>(noise, true));
     }
 
     LOG.ensureCompleted(stepProgress);
@@ -558,12 +550,15 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param clusterCores the cluster cores.
    * @param unassigned set to which to add unassigned points.
    * @param probClusterIGivenX Membership probabilities.
-   * @param clusterWeights Cluster weights
+   * @param models Cluster models.
+   * @param dim Dimensionality
    */
-  private void computeFuzzyMembership(Relation<V> relation, ArrayList<Signature> clusterCores, ModifiableDBIDs unassigned, WritableDataStore<double[]> probClusterIGivenX, double[] clusterWeights) {
+  private void computeFuzzyMembership(Relation<V> relation, ArrayList<Signature> clusterCores, ModifiableDBIDs unassigned, WritableDataStore<double[]> probClusterIGivenX, List<MultivariateGaussianModel> models, int dim) {
     final int n = relation.size();
+    final double pweight = 1. / n; // Weight of each point
     final int k = clusterCores.size();
 
+    double[] clusterWeights = new double[k];
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       int count = 0;
       double[] weights = new double[k];
@@ -578,13 +573,17 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       if(count > 0) {
         // Rescale.
         VMath.timesEquals(weights, 1. / count);
-        VMath.plusTimesEquals(clusterWeights, weights, 1. / n);
+        VMath.plusTimesEquals(clusterWeights, weights, pweight);
       }
       else {
         // Does not match any cluster, mark it.
         unassigned.add(iter);
       }
       probClusterIGivenX.put(iter, weights);
+    }
+    final double f = MathUtil.powi(MathUtil.TWOPI, dim); // Scaling coefficient
+    for(int i = 0; i < k; i++) {
+      models.add(new MultivariateGaussianModel(clusterWeights[i], new Vector(dim), f));
     }
   }
 
@@ -600,30 +599,41 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param assigned mapping of matrix row to DBID.
    * @param unassigned the list of points not yet assigned.
    */
-  private void assignUnassigned(Relation<V> relation, WritableDataStore<double[]> probClusterIGivenX, Vector[] means, Matrix[] invCovMatr, double[] clusterWeights, ModifiableDBIDs unassigned) {
+  private void assignUnassigned(Relation<V> relation, WritableDataStore<double[]> probClusterIGivenX, List<MultivariateGaussianModel> models, ModifiableDBIDs unassigned) {
     if(unassigned.size() == 0) {
       return;
     }
-    final int k = means.length;
+    final int k = models.size();
     double pweight = 1. / relation.size();
 
+    // Rescale weights, to take unassigned points into account:
+    for(EMClusterModel<?> m : models) {
+      m.setWeight(m.getWeight() * (relation.size() - unassigned.size()) * pweight);
+    }
+
+    // Assign noise objects, increase weights accordingly.
     for(DBIDIter iter = unassigned.iter(); iter.valid(); iter.advance()) {
       // Find the best matching known cluster core using the Mahalanobis
       // distance.
-      Vector v = relation.get(iter).getColumnVector();
+      V v = relation.get(iter);
       int bestCluster = -1;
+      MultivariateGaussianModel bestModel = null;
       double minDistance = Double.POSITIVE_INFINITY;
-      for(int c = 0; c < k; ++c) {
-        final double distance = MathUtil.mahalanobisDistance(invCovMatr[c], v.minus(means[c]));
+      int c = 0;
+      for(MultivariateGaussianModel model : models) {
+        final double distance = model.mahalanobisDistance(v);
         if(distance < minDistance) {
           minDistance = distance;
           bestCluster = c;
+          bestModel = model;
         }
+        c++;
       }
       // Assign to best core.
       double[] weights = new double[k];
-      weights[bestCluster] = 1.0;
-      clusterWeights[bestCluster] += pweight;
+      weights[bestCluster] = 1.;
+
+      bestModel.setWeight(bestModel.getWeight() + pweight);
       probClusterIGivenX.put(iter, weights);
     }
 
@@ -675,25 +685,17 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param means Cluster means
    * @param invCovMatr Inverse covariance matrixes
    * @param clusterCandidates the list of clusters to check.
-   * @param nonUniformDimensionCount the number of dimensions to consider when
-   *        testing.
    * @param noise the set to which to add points deemed outliers.
    */
-  private void findOutliers(Relation<V> relation, Vector[] means, Matrix[] invCovMatr, ArrayList<ClusterCandidate> clusterCandidates, int nonUniformDimensionCount, ModifiableDBIDs noise) {
-    final int k = clusterCandidates.size();
-
-    for(int c = 0; c < k; ++c) {
+  private void findOutliers(Relation<V> relation, List<MultivariateGaussianModel> models, ArrayList<ClusterCandidate> clusterCandidates, ModifiableDBIDs noise) {
+    Iterator<MultivariateGaussianModel> it = models.iterator();
+    for(int c = 0; it.hasNext(); c++) {
+      MultivariateGaussianModel model = it.next();
       final ClusterCandidate candidate = clusterCandidates.get(c);
-      if(candidate.ids.size() < 2) {
-        continue;
-      }
       final int dof = BitsUtil.cardinality(candidate.dimensions);
-      final double threshold = ChiSquaredDistribution.quantile(1 - .001, dof);
+      final double threshold = ChiSquaredDistribution.quantile(1 - alpha, dof);
       for(DBIDMIter iter = candidate.ids.iter(); iter.valid(); iter.advance()) {
-        final Vector mean = means[c];
-        final Vector delta = relation.get(iter).getColumnVector().minusEquals(mean);
-        final Matrix invCov = invCovMatr[c];
-        final double distance = MathUtil.mahalanobisDistance(invCov, delta);
+        final double distance = model.mahalanobisDistance(relation.get(iter));
         if(distance >= threshold) {
           // Outlier, remove it and add it to the outlier set.
           noise.add(iter);

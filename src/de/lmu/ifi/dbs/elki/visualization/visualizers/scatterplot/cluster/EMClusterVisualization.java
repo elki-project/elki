@@ -32,8 +32,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -92,8 +90,8 @@ public class EMClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Instance<DoubleVector> makeVisualization(VisualizationTask task) {
-    return new Instance<>(task);
+  public Instance makeVisualization(VisualizationTask task) {
+    return new Instance(task);
   }
 
   @Override
@@ -103,7 +101,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
-        Clustering<MeanModel<DoubleVector>> mcls = findMeanModel(c);
+        Clustering<MeanModel> mcls = findMeanModel(c);
         if(mcls != null) {
           Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
@@ -125,10 +123,10 @@ public class EMClusterVisualization extends AbstractVisFactory {
    * @return the clustering cast to return a mean model, null otherwise.
    */
   @SuppressWarnings("unchecked")
-  private static <NV extends NumberVector> Clustering<MeanModel<NV>> findMeanModel(Clustering<?> c) {
+  private static Clustering<MeanModel> findMeanModel(Clustering<?> c) {
     final Model firstModel = c.getAllClusters().get(0).getModel();
-    if(c.getAllClusters().get(0).getModel() instanceof MeanModel<?> && firstModel instanceof EMModel<?>) {
-      return (Clustering<MeanModel<NV>>) c;
+    if(c.getAllClusters().get(0).getModel() instanceof MeanModel && firstModel instanceof EMModel) {
+      return (Clustering<MeanModel>) c;
     }
     return null;
   }
@@ -140,12 +138,10 @@ public class EMClusterVisualization extends AbstractVisFactory {
    * 
    * @apiviz.has EMModel oneway - - visualizes
    * @apiviz.uses GrahamScanConvexHull2D
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
   // TODO: nicer stacking of n-fold hulls
   // TODO: can we find a proper sphere for 3+ dimensions?
-  public class Instance<NV extends NumberVector> extends AbstractScatterplotVisualization {
+  public class Instance extends AbstractScatterplotVisualization {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -155,7 +151,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
     /**
      * The result we work on
      */
-    Clustering<EMModel<NV>> clustering;
+    Clustering<EMModel> clustering;
 
     private static final double KAPPA = SVGHyperSphere.EUCLIDEAN_KAPPA;
 
@@ -189,14 +185,14 @@ public class EMClusterVisualization extends AbstractVisFactory {
       // PCARunner
       PCARunner pcarun = ClassGenericsUtil.parameterizeOrAbort(PCARunner.class, new EmptyParameterization());
 
-      Iterator<Cluster<EMModel<NV>>> ci = clustering.getAllClusters().iterator();
+      Iterator<Cluster<EMModel>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-        Cluster<EMModel<NV>> clus = ci.next();
+        Cluster<EMModel> clus = ci.next();
         DBIDs ids = clus.getIDs();
 
         if(ids.size() > 0) {
           Matrix covmat = clus.getModel().getCovarianceMatrix();
-          NV centroid = clus.getModel().getMean();
+          Vector centroid = clus.getModel().getMean();
           Vector cent = new Vector(proj.fastProjectDataToRenderSpace(centroid));
 
           // Compute the eigenvectors

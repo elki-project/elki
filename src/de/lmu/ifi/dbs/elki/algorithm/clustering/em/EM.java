@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
 /*
  This file is part of ELKI:
@@ -27,13 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyGeneratedInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.EMModel;
+import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -46,14 +45,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -68,11 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Provides the EM algorithm (clustering by expectation maximization), also
  * known as Gaussian Mixture Modeling (GMM).
- * <p/>
- * Initialization is implemented as random initialization of means (uniformly
- * distributed within the attribute ranges of the given database) and initial
- * zero-covariance and variance=1 in covariance matrices.
- * </p>
+ * 
  * <p>
  * Reference: A. P. Dempster, N. M. Laird, D. B. Rubin:<br />
  * Maximum Likelihood from Incomplete Data via the EM algorithm.<br>
@@ -80,26 +70,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Arthur Zimek
+ * @author Erich Schubert
  * 
- * @apiviz.has EMModel
+ * @apiviz.composedOf KMeansInitialization
+ * @apiviz.composedOf EMModelFactory
  * 
- * @param <V> a type of {@link NumberVector} as a suitable datatype for this
- *        algorithm
+ * @param <V> vector type to analyze
+ * @param <M> model type to produce
  */
 @Title("EM-Clustering: Clustering by Expectation Maximization")
 @Description("Provides k Gaussian mixtures maximizing the probability of the given data")
-@Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", title = "Maximum Likelihood from Incomplete Data via the EM algorithm", booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", url = "http://www.jstor.org/stable/2984875")
-public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>> {
+@Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", //
+title = "Maximum Likelihood from Incomplete Data via the EM algorithm", //
+booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", //
+url = "http://www.jstor.org/stable/2984875")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.EM", "EM" })
+public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(EM.class);
-
-  /**
-   * Small value to increment diagonally of a matrix in order to avoid
-   * singularity before building the inverse.
-   */
-  private static final double SINGULARITY_CHEAT = 1E-9;
 
   /**
    * Number of clusters
@@ -112,9 +102,9 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
   private double delta;
 
   /**
-   * Class to choose the initial means
+   * Factory for producing the initial cluster model.
    */
-  private KMeansInitialization<V> initializer;
+  private EMClusterModelFactory<V, M> mfactory;
 
   /**
    * Maximum number of iterations to allow
@@ -142,11 +132,11 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
    * @param maxiter Maximum number of iterations
    * @param soft Include soft assignments
    */
-  public EM(int k, double delta, KMeansInitialization<V> initializer, int maxiter, boolean soft) {
+  public EM(int k, double delta, EMClusterModelFactory<V, M> mfactory, int maxiter, boolean soft) {
     super();
     this.k = k;
     this.delta = delta;
-    this.initializer = initializer;
+    this.mfactory = mfactory;
     this.maxiter = maxiter;
     this.setSoft(soft);
   }
@@ -163,7 +153,7 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
    * @param relation Relation
    * @return Result
    */
-  public Clustering<EMModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<M> run(Database database, Relation<V> relation) {
     if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
@@ -171,32 +161,9 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
     if(LOG.isVerbose()) {
       LOG.verbose("initializing " + k + " models");
     }
-    final List<V> initialMeans = initializer.chooseInitialMeans(database, relation, k, EuclideanDistanceFunction.STATIC);
-    assert (initialMeans.size() == k);
-    Vector[] means = new Vector[k];
-    {
-      int i = 0;
-      for(NumberVector nv : initialMeans) {
-        means[i] = nv.getColumnVector();
-        i++;
-      }
-    }
-    Matrix[] covarianceMatrices = new Matrix[k];
-    double[] normDistrFactor = new double[k];
-    Matrix[] invCovMatr = new Matrix[k];
-    double[] clusterWeights = new double[k];
+    List<? extends EMClusterModel<M>> models = mfactory.buildInitialModels(database, relation, k, SquaredEuclideanDistanceFunction.STATIC);
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
-
-    final int dimensionality = means[0].getDimensionality();
-    final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
-    for(int i = 0; i < k; i++) {
-      Matrix m = Matrix.identity(dimensionality, dimensionality);
-      covarianceMatrices[i] = m;
-      normDistrFactor[i] = 1.0 / Math.sqrt(norm);
-      invCovMatr[i] = Matrix.identity(dimensionality, dimensionality);
-      clusterWeights[i] = 1.0 / k;
-    }
-    double emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+    double emNew = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
     // iteration unless no change
     if(LOG.isVerbose()) {
@@ -208,10 +175,9 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
 
     for(int it = 1; it <= maxiter || maxiter < 0; it++) {
       final double emOld = emNew;
-      recomputeCovarianceMatrices(relation, probClusterIGivenX, means, covarianceMatrices, dimensionality);
-      computeInverseMatrixes(covarianceMatrices, invCovMatr, normDistrFactor, norm);
+      recomputeCovarianceMatrices(relation, probClusterIGivenX, models);
       // reassign probabilities
-      emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+      emNew = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
       if(LOG.isVerbose()) {
         LOG.verbose("iteration " + it + " - expectation value: " + emNew);
@@ -244,14 +210,13 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
       }
       hardClusters.get(maxIndex).add(iditer);
     }
-    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<EMModel<V>> result = new Clustering<>("EM Clustering", "em-clustering");
+    Clustering<M> result = new Clustering<>("EM Clustering", "em-clustering");
     // provide models within the result
     for(int i = 0; i < k; i++) {
       // TODO: re-do labeling.
       // SimpleClassLabel label = new SimpleClassLabel();
       // label.init(result.canonicalClusterLabel(i));
-      Cluster<EMModel<V>> model = new Cluster<>(hardClusters.get(i), new EMModel<>(factory.newNumberVector(means[i].getArrayRef()), covarianceMatrices[i]));
+      Cluster<M> model = new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster());
       result.addToplevelCluster(model);
     }
     if(isSoft()) {
@@ -264,61 +229,35 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
   }
 
   /**
-   * Compute the inverse cluster matrices.
-   * 
-   * @param covarianceMatrices Input covariance matrices
-   * @param invCovMatr Output array for inverse matrices
-   * @param normDistrFactor Output array for norm distribution factors.
-   * @param norm Normalization factor, usually (2pi)^d
-   */
-  public static void computeInverseMatrixes(Matrix[] covarianceMatrices, Matrix[] invCovMatr, double[] normDistrFactor, final double norm) {
-    int k = covarianceMatrices.length;
-    for(int i = 0; i < k; i++) {
-      final double det = covarianceMatrices[i].det();
-      if(det > 0.) {
-        normDistrFactor[i] = 1. / Math.sqrt(norm * det);
-      }
-      else {
-        LOG.warning("Encountered matrix with 0 determinant - degenerated.");
-        normDistrFactor[i] = 1.; // Not really well defined
-      }
-      invCovMatr[i] = covarianceMatrices[i].inverse();
-    }
-  }
-
-  /**
    * Recompute the covariance matrixes.
    * 
    * @param relation Vector data
    * @param probClusterIGivenX Object probabilities
-   * @param means Cluster means output
-   * @param covarianceMatrices Output covariance matrixes
-   * @param dimensionality Data set dimensionality
+   * @param models Cluster models to update
    */
-  public static void recomputeCovarianceMatrices(Relation<? extends NumberVector> relation, WritableDataStore<double[]> probClusterIGivenX, Vector[] means, Matrix[] covarianceMatrices, final int dimensionality) {
-    final int k = means.length;
-    CovarianceMatrix[] cms = new CovarianceMatrix[k];
-    for(int i = 0; i < k; i++) {
-      cms[i] = new CovarianceMatrix(dimensionality);
+  public static void recomputeCovarianceMatrices(Relation<? extends NumberVector> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<?>> models) {
+    for(EMClusterModel<?> m : models) {
+      m.beginEStep();
     }
+    double[] wsum = new double[models.size()];
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] clusterProbabilities = probClusterIGivenX.get(iditer);
-      Vector instance = relation.get(iditer).getColumnVector();
-      for(int i = 0; i < k; i++) {
-        if(clusterProbabilities[i] > 0.) {
-          cms[i].put(instance, clusterProbabilities[i]);
+      NumberVector instance = relation.get(iditer);
+      int i = 0;
+      for(EMClusterModel<?> m : models) {
+        final double prior = clusterProbabilities[i];
+        if(prior > 0.) {
+          m.updateE(instance, prior);
         }
+        wsum[i] += prior;
+        ++i;
       }
     }
-    for(int i = 0; i < k; i++) {
-      if(cms[i].getWeight() <= 0.) {
-        means[i] = new Vector(dimensionality);
-        covarianceMatrices[i] = Matrix.identity(dimensionality, dimensionality);
-      }
-      else {
-        means[i] = cms[i].getMeanVector();
-        covarianceMatrices[i] = cms[i].destroyToNaiveMatrix().cheatToAvoidSingularity(SINGULARITY_CHEAT);
-      }
+    int i = 0;
+    for(EMClusterModel<?> m : models) {
+      m.finalizeEStep();
+      m.setWeight(wsum[i] / relation.size());
+      i++;
     }
   }
 
@@ -330,56 +269,37 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
    * instance.
    * 
    * @param relation the database used for assignment to instances
-   * @param normDistrFactor normalization factor for density function, based on
-   *        current covariance matrix
-   * @param means the current means
-   * @param invCovMatr the inverse covariance matrices
+   * @param models Cluster models
    * @param clusterWeights the weights of the current clusters
+   * @param probClusterIGivenX Output storage for cluster probabilities
    * @return the expectation value of the current mixture of distributions
    */
-  public static double assignProbabilitiesToInstances(Relation<? extends NumberVector> relation, double[] normDistrFactor, Vector[] means, Matrix[] invCovMatr, double[] clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
-    final int k = clusterWeights.length;
+  public static double assignProbabilitiesToInstances(Relation<? extends NumberVector> relation, List<? extends EMClusterModel<?>> models, WritableDataStore<double[]> probClusterIGivenX) {
+    final int k = models.size();
     double emSum = 0.;
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      Vector x = relation.get(iditer).getColumnVector();
+      NumberVector vec = relation.get(iditer);
       double[] probabilities = new double[k];
-      for(int i = 0; i < k; i++) {
-        Vector difference = x.minus(means[i]);
-        double rowTimesCovTimesCol = difference.transposeTimesTimes(invCovMatr[i], difference);
-        double power = rowTimesCovTimesCol / 2.;
-        double prob = normDistrFactor[i] * Math.exp(-power);
-        if(LOG.isDebuggingFinest()) {
-          LOG.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + //
-          " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + //
-          " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol + "\n" + //
-          " power= " + power + "\n" + " prob=" + prob + "\n" + //
-          " inv cov matrix: \n" + FormatUtil.format(invCovMatr[i], "     "));
+      {
+        int i = 0;
+        for(EMClusterModel<?> m : models) {
+          probabilities[i] = m.estimateDensity(vec);
+          ++i;
         }
-        if(!(prob >= 0.)) {
-          LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor[i]);
-          prob = 0.;
-        }
-        probabilities[i] = prob;
       }
       double priorProbability = 0.;
       for(int i = 0; i < k; i++) {
-        priorProbability += probabilities[i] * clusterWeights[i];
+        priorProbability += probabilities[i];
       }
       double logP = Math.max(Math.log(priorProbability), MIN_LOGLIKELIHOOD);
-      if(!Double.isNaN(logP)) {
-        emSum += logP;
-      }
+      emSum += (logP == logP) ? logP : 0.; /* avoid NaN */
 
       double[] clusterProbabilities = new double[k];
-      for(int i = 0; i < k; i++) {
-        assert (clusterWeights[i] >= 0.);
-        // do not divide by zero!
-        if(priorProbability > 0.) {
-          clusterProbabilities[i] = probabilities[i] / priorProbability * clusterWeights[i];
-        }
-        else {
-          clusterProbabilities[i] = 0.;
+      if(priorProbability > 0.) {
+        for(int i = 0; i < k; i++) {
+          // do not divide by zero!
+          clusterProbabilities[i] = probabilities[i] / priorProbability;
         }
       }
       probClusterIGivenX.put(iditer, clusterProbabilities);
@@ -419,7 +339,7 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractParameterizer {
     /**
      * Parameter to specify the number of clusters to find, must be an integer
      * greater than 0.
@@ -435,10 +355,10 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
     "E(M) - E(M') < em.delta");
 
     /**
-     * Parameter to specify the initialization method
+     * Parameter to specify the EM cluster models to use.
      */
-    public static final OptionID INIT_ID = new OptionID("kmeans.initialization", //
-    "Method to choose the initial means.");
+    public static final OptionID INIT_ID = new OptionID("em.model", //
+    "Model factory.");
 
     /**
      * Number of clusters.
@@ -453,7 +373,7 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
     /**
      * Initialization method
      */
-    protected KMeansInitialization<V> initializer;
+    protected EMClusterModelFactory<V, M> initializer;
 
     /**
      * Maximum number of iterations.
@@ -469,27 +389,27 @@ public class EM<V extends NumberVector> extends AbstractAlgorithm<Clustering<EMM
         k = kP.getValue();
       }
 
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
+      ObjectParameter<EMClusterModelFactory<V, M>> initialP = new ObjectParameter<>(INIT_ID, EMClusterModelFactory.class, MultivariateGaussianModelFactory.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.0);
-      deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();
       }
 
-      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID);
-      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      maxiterP.setOptional(true);
+      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+      .setOptional(true);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }
     }
 
     @Override
-    protected EM<V> makeInstance() {
+    protected EM<V, M> makeInstance() {
       return new EM<>(k, delta, initializer, maxiter, false);
     }
   }

@@ -83,7 +83,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
     for (Clustering<?> c : clusterings) {
       if (c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
-        Clustering<MeanModel<? extends NumberVector>> mcls = findMeanModel(c);
+        Clustering<MeanModel> mcls = findMeanModel(c);
         if (mcls != null) {
           Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
           for (ParallelPlotProjector<?> p : ps) {
@@ -104,9 +104,9 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
    * @return the clustering cast to return a mean model, null otherwise.
    */
   @SuppressWarnings("unchecked")
-  private static Clustering<MeanModel<? extends NumberVector>> findMeanModel(Clustering<?> c) {
-    if (c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
-      return (Clustering<MeanModel<? extends NumberVector>>) c;
+  private static Clustering<MeanModel> findMeanModel(Clustering<?> c) {
+    if (c.getAllClusters().get(0).getModel() instanceof MeanModel) {
+      return (Clustering<MeanModel>) c;
     }
     return null;
   }
@@ -133,7 +133,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
     /**
      * The result we visualize.
      */
-    private Clustering<MeanModel<? extends NumberVector>> clustering;
+    private Clustering<MeanModel> clustering;
 
     /**
      * Constructor.
@@ -159,9 +159,9 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
     protected void redraw() {
       addCSSClasses(svgp);
 
-      Iterator<Cluster<MeanModel<? extends NumberVector>>> ci = clustering.getAllClusters().iterator();
+      Iterator<Cluster<MeanModel>> ci = clustering.getAllClusters().iterator();
       for (int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-        Cluster<MeanModel<? extends NumberVector>> clus = ci.next();
+        Cluster<MeanModel> clus = ci.next();
         if (clus.getModel() == null) {
           continue;
         }

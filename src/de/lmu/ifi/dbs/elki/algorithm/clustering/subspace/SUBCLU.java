@@ -84,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("SUBCLU: Density connected Subspace Clustering")
 @Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. SUBCLU delivers for each subspace the same clusters DBSCAN would have found, when applied to this subspace seperately.")
 @Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
-public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -139,7 +139,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
   /**
    * Holds the result;
    */
-  private Clustering<SubspaceModel<V>> result;
+  private Clustering<SubspaceModel> result;
 
   /**
    * Constructor.
@@ -161,7 +161,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * @param relation Relation to process
    * @return Clustering result
    */
-  public Clustering<SubspaceModel<V>> run(Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Relation<V> relation) {
     final int dimensionality = RelationUtil.dimensionality(relation);
 
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(dimensionality) : null;
@@ -258,8 +258,8 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     for(Subspace subspace : clusterMap.descendingKeySet()) {
       List<Cluster<Model>> clusters = clusterMap.get(subspace);
       for(Cluster<Model> cluster : clusters) {
-        Cluster<SubspaceModel<V>> newCluster = new Cluster<>(cluster.getIDs());
-        newCluster.setModel(new SubspaceModel<>(subspace, Centroid.make(relation, cluster.getIDs()).toVector(relation)));
+        Cluster<SubspaceModel> newCluster = new Cluster<>(cluster.getIDs());
+        newCluster.setModel(new SubspaceModel(subspace, Centroid.make(relation, cluster.getIDs())));
         newCluster.setName("cluster_" + numClusters++);
         result.addToplevelCluster(newCluster);
       }
@@ -274,7 +274,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * 
    * @return the result of the algorithm
    */
-  public Clustering<SubspaceModel<V>> getResult() {
+  public Clustering<SubspaceModel> getResult() {
     return result;
   }
 

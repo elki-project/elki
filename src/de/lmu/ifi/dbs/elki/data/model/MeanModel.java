@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
@@ -31,21 +31,19 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Cluster model that stores a mean for the cluster.
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector type
  */
-public class MeanModel<V extends FeatureVector<?>> extends BaseModel implements TextWriteable{
+public class MeanModel extends BaseModel implements TextWriteable {
   /**
    * Cluster mean
    */
-  private V mean;
+  private Vector mean;
 
   /**
    * Constructor with mean
    * 
    * @param mean Cluster mean
    */
-  public MeanModel(V mean) {
+  public MeanModel(Vector mean) {
     super();
     this.mean = mean;
   }
@@ -53,14 +51,14 @@ public class MeanModel<V extends FeatureVector<?>> extends BaseModel implements 
   /**
    * @return mean
    */
-  public V getMean() {
+  public Vector getMean() {
     return mean;
   }
 
   /**
    * @param mean Mean vector
    */
-  public void setMean(V mean) {
+  public void setMean(Vector mean) {
     this.mean = mean;
   }
 

@@ -65,7 +65,7 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
     testParameterizationOk(params);
 
     // run DiSH on database
-    Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
+    Clustering<SubspaceModel> result = dish.run(db);
 
     testFMeasure(db, result, 1.0);
     testClusterSizes(result, new int[] { 50, 200, 200 });
@@ -89,7 +89,7 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
     testParameterizationOk(params);
 
     // run DiSH on database
-    Clustering<SubspaceModel<DoubleVector>> result = dish.run(db);
+    Clustering<SubspaceModel> result = dish.run(db);
     testFMeasure(db, result, 0.6646);
     testClusterSizes(result, new int[] { 57, 84, 151, 189, 282, 337 });
   }

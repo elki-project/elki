@@ -98,7 +98,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
-public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -138,7 +138,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * 
    * @param relation Relation to process
    */
-  public Clustering<SubspaceModel<V>> run(Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Relation<V> relation) {
     if(LOG.isVerbose()) {
       LOG.verbose("Running the DiSH preprocessor.");
     }
@@ -161,7 +161,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param database the database holding the objects
    * @param clusterOrder the cluster order
    */
-  private Clustering<SubspaceModel<V>> computeClusters(Relation<V> database, ClusterOrderResult<DiSHClusterOrderEntry> clusterOrder) {
+  private Clustering<SubspaceModel> computeClusters(Relation<V> database, ClusterOrderResult<DiSHClusterOrderEntry> clusterOrder) {
     final int dimensionality = RelationUtil.dimensionality(database);
 
     // extract clusters
@@ -202,26 +202,26 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     }
 
     // sort the clusters
-    List<Cluster<SubspaceModel<V>>> clusters = sortClusters(database, clustersMap);
+    List<Cluster<SubspaceModel>> clusters = sortClusters(database, clustersMap);
     if(LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 3: sort clusters");
-      for(Cluster<SubspaceModel<V>> c : clusters) {
+      for(Cluster<SubspaceModel> c : clusters) {
         msg.append('\n').append(BitsUtil.toStringLow(c.getModel().getSubspace().getDimensions(), dimensionality)).append(" ids ").append(c.size());
       }
       LOG.verbose(msg.toString());
     }
 
     // build the hierarchy
-    Clustering<SubspaceModel<V>> clustering = new Clustering<>("DiSH clustering", "dish-clustering");
+    Clustering<SubspaceModel> clustering = new Clustering<>("DiSH clustering", "dish-clustering");
     buildHierarchy(database, clustering, clusters, dimensionality);
     if(LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 4: build hierarchy");
-      for(Cluster<SubspaceModel<V>> c : clusters) {
+      for(Cluster<SubspaceModel> c : clusters) {
         msg.append('\n').append(BitsUtil.toStringLow(c.getModel().getSubspace().getDimensions(), dimensionality)).append(" ids ").append(c.size());
-        for(Iter<Cluster<SubspaceModel<V>>> iter = clustering.getClusterHierarchy().iterParents(c); iter.valid(); iter.advance()) {
+        for(Iter<Cluster<SubspaceModel>> iter = clustering.getClusterHierarchy().iterParents(c); iter.valid(); iter.advance()) {
           msg.append("\n   parent ").append(iter.get());
         }
-        for(Iter<Cluster<SubspaceModel<V>>> iter = clustering.getClusterHierarchy().iterChildren(c); iter.valid(); iter.advance()) {
+        for(Iter<Cluster<SubspaceModel>> iter = clustering.getClusterHierarchy().iterChildren(c); iter.valid(); iter.advance()) {
           msg.append("\n   child ").append(iter.get());
         }
       }
@@ -229,7 +229,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     }
 
     // build result
-    for(Cluster<SubspaceModel<V>> c : clusters) {
+    for(Cluster<SubspaceModel> c : clusters) {
       if(clustering.getClusterHierarchy().numParents(c) == 0) {
         clustering.addToplevelCluster(c);
       }
@@ -344,16 +344,16 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param clustersMap the mapping of bits sets to clusters
    * @return a sorted list of the clusters
    */
-  private List<Cluster<SubspaceModel<V>>> sortClusters(Relation<V> relation, TCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
+  private List<Cluster<SubspaceModel>> sortClusters(Relation<V> relation, TCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
     final int db_dim = RelationUtil.dimensionality(relation);
     // int num = 1;
-    List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<>();
+    List<Cluster<SubspaceModel>> clusters = new ArrayList<>();
     for(long[] pv : clustersMap.keySet()) {
       List<ArrayModifiableDBIDs> parallelClusters = clustersMap.get(pv);
       for(int i = 0; i < parallelClusters.size(); i++) {
         ArrayModifiableDBIDs c = parallelClusters.get(i);
-        Cluster<SubspaceModel<V>> cluster = new Cluster<>(c);
-        cluster.setModel(new SubspaceModel<>(new Subspace(pv), Centroid.make(relation, c).toVector(relation)));
+        Cluster<SubspaceModel> cluster = new Cluster<>(c);
+        cluster.setModel(new SubspaceModel(new Subspace(pv), Centroid.make(relation, c)));
         String subspace = BitsUtil.toStringLow(cluster.getModel().getSubspace().getDimensions(), db_dim);
         if(parallelClusters.size() > 1) {
           cluster.setName("Cluster_" + subspace + "_" + i);
@@ -365,9 +365,9 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       }
     }
     // sort the clusters w.r.t. lambda
-    Comparator<Cluster<SubspaceModel<V>>> comparator = new Comparator<Cluster<SubspaceModel<V>>>() {
+    Comparator<Cluster<SubspaceModel>> comparator = new Comparator<Cluster<SubspaceModel>>() {
       @Override
-      public int compare(Cluster<SubspaceModel<V>> c1, Cluster<SubspaceModel<V>> c2) {
+      public int compare(Cluster<SubspaceModel> c1, Cluster<SubspaceModel> c2) {
         return c2.getModel().getSubspace().dimensionality() - c1.getModel().getSubspace().dimensionality();
       }
     };
@@ -485,20 +485,20 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param dimensionality the dimensionality of the data
    * @param database the database containing the data objects
    */
-  private void buildHierarchy(Relation<V> database, Clustering<SubspaceModel<V>> clustering, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
+  private void buildHierarchy(Relation<V> database, Clustering<SubspaceModel> clustering, List<Cluster<SubspaceModel>> clusters, int dimensionality) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
     final int db_dim = RelationUtil.dimensionality(database);
-    Hierarchy<Cluster<SubspaceModel<V>>> hier = clustering.getClusterHierarchy();
+    Hierarchy<Cluster<SubspaceModel>> hier = clustering.getClusterHierarchy();
 
     for(int i = 0; i < clusters.size() - 1; i++) {
-      Cluster<SubspaceModel<V>> c_i = clusters.get(i);
+      Cluster<SubspaceModel> c_i = clusters.get(i);
       final Subspace s_i = c_i.getModel().getSubspace();
       int subspaceDim_i = dimensionality - s_i.dimensionality();
       Vector ci_centroid = ProjectedCentroid.make(s_i.getDimensions(), database, c_i.getIDs());
       long[] pv1 = s_i.getDimensions();
 
       for(int j = i + 1; j < clusters.size(); j++) {
-        Cluster<SubspaceModel<V>> c_j = clusters.get(j);
+        Cluster<SubspaceModel> c_j = clusters.get(j);
         final Subspace s_j = c_j.getModel().getSubspace();
         int subspaceDim_j = dimensionality - s_j.dimensionality();
 
@@ -572,13 +572,13 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(Relation<V> relation, Cluster<SubspaceModel<V>> parent, Iter<Cluster<SubspaceModel<V>>> iter, int db_dim) {
+  private boolean isParent(Relation<V> relation, Cluster<SubspaceModel> parent, Iter<Cluster<SubspaceModel>> iter, int db_dim) {
     Subspace s_p = parent.getModel().getSubspace();
     Vector parent_centroid = ProjectedCentroid.make(s_p.getDimensions(), relation, parent.getIDs());
     int subspaceDim_parent = db_dim - s_p.dimensionality();
 
     for(; iter.valid(); iter.advance()) {
-      Cluster<SubspaceModel<V>> child = iter.get();
+      Cluster<SubspaceModel> child = iter.get();
       Subspace s_c = child.getModel().getSubspace();
       Vector child_centroid = ProjectedCentroid.make(s_c.getDimensions(), relation, child.getIDs());
       long[] commonPreferenceVector = BitsUtil.andCMin(s_p.getDimensions(), s_c.getDimensions());

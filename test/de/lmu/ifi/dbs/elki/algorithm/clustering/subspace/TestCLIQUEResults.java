@@ -65,7 +65,7 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
     testParameterizationOk(params);
 
     // run CLIQUE on database
-    Clustering<SubspaceModel<DoubleVector>> result = clique.run(db);
+    Clustering<SubspaceModel> result = clique.run(db);
 
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.9882);
@@ -90,7 +90,7 @@ public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JU
     testParameterizationOk(params);
 
     // run CLIQUE on database
-    Clustering<SubspaceModel<DoubleVector>> result = clique.run(db);
+    Clustering<SubspaceModel> result = clique.run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.433661);
     testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });

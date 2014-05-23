@@ -22,23 +22,21 @@ package de.lmu.ifi.dbs.elki.data.model;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Trivial subclass of the {@link MeanModel} that indicates the clustering to be
  * produced by k-means (so the Voronoi cell visualization is sensible).
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector type.
  */
-public class KMeansModel<V extends NumberVector> extends MeanModel<V> {
+public class KMeansModel extends MeanModel {
   /**
    * Constructor with mean.
    * 
    * @param mean Mean vector.
    */
-  public KMeansModel(V mean) {
+  public KMeansModel(Vector mean) {
     super(mean);
   }
 }

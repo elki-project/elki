@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -65,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("K-Means")
 @Description("Finds a partitioning into k clusters.")
 @Reference(authors = "J. MacQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
-public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KMeansModel<V>> {
+public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.
    */
@@ -84,7 +83,7 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
   }
 
   @Override
-  public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
@@ -111,11 +110,10 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
     }
     LOG.setCompleted(prog);
 
-    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
+    Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getArrayRef()));
+      KMeansModel model = new KMeansModel(means.get(i));
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;

@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <M> Model type
  */
 @Reference(authors = "M. Steinbach, G. Karypis, V. Kumar", title = "A Comparison of Document Clustering Techniques", booktitle = "KDD workshop on text mining. Vol. 400. No. 1")
-public class KMeansBisecting<V extends NumberVector, M extends MeanModel<V>> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
+public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
   /**
    * The logger for this class.
    */
@@ -177,7 +177,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel<V>> ext
    * @param <V> Vector type
    * @param <M> Model type
    */
-  public static class Parameterizer<V extends NumberVector, M extends MeanModel<V>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractParameterizer {
     /**
      * Parameter to specify the kMeans variant.
      */

@@ -57,9 +57,15 @@ public class Matrix {
   public static final double DELTA = 1E-3;
 
   /**
-   * Error: matrix not square.
+   * Small value to increment diagonally of a matrix in order to avoid
+   * singularity before building the inverse.
    */
-  public static final String ERR_NOTSQUARE = "All rows must have the same length.";
+  public static final double SINGULARITY_CHEAT = 1E-9;
+
+  /**
+   * Error: matrix not rectangular.
+   */
+  public static final String ERR_NOTRECTANGULAR = "All rows must have the same length.";
 
   /**
    * Error: matrix indexes incorrect
@@ -129,7 +135,7 @@ public class Matrix {
     columndimension = elements[0].length;
     for(int i = 0; i < elements.length; i++) {
       if(elements[i].length != columndimension) {
-        throw new IllegalArgumentException(ERR_NOTSQUARE);
+        throw new IllegalArgumentException(ERR_NOTRECTANGULAR);
       }
     }
     this.elements = elements;
@@ -178,7 +184,7 @@ public class Matrix {
     final Matrix X = new Matrix(m, n);
     for(int i = 0; i < m; i++) {
       if(A[i].length != n) {
-        throw new IllegalArgumentException(ERR_NOTSQUARE);
+        throw new IllegalArgumentException(ERR_NOTRECTANGULAR);
       }
       System.arraycopy(A[i], 0, X.elements[i], 0, n);
     }
@@ -656,6 +662,26 @@ public class Matrix {
   }
 
   /**
+   * C = A + s
+   * 
+   * @param s scalar value
+   * @return A + s in a new Matrix
+   */
+  public final Matrix plus(final double s) {
+    return copy().plusEquals(s);
+  }
+
+  /**
+   * C = A + s
+   * 
+   * @param s scalar value
+   * @return A + s * E in a new Matrix
+   */
+  public final Matrix plusDiagonal(final double s) {
+    return copy().plusDiagonalEquals(s);
+  }
+
+  /**
    * C = A + s * B
    * 
    * @param B another matrix
@@ -678,6 +704,34 @@ public class Matrix {
       for(int j = 0; j < columndimension; j++) {
         elements[i][j] += B.elements[i][j];
       }
+    }
+    return this;
+  }
+
+  /**
+   * A = A + s
+   * 
+   * @param s constant to add to every cell
+   * @return A + s in this Matrix
+   */
+  public final Matrix plusEquals(final double s) {
+    for(int i = 0; i < elements.length; i++) {
+      for(int j = 0; j < columndimension; j++) {
+        elements[i][j] += s;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * A = A + s
+   * 
+   * @param s constant to add to the diagonal
+   * @return A + s in this Matrix
+   */
+  public final Matrix plusDiagonalEquals(final double s) {
+    for(int i = 0; i < elements.length && i < columndimension; i++) {
+      elements[i][i] += s;
     }
     return this;
   }
@@ -966,6 +1020,19 @@ public class Matrix {
    */
   public final Matrix inverse() {
     return solve(identity(elements.length, elements.length));
+  }
+
+  /**
+   * Matrix inverse for square matrixes.
+   * 
+   * @return inverse(A), or inverse(A + epsilon E) if singular.
+   */
+  public final Matrix robustInverse() {
+    LUDecomposition d = new LUDecomposition(this);
+    if(!d.isNonsingular()) {
+      d = new LUDecomposition(plusDiagonal(SINGULARITY_CHEAT).getArrayRef(), elements.length, columndimension);
+    }
+    return d.solve(identity(elements.length, elements.length));
   }
 
   /**

@@ -56,11 +56,11 @@ public class TestKMeansBisecting extends AbstractSimpleAlgorithmTest implements 
     params.addParameter(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class);
 
-    KMeansBisecting<DoubleVector, MeanModel<DoubleVector>> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
+    KMeansBisecting<DoubleVector, MeanModel> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database
-    Clustering<MeanModel<DoubleVector>> result = kmeans.run(db);
+    Clustering<MeanModel> result = kmeans.run(db);
     testClusterSizes(result, new int[] { 103, 97, 100 });
   }
 
@@ -79,11 +79,11 @@ public class TestKMeansBisecting extends AbstractSimpleAlgorithmTest implements 
     params.addParameter(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class);
 
-    KMeansBisecting<DoubleVector, MeanModel<DoubleVector>> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
+    KMeansBisecting<DoubleVector, MeanModel> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBisecting.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database
-    Clustering<MeanModel<DoubleVector>> result = kmeans.run(db);
+    Clustering<MeanModel> result = kmeans.run(db);
     testFMeasure(db, result, 0.7408);
   }
 }

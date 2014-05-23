@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -51,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type
  * @param <M> Model type
  */
-public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel<V>> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
+public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
   /**
    * The logger for this class.
    */
@@ -91,7 +92,9 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel<V>
     if(!(innerkMeans.getDistanceFunction() instanceof PrimitiveDistanceFunction)) {
       throw new AbortException("K-Means results can only be evaluated for primitive distance functions, got: " + innerkMeans.getDistanceFunction().getClass());
     }
-    final PrimitiveDistanceFunction<? super V> df = (PrimitiveDistanceFunction<? super V>) innerkMeans.getDistanceFunction();
+    @SuppressWarnings("unchecked")
+    final PrimitiveDistanceFunction<? super NumberVector> df = (PrimitiveDistanceFunction<? super NumberVector>) innerkMeans.getDistanceFunction();
+    // TODO: double-check that we have a valid distance function!
     Clustering<M> bestResult = null;
     if(trials > 1) {
       double bestCost = Double.POSITIVE_INFINITY;
@@ -155,7 +158,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel<V>
    * @param <V> Vector type
    * @param <M> Model type
    */
-  public static class Parameterizer<V extends NumberVector, M extends MeanModel<V>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractParameterizer {
     /**
      * Parameter to specify the iterations of the bisecting step.
      */

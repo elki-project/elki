@@ -84,7 +84,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
   /**
    * Clustering algorithm to run.
    */
-  protected SubspaceClusteringAlgorithm<? extends SubspaceModel<?>> clusteralg;
+  protected SubspaceClusteringAlgorithm<? extends SubspaceModel> clusteralg;
 
   /**
    * Weighting parameter of size vs. dimensionality score.
@@ -98,7 +98,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
    *        {@link SubspaceClusteringAlgorithm}!)
    * @param alpha Alpha parameter to balance size and dimensionality.
    */
-  public OutRankS1(SubspaceClusteringAlgorithm<? extends SubspaceModel<?>> clusteralg, double alpha) {
+  public OutRankS1(SubspaceClusteringAlgorithm<? extends SubspaceModel> clusteralg, double alpha) {
     super();
     this.clusteralg = clusteralg;
     this.alpha = alpha;
@@ -108,7 +108,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
   public OutlierResult run(Database database) {
     DBIDs ids = database.getRelation(TypeUtil.DBID).getDBIDs();
     // Run the primary algorithm
-    Clustering<? extends SubspaceModel<?>> clustering = clusteralg.run(database);
+    Clustering<? extends SubspaceModel> clustering = clusteralg.run(database);
 
     WritableDoubleDataStore score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -117,13 +117,13 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
 
     int maxdim = 0, maxsize = 0;
     // Find maximum dimensionality and cluster size
-    for(Cluster<? extends SubspaceModel<?>> cluster : clustering.getAllClusters()) {
+    for(Cluster<? extends SubspaceModel> cluster : clustering.getAllClusters()) {
       maxsize = Math.max(maxsize, cluster.size());
       maxdim = Math.max(maxdim, BitsUtil.cardinality(cluster.getModel().getDimensions()));
     }
     // Iterate over all clusters:
     DoubleMinMax minmax = new DoubleMinMax();
-    for(Cluster<? extends SubspaceModel<?>> cluster : clustering.getAllClusters()) {
+    for(Cluster<? extends SubspaceModel> cluster : clustering.getAllClusters()) {
       double relsize = cluster.size() / (double) maxsize;
       double reldim = BitsUtil.cardinality(cluster.getModel().getDimensions()) / (double) maxdim;
       // Process objects in the cluster
@@ -172,7 +172,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     /**
      * Clustering algorithm to run.
      */
-    protected SubspaceClusteringAlgorithm<? extends SubspaceModel<?>> algorithm = null;
+    protected SubspaceClusteringAlgorithm<? extends SubspaceModel> algorithm = null;
 
     /**
      * Alpha parameter to balance parameters
@@ -182,7 +182,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<SubspaceClusteringAlgorithm<? extends SubspaceModel<?>>> algP = new ObjectParameter<>(ALGORITHM_ID, SubspaceClusteringAlgorithm.class);
+      ObjectParameter<SubspaceClusteringAlgorithm<? extends SubspaceModel>> algP = new ObjectParameter<>(ALGORITHM_ID, SubspaceClusteringAlgorithm.class);
       if(config.grab(algP)) {
         algorithm = algP.instantiateClass(config);
       }

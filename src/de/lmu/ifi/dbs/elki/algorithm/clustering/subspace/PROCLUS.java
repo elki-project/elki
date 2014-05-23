@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -100,7 +101,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("PROCLUS: PROjected CLUStering")
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304188")
-public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering<Clustering<SubspaceModel<V>>, V> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering<Clustering<SubspaceModel>, V> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -149,7 +150,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @param database Database to process
    * @param relation Relation to process
    */
-  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Database database, Relation<V> relation) {
     DistanceQuery<V> distFunc = this.getDistanceQuery(database);
     RangeQuery<V> rangeQuery = database.getRangeQuery(distFunc);
     final Random random = rnd.getSingleThreadedRandom();
@@ -226,15 +227,15 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       LOG.verbose("3. Refinement phase...");
     }
 
-    List<Pair<V, TIntSet>> dimensions = findDimensions(clusters, relation);
+    List<Pair<Vector, TIntSet>> dimensions = findDimensions(clusters, relation);
     List<PROCLUSCluster> finalClusters = finalAssignment(dimensions, relation);
 
     // build result
     int numClusters = 1;
-    Clustering<SubspaceModel<V>> result = new Clustering<>("ProClus clustering", "proclus-clustering");
+    Clustering<SubspaceModel> result = new Clustering<>("ProClus clustering", "proclus-clustering");
     for(PROCLUSCluster c : finalClusters) {
-      Cluster<SubspaceModel<V>> cluster = new Cluster<>(c.objectIDs);
-      cluster.setModel(new SubspaceModel<>(new Subspace(c.getDimensions()), c.centroid));
+      Cluster<SubspaceModel> cluster = new Cluster<>(c.objectIDs);
+      cluster.setModel(new SubspaceModel(new Subspace(c.getDimensions()), c.centroid));
       cluster.setName("cluster_" + numClusters++);
 
       result.addToplevelCluster(cluster);
@@ -484,7 +485,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @return the set of correlated dimensions for each specified cluster
    *         centroid
    */
-  private List<Pair<V, TIntSet>> findDimensions(ArrayList<PROCLUSCluster> clusters, Relation<V> database) {
+  private List<Pair<Vector, TIntSet>> findDimensions(ArrayList<PROCLUSCluster> clusters, Relation<V> database) {
     // compute x_ij = avg distance from points in c_i to c_i.centroid
     int dim = RelationUtil.dimensionality(database);
     final int numc = clusters.size();
@@ -552,7 +553,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     }
 
     // mapping cluster -> dimensions
-    List<Pair<V, TIntSet>> result = new ArrayList<>();
+    List<Pair<Vector, TIntSet>> result = new ArrayList<>();
     for(int i = 0; i < numc; i++) {
       TIntSet dims_i = dimensionMap[i];
       if(dims_i == null) {
@@ -603,7 +604,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       ModifiableDBIDs objectIDs = clusterIDs[i];
       if(!objectIDs.isEmpty()) {
         TIntSet clusterDimensions = dimensions[i];
-        V centroid = Centroid.make(database, objectIDs).toVector(database);
+        Vector centroid = Centroid.make(database, objectIDs);
         clusters.add(new PROCLUSCluster(objectIDs, clusterDimensions, centroid));
       }
       else {
@@ -628,7 +629,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @param database the database containing the objects
    * @return the assignments of the object to the clusters
    */
-  private List<PROCLUSCluster> finalAssignment(List<Pair<V, TIntSet>> dimensions, Relation<V> database) {
+  private List<PROCLUSCluster> finalAssignment(List<Pair<Vector, TIntSet>> dimensions, Relation<V> database) {
     Map<Integer, ModifiableDBIDs> clusterIDs = new HashMap<>();
     for(int i = 0; i < dimensions.size(); i++) {
       clusterIDs.put(i, DBIDUtil.newHashSet());
@@ -639,8 +640,8 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       double minDist = Double.POSITIVE_INFINITY;
       int best = -1;
       for(int i = 0; i < dimensions.size(); i++) {
-        Pair<V, TIntSet> pair_i = dimensions.get(i);
-        V c_i = pair_i.first;
+        Pair<Vector, TIntSet> pair_i = dimensions.get(i);
+        Vector c_i = pair_i.first;
         TIntSet dimensions_i = pair_i.second;
         double currentDist = manhattanSegmentalDistance(p, c_i, dimensions_i);
         if(best < 0 || currentDist < minDist) {
@@ -659,7 +660,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       ModifiableDBIDs objectIDs = clusterIDs.get(i);
       if(!objectIDs.isEmpty()) {
         TIntSet clusterDimensions = dimensions.get(i).second;
-        V centroid = Centroid.make(database, objectIDs).toVector(database);
+        Vector centroid = Centroid.make(database, objectIDs);
         clusters.add(new PROCLUSCluster(objectIDs, clusterDimensions, centroid));
       }
     }
@@ -683,7 +684,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @return the Manhattan segmental distance between o1 and o2 relative to the
    *         specified dimensions
    */
-  private double manhattanSegmentalDistance(V o1, V o2, TIntSet dimensions) {
+  private double manhattanSegmentalDistance(NumberVector o1, NumberVector o2, TIntSet dimensions) {
     double result = 0;
     for(TIntIterator iter = dimensions.iterator(); iter.hasNext();) {
       final int d = iter.next();
@@ -705,7 +706,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     double result = 0;
     for(int i = 0; i < dimensions.length; i++) {
       PROCLUSCluster c_i = clusters.get(i);
-      V centroid_i = c_i.centroid;
+      Vector centroid_i = c_i.centroid;
 
       TIntSet dims_i = dimensions[i];
       double w_i = 0;
@@ -732,7 +733,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @return the average distance of the objects to the centroid along the
    *         specified dimension
    */
-  private double avgDistance(V centroid, DBIDs objectIDs, Relation<V> database, int dimension) {
+  private double avgDistance(Vector centroid, DBIDs objectIDs, Relation<V> database, int dimension) {
     Mean avg = new Mean();
     for(DBIDIter iter = objectIDs.iter(); iter.valid(); iter.advance()) {
       V o = database.get(iter);
@@ -791,7 +792,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     /**
      * The centroids of this cluster along each dimension.
      */
-    V centroid;
+    Vector centroid;
 
     /**
      * Provides a new cluster with the specified parameters.
@@ -800,7 +801,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
      * @param dimensions the correlated dimensions of this cluster
      * @param centroid the centroid of this cluster
      */
-    public PROCLUSCluster(ModifiableDBIDs objectIDs, TIntSet dimensions, V centroid) {
+    public PROCLUSCluster(ModifiableDBIDs objectIDs, TIntSet dimensions, Vector centroid) {
       this.objectIDs = objectIDs;
       this.dimensions = dimensions;
       this.centroid = centroid;

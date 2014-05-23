@@ -84,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  */
 @Title("DOC: Density-based Optimal projective Clustering")
 @Reference(authors = "C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali", title = "A Monte Carlo algorithm for fast projective clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", url = "http://dx.doi.org/10.1145/564691.564739")
-public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -151,7 +151,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param database Database
    * @param relation Data relation
    */
-  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Database database, Relation<V> relation) {
     // Dimensionality of our set.
     final int d = RelationUtil.dimensionality(relation);
 
@@ -172,7 +172,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     int minClusterSize = (int) (alpha * S.size());
 
     // List of all clusters we found.
-    Clustering<SubspaceModel<V>> result = new Clustering<>("DOC Clusters", "DOC");
+    Clustering<SubspaceModel> result = new Clustering<>("DOC Clusters", "DOC");
 
     // Inform the user about the number of actual clusters found so far.
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
@@ -180,7 +180,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     // To not only find a single cluster, we continue running until our set
     // of points is empty.
     while(S.size() > minClusterSize) {
-      Cluster<SubspaceModel<V>> C;
+      Cluster<SubspaceModel> C;
       if(heuristics) {
         C = runFastDOC(relation, S, d, n, m, (int) r);
       }
@@ -206,7 +206,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     // Add the remainder as noise.
     if(S.size() > 0) {
       long[] alldims = BitsUtil.ones(d);
-      result.addToplevelCluster(new Cluster<>(S, true, new SubspaceModel<>(new Subspace(alldims), Centroid.make(relation, S).toVector(relation))));
+      result.addToplevelCluster(new Cluster<>(S, true, new SubspaceModel(new Subspace(alldims), Centroid.make(relation, S))));
     }
     LOG.setCompleted(cprogress);
     return result;
@@ -224,7 +224,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param minClusterSize Minimum size a cluster must have to be accepted.
    * @return a cluster, if one is found, else <code>null</code>.
    */
-  private Cluster<SubspaceModel<V>> runDOC(Relation<V> relation, ArrayModifiableDBIDs S, final int d, int n, int m, int r, int minClusterSize) {
+  private Cluster<SubspaceModel> runDOC(Relation<V> relation, ArrayModifiableDBIDs S, final int d, int n, int m, int r, int minClusterSize) {
     // Best cluster for the current run.
     DBIDs C = null;
     // Relevant attributes for the best cluster.
@@ -318,7 +318,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param n Number of outer iterations (seed points).
    * @return a cluster, if one is found, else <code>null</code>.
    */
-  private Cluster<SubspaceModel<V>> runFastDOC(Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r) {
+  private Cluster<SubspaceModel> runFastDOC(Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r) {
     // Relevant attributes of highest cardinality.
     long[] D = null;
     // The seed point for the best dimensions.
@@ -413,10 +413,10 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param D the relevant dimensions.
    * @return an object representing the subspace cluster.
    */
-  private Cluster<SubspaceModel<V>> makeCluster(Relation<V> relation, DBIDs C, long[] D) {
+  private Cluster<SubspaceModel> makeCluster(Relation<V> relation, DBIDs C, long[] D) {
     DBIDs ids = DBIDUtil.newHashSet(C); // copy, also to lose distance values!
-    Cluster<SubspaceModel<V>> cluster = new Cluster<>(ids);
-    cluster.setModel(new SubspaceModel<>(new Subspace(D), Centroid.make(relation, ids).toVector(relation)));
+    Cluster<SubspaceModel> cluster = new Cluster<>(ids);
+    cluster.setModel(new SubspaceModel(new Subspace(D), Centroid.make(relation, ids)));
     return cluster;
   }
 

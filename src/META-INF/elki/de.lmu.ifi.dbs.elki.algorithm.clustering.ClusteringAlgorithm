@@ -1,7 +1,7 @@
 de.lmu.ifi.dbs.elki.algorithm.clustering.CanopyPreClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
-de.lmu.ifi.dbs.elki.algorithm.clustering.EM
 de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation.AffinityPropagationClusteringAlgorithm
+de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.ExtractFlatClusteringFromHierarchy
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd

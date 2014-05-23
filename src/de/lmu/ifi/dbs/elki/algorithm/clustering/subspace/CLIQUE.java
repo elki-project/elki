@@ -95,7 +95,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")
 @Description("Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality.")
 @Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", url = "http://dx.doi.org/10.1145/276304.276314")
-public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -165,7 +165,7 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * @param relation Data relation to process
    * @return Clustering result
    */
-  public Clustering<SubspaceModel<V>> run(Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Relation<V> relation) {
     // 1. Identification of subspaces that contain clusters
     // TODO: use step logging.
     if(LOG.isVerbose()) {
@@ -203,7 +203,7 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
     }
     // build result
     int numClusters = 1;
-    Clustering<SubspaceModel<V>> result = new Clustering<>("CLIQUE clustering", "clique-clustering");
+    Clustering<SubspaceModel> result = new Clustering<>("CLIQUE clustering", "clique-clustering");
     for(Integer dim : dimensionToDenseSubspaces.keySet()) {
       List<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
       List<Pair<Subspace, ModifiableDBIDs>> modelsAndClusters = determineClusters(subspaces);
@@ -213,8 +213,8 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
       }
 
       for(Pair<Subspace, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
-        Cluster<SubspaceModel<V>> newCluster = new Cluster<>(modelAndCluster.second);
-        newCluster.setModel(new SubspaceModel<>(modelAndCluster.first, Centroid.make(relation, modelAndCluster.second).toVector(relation)));
+        Cluster<SubspaceModel> newCluster = new Cluster<>(modelAndCluster.second);
+        newCluster.setModel(new SubspaceModel(modelAndCluster.first, Centroid.make(relation, modelAndCluster.second)));
         newCluster.setName("cluster_" + numClusters++);
         result.addToplevelCluster(newCluster);
       }

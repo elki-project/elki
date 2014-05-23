@@ -66,7 +66,7 @@ public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implem
 
     // run KMeans on database
     @SuppressWarnings("unchecked")
-    Clustering<MeanModel<DoubleVector>> result2 = (Clustering<MeanModel<DoubleVector>>) kmeans.run(db);
+    Clustering<MeanModel> result2 = (Clustering<MeanModel>) kmeans.run(db);
 
     // Test Cluster Variance
     KMeansQualityMeasure<? super DoubleVector> variance = new WithinClusterVarianceQualityMeasure();
@@ -95,7 +95,7 @@ public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implem
 
     // run KMeans on database
     @SuppressWarnings("unchecked")
-    Clustering<MeanModel<DoubleVector>> result = (Clustering<MeanModel<DoubleVector>>) kmeans.run(db);
+    Clustering<MeanModel> result = (Clustering<MeanModel>) kmeans.run(db);
     final PrimitiveDistanceFunction<? super NumberVector> dist = kmeans.getDistanceFunction();
 
     // Test Cluster Average Overall Distance

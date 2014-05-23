@@ -64,7 +64,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     testParameterizationOk(params);
 
     // run KMeans on database
-    Clustering<? extends MeanModel<DoubleVector>> result = kmeans.run(db);
+    Clustering<? extends MeanModel> result = kmeans.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -87,7 +87,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     testParameterizationOk(params);
 
     // run KMeans on database
-    Clustering<? extends MeanModel<DoubleVector>> result = kmeans.run(db);
+    Clustering<? extends MeanModel> result = kmeans.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -110,7 +110,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     testParameterizationOk(params);
 
     // run KMedians on database
-    Clustering<? extends MeanModel<DoubleVector>> result = kmedians.run(db);
+    Clustering<? extends MeanModel> result = kmedians.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

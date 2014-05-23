@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -61,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("K-Medians")
 @Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url = "http://nips.djvuzone.org/djvu/nips09/0368.djvu")
-public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, MeanModel<V>> {
+public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
   /**
    * The logger for this class.
    */
@@ -80,7 +79,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
   }
 
   @Override
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<MeanModel> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
       return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     }
@@ -106,10 +105,9 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
     }
     LOG.setCompleted(prog);
     // Wrap result
-    final NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<MeanModel<V>> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
+    Clustering<MeanModel> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel<V> model = new MeanModel<>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
+      MeanModel model = new MeanModel(medians.get(i).getColumnVector());
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

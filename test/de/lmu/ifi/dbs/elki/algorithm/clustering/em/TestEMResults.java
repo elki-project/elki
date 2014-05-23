@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
 
 /*
  This file is part of ELKI:
@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -59,11 +58,11 @@ public class TestEMResults extends AbstractSimpleAlgorithmTest implements JUnit4
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.SEED_ID, 0);
     params.addParameter(EM.Parameterizer.K_ID, 6);
-    EM<DoubleVector> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
+    EM<DoubleVector, ?> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
     testParameterizationOk(params);
 
     // run EM on database
-    Clustering<EMModel<DoubleVector>> result = em.run(db);
+    Clustering<?> result = em.run(db);
     testFMeasure(db, result, 0.7551098);
     testClusterSizes(result, new int[] { 50, 99, 102, 120, 141, 198 });
   }

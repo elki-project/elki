@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Class for computing the variance in a clustering result (sum-of-squares).
@@ -41,15 +42,15 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
  */
 public class WithinClusterVarianceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel<V>> clustering, PrimitiveDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
     @SuppressWarnings("unchecked")
-    final List<Cluster<MeanModel<V>>> clusterList = (List<Cluster<MeanModel<V>>>) (List<?>) clustering.getAllClusters();
+    final List<Cluster<MeanModel>> clusterList = (List<Cluster<MeanModel>>) (List<?>) clustering.getAllClusters();
 
     boolean squared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
     double variance = 0.0;
-    for(Cluster<MeanModel<V>> cluster : clusterList) {
+    for(Cluster<MeanModel> cluster : clusterList) {
       DBIDs ids = cluster.getIDs();
-      V mean = cluster.getModel().getMean();
+      Vector mean = cluster.getModel().getMean();
 
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double dist = distanceFunction.distance(relation.get(iter), mean);

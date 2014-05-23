@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -85,7 +87,16 @@ public class CovarianceMatrix {
     this.mean = new double[dim];
     this.nmea = new double[dim];
     this.elements = new double[dim][dim];
-    this.wsum = 0.0;
+    this.wsum = 0.;
+  }
+
+  /**
+   * Get the matrix dimensionality.
+   * 
+   * @return Mean length.
+   */
+  public int getDimensionality() {
+    return mean.length;
   }
 
   /**
@@ -95,21 +106,21 @@ public class CovarianceMatrix {
    */
   public void put(double[] val) {
     assert (val.length == mean.length);
-    final double nwsum = wsum + 1.0;
+    final double nwsum = wsum + 1.;
     // Compute new means
-    for (int i = 0; i < mean.length; i++) {
+    for(int i = 0; i < mean.length; i++) {
       final double delta = val[i] - mean[i];
       nmea[i] = mean[i] + delta / nwsum;
     }
     // Update covariance matrix
-    for (int i = 0; i < mean.length; i++) {
-      for (int j = i; j < mean.length; j++) {
+    for(int i = 0; i < mean.length; i++) {
+      for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
         double delta = (val[i] - nmea[i]) * (val[j] - mean[j]);
         elements[i][j] = elements[i][j] + delta;
         // Optimize via symmetry
-        if (i != j) {
+        if(i != j) {
           elements[j][i] = elements[j][i] + delta;
         }
       }
@@ -130,20 +141,20 @@ public class CovarianceMatrix {
     assert (val.length == mean.length);
     final double nwsum = wsum + weight;
     // Compute new means
-    for (int i = 0; i < mean.length; i++) {
+    for(int i = 0; i < mean.length; i++) {
       final double delta = val[i] - mean[i];
       final double rval = delta * weight / nwsum;
       nmea[i] = mean[i] + rval;
     }
     // Update covariance matrix
-    for (int i = 0; i < mean.length; i++) {
-      for (int j = i; j < mean.length; j++) {
+    for(int i = 0; i < mean.length; i++) {
+      for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
         double delta = (val[i] - nmea[i]) * (val[j] - mean[j]) * weight;
         elements[i][j] = elements[i][j] + delta;
         // Optimize via symmetry
-        if (i != j) {
+        if(i != j) {
           elements[j][i] = elements[j][i] + delta;
         }
       }
@@ -180,21 +191,54 @@ public class CovarianceMatrix {
    */
   public void put(NumberVector val) {
     assert (val.getDimensionality() == mean.length);
-    final double nwsum = wsum + 1.0;
+    final double nwsum = wsum + 1.;
     // Compute new means
-    for (int i = 0; i < mean.length; i++) {
+    for(int i = 0; i < mean.length; i++) {
       final double delta = val.doubleValue(i) - mean[i];
       nmea[i] = mean[i] + delta / nwsum;
     }
     // Update covariance matrix
-    for (int i = 0; i < mean.length; i++) {
-      for (int j = i; j < mean.length; j++) {
+    for(int i = 0; i < mean.length; i++) {
+      for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
         double delta = (val.doubleValue(i) - nmea[i]) * (val.doubleValue(j) - mean[j]);
         elements[i][j] = elements[i][j] + delta;
         // Optimize via symmetry
-        if (i != j) {
+        if(i != j) {
+          elements[j][i] = elements[j][i] + delta;
+        }
+      }
+    }
+    // Use new values.
+    wsum = nwsum;
+    System.arraycopy(nmea, 0, mean, 0, nmea.length);
+  }
+
+  /**
+   * Add data with a given weight.
+   * 
+   * @param val data
+   * @param weight weight
+   */
+  public void put(NumberVector val, double weight) {
+    assert (val.getDimensionality() == mean.length);
+    final double nwsum = wsum + weight;
+    // Compute new means
+    for(int i = 0; i < mean.length; i++) {
+      final double delta = val.doubleValue(i) - mean[i];
+      final double rval = delta * weight / nwsum;
+      nmea[i] = mean[i] + rval;
+    }
+    // Update covariance matrix
+    for(int i = 0; i < mean.length; i++) {
+      for(int j = i; j < mean.length; j++) {
+        // We DO want to use the new mean once and the old mean once!
+        // It does not matter which one is which.
+        double delta = (val.doubleValue(i) - nmea[i]) * (val.doubleValue(j) - mean[j]) * weight;
+        elements[i][j] = elements[i][j] + delta;
+        // Optimize via symmetry
+        if(i != j) {
           elements[j][i] = elements[j][i] + delta;
         }
       }
@@ -212,39 +256,6 @@ public class CovarianceMatrix {
    */
   public double getWeight() {
     return wsum;
-  }
-
-  /**
-   * Add data with a given weight.
-   * 
-   * @param val data
-   * @param weight weight
-   */
-  public void put(NumberVector val, double weight) {
-    assert (val.getDimensionality() == mean.length);
-    final double nwsum = wsum + weight;
-    // Compute new means
-    for (int i = 0; i < mean.length; i++) {
-      final double delta = val.doubleValue(i) - mean[i];
-      final double rval = delta * weight / nwsum;
-      nmea[i] = mean[i] + rval;
-    }
-    // Update covariance matrix
-    for (int i = 0; i < mean.length; i++) {
-      for (int j = i; j < mean.length; j++) {
-        // We DO want to use the new mean once and the old mean once!
-        // It does not matter which one is which.
-        double delta = (val.doubleValue(i) - nmea[i]) * (val.doubleValue(j) - mean[j]) * weight;
-        elements[i][j] = elements[i][j] + delta;
-        // Optimize via symmetry
-        if (i != j) {
-          elements[j][i] = elements[j][i] + delta;
-        }
-      }
-    }
-    // Use new values.
-    wsum = nwsum;
-    System.arraycopy(nmea, 0, mean, 0, nmea.length);
   }
 
   /**
@@ -278,7 +289,7 @@ public class CovarianceMatrix {
    * @return New matrix
    */
   public Matrix makeSampleMatrix() {
-    if (wsum <= 1.0) {
+    if(wsum <= 1.0) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
     Matrix mat = new Matrix(elements);
@@ -296,11 +307,11 @@ public class CovarianceMatrix {
    * @return New matrix
    */
   public Matrix makeNaiveMatrix() {
-    if (wsum <= 0.0) {
+    if(wsum <= 0.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
     Matrix mat = new Matrix(elements);
-    return mat.times(1.0 / wsum);
+    return mat.times(1. / wsum);
   }
 
   /**
@@ -314,10 +325,10 @@ public class CovarianceMatrix {
    * @return New matrix
    */
   public Matrix destroyToSampleMatrix() {
-    if (wsum <= 1.0) {
+    if(wsum <= 1.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
-    Matrix mat = new Matrix(elements).timesEquals(1.0 / (wsum - 1));
+    Matrix mat = new Matrix(elements).timesEquals(1. / (wsum - 1.));
     this.elements = null;
     return mat;
   }
@@ -333,12 +344,31 @@ public class CovarianceMatrix {
    * @return New matrix
    */
   public Matrix destroyToNaiveMatrix() {
-    if (wsum <= 0.0) {
+    if(wsum <= 0.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
-    Matrix mat = new Matrix(elements).timesEquals(1.0 / wsum);
+    Matrix mat = new Matrix(elements).timesEquals(1. / wsum);
     this.elements = null;
     return mat;
+  }
+
+  /**
+   * Reset the covariance matrix.
+   * 
+   * This function <em>may</em> be called after a "destroy".
+   */
+  public void reset() {
+    Arrays.fill(mean, 0.);
+    Arrays.fill(nmea, 0.);
+    if(elements != null) {
+      for(int i = 0; i < elements.length; i++) {
+        Arrays.fill(elements[i], 0.);
+      }
+    }
+    else {
+      elements = new double[mean.length][mean.length];
+    }
+    wsum = 0.;
   }
 
   /**
@@ -350,7 +380,7 @@ public class CovarianceMatrix {
   public static CovarianceMatrix make(Matrix mat) {
     CovarianceMatrix c = new CovarianceMatrix(mat.getRowDimensionality());
     int n = mat.getColumnDimensionality();
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       // TODO: avoid constructing the vector objects?
       c.put(mat.getCol(i));
     }
@@ -365,7 +395,7 @@ public class CovarianceMatrix {
    */
   public static CovarianceMatrix make(Relation<? extends NumberVector> relation) {
     CovarianceMatrix c = new CovarianceMatrix(RelationUtil.dimensionality(relation));
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       c.put(relation.get(iditer));
     }
     return c;
@@ -380,7 +410,7 @@ public class CovarianceMatrix {
    */
   public static CovarianceMatrix make(Relation<? extends NumberVector> relation, DBIDs ids) {
     CovarianceMatrix c = new CovarianceMatrix(RelationUtil.dimensionality(relation));
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));
     }
     return c;
