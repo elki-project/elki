@@ -113,8 +113,8 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
     MeanVariance mssilAlt = new MeanVariance();
     for(Cluster<?> cluster : clusters) {
       if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
-        // we use 0 for singletons.
-        mssil.put(0., cluster.size());
+        // simplified silhouette is always one for singletons
+        mssil.put(1);
         continue;
       }
 
@@ -156,6 +156,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
           }
         }
         mssil.put((min - a) / Math.max(min, a));
+        LOG.verbose("mssil put: " + (min - a) / Math.max(min, a));
         mssilAlt.put(min / (a + this.eps));
       }
     }
