@@ -110,5 +110,4 @@ public final class GUIUtil {
       logger.warning("Could not set the Default Uncaught Exception Handler", e);
     }
   }
-
 }

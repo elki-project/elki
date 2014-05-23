@@ -245,7 +245,9 @@ public class ResultWindow extends JFrame implements ResultListener {
           showSubplot((DetailViewSelectedEvent) e);
         }
         if(OverviewPlot.OVERVIEW_REFRESHED.equals(e.getActionCommand())) {
-          svgCanvas.setPlot(overview.getPlot());
+          if (currentSubplot == null) {
+            svgCanvas.setPlot(overview.getPlot());
+          }
         }
       }
     });
