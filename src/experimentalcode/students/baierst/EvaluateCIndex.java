@@ -2,6 +2,7 @@ package experimentalcode.students.baierst;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -14,19 +15,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -49,21 +37,32 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Compute the Davies-Bouldin index of a data set.
+ * Compute the C-index of a data set.
  * 
  * Reference:
  * <p>
- * D. L. Davies and D. W. Bouldin<br />
- * A cluster separation measure<br />
- * In: IEEE Trans Pattern Anal MAch Intell 1, 1979
+ * L. J. Hubert and J.R. Levin <br />
+ * A general statistical framework for assessing categorical clustering in free
+ * recall<br />
+ * Psychol Bull 10, 1976
  * </p>
  * 
  * @author Stephan Baier
  * 
  */
-public class EvaluateDB<O> implements Evaluator {
+public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
@@ -85,7 +84,7 @@ public class EvaluateDB<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateDB(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise) {
+  public EvaluateCIndex(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise) {
     super();
     this.distanceFunction = distance;
     this.mergenoise = mergenoise;
@@ -101,60 +100,60 @@ public class EvaluateDB<O> implements Evaluator {
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
-    // precompute all centroids and within-group distances
-    ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
-    ArrayList<Double> withinGroupDists = new ArrayList<Double>();
+    /* w is the number of within group distances */
+    int w = 0;
+    ArrayList<Double> pairDists = new ArrayList<Double>();
+    double theta = 0;
+
     for(Cluster<?> cluster : clusters) {
-      if(!mergenoise && cluster.isNoise()) {
-        for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-          centroids.add(rel.get(it1));
-          withinGroupDists.add(0.);
-        }
-        continue;
-      }
-      NumberVector currentCentroid = Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel);
-      centroids.add(currentCentroid);
-      double wD = 0;
       for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-        wD += distanceFunction.distance(currentCentroid, rel.get(it1));
+        for(Cluster<?> ocluster : clusters) {
+          for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
+            if(it1 == it2) {
+              continue;
+            }
+            double dist = distanceFunction.distance(rel.get(it1), rel.get(it2));
+            pairDists.add(dist);
+            if(ocluster == cluster && ((!cluster.isNoise() && !mergenoise) || mergenoise)) {
+              theta += dist;
+              w++;
+            }
+          }
+        }
       }
-      withinGroupDists.add(wD * (1. / cluster.size()));
     }
 
-    MeanVariance daviesBouldin = new MeanVariance();
-
+    Collections.sort(pairDists);
+    double min = 0;
     int i = 0;
-    for(NumberVector centroid : centroids) {
-      /* maximum within-to-between cluster spread */
-      double max = 0;
-
-      int o = 0;
-      for(NumberVector ocentroid : centroids) {
-        if(ocentroid == /* yes, reference identity */centroid) {
-          continue;
-        }
-        /* bD = between group distance */
-        double bD = distanceFunction.distance(centroid, ocentroid);
-        /* d = within-to-between cluster spread */
-        double d = (withinGroupDists.get(i) + withinGroupDists.get(o) / bD);
-        if(d > max) {
-          max = d;
-        }
-        o++;
+    for(double dist : pairDists) {
+      if(i >= w) {
+        break;
       }
-
-      daviesBouldin.put(max);
-
+      min += dist;
       i++;
     }
 
+    Collections.reverse(pairDists);
+    double max = 0;
+    i = 0;
+    for(double dist : pairDists) {
+      if(i >= w) {
+        break;
+      }
+      max += dist;
+      i++;
+    }
+
+    double cIndex = (theta - min) / (max - min);
+
     if(LOG.isVerbose()) {
-      LOG.verbose("Davies-Bouldin: " + daviesBouldin);
+      LOG.verbose("c-index: " + cIndex);
     }
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { daviesBouldin.getMean(), daviesBouldin.getSampleStddev() }));
-    db.getHierarchy().add(c, new CollectionResult<>("Davies Bouldin Index", "davies-bouldin", col));
+    col.add(new DoubleVector(new double[] { cIndex }));
+    db.getHierarchy().add(c, new CollectionResult<>("C-Index", "c-index", col));
 
   }
 
@@ -183,12 +182,12 @@ public class EvaluateDB<O> implements Evaluator {
     /**
      * Parameter for choosing the distance function.
      */
-    public static final OptionID DISTANCE_ID = new OptionID("davies-bouldin.distance", "Distance function to use for computing the davies-bouldin index.");
+    public static final OptionID DISTANCE_ID = new OptionID("c-index.distance", "Distance function to use for computing the c-index.");
 
     /**
      * Parameter to treat noise as a single cluster.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("davies-bouldin.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID MERGENOISE_ID = new OptionID("c-index.noisecluster", "Treat noise as a cluster, not as singletons.");
 
     /**
      * Distance function to use.
@@ -216,8 +215,8 @@ public class EvaluateDB<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluateDB<O> makeInstance() {
-      return new EvaluateDB<>(distance, mergenoise);
+    protected EvaluateCIndex<O> makeInstance() {
+      return new EvaluateCIndex<>(distance, mergenoise);
     }
   }
 
