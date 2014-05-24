@@ -155,7 +155,7 @@ public class EvaluatePBM<O> implements Evaluator {
       }
     }
 
-    double pbm = (1. / centroids.size()) * (a / b) * max;
+    double pbm = (1. / centroids.size()) * (b / a) * max;
 
 
     if(LOG.isVerbose()) {

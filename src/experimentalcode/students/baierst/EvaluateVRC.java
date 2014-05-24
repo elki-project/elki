@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  * 
  */
-public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
+public class EvaluateVRC<O> implements Evaluator {
 
   /**
    * Logger for debug output.
@@ -87,7 +87,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateVarianceRatioCriteria(boolean mergenoise) {
+  public EvaluateVRC(boolean mergenoise) {
     super();
     this.mergenoise = mergenoise;
   }
@@ -199,8 +199,8 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluateVarianceRatioCriteria<? extends NumberVector> makeInstance() {
-      return new EvaluateVarianceRatioCriteria<>(mergenoise);
+    protected EvaluateVRC<? extends NumberVector> makeInstance() {
+      return new EvaluateVRC<>(mergenoise);
     }
   }
 
