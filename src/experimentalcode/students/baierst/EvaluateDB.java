@@ -9,15 +9,16 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -26,6 +27,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -53,26 +55,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 
 /**
- * 
- * Compute the PBM of a data set
+ * Compute the Davies-Bouldin index of a data set.
  * 
  * Reference:
  * <p>
- * M. K. Pakhira et al.<br />
- * Validity index for crisp and fuzzy clusters <br />
- * In: Pattern Recognit Soc 37, 487-501, 2004
+ * D. L. Davies and D. W. Bouldin<br />
+ * A cluster separation measure<br />
+ * In: IEEE Trans Pattern Anal MAch Intell 1, 1979
  * </p>
  * 
  * @author Stephan Baier
- * @param <O> Object type
  * 
  */
-public class EvaluatePBM<O> implements Evaluator {
-
+public class EvaluateDB<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouetteSimplified.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
 
   /**
    * Keep noise "clusters" merged.
@@ -90,7 +89,7 @@ public class EvaluatePBM<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluatePBM(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise) {
+  public EvaluateDB(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise) {
     super();
     this.distanceFunction = distance;
     this.mergenoise = mergenoise;
@@ -101,69 +100,65 @@ public class EvaluatePBM<O> implements Evaluator {
    * 
    * @param db Database
    * @param rel Data relation
-   * @param dq Distance query
    * @param c Clustering
    */
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
-
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
-    // precompute all centroids
+    // precompute all centroids and within-group distances
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
+    ArrayList<Double> withinGroupDists = new ArrayList<Double>();
     for(Cluster<?> cluster : clusters) {
       if(!mergenoise && cluster.isNoise()) {
         for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
           centroids.add(rel.get(it1));
+          withinGroupDists.add(0.);
         }
         continue;
       }
-      centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
-
+      NumberVector currentCentroid = Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel);
+      centroids.add(currentCentroid);
+      double wD = 0;
+      for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
+        wD += distanceFunction.distance(currentCentroid, rel.get(it1));
+      }
+      withinGroupDists.add(wD * (1. / cluster.size()));
     }
-    NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel).toVector(rel);
 
-    // a: Distance to own centroid
-    double a = 0;
-    // b: Distance to overall centroid
-    double b = 0;
+    MeanVariance daviesBouldin = new MeanVariance();
+
     int i = 0;
-    for(Cluster<?> cluster : clusters) {
+    for(NumberVector centroid : centroids) {
+      /* maximum within-to-between cluster spread */
+      double max = 0;
 
-      if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
-        for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-          b += distanceFunction.distance(dataCentroid, rel.get(it1));
-          i++;
+      int o = 0;
+      for(NumberVector ocentroid : centroids) {
+        if(ocentroid == /* yes, reference identity */centroid) {
+          continue;
         }
-        continue;
+        /* bD = between group distance */
+        double bD = distanceFunction.distance(centroid, ocentroid);
+        /* d = within-to-between cluster spread */
+        double d = (withinGroupDists.get(i) + withinGroupDists.get(o) / bD);
+        if(d > max) {
+          max = d;
+        }
+        o++;
       }
 
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-      DBIDArrayIter it2 = ids.iter();
-      for(it2.seek(0); it2.valid(); it2.advance()) {
-        a += distanceFunction.distance(centroids.get(i), rel.get(it2));
-        b += distanceFunction.distance(dataCentroid, rel.get(it2));
-      }
+      daviesBouldin.put(max);
+
       i++;
     }
 
-    double max = 0;
-    for(NumberVector centroid1 : centroids) {
-      for(NumberVector centroid2 : centroids) {
-        double dist = distanceFunction.distance(centroid1, centroid2);
-        if(dist > max)
-          max = dist;
-      }
-    }
-
-    double pbm = (1. / centroids.size()) * (b / a) * max;
-
     if(LOG.isVerbose()) {
-      LOG.verbose("PBM: " + pbm);
+      LOG.verbose("Davies-Bouldin: " + daviesBouldin);
     }
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { pbm }));
-    db.getHierarchy().add(c, new CollectionResult<>("PBM", "pbm", col));
+    col.add(new DoubleVector(new double[] { daviesBouldin.getMean(), daviesBouldin.getSampleStddev() }));
+    db.getHierarchy().add(c, new CollectionResult<>("Davies Bouldin Index", "davies-bouldin", col));
 
   }
 
@@ -192,12 +187,12 @@ public class EvaluatePBM<O> implements Evaluator {
     /**
      * Parameter for choosing the distance function.
      */
-    public static final OptionID DISTANCE_ID = new OptionID("pbm.distance", "Distance function to use for computing PBM.");
+    public static final OptionID DISTANCE_ID = new OptionID("davies-bouldin.distance", "Distance function to use for computing the davies-bouldin index.");
 
     /**
      * Parameter to treat noise as a single cluster.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("pbm.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID MERGENOISE_ID = new OptionID("davies-bouldin.noisecluster", "Treat noise as a cluster, not as singletons.");
 
     /**
      * Distance function to use.
@@ -212,7 +207,6 @@ public class EvaluatePBM<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
       ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, ManhattanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
@@ -226,8 +220,8 @@ public class EvaluatePBM<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluatePBM<? extends NumberVector> makeInstance() {
-      return new EvaluatePBM<>(distance, mergenoise);
+    protected EvaluateDB<O> makeInstance() {
+      return new EvaluateDB<>(distance, mergenoise);
     }
   }
 
