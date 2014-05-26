@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 
 /**
- * Iterator over distance-based query results.
+ * Iterator over double-DBID pairs results.
  * 
  * There is no getter for the DBID, as this implements
  * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDRef}.
@@ -38,9 +38,9 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 public interface DoubleDBIDListIter extends DBIDArrayIter {
   /**
-   * Get the distance
+   * Get the double value
    * 
-   * @return distance
+   * @return double value
    */
   public double doubleValue();
 
@@ -49,7 +49,7 @@ public interface DoubleDBIDListIter extends DBIDArrayIter {
    * 
    * Note: currently, this will create a <em>new object</em>. In order to avoid
    * the garbage collection overhead, it is preferable to use
-   * {@code #doubleValue()} and exploit that the iteratore itself is a
+   * {@code #doubleValue()} and exploit that the iterator itself is a
    * {@code DBIDRef} reference.
    * 
    * @return object pair
