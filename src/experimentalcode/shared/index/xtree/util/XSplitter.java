@@ -27,10 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
@@ -38,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
@@ -47,6 +46,7 @@ import experimentalcode.shared.index.xtree.AbstractXTree;
 import experimentalcode.shared.index.xtree.AbstractXTreeNode;
 import experimentalcode.shared.index.xtree.XTreeDirectoryEntry;
 import experimentalcode.shared.index.xtree.XTreeSettings;
+import gnu.trove.iterator.TIntIterator;
 
 /**
  * Provides methods for splitting X-tree nodes.
@@ -54,9 +54,8 @@ import experimentalcode.shared.index.xtree.XTreeSettings;
  * @author Marisa Thoma
  */
 public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>, T extends AbstractXTree<N, E>> {
-
   /** Logger object for the XSplitter. */
-  private transient Logger logger = Logger.getLogger(XSplitter.class.getName());
+  private transient Logging LOG = Logging.getLogger(XSplitter.class);
 
   private EntryTypeDimensionalComparator etdc;
 
@@ -345,8 +344,6 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
 
     private boolean lb;
 
-    private double d1, d2;
-
     private List<E> entries;
 
     public EntryTypeDimensionalComparator(int dimension, boolean lb, List<E> entries) {
@@ -360,6 +357,7 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
      */
     @Override
     public int compare(int o1, int o2) {
+      final double d1, d2;
       if(lb) {
         d1 = entries.get(o1).getMin(dimension);
         d2 = entries.get(o2).getMin(dimension);
@@ -390,15 +388,13 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
    *        dimensions
    * @return common split dimensions
    */
-  private Collection<Integer> getCommonSplitDimensions(Collection<E> entries) {
+  private TIntIterator getCommonSplitDimensions(Collection<E> entries) {
     Collection<SplitHistory> splitHistories = new ArrayList<>(entries.size());
     for(E entry : entries) {
-      if(entry instanceof XTreeDirectoryEntry) {
-        splitHistories.add(((XTreeDirectoryEntry) entry).getSplitHistory());
-      }
-      else {
+      if(!(entry instanceof XTreeDirectoryEntry)) {
         throw new RuntimeException("Wrong entry type to derive split dimension from: " + entry.getClass().getName());
       }
+      splitHistories.add(((XTreeDirectoryEntry) entry).getSplitHistory());
     }
     return SplitHistory.getCommonDimensions(splitHistories);
   }
@@ -421,9 +417,9 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
    * @return The dimension with the minimum surface sum, or <code>null</code> if
    *         dimensionIterable yielded nothing
    */
-  private int chooseSplitAxis(Iterable<Integer> dimensionIterable, int minEntries, int maxEntries) {
+  private int chooseSplitAxis(TIntIterator dimensionIterator, int minEntries, int maxEntries) {
     // assert that there ARE dimensions to be tested
-    if(!dimensionIterable.iterator().hasNext()) {
+    if(!dimensionIterator.hasNext()) {
       return -1;
     }
 
@@ -448,7 +444,8 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
       entriesByUBRev = new int[entries.size()];
     }
 
-    for(Integer d : dimensionIterable) {
+    while(dimensionIterator.hasNext()) {
+      int d = dimensionIterator.next();
       sortEntriesForDimension(d, entriesByLB, entriesByUB);
       double surfaceSum = generateDistributionsAndSurfaceSums(minEntries, maxEntries, entriesByLB, entriesByUB);
       if(maxEntries <= entries.size() / 2) { // add opposite ranges
@@ -532,7 +529,7 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
       for(int limit = minEntries; limit <= maxEntries; limit++) {
         HyperBoundingBox mbr1 = mbr(entrySorting, 0, limit);
         HyperBoundingBox mbr2 = mbr(entrySorting, limit, entrySorting.length);
-        double xVolume = getIntersectionVolume(mbr1, mbr2);
+        double xVolume = SpatialUtil.overlap(mbr1, mbr2);
         if(xVolume < optXVolume) {
           optXVolume = xVolume;
           optDistribution = generateSplitSorting(entrySorting, limit);
@@ -555,31 +552,30 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
         }
       }
     }
-    if(!entries.get(0).isLeafEntry() && tree.get_max_overlap() < 1) {
-      // test overlap
-      switch(maxOverlapStrategy){
-      case DATA_OVERLAP:
-        pastOverlap = getRatioOfDataInIntersectionVolume(generateDistribution(optDistribution), optMBRs);
-        if(tree.get_max_overlap() < pastOverlap) {
-          logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best data overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), pastOverlap));
-          return null;
-        }
-        break;
-      case VOLUME_OVERLAP:
-        if(Double.isNaN(optVolume)) {
-          optVolume = SpatialUtil.volume(optMBRs[0]);
-          optVolume += SpatialUtil.volume(optMBRs[1]);
-        }
-        pastOverlap = optXVolume / optVolume;
-        if(tree.get_max_overlap() < pastOverlap) {
-          logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best volume overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), pastOverlap));
-          return null;
-        }
-        break;
-      }
-    }
-    else {
+    if(entries.get(0).isLeafEntry() || tree.get_max_overlap() >= 1) {
       pastOverlap = Double.NaN; // overlap is not computed
+      return optDistribution;
+    }
+    // test overlap
+    switch(maxOverlapStrategy){
+    case DATA_OVERLAP:
+      pastOverlap = getRatioOfDataInIntersectionVolume(generateDistribution(optDistribution), optMBRs);
+      if(tree.get_max_overlap() < pastOverlap) {
+        LOG.finest(String.format(Locale.ENGLISH, "No %s split found%s; best data overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), pastOverlap));
+        return null;
+      }
+      break;
+    case VOLUME_OVERLAP:
+      if(Double.isNaN(optVolume)) {
+        optVolume = SpatialUtil.volume(optMBRs[0]);
+        optVolume += SpatialUtil.volume(optMBRs[1]);
+      }
+      pastOverlap = optXVolume / optVolume;
+      if(tree.get_max_overlap() < pastOverlap) {
+        LOG.finest(String.format(Locale.ENGLISH, "No %s split found%s; best volume overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), pastOverlap));
+        return null;
+      }
+      break;
     }
 
     return optDistribution;
@@ -664,17 +660,17 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
       // minFanout not set for allowing underflowing nodes
       return null;
     }
-    Iterable<Integer> dimensionListing;
+    TIntIterator dimensionListing;
     if(entries.get(0) instanceof XTreeDirectoryEntry) {
       // filter common split dimensions
       dimensionListing = getCommonSplitDimensions(entries);
-      if(!dimensionListing.iterator().hasNext()) { // no common dimensions
+      if(!dimensionListing.hasNext()) { // no common dimensions
         return null;
       }
     }
     else {
       // test all dimensions
-      dimensionListing = new Range(0, entries.get(0).getDimensionality());
+      dimensionListing = new IntegerRangeIterator(0, entries.get(0).getDimensionality());
     }
     int formerSplitAxis = this.splitAxis;
     maxEntries = maxEntries + 1 - minFanout; // = maximum left-hand size
@@ -736,7 +732,7 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
 
     maxEntries = maxEntries + 1 - minEntries;
 
-    chooseSplitAxis(new Range(0, entries.get(0).getDimensionality()), minEntries, maxEntries);
+    chooseSplitAxis(new IntegerRangeIterator(0, entries.get(0).getDimensionality()), minEntries, maxEntries);
     return chooseMinimumOverlapSplit(splitAxis, minEntries, maxEntries, false);
   }
 
@@ -759,51 +755,6 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
   }
 
   /**
-   * Calculate the intersection volume of the two MBRs.
-   * 
-   * @param m1
-   * @param m2
-   * @return intersection volume
-   */
-  public static double getIntersectionVolume(final HyperBoundingBox m1, final HyperBoundingBox m2) {
-    final int dimensionality = m1.getDimensionality();
-
-    double volume = 1.0, len;
-    for(int d = 0; d < dimensionality; d++) {
-      len = (m1.getMax(d) < m2.getMax(d) ? m1.getMax(d) : m2.getMax(d)) - (m1.getMin(d) > m2.getMin(d) ? m1.getMin(d) : m2.getMin(d));
-      if(len <= 0.) {
-        return 0.;
-      }
-      volume *= len;
-    }
-    assert volume >= 0;
-    return volume;
-  }
-
-  /**
-   * Calculate the intersection of the two MBRs or <code>null</code> if they do
-   * not intersect. <em>Note</em>: if the given MBRs intersect in only one point
-   * of any dimension, this method still returns a result!
-   * 
-   * @param m1
-   * @param m2
-   * @return intersection volume
-   */
-  public static HyperBoundingBox getIntersection(final HyperBoundingBox m1, final HyperBoundingBox m2) {
-    final int dimensionality = m1.getDimensionality();
-    double[] min = new double[dimensionality];
-    double[] max = new double[dimensionality];
-    for(int d = 0; d < dimensionality; d++) {
-      min[d] = (m1.getMin(d) > m2.getMin(d) ? m1.getMin(d) : m2.getMin(d));
-      max[d] = (m1.getMax(d) < m2.getMax(d) ? m1.getMax(d) : m2.getMax(d));
-      if(min[d] > max[d]) {
-        return null;
-      }
-    }
-    return new HyperBoundingBox(min, max);
-  }
-
-  /**
    * Get the ratio of data objects in the intersection volume (weighted
    * overlap).
    * 
@@ -813,7 +764,7 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
    *         between 0 and 1
    */
   public double getRatioOfDataInIntersectionVolume(List<E>[] split, HyperBoundingBox[] mbrs) {
-    final HyperBoundingBox xMBR = getIntersection(mbrs[0], mbrs[1]);
+    final ModifiableHyperBoundingBox xMBR = SpatialUtil.intersection(mbrs[0], mbrs[1]);
     if(xMBR == null) {
       return 0.;
     }
@@ -822,7 +773,7 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
     countXingDataEntries(split[0], xMBR, numOf);
     countXingDataEntries(split[1], xMBR, numOf);
 
-    return ((double) numOf[1]) / ((double) numOf[0]);
+    return numOf[1] / (double) numOf[0];
   }
 
   /**
@@ -852,43 +803,6 @@ public class XSplitter<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>
       }
     }
     return numOf;
-  }
-
-  /**
-   * Iterator provider for an integer range from <code>from</code> to
-   * <code>to</code>. Covers <code>[from,to[</code>.
-   */
-  static class Range implements Iterable<Integer> {
-
-    protected int from, to;
-
-    public Range(int from, int to) {
-      this.from = from;
-      this.to = to;
-    }
-
-    @Override
-    public Iterator<Integer> iterator() {
-      return new Iterator<Integer>() {
-        private int i = from;
-
-        @Override
-        public boolean hasNext() {
-          return i < to;
-        }
-
-        @Override
-        public Integer next() {
-          return i++;
-        }
-
-        @Override
-        public void remove() {
-          throw new UnsupportedOperationException();
-        }
-
-      };
-    }
   }
 
   /**

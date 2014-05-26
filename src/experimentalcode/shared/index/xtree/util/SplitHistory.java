@@ -23,28 +23,33 @@ package experimentalcode.shared.index.xtree.util;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntIterator;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * History of all splits ever occurred in a Node.
  * 
  * @author Marisa Thoma
+ * @author Erich Schubert
  */
 public final class SplitHistory implements Serializable, Cloneable {
-  private static final long serialVersionUID = -340123050472355300L;
+  /**
+   * Serialization version number.
+   */
+  private static final long serialVersionUID = -340123050472355301L;
 
   /**
-   * BitSet with a bit for each dimension
+   * Bitset with a bit for each dimension
    */
-  private LargeProperties dimBits;
+  private long[] dimBits;
 
   /**
    * Initialize a new split history instance of dimension <code>dim</code>.
@@ -52,11 +57,16 @@ public final class SplitHistory implements Serializable, Cloneable {
    * @param dim
    */
   public SplitHistory(int dim) {
-    dimBits = new LargeProperties(dim);
+    dimBits = BitsUtil.zero(dim);
   }
 
-  public SplitHistory(LargeProperties lp) {
-    this.dimBits = lp;
+  /**
+   * Constructor.
+   * 
+   * @param bitset Existing bitset
+   */
+  private SplitHistory(long[] bitset) {
+    this.dimBits = bitset;
   }
 
   /**
@@ -65,7 +75,7 @@ public final class SplitHistory implements Serializable, Cloneable {
    * @param dimension
    */
   public void setDim(int dimension) {
-    dimBits.setProperty(dimension);
+    BitsUtil.setI(dimBits, dimension);
   }
 
   /**
@@ -74,42 +84,25 @@ public final class SplitHistory implements Serializable, Cloneable {
    * @param splitHistories
    * @return list of split dimensions
    */
-  public static Collection<Integer> getCommonDimensions(Collection<SplitHistory> splitHistories) {
-    Collection<Integer> common = new Stack<>();
+  public static TIntIterator getCommonDimensions(Collection<SplitHistory> splitHistories) {
     Iterator<SplitHistory> it = splitHistories.iterator();
-    LargeProperties checkSet = null;
-    try {
-      checkSet = (LargeProperties) (it.next().dimBits).clone();
-    }
-    catch(CloneNotSupportedException ex) {
-      Logger.getLogger(SplitHistory.class.getName()).log(Level.SEVERE, null, ex);
-    }
+    long[] checkSet = BitsUtil.copy(it.next().dimBits);
     while(it.hasNext()) {
       SplitHistory sh = it.next();
-      checkSet.intersect(sh.dimBits);
+      BitsUtil.andI(checkSet, sh.dimBits);
     }
-    int i = 0;
-    for(Iterator<Boolean> bIt = checkSet.iterator(); bIt.hasNext(); i++) {
-      if(bIt.next()) {
-        common.add(i);
-      }
-    }
-    return common;
+    return new BitsetIterator(checkSet);
   }
 
-  /**
-   * See {@link LargeProperties#toString()} for reference on the returned
-   * string's format
-   */
   @Override
   public String toString() {
-    return dimBits.toString();
+    return BitsUtil.toString(dimBits);
   }
 
   @Override
   public Object clone() throws CloneNotSupportedException {
     SplitHistory c = (SplitHistory) super.clone();
-    c.dimBits = (LargeProperties) this.dimBits.clone();
+    c.dimBits = this.dimBits.clone();
     return c;
   }
 
@@ -120,7 +113,7 @@ public final class SplitHistory implements Serializable, Cloneable {
    * @throws java.io.IOException Includes any I/O exceptions that may occur
    */
   public void writeExternal(ObjectOutput out) throws IOException {
-    dimBits.writeExternal(out);
+    out.writeObject(dimBits);
   }
 
   /**
@@ -132,10 +125,10 @@ public final class SplitHistory implements Serializable, Cloneable {
    *         cannot be found.
    */
   public static SplitHistory readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    return new SplitHistory(LargeProperties.readExternal(in));
+    return new SplitHistory((long[]) in.readObject());
   }
 
   public boolean isEmpty() {
-    return dimBits.isEmpty();
+    return BitsUtil.isZero(dimBits);
   }
 }
