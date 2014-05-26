@@ -130,7 +130,7 @@ public class EvaluateDB<O> implements Evaluator {
 
       int o = 0;
       for(NumberVector ocentroid : centroids) {
-        if(ocentroid == /* yes, reference identity */centroid) {
+        if(ocentroid == centroid) {
           continue;
         }
         /* bD = between group distance */

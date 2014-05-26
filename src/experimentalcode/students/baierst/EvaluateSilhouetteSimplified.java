@@ -125,14 +125,14 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
         // b: Distance to other clusters centroids:
         double min = Double.POSITIVE_INFINITY;
         for(Cluster<?> ocluster : clusters) {
-          if(ocluster == /* yes, reference identity */cluster && !cluster.isNoise()) {
+          if(ocluster == cluster && !cluster.isNoise()) {
             continue;
           }
 
           if(!mergenoise && ocluster.isNoise()) {
             // Treat noise cluster as singletons:
             for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
-              if(it1.internalGetIndex() == it2.internalGetIndex()) {
+              if(DBIDUtil.equal(it1,it2)) {
                 continue;
               }
               double b = distanceFunction.distance(rel.get(it1), rel.get(it2));
