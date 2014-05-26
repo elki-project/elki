@@ -27,7 +27,7 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param cls
    */
   public MultiVectorTypeInformation(Class<? super V> cls) {
-    this(cls, -1, Integer.MAX_VALUE, -1);
+    this(cls,null, -1, Integer.MAX_VALUE, -1);
   }
 
 
@@ -39,8 +39,8 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
    * @param maxdim Maximum dimensionality
    * @param multiplicity
    */
-  public MultiVectorTypeInformation(Class<? super V> cls, int mindim, int maxdim, int multiplicity) {
-    super(cls, mindim, maxdim);
+  public MultiVectorTypeInformation(Class<? super V> cls,ByteBufferSerializer<? super V> serializer, int mindim, int maxdim, int multiplicity) {
+    super(cls, serializer, mindim, maxdim);
     this.multiplicity = multiplicity;
   }
 
@@ -74,6 +74,6 @@ public class MultiVectorTypeInformation<V extends FeatureVector<?>> extends Vect
   * @param <V> vector type
   */
  public static <V extends FeatureVector<?>> MultiVectorTypeInformation<V> typeRequest(Class<? super V> cls) {
-   return new MultiVectorTypeInformation<>(cls,-1, Integer.MAX_VALUE, -1);
+   return new MultiVectorTypeInformation<>(cls);
  }
 }
