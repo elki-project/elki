@@ -243,7 +243,7 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   }
 
   public Set<Integer> getComplementSet() {
-    Set<Integer> complement = new java.util.HashSet<Integer>();
+    Set<Integer> complement = new HashSet<>();
     for(int i = 0; i < propArray.length; i++) {
       Set<Integer> partialComplement;
       if(i == propArray.length - 1) {
@@ -260,7 +260,7 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   }
 
   public static Set<Integer> toSet(long set) {
-    Set<Integer> outSet = new HashSet<Integer>();
+    Set<Integer> outSet = new HashSet<>();
     for(int i = 0; i < 64; i++) {
       long target = (((long) 1) << ((long) i - 1));
       if((set & target) == target) {
@@ -274,12 +274,7 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   public String toString() {
     char[] chars = new char[size];
     for(int i = 0; i < chars.length; i++) {
-      if(hasProperty(i)) {
-        chars[i] = '1';
-      }
-      else {
-        chars[i] = '0';
-      }
+      chars[i] = hasProperty(i) ? '1' : '0';
     }
     return new String(chars);
   }
@@ -345,8 +340,9 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   public int getNumberOfElements() {
     int numSet = 0;
     for(Iterator<Boolean> iterator = newPropertyIterator(); iterator.hasNext();) {
-      if(iterator.next())
+      if(iterator.next()){
         numSet++;
+      }
     }
     return numSet;
   }
@@ -357,8 +353,9 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
    */
   public boolean isEmpty() {
     for(int i = 0; i < propArray.length; i++) {
-      if(propArray[i] != 0)
+      if(propArray[i] != 0) {
         return false;
+      }
     }
     return true;
   }

@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <E> Type of the entries stored in this node
  * @param <N> Type of this node (for extendability)
  */
-public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> extends AbstractRStarTreeNode<N, E> {
+public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>> extends AbstractRStarTreeNode<N, E> {
   /**
    * Is this node a supernode?
    */
@@ -53,8 +53,8 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
   /**
    * Utility field for maintaining the loading of supernodes. Initialized by
    * {@link #readExternal(ObjectInput)} if the node is a supernode. Must then be
-   * filled by {@link #readSuperNode(ObjectInput, XTreeBase)} or
-   * {@link #fillSuperNode(XTreeBase)}.
+   * filled by {@link #readSuperNode(ObjectInput, AbstractXTree)} or
+   * {@link #fillSuperNode(AbstractXTree)}.
    */
   private int capacity_to_be_filled = 0;
 
@@ -70,7 +70,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
   /**
    * Empty constructor for Externalizable interface.
    */
-  public XNode() {
+  public AbstractXTreeNode() {
     // empty constructor
     super();
   }
@@ -83,7 +83,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * @param isLeaf indicates whether this node is a leaf node
    */
   @SuppressWarnings("unchecked")
-  public XNode(int capacity, boolean isLeaf, Class<? extends E> eclass) {
+  public AbstractXTreeNode(int capacity, boolean isLeaf, Class<? extends E> eclass) {
     super(capacity, isLeaf, (Class<? super E>) eclass);
     this.eclass = eclass;
   }
@@ -174,7 +174,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * Reads the id of this node, the numEntries and the entries array from the
    * specified stream. If the {@link #supernode} field is set, <code>this</code>
    * cannot be contained in <code>in</code>. Such a node has to be manually
-   * filled using {@link #readSuperNode(ObjectInput, XTreeBase)}.
+   * filled using {@link #readSuperNode(ObjectInput, AbstractXTree)}.
    * 
    * @param in the stream to read data from in order to restore the object
    * @throws java.io.IOException if I/O errors occur
@@ -200,7 +200,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
       entries = (E[]) new SpatialPointLeafEntry[capacity];
     }
     else {
-      entries = (E[]) new XDirectoryEntry[capacity];
+      entries = (E[]) new XTreeDirectoryEntry[capacity];
     }
     for(int i = 0; i < numEntries; i++) {
       E s;
@@ -221,7 +221,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
           s = (E) new SpatialPointLeafEntry();
         }
         else {
-          s = (E) new XDirectoryEntry();
+          s = (E) new XTreeDirectoryEntry();
         }
       }
       s.readExternal(in);
@@ -260,7 +260,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * @throws IllegalStateException if the parameters of the file's supernode do
    *         not match this
    */
-  public <T extends XTreeBase<N, E>> void readSuperNode(ObjectInput in, T tree) throws IOException, ClassNotFoundException {
+  public <T extends AbstractXTree<N, E>> void readSuperNode(ObjectInput in, T tree) throws IOException, ClassNotFoundException {
     readExternal(in);
     if(capacity_to_be_filled <= 0 || !isSuperNode()) {
       throw new IllegalStateException("This node does not appear to be a supernode");

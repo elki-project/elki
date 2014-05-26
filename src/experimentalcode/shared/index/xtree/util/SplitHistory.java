@@ -1,26 +1,27 @@
 package experimentalcode.shared.index.xtree.util;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2013
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -32,15 +33,12 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-
 /**
  * History of all splits ever occurred in a Node.
  * 
  * @author Marisa Thoma
  */
-public final class SplitHistory implements Serializable {
-
+public final class SplitHistory implements Serializable, Cloneable {
   private static final long serialVersionUID = -340123050472355300L;
 
   /**
@@ -57,20 +55,8 @@ public final class SplitHistory implements Serializable {
     dimBits = new LargeProperties(dim);
   }
 
-  public SplitHistory(LargeProperties lp) throws CloneNotSupportedException {
-    this.dimBits = (LargeProperties) lp.clone();
-  }
-
-  public SplitHistory(LargeProperties lp, boolean clone) {
-    if(clone)
-      try {
-        this.dimBits = (LargeProperties) lp.clone();
-      }
-      catch(CloneNotSupportedException e) {
-        throw new AbortException("This cannot not have happened", e);
-      }
-    else
-      this.dimBits = lp;
+  public SplitHistory(LargeProperties lp) {
+    this.dimBits = lp;
   }
 
   /**
@@ -89,7 +75,7 @@ public final class SplitHistory implements Serializable {
    * @return list of split dimensions
    */
   public static Collection<Integer> getCommonDimensions(Collection<SplitHistory> splitHistories) {
-    Collection<Integer> common = new Stack<Integer>();
+    Collection<Integer> common = new Stack<>();
     Iterator<SplitHistory> it = splitHistories.iterator();
     LargeProperties checkSet = null;
     try {
@@ -104,8 +90,9 @@ public final class SplitHistory implements Serializable {
     }
     int i = 0;
     for(Iterator<Boolean> bIt = checkSet.iterator(); bIt.hasNext(); i++) {
-      if(bIt.next())
+      if(bIt.next()) {
         common.add(i);
+      }
     }
     return common;
   }
@@ -121,7 +108,9 @@ public final class SplitHistory implements Serializable {
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    return new SplitHistory(this.dimBits);
+    SplitHistory c = (SplitHistory) super.clone();
+    c.dimBits = (LargeProperties) this.dimBits.clone();
+    return c;
   }
 
   /**
@@ -143,9 +132,9 @@ public final class SplitHistory implements Serializable {
    *         cannot be found.
    */
   public static SplitHistory readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    return new SplitHistory(LargeProperties.readExternal(in), false);
+    return new SplitHistory(LargeProperties.readExternal(in));
   }
-  
+
   public boolean isEmpty() {
     return dimBits.isEmpty();
   }

@@ -30,22 +30,22 @@ import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import experimentalcode.shared.index.xtree.util.SplitHistory;
 
-public class XDirectoryEntry extends SpatialDirectoryEntry implements SplitHistorySpatialEntry {
+public class XTreeDirectoryEntry extends SpatialDirectoryEntry implements SplitHistorySpatialEntry {
   /**
    * The split history of this entry. Should be set via {@link #splitHistory}
    * and only afterwards queried by {@link #getSplitHistory()} or extended by
-   * {@link #addSplitDimension(int)}. Only used if this {@link XDirectoryEntry}
+   * {@link #addSplitDimension(int)}. Only used if this {@link XTreeDirectoryEntry}
    * does <em>not</em> approximate a leaf node. If it does, all dimensions of
    * the parent node of <code>this</code> will be examined as potential split
    * axes, regardless of any former splits.
    */
   private SplitHistory splitHistory = null;
 
-  public XDirectoryEntry() {
+  public XTreeDirectoryEntry() {
     super();
   }
 
-  public XDirectoryEntry(int id, ModifiableHyperBoundingBox mbr) {
+  public XTreeDirectoryEntry(int id, ModifiableHyperBoundingBox mbr) {
     super(id, mbr);
     if(mbr != null) {
       splitHistory = new SplitHistory(mbr.getDimensionality());

@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
-public class XTreeFactory<O extends NumberVector> extends XTreeBaseFactory<O, XTreeNode, SpatialEntry, XTreeIndex<O>> {
+public class XTreeFactory<O extends NumberVector> extends AbstractXTreeFactory<O, XTreeNode, SpatialEntry, XTreeIndex<O>> {
   public XTreeFactory(PageFileFactory<?> pageFileFactory, XTreeSettings settings) {
     super(pageFileFactory, settings);
   }
@@ -44,7 +44,7 @@ public class XTreeFactory<O extends NumberVector> extends XTreeBaseFactory<O, XT
     return XTreeNode.class;
   }
   
-  public static class Parameterizer<O extends NumberVector> extends XTreeBaseFactory.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractXTreeFactory.Parameterizer<O> {
     @Override
     protected XTreeFactory<O> makeInstance() {
       return new XTreeFactory<>(pageFileFactory, settings);

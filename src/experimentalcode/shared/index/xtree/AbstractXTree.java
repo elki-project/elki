@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import experimentalcode.shared.index.xtree.XTreeSettings.Overlap;
 import experimentalcode.shared.index.xtree.util.SplitHistory;
@@ -60,13 +61,24 @@ import experimentalcode.shared.index.xtree.util.XSplitter;
  * Base class for XTree implementations and other extensions; derived from
  * {@link NonFlatRStarTree}.
  * 
+ * Reference:
+ * <p>
+ * Stefan Berchtold, Daniel A. Keim, Hans-Peter Kriegel: The X-tree: An Index
+ * Structure for High-Dimensional Data<br>
+ * In Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India,
+ * 1996.
+ * </p>
+ * 
  * @author Marisa Thoma
  * 
- * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<N, E, XTreeSettings> {
+@Reference(authors = "S. Berchtold, D. A. Keim, H.-P. Kriegel", //
+title = "The X-tree: An Index Structure for High-Dimensional Data", //
+booktitle = "Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India, 1996", //
+url = "http://www.vldb.org/conf/1996/P028.PDF")
+public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<N, E, XTreeSettings> {
   /**
    * If <code>true</code>, the expensive call of
    * {@link #calculateOverlapIncrease(List, SpatialEntry, HyperBoundingBox)} is
@@ -96,7 +108,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * @param pagefile the page file
    * @param settings tree parameter
    */
-  public XTreeBase(PageFile<N> pagefile, XTreeSettings settings) {
+  public AbstractXTree(PageFile<N> pagefile, XTreeSettings settings) {
     super(pagefile, settings);
   }
 
@@ -478,7 +490,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       ModifiableHyperBoundingBox hb = new ModifiableHyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
-      XDirectoryEntry xl = new XDirectoryEntry(0, hb);
+      XTreeDirectoryEntry xl = new XTreeDirectoryEntry(0, hb);
       while(baos.size() <= getPageSize()) {
         xl.writeExternal(oos);
         oos.flush();
@@ -631,14 +643,14 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
           if(volumeInc < optVolumeInc) {
             optVolumeInc = volumeInc;
             optVolume = volume;
-            optEntry = new TreeIndexPathComponent<E>(child, index);
+            optEntry = new TreeIndexPathComponent<>(child, index);
           }
           else if(volumeInc == optVolumeInc && volume < optVolume) {
             // TODO: decide whether to remove this option
             System.out.println("####\nEQUAL VOLUME INCREASE: HAPPENS!\n####");
             optVolumeInc = volumeInc;
             optVolume = volume;
-            optEntry = new TreeIndexPathComponent<E>(child, index);
+            optEntry = new TreeIndexPathComponent<>(child, index);
           }
         }
         else { // already better
@@ -646,7 +658,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
           optVolume = Double.NaN;
           optVolumeInc = Double.NaN;
           optTestMBR = testMBR; // for later calculations
-          optEntry = new TreeIndexPathComponent<E>(child, index);
+          optEntry = new TreeIndexPathComponent<>(child, index);
         }
       }
     }
@@ -759,7 +771,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     }
     // choose the split dimension and the split point
 
-    XSplitter<E, N, XTreeBase<N, E>> splitter = new XSplitter<>(this, node.getChildren());
+    XSplitter<E, N, AbstractXTree<N, E>> splitter = new XSplitter<>(this, node.getChildren());
     XSplitter.SplitSorting<E> split = splitter.topologicalSplit();
     double minOv = splitter.getPastOverlap();
     if(split == null) { // topological split failed
@@ -1078,7 +1090,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     // get split history
     SplitHistory sh = null;
     // TODO: see whether root entry is ALWAYS a directory entry .. it SHOULD!
-    sh = ((XDirectoryEntry) getRootEntry()).getSplitHistory();
+    sh = ((XTreeDirectoryEntry) getRootEntry()).getSplitHistory();
     if(sh == null) {
       sh = new SplitHistory(getDimensionality());
     }
@@ -1123,7 +1135,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       getLogger().debugFine(msg);
     }
     // the root entry still needs to be set to the new root node's MBR
-    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
+    return new IndexTreePath<>(new TreeIndexPathComponent<>(getRootEntry(), null));
   }
 
   /**

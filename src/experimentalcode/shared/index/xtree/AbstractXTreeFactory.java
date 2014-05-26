@@ -46,14 +46,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * @param <O> object type
  * @param <X> actual tree type
  */
-public abstract class XTreeBaseFactory<O extends NumberVector, N extends XNode<E, N>, E extends SpatialEntry, X extends AbstractRStarTree<N, E, XTreeSettings> & Index> extends AbstractRStarTreeFactory<O, N, E, X, XTreeSettings> {
+public abstract class AbstractXTreeFactory<O extends NumberVector, N extends AbstractXTreeNode<E, N>, E extends SpatialEntry, X extends AbstractRStarTree<N, E, XTreeSettings> & Index> extends AbstractRStarTreeFactory<O, N, E, X, XTreeSettings> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public XTreeBaseFactory(PageFileFactory<?> pageFileFactory, XTreeSettings settings) {
+  public AbstractXTreeFactory(PageFileFactory<?> pageFileFactory, XTreeSettings settings) {
     super(pageFileFactory, settings);
   }
 

@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  * 
  * @author Marisa Thoma
  */
-public class XTreeNode extends XNode<SpatialEntry, XTreeNode> {
+public class XTreeNode extends AbstractXTreeNode<SpatialEntry, XTreeNode> {
   /**
    * Empty constructor for Externalizable interface.
    */
