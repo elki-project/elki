@@ -9,15 +9,10 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
@@ -32,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /*
@@ -125,25 +119,24 @@ public class EvaluatePBM<O> implements Evaluator {
 
     // precompute all centroids
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
-        
+
     ArrayModifiableDBIDs dataCentroidIDs = DBIDUtil.newArray();
-    
+
     for(Cluster<?> cluster : clusters) {
 
       if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
         countNoise += cluster.size();
         continue;
       }
-      
+
       dataCentroidIDs.addDBIDs(cluster.getIDs());
-      
+
       centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
 
     }
 
     NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel, dataCentroidIDs).toVector(rel);
 
-    
     // a: Distance to own centroid
     double a = 0;
     // b: Distance to overall centroid
@@ -174,13 +167,13 @@ public class EvaluatePBM<O> implements Evaluator {
     }
 
     double pbm = (1. / centroids.size()) * (b / a) * max;
-    
+
     if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
 
       double penalty = 1;
 
       if(countNoise != 0) {
-        penalty = (double) countNoise / (double) rel.size() ;
+        penalty = (double) countNoise / (double) rel.size();
       }
 
       pbm = penalty * pbm;

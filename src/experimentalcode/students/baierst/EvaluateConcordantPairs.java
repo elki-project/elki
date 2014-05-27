@@ -101,8 +101,6 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
-    
-    
     int concordantPairs = 0;
     int discordantPairs = 0;
 
@@ -134,9 +132,9 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
         }
       }
     }
-    
+
     double gamma = (concordantPairs - discordantPairs) / (concordantPairs + discordantPairs);
-    
+
     if(LOG.isVerbose()) {
       LOG.verbose("gamma: " + gamma);
     }
@@ -144,7 +142,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     Collection<DoubleVector> col = new ArrayList<>();
     col.add(new DoubleVector(new double[] { gamma }));
     db.getHierarchy().add(c, new CollectionResult<>("Gamma", "gamma", col));
-    
+
   }
 
   @Override
