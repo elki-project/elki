@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -100,6 +101,8 @@ public class EvaluateVRC<O> implements Evaluator {
 
     List<? extends Cluster<?>> clusters;
     
+    ArrayModifiableDBIDs dataCentroidIDs = DBIDUtil.newArray();
+    
     if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)){
       clusters = ClusteringUtils.convertNoiseToSingletons(c);
     }else{
@@ -116,9 +119,11 @@ public class EvaluateVRC<O> implements Evaluator {
         continue;
       }
       
+      dataCentroidIDs.addDBIDs(cluster.getIDs());
+      
       centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
     }
-    NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel).toVector(rel);
+    NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel, dataCentroidIDs).toVector(rel);
 
     // a: Distance to own centroid
     double a = 0;

@@ -9,10 +9,15 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
@@ -26,6 +31,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -75,9 +81,9 @@ public class EvaluatePBM<O> implements Evaluator {
   private static final Logging LOG = Logging.getLogger(EvaluateSilhouetteSimplified.class);
 
   /**
-   * Keep noise "clusters" merged.
+   * Option for noise handling.
    */
-  private boolean mergenoise = false;
+  private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
   /**
    * Distance function to use.
@@ -90,10 +96,10 @@ public class EvaluatePBM<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluatePBM(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise) {
+  public EvaluatePBM(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseOption noiseOpt) {
     super();
     this.distanceFunction = distance;
-    this.mergenoise = mergenoise;
+    this.noiseOption = noiseOpt;
   }
 
   /**
@@ -106,22 +112,38 @@ public class EvaluatePBM<O> implements Evaluator {
    */
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
 
-    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    List<? extends Cluster<?>> clusters;
+
+    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)) {
+      clusters = ClusteringUtils.convertNoiseToSingletons(c);
+    }
+    else {
+      clusters = c.getAllClusters();
+    }
+
+    int countNoise = 0;
 
     // precompute all centroids
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
+        
+    ArrayModifiableDBIDs dataCentroidIDs = DBIDUtil.newArray();
+    
     for(Cluster<?> cluster : clusters) {
-      if(!mergenoise && cluster.isNoise()) {
-        for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-          centroids.add(rel.get(it1));
-        }
+
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+        countNoise += cluster.size();
         continue;
       }
+      
+      dataCentroidIDs.addDBIDs(cluster.getIDs());
+      
       centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
 
     }
-    NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel).toVector(rel);
 
+    NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel, dataCentroidIDs).toVector(rel);
+
+    
     // a: Distance to own centroid
     double a = 0;
     // b: Distance to overall centroid
@@ -129,11 +151,7 @@ public class EvaluatePBM<O> implements Evaluator {
     int i = 0;
     for(Cluster<?> cluster : clusters) {
 
-      if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
-        for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-          b += distanceFunction.distance(dataCentroid, rel.get(it1));
-          i++;
-        }
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
         continue;
       }
 
@@ -156,6 +174,17 @@ public class EvaluatePBM<O> implements Evaluator {
     }
 
     double pbm = (1. / centroids.size()) * (b / a) * max;
+    
+    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
+
+      double penalty = 1;
+
+      if(countNoise != 0) {
+        penalty = (double) countNoise / (double) rel.size() ;
+      }
+
+      pbm = penalty * pbm;
+    }
 
     if(LOG.isVerbose()) {
       LOG.verbose("PBM: " + pbm);
@@ -195,9 +224,9 @@ public class EvaluatePBM<O> implements Evaluator {
     public static final OptionID DISTANCE_ID = new OptionID("pbm.distance", "Distance function to use for computing PBM.");
 
     /**
-     * Parameter to treat noise as a single cluster.
+     * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("pbm.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID NOISE_OPTION_ID = new OptionID("pbm.noiseoption", "option, how noise should be treated.");
 
     /**
      * Distance function to use.
@@ -205,9 +234,9 @@ public class EvaluatePBM<O> implements Evaluator {
     private PrimitiveDistanceFunction<NumberVector> distance;
 
     /**
-     * Keep noise "clusters" merged.
+     * Option, how noise should be treated.
      */
-    private boolean mergenoise = false;
+    private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -218,16 +247,16 @@ public class EvaluatePBM<O> implements Evaluator {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      Flag noiseP = new Flag(MERGENOISE_ID);
+      EnumParameter<NoiseOption> noiseP = new EnumParameter<NoiseOption>(NOISE_OPTION_ID, NoiseOption.class, NoiseOption.IGNORE_NOISE_WITH_PENALTY);
       if(config.grab(noiseP)) {
-        mergenoise = noiseP.isTrue();
+        noiseOption = noiseP.getValue();
       }
 
     }
 
     @Override
     protected EvaluatePBM<? extends NumberVector> makeInstance() {
-      return new EvaluatePBM<>(distance, mergenoise);
+      return new EvaluatePBM<>(distance, noiseOption);
     }
   }
 

@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -70,9 +71,9 @@ public class EvaluateDB<O> implements Evaluator {
   private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
 
   /**
-   * Keep noise "clusters" merged.
+   * Option for noise handling.
    */
-  private boolean mergenoise = false;
+  private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
   /**
    * Distance function to use.
@@ -85,10 +86,10 @@ public class EvaluateDB<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateDB(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise) {
+  public EvaluateDB(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseOption noiseOpt) {
     super();
     this.distanceFunction = distance;
-    this.mergenoise = mergenoise;
+    this.noiseOption = noiseOpt;
   }
 
   /**
@@ -99,19 +100,28 @@ public class EvaluateDB<O> implements Evaluator {
    * @param c Clustering
    */
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
-    List<? extends Cluster<?>> clusters = c.getAllClusters();
+
+    List<? extends Cluster<?>> clusters;
+
+    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)) {
+      clusters = ClusteringUtils.convertNoiseToSingletons(c);
+    }
+    else {
+      clusters = c.getAllClusters();
+    }
+
+    int countNoise = 0;
 
     // precompute all centroids and within-group distances
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
     ArrayList<Double> withinGroupDists = new ArrayList<Double>();
     for(Cluster<?> cluster : clusters) {
-      if(!mergenoise && cluster.isNoise()) {
-        for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-          centroids.add(rel.get(it1));
-          withinGroupDists.add(0.);
-        }
+
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+        countNoise += cluster.size();
         continue;
       }
+
       NumberVector currentCentroid = Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel);
       centroids.add(currentCentroid);
       double wD = 0;
@@ -131,6 +141,7 @@ public class EvaluateDB<O> implements Evaluator {
       int o = 0;
       for(NumberVector ocentroid : centroids) {
         if(ocentroid == centroid) {
+          o++;
           continue;
         }
         /* bD = between group distance */
@@ -148,12 +159,25 @@ public class EvaluateDB<O> implements Evaluator {
       i++;
     }
 
+    double daviesBouldinMean = daviesBouldin.getMean();
+
+    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
+
+      double penalty = 1;
+
+      if(countNoise != 0) {
+        penalty = (double) countNoise / (double) rel.size();
+      }
+
+      daviesBouldinMean = penalty * daviesBouldinMean;
+    }
+
     if(LOG.isVerbose()) {
-      LOG.verbose("Davies-Bouldin: " + daviesBouldin);
+      LOG.verbose("Davies-Bouldin: " + daviesBouldinMean);
     }
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { daviesBouldin.getMean(), daviesBouldin.getSampleStddev() }));
+    col.add(new DoubleVector(new double[] { daviesBouldinMean }));
     db.getHierarchy().add(c, new CollectionResult<>("Davies Bouldin Index", "davies-bouldin", col));
 
   }
@@ -186,9 +210,9 @@ public class EvaluateDB<O> implements Evaluator {
     public static final OptionID DISTANCE_ID = new OptionID("davies-bouldin.distance", "Distance function to use for computing the davies-bouldin index.");
 
     /**
-     * Parameter to treat noise as a single cluster.
+     * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("davies-bouldin.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID NOISE_OPTION_ID = new OptionID("davies-bouldin.noiseoption", "option, how noise should be treated.");
 
     /**
      * Distance function to use.
@@ -196,28 +220,29 @@ public class EvaluateDB<O> implements Evaluator {
     private PrimitiveDistanceFunction<NumberVector> distance;
 
     /**
-     * Keep noise "clusters" merged.
+     * Option, how noise should be treated.
      */
-    private boolean mergenoise = false;
+    private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+
       ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, ManhattanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      Flag noiseP = new Flag(MERGENOISE_ID);
+      EnumParameter<NoiseOption> noiseP = new EnumParameter<NoiseOption>(NOISE_OPTION_ID, NoiseOption.class, NoiseOption.IGNORE_NOISE_WITH_PENALTY);
       if(config.grab(noiseP)) {
-        mergenoise = noiseP.isTrue();
+        noiseOption = noiseP.getValue();
       }
 
     }
 
     @Override
     protected EvaluateDB<O> makeInstance() {
-      return new EvaluateDB<>(distance, mergenoise);
+      return new EvaluateDB<>(distance, noiseOption);
     }
   }
 
