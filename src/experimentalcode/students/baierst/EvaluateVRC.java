@@ -111,6 +111,11 @@ public class EvaluateVRC<O> implements Evaluator {
     // precompute all centroids
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
     for(Cluster<?> cluster : clusters) {      
+      
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))){
+        continue;
+      }
+      
       centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
     }
     NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel).toVector(rel);
@@ -139,7 +144,13 @@ public class EvaluateVRC<O> implements Evaluator {
     double vrc = ((b - a) / a) * ((rel.size() - centroids.size()) / (centroids.size() - 1.));
 
     if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)){
-      double penalty = countNoise / rel.size();
+      
+      double penalty = 1;
+      
+      if(countNoise != 0){
+        penalty = (double) countNoise / (double) rel.size();
+      }
+              
       vrc = penalty * vrc;
     }
     
