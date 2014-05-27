@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  */
-public class DimensionModel extends BaseModel implements TextWriteable {
+public class DimensionModel extends AbstractModel implements TextWriteable {
   /**
    * Number of dimensions
    */

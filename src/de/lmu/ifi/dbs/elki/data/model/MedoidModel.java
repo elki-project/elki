@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  */
-public class MedoidModel extends BaseModel implements TextWriteable {
+public class MedoidModel extends AbstractModel implements TextWriteable {
   /**
    * Cluster medoid
    */

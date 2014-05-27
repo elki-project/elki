@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  */
-public class MeanModel extends BaseModel implements TextWriteable {
+public class MeanModel extends AbstractModel implements TextWriteable {
   /**
    * Cluster mean
    */

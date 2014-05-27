@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  */
-public abstract class BaseModel implements Model {
+public abstract class AbstractModel implements Model {
   /**
    * Implement writeToText as per
    * {@link de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable} interface.

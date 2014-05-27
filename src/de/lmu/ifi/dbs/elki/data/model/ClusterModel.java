@@ -32,7 +32,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * 
  * @apiviz.landmark
  */
-public final class ClusterModel extends BaseModel {
+public final class ClusterModel extends AbstractModel {
   /**
    * Static cluster model that can be shared for all clusters (since the object
    * doesn't include meta information.

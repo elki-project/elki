@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @author Erich Schubert
  */
-public class CoreObjectsModel extends BaseModel {
+public class CoreObjectsModel extends AbstractModel {
   /**
    * Objects that are part of the cluster core.
    */

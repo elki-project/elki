@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @apiviz.composedOf LinearEquationSystem
  */
-public class LinearEquationModel extends BaseModel implements TextWriteable {
+public class LinearEquationModel extends AbstractModel implements TextWriteable {
   /**
    * Equation system
    */

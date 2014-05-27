@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Elke Achtert
  */
 // TODO: comments
-public class DendrogramModel extends BaseModel {
+public class DendrogramModel extends AbstractModel {
   /**
    * Distance to child cluster
    */

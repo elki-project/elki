@@ -29,7 +29,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * 
  * @author Erich Schubert
  */
-public class OPTICSModel extends BaseModel {
+public class OPTICSModel extends AbstractModel {
   /**
    * Start index
    */
