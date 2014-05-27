@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.PrototypeModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 title = "Efficient Clustering of High Dimensional Data Sets with Application to Reference Matching", //
 booktitle = "Proc. 6th ACM SIGKDD international conference on Knowledge discovery and data mining",//
 url = "http://dx.doi.org/10.1145%2F347090.347123")
-public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<ClusterModel>> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
+public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Class logger.
    */
@@ -102,10 +102,10 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
    * @param database Database
    * @param relation Relation to process
    */
-  public Clustering<ClusterModel> run(Database database, Relation<O> relation) {
+  public Clustering<PrototypeModel<O>> run(Database database, Relation<O> relation) {
     DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
     ModifiableDBIDs ids = DBIDUtil.newHashSet(relation.getDBIDs());
-    ArrayList<Cluster<ClusterModel>> clusters = new ArrayList<>();
+    ArrayList<Cluster<PrototypeModel<O>>> clusters = new ArrayList<>();
     final int size = relation.size();
 
     if(t1 <= t2) {
@@ -140,7 +140,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
       }
       // TODO: remember the central object using a CanopyModel?
       // Construct cluster:
-      clusters.add(new Cluster<>(cids, ClusterModel.CLUSTER));
+      clusters.add(new Cluster<>(cids, new PrototypeModel<>(relation.get(first))));
 
       if(prog != null) {
         prog.setProcessed(size - ids.size(), LOG);

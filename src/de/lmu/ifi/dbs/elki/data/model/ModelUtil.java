@@ -48,7 +48,7 @@ public final class ModelUtil {
    * @param <V> desired vector type
    */
   @SuppressWarnings("unchecked")
-  public static <V extends NumberVector> V getRepresentative(Model model, Relation<? extends V> relation, NumberVector.Factory<V> factory) {
+  public static <V extends NumberVector> V getPrototype(Model model, Relation<? extends V> relation, NumberVector.Factory<V> factory) {
     // Mean model contains a numeric Vector
     if(model instanceof MeanModel) {
       final Vector p = ((MeanModel) model).getMean();
@@ -65,6 +65,16 @@ public final class ModelUtil {
       }
       return factory.newNumberVector(p, ArrayLikeUtil.NUMBERVECTORADAPTER);
     }
+    if(model instanceof PrototypeModel) {
+      Object p = ((PrototypeModel<?>) model).getPrototype();
+      if(factory.getRestrictionClass().isInstance(p)) {
+        return (V) p;
+      }
+      if(p instanceof NumberVector) {
+        return factory.newNumberVector((NumberVector) p, ArrayLikeUtil.NUMBERVECTORADAPTER);
+      }
+      return null; // Inconvertible
+    }
     return null;
   }
 
@@ -79,7 +89,7 @@ public final class ModelUtil {
    * @param relation Data relation (for representatives specified per DBID)
    * @return Some {@link NumberVector}, {@code null} if not supported.
    */
-  public static NumberVector getRepresentative(Model model, Relation<? extends NumberVector> relation) {
+  public static NumberVector getPrototype(Model model, Relation<? extends NumberVector> relation) {
     // Mean model contains a numeric Vector
     if(model instanceof MeanModel) {
       return ((MeanModel) model).getMean();
@@ -87,6 +97,13 @@ public final class ModelUtil {
     // Handle medoid models
     if(model instanceof MedoidModel) {
       return relation.get(((MedoidModel) model).getMedoid());
+    }
+    if(model instanceof PrototypeModel) {
+      Object p = ((PrototypeModel<?>) model).getPrototype();
+      if(p instanceof NumberVector) {
+        return (NumberVector) p;
+      }
+      return null; // Inconvertible
     }
     return null;
   }
