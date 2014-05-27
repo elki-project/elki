@@ -52,6 +52,7 @@ public class TestKMeansBisecting extends AbstractSimpleAlgorithmTest implements 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 3);
+    params.addParameter(KMeans.SEED_ID, 0);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class);
@@ -75,6 +76,7 @@ public class TestKMeansBisecting extends AbstractSimpleAlgorithmTest implements 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 2);
+    params.addParameter(KMeans.SEED_ID, 0);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, KMeansLloyd.class);
     params.addParameter(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVarianceQualityMeasure.class);
