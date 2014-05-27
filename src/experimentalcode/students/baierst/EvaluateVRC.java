@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 
 /*
  This file is part of ELKI:
@@ -74,9 +73,9 @@ public class EvaluateVRC<O> implements Evaluator {
   private static final Logging LOG = Logging.getLogger(EvaluateSilhouetteSimplified.class);
 
   /**
-   * Keep noise "clusters" merged.
+   * Option for noise handling.
    */
-  private boolean mergenoise = false;
+  private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
   /**
    * Constructor.
@@ -84,9 +83,9 @@ public class EvaluateVRC<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateVRC(boolean mergenoise) {
+  public EvaluateVRC(NoiseOption opt) {
     super();
-    this.mergenoise = mergenoise;
+    this.noiseOption = opt;
   }
 
   /**
@@ -99,19 +98,20 @@ public class EvaluateVRC<O> implements Evaluator {
    */
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
 
-    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    List<? extends Cluster<?>> clusters;
+    
+    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)){
+      clusters = ClusteringUtils.convertNoiseToSingletons(c);
+    }else{
+      clusters = c.getAllClusters();
+    }
+       
+    int countNoise = 0;
 
     // precompute all centroids
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
-    for(Cluster<?> cluster : clusters) {
-      if(!mergenoise && cluster.isNoise()) {
-        for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-          centroids.add(rel.get(it1));
-        }
-        continue;
-      }
+    for(Cluster<?> cluster : clusters) {      
       centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
-
     }
     NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel).toVector(rel);
 
@@ -120,16 +120,13 @@ public class EvaluateVRC<O> implements Evaluator {
     // b: Distance to overall centroid
     double b = 0;
     int i = 0;
-    for(Cluster<?> cluster : clusters) {
-
-      if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
-        for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-          b += SquaredEuclideanDistanceFunction.STATIC.distance(dataCentroid, rel.get(it1));
-          i++;
-        }
+    for(Cluster<?> cluster : clusters) {    
+      
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))){
+        countNoise += cluster.size();
         continue;
       }
-
+      
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
       DBIDArrayIter it2 = ids.iter();
       for(it2.seek(0); it2.valid(); it2.advance()) {
@@ -141,9 +138,15 @@ public class EvaluateVRC<O> implements Evaluator {
 
     double vrc = ((b - a) / a) * ((rel.size() - centroids.size()) / (centroids.size() - 1.));
 
+    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)){
+      double penalty = countNoise / rel.size();
+      vrc = penalty * vrc;
+    }
+    
     if(LOG.isVerbose()) {
       LOG.verbose("VRC: " + vrc);
     }
+    
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
     col.add(new DoubleVector(new double[] { vrc }));
@@ -175,29 +178,30 @@ public class EvaluateVRC<O> implements Evaluator {
   public static class Parameterizer<O> extends AbstractParameterizer {
 
     /**
-     * Parameter to treat noise as a single cluster.
+     * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("vrc.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID NOISE_OPTION_ID = new OptionID("vrc.noiseoption", "option, how noise should be treated.");
+
 
     /**
-     * Keep noise "clusters" merged.
+     * Option, how noise should be treated.
      */
-    private boolean mergenoise = false;
+    private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      Flag noiseP = new Flag(MERGENOISE_ID);
+      EnumParameter<NoiseOption> noiseP = new EnumParameter<NoiseOption>(NOISE_OPTION_ID, NoiseOption.class, NoiseOption.IGNORE_NOISE_WITH_PENALTY);
       if(config.grab(noiseP)) {
-        mergenoise = noiseP.isTrue();
+        noiseOption = noiseP.getValue();
       }
 
     }
 
     @Override
     protected EvaluateVRC<? extends NumberVector> makeInstance() {
-      return new EvaluateVRC<>(mergenoise);
+      return new EvaluateVRC<>(noiseOption);
     }
   }
 
