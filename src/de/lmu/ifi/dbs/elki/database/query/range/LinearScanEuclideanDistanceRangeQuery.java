@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -30,13 +31,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 
 /**
- * Default linear scan range query class.
- * 
- * Subtle optimization: for primitive distances, retrieve the query object only
- * once from the relation.
+ * Optimized linear scan for Euclidean distance range queries.
  * 
  * @author Erich Schubert
  * 
@@ -44,20 +42,19 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  * 
  * @param <O> Database object type
  */
-public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<O> {
+public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceRangeQuery<O> {
   /**
-   * Unboxed distance function.
+   * Squared Euclidean distance function.
    */
-  private PrimitiveDistanceFunction<? super O> rawdist;
+  private static final SquaredEuclideanDistanceFunction SQUARED = SquaredEuclideanDistanceFunction.STATIC;
 
   /**
    * Constructor.
    * 
    * @param distanceQuery Distance function to use
    */
-  public LinearScanPrimitiveDistanceRangeQuery(PrimitiveDistanceQuery<O> distanceQuery) {
+  public LinearScanEuclideanDistanceRangeQuery(PrimitiveDistanceQuery<O> distanceQuery) {
     super(distanceQuery);
-    rawdist = distanceQuery.getDistanceFunction();
   }
 
   @Override
@@ -88,10 +85,18 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
    * @param result Output data structure
    */
   private void linearScan(Relation<? extends O> relation, DBIDIter iter, O obj, double range, ModifiableDoubleDBIDList result) {
+    // Avoid a loss in numerical precision when using the squared radius:
+    final double upper = range * 1.0000001;
+    // This should be more precise, but slower:
+    // upper = MathUtil.floatToDoubleUpper((float)range);
+    final double sqrange = upper * upper;
     while(iter.valid()) {
-      final double distance = rawdist.distance(obj, relation.get(iter));
-      if(distance <= range) {
-        result.add(distance, iter);
+      final double sqdistance = SQUARED.distance(obj, relation.get(iter));
+      if(sqdistance <= sqrange) {
+        final double dist = Math.sqrt(sqdistance);
+        if(dist <= range) { // double check, as we increased the radius above
+          result.add(dist, iter);
+        }
       }
       iter.advance();
     }

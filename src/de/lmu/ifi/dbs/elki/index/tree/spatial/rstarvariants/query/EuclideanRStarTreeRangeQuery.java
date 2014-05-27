@@ -25,14 +25,13 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -56,45 +55,28 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  */
 @Reference(authors = "J. Kuan, P. Lewis", title = "Fast k nearest neighbour search for R-tree family", booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", url = "http://dx.doi.org/10.1109/ICICS.1997.652114")
-public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQuery<O> {
+public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarTreeRangeQuery<O> {
   /**
-   * The index to use
+   * Squared euclidean distance function.
    */
-  protected final AbstractRStarTree<?, ?, ?> tree;
-
-  /**
-   * Spatial primitive distance function
-   */
-  protected final SpatialPrimitiveDistanceFunction<? super O> distanceFunction;
-
-  /**
-   * Relation we query.
-   */
-  protected Relation<? extends O> relation;
+  private static final SquaredEuclideanDistanceFunction SQUARED = SquaredEuclideanDistanceFunction.STATIC;
 
   /**
    * Constructor.
    * 
    * @param tree Index to use
-   * @param relation Data relation to query
-   * @param distanceFunction Distance function
+   * @param relation Relation to use.
    */
-  public RStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistanceFunction<? super O> distanceFunction) {
-    super();
-    this.relation = relation;
-    this.tree = tree;
-    this.distanceFunction = distanceFunction;
+  public EuclideanRStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation) {
+    super(tree, relation, EuclideanDistanceFunction.STATIC);
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    return getRangeForObject(relation.get(id), range);
-  }
-
-  @Override
-  public DoubleDBIDList getRangeForObject(O obj, double range) {
+  public DoubleDBIDList getRangeForObject(O object, double range) {
     tree.statistics.countRangeQuery();
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
+    
+    final double sqepsilon = range * range;
 
     // Processing queue.
     int[] pq = new int[101];
@@ -110,19 +92,19 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
       if(node.isLeaf()) {
         for(int i = 0; i < numEntries; i++) {
           SpatialPointLeafEntry entry = (SpatialPointLeafEntry) node.getEntry(i);
-          double distance = distanceFunction.minDist(obj, entry);
+          double distance = SQUARED.minDist(object, entry);
           tree.statistics.countDistanceCalculation();
-          if(distance <= range) {
-            result.add(distance, entry.getDBID());
+          if(distance <= sqepsilon) {
+            result.add(Math.sqrt(distance), entry.getDBID());
           }
         }
       }
       else {
         for(int i = 0; i < numEntries; i++) {
           SpatialDirectoryEntry entry = (SpatialDirectoryEntry) node.getEntry(i);
-          double distance = distanceFunction.minDist(obj, entry);
-          if(distance <= range) {
-            if(ps == pq.length) {
+          double distance = SQUARED.minDist(object, entry);
+          if(distance <= sqepsilon) {
+            if(ps == pq.length) { // Resize:
               pq = Arrays.copyOf(pq, pq.length + (pq.length >>> 1));
             }
             pq[ps++] = entry.getEntryID();

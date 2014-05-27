@@ -23,12 +23,14 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 
 /**
@@ -59,9 +61,10 @@ public final class RStarTreeUtil {
   public static <O extends SpatialComparable> RangeQuery<O> getRangeQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
     SpatialPrimitiveDistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
-    DistanceQuery<O> dqc = (DistanceQuery<O>) DistanceQuery.class.cast(distanceQuery);
-    RangeQuery<O> q = new RStarTreeRangeQuery<>(tree, dqc, df);
-    return (RangeQuery<O>) q;
+    if(EuclideanDistanceFunction.STATIC.equals(df)) {
+      return (RangeQuery<O>) new EuclideanRStarTreeRangeQuery<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
+    }
+    return new RStarTreeRangeQuery<>(tree, distanceQuery.getRelation(), df);
   }
 
   /**
@@ -78,8 +81,9 @@ public final class RStarTreeUtil {
   public static <O extends SpatialComparable> KNNQuery<O> getKNNQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
     SpatialPrimitiveDistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
-    DistanceQuery<O> dqc = (DistanceQuery<O>) DistanceQuery.class.cast(distanceQuery);
-    KNNQuery<O> q = new RStarTreeKNNQuery<>(tree, dqc, df);
-    return (KNNQuery<O>) q;
+    if(EuclideanDistanceFunction.STATIC.equals(df)) {
+      return (KNNQuery<O>) new EuclideanRStarTreeKNNQuery<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
+    }
+    return new RStarTreeKNNQuery<>(tree, distanceQuery.getRelation(), df);
   }
 }

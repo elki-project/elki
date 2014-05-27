@@ -23,18 +23,25 @@ package de.lmu.ifi.dbs.elki.database;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleIntegerDBIDKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanEuclideanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanEuclideanDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 
 /**
@@ -217,10 +224,15 @@ public final class QueryUtil {
    * @param distanceQuery distance query
    * @return KNN query
    */
+  @SuppressWarnings("unchecked")
   public static <O> KNNQuery<O> getLinearScanKNNQuery(DistanceQuery<O> distanceQuery) {
     // Slight optimizations of linear scans
     if(distanceQuery instanceof PrimitiveDistanceQuery) {
       final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
+      if (EuclideanDistanceFunction.STATIC.equals(pdq.getDistanceFunction())) {
+        final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>)pdq;
+        return (KNNQuery<O>) new LinearScanEuclideanDistanceKNNQuery<>(ndq);
+      }
       return new LinearScanPrimitiveDistanceKNNQuery<>(pdq);
     }
     return new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -233,12 +245,31 @@ public final class QueryUtil {
    * @param distanceQuery distance query
    * @return Range query
    */
+  @SuppressWarnings("unchecked")
   public static <O> RangeQuery<O> getLinearScanRangeQuery(DistanceQuery<O> distanceQuery) {
     // Slight optimizations of linear scans
     if(distanceQuery instanceof PrimitiveDistanceQuery) {
       final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
+      if (EuclideanDistanceFunction.STATIC.equals(pdq.getDistanceFunction())) {
+        final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>)pdq;
+        return (RangeQuery<O>) new LinearScanEuclideanDistanceRangeQuery<>(ndq);
+      }
       return new LinearScanPrimitiveDistanceRangeQuery<>(pdq);
     }
     return new LinearScanDistanceRangeQuery<>(distanceQuery);
+  }
+
+  /**
+   * Apply the square root function to each value in the list.
+   * 
+   * @param knnList kNN list
+   * @return new list, after taking the square root
+   */
+  public static KNNList applySqrt(KNNList knnList) {
+    DoubleIntegerDBIDKNNList ret = new DoubleIntegerDBIDKNNList(knnList.getK(), knnList.size());
+    for(DoubleDBIDListIter iter = knnList.iter(); iter.valid(); iter.advance()) {
+      ret.add(Math.sqrt(iter.doubleValue()), iter);
+    }
+    return ret;
   }
 }

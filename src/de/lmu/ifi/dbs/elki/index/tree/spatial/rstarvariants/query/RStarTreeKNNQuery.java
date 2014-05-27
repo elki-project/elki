@@ -34,13 +34,14 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -69,28 +70,39 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", title = "Ranking in spatial databases", booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", url = "http://dx.doi.org/10.1007/3-540-60159-7_6")
-public class RStarTreeKNNQuery<O extends SpatialComparable> extends AbstractDistanceKNNQuery<O> {
+public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<O> {
   /**
    * The index to use
    */
   protected final AbstractRStarTree<?, ?, ?> tree;
 
   /**
-   * Spatial primitive distance function
+   * Spatial primitive distance function.
    */
   protected final SpatialPrimitiveDistanceFunction<? super O> distanceFunction;
+
+  /**
+   * Relation we query.
+   */
+  protected Relation<? extends O> relation;
 
   /**
    * Constructor.
    * 
    * @param tree Index to use
-   * @param distanceQuery Distance query to use
+   * @param relation Data relation to query
    * @param distanceFunction Distance function
    */
-  public RStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, DistanceQuery<O> distanceQuery, SpatialPrimitiveDistanceFunction<? super O> distanceFunction) {
-    super(distanceQuery);
+  public RStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistanceFunction<? super O> distanceFunction) {
+    super();
+    this.relation = relation;
     this.tree = tree;
     this.distanceFunction = distanceFunction;
+  }
+
+  @Override
+  public KNNList getKNNForDBID(DBIDRef id, int k) {
+    return getKNNForObject(relation.get(id), k);
   }
 
   @Override
@@ -233,7 +245,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> extends AbstractDist
    * 
    * @apiviz.hidden
    */
-  class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
+  static class DoubleDistanceEntry implements Comparable<DoubleDistanceEntry> {
     /**
      * Referenced entry
      */
