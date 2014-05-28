@@ -71,7 +71,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    * @param k k parameter
    * @param initializer Initialization method
    */
-  public SingleAssignmentKMeans(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, KMeansInitialization<V> initializer) {
+  public SingleAssignmentKMeans(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, -1, initializer);
   }
 

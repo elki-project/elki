@@ -97,7 +97,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
    * @param blocks Number of blocks
    * @param random Random factory used for partitioning.
    */
-  public KMeansBatchedLloyd(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer, int blocks, RandomFactory random) {
+  public KMeansBatchedLloyd(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, int blocks, RandomFactory random) {
     super(distanceFunction, k, maxiter, initializer);
     this.blocks = blocks;
     this.random = random;

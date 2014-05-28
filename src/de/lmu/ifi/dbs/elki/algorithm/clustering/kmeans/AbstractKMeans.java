@@ -80,7 +80,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends MeanModel
   /**
    * Method to choose initial means.
    */
-  protected KMeansInitialization<V> initializer;
+  protected KMeansInitialization<? super V> initializer;
 
   /**
    * Constructor.
@@ -90,7 +90,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends MeanModel
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public AbstractKMeans(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public AbstractKMeans(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;

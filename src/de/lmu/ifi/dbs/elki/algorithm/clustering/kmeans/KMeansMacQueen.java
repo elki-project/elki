@@ -79,7 +79,7 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansMacQueen(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMeansMacQueen(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 

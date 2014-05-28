@@ -91,7 +91,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param maxiter Maximum number of iterations
    * @param initializer
    */
-  public SameSizeKMeansAlgorithm(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public SameSizeKMeansAlgorithm(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 

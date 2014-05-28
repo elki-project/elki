@@ -68,7 +68,7 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansHybridLloydMacQueen(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMeansHybridLloydMacQueen(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
