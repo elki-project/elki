@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.data.model;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Cluster model that stores a mean for the cluster.
