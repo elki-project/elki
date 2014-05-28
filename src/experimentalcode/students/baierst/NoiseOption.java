@@ -1,4 +1,5 @@
 package experimentalcode.students.baierst;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,10 +27,10 @@ package experimentalcode.students.baierst;
  * Options for handling noise in internal measures.
  * 
  * @author Stephan Baier
- *
+ * 
  */
 public enum NoiseOption {
 
-  MERGE_NOISE,TREAT_NOISE_AS_SINGLETONS,IGNORE_NOISE,IGNORE_NOISE_WITH_PENALTY;
-  
+  MERGE_NOISE, TREAT_NOISE_AS_SINGLETONS, IGNORE_NOISE, IGNORE_NOISE_WITH_PENALTY;
+
 }

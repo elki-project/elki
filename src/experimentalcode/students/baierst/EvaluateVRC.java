@@ -100,27 +100,28 @@ public class EvaluateVRC<O> implements Evaluator {
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
 
     List<? extends Cluster<?>> clusters;
-    
+
     ArrayModifiableDBIDs dataCentroidIDs = DBIDUtil.newArray();
-    
-    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)){
+
+    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)) {
       clusters = ClusteringUtils.convertNoiseToSingletons(c);
-    }else{
+    }
+    else {
       clusters = c.getAllClusters();
     }
-       
+
     int countNoise = 0;
 
     // precompute all centroids
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
-    for(Cluster<?> cluster : clusters) {      
-      
-      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))){
+    for(Cluster<?> cluster : clusters) {
+
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
         continue;
       }
-      
+
       dataCentroidIDs.addDBIDs(cluster.getIDs());
-      
+
       centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
     }
     NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel, dataCentroidIDs).toVector(rel);
@@ -130,13 +131,13 @@ public class EvaluateVRC<O> implements Evaluator {
     // b: Distance to overall centroid
     double b = 0;
     int i = 0;
-    for(Cluster<?> cluster : clusters) {    
-      
-      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))){
+    for(Cluster<?> cluster : clusters) {
+
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
         countNoise += cluster.size();
         continue;
       }
-      
+
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
       DBIDArrayIter it2 = ids.iter();
       for(it2.seek(0); it2.valid(); it2.advance()) {
@@ -148,21 +149,21 @@ public class EvaluateVRC<O> implements Evaluator {
 
     double vrc = ((b - a) / a) * ((rel.size() - centroids.size()) / (centroids.size() - 1.));
 
-    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)){
-      
+    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
+
       double penalty = 1;
-      
-      if(countNoise != 0){
+
+      if(countNoise != 0) {
         penalty = (double) countNoise / (double) rel.size();
       }
-              
+
       vrc = penalty * vrc;
     }
-    
+
     if(LOG.isVerbose()) {
       LOG.verbose("VRC: " + vrc);
     }
-    
+
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
     col.add(new DoubleVector(new double[] { vrc }));
@@ -197,7 +198,6 @@ public class EvaluateVRC<O> implements Evaluator {
      * Parameter for the option, how noise should be treated.
      */
     public static final OptionID NOISE_OPTION_ID = new OptionID("vrc.noiseoption", "option, how noise should be treated.");
-
 
     /**
      * Option, how noise should be treated.

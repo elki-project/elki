@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -71,9 +70,9 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
   private static final Logging LOG = Logging.getLogger(EvaluateSilhouetteSimplified.class);
 
   /**
-   * Keep noise "clusters" merged.
+   * Option for noise handling.
    */
-  private boolean mergenoise = false;
+  private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
   /**
    * Distance function to use.
@@ -92,10 +91,10 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
    * @param mergenoise Flag to treat noise as clusters, not singletons
    * @param eps Epsilon parameter of alternative silhouette
    */
-  public EvaluateSilhouetteSimplified(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise, double eps) {
+  public EvaluateSilhouetteSimplified(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseOption noiseOpt, double eps) {
     super();
     this.distanceFunction = distance;
-    this.mergenoise = mergenoise;
+    this.noiseOption = noiseOpt;
     this.eps = eps;
   }
 
@@ -108,75 +107,102 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
    * @param c Clustering
    */
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
-    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    List<? extends Cluster<?>> clusters;
+
+    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)) {
+      clusters = ClusteringUtils.convertNoiseToSingletons(c);
+    }
+    else {
+      clusters = c.getAllClusters();
+    }
+
+    int countNoise = 0;
+
     MeanVariance mssil = new MeanVariance();
     MeanVariance mssilAlt = new MeanVariance();
+
+    // precompute all centroids
+    ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
+
+    for(Cluster<?> cluster : clusters) {
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+        countNoise += cluster.size();
+        continue;
+      }
+      centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
+    }
+
+    int i = 0;
     for(Cluster<?> cluster : clusters) {
 
-      NumberVector centroid = Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel);
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+        continue;
+      }
 
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
       DBIDArrayIter it1 = ids.iter();
       for(it1.seek(0); it1.valid(); it1.advance()) {
         // a: Distance to own centroid
-
-        double a = distanceFunction.distance(centroid, rel.get(it1));
+        double a = distanceFunction.distance(centroids.get(i), rel.get(it1));
 
         // b: Distance to other clusters centroids:
         double min = Double.POSITIVE_INFINITY;
+        int j = 0;
         for(Cluster<?> ocluster : clusters) {
-          if(ocluster == cluster && !cluster.isNoise()) {
+
+          if(ocluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+            continue;
+          }
+          if(ocluster == cluster) {
+            j++;
             continue;
           }
 
-          if(!mergenoise && ocluster.isNoise()) {
-            // Treat noise cluster as singletons:
-            for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
-              if(DBIDUtil.equal(it1,it2)) {
-                continue;
-              }
-              double b = distanceFunction.distance(rel.get(it1), rel.get(it2));
-              if(b < min) {
-                min = b;
-              }
-            }
-            continue;
-          }
-
-          // TODO: calculate each centroid only once!
-          NumberVector ocentroid = Centroid.make((Relation<? extends NumberVector>) rel, ocluster.getIDs()).toVector(rel);
-
-          double b = distanceFunction.distance(ocentroid, rel.get(it1));
+          double b = distanceFunction.distance(centroids.get(j), rel.get(it1));
 
           if(b < min) {
             min = b;
           }
+          j++;
         }
 
-        if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
-          // simplified silhouette is always one for singletons
-          mssil.put(1);
-          LOG.verbose("mssil put: " + 1);
-          mssilAlt.put(min / (0 + this.eps));
-          LOG.verbose("mssilAlt put: " + min / (0 + this.eps));
+        if(cluster.size() <= 1) {
+          // put 0 for singletons
+          mssil.put(0);
+          mssilAlt.put(0);
 
           continue;
         }
 
         mssil.put((min - a) / Math.max(min, a));
-        LOG.verbose("mssil put: " + (min - a) / Math.max(min, a));
         mssilAlt.put(min / (a + this.eps));
-        LOG.verbose("mssilAlt put: " + min / (a + this.eps));
       }
+      i++;
     }
+
+    double mssilMean = mssil.getMean();
+    double mssilAltMean = mssilAlt.getMean();
+
+    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
+
+      double penalty = 1;
+
+      if(countNoise != 0) {
+        penalty = (double) countNoise / (double) rel.size();
+      }
+
+      mssilMean = penalty * mssilMean;
+      mssilAltMean = penalty * mssilAltMean;
+    }
+
     if(LOG.isVerbose()) {
-      LOG.verbose("Mean Simplified Silhouette: " + mssil);
-      LOG.verbose("Mean Simplified Silhouette Alternative: " + mssilAlt);
+      LOG.verbose("Mean Simplified Silhouette: " + mssilMean);
+      LOG.verbose("Mean Simplified Silhouette Alternative: " + mssilAltMean);
     }
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { mssil.getMean(), mssil.getSampleStddev() }));
-    col.add(new DoubleVector(new double[] { mssilAlt.getMean(), mssilAlt.getSampleStddev() }));
+    col.add(new DoubleVector(new double[] { mssilMean }));
+    col.add(new DoubleVector(new double[] { mssilAltMean }));
     db.getHierarchy().add(c, new CollectionResult<>("Simplified Silhouette coefficient", "simplified-silhouette-coefficient", col));
   }
 
@@ -208,14 +234,14 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
     public static final OptionID DISTANCE_ID = new OptionID("simplified-silhouette.distance", "Distance function to use for computing the silhouette.");
 
     /**
-     * Parameter to treat noise as a single cluster.
-     */
-    public static final OptionID MERGENOISE_ID = new OptionID("simplified-silhouette.noisecluster", "Treat noise as a cluster, not as singletons.");
-
-    /**
      * Parameter for epsilon value of alternative silhouette.
      */
     public static final OptionID EPS_ID = new OptionID("simplified-silhouette.alternative_eps", "Epsilon parameter for alternative silhouette.");
+
+    /**
+     * Parameter for the option, how noise should be treated.
+     */
+    public static final OptionID NOISE_OPTION_ID = new OptionID("simplified-silhouette.noiseoption", "option, how noise should be treated.");
 
     /**
      * Distance function to use.
@@ -223,14 +249,14 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
     private PrimitiveDistanceFunction<NumberVector> distance;
 
     /**
-     * Keep noise "clusters" merged.
-     */
-    private boolean mergenoise = false;
-
-    /**
      * Epsilon for alternative silhouette.
      */
     private double eps;
+
+    /**
+     * Option, how noise should be treated.
+     */
+    private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -241,9 +267,9 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      Flag noiseP = new Flag(MERGENOISE_ID);
+      EnumParameter<NoiseOption> noiseP = new EnumParameter<NoiseOption>(NOISE_OPTION_ID, NoiseOption.class, NoiseOption.IGNORE_NOISE_WITH_PENALTY);
       if(config.grab(noiseP)) {
-        mergenoise = noiseP.isTrue();
+        noiseOption = noiseP.getValue();
       }
 
       DoubleParameter epsP = new DoubleParameter(EPS_ID, 1e-6);
@@ -255,7 +281,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
 
     @Override
     protected EvaluateSilhouetteSimplified<? extends NumberVector> makeInstance() {
-      return new EvaluateSilhouetteSimplified<>(distance, mergenoise, eps);
+      return new EvaluateSilhouetteSimplified<>(distance, noiseOption, eps);
     }
   }
 

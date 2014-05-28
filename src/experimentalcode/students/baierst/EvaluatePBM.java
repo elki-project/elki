@@ -119,20 +119,15 @@ public class EvaluatePBM<O> implements Evaluator {
 
     // precompute all centroids
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
-
     ArrayModifiableDBIDs dataCentroidIDs = DBIDUtil.newArray();
 
     for(Cluster<?> cluster : clusters) {
-
       if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
         countNoise += cluster.size();
         continue;
       }
-
       dataCentroidIDs.addDBIDs(cluster.getIDs());
-
       centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
-
     }
 
     NumberVector dataCentroid = Centroid.make((Relation<? extends NumberVector>) rel, dataCentroidIDs).toVector(rel);
