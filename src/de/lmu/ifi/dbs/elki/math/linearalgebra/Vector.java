@@ -23,10 +23,17 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * Provides a vector object that encapsulates an m x 1 - matrix object.
@@ -36,6 +43,26 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @apiviz.landmark
  */
 public class Vector implements NumberVector {
+  /**
+   * Static vector factory.
+   */
+  public static final Factory FACTORY = new Factory();
+
+  /**
+   * Serializer for up to 127 dimensions.
+   */
+  public static final ByteBufferSerializer<Vector> BYTE_SERIALIZER = new SmallSerializer();
+
+  /**
+   * Serializer for up to 2^15-1 dimensions.
+   */
+  public static final ByteBufferSerializer<Vector> SHORT_SERIALIZER = new ShortSerializer();
+
+  /**
+   * Serializer using varint encoding.
+   */
+  public static final ByteBufferSerializer<Vector> VARIABLE_SERIALIZER = new VariableSerializer();
+
   /**
    * Array for internal storage of elements.
    * 
@@ -85,13 +112,13 @@ public class Vector implements NumberVector {
   public static final Vector randomNormalizedVector(final int dimensionality) {
     final Vector v = new Vector(dimensionality);
     double norm = 0;
-    while (norm <= 0) {
-      for (int i = 0; i < dimensionality; i++) {
+    while(norm <= 0) {
+      for(int i = 0; i < dimensionality; i++) {
         v.elements[i] = Math.random();
       }
       norm = v.euclideanLength();
     }
-    for (int row = 0; row < dimensionality; row++) {
+    for(int row = 0; row < dimensionality; row++) {
       v.elements[row] /= norm;
     }
     return v;
@@ -185,7 +212,7 @@ public class Vector implements NumberVector {
   public final Vector plus(final Vector v) {
     assert (this.elements.length == v.elements.length) : ERR_VEC_DIMENSIONS;
     final Vector result = new Vector(elements.length);
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       result.elements[i] = elements[i] + v.elements[i];
     }
     return result;
@@ -202,7 +229,7 @@ public class Vector implements NumberVector {
   public final Vector plusTimes(final Vector v, final double s) {
     assert (this.elements.length == v.elements.length) : ERR_VEC_DIMENSIONS;
     final Vector result = new Vector(elements.length);
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       result.elements[i] = elements[i] + v.elements[i] * s;
     }
     return result;
@@ -216,7 +243,7 @@ public class Vector implements NumberVector {
    */
   public final Vector plusEquals(final Vector b) {
     assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       elements[i] += b.elements[i];
     }
     return this;
@@ -231,7 +258,7 @@ public class Vector implements NumberVector {
    */
   public final Vector plusTimesEquals(final Vector b, final double s) {
     assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       elements[i] += s * b.elements[i];
     }
     return this;
@@ -244,7 +271,7 @@ public class Vector implements NumberVector {
    * @return Modified vector
    */
   public final Vector plusEquals(final double d) {
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       elements[i] += d;
     }
     return this;
@@ -258,7 +285,7 @@ public class Vector implements NumberVector {
    */
   public final Vector minus(final Vector v) {
     final Vector sub = new Vector(elements.length);
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       sub.elements[i] = elements[i] - v.elements[i];
     }
     return sub;
@@ -273,7 +300,7 @@ public class Vector implements NumberVector {
    */
   public final Vector minusTimes(final Vector v, final double s) {
     final Vector sub = new Vector(elements.length);
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       sub.elements[i] = elements[i] - v.elements[i] * s;
     }
     return sub;
@@ -287,7 +314,7 @@ public class Vector implements NumberVector {
    */
   public final Vector minusEquals(final Vector b) {
     assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       elements[i] -= b.elements[i];
     }
     return this;
@@ -302,7 +329,7 @@ public class Vector implements NumberVector {
    */
   public final Vector minusTimesEquals(final Vector b, final double s) {
     assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       elements[i] -= s * b.elements[i];
     }
     return this;
@@ -315,7 +342,7 @@ public class Vector implements NumberVector {
    * @return Modified vector
    */
   public final Vector minusEquals(final double d) {
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       elements[i] -= d;
     }
     return this;
@@ -330,7 +357,7 @@ public class Vector implements NumberVector {
    */
   public final Vector times(final double s) {
     final Vector v = new Vector(elements.length);
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       v.elements[i] = elements[i] * s;
     }
     return v;
@@ -343,7 +370,7 @@ public class Vector implements NumberVector {
    * @return replace A by s*A
    */
   public final Vector timesEquals(final double s) {
-    for (int i = 0; i < elements.length; i++) {
+    for(int i = 0; i < elements.length; i++) {
       elements[i] *= s;
     }
     return this;
@@ -358,8 +385,8 @@ public class Vector implements NumberVector {
   public final Matrix times(final Matrix B) {
     assert (B.elements.length == 1) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(this.elements.length, B.columndimension);
-    for (int j = 0; j < B.columndimension; j++) {
-      for (int i = 0; i < this.elements.length; i++) {
+    for(int j = 0; j < B.columndimension; j++) {
+      for(int i = 0; i < this.elements.length; i++) {
         X.elements[i][j] = elements[i] * B.elements[0][j];
       }
     }
@@ -375,10 +402,10 @@ public class Vector implements NumberVector {
   public final Matrix transposeTimes(final Matrix B) {
     assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(1, B.columndimension);
-    for (int j = 0; j < B.columndimension; j++) {
+    for(int j = 0; j < B.columndimension; j++) {
       // multiply it with each row from A
       double s = 0;
-      for (int k = 0; k < this.elements.length; k++) {
+      for(int k = 0; k < this.elements.length; k++) {
         s += this.elements[k] * B.elements[k][j];
       }
       X.elements[0][j] = s;
@@ -396,10 +423,10 @@ public class Vector implements NumberVector {
   public final double transposeTimesTimes(final Matrix B, final Vector c) {
     assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
-    for (int j = 0; j < B.columndimension; j++) {
+    for(int j = 0; j < B.columndimension; j++) {
       // multiply it with each row from A
       double s = 0;
-      for (int k = 0; k < this.elements.length; k++) {
+      for(int k = 0; k < this.elements.length; k++) {
         s += this.elements[k] * B.elements[k][j];
       }
       sum += s * c.elements[j];
@@ -416,7 +443,7 @@ public class Vector implements NumberVector {
   public final double transposeTimes(final Vector B) {
     assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     double s = 0;
-    for (int k = 0; k < this.elements.length; k++) {
+    for(int k = 0; k < this.elements.length; k++) {
       s += this.elements[k] * B.elements[k];
     }
     return s;
@@ -431,8 +458,8 @@ public class Vector implements NumberVector {
   public final Matrix timesTranspose(final Matrix B) {
     assert (B.columndimension == 1) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
-    for (int j = 0; j < B.elements.length; j++) {
-      for (int i = 0; i < this.elements.length; i++) {
+    for(int j = 0; j < B.elements.length; j++) {
+      for(int i = 0; i < this.elements.length; i++) {
         X.elements[i][j] = elements[i] * B.elements[j][0];
       }
     }
@@ -447,8 +474,8 @@ public class Vector implements NumberVector {
    */
   public final Matrix timesTranspose(final Vector B) {
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
-    for (int j = 0; j < B.elements.length; j++) {
-      for (int i = 0; i < this.elements.length; i++) {
+    for(int j = 0; j < B.elements.length; j++) {
+      for(int i = 0; i < this.elements.length; i++) {
         X.elements[i][j] = elements[i] * B.elements[j];
       }
     }
@@ -462,7 +489,7 @@ public class Vector implements NumberVector {
    */
   public final double euclideanLength() {
     double acc = 0.0;
-    for (int row = 0; row < elements.length; row++) {
+    for(int row = 0; row < elements.length; row++) {
       final double v = elements[row];
       acc += v * v;
     }
@@ -476,8 +503,8 @@ public class Vector implements NumberVector {
    */
   public final Vector normalize() {
     double norm = euclideanLength();
-    if (norm != 0) {
-      for (int row = 0; row < elements.length; row++) {
+    if(norm != 0) {
+      for(int row = 0; row < elements.length; row++) {
         elements[row] /= norm;
       }
     }
@@ -494,7 +521,7 @@ public class Vector implements NumberVector {
   public final Vector projection(final Matrix v) {
     assert (elements.length == v.elements.length) : ERR_DIMENSIONS;
     Vector sum = new Vector(elements.length);
-    for (int i = 0; i < v.columndimension; i++) {
+    for(int i = 0; i < v.columndimension; i++) {
       // TODO: optimize - copy less?
       Vector v_i = v.getCol(i);
       sum.plusTimesEquals(v_i, this.transposeTimes(v_i));
@@ -509,17 +536,17 @@ public class Vector implements NumberVector {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if(getClass() != obj.getClass()) {
       return false;
     }
     final Vector other = (Vector) obj;
-    if (this.elements.length != other.elements.length) {
+    if(this.elements.length != other.elements.length) {
       return false;
     }
     return Arrays.equals(this.elements, other.elements);
@@ -631,5 +658,155 @@ public class Vector implements NumberVector {
   @Override
   public Vector getColumnVector() {
     return copy();
+  }
+
+  /**
+   * Vector factory for Vectors.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private static class Factory implements NumberVector.Factory<Vector> {
+    @Override
+    public <A> Vector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
+      if(adapter instanceof NumberArrayAdapter) {
+        return new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(array, (NumberArrayAdapter<?, ? super A>) adapter));
+      }
+      double[] data = new double[adapter.size(array)];
+      for(int i = 0; i < data.length; i++) {
+        data[i] = adapter.get(array, i).doubleValue();
+      }
+      return new Vector(data);
+    }
+
+    @Override
+    public ByteBufferSerializer<Vector> getDefaultSerializer() {
+      return VARIABLE_SERIALIZER;
+    }
+
+    @Override
+    public Class<? super Vector> getRestrictionClass() {
+      return Vector.class;
+    }
+
+    @Override
+    public Vector newNumberVector(double[] values) {
+      return new Vector(values.clone());
+    }
+
+    @Override
+    public <A> Vector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
+      return new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter));
+    }
+  }
+
+  /**
+   * Serialization class for dense double vectors with up to 127 dimensions, by
+   * using a byte for storing the dimensionality.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class SmallSerializer implements ByteBufferSerializer<Vector> {
+    @Override
+    public Vector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final byte dimensionality = buffer.get();
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
+      final double[] values = new double[dimensionality];
+      for(int i = 0; i < dimensionality; i++) {
+        values[i] = buffer.getDouble();
+      }
+      return new Vector(values);
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, Vector vec) throws IOException {
+      assert (vec.elements.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.elements.length);
+      buffer.put((byte) vec.elements.length);
+      for(int i = 0; i < vec.elements.length; i++) {
+        buffer.putDouble(vec.elements[i]);
+      }
+    }
+
+    @Override
+    public int getByteSize(Vector vec) {
+      assert (vec.elements.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
+      return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
+    }
+  }
+
+  /**
+   * Serialization class for dense double vectors with up to
+   * {@link Short#MAX_VALUE} dimensions, by using a short for storing the
+   * dimensionality.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class ShortSerializer implements ByteBufferSerializer<Vector> {
+    @Override
+    public Vector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final short dimensionality = buffer.getShort();
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
+      final double[] values = new double[dimensionality];
+      for(int i = 0; i < dimensionality; i++) {
+        values[i] = buffer.getDouble();
+      }
+      return new Vector(values);
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, Vector vec) throws IOException {
+      assert (vec.elements.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.elements.length);
+      buffer.putShort((short) vec.elements.length);
+      for(int i = 0; i < vec.elements.length; i++) {
+        buffer.putDouble(vec.elements[i]);
+      }
+    }
+
+    @Override
+    public int getByteSize(Vector vec) {
+      assert (vec.elements.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
+    }
+  }
+
+  /**
+   * Serialization class for variable dimensionality by using VarInt encoding.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected static class VariableSerializer implements ByteBufferSerializer<Vector> {
+    @Override
+    public Vector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
+      final double[] values = new double[dimensionality];
+      for(int i = 0; i < dimensionality; i++) {
+        values[i] = buffer.getDouble();
+      }
+      return new Vector(values);
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, Vector vec) throws IOException {
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.elements.length);
+      ByteArrayUtil.writeUnsignedVarint(buffer, vec.elements.length);
+      for(int i = 0; i < vec.elements.length; i++) {
+        buffer.putDouble(vec.elements[i]);
+      }
+    }
+
+    @Override
+    public int getByteSize(Vector vec) {
+      return ByteArrayUtil.getUnsignedVarintSize(vec.elements.length) + ByteArrayUtil.SIZE_DOUBLE * vec.elements.length;
+    }
   }
 }
