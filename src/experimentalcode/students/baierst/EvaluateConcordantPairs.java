@@ -119,7 +119,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
         countNoise += cluster.size();
         continue;
       }
-      
+
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
       DBIDArrayIter it1 = ids.iter();
       for(it1.seek(0); it1.valid(); it1.advance()) {
@@ -153,23 +153,24 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
         }
       }
     }
-    
+
     double wd = 0;
     double bd = 0;
-    
+
     for(Cluster<?> cluster : clusters) {
       if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
         continue;
       }
-      wd += cluster.size() * (cluster.size() - 1.)/2.;
+      wd += cluster.size() * (cluster.size() - 1.) / 2.;
       if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY) || noiseOption.equals(NoiseOption.IGNORE_NOISE)) {
-        bd += cluster.size() * (rel.size() - countNoise - cluster.size());      
-      }else{
+        bd += cluster.size() * (rel.size() - countNoise - cluster.size());
+      }
+      else {
         bd += cluster.size() * (rel.size() - cluster.size());
       }
     }
-    
-    //compute gamma, g+ and tau
+
+    // compute gamma, g+ and tau
     double gamma = (concordantPairs - discordantPairs) / (concordantPairs + discordantPairs);
 
     double t;
@@ -181,10 +182,10 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     }
 
     double gPlus = (2 * discordantPairs) / (t * (t - 1));
-    
-    double tau = (concordantPairs - discordantPairs) / Math.sqrt((((t * (t - 1.)) / 2.) - wd - bd) * (t * (t - 1.) / 2.)   );
-    
-    //compute penalty, if necessary
+
+    double tau = (concordantPairs - discordantPairs) / Math.sqrt((((t * (t - 1.)) / 2.) - wd - bd) * (t * (t - 1.) / 2.));
+
+    // compute penalty, if necessary
     if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
 
       double penalty = 1;
