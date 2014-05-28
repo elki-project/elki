@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -71,9 +72,9 @@ public class EvaluateCIndex<O> implements Evaluator {
   private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
 
   /**
-   * Keep noise "clusters" merged.
+   * Option for noise handling.
    */
-  private boolean mergenoise = false;
+  private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
   /**
    * Distance function to use.
@@ -86,10 +87,10 @@ public class EvaluateCIndex<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateCIndex(PrimitiveDistanceFunction<? super NumberVector> distance, boolean mergenoise) {
+  public EvaluateCIndex(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseOption noiseOpt) {
     super();
     this.distanceFunction = distance;
-    this.mergenoise = mergenoise;
+    this.noiseOption = noiseOpt;
   }
 
   /**
@@ -100,23 +101,41 @@ public class EvaluateCIndex<O> implements Evaluator {
    * @param c Clustering
    */
   public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
-    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    List<? extends Cluster<?>> clusters;
+
+    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)) {
+      clusters = ClusteringUtils.convertNoiseToSingletons(c);
+    }
+    else {
+      clusters = c.getAllClusters();
+    }
+
+    int countNoise = 0;
 
     /* w is the number of within group distances */
     int w = 0;
     ArrayList<Double> pairDists = new ArrayList<Double>();
     double theta = 0;
 
-    for(Cluster<?> cluster : clusters) {
+    for(int i = 0; i < clusters.size(); i++) {
+      Cluster<?> cluster = clusters.get(i);
+      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+        countNoise += cluster.size();
+        continue;
+      }
       for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-        for(Cluster<?> ocluster : clusters) {
+        for(int j = i; j < clusters.size(); j++) {
+          Cluster<?> ocluster = clusters.get(j);
+          if(ocluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+            continue;
+          }
           for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
             if(DBIDUtil.equal(it1, it2)) {
               continue;
             }
             double dist = distanceFunction.distance(rel.get(it1), rel.get(it2));
             pairDists.add(dist);
-            if(ocluster == cluster && ((!cluster.isNoise() && !mergenoise) || mergenoise)) {
+            if(ocluster == cluster) {
               theta += dist;
               w++;
             }
@@ -148,6 +167,16 @@ public class EvaluateCIndex<O> implements Evaluator {
     }
 
     double cIndex = (theta - min) / (max - min);
+
+    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
+
+      double penalty = 1;
+
+      if(countNoise != 0) {
+        penalty = (double) countNoise / (double) rel.size();
+      }
+      cIndex = penalty * cIndex;
+    }
 
     if(LOG.isVerbose()) {
       LOG.verbose("c-index: " + cIndex);
@@ -187,9 +216,9 @@ public class EvaluateCIndex<O> implements Evaluator {
     public static final OptionID DISTANCE_ID = new OptionID("c-index.distance", "Distance function to use for computing the c-index.");
 
     /**
-     * Parameter to treat noise as a single cluster.
+     * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("c-index.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID NOISE_OPTION_ID = new OptionID("c-index.noiseoption", "option, how noise should be treated.");
 
     /**
      * Distance function to use.
@@ -197,9 +226,9 @@ public class EvaluateCIndex<O> implements Evaluator {
     private PrimitiveDistanceFunction<NumberVector> distance;
 
     /**
-     * Keep noise "clusters" merged.
+     * Option, how noise should be treated.
      */
-    private boolean mergenoise = false;
+    private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -209,16 +238,16 @@ public class EvaluateCIndex<O> implements Evaluator {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      Flag noiseP = new Flag(MERGENOISE_ID);
+      EnumParameter<NoiseOption> noiseP = new EnumParameter<NoiseOption>(NOISE_OPTION_ID, NoiseOption.class, NoiseOption.IGNORE_NOISE_WITH_PENALTY);
       if(config.grab(noiseP)) {
-        mergenoise = noiseP.isTrue();
+        noiseOption = noiseP.getValue();
       }
 
     }
 
     @Override
     protected EvaluateCIndex<O> makeInstance() {
-      return new EvaluateCIndex<>(distance, mergenoise);
+      return new EvaluateCIndex<>(distance, noiseOption);
     }
   }
 
