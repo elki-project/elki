@@ -32,42 +32,25 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  */
-public class MedoidModel extends AbstractModel implements TextWriteable {
-  /**
-   * Cluster medoid
-   */
-  private DBID medoid;
-
+public class MedoidModel extends PrototypeModel<DBID> implements TextWriteable {
   /**
    * Constructor with medoid
    * 
    * @param medoid Cluster medoid
    */
   public MedoidModel(DBID medoid) {
-    super();
-    this.medoid = medoid;
+    super(medoid);
   }
 
   /**
    * @return medoid
    */
   public DBID getMedoid() {
-    return medoid;
+    return prototype;
   }
 
-  /**
-   * @param medoid Medoid object
-   */
-  public void setMedoid(DBID medoid) {
-    this.medoid = medoid;
-  }
-
-  /**
-   * Implementation of {@link TextWriteable} interface.
-   */
   @Override
-  public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
-    out.commentPrintLn("Cluster Medoid: " + medoid.toString());
+  protected String getPrototypeType() {
+    return "Medoid";
   }
 }

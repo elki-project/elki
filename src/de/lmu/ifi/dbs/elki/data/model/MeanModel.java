@@ -25,49 +25,31 @@ package de.lmu.ifi.dbs.elki.data.model;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Cluster model that stores a mean for the cluster.
  * 
  * @author Erich Schubert
  */
-public class MeanModel extends AbstractModel implements TextWriteable {
-  /**
-   * Cluster mean
-   */
-  private Vector mean;
-
+public class MeanModel extends PrototypeModel<Vector> implements TextWriteable {
   /**
    * Constructor with mean
    * 
    * @param mean Cluster mean
    */
   public MeanModel(Vector mean) {
-    super();
-    this.mean = mean;
+    super(mean);
   }
 
   /**
    * @return mean
    */
   public Vector getMean() {
-    return mean;
+    return prototype;
   }
 
-  /**
-   * @param mean Mean vector
-   */
-  public void setMean(Vector mean) {
-    this.mean = mean;
-  }
-
-  /**
-   * Implementation of {@link TextWriteable} interface.
-   */
   @Override
-  public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
-    out.commentPrintLn("Cluster Mean: " + mean.toString());
+  protected String getPrototypeType() {
+    return "Mean";
   }
 }

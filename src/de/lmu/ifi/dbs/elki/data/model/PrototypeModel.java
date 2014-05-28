@@ -35,7 +35,7 @@ public class PrototypeModel<V> extends AbstractModel implements TextWriteable {
   /**
    * Cluster prototype
    */
-  private V prototype;
+  protected V prototype;
 
   /**
    * Constructor with prototype
@@ -60,6 +60,15 @@ public class PrototypeModel<V> extends AbstractModel implements TextWriteable {
   @Override
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
-    out.commentPrintLn("Cluster Prototype: " + prototype.toString());
+    out.commentPrintLn("Cluster " + getPrototypeType() + ": " + prototype.toString());
+  }
+
+  /**
+   * Type of prototype (Median, Mean, ...) for printing.
+   * 
+   * @return String name
+   */
+  protected String getPrototypeType() {
+    return "Prototype";
   }
 }
