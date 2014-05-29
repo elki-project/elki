@@ -81,5 +81,10 @@ public abstract class AbstractNumberVector implements NumberVector {
     public V newNumberVector(double[] values) {
       return newNumberVector(values, ArrayLikeUtil.doubleArrayAdapter());
     }
+
+    @Override
+    public V newNumberVector(NumberVector values) {
+      return newNumberVector(values, ArrayLikeUtil.numberVectorAdapter(values));
+    }
   }
 }

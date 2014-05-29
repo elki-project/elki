@@ -148,6 +148,14 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
     V newNumberVector(double[] values);
 
     /**
+     * Returns a new NumberVector of N for the given values.
+     * 
+     * @param values Existing number vector
+     * @return a new NumberVector of N for the given values
+     */
+    V newNumberVector(NumberVector values);
+
+    /**
      * Instantiate from any number-array like object.
      * 
      * @param <A> Array type

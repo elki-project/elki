@@ -699,6 +699,11 @@ public class Vector implements NumberVector {
     public <A> Vector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       return new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter));
     }
+
+    @Override
+    public Vector newNumberVector(NumberVector values) {
+      return new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(values));
+    }
   }
 
   /**
