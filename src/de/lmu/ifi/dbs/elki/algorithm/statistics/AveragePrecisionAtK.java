@@ -164,7 +164,8 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
-      DoubleVector row = new DoubleVector(new double[] { mvs[i].getMean(), mvs[i].getSampleStddev() });
+      final MeanVariance mv = mvs[i];
+      DoubleVector row = new DoubleVector(new double[] { mv.getMean(), mv.getCount() > 1. ? mv.getSampleStddev() : 0 });
       res.add(row);
     }
     return new CollectionResult<>("Average Precision", "average-precision", res);
