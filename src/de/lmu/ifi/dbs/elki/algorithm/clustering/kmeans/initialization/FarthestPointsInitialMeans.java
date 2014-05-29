@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -54,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Object type for kMedoids
+ * @param <O> Object type for kMedoids and kMedians
  */
 public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
@@ -74,19 +73,19 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <V extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     // Get a distance query
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
 
     // Chose first mean
-    List<Vector> means = new ArrayList<>(k);
+    List<V> means = new ArrayList<>(k);
 
     DBIDRef first = DBIDUtil.randomSample(ids, 1, rnd).iter();
-    V prevmean = relation.get(first);
-    means.add(prevmean.getColumnVector());
+    T prevmean = relation.get(first);
+    means.add(factory.newNumberVector(prevmean));
 
     // Find farthest object each.
     DBIDVar best = DBIDUtil.newVar(first);
@@ -113,7 +112,7 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
       }
       store.putDouble(best, Double.NaN); // So it won't be chosen twice.
       prevmean = relation.get(best);
-      means.add(prevmean.getColumnVector());
+      means.add(factory.newNumberVector(prevmean));
     }
 
     // Explicitly destroy temporary data.

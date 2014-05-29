@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.ModelUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -103,16 +103,17 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
     DistanceQuery<O> dq = database.getDistanceQuery(relation, df);
 
     // TODO: improve ELKI api to ensure we're using the same DBIDs!
-    Clustering<? extends MeanModel> c = clusterer.run(database, relation);
+    Clustering<?> c = clusterer.run(database, relation);
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     DoubleMinMax mm = new DoubleMinMax();
 
     @SuppressWarnings("unchecked")
     NumberVector.Factory<O> factory = (NumberVector.Factory<O>) RelationUtil.assumeVectorField(relation).getFactory();
-    List<? extends Cluster<? extends MeanModel>> clusters = c.getAllClusters();
-    for(Cluster<? extends MeanModel> cluster : clusters) {
-      O mean = factory.newNumberVector(cluster.getModel().getMean().getArrayRef());
+    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    for(Cluster<?> cluster : clusters) {
+      // FIXME: use a primitive distance function on number vectors instead.
+      O mean = factory.newNumberVector(ModelUtil.getPrototype(cluster.getModel(), relation));
       for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
         double dist = dq.distance(mean, iter);
         scores.put(iter, dist);

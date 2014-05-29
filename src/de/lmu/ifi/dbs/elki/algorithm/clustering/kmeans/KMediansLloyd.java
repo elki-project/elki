@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * <p>
  * Clustering via Concave Minimization<br />
  * P. S. Bradley, O. L. Mangasarian, W. N. Street<br />
- * in: Advances in neural information processing systems
+ * in: Advances in Neural Information Processing Systems (NIPS)
  * </p>
  * 
  * @author Erich Schubert
@@ -61,7 +61,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <V> vector datatype
  */
 @Title("K-Medians")
-@Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url = "http://nips.djvuzone.org/djvu/nips09/0368.djvu")
+@Reference(title = "Clustering via Concave Minimization", //
+authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", //
+booktitle = "Advances in Neural Information Processing Systems", //
+url = "https://papers.nips.cc/paper/1260-clustering-via-concave-minimization.pdf")
 public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
   /**
    * The logger for this class.
@@ -76,7 +79,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMediansLloyd(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMediansLloyd(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -86,7 +89,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
       return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
-    List<Vector> medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<Vector> medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -109,7 +112,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
     // Wrap result
     Clustering<MeanModel> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel model = new MeanModel(medians.get(i).getColumnVector());
+      MeanModel model = new MeanModel(medians.get(i));
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

@@ -83,7 +83,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
     DBIDs ids = relation.getDBIDs();
 
     // Choose initial means
-    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
 
     // Store for current cluster assignment.
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);

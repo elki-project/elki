@@ -57,7 +57,7 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
 
   @Override
   public List<SphericalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> df) {
-    final List<Vector> initialMeans = initializer.chooseInitialMeans(database, relation, k, df);
+    final List<Vector> initialMeans = initializer.chooseInitialMeans(database, relation, k, df, Vector.FACTORY);
     assert (initialMeans.size() == k);
     final int dimensionality = initialMeans.get(0).getDimensionality();
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);

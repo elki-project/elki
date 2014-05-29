@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -58,10 +57,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector type
+ * @param <O> Vector type
  */
 @Reference(authors = "D. Arthur, S. Vassilvitskii", title = "k-means++: the advantages of careful seeding", booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", url = "http://dx.doi.org/10.1145/1283383.1283494")
-public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<V> {
+public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Constructor.
    * 
@@ -72,18 +71,18 @@ public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     // Chose first mean
-    List<Vector> means = new ArrayList<>(k);
+    List<V> means = new ArrayList<>(k);
 
     Random random = rnd.getSingleThreadedRandom();
     DBID first = DBIDUtil.deref(DBIDUtil.randomSample(ids, 1, random).iter());
-    means.add(relation.get(first).getColumnVector());
+    means.add(factory.newNumberVector(relation.get(first)));
 
     // Initialize weights
     double weightsum = initialWeights(weights, ids, first, distQ);
@@ -105,7 +104,7 @@ public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<
       }
       // Add new mean:
       final T newmean = relation.get(it);
-      means.add(newmean.getColumnVector());
+      means.add(factory.newNumberVector(newmean));
       // Update weights:
       weights.putDouble(it, Double.NaN);
       // Choose optimized version for double distances, if applicable.
@@ -119,9 +118,9 @@ public class KMeansPlusPlusInitialMeans<V> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V> distQ) {
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distQ) {
     @SuppressWarnings("unchecked")
-    final Relation<V> rel = (Relation<V>) distQ.getRelation();
+    final Relation<O> rel = (Relation<O>) distQ.getRelation();
 
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 

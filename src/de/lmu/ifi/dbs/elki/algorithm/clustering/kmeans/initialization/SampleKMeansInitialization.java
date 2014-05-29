@@ -30,7 +30,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.ModelUtil;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -57,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public class SampleKMeansInitialization<V extends NumberVector> extends AbstractKMeansInitialization<V> {
   /**
-   * Variant of kMeans for the bisecting step.
+   * Variant of kMeans to use for initialization.
    */
   private KMeans<V, ?> innerkMeans;
 
@@ -80,23 +81,29 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
   }
 
   @Override
-  public <T extends V> List<Vector> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <T extends V, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<O> factory) {
     final int samplesize = (int) Math.ceil(rate * relation.size());
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), samplesize, rnd);
 
     // Ugly cast, sorry
     @SuppressWarnings("unchecked")
-    final Relation<V> rel = (Relation<V>) relation;
+    Relation<V> rel = (Relation<V>) relation;
+    // FIXME: This does not necessarily hold. Check and fail!
+    if(!distanceFunction.getInputTypeRestriction().isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+      LoggingUtil.warning("Initializing k-means with k-means using specialized distance functions MAY fail, if the initialization method does require a distance defined on arbitrary number vectors.");
+    }
+    @SuppressWarnings("unchecked")
+    PrimitiveDistanceFunction<? super NumberVector> pdf = (PrimitiveDistanceFunction<? super NumberVector>) distanceFunction;
     ProxyView<V> proxyv = new ProxyView<>(database, sample, rel);
     ProxyDatabase proxydb = new ProxyDatabase(sample, proxyv);
 
     innerkMeans.setK(k);
-    innerkMeans.setDistanceFunction(distanceFunction);
-    Clustering<? extends MeanModel> clusters = innerkMeans.run(proxydb, proxyv);
+    innerkMeans.setDistanceFunction(pdf);
+    Clustering<?> clusters = innerkMeans.run(proxydb, proxyv);
 
-    List<Vector> means = new ArrayList<>();
-    for(Cluster<? extends MeanModel> cluster : clusters.getAllClusters()) {
-      means.add(cluster.getModel().getMean());
+    List<O> means = new ArrayList<>();
+    for(Cluster<?> cluster : clusters.getAllClusters()) {
+      means.add(factory.newNumberVector(ModelUtil.getPrototype(cluster.getModel(), relation)));
     }
 
     return means;

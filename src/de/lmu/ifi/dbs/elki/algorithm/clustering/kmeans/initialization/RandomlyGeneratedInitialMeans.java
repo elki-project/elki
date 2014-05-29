@@ -53,10 +53,10 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <V extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     final int dim = RelationUtil.dimensionality(relation);
     Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(relation);
-    List<Vector> means = new ArrayList<>(k);
+    List<V> means = new ArrayList<>(k);
     final Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < k; i++) {
       double[] r = MathUtil.randomDoubleArray(dim, random);
@@ -64,7 +64,7 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
       for(int d = 0; d < dim; d++) {
         r[d] = minmax.first.doubleValue(d) + (minmax.second.doubleValue(d) - minmax.first.doubleValue(d)) * r[d];
       }
-      means.add(new Vector(r));
+      means.add(factory.newNumberVector(r));
     }
     return means;
   }

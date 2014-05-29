@@ -107,7 +107,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     // Choose initial means
-    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
 
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();

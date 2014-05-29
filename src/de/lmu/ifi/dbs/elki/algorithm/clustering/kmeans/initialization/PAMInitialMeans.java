@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -72,7 +71,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
   }
 
   @Override
-  public <V extends NumberVector> List<Vector> chooseInitialMeans(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     // Ugly cast; but better than code duplication.
     @SuppressWarnings("unchecked")
     Relation<O> rel = (Relation<O>) relation;
@@ -81,9 +80,9 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
     final PrimitiveDistanceFunction<? super O> distF = (PrimitiveDistanceFunction<? super O>) distanceFunction;
     final DistanceQuery<O> distQ = database.getDistanceQuery(rel, distF);
     DBIDs medids = chooseInitialMedoids(k, distQ);
-    List<Vector> medoids = new ArrayList<>(k);
+    List<V> medoids = new ArrayList<>(k);
     for(DBIDIter iter = medids.iter(); iter.valid(); iter.advance()) {
-      medoids.add(relation.get(iter).getColumnVector());
+      medoids.add(factory.newNumberVector(relation.get(iter)));
     }
     return medoids;
   }

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyCh
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -66,14 +66,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type
  * @param <M> Cluster model type
  */
-public abstract class AbstractKMeans<V extends NumberVector, M extends MeanModel> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector, Clustering<M>> implements KMeans<V, M>, ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector, Clustering<M>> implements KMeans<V, M>, ClusteringAlgorithm<Clustering<M>> {
   /**
-   * Holds the value of {@link #K_ID}.
+   * Number of cluster centers to initialize.
    */
   protected int k;
 
   /**
-   * Holds the value of {@link #MAXITER_ID}.
+   * Maximum number of iterations
    */
   protected int maxiter;
 

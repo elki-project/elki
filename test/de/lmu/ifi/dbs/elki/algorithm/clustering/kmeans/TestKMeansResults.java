@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -65,7 +64,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     testParameterizationOk(params);
 
     // run KMeans on database
-    Clustering<? extends MeanModel> result = kmeans.run(db);
+    Clustering<?> result = kmeans.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -88,7 +87,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     testParameterizationOk(params);
 
     // run KMeans on database
-    Clustering<? extends MeanModel> result = kmeans.run(db);
+    Clustering<?> result = kmeans.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -111,7 +110,7 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     testParameterizationOk(params);
 
     // run KMedians on database
-    Clustering<? extends MeanModel> result = kmedians.run(db);
+    Clustering<?> result = kmedians.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

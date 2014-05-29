@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Interface for initializing K-Means
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @apiviz.landmark
  * 
- * @param<V> Vector type
+ * @param <V> Vector type
  */
 public interface KMeansInitialization<V extends NumberVector> {
   /**
@@ -47,8 +46,10 @@ public interface KMeansInitialization<V extends NumberVector> {
    * @param relation Relation
    * @param k Parameter k
    * @param distanceFunction Distance function
+   * @param factory Factory for output vectors.
    * @param <T> Input vector type
+   * @param <O> Output vector type
    * @return List of chosen means for k-means
    */
-  public abstract <T extends V> List<Vector> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction);
+  public abstract <T extends V, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<O> factory);
 }

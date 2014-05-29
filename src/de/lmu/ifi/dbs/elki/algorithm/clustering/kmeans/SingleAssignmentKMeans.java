@@ -81,7 +81,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
       return new Clustering<>("k-Means Assignment", "kmeans-assignment");
     }
     // Choose initial means
-    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
