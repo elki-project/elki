@@ -33,10 +33,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Dual-Pivot Quicksort<br />
  * Vladimir Yaroslavskiy
  * </p>
- * 
- * and differs mostly in that we sort different kinds of arrays, and allow the
- * use of comparators - useful in particular when the array references external
- * objects.
+ *
+ * and differs mostly in that we sort different kinds of arrays,
+ * and allow the use of comparators - useful in particular when
+ * the array references external objects.
  * 
  * @author Erich Schubert
  * 
@@ -69,7 +69,7 @@ public class IntegerArrayQuickSort {
    * @param comp Comparator
    */
   public static void sort(int[] data, int start, int end, IntegerComparator comp) {
-    quickSort(data, start, end - 1, comp);
+    quickSort(data, start, end, comp);
   }
 
   /**
@@ -77,12 +77,13 @@ public class IntegerArrayQuickSort {
    * 
    * @param data Data to sort
    * @param start First index
-   * @param end Last index (inclusive!)
+   * @param end Last index (exclusive!)
    * @param comp Comparator
    */
   private static void quickSort(int[] data, final int start, final int end, IntegerComparator comp) {
     final int len = end - start;
-    if(len < INSERTION_THRESHOLD) {
+    final int last = end - 1;
+    if (len < INSERTION_THRESHOLD) {
       insertionSort(data, start, end, comp);
       return;
     }
@@ -97,7 +98,7 @@ public class IntegerArrayQuickSort {
 
     // Explicit (and optimal) sorting network for 5 elements
     // See Knuth for details.
-    sort5(data, comp, m1, m2, m3, m4, m5);
+    sort5(data, m1, m2, m3, m4, m5, comp);
 
     // Choose the 2 and 4th as pivots, as we want to get three parts
     // Copy to variables v1 and v3, replace them with the start and end
@@ -105,38 +106,35 @@ public class IntegerArrayQuickSort {
     final int lpivot = data[m2];
     final int rpivot = data[m4];
     data[m2] = data[start];
-    data[m4] = data[end];
+    data[m4] = data[last];
 
     // A tie is when the two chosen pivots are the same
     final boolean tied = comp.compare(lpivot, rpivot) == 0;
 
     // Insertion points for pivot areas.
     int left = start + 1;
-    int right = end - 1;
+    int right = last - 1;
 
     // Note: we merged the ties and no ties cases.
     // This likely is marginally slower, but not at a macro level
     // And you never know with hotspot.
-    for(int k = left; k <= right; k++) {
+    for (int k = left; k <= right; k++) {
       final int tmp = data[k];
       final int c = comp.compare(tmp, lpivot);
-      if(c == 0) {
+      if (c == 0) {
         continue;
-      }
-      else if(c < 0) {
+      } else if (c < 0) {
         // Traditional quicksort
         data[k] = data[left];
         data[left] = tmp;
         left++;
-      }
-      else if(tied || comp.compare(tmp, rpivot) > 0) {
+      } else if (tied || comp.compare(tmp, rpivot) > 0) {
         // Now look at the right. First skip correct entries there, too
-        while(true) {
+        while (true) {
           final int tmp2 = data[right];
-          if(comp.compare(tmp2, rpivot) > 0 && k < right) {
+          if (comp.compare(tmp2, rpivot) > 0 && k < right) {
             right--;
-          }
-          else {
+          } else {
             break;
           }
         }
@@ -145,7 +143,7 @@ public class IntegerArrayQuickSort {
         data[right] = tmp;
         right--;
         // Test the element we just inserted: left or center?
-        if(comp.compare(data[k], lpivot) < 0) {
+        if (comp.compare(data[k], lpivot) < 0) {
           final int tmp2 = data[k];
           data[k] = data[left];
           data[left] = tmp2;
@@ -157,99 +155,103 @@ public class IntegerArrayQuickSort {
     // Remember: we must not modify v1 and v3 above.
     data[start] = data[left - 1];
     data[left - 1] = lpivot;
-    data[end] = data[right + 1];
+    data[last] = data[right + 1];
     data[right + 1] = rpivot;
     // v1 and v3 are now safe to modify again. Perform recursion:
-    quickSort(data, start, left - 2, comp);
+    quickSort(data, start, left - 1, comp);
     // Handle the middle part - if necessary:
-    if(!tied) {
+    if (!tied) {
       // TODO: the original publication had a special tie handling here.
       // It shouldn't affect correctness, but probably improves situations
       // with a lot of tied elements.
-      quickSort(data, left, right, comp);
+      quickSort(data, left, right + 1, comp);
     }
     quickSort(data, right + 2, end, comp);
   }
 
   /**
-   * Sort 5 pivot candidates.
-   * 
-   * Note that this assumes {@code m1 < m2 < m3 < m4 < m5}!
-   * 
-   * @param data Data array
-   * @param comp Comparator
-   * @param m1 First pivot candidate
-   * @param m2 Second pivot candidate
-   * @param m3 Third pivot candidate
-   * @param m4 Fourth pivot candidate
-   * @param m5 Fifth pivot candidate
-   */
-  private static void sort5(int[] data, IntegerComparator comp, int m1, int m2, int m3, int m4, int m5) {
-    if(comp.compare(data[m1], data[m2]) > 0) {
-      final int tmp = data[m2];
-      data[m2] = data[m1];
-      data[m1] = tmp;
-    }
-    if(comp.compare(data[m1], data[m3]) > 0) {
-      final int tmp = data[m3];
-      data[m3] = data[m1];
-      data[m1] = tmp;
-    }
-    if(comp.compare(data[m2], data[m3]) > 0) {
-      final int tmp = data[m3];
-      data[m3] = data[m2];
-      data[m2] = tmp;
-    }
-    if(comp.compare(data[m4], data[m5]) > 0) {
-      final int tmp = data[m5];
-      data[m5] = data[m4];
-      data[m4] = tmp;
-    }
-    if(comp.compare(data[m1], data[m4]) > 0) {
-      final int tmp = data[m4];
-      data[m4] = data[m1];
-      data[m1] = tmp;
-    }
-    if(comp.compare(data[m3], data[m4]) > 0) {
-      final int tmp = data[m4];
-      data[m4] = data[m3];
-      data[m3] = tmp;
-    }
-    if(comp.compare(data[m2], data[m5]) > 0) {
-      final int tmp = data[m5];
-      data[m5] = data[m2];
-      data[m2] = tmp;
-    }
-    if(comp.compare(data[m2], data[m3]) > 0) {
-      final int tmp = data[m3];
-      data[m3] = data[m2];
-      data[m2] = tmp;
-    }
-    if(comp.compare(data[m4], data[m5]) > 0) {
-      final int tmp = data[m5];
-      data[m5] = data[m4];
-      data[m4] = tmp;
-    }
-  }
-
-  /**
-   * Sort an array using insertion sort.
-   * 
-   * @param data Array to sort
+   * Insertion sort, for short arrays.
+   *
+   * @param data Data to sort
    * @param start First index
-   * @param end Last index (inclusive!)
+   * @param end Last index (exclusive!)
    * @param comp Comparator
    */
   private static void insertionSort(int[] data, final int start, final int end, IntegerComparator comp) {
     // Classic insertion sort.
-    for(int i = start + 1; i <= end; i++) {
-      final int tmp = data[i];
-      int j = i;
-      while(j > start && comp.compare(tmp, data[j - 1]) < 0) {
-        data[j] = data[j - 1];
-        j--;
+    for (int i = start + 1; i < end; i++) {
+      final int cur = data[i];
+      for (int j = i - 1; j >= start; j--) {
+        final int pre = data[j];
+        if (comp.compare(cur, pre) >= 0) {
+          data[j] = cur;
+          break;
+        }
+        data[j + 1] = pre;
       }
-      data[j] = tmp;
+    }
+  }
+
+  /**
+   * An explicit sort, for the five pivot candidates.
+   *
+   * Note that this <em>must</em> only be used with
+   * {@code m1 < m2 < m3 < m4 < m5}.
+   *
+   * @param keys Keys
+   * @param m1 Pivot candidate position
+   * @param m2 Pivot candidate position
+   * @param m3 Pivot candidate position
+   * @param m4 Pivot candidate position
+   * @param m5 Pivot candidate position
+   * @param comp Comparator
+   */
+  private static void sort5(int[] data, int m1, int m2, int m3, int m4, int m5, IntegerComparator comp) {
+    // Sort m1, m2
+    if (comp.compare(data[m1], data[m2]) > 0) {
+      final int tmp = data[m2];
+      data[m2] = data[m1];
+      data[m1] = tmp;
+    }
+    // Sort m3, m4
+    if (comp.compare(data[m3], data[m4]) > 0) {
+      final int tmp = data[m4];
+      data[m4] = data[m3];
+      data[m3] = tmp;
+    }
+    // Merge 1+2 and 3+4
+    if (comp.compare(data[m2], data[m4]) > 0) {
+      final int tmp = data[m4];
+      data[m4] = data[m2];
+      data[m2] = tmp;
+    }
+    if (comp.compare(data[m1], data[m3]) > 0) {
+      final int tmp = data[m3];
+      data[m3] = data[m1];
+      data[m1] = tmp;
+    }
+    if (comp.compare(data[m2], data[m3]) > 0) {
+      final int tmp = data[m3];
+      data[m3] = data[m2];
+      data[m2] = tmp;
+    }
+    // Insertion sort m5:
+    final int tmp = data[m5];
+    if (comp.compare(data[m4], tmp) > 0) {
+      data[m5] = data[m4];
+      data[m4] = tmp;
+      if (comp.compare(data[m3], tmp) > 0) {
+        data[m4] = data[m3];
+        data[m3] = tmp;
+        if (comp.compare(data[m2], tmp) > 0) {
+          data[m3] = data[m2];
+          data[m2] = tmp;
+          if (comp.compare(data[m1], tmp) > 0) {
+            data[m2] = data[m1];
+            data[m1] = tmp;
+          }
+        }
+      }
     }
   }
 }

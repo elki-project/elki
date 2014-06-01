@@ -24,13 +24,13 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arrays;
  */
 
 /**
- * Interface for comparing two integers.
+ * Interface for comparing two Integer.
  * 
  * @author Erich Schubert
  */
 public interface IntegerComparator {
   /**
-   * Compare two integers.
+   * Compare two Integer.
    * 
    * @param x First int
    * @param y Second int
