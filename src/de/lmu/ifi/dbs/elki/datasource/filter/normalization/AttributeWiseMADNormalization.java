@@ -63,7 +63,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
   /**
    * Number vector factory.
    */
-  protected NumberVector.Factory<V>  factory;
+  protected NumberVector.Factory<V> factory;
 
   /**
    * Stores the median in each dimension.
@@ -84,13 +84,13 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
 
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
-    if (objects.dataLength() == 0) {
+    if(objects.dataLength() == 0) {
       return objects;
     }
-    for (int r = 0; r < objects.metaLength(); r++) {
+    for(int r = 0; r < objects.metaLength(); r++) {
       SimpleTypeInformation<?> type = (SimpleTypeInformation<?>) objects.meta(r);
       final List<?> column = (List<?>) objects.getColumn(r);
-      if (!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
         continue;
       }
       @SuppressWarnings("unchecked")
@@ -110,17 +110,27 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
       FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Analyzing data.", dim, LOG) : null;
       // We iterate over dimensions, this kind of filter needs fast random
       // access.
-      for (int d = 0; d < dim; d++) {
-        for (int i = 0; i < test.length; i++) {
+      for(int d = 0; d < dim; d++) {
+        for(int i = 0; i < test.length; i++) {
           test[i] = castColumn.get(i).doubleValue(d);
         }
         final double med = QuickSelect.median(test);
         median[d] = med;
-        for (int i = 0; i < test.length; i++) {
+        for(int i = 0; i < test.length; i++) {
           test[i] = Math.abs(test[i] - med);
         }
         // Rescale the true MAD for the best standard deviation estimate:
         madsigma[d] = QuickSelect.median(test) * NormalDistribution.ONEBYPHIINV075;
+        if(!(madsigma[d] > 0)) {
+          LOG.warning("Attribute " + d + " had a MAD of " + madsigma[d] + ". This normalization is not reliable on data sets with mostly duplicate values.");
+          // Use smallest non-zero value instead.
+          double min = Double.POSITIVE_INFINITY;
+          for(double v : test) {
+            min = (v > 0 && v < min) ? v : min;
+          }
+          // Second fallback: if all values were constant, it does not matter:
+          madsigma[d] = (min < Double.POSITIVE_INFINITY) ? min * NormalDistribution.ONEBYPHIINV075 : 1.;
+        }
         LOG.incrementProcessed(dprog);
       }
       LOG.ensureCompleted(dprog);
@@ -128,9 +138,9 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
       FiniteProgress nprog = LOG.isVerbose() ? new FiniteProgress("Data normalization.", objects.dataLength(), LOG) : null;
       // Normalization scan
       double[] buf = new double[dim];
-      for (int i = 0; i < objects.dataLength(); i++) {
+      for(int i = 0; i < objects.dataLength(); i++) {
         final V obj = castColumn.get(i);
-        for (int d = 0; d < dim; d++) {
+        for(int d = 0; d < dim; d++) {
           buf[d] = normalize(d, obj.doubleValue(d));
         }
         castColumn.set(i, factory.newNumberVector(buf));
@@ -143,13 +153,14 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
 
   @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
-    if (featureVector.getDimensionality() == median.length) {
+    if(featureVector.getDimensionality() == median.length) {
       double[] values = new double[featureVector.getDimensionality()];
-      for (int d = 0; d < featureVector.getDimensionality(); d++) {
+      for(int d = 0; d < featureVector.getDimensionality(); d++) {
         values[d] = restore(d, featureVector.doubleValue(d));
       }
       return factory.newNumberVector(values);
-    } else {
+    }
+    else {
       throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + median.length);
     }
   }
