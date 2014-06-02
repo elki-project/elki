@@ -27,8 +27,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.type.AlternativeTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -42,7 +43,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -50,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Evaluate a distance functions performance by computing the average precision
@@ -79,7 +81,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
   /**
    * Random sampling seed.
    */
-  private Long seed = null;
+  private RandomFactory random = null;
 
   /**
    * Include query object in evaluation.
@@ -92,14 +94,14 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
    * @param distanceFunction Distance function
    * @param k K parameter
    * @param sampling Sampling rate
-   * @param seed Random sampling seed (may be null)
+   * @param random Random sampling generator
    * @param includeSelf Include query object in evaluation
    */
-  public AveragePrecisionAtK(DistanceFunction<? super O> distanceFunction, int k, double sampling, Long seed, boolean includeSelf) {
+  public AveragePrecisionAtK(DistanceFunction<? super O> distanceFunction, int k, double sampling, RandomFactory random, boolean includeSelf) {
     super(distanceFunction);
     this.k = k;
     this.sampling = sampling;
-    this.seed = seed;
+    this.random = random;
     this.includeSelf = includeSelf;
   }
 
@@ -111,25 +113,25 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
    * @param lrelation Relation for class label comparison
    * @return Vectors containing mean and standard deviation.
    */
-  public CollectionResult<DoubleVector> run(Database database, Relation<O> relation, Relation<ClassLabel> lrelation) {
+  public CollectionResult<DoubleVector> run(Database database, Relation<O> relation, Relation<?> lrelation) {
     final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final int qk = k + (includeSelf ? 0 : 1);
     final KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, qk);
 
-    MeanVariance[] mvs = MeanVariance.newArray(k);
+    MeanVarianceMinMax[] mvs = MeanVarianceMinMax.newArray(k);
 
     final DBIDs ids;
-    if(sampling < 1.0) {
+    if(sampling < 1.) {
       int size = Math.max(1, (int) (sampling * relation.size()));
-      ids = DBIDUtil.randomSample(relation.getDBIDs(), size, seed);
+      ids = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
+    }
+    else if(sampling > 1.) {
+      ids = DBIDUtil.randomSample(relation.getDBIDs(), (int) sampling, random);
     }
     else {
       ids = relation.getDBIDs();
     }
 
-    if(LOG.isVerbose()) {
-      LOG.verbose("Processing points...");
-    }
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), LOG) : null;
     // sort neighbors
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -139,19 +141,10 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
       int positive = 0, i = 0;
       for(DBIDIter ri = knn.iter(); i < k && ri.valid(); ri.advance()) {
         if(!includeSelf && DBIDUtil.equal(iter, ri)) {
+          // Do not increment i.
           continue;
         }
-        Object olabel = lrelation.get(ri);
-        if(label == null) {
-          if(olabel == null) {
-            positive += 1;
-          }
-        }
-        else {
-          if(label.equals(olabel)) {
-            positive += 1;
-          }
-        }
+        positive += match(label, lrelation.get(ri)) ? 1 : 0;
         final double precision = positive / (double) (i + 1);
         mvs[i].put(precision);
         i++;
@@ -159,21 +152,60 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
       LOG.incrementProcessed(objloop);
     }
     LOG.ensureCompleted(objloop);
-    // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
-      final MeanVariance mv = mvs[i];
-      DoubleVector row = new DoubleVector(new double[] { mv.getMean(), mv.getCount() > 1. ? mv.getSampleStddev() : 0 });
+      final MeanVarianceMinMax mv = mvs[i];
+      final double std = mv.getCount() > 1. ? mv.getSampleStddev() : 0.;
+      DoubleVector row = new DoubleVector(new double[] { i + 1, mv.getMean(), std, mv.getMin(), mv.getMax(), mv.getCount() });
       res.add(row);
     }
     return new CollectionResult<>("Average Precision", "average-precision", res);
   }
 
+  /**
+   * Test whether two relation agree.
+   * 
+   * @param ref Reference object
+   * @param test Test object
+   * @return {@code true} if the objects match
+   */
+  protected static boolean match(Object ref, Object test) {
+    if(ref == null) {
+      return false;
+    }
+    // Cheap and fast, may hold for class labels!
+    if(ref == test) {
+      return true;
+    }
+    if(ref instanceof LabelList && test instanceof LabelList) {
+      final LabelList lref = (LabelList) ref;
+      final LabelList ltest = (LabelList) test;
+      final int s1 = lref.size(), s2 = ltest.size();
+      if(s1 == 0 || s2 == 0) {
+        return false;
+      }
+      for(int i = 0; i < s1; i++) {
+        String l1 = lref.get(i);
+        if(l1 == null) {
+          continue;
+        }
+        for(int j = 0; j < s2; j++) {
+          if(l1.equals(ltest.get(j))) {
+            return true;
+          }
+        }
+      }
+    }
+    // Fallback to equality, e.g. on class labels
+    return ref.equals(test);
+  }
+
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.CLASSLABEL);
+    TypeInformation cls = new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST);
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), cls);
   }
 
   @Override
@@ -224,7 +256,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
     /**
      * Random sampling seed.
      */
-    protected Long seed = null;
+    protected RandomFactory seed = null;
 
     /**
      * Include query object in evaluation.
@@ -246,7 +278,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
       if(config.grab(samplingP)) {
         sampling = samplingP.getValue();
       }
-      final LongParameter rndP = new LongParameter(SEED_ID);
+      final RandomParameter rndP = new RandomParameter(SEED_ID);
       rndP.setOptional(true);
       if(config.grab(rndP)) {
         seed = rndP.getValue();

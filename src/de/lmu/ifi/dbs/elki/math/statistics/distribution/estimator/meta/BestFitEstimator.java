@@ -199,7 +199,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     }
     if (mom.getMax() <= mom.getMin()) {
       LOG.warning("Constant distribution detected. Cannot fit.");
-      return new UniformDistribution(mom.getMin() - .1, mom.getMax() + .1);
+      return new UniformDistribution(mom.getMin() - 1., mom.getMax() + 1.);
     }
     // Sort: for L-Moments, but getting the median is now also cheap.
     Arrays.sort(x);
