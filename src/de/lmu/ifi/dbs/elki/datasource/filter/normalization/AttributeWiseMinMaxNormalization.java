@@ -46,22 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * 
  * @apiviz.uses NumberVector
  */
-// TODO: extract superclass AbstractAttributeWiseNormalization
 public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(AttributeWiseMinMaxNormalization.class);
-
-  /**
-   * Parameter for minimum.
-   */
-  public static final OptionID MINIMA_ID = new OptionID("normalize.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
-
-  /**
-   * Parameter for maximum.
-   */
-  public static final OptionID MAXIMA_ID = new OptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
 
   /**
    * Stores the maximum in each dimension.
@@ -130,16 +119,14 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
 
   @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
-    if(featureVector.getDimensionality() == maxima.length && featureVector.getDimensionality() == minima.length) {
-      double[] values = new double[featureVector.getDimensionality()];
-      for(int d = 0; d < featureVector.getDimensionality(); d++) {
-        values[d] = (featureVector.doubleValue(d) * (factor(d)) + minima[d]);
-      }
-      return factory.newNumberVector(values);
-    }
-    else {
+    if(featureVector.getDimensionality() != maxima.length || featureVector.getDimensionality() != minima.length) {
       throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + maxima.length);
     }
+    double[] values = new double[featureVector.getDimensionality()];
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+      values[d] = featureVector.doubleValue(d) * factor(d) + minima[d];
+    }
+    return factory.newNumberVector(values);
   }
 
   /**
@@ -174,8 +161,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
       }
     }
 
-    LinearEquationSystem lq = new LinearEquationSystem(coeff, rhs, row, col);
-    return lq;
+    return new LinearEquationSystem(coeff, rhs, row, col);
   }
 
   @Override
@@ -190,13 +176,13 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
   }
 
   @Override
-  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  protected Logging getLogger() {
+    return LOG;
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
+  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   /**
@@ -207,6 +193,16 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    /**
+     * Parameter for minimum.
+     */
+    public static final OptionID MINIMA_ID = new OptionID("normalize.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
+
+    /**
+     * Parameter for maximum.
+     */
+    public static final OptionID MAXIMA_ID = new OptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
+
     /**
      * Stores the maximum in each dimension.
      */

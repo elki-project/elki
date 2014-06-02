@@ -56,16 +56,6 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
   private static final Logging LOG = Logging.getLogger(AttributeWiseVarianceNormalization.class);
 
   /**
-   * Parameter for means.
-   */
-  public static final OptionID MEAN_ID = new OptionID("normalize.mean", "a comma separated concatenation of the mean values in each dimension that are mapped to 0. If no value is specified, the mean value of the attribute range in this dimension will be taken.");
-
-  /**
-   * Parameter for stddevs.
-   */
-  public static final OptionID STDDEV_ID = new OptionID("normalize.stddev", "a comma separated concatenation of the standard deviations in each dimension that are scaled to 1. If no value is specified, the standard deviation of the attribute range in this dimension will be taken.");
-
-  /**
    * Stores the mean in each dimension.
    */
   private double[] mean = new double[0];
@@ -219,11 +209,6 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
   }
 
   @Override
-  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("normalization class: ").append(getClass().getName());
@@ -240,6 +225,11 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     return LOG;
   }
 
+  @Override
+  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
   /**
    * Parameterization class.
    * 
@@ -248,6 +238,16 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    /**
+     * Parameter for means.
+     */
+    public static final OptionID MEAN_ID = new OptionID("normalize.mean", "a comma separated concatenation of the mean values in each dimension that are mapped to 0. If no value is specified, the mean value of the attribute range in this dimension will be taken.");
+
+    /**
+     * Parameter for stddevs.
+     */
+    public static final OptionID STDDEV_ID = new OptionID("normalize.stddev", "a comma separated concatenation of the standard deviations in each dimension that are scaled to 1. If no value is specified, the standard deviation of the attribute range in this dimension will be taken.");
+
     /**
      * Stores the mean in each dimension.
      */

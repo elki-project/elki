@@ -292,6 +292,9 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
      */
     private List<DistributionEstimator<?>> estimators;
 
+    /**
+     * Expected outlier rate alpha.
+     */
     private double alpha;
 
     @Override

@@ -35,11 +35,11 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Object type
+ * @param <V> Object type
  * 
  * @apiviz.uses NumberVector
  */
-public class AttributeWiseErfNormalization<O extends NumberVector> extends AbstractNormalization<O> {
+public class AttributeWiseErfNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
    */
@@ -53,26 +53,21 @@ public class AttributeWiseErfNormalization<O extends NumberVector> extends Abstr
   }
 
   @Override
-  public O restore(O featureVector) {
-    throw new UnsupportedOperationException("Not implemented yet.");
-  }
-
-  @Override
-  protected O filterSingleObject(O obj) {
+  protected V filterSingleObject(V obj) {
     double[] val = new double[obj.getDimensionality()];
-    for (int i = 0; i < val.length; i++) {
+    for(int i = 0; i < val.length; i++) {
       val[i] = NormalDistribution.erf(obj.doubleValue(i));
     }
     return factory.newNumberVector(val);
   }
 
   @Override
-  protected SimpleTypeInformation<? super O> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
+  protected Logging getLogger() {
+    return LOG;
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
+  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 }

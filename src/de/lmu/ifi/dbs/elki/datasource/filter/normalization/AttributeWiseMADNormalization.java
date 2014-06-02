@@ -71,9 +71,9 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
   private double[] median = new double[0];
 
   /**
-   * Stores the median absolute deviation in each dimension.
+   * Stores the inverse median absolute deviation in each dimension.
    */
-  private double[] madsigma = new double[0];
+  private double[] imadsigma = new double[0];
 
   /**
    * Constructor.
@@ -103,7 +103,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
       // Scan to find the best
       final int dim = castType.getDimensionality();
       median = new double[dim];
-      madsigma = new double[dim];
+      imadsigma = new double[dim];
       // Scratch space for testing:
       double[] test = new double[castColumn.size()];
 
@@ -116,20 +116,28 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
         }
         final double med = QuickSelect.median(test);
         median[d] = med;
+        int zeros = 0;
         for(int i = 0; i < test.length; i++) {
           test[i] = Math.abs(test[i] - med);
+          if(test[i] == 0.) {
+            zeros++;
+          }
         }
         // Rescale the true MAD for the best standard deviation estimate:
-        madsigma[d] = QuickSelect.median(test) * NormalDistribution.ONEBYPHIINV075;
-        if(!(madsigma[d] > 0)) {
-          LOG.warning("Attribute " + d + " had a MAD of " + madsigma[d] + ". This normalization is not reliable on data sets with mostly duplicate values.");
-          // Use smallest non-zero value instead.
-          double min = Double.POSITIVE_INFINITY;
-          for(double v : test) {
-            min = (v > 0 && v < min) ? v : min;
-          }
-          // Second fallback: if all values were constant, it does not matter:
-          madsigma[d] = (min < Double.POSITIVE_INFINITY) ? min * NormalDistribution.ONEBYPHIINV075 : 1.;
+        if(zeros < (test.length >>> 1)) {
+          imadsigma[d] = NormalDistribution.PHIINV075 / QuickSelect.median(test);
+        }
+        else if(zeros == test.length) {
+          LOG.warning("Constant attribute detected. Using MAD=1.");
+          imadsigma[d] = 1.; // Does not matter. Constant distribution.
+        }
+        else {
+          // We have more than 50% zeros, so the regular MAD estimate does not
+          // work. Generalize the MAD approach to use the 50% non-zero value:
+          final int rank = zeros + ((test.length - zeros) >> 1);
+          final double rel = .5 + rank * .5 / test.length;
+          imadsigma[d] = NormalDistribution.quantile(0., 1., rel) / QuickSelect.quickSelect(test, rank);
+          LOG.warning("Near-constant attribute detected. Using modified MAD.");
         }
         LOG.incrementProcessed(dprog);
       }
@@ -178,7 +186,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
    * @return Normalized value
    */
   private double normalize(int d, double val) {
-    return (val - median[d]) / madsigma[d];
+    return (val - median[d]) * imadsigma[d];
   }
 
   /**
@@ -189,7 +197,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
    * @return Normalized value
    */
   private double restore(int d, double val) {
-    return (val * madsigma[d]) + median[d];
+    return (val / imadsigma[d]) + median[d];
   }
 
   @Override
@@ -199,7 +207,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
     result.append('\n');
     result.append("normalization median: ").append(FormatUtil.format(median));
     result.append('\n');
-    result.append("normalization MAD sigma: ").append(FormatUtil.format(madsigma));
+    result.append("normalization scaling factor: ").append(FormatUtil.format(imadsigma));
     return result.toString();
   }
 }

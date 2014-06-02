@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * 
  * @author Elke Achtert
  * 
- * @param <O> Object type processed
+ * @param <V> Object type processed
  */
-public abstract class AbstractNormalization<O extends NumberVector> extends AbstractVectorConversionFilter<O, O> implements Normalization<O> {
+public abstract class AbstractNormalization<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> implements Normalization<V> {
   /**
    * Initializes the option handler and the parameter map.
    */
@@ -44,9 +44,15 @@ public abstract class AbstractNormalization<O extends NumberVector> extends Abst
   }
 
   @Override
-  protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
     initializeOutputType(in);
     return in;
+  }
+
+  @Override
+  public V restore(V featureVector) throws NonNumericFeaturesException {
+    // FIXME: implement everywhere.
+    throw new UnsupportedOperationException("Not implemented yet.");
   }
 
   @Override
