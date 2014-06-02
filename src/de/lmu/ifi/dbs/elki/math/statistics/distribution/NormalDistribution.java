@@ -112,6 +112,11 @@ public class NormalDistribution extends AbstractDistribution {
   static final double ERFINV_D[] = { 7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00 };
 
   /**
+   * CDFINV(0.75)
+   */
+  public static final double PHIINV075 = 0.67448975019608171;
+
+  /**
    * 1 / CDFINV(0.75)
    */
   public static final double ONEBYPHIINV075 = 1.48260221850560186054;
@@ -212,28 +217,28 @@ public class NormalDistribution extends AbstractDistribution {
    * @return erfc(x)
    */
   public static double erfc(double x) {
-    if (Double.isNaN(x)) {
+    if(Double.isNaN(x)) {
       return Double.NaN;
     }
-    if (Double.isInfinite(x)) {
+    if(Double.isInfinite(x)) {
       return (x < 0.0) ? 2 : 0;
     }
 
     double result = Double.NaN;
     double absx = Math.abs(x);
     // First approximation interval
-    if (absx < 0.46875) {
+    if(absx < 0.46875) {
       double z = x * x;
       result = 1 - x * ((((ERFAPP_A[0] * z + ERFAPP_A[1]) * z + ERFAPP_A[2]) * z + ERFAPP_A[3]) * z + ERFAPP_A[4]) / ((((ERFAPP_B[0] * z + ERFAPP_B[1]) * z + ERFAPP_B[2]) * z + ERFAPP_B[3]) * z + ERFAPP_B[4]);
     }
     // Second approximation interval
-    else if (absx < 4.0) {
+    else if(absx < 4.0) {
       double z = absx;
       result = ((((((((ERFAPP_C[0] * z + ERFAPP_C[1]) * z + ERFAPP_C[2]) * z + ERFAPP_C[3]) * z + ERFAPP_C[4]) * z + ERFAPP_C[5]) * z + ERFAPP_C[6]) * z + ERFAPP_C[7]) * z + ERFAPP_C[8]) / ((((((((ERFAPP_D[0] * z + ERFAPP_D[1]) * z + ERFAPP_D[2]) * z + ERFAPP_D[3]) * z + ERFAPP_D[4]) * z + ERFAPP_D[5]) * z + ERFAPP_D[6]) * z + ERFAPP_D[7]) * z + ERFAPP_D[8]);
       double rounded = Math.round(result * 16.0) / 16.0;
       double del = (absx - rounded) * (absx + rounded);
       result = Math.exp(-rounded * rounded) * Math.exp(-del) * result;
-      if (x < 0.0) {
+      if(x < 0.0) {
         result = 2.0 - result;
       }
     }
@@ -245,7 +250,7 @@ public class NormalDistribution extends AbstractDistribution {
       double rounded = Math.round(result * 16.0) / 16.0;
       double del = (absx - rounded) * (absx + rounded);
       result = Math.exp(-rounded * rounded) * Math.exp(-del) * result;
-      if (x < 0.0) {
+      if(x < 0.0) {
         result = 2.0 - result;
       }
     }
@@ -358,21 +363,26 @@ public class NormalDistribution extends AbstractDistribution {
    * @return Inverse erf.
    */
   public static double standardNormalQuantile(double d) {
-    if (d == 0) {
+    if(d == 0) {
       return Double.NEGATIVE_INFINITY;
-    } else if (d == 1) {
+    }
+    else if(d == 1) {
       return Double.POSITIVE_INFINITY;
-    } else if (Double.isNaN(d) || d < 0 || d > 1) {
+    }
+    else if(Double.isNaN(d) || d < 0 || d > 1) {
       return Double.NaN;
-    } else if (d < P_LOW) {
+    }
+    else if(d < P_LOW) {
       // Rational approximation for lower region:
       double q = Math.sqrt(-2 * Math.log(d));
       return (((((ERFINV_C[0] * q + ERFINV_C[1]) * q + ERFINV_C[2]) * q + ERFINV_C[3]) * q + ERFINV_C[4]) * q + ERFINV_C[5]) / ((((ERFINV_D[0] * q + ERFINV_D[1]) * q + ERFINV_D[2]) * q + ERFINV_D[3]) * q + 1);
-    } else if (P_HIGH < d) {
+    }
+    else if(P_HIGH < d) {
       // Rational approximation for upper region:
       double q = Math.sqrt(-2 * Math.log(1 - d));
       return -(((((ERFINV_C[0] * q + ERFINV_C[1]) * q + ERFINV_C[2]) * q + ERFINV_C[3]) * q + ERFINV_C[4]) * q + ERFINV_C[5]) / ((((ERFINV_D[0] * q + ERFINV_D[1]) * q + ERFINV_D[2]) * q + ERFINV_D[3]) * q + 1);
-    } else {
+    }
+    else {
       // Rational approximation for central region:
       double q = d - 0.5D;
       double r = q * q;
@@ -396,13 +406,13 @@ public class NormalDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter muP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(muP)) {
+      if(config.grab(muP)) {
         mu = muP.doubleValue();
       }
 
       DoubleParameter sigmaP = new DoubleParameter(SCALE_ID);
       sigmaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if (config.grab(sigmaP)) {
+      if(config.grab(sigmaP)) {
         sigma = sigmaP.doubleValue();
       }
     }
