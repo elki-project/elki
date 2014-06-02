@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
@@ -85,7 +86,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
   /**
    * Number vector factory.
    */
-  protected NumberVector.Factory<V>  factory;
+  protected NumberVector.Factory<V> factory;
 
   /**
    * Constructor.
@@ -99,13 +100,13 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
 
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
-    if (objects.dataLength() == 0) {
+    if(objects.dataLength() == 0) {
       return objects;
     }
-    for (int r = 0; r < objects.metaLength(); r++) {
+    for(int r = 0; r < objects.metaLength(); r++) {
       SimpleTypeInformation<?> type = (SimpleTypeInformation<?>) objects.meta(r);
       final List<?> column = (List<?>) objects.getColumn(r);
-      if (!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
         continue;
       }
       @SuppressWarnings("unchecked")
@@ -119,66 +120,104 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
       final int dim = castType.getDimensionality();
       dists = new ArrayList<>(dim);
       // Scratch space for testing:
-      double[] test = new double[castColumn.size()];
+      double[] test = estimators.size() > 1 ? new double[castColumn.size()] : null;
 
       // We iterate over dimensions, this kind of filter needs fast random
       // access.
       Adapter adapter = new Adapter();
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         adapter.dim = d;
-        if (estimators.size() == 1) {
-          dists.add(estimators.get(0).estimate(castColumn, adapter));
-        } else {
-          Distribution best = null;
-          double bestq = Double.POSITIVE_INFINITY;
-          trials: for (DistributionEstimator<?> est : estimators) {
-            try {
-              Distribution dist = est.estimate(castColumn, adapter);
-              for (int i = 0; i < test.length; i++) {
-                test[i] = dist.cdf(castColumn.get(i).doubleValue(d));
-                if (Double.isNaN(test[i])) {
-                  LOG.warning("Got NaN after fitting " + est.toString() + ": " + dist.toString());
-                  continue trials;
-                }
-                if (Double.isInfinite(test[i])) {
-                  LOG.warning("Got infinite value after fitting " + est.toString() + ": " + dist.toString());
-                  continue trials;
-                }
-              }
-              Arrays.sort(test);
-              double q = KolmogorovSmirnovTest.simpleTest(test);
-              if (LOG.isVeryVerbose()) {
-                LOG.veryverbose("Estimator " + est.toString() + " (" + dist.toString() + ") has maximum deviation " + q + " for dimension " + d);
-              }
-              if (best == null || q < bestq) {
-                best = dist;
-                bestq = q;
-              }
-            } catch (ArithmeticException e) {
-              if (LOG.isVeryVerbose()) {
-                LOG.veryverbose("Fitting distribution " + est + " failed: " + e.getMessage());
-              }
-              continue;
-            }
-          }
-          if (LOG.isVerbose()) {
-            LOG.verbose("Best fit for dimension " + d + ": " + best.toString());
-          }
-          dists.add(best);
+        Distribution dist;
+        if(estimators.size() == 1) {
+          dist = estimators.get(0).estimate(castColumn, adapter);
         }
+        else {
+          dist = findBestFit(castColumn, adapter, d, test);
+        }
+        // Special handling for constant distributions:
+        // We want them to remain 0, instead of - usually - becoming constant .5
+        if(dist instanceof UniformDistribution) {
+          dist = constantZero(castColumn, adapter) ? new UniformDistribution(0., 1.) : dist;
+        }
+        dists.add(dist);
       }
 
       // Normalization scan
       double[] buf = new double[dim];
-      for (int i = 0; i < objects.dataLength(); i++) {
+      for(int i = 0; i < objects.dataLength(); i++) {
         final V obj = castColumn.get(i);
-        for (int d = 0; d < dim; d++) {
+        for(int d = 0; d < dim; d++) {
           buf[d] = dists.get(d).cdf(obj.doubleValue(d));
         }
         castColumn.set(i, factory.newNumberVector(buf));
       }
     }
     return objects;
+  }
+
+  /**
+   * Find the best fitting distribution.
+   * 
+   * @param col Column of table
+   * @param adapter Adapter for accessing the data
+   * @param d Dimension
+   * @param test Scatch space for testing goodness of fit
+   * @return Best fit distribution
+   */
+  protected Distribution findBestFit(final List<V> col, Adapter adapter, int d, double[] test) {
+    Distribution best = null;
+    double bestq = Double.POSITIVE_INFINITY;
+    trials: for(DistributionEstimator<?> est : estimators) {
+      try {
+        Distribution dist = est.estimate(col, adapter);
+        for(int i = 0; i < test.length; i++) {
+          test[i] = dist.cdf(col.get(i).doubleValue(d));
+          if(Double.isNaN(test[i])) {
+            LOG.warning("Got NaN after fitting " + est.toString() + ": " + dist.toString());
+            continue trials;
+          }
+          if(Double.isInfinite(test[i])) {
+            LOG.warning("Got infinite value after fitting " + est.toString() + ": " + dist.toString());
+            continue trials;
+          }
+        }
+        Arrays.sort(test);
+        double q = KolmogorovSmirnovTest.simpleTest(test);
+        if(LOG.isVeryVerbose()) {
+          LOG.veryverbose("Estimator " + est.toString() + " (" + dist.toString() + ") has maximum deviation " + q + " for dimension " + d);
+        }
+        if(best == null || q < bestq) {
+          best = dist;
+          bestq = q;
+        }
+      }
+      catch(ArithmeticException e) {
+        if(LOG.isVeryVerbose()) {
+          LOG.veryverbose("Fitting distribution " + est + " failed: " + e.getMessage());
+        }
+        continue trials;
+      }
+    }
+    if(LOG.isVerbose()) {
+      LOG.verbose("Best fit for dimension " + d + ": " + best.toString());
+    }
+    return best;
+  }
+
+  /**
+   * Test if an attribute is constant zero.
+   * 
+   * @param column Column
+   * @param adapter Data accessor.
+   * @return {@code true} if all values are zero
+   */
+  protected boolean constantZero(List<V> column, Adapter adapter) {
+    for(int i = 0, s = adapter.size(column); i < s; i++) {
+      if(adapter.get(column, i) != 0.) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -198,8 +237,8 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
     result.append('\n');
     result.append("normalization distributions: ");
     boolean first = true;
-    for (DistributionEstimator<?> est : estimators) {
-      if (!first) {
+    for(DistributionEstimator<?> est : estimators) {
+      if(!first) {
         result.append(',');
       }
       first = false;
@@ -212,7 +251,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
    * Array adapter class for vectors.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   private static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector>> {
@@ -287,7 +326,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
       List<Class<? extends DistributionEstimator<?>>> def = new ArrayList<>(1);
       def.add(BestFitEstimator.class);
       estP.setDefaultValue(def);
-      if (config.grab(estP)) {
+      if(config.grab(estP)) {
         estimators = estP.instantiateClasses(config);
       }
     }
