@@ -47,6 +47,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.HistogramMatchDistanceFu
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.KolmogorovSmirnovDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceAsymmetricDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction
