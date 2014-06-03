@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * 
  * @author Erich Schubert
  * 
- * @param <O> Object type processed
+ * @param <V> Object type processed
  */
-public abstract class AbstractStreamNormalization<O extends NumberVector> extends AbstractVectorStreamConversionFilter<O, O> implements Normalization<O> {
+public abstract class AbstractStreamNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
    * Initializes the option handler and the parameter map.
    */
@@ -44,9 +44,14 @@ public abstract class AbstractStreamNormalization<O extends NumberVector> extend
   }
 
   @Override
-  protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
     initializeOutputType(in);
     return in;
+  }
+
+  @Override
+  public V restore(V featureVector) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

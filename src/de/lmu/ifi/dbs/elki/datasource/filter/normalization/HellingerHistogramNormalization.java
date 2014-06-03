@@ -26,41 +26,51 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Class to perform a normalization on vectors to norm 1.
+ * Normalize histograms by scaling them to L1 norm 1, then taking the square
+ * root in each attribute.
  * 
- * @author Heidi Kolb
+ * Using Euclidean distance (linear kernel) and this transformation is the same
+ * as using Hellinger distance:
+ * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction}
+ * 
  * @author Erich Schubert
  * 
  * @param <V> vector type
  */
-public class LengthNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+public class HellingerHistogramNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
   /**
-   * Norm to use.
+   * Static instance.
    */
-  Norm<? super V> norm;
+  public static final HellingerHistogramNormalization<NumberVector> STATIC = new HellingerHistogramNormalization<>();
 
   /**
    * Constructor.
-   * 
-   * @param norm Norm to use
    */
-  public LengthNormalization(Norm<? super V> norm) {
+  public HellingerHistogramNormalization() {
     super();
-    this.norm = norm;
   }
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    final double d = norm.norm(featureVector);
-    return factory.newNumberVector(featureVector.getColumnVector().timesEquals(1 / d).getArrayRef());
+    double[] data = new double[featureVector.getDimensionality()];
+    double sum = 0.;
+    for(int d = 0; d < data.length; ++d) {
+      data[d] = featureVector.doubleValue(d);
+      data[d] = data[d] > 0 ? data[d] : -data[d];
+      sum += data[d];
+    }
+    // Normalize and sqrt:
+    if(sum > 0.) {
+      for(int d = 0; d < data.length; ++d) {
+        if(data[d] > 0) {
+          data[d] = Math.sqrt(data[d] / sum);
+        }
+      }
+    }
+    return factory.newNumberVector(data);
   }
 
   @Override
@@ -76,28 +86,9 @@ public class LengthNormalization<V extends NumberVector> extends AbstractStreamN
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
-    /**
-     * Option ID for normalization norm.
-     */
-    public static final OptionID NORM_ID = new OptionID("normalization.norm", "Norm (length function) to use for computing the vector length.");
-
-    /**
-     * Norm to use.
-     */
-    Norm<? super V> norm;
-
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      ObjectParameter<Norm<? super V>> normP = new ObjectParameter<>(NORM_ID, Norm.class, EuclideanDistanceFunction.class);
-      if(config.grab(normP)) {
-        norm = normP.instantiateClass(config);
-      }
-    }
-
-    @Override
-    protected LengthNormalization<V> makeInstance() {
-      return new LengthNormalization<>(norm);
+    protected HellingerHistogramNormalization<V> makeInstance() {
+      return new HellingerHistogramNormalization<>();
     }
   }
 }

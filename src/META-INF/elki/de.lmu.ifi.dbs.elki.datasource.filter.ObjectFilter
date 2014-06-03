@@ -22,6 +22,7 @@ de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalizatio
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseCDFNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseBetaNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.LengthNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.HellingerHistogramNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.IntegerRankTieNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.TFIDFNormalization
