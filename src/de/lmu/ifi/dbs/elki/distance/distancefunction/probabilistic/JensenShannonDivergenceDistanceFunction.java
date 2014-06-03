@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -53,6 +54,11 @@ public class JensenShannonDivergenceDistanceFunction extends JeffreyDivergenceDi
     return .5 * super.distance(v1, v2);
   }
 
+  @Override
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return .5 * super.minDist(mbr1, mbr2);
+  }
+  
   @Override
   public String toString() {
     return "JensenShannonDivergenceDistance";
