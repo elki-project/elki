@@ -167,7 +167,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     }
 
     // Desired number of bins, as per Sturge:
-    final int binCount = (int) Math.ceil(1 + (Math.log(relation.size()) / MathUtil.LOG2));
+    final int binCount = (int) Math.ceil(1 + MathUtil.log2(relation.size()));
 
     // Perform 1-dimensional projections, and split into bins.
     SetDBIDs[][] partitions = partitionData(relation, binCount);

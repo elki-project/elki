@@ -106,6 +106,11 @@ public final class MathUtil {
   public static final double ONE_BY_SQRTTWOPI = 1. / SQRTTWOPI;
 
   /**
+   * 1. / log(2)
+   */
+  public static final double ONE_BY_LOG2 = 1. / Math.log(2.);
+
+  /**
    * Logarithm of 2 to the basis e, for logarithm conversion.
    */
   public static final double LOG2 = Math.log(2.);
@@ -155,6 +160,16 @@ public final class MathUtil {
    */
   private MathUtil() {
     // Static methods only - do not instantiate!
+  }
+
+  /**
+   * Compute the base 2 logarithm.
+   * 
+   * @param x X
+   * @return Logarithm base 2.
+   */
+  public static double log2(double x) {
+    return Math.log(x) * ONE_BY_LOG2;
   }
 
   /**
@@ -273,7 +288,7 @@ public final class MathUtil {
    * @return Mahalanobis distance
    */
   public static double mahalanobisDistance(double[][] weightMatrix, double[] o1, double[] o2) {
-    double sqrDist = VMath.mahalanobisDistance(weightMatrix, o1,  o2);
+    double sqrDist = VMath.mahalanobisDistance(weightMatrix, o1, o2);
     if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
       sqrDist = Math.abs(sqrDist);
     }

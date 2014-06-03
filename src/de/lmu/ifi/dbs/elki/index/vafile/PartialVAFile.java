@@ -151,7 +151,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       throw new IllegalStateException("Data already inserted.");
     }
 
-    if((Math.log(partitions) / MathUtil.LOG2) != (int) (Math.log(partitions) / MathUtil.LOG2)) {
+    if(MathUtil.log2(partitions) != (int) MathUtil.log2(partitions)) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 

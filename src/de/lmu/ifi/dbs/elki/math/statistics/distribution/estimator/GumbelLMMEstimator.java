@@ -65,7 +65,7 @@ public class GumbelLMMEstimator extends AbstractLMMEstimator<GumbelDistribution>
 
   @Override
   public GumbelDistribution estimateFromLMoments(double[] xmom) {
-    double scale = xmom[1] / MathUtil.LOG2;
+    double scale = xmom[1] * MathUtil.ONE_BY_LOG2;
     return new GumbelDistribution(xmom[0] - Math.E * scale, scale);
   }
 

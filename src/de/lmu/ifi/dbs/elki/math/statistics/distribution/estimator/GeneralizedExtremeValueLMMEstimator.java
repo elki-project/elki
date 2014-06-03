@@ -103,7 +103,7 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
       // g: Almost zero?
       if (Math.abs(g) < 1e-50) {
         double k = 0;
-        double sigma = xmom[1] / MathUtil.LOG2;
+        double sigma = xmom[1] * MathUtil.ONE_BY_LOG2;
         double mu = xmom[0] - Math.E * sigma;
         return new GeneralizedExtremeValueDistribution(mu, sigma, k);
       }
@@ -113,7 +113,7 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
       if (t3 < -.8) {
         // Newton-Raphson iteration for t3 < -.8
         if (t3 <= -.97) {
-          g = 1. - Math.log(1. + t3) / MathUtil.LOG2;
+          g = 1. - Math.log1p(t3) * MathUtil.ONE_BY_LOG2;
         }
         double t0 = .5 * (t3 + 3.);
         for (int it = 1;; it++) {

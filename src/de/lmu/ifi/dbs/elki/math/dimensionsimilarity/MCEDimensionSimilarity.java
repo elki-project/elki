@@ -81,7 +81,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
     final int dim = matrix.size();
 
     // Find a number of bins as recommended by Cheng et al.
-    double p = Math.log(subset.size() / (double) TARGET) / MathUtil.LOG2;
+    double p = MathUtil.log2(subset.size() / (double) TARGET);
     // As we are in 2d, take the root (*.5) But let's use at least 1, too.
     // Check: for 10000 this should give 4, for 150 it gives 1.
     int power = Math.max(1, (int) Math.floor(p * .5));
