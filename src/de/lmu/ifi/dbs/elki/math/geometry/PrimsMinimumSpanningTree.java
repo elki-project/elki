@@ -99,18 +99,18 @@ public class PrimsMinimumSpanningTree {
     best[current] = 0;
 
     // Search
-    for (int i = n - 2; i >= 0; i--) {
+    for(int i = n - 2; i >= 0; i--) {
       // Update best and src from current:
       int newbesti = -1;
       double newbestd = Double.POSITIVE_INFINITY;
       // Note: we assume we started with 0, and can thus skip it
-      for (int j = in.nextClearBit(1); j < n && j > 0; j = in.nextClearBit(j + 1)) {
+      for(int j = in.nextClearBit(1); j < n && j > 0; j = in.nextClearBit(j + 1)) {
         final double dist = adapter.distance(data, current, j);
-        if (dist < best[j]) {
+        if(dist < best[j]) {
           best[j] = dist;
           src[j] = current;
         }
-        if (best[j] < newbestd) {
+        if(best[j] < newbestd) {
           newbestd = best[j];
           newbesti = j;
         }
@@ -125,6 +125,42 @@ public class PrimsMinimumSpanningTree {
       current = newbesti;
     }
     return mst;
+  }
+
+  /**
+   * Prune the minimum spanning tree, removing all edges to nodes that have a
+   * degree below {@code minDegree}.
+   * 
+   * @param numnodes Number of nodes (MUST use numbers 0 to {@code numnodes-1})
+   * @param tree Original spanning tree
+   * @param minDegree Minimum node degree
+   * @return Pruned spanning tree
+   */
+  public static int[] pruneTree(int numnodes, int[] tree, int minDegree) {
+    // Compute node degrees
+    int[] deg = new int[numnodes];
+    for(int i = 0; i < tree.length; i++) {
+      deg[tree[i]]++;
+    }
+    // Count nodes to be retained:
+    int keep = 0;
+    for(int i = 0; i < tree.length; i += 2) {
+      if(deg[tree[i]] >= minDegree && deg[tree[i + 1]] >= minDegree) {
+        keep++;
+      }
+    }
+    // Build reduced tree
+    int j = 0;
+    int[] ret = new int[keep];
+    for(int i = 0; i < tree.length; i += 2) {
+      if(deg[tree[i]] >= minDegree && deg[tree[i + 1]] >= minDegree) {
+        ret[j] = tree[i];
+        ret[j + 1] = tree[i + 1];
+        j += 2;
+      }
+    }
+    assert (j == ret.length);
+    return ret;
   }
 
   /**
