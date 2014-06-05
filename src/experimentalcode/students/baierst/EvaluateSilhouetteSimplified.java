@@ -188,7 +188,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
       double penalty = 1;
 
       if(countNoise != 0) {
-        penalty = (double) countNoise / (double) rel.size();
+        penalty = ((double) rel.size() - (double) countNoise) / (double) rel.size();
       }
 
       mssilMean = penalty * mssilMean;

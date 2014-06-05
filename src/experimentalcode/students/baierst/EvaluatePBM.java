@@ -168,7 +168,7 @@ public class EvaluatePBM<O> implements Evaluator {
       double penalty = 1;
 
       if(countNoise != 0) {
-        penalty = (double) countNoise / (double) rel.size();
+        penalty = ((double) rel.size() - (double) countNoise) / (double) rel.size();
       }
 
       pbm = penalty * pbm;

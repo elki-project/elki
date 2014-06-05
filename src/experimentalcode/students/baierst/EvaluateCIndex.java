@@ -172,7 +172,7 @@ public class EvaluateCIndex<O> implements Evaluator {
       double penalty = 1;
 
       if(countNoise != 0) {
-        penalty = (double) countNoise / (double) rel.size();
+        penalty = ((double) rel.size() - (double) countNoise) / (double) rel.size();
       }
       cIndex = penalty * cIndex;
     }
