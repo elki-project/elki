@@ -142,7 +142,7 @@ public class IntegerRankTieNormalization implements ObjectFilter {
     @Override
     public int compare(int x, int y) {
       final double vx = col.get(x).doubleValue(dim), vy = col.get(y).doubleValue(dim);
-      return (vx < vy) ? -1 : +1;
+      return (vx < vy) ? -1 : (vx == vy) ? 0 : +1;
     }
   }
 }
