@@ -1,4 +1,4 @@
-package experimentalcode.students.faerman.src.lsh.clustering.uf;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.mst.utils.uf;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
 

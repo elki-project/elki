@@ -1,4 +1,4 @@
-package experimentalcode.students.faerman.test.lsh.clustering.uf;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.mst.utils.uf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import experimentalcode.students.faerman.src.lsh.clustering.uf.UnionFindWeightedQuickUnion;
 
 /*
  This file is part of ELKI:
