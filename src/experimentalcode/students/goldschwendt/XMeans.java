@@ -89,7 +89,7 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMeansBisecting.class);
+  private static final Logging LOG = Logging.getLogger(XMeans.class);
 
   /**
    * Variant of kMeans for the bisecting step.
@@ -133,7 +133,7 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
     Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
     
     // Check if split is an improvement
-    if (BIC(childClustering) < BIC(parentClustering)) {
+    if (bic(childClustering) < bic(parentClustering)) {
       // Split does not improve clustering.
       // Return old cluster
       return parentClustering;
@@ -148,12 +148,16 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
   
   public Clustering<M> run(Database database, Relation<V> relation) {
     
+    LOG.debug("start");
+    
     ProxyDatabase proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
 
-    MutableProgress prog = LOG.isVerbose() ? new MutableProgress("x-means", k_max, LOG) : null;
+    MutableProgress prog = LOG.isVerbose() ? new MutableProgress("X-means", k_max, LOG) : null;
 
     // Run initial k-means to find at least k_min clusters
     Clustering<M> initialClustering = innerkMeans.run(proxyDB);
+    
+    prog.setProcessed(k_min, LOG);
     
     LinkedList<Cluster<M>> resultClusterList = new LinkedList<>(initialClustering.getAllClusters());
     LinkedList<Cluster<M>> toSplitClusterList = new LinkedList<>(resultClusterList);
@@ -163,29 +167,29 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
       LinkedList<Cluster<M>> currentClusterList = new LinkedList<>(toSplitClusterList);
       toSplitClusterList.clear();
       
-      for (int i = 0; i < currentClusterList.size() && k <= k_max; i++) {
+      for (int i = 0; i < currentClusterList.size() && k < k_max; i++) {
         
         Cluster<M> cluster = currentClusterList.get(i);
         
         // Split all clusters
         List<Cluster<M>> childClusterList = splitCluster(cluster, database).getAllClusters();
         
-        // Splitting improves clustering quality replace parent cluster by child clusters
+        // If splitting improves clustering quality replace parent cluster with child clusters
         // and add child clusters to the list of clusters that should be split again
         if (childClusterList.size() > 1) {
           resultClusterList.remove(cluster);
+          resultClusterList.addAll(childClusterList);
           toSplitClusterList.addAll(childClusterList);
-          resultClusterList.addAll(toSplitClusterList);
+          
+          prog.incrementProcessed(LOG);
         }
       }
     }
+    
+    prog.setTotal(k);
 
     // add all current clusters to the result
-    Clustering<M> result = new Clustering<>("X-Means Result", "X-Means");
-    for (Cluster<M> cluster : resultClusterList) {
-      result.addToplevelCluster(cluster);
-    }
-    return result;
+    return new Clustering<>("X-Means Result", "X-Means", resultClusterList);
   }
 
   @Override
@@ -198,23 +202,14 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
     return innerkMeans.getDistanceFunction();
   }
 
-  /*@Override
-  public void setK(int k) {
-    this.k = k;
-  }*/
-
-  //@Override
-  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
-    innerkMeans.setDistanceFunction(distanceFunction);
-  }
-
   @Override
   protected Logging getLogger() {
     return LOG;
   }
   
-  private double BIC(Clustering<M> clustering) {
-    return 1 / clustering.getAllClusters().size();
+  private double bic(Clustering<M> clustering) {
+    double bic = clustering.getAllClusters().size();
+    return bic;
   }
 
   /**
