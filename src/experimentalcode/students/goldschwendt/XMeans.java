@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -115,52 +116,73 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
     super();
     this.k_min = k_min;
     this.k_max = k_max;
+    this.k = k_min;
     this.innerkMeans = innerkMeans;
   }
 
-  //@Override
+  private Clustering<M> splitCluster(Cluster<M> parentCluster, Database database) {
+    
+    ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
+    
+    innerkMeans.setK(2);
+    Clustering<M> childClustering = innerkMeans.run(proxyDB);
+    
+    // Transform parent cluster into a clustering
+    LinkedList<Cluster<M>> parentClusterList = new LinkedList<Cluster<M>>();
+    parentClusterList.add(parentCluster);
+    Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
+    
+    // Check if split is an improvement
+    if (BIC(childClustering) < BIC(parentClustering)) {
+      // Split does not improve clustering.
+      // Return old cluster
+      return parentClustering;
+    }
+    else {
+      // Split improves clustering
+      // Return the new clusters
+      k++;
+      return childClustering;
+    }
+  }
+  
   public Clustering<M> run(Database database, Relation<V> relation) {
+    
     ProxyDatabase proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
 
-    // Linked list is preferrable for scratch, as we will A) not need that many
-    // clusters and B) be doing random removals of the largest cluster (often at
-    // the head)
-    LinkedList<Cluster<M>> currentClusterList = new LinkedList<>();
+    MutableProgress prog = LOG.isVerbose() ? new MutableProgress("x-means", k_max, LOG) : null;
 
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Bisecting k-means", k - 1, LOG) : null;
-
-    for (int j = 0; j < this.k - 1; j++) {
-      // Choose a cluster to split and project database to cluster
-      if (currentClusterList.size() == 0) {
-        proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
-      } else {
-        Cluster<M> largestCluster = null;
-        for (Cluster<M> cluster : currentClusterList) {
-          if (largestCluster == null || cluster.size() > largestCluster.size()) {
-            largestCluster = cluster;
-          }
+    // Run initial k-means to find at least k_min clusters
+    Clustering<M> initialClustering = innerkMeans.run(proxyDB);
+    
+    LinkedList<Cluster<M>> resultClusterList = new LinkedList<>(initialClustering.getAllClusters());
+    LinkedList<Cluster<M>> toSplitClusterList = new LinkedList<>(resultClusterList);
+ 
+    while (toSplitClusterList.size() > 0) {
+    
+      LinkedList<Cluster<M>> currentClusterList = new LinkedList<>(toSplitClusterList);
+      toSplitClusterList.clear();
+      
+      for (int i = 0; i < currentClusterList.size() && k <= k_max; i++) {
+        
+        Cluster<M> cluster = currentClusterList.get(i);
+        
+        // Split all clusters
+        List<Cluster<M>> childClusterList = splitCluster(cluster, database).getAllClusters();
+        
+        // Splitting improves clustering quality replace parent cluster by child clusters
+        // and add child clusters to the list of clusters that should be split again
+        if (childClusterList.size() > 1) {
+          resultClusterList.remove(cluster);
+          toSplitClusterList.addAll(childClusterList);
+          resultClusterList.addAll(toSplitClusterList);
         }
-        currentClusterList.remove(largestCluster);
-        proxyDB.setDBIDs(largestCluster.getIDs());
-      }
-
-      // Run the inner k-means algorithm:
-      // FIXME: ensure we run on the correct relation in a multirelational
-      // setting!
-      Clustering<M> innerResult = innerkMeans.run(proxyDB);
-      // Add resulting clusters to current result.
-      currentClusterList.addAll(innerResult.getAllClusters());
-
-      LOG.incrementProcessed(prog);
-      if (LOG.isVerbose()) {
-        LOG.verbose("Iteration " + j);
       }
     }
-    LOG.ensureCompleted(prog);
 
     // add all current clusters to the result
-    Clustering<M> result = new Clustering<>("Bisecting k-Means Result", "Bisecting-k-means");
-    for (Cluster<M> cluster : currentClusterList) {
+    Clustering<M> result = new Clustering<>("X-Means Result", "X-Means");
+    for (Cluster<M> cluster : resultClusterList) {
       result.addToplevelCluster(cluster);
     }
     return result;
@@ -189,6 +211,10 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+  
+  private double BIC(Clustering<M> clustering) {
+    return 1 / clustering.getAllClusters().size();
   }
 
   /**
