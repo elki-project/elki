@@ -125,7 +125,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
     for(Cluster<?> clus : split) {
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
         KNNList knn = knnQuery.getKNNForDBID(iter, relation.size());
-        double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
+        double result = ROC.computeROCAUCDistanceResult(clus, knn);
 
         mv.put(result);
         hist.increment(result, 1. / relation.size());

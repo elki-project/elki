@@ -624,41 +624,25 @@ public class ROC {
   /**
    * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
    * 
-   * @param size Database size
    * @param clus Cluster object
    * @param nei Query result
    * @return area under curve
    */
-  public static double computeROCAUCDistanceResult(int size, Cluster<?> clus, DoubleDBIDList nei) {
+  public static double computeROCAUCDistanceResult(Cluster<?> clus, DoubleDBIDList nei) {
     // TODO: ensure the collection has efficient "contains".
-    return ROC.computeROCAUCDistanceResult(size, clus.getIDs(), nei);
+    return ROC.computeROCAUCDistanceResult(clus.getIDs(), nei);
   }
 
   /**
    * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
    * 
-   * @param size Database size
    * @param ids Collection of positive IDs, should support efficient contains()
    * @param nei Query Result
    * @return area under curve
    */
-  public static double computeROCAUCDistanceResult(int size, DBIDs ids, DoubleDBIDList nei) {
+  public static double computeROCAUCDistanceResult(DBIDs ids, DoubleDBIDList nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
     XYCurve roc = materializeROC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
-    return XYCurve.areaUnderCurve(roc);
-  }
-
-  /**
-   * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
-   * 
-   * @param size Database size
-   * @param ids Collection of positive IDs, should support efficient contains()
-   * @param nei Query Result
-   * @return area under curve
-   */
-  public static double computeROCAUCSimple(int size, DBIDs ids, DBIDs nei) {
-    // TODO: do not materialize the ROC, but introduce an iterator interface
-    XYCurve roc = materializeROC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new SimpleAdapter(nei.iter()));
     return XYCurve.areaUnderCurve(roc);
   }
 }

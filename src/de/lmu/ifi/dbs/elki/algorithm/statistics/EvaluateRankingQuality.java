@@ -155,7 +155,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
       for(int ind = 0; ind < cmem.size(); ind++) {
         KNNList knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
-        double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
+        double result = ROC.computeROCAUCDistanceResult(clus, knn);
 
         hist.put(((double) ind) / clus.size(), result);
 
