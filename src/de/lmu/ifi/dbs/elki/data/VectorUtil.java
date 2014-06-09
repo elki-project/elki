@@ -127,7 +127,12 @@ public final class VectorUtil {
       l2 += val * val;
       i2 = v2.iterAdvance(i2);
     }
-
+    if(cross == 0.) {
+      return 0.;
+    }
+    if(l1 == 0. || l2 == 0.) {
+      return 1.;
+    }
     final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
@@ -167,6 +172,12 @@ public final class VectorUtil {
       final double r2 = v2.doubleValue(k) - dk;
       l2 += r2 * r2;
     }
+    if(cross == 0.) {
+      return 0.;
+    }
+    if(l1 == 0. || l2 == 0.) {
+      return 1.;
+    }
     final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
@@ -186,26 +197,32 @@ public final class VectorUtil {
     // v1' = v1 - o, v2' = v2 - o
     // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
     // We can just compute all three in parallel.
-    double s = 0, e1 = 0, e2 = 0;
+    double cross = 0, l1 = 0, l2 = 0;
     for(int k = 0; k < mindim; k++) {
       final double ok = k < dimo ? o.doubleValue(k) : 0.;
       final double r1 = v1.doubleValue(k) - ok;
       final double r2 = v2.doubleValue(k) - o.doubleValue(k);
-      s += r1 * r2;
-      e1 += r1 * r1;
-      e2 += r2 * r2;
+      cross += r1 * r2;
+      l1 += r1 * r1;
+      l2 += r2 * r2;
     }
     for(int k = mindim; k < dim1; k++) {
       final double ok = k < dimo ? o.doubleValue(k) : 0.;
       final double r1 = v1.doubleValue(k) - ok;
-      e1 += r1 * r1;
+      l1 += r1 * r1;
     }
     for(int k = mindim; k < dim2; k++) {
       final double ok = k < dimo ? o.doubleValue(k) : 0.;
       final double r2 = v2.doubleValue(k) - ok;
-      e2 += r2 * r2;
+      l2 += r2 * r2;
     }
-    final double a = Math.sqrt((s / e1) * (s / e2));
+    if(cross == 0.) {
+      return 0.;
+    }
+    if(l1 == 0. || l2 == 0.) {
+      return 1.;
+    }
+    final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -243,6 +260,12 @@ public final class VectorUtil {
       final double r2 = v2.doubleValue(k);
       l2 += r2 * r2;
     }
+    if(cross == 0.) {
+      return 0.;
+    }
+    if(l1 == 0. || l2 == 0.) {
+      return 1.;
+    }
     final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
@@ -267,47 +290,53 @@ public final class VectorUtil {
     // Essentially, we want to compute this:
     // absmax(v1.transposeTimes(v2))/(min(v1.euclideanLength())*min(v2.euclideanLength()));
     // We can just compute all three in parallel.
-    double s1 = 0, s2 = 0, e1 = 0, e2 = 0;
+    double s1 = 0, s2 = 0, l1 = 0, l2 = 0;
     for(int k = 0; k < mindim; k++) {
       final double min1 = v1.getMin(k), max1 = v1.getMax(k);
       final double min2 = v2.getMin(k), max2 = v2.getMax(k);
       final double p1 = min1 * min2, p2 = min1 * max2;
       final double p3 = max1 * min2, p4 = max1 * max2;
-      s1 += Math.max(Math.max(p1, p2), Math.max(p3, p4));
-      s2 += Math.min(Math.min(p1, p2), Math.min(p3, p4));
+      s1 += Math.max(p1 > p2 ? p1 : p2, p3 > p4 ? p3 : p4);
+      s2 += Math.min(p1 < p2 ? p1 : p2, p3 < p4 ? p3 : p4);
       if(max1 < 0) {
-        e1 += max1 * max1;
+        l1 += max1 * max1;
       }
       else if(min1 > 0) {
-        e1 += min1 * min1;
+        l1 += min1 * min1;
       } // else: 0
       if(max2 < 0) {
-        e2 += max2 * max2;
+        l2 += max2 * max2;
       }
       else if(min2 > 0) {
-        e2 += min2 * min2;
+        l2 += min2 * min2;
       } // else: 0
     }
     for(int k = mindim; k < dim1; k++) {
       final double min1 = v1.getMin(k), max1 = v1.getMax(k);
       if(max1 < 0.) {
-        e1 += max1 * max1;
+        l1 += max1 * max1;
       }
       else if(min1 > 0.) {
-        e1 += min1 * min1;
+        l1 += min1 * min1;
       } // else: 0
     }
     for(int k = mindim; k < dim2; k++) {
       final double min2 = v2.getMin(k), max2 = v2.getMax(k);
       if(max2 < 0.) {
-        e2 += max2 * max2;
+        l2 += max2 * max2;
       }
       else if(min2 > 0.) {
-        e2 += min2 * min2;
+        l2 += min2 * min2;
       } // else: 0
     }
-    final double s = Math.max(s1, Math.abs(s2));
-    final double a = Math.sqrt((s / e1) * (s / e2));
+    final double cross = Math.max(s1, Math.abs(s2));
+    if(cross == 0.) {
+      return 0.;
+    }
+    if(l1 == 0. || l2 == 0.) {
+      return 1.;
+    }
+    final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
