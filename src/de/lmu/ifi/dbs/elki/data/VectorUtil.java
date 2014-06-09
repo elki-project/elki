@@ -129,7 +129,7 @@ public final class VectorUtil {
     }
 
     final double a = Math.sqrt((cross / l1) * (cross / l2));
-    return (a > 1.) ? 1. : a;
+    return (a < 1.) ? a : 1.;
   }
 
   /**
@@ -168,7 +168,7 @@ public final class VectorUtil {
       l2 += r2 * r2;
     }
     final double a = Math.sqrt((cross / l1) * (cross / l2));
-    return (a > 1.) ? 1. : a;
+    return (a < 1.) ? a : 1.;
   }
 
   /**
@@ -206,7 +206,7 @@ public final class VectorUtil {
       e2 += r2 * r2;
     }
     final double a = Math.sqrt((s / e1) * (s / e2));
-    return (a > 1.) ? 1. : a;
+    return (a < 1.) ? a : 1.;
   }
 
   /**
@@ -244,7 +244,7 @@ public final class VectorUtil {
       l2 += r2 * r2;
     }
     final double a = Math.sqrt((cross / l1) * (cross / l2));
-    return (a > 1.) ? 1. : a;
+    return (a < 1.) ? a : 1.;
   }
 
   // TODO: add more precise but slower O(n^2) angle computation according to:
@@ -308,7 +308,7 @@ public final class VectorUtil {
     }
     final double s = Math.max(s1, Math.abs(s2));
     final double a = Math.sqrt((s / e1) * (s / e2));
-    return (a > 1.) ? 1. : a;
+    return (a < 1.) ? a : 1.;
   }
 
   /**
