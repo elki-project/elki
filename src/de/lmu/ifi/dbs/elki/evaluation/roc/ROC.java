@@ -318,28 +318,24 @@ public class ROC {
   }
 
   /**
-   * This adapter can be used for an arbitrary collection of Integers, and uses
-   * that id1.compareTo(id2) != 0 for id1 != id2 to satisfy the comparability.
-   * 
-   * Note that of course, no id should occur more than once.
-   * 
-   * The ROC values would be incorrect then anyway!
+   * This adapter is used to process a list of (double, DBID) objects. The list
+   * <em>must</em> be sorted appropriately, the score is only used to detect
+   * ties.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.composedOf DistanceDBIDListIter
-   * 
    */
   public static class DistanceResultAdapter implements ScoreIter, DBIDRef {
     /**
      * Original Iterator
      */
-    private DoubleDBIDListIter iter;
+    protected DoubleDBIDListIter iter;
 
     /**
      * Distance of previous.
      */
-    private double prevDist = Double.NaN;
+    protected double prevDist = Double.NaN;
 
     /**
      * Constructor
@@ -371,6 +367,55 @@ public class ROC {
     @Override
     public boolean tiedToPrevious() {
       return iter.doubleValue() == prevDist;
+    }
+
+    @Deprecated
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Deprecated
+    @Override
+    public boolean equals(Object obj) {
+      return super.equals(obj);
+    }
+  }
+
+  /**
+   * This adapter is used to process a list of (double, DBID) objects, but
+   * allows skipping one object in the ranking. The list <em>must</em> be sorted
+   * appropriately, the score is only used to detect ties.
+   * 
+   * @author Erich Schubert
+   */
+  public static class FilteredDistanceResultAdapter extends DistanceResultAdapter {
+    /**
+     * DBID to skip (usually: query object).
+     */
+    DBIDRef skip;
+
+    /**
+     * Constructor
+     * 
+     * @param iter Iterator for distance results
+     * @param skip DBID to skip (reference must remain stable!)
+     */
+    public FilteredDistanceResultAdapter(DoubleDBIDListIter iter, DBIDRef skip) {
+      super(iter);
+      this.skip = skip;
+      if(iter.valid() && DBIDUtil.equal(iter, skip)) {
+        iter.advance();
+      }
+    }
+
+    @Override
+    public DistanceResultAdapter advance() {
+      super.advance();
+      if(iter.valid() && DBIDUtil.equal(iter, skip)) {
+        iter.advance();
+      }
+      return this;
     }
 
     @Deprecated

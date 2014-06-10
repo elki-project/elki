@@ -202,14 +202,17 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
    * Compute the distances to the neighbor objects.
    * 
    * @param nlist Neighbor list (output)
-   * @param iter Query object
+   * @param query Query object
    * @param distQuery Distance function
    * @param relation Data relation
    */
-  private void computeDistances(ModifiableDoubleDBIDList nlist, DBIDIter iter, final DistanceQuery<O> distQuery, Relation<O> relation) {
+  private void computeDistances(ModifiableDoubleDBIDList nlist, DBIDIter query, final DistanceQuery<O> distQuery, Relation<O> relation) {
     nlist.clear();
-    O qo = relation.get(iter);
+    O qo = relation.get(query);
     for(DBIDIter ri = relation.iterDBIDs(); ri.valid(); ri.advance()) {
+      if (!includeSelf && DBIDUtil.equal(ri, query)) {
+        continue;
+      }
       nlist.add(distQuery.distance(qo, ri), ri);
     }
     nlist.sort();
