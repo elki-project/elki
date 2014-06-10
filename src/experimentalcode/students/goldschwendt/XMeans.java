@@ -23,8 +23,10 @@ import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -120,11 +122,12 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
     this.innerkMeans = innerkMeans;
   }
 
-  private Clustering<M> splitCluster(Cluster<M> parentCluster, Database database) {
+  private Clustering<M> splitCluster(Relation<V> relation, Cluster<M> parentCluster, Database database) {
     
     ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
     
     innerkMeans.setK(2);
+    // TODO: Throws exception when there are too few data points in the child cluster
     Clustering<M> childClustering = innerkMeans.run(proxyDB);
     
     // Transform parent cluster into a clustering
@@ -132,8 +135,14 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
     parentClusterList.add(parentCluster);
     Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
     
+    double bicParent   = bic(relation, parentClustering);
+    double bicChildren = bic(relation, childClustering);
+    
+    LOG.log(Logging.Level.FINE, "BIC parent: " + bicParent);
+    LOG.log(Logging.Level.FINE, "BIC children: " + bicChildren);
+    
     // Check if split is an improvement
-    if (bic(childClustering) < bic(parentClustering)) {
+    if (bicChildren < bicParent) {
       // Split does not improve clustering.
       // Return old cluster
       return parentClustering;
@@ -148,6 +157,7 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
   
   public Clustering<M> run(Database database, Relation<V> relation) {
     
+    // TODO: debug output does not appear
     LOG.debug("start");
     
     ProxyDatabase proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
@@ -172,7 +182,7 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
         Cluster<M> cluster = currentClusterList.get(i);
         
         // Split all clusters
-        List<Cluster<M>> childClusterList = splitCluster(cluster, database).getAllClusters();
+        List<Cluster<M>> childClusterList = splitCluster(relation, cluster, database).getAllClusters();
         
         // If splitting improves clustering quality replace parent cluster with child clusters
         // and add child clusters to the list of clusters that should be split again
@@ -186,6 +196,7 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
       }
     }
     
+    // TODO: progress is not set properly
     prog.setTotal(k);
 
     // add all current clusters to the result
@@ -207,8 +218,59 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
     return LOG;
   }
   
-  private double bic(Clustering<M> clustering) {
-    double bic = clustering.getAllClusters().size();
+  private double maxLikelihood (Relation<V> relation, Cluster<M> cluster, int m) {
+    
+    int ni = cluster.size();
+    V ci = (V) cluster.getModel().getMean();
+    
+    // TODO: best way to get distance?
+    DistanceQuery<V> distanceQuery = relation.getDatabase().getDistanceQuery(relation, innerkMeans.getDistanceFunction());
+    
+    double maxLikelihood = 0;
+    
+    for (DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+      V xj = relation.get(iter);
+      maxLikelihood += Math.pow(distanceQuery.distance(xj, ci), 2);
+      
+    }
+    maxLikelihood = maxLikelihood / (ni - m);
+    
+    return maxLikelihood;
+  }
+  
+  private double logLikelihood(Relation<V> relation, Cluster<M> cluster, int n, int m) {
+    
+    DBIDIter iter = relation.getDBIDs().iter();
+    V vector = relation.get(iter);
+    
+    // TODO: best way to get dimensionality
+    int d = vector.getDimensionality();
+    int ni = cluster.size();
+    
+    double logLikelihood = ni * Math.log(ni) -
+        ni * Math.log(n) -
+        ((ni * d) / 2) * Math.log(2 * Math.PI) -
+        (ni / 2) * Math.log(maxLikelihood(relation, cluster, m)) -
+        (ni - m) / 2;
+    
+    return logLikelihood;
+  }
+  
+  private double bic(Relation<V> relation, Clustering<M> clustering) {
+    
+    // compute number of points of clustering
+    int n = 0;
+    for (Cluster<M> cluster : clustering.getAllClusters()) {
+      n += cluster.size();
+    }
+    
+    int m = clustering.getAllClusters().size();
+    
+    // add up the log-likelihood of all clusters
+    double bic = 0.0;
+    for (Cluster<M> cluster : clustering.getAllClusters()) {
+      bic += logLikelihood(relation, cluster, n, m);
+    }
     return bic;
   }
 
@@ -247,8 +309,9 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
       IntParameter kMinP = new IntParameter(K_MIN_ID);
       IntParameter kMaxP = new IntParameter(K_MAX_ID);
       
-      kMinP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      kMaxP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      kMinP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      // TODO: k_max should be equal or greater than k_min
+      kMaxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       
       if (config.grab(kMinP) &&
           config.grab(kMaxP)) {
