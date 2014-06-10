@@ -1,7 +1,9 @@
 package experimentalcode.students.goldschwendt;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -14,7 +16,10 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -25,9 +30,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -56,7 +64,9 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
  */
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -68,6 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  *
@@ -101,6 +112,7 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
   /**
    * Computed number of clusters. Output value
    */
+  // TODO: how to return k?
   private int k;
   
   private int k_min;
@@ -122,9 +134,45 @@ public class XMeans<V extends NumberVector, M extends KMeansModel> extends Abstr
     this.innerkMeans = innerkMeans;
   }
 
+  private List<V> determineChildCentroids(Relation<V> relation, Cluster<M> parentCluster, Database database) {
+    
+    // Variables necessary to determine child centroids
+    NumberVector.Factory<V> vectorFactory = RelationUtil.getNumberVectorFactory(relation);
+    Random random = RandomFactory.DEFAULT.getSingleThreadedRandom();
+    Vector parentCentroid = parentCluster.getModel().getMean();
+    
+    // Compute size of cluster/region
+    // TODO: best way to determine size of cluster?
+    int parentK = parentCluster.size();
+    DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    KNNQuery<V> knnQuery = database.getKNNQuery(distQuery, parentK);
+    KNNList knns = knnQuery.getKNNForObject(vectorFactory.newNumberVector(parentCentroid), parentK);
+    double clusterSize = knns.getKNNDistance();
+    
+    // Chose random vector
+    final int dim = RelationUtil.dimensionality(relation);
+    Vector randomVector = VectorUtil.randomVector(Vector.FACTORY, dim);
+    
+    // Set the vectors length between 0 and the cluster size (randomly)
+    randomVector.normalize();
+    randomVector = randomVector.times((0.5 + random.nextDouble() % 0.5) * clusterSize);
+    
+    // Get the new centroids
+    Vector childCentroid1 = parentCentroid.plus(randomVector);
+    Vector childCentroid2 = parentCentroid.plus(randomVector.times(-1));
+    
+    ArrayList<V> result = new ArrayList<V>(2);
+    result.add(vectorFactory.newNumberVector(childCentroid1));
+    result.add(vectorFactory.newNumberVector(childCentroid2));
+    
+    return result;
+  }
+  
   private Clustering<M> splitCluster(Relation<V> relation, Cluster<M> parentCluster, Database database) {
     
     ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
+    
+    determineChildCentroids(relation, parentCluster, database);
     
     innerkMeans.setK(2);
     // TODO: Throws exception when there are too few data points in the child cluster
