@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -109,8 +108,7 @@ public class RandomSampleKNNExperiment {
           final int k = i * step;
           KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
-          double auc = XYCurve.areaUnderCurve(roccurve);
+          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
           data[i - 1][0] = auc;
           LOG.incrementProcessed(prog);
         }
@@ -123,8 +121,7 @@ public class RandomSampleKNNExperiment {
           final int k = i * step;
           LOF<NumberVector> lof = new LOF<>(k, distanceFunction);
           OutlierResult res = lof.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
-          double auc = XYCurve.areaUnderCurve(roccurve);
+          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
           data[i - 1][3] = auc;
           LOG.incrementProcessed(prog);
         }
@@ -157,32 +154,28 @@ public class RandomSampleKNNExperiment {
         {
           KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, maxk);
           OutlierResult res = knn.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
-          double auc = XYCurve.areaUnderCurve(roccurve);
+          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
           data[i - 1][1] = auc;
         }
         // Scaled k kNNOutlier run
         {
           KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
-          double auc = XYCurve.areaUnderCurve(roccurve);
+          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
           data[i - 1][2] = auc;
         }
         // Max k LOF run
         {
           LOF<NumberVector> lof = new LOF<>(maxk, distanceFunction);
           OutlierResult res = lof.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
-          double auc = XYCurve.areaUnderCurve(roccurve);
+          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
           data[i - 1][4] = auc;
         }
         // Scaled k LOF run
         {
           LOF<NumberVector> lof = new LOF<>(k, distanceFunction);
           OutlierResult res = lof.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
-          double auc = XYCurve.areaUnderCurve(roccurve);
+          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
           data[i - 1][5] = auc;
         }
         // Remove preprocessor
