@@ -67,7 +67,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateConcordantPairs.class);
 
   /**
    * Option for noise handling.

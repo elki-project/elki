@@ -72,7 +72,7 @@ public class EvaluatePBM<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouetteSimplified.class);
+  private static final Logging LOG = Logging.getLogger(EvaluatePBM.class);
 
   /**
    * Option for noise handling.

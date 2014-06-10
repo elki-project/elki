@@ -71,7 +71,7 @@ public class EvaluateVRC<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouetteSimplified.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateVRC.class);
 
   /**
    * Option for noise handling.

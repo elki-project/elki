@@ -68,7 +68,7 @@ public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateCIndex.class);
 
   /**
    * Option for noise handling.
