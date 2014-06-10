@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -128,17 +127,16 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
     ModifiableDoubleDBIDList nlist = DBIDUtil.newDistanceDBIDList(relation.size());
 
     // Statistics tracking
-    Mean mean = new Mean(), map = new Mean(), mroc = new Mean();
+    Mean map = new Mean(), mroc = new Mean();
 
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Processing query objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       Object label = lrelation.get(iter);
       findMatches(posn, lrelation, label);
       computeDistances(nlist, iter, distQuery, relation);
-      computeAP(iter, posn, nlist, mean);
-      map.put(mean.getCount() > 0 ? mean.getMean() : 0.);
+      map.put(ROC.computeAveragePrecision(posn, nlist));      
       // We may as well compute ROC AUC while we're at it.
-      mroc.put(ROC.computeROCAUCDistanceResult(posn, nlist));
+      mroc.put(ROC.computeROCAUC(posn, nlist));
       LOG.incrementProcessed(objloop);
     }
     LOG.ensureCompleted(objloop);
@@ -215,45 +213,6 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
       nlist.add(distQuery.distance(qo, ri), ri);
     }
     nlist.sort();
-  }
-
-  /**
-   * Compute the average precision.
-   * 
-   * @param query Query object
-   * @param posn Positive neighbors
-   * @param nlist Neighbor list (sorted)
-   * @param mean Output mean
-   */
-  private void computeAP(DBIDIter query, DBIDs posn, ModifiableDoubleDBIDList nlist, Mean mean) {
-    mean.reset();
-    int positive = 0, i = 0, npos = 0;
-    double prev = Double.NaN;
-    for(DoubleDBIDListIter ri = nlist.iter(); ri.valid(); ri.advance()) {
-      if(!includeSelf && DBIDUtil.equal(query, ri)) {
-        // Do not increment i.
-        continue;
-      }
-      i++;
-      if(posn.contains(ri)) {
-        positive++;
-        npos++;
-      }
-      // Tie handling:
-      if(ri.doubleValue() == prev) {
-        continue;
-      }
-      // We may have seen positives earlier.
-      if(npos > 0) {
-        mean.put(positive / (double) i, npos);
-        npos = 0;
-      }
-      prev = ri.doubleValue();
-    }
-    // Ties at maximum distance and last object:
-    if(npos > 0) {
-      mean.put(positive / (double) i, npos);
-    }
   }
 
   @Override

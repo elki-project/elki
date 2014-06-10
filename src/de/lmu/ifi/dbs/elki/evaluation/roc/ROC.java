@@ -130,9 +130,9 @@ public class ROC {
   }
 
   /**
-   * Compute a ROC curve given a set of positive IDs and a sorted list of
-   * (comparable, ID)s, where the comparable object is used to decided when two
-   * objects are interchangeable.
+   * Compute the area under the ROC curve given a set of positive IDs and a
+   * sorted list of (comparable, ID)s, where the comparable object is used to
+   * decided when two objects are interchangeable.
    * 
    * @param <I> Iterator type
    * @param predicate Predicate to test for positive objects
@@ -140,7 +140,76 @@ public class ROC {
    * @return area under curve
    */
   public static <I extends ScoreIter> double computeROCAUC(Predicate<? super I> predicate, I iter) {
-    int poscnt = 0, negcnt = 0, negpre = 0;
+    int poscnt = 0, negcnt = 0, pospre = 0, negpre = 0;
+    double acc = 0.;
+    while(iter.valid()) {
+      // positive or negative match?
+      do {
+        if(predicate.test(iter)) {
+          ++poscnt;
+        }
+        else {
+          ++negcnt;
+        }
+        iter.advance();
+      } // Loop while tied:
+      while(iter.valid() && iter.tiedToPrevious());
+      if(negcnt > negpre) {
+        acc += (poscnt + pospre) * .5 * (negcnt - negpre);
+        negpre = negcnt;
+      }
+      pospre = poscnt;
+    }
+    acc /= negcnt * (long) poscnt;
+    return acc;
+  }
+
+  /**
+   * Compute a ROC curves Area-under-curve for cluster and a ranking.
+   * 
+   * @param clus Cluster object
+   * @param nei Query result
+   * @return area under curve
+   */
+  public static double computeROCAUC(Cluster<?> clus, DoubleDBIDList nei) {
+    return computeROCAUC(new DBIDsTest(DBIDUtil.ensureSet(clus.getIDs())), new DistanceResultAdapter(nei.iter()));
+  }
+
+  /**
+   * Compute a ROC curves Area-under-curve for a set of DBIDs and a ranking.
+   * 
+   * @param ids Collection of positive IDs, should support efficient contains()
+   * @param nei Query Result
+   * @return area under curve
+   */
+  public static double computeROCAUC(DBIDs ids, DoubleDBIDList nei) {
+    return computeROCAUC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
+  }
+
+  /**
+   * Compute a ROC curves Area-under-curve for a set of outliers and an outlier
+   * scoring.
+   * 
+   * @param ids Collection of positive IDs, should support efficient contains()
+   * @param outlier Outlier result
+   * @return area under curve
+   */
+  public static double computeROCAUC(DBIDs ids, OutlierResult outlier) {
+    return computeROCAUC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new OutlierScoreAdapter(outlier));
+  }
+
+  /**
+   * Compute the average precision given a set of positive IDs and a sorted list
+   * of (comparable, ID)s, where the comparable object is used to decided when
+   * two objects are interchangeable.
+   * 
+   * @param <I> Iterator type
+   * @param predicate Predicate to test for positive objects
+   * @param iter Iterator over results, with ties.
+   * @return average precision
+   */
+  public static <I extends ScoreIter> double computeAveragePrecision(Predicate<? super I> predicate, I iter) {
+    int poscnt = 0, negcnt = 0, pospre = 0;
     double acc = 0.;
     while(iter.valid()) {
       // positive or negative match?
@@ -155,14 +224,35 @@ public class ROC {
       } // Loop while tied:
       while(iter.valid() && iter.tiedToPrevious());
       // Add a new point.
-      acc += poscnt * (negcnt - negpre);
-      negpre = negcnt;
+      if(poscnt > pospre) {
+        acc += (poscnt / (double) (poscnt + negcnt)) * (poscnt - pospre);
+        pospre = poscnt;
+      }
     }
-    // Ensure we end up in the top right corner.
-    // Simplification will skip this if we already were.
-    acc += poscnt * (negcnt - negpre);
-    acc /= negcnt * (long) poscnt;
+    acc /= poscnt;
     return acc;
+  }
+
+  /**
+   * Compute the average precision for a set of DBIDs and a ranking.
+   * 
+   * @param ids Collection of positive IDs, should support efficient contains()
+   * @param nei Query Result
+   * @return average precision
+   */
+  public static double computeAveragePrecision(DBIDs ids, DoubleDBIDList nei) {
+    return computeAveragePrecision(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
+  }
+
+  /**
+   * Compute the average precision for a set of outliers and an outlier scoring.
+   * 
+   * @param ids Collection of positive IDs, should support efficient contains()
+   * @param outlier Outlier result
+   * @return average precision
+   */
+  public static double computeAveragePrecision(DBIDs ids, OutlierResult outlier) {
+    return computeAveragePrecision(new DBIDsTest(DBIDUtil.ensureSet(ids)), new OutlierScoreAdapter(outlier));
   }
 
   /**
@@ -655,29 +745,5 @@ public class ROC {
     public boolean test(DBIDRef o) {
       return set.contains(o);
     }
-  }
-
-  /**
-   * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
-   * 
-   * @param clus Cluster object
-   * @param nei Query result
-   * @return area under curve
-   */
-  public static double computeROCAUCDistanceResult(Cluster<?> clus, DoubleDBIDList nei) {
-    // TODO: ensure the collection has efficient "contains".
-    return computeROCAUC(new DBIDsTest(clus.getIDs()), new DistanceResultAdapter(nei.iter()));
-  }
-
-  /**
-   * Compute a ROC curves Area-under-curve for a QueryResult and a Cluster.
-   * 
-   * @param ids Collection of positive IDs, should support efficient contains()
-   * @param nei Query Result
-   * @return area under curve
-   */
-  public static double computeROCAUCDistanceResult(DBIDs ids, DoubleDBIDList nei) {
-    // TODO: do not materialize the ROC, but introduce an iterator interface
-    return computeROCAUC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
   }
 }

@@ -69,7 +69,35 @@ public class TestComputeROC implements JUnit4Test {
 
     double auc = XYCurve.areaUnderCurve(roccurve);
     Assert.assertEquals("ROC AUC not right.", 0.6, auc, 1e-14);
-    double auc2 = ROC.computeROCAUCDistanceResult(positive, distances);
+    double auc2 = ROC.computeROCAUC(positive, distances);
     Assert.assertEquals("ROC AUC not right.", 0.6, auc2, 1e-14);
+  }
+
+  /**
+   * Test Average Precision score computation.
+   */
+  @Test
+  public void testAveragePrecision() {
+    HashSetModifiableDBIDs positive = DBIDUtil.newHashSet();
+    positive.add(DBIDUtil.importInteger(1));
+    positive.add(DBIDUtil.importInteger(2));
+    positive.add(DBIDUtil.importInteger(3));
+    positive.add(DBIDUtil.importInteger(4));
+    positive.add(DBIDUtil.importInteger(5));
+
+    final ModifiableDoubleDBIDList distances = DBIDUtil.newDistanceDBIDList();
+    distances.add(0.0, DBIDUtil.importInteger(1)); // Precision: 1.0
+    distances.add(1.0, DBIDUtil.importInteger(2)); // Precision: 1.0
+    distances.add(2.0, DBIDUtil.importInteger(6)); //
+    distances.add(3.0, DBIDUtil.importInteger(7)); //
+    distances.add(3.0, DBIDUtil.importInteger(3)); // Precision: 0.6
+    distances.add(4.0, DBIDUtil.importInteger(8)); //
+    distances.add(4.0, DBIDUtil.importInteger(4)); // Precision: 4/7.
+    distances.add(5.0, DBIDUtil.importInteger(9)); //
+    distances.add(6.0, DBIDUtil.importInteger(5)); // Precision: 5/9.
+    // (1+1+.6+4/7.+5/9.)/5 = 0.7453968253968254
+
+    double ap = ROC.computeAveragePrecision(new ROC.DBIDsTest(positive), new ROC.DistanceResultAdapter(distances.iter()));
+    Assert.assertEquals("Average precision not right.", 0.7453968253968254, ap, 1e-14);
   }
 }
