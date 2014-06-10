@@ -25,10 +25,7 @@ package experimentalcode.students.baierst;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -40,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -75,7 +71,7 @@ public class EvaluateDBCV<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateDBCV.class);
 
   /**
    * Distance function to use.
@@ -174,7 +170,7 @@ public class EvaluateDBCV<O> implements Evaluator {
           internalNodes[c] = true;
         }
         else {
-          degree[nodes[i]] = 1;          
+          degree[nodes[i]] = 1;
         }
       }
 
