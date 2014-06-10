@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixIm
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -166,7 +165,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         final NumberVector veca = relation.get(id);
         // Direct AUC score:
         {
-          double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(veca)));
+          double auc = ROC.computeROCAUC(pos, new ROC.DecreasingVectorIter(veca));
           data[a][a] = auc;
           // minmax.put(auc);
           LOG.incrementProcessed(prog);
@@ -182,7 +181,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
             buf[1] = vecb.doubleValue(d);
             combined[d] = voting.combine(buf);
           }
-          double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(new Vector(combined))));
+          double auc = ROC.computeROCAUC(pos, new ROC.DecreasingVectorIter(new Vector(combined)));
           // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
           // labels.get(ids.get(b)));
           data[a][b] = auc;

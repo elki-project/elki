@@ -130,6 +130,42 @@ public class ROC {
   }
 
   /**
+   * Compute a ROC curve given a set of positive IDs and a sorted list of
+   * (comparable, ID)s, where the comparable object is used to decided when two
+   * objects are interchangeable.
+   * 
+   * @param <I> Iterator type
+   * @param predicate Predicate to test for positive objects
+   * @param iter Iterator over results, with ties.
+   * @return area under curve
+   */
+  public static <I extends ScoreIter> double computeROCAUC(Predicate<? super I> predicate, I iter) {
+    int poscnt = 0, negcnt = 0, negpre = 0;
+    double acc = 0.;
+    while(iter.valid()) {
+      // positive or negative match?
+      do {
+        if(predicate.test(iter)) {
+          ++poscnt;
+        }
+        else {
+          ++negcnt;
+        }
+        iter.advance();
+      } // Loop while tied:
+      while(iter.valid() && iter.tiedToPrevious());
+      // Add a new point.
+      acc += poscnt * (negcnt - negpre);
+      negpre = negcnt;
+    }
+    // Ensure we end up in the top right corner.
+    // Simplification will skip this if we already were.
+    acc += poscnt * (negcnt - negpre);
+    acc /= negcnt * (long) poscnt;
+    return acc;
+  }
+
+  /**
    * This adapter can be used for an arbitrary collection of Integers, and uses
    * that id1.compareTo(id2) != 0 for id1 != id2 to satisfy the comparability.
    * 
@@ -630,7 +666,7 @@ public class ROC {
    */
   public static double computeROCAUCDistanceResult(Cluster<?> clus, DoubleDBIDList nei) {
     // TODO: ensure the collection has efficient "contains".
-    return ROC.computeROCAUCDistanceResult(clus.getIDs(), nei);
+    return computeROCAUC(new DBIDsTest(clus.getIDs()), new DistanceResultAdapter(nei.iter()));
   }
 
   /**
@@ -642,7 +678,6 @@ public class ROC {
    */
   public static double computeROCAUCDistanceResult(DBIDs ids, DoubleDBIDList nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    XYCurve roc = materializeROC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
-    return XYCurve.areaUnderCurve(roc);
+    return computeROCAUC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
   }
 }

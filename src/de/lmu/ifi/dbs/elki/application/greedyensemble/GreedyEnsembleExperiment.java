@@ -53,7 +53,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEu
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -283,7 +282,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         final NumberVector vec = relation.get(iditer);
         singleEnsemble(greedyensemble, vec);
         final Vector v2 = new Vector(greedyensemble);
-        double auc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(v2)));
+        double auc = ROC.computeROCAUC(positive, new ROC.DecreasingVectorIter(v2));
         double estimated = wdist.distance(v2, estimated_truth_vec);
         double cost = tdist.distance(v2, refvec);
         LOG.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(iditer));
@@ -431,14 +430,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Evaluate the naive ensemble and the "shrunk" ensemble
     double naiveauc, naivecost;
     {
-      naiveauc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(naivevec)));
+      naiveauc = ROC.computeROCAUC(positive, new ROC.DecreasingVectorIter(naivevec));
       naivecost = tdist.distance(naivevec, refvec);
       LOG.verbose("Naive ensemble AUC:   " + naiveauc + " cost: " + naivecost);
       LOG.verbose("Naive ensemble Gain:  " + gain(naiveauc, bestauc, 1) + " cost gain: " + gain(naivecost, bestcost, 0));
     }
     double greedyauc, greedycost;
     {
-      greedyauc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(greedyvec)));
+      greedyauc = ROC.computeROCAUC(positive, new ROC.DecreasingVectorIter(greedyvec));
       greedycost = tdist.distance(greedyvec, refvec);
       LOG.verbose("Greedy ensemble AUC:  " + greedyauc + " cost: " + greedycost);
       LOG.verbose("Greedy ensemble Gain to best:  " + gain(greedyauc, bestauc, 1) + " cost gain: " + gain(greedycost, bestcost, 0));
@@ -468,7 +467,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         }
         applyScaling(randomensemble, scaling);
         NumberVector randomvec = factory.newNumberVector(randomensemble);
-        double auc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(randomvec)));
+        double auc = ROC.computeROCAUC(positive, new ROC.DecreasingVectorIter(randomvec));
         meanauc.put(auc);
         double cost = tdist.distance(randomvec, refvec);
         meancost.put(cost);

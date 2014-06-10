@@ -68,6 +68,8 @@ public class TestComputeROC implements JUnit4Test {
     Assert.assertEquals("ROC curve too complex", 6, roccurve.size());
 
     double auc = XYCurve.areaUnderCurve(roccurve);
-    Assert.assertEquals("ROC AUC not right.", 0.6, auc, 0.0001);
+    Assert.assertEquals("ROC AUC not right.", 0.6, auc, 1e-14);
+    double auc2 = ROC.computeROCAUCDistanceResult(positive, distances);
+    Assert.assertEquals("ROC AUC not right.", 0.6, auc2, 1e-14);
   }
 }
