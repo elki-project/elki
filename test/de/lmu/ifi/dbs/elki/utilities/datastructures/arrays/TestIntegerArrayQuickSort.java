@@ -81,22 +81,55 @@ public class TestIntegerArrayQuickSort implements JUnit4Test {
     }
   }
 
-  @Test(timeout = 100)
+  @Test(timeout = 500)
   public void testTies() {
     int size = 1000000;
     int[] idx = new int[size];
 
     // Initialize indexes
     for(int i = 0; i < size; i++) {
-      idx[i] = i;
+      idx[i] = 0;
     }
 
     // Run QuickSort and validate monotonicity.
     IntegerArrayQuickSort.sort(idx, new IntegerComparator() {
       @Override
       public int compare(int x, int y) {
-        return 0;
+        return (x < y) ? -1 : (x == y) ? 0 : +1;
       }
     });
+
+    int prev = idx[0];
+    for(int i = 1; i < size; i++) {
+      int val = idx[i];
+      assertTrue("Resulting array is not sorted.", prev <= val);
+      prev = val;
+    }
+  }
+
+  @Test(timeout = 500)
+  public void testSorted() {
+    int size = 1000000;
+    int[] idx = new int[size];
+
+    // Initialize indexes
+    for(int i = 0; i < size; i++) {
+      idx[i] = size - i;
+    }
+
+    // Run QuickSort and validate monotonicity.
+    IntegerArrayQuickSort.sort(idx, new IntegerComparator() {
+      @Override
+      public int compare(int x, int y) {
+        return (x < y) ? -1 : (x == y) ? 0 : +1;
+      }
+    });
+
+    int prev = idx[0];
+    for(int i = 1; i < size; i++) {
+      int val = idx[i];
+      assertTrue("Resulting array is not sorted.", prev <= val);
+      prev = val;
+    }
   }
 }
