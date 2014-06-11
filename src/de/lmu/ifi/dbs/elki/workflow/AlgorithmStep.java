@@ -91,6 +91,7 @@ public class AlgorithmStep implements WorkflowStep {
       }
     }
     for (Algorithm algorithm : algorithms) {
+      Thread.currentThread().setName(algorithm.toString());
       Duration duration = LOG.isStatistics() ? LOG.newDuration(algorithm.getClass().getName()+".runtime").begin() : null;
       Result res = algorithm.run(database);
       if (duration != null) {

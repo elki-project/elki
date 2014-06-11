@@ -32,7 +32,18 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * 
+ * @param <O> vector type, usually NumberVector or a parent type
  */
-public interface NumberVectorDistanceFunction extends PrimitiveDistanceFunction<NumberVector> {
-  // Empty - marker interface
+public interface NumberVectorDistanceFunction<O> extends PrimitiveDistanceFunction<O> {
+  /**
+   * Computes the distance between two given vectors according to this distance
+   * function.
+   * 
+   * @param o1 first DatabaseObject
+   * @param o2 second DatabaseObject
+   * @return the distance between two given vectors according to this distance
+   *         function
+   */
+  double distance(NumberVector o1, NumberVector o2);
 }

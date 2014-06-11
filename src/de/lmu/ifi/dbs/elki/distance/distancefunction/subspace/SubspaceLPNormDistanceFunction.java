@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Elke Achtert
  */
-public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingDistanceFunction<NumberVector> implements SpatialPrimitiveDistanceFunction<NumberVector>, Norm<NumberVector>, NumberVectorDistanceFunction {
+public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingDistanceFunction<NumberVector> implements SpatialPrimitiveDistanceFunction<NumberVector>, Norm<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Value of p
    */

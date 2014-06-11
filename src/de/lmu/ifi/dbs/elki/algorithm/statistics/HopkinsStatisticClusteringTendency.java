@@ -111,7 +111,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanc
    * @param minima Data space minima, may be {@code null} (get from data).
    * @param maxima Data space minima, may be {@code null} (get from data).
    */
-  public HopkinsStatisticClusteringTendency(NumberVectorDistanceFunction distanceFunction, int samplesize, RandomFactory random, int rep, int k, double[] minima, double[] maxima) {
+  public HopkinsStatisticClusteringTendency(NumberVectorDistanceFunction<? super NumberVector> distanceFunction, int samplesize, RandomFactory random, int rep, int k, double[] minima, double[] maxima) {
     super(distanceFunction);
     this.sampleSize = samplesize;
     this.random = random;
@@ -389,7 +389,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanc
 
     @Override
     protected HopkinsStatisticClusteringTendency makeInstance() {
-      return new HopkinsStatisticClusteringTendency((NumberVectorDistanceFunction) distanceFunction, sampleSize, random, rep, k, minima, maxima);
+      return new HopkinsStatisticClusteringTendency((NumberVectorDistanceFunction<? super NumberVector>) distanceFunction, sampleSize, random, rep, k, minima, maxima);
     }
   }
 }

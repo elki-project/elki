@@ -112,6 +112,7 @@ public class EvaluationStep implements WorkflowStep {
      */
     public void update(Result r) {
       for (Evaluator evaluator : evaluators) {
+        Thread.currentThread().setName(evaluator.toString());
         /*
          * if(normalizationUndo) { evaluator.setNormalization(normalization); }
          */

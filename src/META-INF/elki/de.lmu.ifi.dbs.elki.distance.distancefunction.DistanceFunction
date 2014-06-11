@@ -52,6 +52,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDiverge
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceAsymmetricDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.SqrtJensenShannonDivergenceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.set.HammingDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.set.JaccardSimilarityDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.strings.LevenshteinDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.strings.NormalizedLevenshteinDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
@@ -68,7 +70,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDista
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedFloatDistanceFunction
-de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusterIntersectionSimilarityFunction

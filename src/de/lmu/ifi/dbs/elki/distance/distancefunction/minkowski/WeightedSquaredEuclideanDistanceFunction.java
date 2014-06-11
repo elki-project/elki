@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * 
  * @author Arthur Zimek
  */
-public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNorm implements WeightedNumberVectorDistanceFunction {
+public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNorm implements WeightedNumberVectorDistanceFunction<NumberVector> {
   /**
    * Weight array
    */

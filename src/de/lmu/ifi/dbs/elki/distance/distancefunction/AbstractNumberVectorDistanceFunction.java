@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
  * @apiviz.excludeSubtypes
  * @apiviz.uses NumberVector
  */
-public abstract class AbstractNumberVectorDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector> implements NumberVectorDistanceFunction {
+public abstract class AbstractNumberVectorDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector> implements NumberVectorDistanceFunction<NumberVector> {
   /**
    * Constructor.
    */

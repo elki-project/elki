@@ -117,7 +117,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
   /**
    * Distance function
    */
-  private NumberVectorDistanceFunction distFunc;
+  private NumberVectorDistanceFunction<?> distFunc;
 
   /**
    * Constructor.
@@ -128,7 +128,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
    * @param g Number of grids to use
    * @param rnd Random generator.
    */
-  public ALOCI(NumberVectorDistanceFunction distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
+  public ALOCI(NumberVectorDistanceFunction<?> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
     super();
     this.distFunc = distanceFunction;
     this.nmin = nmin;
@@ -682,13 +682,13 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     /**
      * The distance function
      */
-    private NumberVectorDistanceFunction distanceFunction;
+    private NumberVectorDistanceFunction<?> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<NumberVectorDistanceFunction> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

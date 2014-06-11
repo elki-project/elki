@@ -67,6 +67,7 @@ public class OutputStep implements WorkflowStep {
   public void runResultHandlers(HierarchicalResult result) {
     // Run result handlers
     for (ResultHandler resulthandler : resulthandlers) {
+      Thread.currentThread().setName(resulthandler.toString());
       resulthandler.processNewResult(result, result);
     }
   }

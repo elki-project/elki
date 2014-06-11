@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @author Arthur Zimek
  * @author Erich Schubert
  */
-public class WeightedPearsonCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction implements WeightedNumberVectorDistanceFunction {
+public class WeightedPearsonCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction implements WeightedNumberVectorDistanceFunction<NumberVector> {
   /**
    * Weights
    */

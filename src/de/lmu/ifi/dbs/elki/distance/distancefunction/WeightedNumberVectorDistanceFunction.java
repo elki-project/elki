@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,12 +23,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+
 /**
  * Distance functions where each dimension is assigned a weight.
  * 
  * @author Erich Schubert
+ * 
+ * @param <V> Vector type, usually NumberVector or above.
  */
-public interface WeightedNumberVectorDistanceFunction extends NumberVectorDistanceFunction {
+public interface WeightedNumberVectorDistanceFunction<V> extends NumberVectorDistanceFunction<V> {
   /**
    * Parameter to set the weights of the weighted distance function.
    */

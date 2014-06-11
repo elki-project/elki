@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * 
  * @author Erich Schubert
  */
-public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFunction implements WeightedNumberVectorDistanceFunction {
+public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFunction implements WeightedNumberVectorDistanceFunction<NumberVector> {
   /**
    * Weight array
    */

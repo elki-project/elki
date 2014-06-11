@@ -144,7 +144,12 @@ public final class TypeUtil {
   public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(FloatVector.class);
 
   /**
-   * Input type for algorithms that require number vector fields.
+   * Input type for algorithms that require bit vectors.
+   */
+  public static final VectorTypeInformation<BitVector> BIT_VECTOR = VectorTypeInformation.typeRequest(BitVector.class);
+
+  /**
+   * Input type for algorithms that require bit vector fields.
    */
   public static final VectorFieldTypeInformation<BitVector> BIT_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(BitVector.class);
 

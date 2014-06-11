@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * 
  * @author Erich Schubert
  */
-public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction implements WeightedNumberVectorDistanceFunction {
+public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction implements WeightedNumberVectorDistanceFunction<NumberVector> {
   /**
    * Weight array
    */

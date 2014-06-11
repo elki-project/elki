@@ -223,6 +223,16 @@ public class BitVector extends AbstractNumberVector implements SparseNumberVecto
   }
 
   /**
+   * Compute the Jaccard similarity of two bit vectors.
+   * 
+   * @param v2 Second bit vector
+   * @return Jaccard similarity (intersection / union)
+   */
+  public double jaccardSimilarity(BitVector v2) {
+    return BitsUtil.intersectionSize(bits, v2.bits) / (double) BitsUtil.unionSize(bits, v2.bits);
+  }
+
+  /**
    * Compute the Hamming distance of two bit vectors.
    * 
    * @param v2 Second bit vector

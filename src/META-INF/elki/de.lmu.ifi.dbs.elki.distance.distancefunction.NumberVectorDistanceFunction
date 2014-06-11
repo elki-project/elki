@@ -42,6 +42,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDiverge
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceAsymmetricDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.SqrtJensenShannonDivergenceDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.set.HammingDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.set.JaccardSimilarityDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction
