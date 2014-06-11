@@ -207,7 +207,6 @@ public class VoronoiVisualization extends AbstractVisFactory {
             Model model = clus.getModel();
             double[] mean;
             if (model instanceof MeanModel) {
-              @SuppressWarnings("unchecked")
               MeanModel mmodel = (MeanModel) model;
               mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
             } else if (model instanceof MedoidModel) {
@@ -237,7 +236,6 @@ public class VoronoiVisualization extends AbstractVisFactory {
             Model model = clus.getModel();
             Vector mean;
             if (model instanceof MeanModel) {
-              @SuppressWarnings("unchecked")
               MeanModel mmodel = (MeanModel) model;
               mean = mmodel.getMean().getColumnVector();
             } else if (model instanceof MedoidModel) {
