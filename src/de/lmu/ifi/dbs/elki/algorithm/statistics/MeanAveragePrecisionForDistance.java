@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -55,8 +56,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 /**
  * Evaluate a distance functions performance by computing the mean average
  * precision, when ranking the objects by distance.
- * 
- * TODO: refactor akin to ROC AUC evaluation.
  * 
  * @author Erich Schubert
  * 
@@ -133,15 +132,26 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       Object label = lrelation.get(iter);
       findMatches(posn, lrelation, label);
-      computeDistances(nlist, iter, distQuery, relation);
-      map.put(ROC.computeAveragePrecision(posn, nlist));      
-      // We may as well compute ROC AUC while we're at it.
-      mroc.put(ROC.computeROCAUC(posn, nlist));
+      if(posn.size() > 0) {
+        computeDistances(nlist, iter, distQuery, relation);
+        if(nlist.size() != relation.size() - (includeSelf ? 0 : 1)) {
+          LOG.warning("Neighbor list does not have the desired size: " + nlist.size());
+        }
+        map.put(ROC.computeAveragePrecision(posn, nlist));
+        // We may as well compute ROC AUC while we're at it.
+        mroc.put(ROC.computeROCAUC(posn, nlist));
+      }
       LOG.incrementProcessed(objloop);
     }
     LOG.ensureCompleted(objloop);
+    if(map.getCount() < 1) {
+      throw new AbortException("No object matched - are labels parsed correctly?");
+    }
+    if(!(map.getMean() >= 0) || !(mroc.getMean() >= 0)) {
+      throw new AbortException("NaN in MAP/ROC.");
+    }
 
-    return new MAPResult(map.getMean(), mroc.getMean());
+    return new MAPResult(map.getMean(), mroc.getMean(), ids.size());
   }
 
   /**
@@ -210,10 +220,14 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
     nlist.clear();
     O qo = relation.get(query);
     for(DBIDIter ri = relation.iterDBIDs(); ri.valid(); ri.advance()) {
-      if (!includeSelf && DBIDUtil.equal(ri, query)) {
+      if(!includeSelf && DBIDUtil.equal(ri, query)) {
         continue;
       }
-      nlist.add(distQuery.distance(qo, ri), ri);
+      double dist = distQuery.distance(qo, ri);
+      if(dist != dist) { /* NaN */
+        dist = Double.POSITIVE_INFINITY;
+      }
+      nlist.add(dist, ri);
     }
     nlist.sort();
   }
@@ -246,15 +260,22 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
     private double rocauc;
 
     /**
+     * Sample size
+     */
+    private int samplesize;
+
+    /**
      * Constructor.
      * 
      * @param map MAP value
      * @param rocauc ROC AUC value
+     * @param samplesize Sample size
      */
-    public MAPResult(double map, double rocauc) {
+    public MAPResult(double map, double rocauc, int samplesize) {
       super();
       this.map = map;
       this.rocauc = rocauc;
+      this.samplesize = samplesize;
     }
 
     /**
@@ -288,6 +309,9 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
       out.flush();
       out.inlinePrintNoQuotes("ROCAUC");
       out.inlinePrint(rocauc);
+      out.flush();
+      out.inlinePrintNoQuotes("Samplesize");
+      out.inlinePrint(samplesize);
       out.flush();
     }
   }

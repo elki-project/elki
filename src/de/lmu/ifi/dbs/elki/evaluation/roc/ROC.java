@@ -161,7 +161,7 @@ public class ROC {
       pospre = poscnt;
     }
     acc /= negcnt * (long) poscnt;
-    return acc;
+    return acc == acc ? acc : 0.5; /* Detect NaN */
   }
 
   /**
@@ -229,8 +229,7 @@ public class ROC {
         pospre = poscnt;
       }
     }
-    acc /= poscnt;
-    return acc;
+    return (poscnt > 0) ? acc / poscnt : 0.;
   }
 
   /**
