@@ -28,8 +28,6 @@ import java.text.NumberFormat;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-
 /**
  * Draw a score bar. Essentially like a progress bar, left-to-right, displaying
  * a relative score.
