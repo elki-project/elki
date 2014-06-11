@@ -37,9 +37,10 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuGLSBackwardSearchAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuRandomWalkEC
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
-de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
+de.lmu.ifi.dbs.elki.algorithm.statistics.MeanAveragePrecisionForDistance
+de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.ValidateApproximativeKNNIndex
