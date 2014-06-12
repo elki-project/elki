@@ -46,6 +46,6 @@ public class TestXTree extends AbstractTestIndexStructures {
     ListParameterization xtreeparams = new ListParameterization();
     xtreeparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, XTreeFactory.class);
     xtreeparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactIndex(xtreeparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactEuclidean(xtreeparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 }
