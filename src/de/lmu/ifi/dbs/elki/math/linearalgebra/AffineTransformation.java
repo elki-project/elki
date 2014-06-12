@@ -270,7 +270,7 @@ public class AffineTransformation {
    * @return copy of the transformation matrix
    */
   public Matrix getTransformation() {
-    return trans.copy();
+    return trans;
   }
 
   /**
@@ -282,7 +282,7 @@ public class AffineTransformation {
     if(inv == null) {
       updateInverse();
     }
-    return inv.copy();
+    return inv;
   }
 
   /**
