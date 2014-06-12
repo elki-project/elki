@@ -61,4 +61,13 @@ public interface WritableDoubleDataStore extends DoubleDataStore, WritableDataSt
    * @return previous value
    */
   public double put(DBIDRef id, double value);
+
+
+  /**
+   * Increment the specified value with the specified id in this storage.
+   * 
+   * @param id Database ID.
+   * @param value Value to add to the previous value.
+   */
+  public void increment(DBIDRef id, double value);
 }

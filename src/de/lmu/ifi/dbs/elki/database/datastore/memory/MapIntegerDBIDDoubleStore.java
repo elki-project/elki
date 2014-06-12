@@ -107,4 +107,9 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   public double put(DBIDRef id, double value) {
     return map.put(DBIDUtil.asInteger(id), value);
   }
+
+  @Override
+  public void increment(DBIDRef id, double value) {
+    map.adjustOrPutValue(DBIDUtil.asInteger(id), value, map.getNoEntryValue() + value);
+  }
 }

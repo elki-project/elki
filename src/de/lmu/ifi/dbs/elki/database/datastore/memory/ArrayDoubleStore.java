@@ -67,7 +67,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   public ArrayDoubleStore(int size, DataStoreIDMap idmap, double def) {
     super();
     this.data = new double[size];
-    if (def != 0) {
+    if(def != 0) {
       Arrays.fill(this.data, def);
     }
     this.idmap = idmap;
@@ -107,6 +107,11 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
     final double ret = data[off];
     data[off] = value;
     return ret;
+  }
+
+  @Override
+  public void increment(DBIDRef id, double value) {
+    data[idmap.mapDBIDToOffset(id)] += value;
   }
 
   @Override
