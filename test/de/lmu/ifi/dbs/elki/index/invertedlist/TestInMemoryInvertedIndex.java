@@ -42,6 +42,6 @@ public class TestInMemoryInvertedIndex extends AbstractTestIndexStructures {
   public void testInvertedIndex() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, InMemoryInvertedIndex.Factory.class);
-    testExactCosine(spatparams, InMemoryInvertedIndex.CosineKNNQuery.class, null);
+    testExactCosine(spatparams, InMemoryInvertedIndex.CosineKNNQuery.class, InMemoryInvertedIndex.CosineRangeQuery.class);
   }
 }

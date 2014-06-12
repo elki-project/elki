@@ -10,6 +10,7 @@ de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeFac
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeFactory
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTreeFactory
 de.lmu.ifi.dbs.elki.index.idistance.InMemoryIDistanceIndex$Factory
+de.lmu.ifi.dbs.elki.index.invertedlist.InMemoryInvertedIndex$Factory
 de.lmu.ifi.dbs.elki.index.lsh.InMemoryLSHIndex
 de.lmu.ifi.dbs.elki.index.vafile.VAFile$Factory
 de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile$Factory
