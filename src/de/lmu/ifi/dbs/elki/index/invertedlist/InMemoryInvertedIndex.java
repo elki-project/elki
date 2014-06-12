@@ -308,9 +308,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
 
     @Override
     public KNNList getKNNForObject(V obj, int k) {
-      WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), //
-          DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
+      WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
+          DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       double len = naiveQuery(obj, scores, cands);
       // TODO: delay the division by len!
       KNNHeap heap = DBIDUtil.newHeap(k);
@@ -344,9 +344,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
 
     @Override
     public KNNList getKNNForObject(V obj, int k) {
-      WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), //
-          DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
+      WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
+          DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       double len = naiveQuery(obj, scores, cands);
       // TODO: delay the division by len and acos!
       KNNHeap heap = DBIDUtil.newHeap(k);
@@ -380,9 +380,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
 
     @Override
     public DoubleDBIDList getRangeForObject(V obj, double range) {
-      WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), //
-          DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
+      WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
+          DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       double len = naiveQuery(obj, scores, cands);
       ModifiableDoubleDBIDList list = DBIDUtil.newDistanceDBIDList();
       // dist = 1 - sim/len <-> sim = len * (1-dist)
@@ -417,9 +417,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
 
     @Override
     public DoubleDBIDList getRangeForObject(V obj, double range) {
-      WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), //
-          DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
+      WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
+          DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       double len = naiveQuery(obj, scores, cands);
       // dist = acos(sim/len) <-> sim = cos(dist)*len
       double simrange = Math.cos(range) * len;
