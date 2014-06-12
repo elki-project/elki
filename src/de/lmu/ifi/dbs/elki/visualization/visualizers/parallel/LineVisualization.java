@@ -184,26 +184,22 @@ public class LineVisualization extends AbstractVisFactory {
     private Element drawLine(DBIDRef iter) {
       SVGPath path = new SVGPath();
       double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
-      boolean draw = false, drawprev = false, drawn = false;
+      boolean drawn = false;
+      int valid = 0; /* run length of valid values */
       for(int i = 0; i < yPos.length; i++) {
         // NaN handling:
         if(yPos[i] != yPos[i]) {
-          draw = false;
-          drawprev = false;
+          valid = 0;
           continue;
         }
-        if(draw) {
-          if(drawprev) {
+        ++valid;
+        if(valid > 1) {
+          if(valid == 2) {
             path.moveTo(getVisibleAxisX(i - 1), yPos[i - 1]);
-            drawprev = false;
           }
           path.lineTo(getVisibleAxisX(i), yPos[i]);
           drawn = true;
         }
-        else {
-          drawprev = true;
-        }
-        draw = true;
       }
       if(!drawn) {
         return null; // Not enough data.
