@@ -133,7 +133,7 @@ public abstract class AbstractTestIndexStructures implements JUnit4Test {
       KNNQuery<DoubleVector> knnq = db.getKNNQuery(dist, k);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
       KNNList ids = knnq.getKNNForObject(dv, k);
-      assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
+      assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
 
       // verify that the neighbors match.
       int i = 0;
@@ -143,7 +143,7 @@ public abstract class AbstractTestIndexStructures implements JUnit4Test {
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 0.00001);
+        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
     }
     if(expectRangeQuery != null) {
@@ -152,7 +152,7 @@ public abstract class AbstractTestIndexStructures implements JUnit4Test {
       RangeQuery<DoubleVector> rangeq = db.getRangeQuery(dist, eps);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
       DoubleDBIDList ids = rangeq.getRangeForObject(dv, eps);
-      assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
+      assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
 
       // verify that the neighbors match.
       int i = 0;
@@ -162,7 +162,7 @@ public abstract class AbstractTestIndexStructures implements JUnit4Test {
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 0.00001);
+        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
     }
   }
@@ -196,11 +196,11 @@ public abstract class AbstractTestIndexStructures implements JUnit4Test {
       int i = 0;
       for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
-        assertEquals("Expected distance doesn't match.", cosshouldd[i], res.doubleValue());
+        assertEquals("Expected distance doesn't match.", cosshouldd[i], res.doubleValue(), 1e-15);
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(cosshouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 0.00001);
+        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
     }
     if(expectRangeQuery != null) {
@@ -215,11 +215,11 @@ public abstract class AbstractTestIndexStructures implements JUnit4Test {
       int i = 0;
       for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
-        assertEquals("Expected distance doesn't match.", cosshouldd[i], res.doubleValue());
+        assertEquals("Expected distance doesn't match.", cosshouldd[i], res.doubleValue(), 1e-15);
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(cosshouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 0.00001);
+        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
     }
   }
