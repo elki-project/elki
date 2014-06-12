@@ -49,7 +49,12 @@ public class TestRStarTree extends AbstractTestIndexStructures {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactIndex(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    //
+    spatparams = new ListParameterization();
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
+    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -64,7 +69,14 @@ public class TestRStarTree extends AbstractTestIndexStructures {
     spatparams.addParameter(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
     spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactIndex(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    //
+    spatparams = new ListParameterization();
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
+    spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
+    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
+    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 
   /**
@@ -76,6 +88,12 @@ public class TestRStarTree extends AbstractTestIndexStructures {
     spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
     spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
-    testExactIndex(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    testExactEuclidean(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    //
+    spatparams = new ListParameterization();
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
+    spatparams.addParameter(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class);
+    testExactCosine(spatparams, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 }

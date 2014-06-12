@@ -47,6 +47,6 @@ public class TestIDistance extends AbstractTestIndexStructures {
     spatparams.addParameter(InMemoryIDistanceIndex.Factory.Parameterizer.K_ID, 4);
     spatparams.addParameter(InMemoryIDistanceIndex.Factory.Parameterizer.DISTANCE_ID, EuclideanDistanceFunction.class);
     spatparams.addParameter(InMemoryIDistanceIndex.Factory.Parameterizer.REFERENCE_ID, FarthestPointsInitialMeans.class);
-    testExactIndex(spatparams, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
+    testExactEuclidean(spatparams, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
   }
 }

@@ -46,6 +46,6 @@ public class TestMTree extends AbstractTestIndexStructures {
     ListParameterization metparams = new ListParameterization();
     metparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, MTreeFactory.class);
     metparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
-    testExactIndex(metparams, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
+    testExactEuclidean(metparams, MetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
   }
 }

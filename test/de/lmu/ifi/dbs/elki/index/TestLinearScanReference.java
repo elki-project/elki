@@ -41,6 +41,15 @@ public class TestLinearScanReference extends AbstractTestIndexStructures {
   @Test
   public void testExact() {
     ListParameterization params = new ListParameterization();
-    testExactIndex(params, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
+    testExactEuclidean(params, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
+  }
+
+  /**
+   * Test exact query, also to validate the test is correct.
+   */
+  @Test
+  public void testExactCosine() {
+    ListParameterization params = new ListParameterization();
+    testExactCosine(params, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
   }
 }

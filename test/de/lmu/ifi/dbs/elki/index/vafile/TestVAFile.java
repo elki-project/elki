@@ -43,6 +43,6 @@ public class TestVAFile extends AbstractTestIndexStructures {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, VAFile.Factory.class);
     spatparams.addParameter(VAFile.Factory.PARTITIONS_ID, 4);
-    testExactIndex(spatparams, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
+    testExactEuclidean(spatparams, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
   }
 }

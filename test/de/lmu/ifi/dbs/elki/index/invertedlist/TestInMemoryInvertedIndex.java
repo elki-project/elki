@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.vafile;
+package de.lmu.ifi.dbs.elki.index.invertedlist;
 
 /*
  This file is part of ELKI:
@@ -30,19 +30,18 @@ import de.lmu.ifi.dbs.elki.index.AbstractTestIndexStructures;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Unit test for the partial VAfile index.
+ * Unit test for the iDistance index.
  * 
  * @author Erich Schubert
  */
-public class TestPartialVAFile extends AbstractTestIndexStructures {
+public class TestInMemoryInvertedIndex extends AbstractTestIndexStructures {
   /**
-   * Test {@link PartialVAFile} using a file based database connection.
+   * Test {@link InMemoryInvertedIndex}.
    */
   @Test
-  public void testPartialVAFile() {
+  public void testInvertedIndex() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, PartialVAFile.Factory.class);
-    spatparams.addParameter(PartialVAFile.Factory.PARTITIONS_ID, 4);
-    testExactEuclidean(spatparams, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, InMemoryInvertedIndex.Factory.class);
+    testExactCosine(spatparams, InMemoryInvertedIndex.CosineKNNQuery.class, null);
   }
 }
