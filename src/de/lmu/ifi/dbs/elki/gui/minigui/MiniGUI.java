@@ -483,6 +483,7 @@ public class MiniGUI extends AbstractApplication {
             if(params.size() > 0) {
               try {
                 gui.maincls = ELKILauncher.findMainClass(params.get(0));
+                params.remove(0); // on success
               }
               catch(ClassNotFoundException e) {
                 // Ignore.
