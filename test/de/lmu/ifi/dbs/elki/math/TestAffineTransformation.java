@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -76,7 +75,6 @@ public class TestAffineTransformation implements JUnit4Test {
     AffineTransformation t = new AffineTransformation(testdim);
     assertTrue(t.getDimensionality() == testdim);
     Matrix tm = t.getTransformation();
-    assertNotSame("getTransformation is expected to return a new copy", tm, t.getTransformation());
     assertEquals("initial transformation matrix should be unity", tm, Matrix.unitMatrix(testdim + 1));
 
     // translation vector
@@ -140,7 +138,6 @@ public class TestAffineTransformation implements JUnit4Test {
     AffineTransformation t = new AffineTransformation(testdim);
     assertTrue(t.getDimensionality() == testdim);
     Matrix tm = t.getTransformation();
-    assertNotSame("getTransformation is expected to return a new copy", tm, t.getTransformation());
     assertEquals("initial transformation matrix should be unity", tm, Matrix.unitMatrix(testdim + 1));
 
     // rotation matrix
