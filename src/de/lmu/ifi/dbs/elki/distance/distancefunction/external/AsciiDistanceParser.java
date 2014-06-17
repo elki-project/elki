@@ -29,10 +29,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -48,14 +44,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Lines starting with &quot;#&quot; will be ignored.
  * 
  * @author Elke Achtert
+ * @author Erich Schubert
  */
 @Title("Number Distance Parser")
-@Description("Parser for the following line format:\n" + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" + " The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
-public class NumberDistanceParser extends AbstractParser implements DistanceParser {
+@Description("Parser for the following line format:\n" //
+    + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" //
+    + " The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
+public class AsciiDistanceParser extends AbstractParser implements DistanceParser {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(NumberDistanceParser.class);
+  private static final Logging LOG = Logging.getLogger(AsciiDistanceParser.class);
 
   /**
    * Constructor.
@@ -64,7 +63,7 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
    * @param quoteChars Quote characters
    * @param comment Comment pattern
    */
-  public NumberDistanceParser(Pattern colSep, String quoteChars, Pattern comment) {
+  public AsciiDistanceParser(Pattern colSep, String quoteChars, Pattern comment) {
     super(colSep, quoteChars, comment);
   }
 
@@ -73,8 +72,8 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
 
+    int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Parsing distance matrix", LOG) : null;
-    ModifiableDBIDs ids = DBIDUtil.newHashSet();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         LOG.incrementProcessed(prog);
@@ -87,9 +86,9 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
         if(!tokenizer.valid()) {
           throw new IllegalArgumentException("Less than three values in line " + lineNumber);
         }
-        DBID id1, id2;
+        int id1, id2;
         try {
-          id1 = DBIDUtil.importInteger((int) tokenizer.getLongBase10());
+          id1 = (int) tokenizer.getLongBase10();
           tokenizer.advance();
         }
         catch(NumberFormatException e) {
@@ -100,7 +99,7 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
         }
 
         try {
-          id2 = DBIDUtil.importInteger((int) tokenizer.getLongBase10());
+          id2 = (int) tokenizer.getLongBase10();
           tokenizer.advance();
         }
         catch(NumberFormatException e) {
@@ -110,11 +109,19 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
           throw new IllegalArgumentException("Less than three values in line " + lineNumber);
         }
 
+        // Track minimum and maximum
+        if(id1 < id2) {
+          min = (id1 < min) ? id1 : min;
+          max = (id2 > min) ? id2 : max;
+        }
+        else {
+          min = (id2 < min) ? id2 : min;
+          max = (id1 > min) ? id1 : max;
+        }
+
         try {
           double distance = tokenizer.getDouble();
           cache.put(id1, id2, distance);
-          ids.add(id1);
-          ids.add(id2);
         }
         catch(IllegalArgumentException e) {
           throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage(), e);
@@ -132,13 +139,10 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
     LOG.setCompleted(prog);
 
     // check if all distance values are specified
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-        if(DBIDUtil.compare(iter2, iter) <= 0) {
-          continue;
-        }
-        if(!cache.containsKey(iter, iter2)) {
-          throw new IllegalArgumentException("Distance value for " + DBIDUtil.toString(iter) + " - " + DBIDUtil.toString(iter2) + " is missing!");
+    for(int i1 = min; i1 <= max; i1++) {
+      for(int i2 = i1 + 1; i2 <= max; i2++) {
+        if(!cache.containsKey(i1, i2)) {
+          throw new IllegalArgumentException("Distance value for " + i1 + " to " + i2 + " is missing!");
         }
       }
     }
@@ -163,8 +167,8 @@ public class NumberDistanceParser extends AbstractParser implements DistancePars
     }
 
     @Override
-    protected NumberDistanceParser makeInstance() {
-      return new NumberDistanceParser(colSep, quoteChars, comment);
+    protected AsciiDistanceParser makeInstance() {
+      return new AsciiDistanceParser(colSep, quoteChars, comment);
     }
   }
 }

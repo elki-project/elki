@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
+package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 /*
  This file is part of ELKI:
@@ -24,28 +24,27 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
  */
 
 /**
- * Interface to plug in the cache storage into the parser.
+ * Distance functions valid in a <em>static</em> database context only (i.e. for
+ * DBIDRanges)
+ * 
+ * For any "distance" that cannot be computed for arbitrary objects, only those
+ * that exist in the database and referenced by their ID. Furthermore, the IDs
+ * must be contiguous.
+ * 
+ * Example: external precomputed distances
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.uses DBIDRange oneway - - defined on
  */
-public interface DistanceCacheWriter {
+public interface DBIDRangeDistanceFunction extends DBIDDistanceFunction {
   /**
-   * Puts the specified distance value for the given ids to the distance cache.
+   * Compute the distance for two integer offsets.
    * 
-   * @param id1 the first id offset
-   * @param id2 the second id offset
-   * @param distance the distance value
+   * @param i1 First offset
+   * @param i2 Second offset
+   * @return Distance
    */
-  void put(int id1, int id2, double distance);
-
-  /**
-   * Returns <tt>true</tt> if the specified distance cache contains a distance
-   * value for the specified ids.
-   * 
-   * @param id1 the first id offset
-   * @param id2 the second id offset
-   * @return <tt>true</tt> if this cache contains a distance value for the
-   *         specified ids, false otherwise
-   */
-  boolean containsKey(int id1, int id2);
+  double distance(int i1, int i2);
 }

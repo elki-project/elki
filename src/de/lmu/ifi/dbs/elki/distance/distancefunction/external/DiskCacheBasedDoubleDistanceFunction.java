@@ -26,13 +26,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 import java.io.File;
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -47,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external matrix.")
-public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunction {
+public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   // TODO: constructor with file.
 
   /**
@@ -56,7 +53,8 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDDistanceFu
    * Key: {@code -distance.matrix}
    * </p>
    */
-  public static final OptionID MATRIX_ID = new OptionID("distance.matrix", "The name of the file containing the distance matrix.");
+  public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
+  "The name of the file containing the distance matrix.");
 
   /**
    * Magic to identify double cache matrices
@@ -83,39 +81,19 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDDistanceFu
     this.cache = cache;
   }
 
-  /**
-   * Returns the distance between the two objects specified by their objects
-   * ids. If a cache is used, the distance value is looked up in the cache. If
-   * the distance does not yet exists in cache, it will be computed an put to
-   * cache. If no cache is used, the distance is computed.
-   * 
-   * @param id1 first object id
-   * @param id2 second object id
-   * @return the distance between the two objects specified by their objects ids
-   */
   @Override
-  public double distance(DBIDRef id1, DBIDRef id2) {
-    if(id1 == null || id2 == null) {
-      throw new AbortException("Unknown object ID - no precomputed distance available.");
-    }
-    final int intid1 = DBIDUtil.asInteger(id1);
-    final int intid2 = DBIDUtil.asInteger(id2);
-    if(intid1 < 0 || intid2 < 0) {
-      throw new AbortException("Negative DBIDs not supported in OnDiskCache");
-    }
+  public double distance(int i1, int i2) {
     // the smaller id is the first key
-    if(intid1 > intid2) {
-      return distance(id2, id1);
+    if(i1 > i2) {
+      return distance(i2, i1);
     }
 
-    double distance;
     try {
-      distance = cache.getRecordBuffer(intid1, intid2).getDouble();
+      return cache.getRecordBuffer(i1, i2).getDouble();
     }
     catch(IOException e) {
-      throw new RuntimeException("Read error when loading distance " + id1 + "," + id2 + " from cache file.", e);
+      throw new RuntimeException("Read error when loading distance " + i1 + "," + i2 + " from cache file.", e);
     }
-    return distance;
   }
 
   @Override

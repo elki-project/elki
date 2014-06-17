@@ -25,8 +25,14 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.distance.DBIDDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -42,9 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction {
-  // TODO: add seed parameter!
-
+public class RandomStableDistanceFunction extends AbstractDatabaseDistanceFunction<DBID> implements DBIDDistanceFunction {
   /**
    * Static instance
    */
@@ -122,6 +126,17 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction {
   @Override
   public int hashCode() {
     return (int) seed;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.DBID;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends DBID> DistanceQuery<T> instantiate(Relation<T> relation) {
+    return (DistanceQuery<T>) new DBIDDistanceQuery((Relation<DBID>) relation, this);
   }
 
   /**

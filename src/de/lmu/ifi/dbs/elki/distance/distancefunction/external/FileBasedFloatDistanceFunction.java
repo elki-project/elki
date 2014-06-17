@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.TObjectFloatMap;
-import gnu.trove.map.hash.TObjectFloatHashMap;
+import gnu.trove.map.TLongFloatMap;
+import gnu.trove.map.hash.TLongFloatHashMap;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -32,10 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -50,35 +47,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Provides a DistanceFunction that is based on float distances given by a
  * distance matrix of an external file.
  * 
- * See {@link NumberDistanceParser} for the default input format.
+ * See {@link AsciiDistanceParser} for the default input format.
+ * 
+ * TODO: use a {@code float[]} instead of the hash map.
  * 
  * @author Elke Achtert
+ * @author Erich Schubert
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external text file.")
-public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction {
-  /**
-   * Parameter that specifies the name of the distance matrix file.
-   * <p>
-   * Key: {@code -distance.matrix}
-   * </p>
-   */
-  public static final OptionID MATRIX_ID = new OptionID("distance.matrix", "The name of the file containing the distance matrix.");
-
-  /**
-   * Optional parameter to specify the parsers to provide a database, must
-   * extend {@link DistanceParser}. If this parameter is not set,
-   * {@link NumberDistanceParser} is used as parser for all input files.
-   * <p>
-   * Key: {@code -distance.parser}
-   * </p>
-   */
-  public static final OptionID PARSER_ID = new OptionID("distance.parser", "Parser used to load the distance matrix.");
-
+public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**
    * The distance cache
    */
-  private TObjectFloatMap<DBIDPair> cache;
+  private TLongFloatMap cache;
 
   /**
    * Constructor.
@@ -96,53 +78,38 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
     }
   }
 
-  /**
-   * Returns the distance between the two objects specified by their objects
-   * ids. If a cache is used, the distance value is looked up in the cache. If
-   * the distance does not yet exists in cache, it will be computed an put to
-   * cache. If no cache is used, the distance is computed.
-   * 
-   * @param id1 first object id
-   * @param id2 second object id
-   * @return the distance between the two objects specified by their objects ids
-   */
   @Override
-  public double distance(DBIDRef id1, DBIDRef id2) {
-    if(id1 == null || id2 == null) {
-      throw new AbortException("Unknown object ID - no precomputed distance available.");
-    }
-    // the smaller id is the first key
-    if(DBIDUtil.compare(id1, id2) > 0) {
-      return distance(id2, id1);
-    }
-    double ret = cache.get(DBIDUtil.newPair(id1, id2));
-    if(ret != ret && DBIDUtil.equal(id1, id2)) {
-      return 0.;
-    }
-    return ret;
+  public double distance(int i1, int i2) {
+    return (i1 == i2) ? 0. : cache.get(makeKey(i1, i2));
   }
 
   private void loadCache(DistanceParser parser, File matrixfile) throws IOException {
     InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
-    cache = new TObjectFloatHashMap<>();
+    cache = new TLongFloatHashMap();
     parser.parse(in, new DistanceCacheWriter() {
       @Override
-      public void put(DBIDRef id1, DBIDRef id2, double distance) {
-        if(DBIDUtil.compare(id1, id2) > 0) {
-          put(id2, id1, distance);
-          return;
-        }
-        cache.put(DBIDUtil.newPair(id1, id2), (float) distance);
+      public void put(int id1, int id2, double distance) {
+        cache.put(makeKey(id1, id2), (float) distance);
       }
 
       @Override
-      public boolean containsKey(DBIDRef id1, DBIDRef id2) {
-        if(DBIDUtil.compare(id1, id2) > 0) {
-          return containsKey(id2, id1);
-        }
-        return cache.containsKey(DBIDUtil.newPair(id1, id2));
+      public boolean containsKey(int id1, int id2) {
+        return cache.containsKey(makeKey(id1, id2));
       }
     });
+  }
+
+  /**
+   * Combine two integer ids into a long value.
+   * 
+   * @param i1 First id
+   * @param i2 Second id
+   * @return Combined value
+   */
+  protected static final long makeKey(int i1, int i2) {
+    return (i1 < i2) //
+    ? ((((long) i1) << 32) | i2)//
+    : ((((long) i2) << 32) | i1);
   }
 
   @Override
@@ -165,6 +132,26 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter that specifies the name of the distance matrix file.
+     * <p>
+     * Key: {@code -distance.matrix}
+     * </p>
+     */
+    public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
+    "The name of the file containing the distance matrix.");
+
+    /**
+     * Optional parameter to specify the parsers to provide a database, must
+     * extend {@link DistanceParser}. If this parameter is not set,
+     * {@link AsciiDistanceParser} is used as parser for all input files.
+     * <p>
+     * Key: {@code -distance.parser}
+     * </p>
+     */
+    public static final OptionID PARSER_ID = new OptionID("distance.parser", //
+    "Parser used to load the distance matrix.");
+
     protected File matrixfile = null;
 
     protected DistanceParser parser = null;
@@ -177,7 +164,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
         matrixfile = MATRIX_PARAM.getValue();
       }
 
-      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         parser = PARSER_PARAM.instantiateClass(config);
       }
