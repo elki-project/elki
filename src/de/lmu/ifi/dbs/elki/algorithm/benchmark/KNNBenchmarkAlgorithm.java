@@ -139,7 +139,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
         KNNList knns = knnQuery.getKNNForDBID(iditer, k);
         int ichecksum = 0;
         for(DBIDIter it = knns.iter(); it.valid(); it.advance()) {
-          ichecksum += it.internalGetIndex();
+          ichecksum += DBIDUtil.asInteger(it);
         }
         hash = Util.mixHashCodes(hash, ichecksum);
         mv.put(knns.size());
@@ -196,7 +196,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
         KNNList knns = knnQuery.getKNNForObject(o, k);
         int ichecksum = 0;
         for(DBIDIter it = knns.iter(); it.valid(); it.advance()) {
-          ichecksum += it.internalGetIndex();
+          ichecksum += DBIDUtil.asInteger(it);
         }
         hash = Util.mixHashCodes(hash, ichecksum);
         mv.put(knns.size());

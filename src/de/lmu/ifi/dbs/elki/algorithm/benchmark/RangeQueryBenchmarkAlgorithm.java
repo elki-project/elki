@@ -166,7 +166,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
       DoubleDBIDList rres = rangeQuery.getRangeForDBID(iditer, r);
       int ichecksum = 0;
       for(DBIDIter it = rres.iter(); it.valid(); it.advance()) {
-        ichecksum += it.internalGetIndex();
+        ichecksum += DBIDUtil.asInteger(it);
       }
       hash = Util.mixHashCodes(hash, ichecksum);
       mv.put(rres.size());
@@ -252,7 +252,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
       DoubleDBIDList rres = rangeQuery.getRangeForObject(v, r);
       int ichecksum = 0;
       for(DBIDIter it = rres.iter(); it.valid(); it.advance()) {
-        ichecksum += it.internalGetIndex();
+        ichecksum += DBIDUtil.asInteger(it);
       }
       hash = Util.mixHashCodes(hash, ichecksum);
       mv.put(rres.size());

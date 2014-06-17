@@ -266,7 +266,7 @@ public class ROC {
    * 
    * @apiviz.composedOf DBIDIter
    */
-  public static class SimpleAdapter implements ScoreIter, DBIDRef {
+  public static class SimpleAdapter implements ScoreIter, DBIDRefIter {
     /**
      * Original Iterator
      */
@@ -298,11 +298,6 @@ public class ROC {
       return false; // No information.
     }
 
-    @Override
-    public int internalGetIndex() {
-      return iter.internalGetIndex();
-    }
-
     @Deprecated
     @Override
     public int hashCode() {
@@ -313,6 +308,11 @@ public class ROC {
     @Override
     public boolean equals(Object obj) {
       return super.equals(obj);
+    }
+
+    @Override
+    public DBIDRef getRef() {
+      return iter;
     }
   }
 
@@ -325,7 +325,7 @@ public class ROC {
    * 
    * @apiviz.composedOf DistanceDBIDListIter
    */
-  public static class DistanceResultAdapter implements ScoreIter, DBIDRef {
+  public static class DistanceResultAdapter implements ScoreIter, DBIDRefIter {
     /**
      * Original Iterator
      */
@@ -359,8 +359,8 @@ public class ROC {
     }
 
     @Override
-    public int internalGetIndex() {
-      return iter.internalGetIndex();
+    public DBIDRef getRef() {
+      return iter;
     }
 
     @Override
@@ -442,7 +442,7 @@ public class ROC {
    * 
    * @apiviz.composedOf OutlierResult
    */
-  public static class OutlierScoreAdapter implements ScoreIter, DBIDRef {
+  public static class OutlierScoreAdapter implements ScoreIter, DBIDRefIter {
     /**
      * Original iterator.
      */
@@ -487,8 +487,8 @@ public class ROC {
     }
 
     @Override
-    public int internalGetIndex() {
-      return iter.internalGetIndex();
+    public DBIDRef getRef() {
+      return iter;
     }
 
     @Deprecated
@@ -764,13 +764,27 @@ public class ROC {
   }
 
   /**
-   * Test predicate using a DBID set as positive elements.
-   * 
-   * @apiviz.composedOf DBIDs
+   * A score iterator wrapping a DBIDRef object.
    * 
    * @author Erich Schubert
    */
-  public static class DBIDsTest implements Predicate<DBIDRef> {
+  public static interface DBIDRefIter {
+    /**
+     * Get the current DBIDRef.
+     * 
+     * @return DBID reference
+     */
+    DBIDRef getRef();
+  }
+
+  /**
+   * Test predicate using a DBID set as positive elements.
+   * 
+   * @apiviz.composedOf DBIDs
+   *
+   * @author Erich Schubert
+   */
+  public static class DBIDsTest implements Predicate<DBIDRefIter> {
     /**
      * DBID set.
      */
@@ -786,8 +800,8 @@ public class ROC {
     }
 
     @Override
-    public boolean test(DBIDRef o) {
-      return set.contains(o);
+    public boolean test(DBIDRefIter o) {
+      return set.contains(o.getRef());
     }
   }
 }

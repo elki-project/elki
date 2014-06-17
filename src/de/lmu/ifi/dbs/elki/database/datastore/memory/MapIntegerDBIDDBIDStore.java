@@ -50,7 +50,7 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
    */
   public MapIntegerDBIDDBIDStore(int size) {
     super();
-    map = new TIntIntHashMap(size, 0.5f, Integer.MIN_VALUE, DBIDUtil.invalid().internalGetIndex());
+    map = new TIntIntHashMap(size, 0.5f, Integer.MIN_VALUE, DBIDUtil.asInteger(DBIDUtil.invalid()));
   }
 
   @Override
@@ -72,7 +72,7 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
   @Override
   @Deprecated
   public DBID put(DBIDRef id, DBID value) {
-    return DBIDUtil.importInteger(map.put(id.internalGetIndex(), value.internalGetIndex()));
+    return DBIDUtil.importInteger(map.put(DBIDUtil.asInteger(id), DBIDUtil.asInteger(value)));
   }
 
   @Override
@@ -88,17 +88,17 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
 
   @Override
   public void put(DBIDRef id, DBIDRef value) {
-    map.put(id.internalGetIndex(), value.internalGetIndex());
+    map.put(DBIDUtil.asInteger(id), DBIDUtil.asInteger(value));
   }
 
   @Override
   public void putDBID(DBIDRef id, DBIDRef value) {
-    map.put(id.internalGetIndex(), value.internalGetIndex());
+    map.put(DBIDUtil.asInteger(id), DBIDUtil.asInteger(value));
   }
 
   @Override
   public void assignVar(DBIDRef id, DBIDVar var) {
-    final int val = map.get(id.internalGetIndex());
+    final int val = map.get(DBIDUtil.asInteger(id));
     DBIDFactory.FACTORY.assignVar(var, val);
   }
 }
