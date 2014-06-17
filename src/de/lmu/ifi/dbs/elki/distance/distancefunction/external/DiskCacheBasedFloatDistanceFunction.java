@@ -27,11 +27,11 @@ import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -48,23 +48,9 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistan
   // TODO: constructor with file.
 
   /**
-   * Parameter that specifies the name of the distance matrix file.
-   * <p>
-   * Key: {@code -distance.matrix}
-   * </p>
-   */
-  public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
-  "The name of the file containing the distance matrix.");
-
-  /**
    * Magic to identify double cache matrices
    */
   public static final int FLOAT_CACHE_MAGIC = 23423411;
-
-  /**
-   * Storage required for a float value.
-   */
-  private static final int FLOAT_SIZE = 4;
 
   /**
    * The distance cache
@@ -121,11 +107,11 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistan
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final FileParameter param = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      final FileParameter param = new FileParameter(DiskCacheBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(param)) {
         File matrixfile = param.getValue();
         try {
-          cache = new OnDiskUpperTriangleMatrix(matrixfile, FLOAT_CACHE_MAGIC, 0, FLOAT_SIZE, false);
+          cache = new OnDiskUpperTriangleMatrix(matrixfile, FLOAT_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_FLOAT, false);
         }
         catch(IOException e) {
           config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e));

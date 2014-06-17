@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -48,23 +49,9 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
   // TODO: constructor with file.
 
   /**
-   * Parameter that specifies the name of the distance matrix file.
-   * <p>
-   * Key: {@code -distance.matrix}
-   * </p>
-   */
-  public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
-  "The name of the file containing the distance matrix.");
-
-  /**
    * Magic to identify double cache matrices
    */
   public static final int DOUBLE_CACHE_MAGIC = 50902811;
-
-  /**
-   * Storage required for a double value.
-   */
-  private static final int DOUBLE_SIZE = 8;
 
   /**
    * The distance matrix
@@ -116,6 +103,16 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    // TODO: constructor with file.
+    
+    /**
+     * Parameter that specifies the name of the distance matrix file.
+     * <p>
+     * Key: {@code -distance.matrix}
+     * </p>
+     */
+    public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
+    "The name of the file containing the distance matrix.");
     protected OnDiskUpperTriangleMatrix cache = null;
 
     @Override
@@ -125,7 +122,7 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
       if(config.grab(param)) {
         File matrixfile = param.getValue();
         try {
-          cache = new OnDiskUpperTriangleMatrix(matrixfile, DOUBLE_CACHE_MAGIC, 0, DOUBLE_SIZE, false);
+          cache = new OnDiskUpperTriangleMatrix(matrixfile, DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, false);
         }
         catch(IOException e) {
           config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e));

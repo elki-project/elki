@@ -26,11 +26,10 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDRangeDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Run a distance query based on DBIDRanges
@@ -59,11 +58,7 @@ public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
    */
   public DBIDRangeDistanceQuery(Relation<DBID> relation, DBIDRangeDistanceFunction distanceFunction) {
     super(relation, distanceFunction);
-    DBIDs ids = relation.getDBIDs();
-    if(!(ids instanceof DBIDRange)) {
-      throw new AbortException("This distance function can only be used with DBID ranges / static databases.");
-    }
-    this.range = (DBIDRange) ids;
+    this.range = DBIDUtil.assertRange(relation.getDBIDs());
     this.distanceFunction = distanceFunction;
   }
 

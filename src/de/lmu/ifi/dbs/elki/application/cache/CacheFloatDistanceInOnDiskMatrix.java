@@ -28,13 +28,15 @@ import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -62,11 +64,6 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
    * Debug flag, to double-check all write operations.
    */
   private static final boolean debugExtraCheckSymmetry = false;
-
-  /**
-   * Storage size: 4 bytes floats
-   */
-  private static final int FLOAT_SIZE = 4;
 
   /**
    * Data source to process.
@@ -103,39 +100,32 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
 
-    int matrixsize = 0;
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final int intid = DBIDUtil.asInteger(iditer);
-      matrixsize = Math.max(matrixsize, intid + 1);
-      if(intid < 0) {
-        throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
-      }
-    }
+    DBIDRange ids = DBIDUtil.assertRange(relation.getDBIDs());
+    int matrixsize = ids.size();
 
     OnDiskUpperTriangleMatrix matrix;
     try {
-      matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedFloatDistanceFunction.FLOAT_CACHE_MAGIC, 0, FLOAT_SIZE, matrixsize);
+      matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedFloatDistanceFunction.FLOAT_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_FLOAT, matrixsize);
     }
     catch(IOException e) {
       throw new AbortException("Error creating output matrix.", e);
     }
 
-    for(DBIDIter id1 = relation.iterDBIDs(); id1.valid(); id1.advance()) {
-      for(DBIDIter id2 = relation.iterDBIDs(); id2.valid(); id2.advance()) {
-        if(DBIDUtil.asInteger(id2) >= DBIDUtil.asInteger(id1)) {
-          float d = (float) distanceQuery.distance(id1, id2);
-          if(debugExtraCheckSymmetry) {
-            float d2 = (float) distanceQuery.distance(id2, id1);
-            if(Math.abs(d - d2) > 0.0000001) {
-              LOG.warning("Distance function doesn't appear to be symmetric!");
-            }
+    DBIDArrayIter id1 = ids.iter(), id2 = ids.iter();
+    for(; id1.valid(); id1.advance()) {
+      for(id2.seek(id1.getOffset()); id2.valid(); id2.advance()) {
+        float d = (float) distanceQuery.distance(id1, id2);
+        if(debugExtraCheckSymmetry) {
+          float d2 = (float) distanceQuery.distance(id2, id1);
+          if(Math.abs(d - d2) > 0.0000001) {
+            LOG.warning("Distance function doesn't appear to be symmetric!");
           }
-          try {
-            matrix.getRecordBuffer(DBIDUtil.asInteger(id1), DBIDUtil.asInteger(id2)).putFloat(d);
-          }
-          catch(IOException e) {
-            throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix.", e);
-          }
+        }
+        try {
+          matrix.getRecordBuffer(id1.getOffset(), id2.getOffset()).putFloat(d);
+        }
+        catch(IOException e) {
+          throw new AbortException("Error writing distance record " + DBIDUtil.toString(id1) + "," + DBIDUtil.toString(id2) + " to matrix.", e);
         }
       }
     }

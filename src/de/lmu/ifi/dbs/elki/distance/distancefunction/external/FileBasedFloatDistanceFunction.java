@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -132,26 +131,6 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    /**
-     * Parameter that specifies the name of the distance matrix file.
-     * <p>
-     * Key: {@code -distance.matrix}
-     * </p>
-     */
-    public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
-    "The name of the file containing the distance matrix.");
-
-    /**
-     * Optional parameter to specify the parsers to provide a database, must
-     * extend {@link DistanceParser}. If this parameter is not set,
-     * {@link AsciiDistanceParser} is used as parser for all input files.
-     * <p>
-     * Key: {@code -distance.parser}
-     * </p>
-     */
-    public static final OptionID PARSER_ID = new OptionID("distance.parser", //
-    "Parser used to load the distance matrix.");
-
     protected File matrixfile = null;
 
     protected DistanceParser parser = null;
@@ -159,12 +138,12 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
+      final FileParameter MATRIX_PARAM = new FileParameter(FileBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(MATRIX_PARAM)) {
         matrixfile = MATRIX_PARAM.getValue();
       }
 
-      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
+      final ObjectParameter<DistanceParser> PARSER_PARAM = new ObjectParameter<>(FileBasedDoubleDistanceFunction.Parameterizer.PARSER_ID, DistanceParser.class, AsciiDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         parser = PARSER_PARAM.instantiateClass(config);
       }

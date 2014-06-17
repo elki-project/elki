@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
 import de.lmu.ifi.dbs.elki.math.random.FastNonThreadsafeRandom;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * DBID Utility functions.
@@ -728,5 +729,19 @@ public final class DBIDUtil {
    */
   public static ModifiableDoubleDBIDList newDistanceDBIDList() {
     return DBIDFactory.FACTORY.newDistanceDBIDList();
+  }
+
+  /**
+   * Assert that the presented ids constitute a continuous {@link DBIDRange}.
+   * 
+   * @param ids ID range.
+   * @return DBID range.
+   * @throws AbortException
+   */
+  public static DBIDRange assertRange(DBIDs ids) {
+    if(!(ids instanceof DBIDRange)) {
+      throw new AbortException("This class may currently only be used with static databases and DBID ranges.");
+    }
+    return (DBIDRange) ids;
   }
 }
