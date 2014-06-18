@@ -51,7 +51,41 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * 
    * @param filters Filters, can be null
    * @param parser the parser to provide a database
-   * @param in the input stream to parse from.
+   * @param infile File to load the data from
+   */
+  public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, File infile) {
+    super(filters, parser);
+    try {
+      this.in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
+    }
+    catch(IOException e) {
+      throw new AbortException("Could not load input file: " + infile, e);
+    }
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param filters Filters, can be null
+   * @param parser the parser to provide a database
+   * @param infile File to load the data from
+   */
+  public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, String infile) {
+    super(filters, parser);
+    try {
+      this.in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
+    }
+    catch(IOException e) {
+      throw new AbortException("Could not load input file: " + infile, e);
+    }
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param filters Filters, can be null
+   * @param parser the parser to provide a database
+   * @param in Input stream
    */
   public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, InputStream in) {
     super(filters, parser);
@@ -91,12 +125,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
 
     @Override
     protected FileBasedDatabaseConnection makeInstance() {
-      try {
-        return new FileBasedDatabaseConnection(filters, parser, new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile))));
-      }
-      catch(IOException e) {
-        throw new AbortException("Input file could not be opened.", e);
-      }
+      return new FileBasedDatabaseConnection(filters, parser, infile);
     }
   }
 }
