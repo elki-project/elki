@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -53,78 +55,124 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
     super();
   }
 
+  private final double preDistance(NumberVector v1, NumberVector v2, int start, int end, double agg) {
+    for(int d = start; d < end; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+      final double delta = xd - yd;
+      agg += delta * delta;
+    }
+    return agg;
+  }
+
+  private final double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end, double agg) {
+    for(int d = start; d < end; d++) {
+      final double value = v.doubleValue(d), min = mbr.getMin(d);
+      double delta = min - value;
+      if(delta < 0.) {
+        delta = value - mbr.getMax(d);
+      }
+      if(delta > 0.) {
+        agg += delta * delta;
+      }
+    }
+    return agg;
+  }
+
+  private final double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end, double agg) {
+    for(int d = start; d < end; d++) {
+      double delta = mbr2.getMin(d) - mbr1.getMax(d);
+      if(delta < 0.) {
+        delta = mbr1.getMin(d) - mbr2.getMax(d);
+      }
+      if(delta > 0.) {
+        agg += delta * delta;
+      }
+    }
+    return agg;
+  }
+
+  private final double preNorm(NumberVector v, int start, int end, double agg) {
+    for(int d = start; d < end; d++) {
+      final double xd = v.doubleValue(d);
+      agg += xd * xd;
+    }
+    return agg;
+  }
+
+  private final double preNormMBR(SpatialComparable mbr, int start, int end, double agg) {
+    for(int d = start; d < end; d++) {
+      double delta = mbr.getMin(d);
+      if(delta < 0.) {
+        delta = -mbr.getMax(d);
+      }
+      if(delta > 0.) {
+        agg += delta * delta;
+      }
+    }
+    return agg;
+  }
+
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    final int dim = dimensionality(v1, v2);
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double delta = v1.doubleValue(d) - v2.doubleValue(d);
-      agg += delta * delta;
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    double agg = preDistance(v1, v2, 0, mindim, 0.);
+    if(dim1 > mindim) {
+      agg = preNorm(v1, mindim, dim1, agg);
+    }
+    else if(dim2 > mindim) {
+      agg = preNorm(v2, mindim, dim2, agg);
     }
     return agg;
   }
 
   @Override
   public double norm(NumberVector v) {
-    final int dim = v.getDimensionality();
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double val = v.doubleValue(d);
-      agg += val * val;
-    }
-    return agg;
-  }
-
-  protected double minDistObject(NumberVector v, SpatialComparable mbr) {
-    final int dim = dimensionality(mbr, v);
-    double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double value = v.doubleValue(d), min = mbr.getMin(d);
-      final double diff;
-      if (value < min) {
-        diff = min - value;
-      } else {
-        final double max = mbr.getMax(d);
-        if (value > max) {
-          diff = value - max;
-        } else {
-          continue;
-        }
-      }
-      agg += diff * diff;
-    }
-    return agg;
+    return preNorm(v, 0, v.getDimensionality(), 0.);
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    // Some optimizations for simpler cases.
-    if (mbr1 instanceof NumberVector) {
-      if (mbr2 instanceof NumberVector) {
-        return distance((NumberVector) mbr1, (NumberVector) mbr2);
-      } else {
-        return minDistObject((NumberVector) mbr1, mbr2);
-      }
-    } else if (mbr2 instanceof NumberVector) {
-      return minDistObject((NumberVector) mbr2, mbr1);
-    }
-    final int dim = dimensionality(mbr1, mbr2);
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+
+    final NumberVector v1 = (mbr1 instanceof NumberVector) ? (NumberVector) mbr1 : null;
+    final NumberVector v2 = (mbr2 instanceof NumberVector) ? (NumberVector) mbr2 : null;
 
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
-      final double diff;
-      final double d1 = mbr2.getMin(d) - mbr1.getMax(d);
-      if (d1 > 0.) {
-        diff = d1;
-      } else {
-        final double d2 = mbr1.getMin(d) - mbr2.getMax(d);
-        if (d2 > 0.) {
-          diff = d2;
-        } else {
-          continue;
-        }
+    if(v1 != null) {
+      if(v2 != null) {
+        agg = preDistance(v1, v2, 0, mindim, agg);
       }
-      agg += diff * diff;
+      else {
+        agg = preDistanceVM(v1, mbr2, 0, mindim, agg);
+      }
+    }
+    else {
+      if(v2 != null) {
+        agg = preDistanceVM(v2, mbr1, 0, mindim, agg);
+      }
+      else {
+        agg = preDistanceMBR(mbr1, mbr2, 0, mindim, agg);
+      }
+    }
+    // first object has more dimensions.
+    if(dim1 > mindim) {
+      if(v1 != null) {
+        agg = preNorm(v1, mindim, dim1, agg);
+      }
+      else {
+        agg = preNormMBR(v1, mindim, dim1, agg);
+      }
+    }
+    // second object has more dimensions.
+    if(dim2 > mindim) {
+      if(v2 != null) {
+        agg = preNorm(v2, mindim, dim2, agg);
+      }
+      else {
+        agg = preNormMBR(mbr2, mindim, dim2, agg);
+      }
     }
     return agg;
   }
@@ -141,13 +189,18 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (obj == this) {
+    if(obj == this) {
       return true;
     }
     return this.getClass().equals(obj.getClass());
+  }
+
+  @Override
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 
   /**

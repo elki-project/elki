@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -58,9 +60,10 @@ public class ClarkDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    final int dim = dimensionality(v1, v2);
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for (int d = 0; d < mindim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double div = Math.abs(xd) + Math.abs(yd);
       if (div > 0.) {
@@ -68,14 +71,25 @@ public class ClarkDistanceFunction extends AbstractSpatialDistanceFunction {
         agg += v * v;
       }
     }
-    return Math.sqrt(agg / dim);
+    for(int d = mindim; d < dim1; d++) {
+      if(v1.doubleValue(d) != 0) {
+        agg += 1;
+      }
+    }
+    for(int d = mindim; d < dim2; d++) {
+      if(v2.doubleValue(d) != 0) {
+        agg += 1;
+      }
+    }
+    return Math.sqrt(agg / Math.max(dim1, dim2));
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim = dimensionality(mbr1, mbr2);
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for (int d = 0; d < mindim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
       final double diff;
@@ -93,7 +107,22 @@ public class ClarkDistanceFunction extends AbstractSpatialDistanceFunction {
       final double v = diff / (absmax1 + absmax2);
       agg += v * v;
     }
-    return Math.sqrt(agg / dim);
+    for(int d = mindim; d < dim1; d++) {
+      if(mbr1.getMin(d) > 0. || mbr1.getMax(d) < 0.) {
+        agg += 1;
+      }
+    }
+    for(int d = mindim; d < dim2; d++) {
+      if(mbr2.getMin(d) > 0. || mbr2.getMax(d) < 0.) {
+        agg += 1;
+      }
+    }
+    return Math.sqrt(agg / Math.max(dim1, dim2));
+  }
+
+  @Override
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 
   /**

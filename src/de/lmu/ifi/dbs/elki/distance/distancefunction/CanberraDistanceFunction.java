@@ -24,6 +24,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -58,13 +60,24 @@ public class CanberraDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    final int dim = dimensionality(v1, v2);
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < mindim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double div = Math.abs(xd) + Math.abs(yd);
-      if (div > 0) {
+      if(div > 0) {
         agg += Math.abs(xd - yd) / div;
+      }
+    }
+    for(int d = mindim; d < dim1; d++) {
+      if(v1.doubleValue(d) != 0) {
+        agg += 1;
+      }
+    }
+    for(int d = mindim; d < dim2; d++) {
+      if(v2.doubleValue(d) != 0) {
+        agg += 1;
       }
     }
     return agg;
@@ -72,15 +85,18 @@ public class CanberraDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim = dimensionality(mbr1, mbr2);
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < mindim; d++) {
       final double diff;
-      if (mbr1.getMax(d) < mbr2.getMin(d)) {
+      if(mbr1.getMax(d) < mbr2.getMin(d)) {
         diff = mbr2.getMin(d) - mbr1.getMax(d);
-      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
+      }
+      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
         diff = mbr1.getMin(d) - mbr2.getMax(d);
-      } else { // The mbrs intersect!
+      }
+      else { // The mbrs intersect!
         continue;
       }
       final double a1 = Math.max(-mbr1.getMin(d), mbr1.getMax(d));
@@ -88,6 +104,16 @@ public class CanberraDistanceFunction extends AbstractSpatialDistanceFunction {
       final double div = a1 + a2;
       // Cannot be 0, because then diff = 0 and we continued above.
       agg += diff / div;
+    }
+    for(int d = mindim; d < dim1; d++) {
+      if(mbr1.getMin(d) > 0. || mbr1.getMax(d) < 0.) {
+        agg += 1;
+      }
+    }
+    for(int d = mindim; d < dim2; d++) {
+      if(mbr2.getMin(d) > 0. || mbr2.getMax(d) < 0.) {
+        agg += 1;
+      }
     }
     return agg;
   }
@@ -97,6 +123,11 @@ public class CanberraDistanceFunction extends AbstractSpatialDistanceFunction {
     // As this is also reffered to as "canberra metric", it is probably a metric
     // But *maybe* only for positive numbers only?
     return true;
+  }
+
+  @Override
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 
   /**
