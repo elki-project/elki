@@ -16,7 +16,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.LorentzianDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.SharedNearestNeighborJaccardDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction
-# de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedManhattanDistanceFunction

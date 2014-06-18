@@ -108,6 +108,7 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
 de.lmu.ifi.dbs.elki.algorithm.statistics.HopkinsStatisticClusteringTendency
+de.lmu.ifi.dbs.elki.algorithm.statistics.MeanAveragePrecisionForDistance
 de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 # de.lmu.ifi.dbs.elki.algorithm.DummyAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator
