@@ -70,4 +70,9 @@ public interface WritableDoubleDataStore extends DoubleDataStore, WritableDataSt
    * @param value Value to add to the previous value.
    */
   public void increment(DBIDRef id, double value);
+
+  /**
+   * Reinitialize (reset to default value).
+   */
+  public void clear();
 }

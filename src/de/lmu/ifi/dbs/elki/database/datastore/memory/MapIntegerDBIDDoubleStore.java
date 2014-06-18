@@ -88,12 +88,6 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   }
 
   @Override
-  public void destroy() {
-    map.clear();
-    map = null;
-  }
-
-  @Override
   public void delete(DBIDRef id) {
     map.remove(DBIDUtil.asInteger(id));
   }
@@ -111,5 +105,16 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   @Override
   public void increment(DBIDRef id, double value) {
     map.adjustOrPutValue(DBIDUtil.asInteger(id), value, map.getNoEntryValue() + value);
+  }
+
+  @Override
+  public void clear() {
+    map.clear();
+  }
+
+  @Override
+  public void destroy() {
+    map.clear();
+    map = null;
   }
 }
