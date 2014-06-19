@@ -25,7 +25,8 @@ import java.util.Collection;
  */
 
 public interface UnionFind<T> {
-  public void union(T p, T q);
+  public int union(T p, T q);
   public boolean isConnected(T p, T q);
   public Collection<T> getRoots();
+  public int find(T p);
 }

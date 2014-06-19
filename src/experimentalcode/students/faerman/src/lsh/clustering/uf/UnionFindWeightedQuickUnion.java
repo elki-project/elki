@@ -1,6 +1,5 @@
 package experimentalcode.students.faerman.src.lsh.clustering.uf;
 
-import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.Collection;
@@ -8,7 +7,6 @@ import java.util.LinkedList;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -72,7 +70,7 @@ public class UnionFindWeightedQuickUnion implements UnionFind<DBID> {
     }
   }
 
-  private int find(DBID element) {
+  public int find(DBID element) {
     int componentNumber = getElementIndex(element);
     return find(componentNumber);
   }
@@ -93,27 +91,30 @@ public class UnionFindWeightedQuickUnion implements UnionFind<DBID> {
     return elementIndex;
   }
 
-  @Override
-  public void union(DBID first, DBID second) {
+  public int union(DBID first, DBID second) {
     int firstIndex = getElementIndex(first);
     int secondIndex = getElementIndex(second);
     int firstComponent = find(firstIndex);
     int secondComponent = find(secondIndex);
     if(firstComponent == secondComponent) {
-      return;
+      return firstComponent;
     }
+    int newComponentNumber=-1;
     if(height[firstComponent] > height[secondComponent]) {
       mappingToComponent[secondComponent] = firstComponent;
       height[firstComponent] = Math.max(height[firstComponent], height[secondComponent] + 1);
       // to find the roots
       height[secondComponent] = 0;
+      newComponentNumber=firstComponent;
     }
     else {
       mappingToComponent[firstComponent] = secondComponent;
       height[secondComponent] = Math.max(height[secondComponent], height[firstComponent] + 1);
       // to find the roots
       height[firstComponent] = 0;
+      newComponentNumber=secondComponent;
     }
+    return newComponentNumber;
   }
 
   @Override
