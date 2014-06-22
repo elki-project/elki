@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.kd.MinimalisticMemoryKDTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -158,6 +159,17 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   }
   
   public Clustering<M> run(Database database, Relation<V> relation) {
+    
+    /**
+     * TODO:
+     * Not much speed improvement.
+     * KD Tree used properly?
+     */
+    
+    // Use kd trees for performance improvements
+    MinimalisticMemoryKDTree<V> index = new MinimalisticMemoryKDTree<>(relation);
+    index.initialize();
+    database.addIndex(index);
     
     ProxyDatabase proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
 

@@ -32,6 +32,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 
 public class BayesianInformationCriterion<V extends NumberVector, M extends MeanModel> extends InformationCriterion<V, M> {
 
+  /**
+   * Evaluates the BIC of a clustering.
+   */
   @Override
   public double evaluate(Relation<V> relation, Clustering<M> clustering, DistanceFunction<? super V> distanceFunction) {
     
@@ -46,8 +49,8 @@ public class BayesianInformationCriterion<V extends NumberVector, M extends Mean
     
     // bayes information criterion for this clustering
     double bic =
-      logLikelihoodClustering(relation, clustering, distanceFunction) -
-      (m * Math.log(n)) / 2;
+        Math.log(n) * m -
+        2 * logLikelihoodClustering(relation, clustering, distanceFunction);
     
     return bic;
   }
