@@ -39,10 +39,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
@@ -97,6 +94,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   private int k_max;
   
   XMeansSplitKMeansInitialization<M> splitInitializer;
+  
+  InformationCriterion<V, M> informationCriterion;
 
   /**
    * Constructor.
@@ -113,6 +112,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     this.initialKMeans    = initialKMeans;
     this.splitKMeans      = splitKMeans;
     this.splitInitializer = splitInitializer;
+    
+    this.informationCriterion = new BayesianInformationCriterion<V, M>();
   }
   
   private Clustering<M> splitCluster(Relation<V> relation, Cluster<M> parentCluster, Database database) {
@@ -130,14 +131,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     parentClusterList.add(parentCluster);
     Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
     
-    double bicParent   = bic(relation, parentClustering);
-    double bicChildren = bic(relation, childClustering);
-    
-    LOG.log(Logging.Level.FINE, "BIC parent: " + bicParent);
-    LOG.log(Logging.Level.FINE, "BIC children: " + bicChildren);
+    double parentEvaluation   = informationCriterion.evaluate(relation, parentClustering, initialKMeans.getDistanceFunction());
+    double childrenEvaluation = informationCriterion.evaluate(relation, childClustering, initialKMeans.getDistanceFunction());
     
     // Check if split is an improvement
-    if (bicChildren < bicParent) {
+    if (childrenEvaluation < parentEvaluation) {
       // Split does not improve clustering.
       // Return old cluster
       return parentClustering;
@@ -216,110 +214,6 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   @Override
   protected Logging getLogger() {
     return LOG;
-  }
-  
-  private double maxLikelihoodCluster(Relation<V> relation, Clustering<M> clustering, Cluster<M> cluster) {
-    
-    NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
-    
-    // number of data points in this cluster
-    int n_i = cluster.size();
-    
-    // number of clusters
-    int m = clustering.getAllClusters().size();
-    
-    // center of this cluster
-    V c_i = factory.newNumberVector(cluster.getModel().getMean());
-    
-    // TODO: best way to get distance?
-    DistanceQuery<V> distanceQuery = relation.getDatabase().getDistanceQuery(relation, initialKMeans.getDistanceFunction());
-    
-    // max likelihood of this cluster
-    double maxLikelihood_i = 0;
-    for (DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-      V x_j = relation.get(iter);
-      maxLikelihood_i += Math.pow(distanceQuery.distance(x_j, c_i), 2);
-      
-    }
-    maxLikelihood_i /= n_i - m;
-    
-    return maxLikelihood_i;
-  }
-  
-  /**
-   * Computes log likelihood for a single cluster of a clustering
-   *
-   * @param relation
-   * @param clustering
-   * @param cluster
-   * @return
-   */
-  private double logLikelihoodCluster(Relation<V> relation, Clustering<M> clustering, Cluster<M> cluster) {
-    
-    // number of all data points
-    int n = 0;
-    for (Cluster<M> aCluster : clustering.getAllClusters()) {
-      n += aCluster.size();
-    }
-    
-    // number of data points in this cluster
-    int n_i = cluster.size();
-    
-    // number of clusters
-    int m = clustering.getAllClusters().size();
-  
-    // dimensionality of data points
-    int d = RelationUtil.dimensionality(relation);
-    
-    // likelihood of this cluster
-    double logLikelihood_i =
-        n_i * Math.log(n_i) -
-        n_i * Math.log(n) -
-        ((n_i * d) / 2) * Math.log(2 * Math.PI) -
-        (n_i / 2) * Math.log(maxLikelihoodCluster(relation, clustering, cluster)) -
-        (n_i - m) / 2;
-    
-    return logLikelihood_i;
-  }
-
-  /**
-   * Computes log likelihood for a cluster
-   * 
-   * @param relation
-   * @param clustering
-   * @return
-   */
-  private double logLikelihoodClustering(Relation<V> relation, Clustering<M> clustering) {
-    
-    // log likelihood of this clustering
-    double logLikelihood = 0.0;
-    
-    // add up the log-likelihood of all clusters
-    for (Cluster<M> cluster : clustering.getAllClusters()) {
-      logLikelihood += logLikelihoodCluster(relation, clustering, cluster);
-    }
-    
-    return logLikelihood;
-  }
-  
-  
-  private double bic(Relation<V> relation, Clustering<M> clustering) {
-    
-    // number of all data points
-    int n = 0;
-    for (Cluster<M> aCluster : clustering.getAllClusters()) {
-      n += aCluster.size();
-    }
-    
-    // number of clusters
-    int m = clustering.getAllClusters().size();
-    
-    // bayes information criterion for this clustering
-    double bic =
-      logLikelihoodClustering(relation, clustering) -
-      (m * Math.log(n)) / 2;
-    
-    return bic;
   }
 
   /**
