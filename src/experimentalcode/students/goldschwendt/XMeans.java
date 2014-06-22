@@ -78,16 +78,16 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    */
   private static final Logging LOG = Logging.getLogger(XMeans.class);
 
-  /**
-   * Variant of kMeans for the bisecting step.
-   */
   private KMeans<V, M> initialKMeans;
   private KMeans<V, M> splitKMeans;
 
   /**
    * Computed number of clusters. Output value
    */
-  // TODO: how to return k?
+  /* 
+   * TODO:
+   * How should I return k (e.g. in the GUI)?
+   */
   private int k;
   
   private int k_min;
@@ -102,9 +102,14 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * 
    * @param k_min k_min parameter - minimum number of result clusters
    * @param k_max k_max parameter - maximum number of result clusters
-   * @param innerkMeans KMeans variant parameter - for split step
+   * @param initialKMeans K-Means variant parameter - for initial clustering
+   * @param splitKMeans K-Means variant parameter - for split step
+   * @param splitInitializer K Means initializer for the splitting step
+   * @param informationCriterion The information criterion used for the splitting step
    */
-  public XMeans(int k_min, int k_max, KMeans<V, M> initialKMeans, KMeans<V, M> splitKMeans, XMeansSplitKMeansInitialization<M> splitInitializer) {
+  public XMeans(int k_min, int k_max, KMeans<V, M> initialKMeans, KMeans<V, M> splitKMeans,
+      XMeansSplitKMeansInitialization<M> splitInitializer, InformationCriterion<V, M> informationCriterion) {
+    
     super();
     this.k_min = k_min;
     this.k_max = k_max;
@@ -112,17 +117,22 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     this.initialKMeans    = initialKMeans;
     this.splitKMeans      = splitKMeans;
     this.splitInitializer = splitInitializer;
-    
-    this.informationCriterion = new BayesianInformationCriterion<V, M>();
+    this.informationCriterion = informationCriterion;
   }
   
+  /**
+   * Conditionally splits the clusters based on the information criterion.
+   * 
+   * @param relation
+   * @param parentCluster
+   * @param database
+   * @return Parent cluster when split decreases clustering quality or child clusters when split improves clustering.
+   */
   private Clustering<M> splitCluster(Relation<V> relation, Cluster<M> parentCluster, Database database) {
     
     ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
     
-    //determineChildCentroids(relation, parentCluster, database);
-    
-    // TODO: Throws exception when there are too few data points in the child cluster
+    // FIXME: Throws exception when there are too few data points in the child cluster
     splitInitializer.setParentCluster(parentCluster);
     Clustering<M> childClustering = splitKMeans.run(proxyDB);
     
@@ -131,8 +141,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     parentClusterList.add(parentCluster);
     Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
     
-    double parentEvaluation   = informationCriterion.evaluate(relation, parentClustering, initialKMeans.getDistanceFunction());
-    double childrenEvaluation = informationCriterion.evaluate(relation, childClustering, initialKMeans.getDistanceFunction());
+    double parentEvaluation   = informationCriterion.evaluate(relation, parentClustering, getDistanceFunction());
+    double childrenEvaluation = informationCriterion.evaluate(relation, childClustering, getDistanceFunction());
     
     // Check if split is an improvement
     if (childrenEvaluation < parentEvaluation) {
@@ -143,16 +153,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     else {
       // Split improves clustering
       // Return the new clusters
-      k++;
       return childClustering;
-      //return parentClustering;
     }
   }
   
   public Clustering<M> run(Database database, Relation<V> relation) {
-    
-    // TODO: debug output does not appear
-    LOG.debugFinest("start");
     
     ProxyDatabase proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
 
@@ -186,13 +191,14 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
           resultClusterList.remove(cluster);
           resultClusterList.addAll(childClusterList);
           toSplitClusterList.addAll(childClusterList);
+          k++;
           
           LOG.incrementProcessed(prog);
         }
       }
     }
     
-    // TODO: progress is not set properly
+    // FIXME: progress is not set properly
     if (prog != null) {
       prog.setTotal(k);
     }
@@ -208,7 +214,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
   @Override
   public DistanceFunction<? super V> getDistanceFunction() {
-    return initialKMeans.getDistanceFunction();
+    return splitKMeans.getDistanceFunction();
   }
 
   @Override
@@ -229,11 +235,18 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
      * Parameter to specify the kMeans variant.
      */
     public static final OptionID INITIAL_KMEANS_ID = new OptionID("xmeans.initial-kmeans-variant", "Initial kMeans variant");
-    // TODO: Good idea?
+    
+    /* 
+     * TODO:
+     * My version of k means can be parameterized with two k means variants.
+     * One for the initial k means and the other for the splitting steps.
+     * Is this a good idea or should there only be one? 
+     */
     public static final OptionID SPLIT_KMEANS_ID = new OptionID("xmeans.split-kmeans-variant", "Split kMeans variant");
 
     public static final OptionID K_MIN_ID = new OptionID("xmeans.k_min", "The minimum number of clusters to find.");
     public static final OptionID K_MAX_ID = new OptionID("xmeans.k_max", "The maximum number of clusters to find.");
+    public static final OptionID INFORMATION_CRITERION_ID = new OptionID("xmeans.information-criterion", "The information to evaluate splits (e.g. AIC, BIC)");
     
     /**
      * Variant of kMeans
@@ -242,6 +255,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     protected KMeans<V, M> splitKMeansVariant;
     
     protected XMeansSplitKMeansInitialization<M> splitInitializer;
+    protected InformationCriterion<V, M> informationCriterion;
 
     /**
      * Mimimum and maximum number of result clusters.
@@ -257,7 +271,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       IntParameter kMaxP = new IntParameter(K_MAX_ID);
       
       kMinP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      // TODO: k_max should be equal or greater than k_min
+      /*
+       * TODO:
+       * k_max should be equal or greater than k_min.
+       * Is there a constraint to express this?
+       */
       kMaxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       
       if (config.grab(kMinP) &&
@@ -277,6 +295,15 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         ListParameterization initialKMeansVariantParameters = new ListParameterization();
         ListParameterization splitKMeansVariantParameters   = new ListParameterization();
 
+        /*
+         * TODO:
+         * For the splitting step I have to constrain the initial position of the cluster centers.
+         * However, the k means class does not have the required API to set the cluster centers.
+         * I solved the problem by implementen a custom initialization class
+         * where I can set the centers during the execution of x means.
+         * In my opinion, rather clumsy.
+         * Should I leave like this or should the API of k means be adapted?    
+         */
         splitInitializer = new XMeansSplitKMeansInitialization<>(rndP.getValue());
         
         initialKMeansVariantParameters.addParameter(KMeans.K_ID, k_min);
@@ -293,11 +320,17 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         combinedConfig.errorsTo(config);
         splitKMeansVariant = splitKMeansVariantP.instantiateClass(combinedConfig);
       }
+      
+      ObjectParameter<InformationCriterion<V, M>> informationCriterionP = new ObjectParameter<>(INFORMATION_CRITERION_ID, InformationCriterion.class);
+      
+      if (config.grab(informationCriterionP)) {
+        informationCriterion = informationCriterionP.instantiateClass(config);
+      }
     }
 
     @Override
     protected XMeans<V, M> makeInstance() {
-      return new XMeans<>(k_min, k_max, initialKMeansVariant, splitKMeansVariant, splitInitializer);
+      return new XMeans<>(k_min, k_max, initialKMeansVariant, splitKMeansVariant, splitInitializer, informationCriterion);
     }
   }
 }
