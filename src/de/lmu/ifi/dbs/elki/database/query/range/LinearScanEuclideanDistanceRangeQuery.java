@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses PrimitiveDistanceQuery
+ * @apiviz.uses SquaredEuclideanDistanceFunction
  * 
  * @param <O> Database object type
  */

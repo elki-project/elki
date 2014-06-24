@@ -172,8 +172,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       if(LOG.isDebugging()) {
         LOG.verbose("Loading neighborhood file.");
       }
-      try(InputStream in = FileUtil.tryGzipInput(new FileInputStream(file))) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+      try(InputStream in = FileUtil.tryGzipInput(new FileInputStream(file));
+        BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
         for(String line; (line = br.readLine()) != null;) {
           ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
           String[] entries = line.split(" ");
@@ -198,9 +198,6 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
             }
           }
         }
-        br.close();
-        in.close();
-
         return store;
       }
       catch(IOException e) {

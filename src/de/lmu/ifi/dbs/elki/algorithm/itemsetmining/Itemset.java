@@ -85,7 +85,7 @@ public abstract class Itemset implements Comparable<Itemset> {
    * Append to a string buffer.
    * 
    * @param buf Buffer
-   * @param labels Item labels
+   * @param meta Relation metadata (for labels)
    * @return String buffer for chaining.
    */
   abstract public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta);

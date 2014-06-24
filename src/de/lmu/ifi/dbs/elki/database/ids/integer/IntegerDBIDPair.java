@@ -62,36 +62,18 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
     return "Pair(" + first + ", " + second + ")";
   }
 
-  /**
-   * Getter for first
-   * 
-   * @return first element in pair
-   */
+  @Deprecated
   @Override
   public final IntegerDBID getFirst() {
     return new IntegerDBID(first);
   }
 
-  /**
-   * Getter for second element in pair
-   * 
-   * @return second element in pair
-   */
+  @Deprecated
   @Override
   public final IntegerDBID getSecond() {
     return new IntegerDBID(second);
   }
 
-  /**
-   * Simple equals statement.
-   * 
-   * This Pair equals another Object if they are identical or if the other
-   * Object is also a Pair and the {@link #first} and {@link #second} element of
-   * this Pair equal the {@link #first} and {@link #second} element,
-   * respectively, of the other Pair.
-   * 
-   * @param obj Object to compare to
-   */
   @Override
   public boolean equals(Object obj) {
     if(this == obj) {

@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  * @apiviz.landmark
  * 
  * @apiviz.uses AbstractRStarTree
- * @apiviz.uses DoubleDistanceRStarTreeKNNQuery
- * @apiviz.uses DoubleDistanceRStarTreeRangeQuery
+ * @apiviz.uses EuclideanRStarTreeKNNQuery
+ * @apiviz.uses EuclideanRStarTreeRangeQuery
  * @apiviz.has RangeQuery
  * @apiviz.has KNNQuery
  */

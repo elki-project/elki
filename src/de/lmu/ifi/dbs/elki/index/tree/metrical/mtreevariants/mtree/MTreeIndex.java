@@ -213,7 +213,7 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
       }
     }
     DistanceQuery<O> dq = distanceFunction.instantiate(relation);
-    return (KNNQuery<O>) MTreeQueryUtil.getKNNQuery(this, dq, hints);
+    return MTreeQueryUtil.getKNNQuery(this, dq, hints);
   }
 
   @Override
@@ -236,7 +236,7 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
       }
     }
     DistanceQuery<O> dq = distanceFunction.instantiate(relation);
-    return (RangeQuery<O>) MTreeQueryUtil.getRangeQuery(this, dq);
+    return MTreeQueryUtil.getRangeQuery(this, dq);
   }
 
   @Override

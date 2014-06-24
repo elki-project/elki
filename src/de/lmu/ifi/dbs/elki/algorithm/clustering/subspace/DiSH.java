@@ -90,7 +90,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * 
  * @apiviz.uses DiSHPreferenceVectorIndex
- * @apiviz.uses DiSHDistanceFunction
  * @apiviz.has SubspaceModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
@@ -123,8 +122,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * Constructor.
    * 
    * @param epsilon Epsilon value
-   * @param dishDistance Distance function
-   * @param opticsAlgorithmParameters OPTICS parameters
+   * @param mu Mu parameter (minPts)
+   * @param dishPreprocessor DiSH preprocessor
    */
   public DiSH(double epsilon, int mu, DiSHPreferenceVectorIndex.Factory<V> dishPreprocessor) {
     super();
@@ -142,7 +141,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     if(LOG.isVerbose()) {
       LOG.verbose("Running the DiSH preprocessor.");
     }
-    DiSHPreferenceVectorIndex<V> indexinst = (DiSHPreferenceVectorIndex<V>) dishPreprocessor.instantiate(relation);
+    DiSHPreferenceVectorIndex<V> indexinst = dishPreprocessor.instantiate(relation);
     if(LOG.isVerbose()) {
       LOG.verbose("Running the OPTICS algorithm.");
     }

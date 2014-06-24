@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
  * @apiviz.landmark
  * 
  * @apiviz.uses SpatialComparable oneway - - «compares»
- * @apiviz.has HyperBoundingBox oneway - - «creates»
+ * @apiviz.has ModifiableHyperBoundingBox oneway - - «creates»
  */
 // IMPORTANT NOTE: when editing this class, bear in mind that the dimension
 // numbers start at 1 or 0 depending on the context!

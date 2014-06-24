@@ -53,9 +53,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * OPTICS provides the OPTICS algorithm.
+ * 
+ * Reference:
  * <p>
- * Reference: M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: OPTICS:
- * Ordering Points to Identify the Clustering Structure. <br>
+ * M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander:<br />
+ * OPTICS: Ordering Points to Identify the Clustering Structure. <br/>
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
  * </p>
  * 
@@ -64,7 +66,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("OPTICS: Density-Based Hierarchical Clustering")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minPts' and 'epsilon' (specifying a volume). These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", title = "OPTICS: Ordering Points to Identify the Clustering Structure", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304187")
+@Reference(authors = "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander", //
+title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
+booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
+url = "http://dx.doi.org/10.1145/304181.304187")
 @Alias({ "OPTICS", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS" })
 public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderResult<DoubleDistanceClusterOrderEntry>> implements OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> {
   /**
@@ -73,12 +78,12 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderRes
   private static final Logging LOG = Logging.getLogger(OPTICS.class);
 
   /**
-   * Hold the value of {@link #EPSILON_ID}.
+   * Holds the maximum distance to search for objects (performance parameter)
    */
   private double epsilon;
 
   /**
-   * Holds the value of {@link #MINPTS_ID}.
+   * The density threshold, in number of points.
    */
   private int minpts;
 
@@ -103,7 +108,6 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderRes
   /**
    * Run OPTICS on the database.
    * 
-   * @param database Database
    * @param relation Relation
    * @return Result
    */
@@ -150,29 +154,14 @@ public class OPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderRes
       DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
       if(neighbors.size() >= minpts) {
         final DoubleDBIDPair last = neighbors.get(minpts - 1);
-        if(last instanceof DoubleDBIDPair) {
-          double coreDistance = ((DoubleDBIDPair) last).doubleValue();
+        double coreDistance = last.doubleValue();
 
-          for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-            if(processedIDs.contains(neighbor)) {
-              continue;
-            }
-            double reachability = Math.max(((DoubleDBIDListIter) neighbor).doubleValue(), coreDistance);
-            heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
+        for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          if(processedIDs.contains(neighbor)) {
+            continue;
           }
-        }
-        else {
-          // Actually we have little gains in this situation,
-          // Only if we got an optimized result before.
-          double coreDistance = last.doubleValue();
-
-          for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-            if(processedIDs.contains(neighbor)) {
-              continue;
-            }
-            double reachability = Math.max(neighbor.doubleValue(), coreDistance);
-            heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
-          }
+          double reachability = Math.max(neighbor.doubleValue(), coreDistance);
+          heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
         }
       }
       if(progress != null) {

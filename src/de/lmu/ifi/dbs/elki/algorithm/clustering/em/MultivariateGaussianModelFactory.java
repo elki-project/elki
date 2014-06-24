@@ -44,6 +44,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has MultivariateGaussianModel
+ * 
  * @param <V> vector type
  */
 public class MultivariateGaussianModelFactory<V extends NumberVector> extends AbstractEMModelFactory<V, EMModel> {

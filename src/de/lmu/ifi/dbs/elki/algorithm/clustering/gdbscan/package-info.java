@@ -17,6 +17,8 @@
  * Applications<br />
  * In: Data Mining and Knowledge Discovery, 1998.
  * </p>
+ * 
+ * @apiviz.exclude .*\.Instance$
  */
 /*
  This file is part of ELKI:

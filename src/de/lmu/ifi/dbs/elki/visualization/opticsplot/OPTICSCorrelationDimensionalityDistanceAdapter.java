@@ -29,8 +29,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrderEn
  * Adapter that will map a correlation distance to its dimensionality.
  * 
  * @author Erich Schubert
- * 
- * @param <D> Cluster order entry type.
  */
 public class OPTICSCorrelationDimensionalityDistanceAdapter implements OPTICSDistanceAdapter<CorrelationClusterOrderEntry<?>> {
   /**

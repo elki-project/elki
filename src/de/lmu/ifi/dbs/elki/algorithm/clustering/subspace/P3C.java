@@ -489,7 +489,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param parts Parts array
    * @param start Array start index
    * @param end Array end index (exclusive)
-   * @return
+   * @return Union
    */
   protected HashSetModifiableDBIDs unionDBIDs(final DBIDs[] parts, int start, int end) {
     int sum = 0;
@@ -593,10 +593,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * 
    * @param relation Data relation
    * @param probClusterIGivenX fuzzy membership matrix.
-   * @param means Cluster means.
-   * @param invCovMatr Cluster covariance matrices.
-   * @param clusterWeights
-   * @param assigned mapping of matrix row to DBID.
+   * @param models Cluster models.
    * @param unassigned the list of points not yet assigned.
    */
   private void assignUnassigned(Relation<V> relation, WritableDataStore<double[]> probClusterIGivenX, List<MultivariateGaussianModel> models, ModifiableDBIDs unassigned) {
@@ -682,8 +679,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * attributes.
    * 
    * @param relation Data relation
-   * @param means Cluster means
-   * @param invCovMatr Inverse covariance matrixes
+   * @param models Cluster models
    * @param clusterCandidates the list of clusters to check.
    * @param noise the set to which to add points deemed outliers.
    */

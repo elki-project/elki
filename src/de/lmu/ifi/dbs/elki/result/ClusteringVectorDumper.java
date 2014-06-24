@@ -141,8 +141,8 @@ public class ClusteringVectorDumper implements ResultHandler {
    * Dump a single clustering result.
    * 
    * @param writer Output writer
+   * @param hierarchy Cluster hierarchy to process
    * @param c Clustering result
-   * @param ids IDs
    */
   protected void dumpClusteringOutput(PrintStream writer, ResultHierarchy hierarchy, Clustering<?> c) {
     DBIDRange ids = null;

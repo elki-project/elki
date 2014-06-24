@@ -121,7 +121,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     // "HEAVY" flag for KNN Query since it is used more than once
     KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
-    if (!(knnq instanceof PreprocessorKNNQuery)) {
+    if(!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       database.addIndex(preproc);
@@ -133,31 +133,19 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     LOG.beginStep(stepprog, 2, "Computing densities.");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
-    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final KNNList neighbors = knnq.getKNNForDBID(it, k);
       int count = 0;
       double sum = 0.0;
-      if (neighbors instanceof KNNList) {
-        // Fast version for double distances
-        for (DoubleDBIDListIter neighbor = ((KNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-          if (DBIDUtil.equal(neighbor, it)) {
-            continue;
-          }
-          double max = ((KNNList)knnq.getKNNForDBID(neighbor, k)).getKNNDistance();
-          final double v = neighbor.doubleValue() / max;
-          sum += kernel.density(v) / MathUtil.powi(max, dim);
-          count++;
+      // Fast version for double distances
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        if(DBIDUtil.equal(neighbor, it)) {
+          continue;
         }
-      } else {
-        for (DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if (DBIDUtil.equal(neighbor, it)) {
-            continue;
-          }
-          double max = knnq.getKNNForDBID(neighbor, k).getKNNDistance();
-          final double v = neighbor.doubleValue() / max;
-          sum += kernel.density(v) / MathUtil.powi(max, dim);
-          count++;
-        }
+        double max = knnq.getKNNForDBID(neighbor, k).getKNNDistance();
+        final double v = neighbor.doubleValue() / max;
+        sum += kernel.density(v) / MathUtil.powi(max, dim);
+        count++;
       }
       final double density = sum / count;
       dens.putDouble(it, density);
@@ -172,23 +160,24 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("KLOF_SCORE for objects", ids.size(), LOG) : null;
-    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final double lrdp = dens.doubleValue(it);
       final double lof;
-      if (lrdp > 0) {
+      if(lrdp > 0) {
         final KNNList neighbors = knnq.getKNNForDBID(it, k);
         double sum = 0.0;
         int count = 0;
-        for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
-          if (DBIDUtil.equal(neighbor, it)) {
+          if(DBIDUtil.equal(neighbor, it)) {
             continue;
           }
           sum += dens.doubleValue(neighbor);
           count++;
         }
         lof = sum / (count * lrdp);
-      } else {
+      }
+      else {
         lof = 1.0;
       }
       lofs.putDouble(it, lof);
@@ -250,12 +239,12 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
 
       final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID);
       pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if (config.grab(pK)) {
+      if(config.grab(pK)) {
         k = pK.getValue();
       }
 
       ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
-      if (config.grab(kernelP)) {
+      if(config.grab(kernelP)) {
         kernel = kernelP.instantiateClass(config);
       }
     }

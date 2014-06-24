@@ -262,7 +262,7 @@ public class SVGHyperSphere {
    * @param svgp SVG Plot
    * @param proj Visualization projection
    * @param mid mean vector
-   * @param rad radius
+   * @param radius radius
    * @return path element
    */
   public static Element drawCross(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius) {

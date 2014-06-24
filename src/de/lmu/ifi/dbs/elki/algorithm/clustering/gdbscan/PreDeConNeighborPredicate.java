@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Reference:
  * <p>
  * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger:<br />
- * Density Connected Clustering with Local Subspace Preferences. <br>
+ * Density Connected Clustering with Local Subspace Preferences.<br />
  * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
  * </p>
  * 

@@ -440,7 +440,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has SimpleInvertedIndex
+   * @apiviz.has InMemoryInvertedIndex
    * 
    * @param <V> Vector type
    */

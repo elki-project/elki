@@ -37,17 +37,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * maximum preference dimensionality of lambda.
  * 
  * <p>
- * Reference: <br>
- * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger: Density Connected Clustering
- * with Local Subspace Preferences. <br>
- * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
+ * Reference:
+ * <p>
+ * C. Böhm, K. Kailing, P. Kröger, A. Zimek:<br />
+ * Computing Clusters of Correlation Connected Objects. <br>
+ * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004.
  * </p>
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has Instance
  */
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
+@Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", //
+title = "Computing Clusters of Correlation Connected Objects", //
+booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", //
+url = "http://dx.doi.org/10.1145/1007568.1007620")
 public class FourCCorePredicate implements CorePredicate {
   /**
    * The PreDeCon settings class.

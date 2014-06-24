@@ -57,8 +57,6 @@
  * </ul>
  * 
  * <h2>Generic utility classes:</h2>
- * <p>{@link de.lmu.ifi.dbs.elki.database.ids.generic.MergedDBIDs MergedDBIDs}
- * allows virtual concatenation of multiple DBIDs objects.</p>
  * 
  * <p>{@link de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs MaskedDBIDs}
  * allows masking an ArrayDBIDs with a BitSet.</p>

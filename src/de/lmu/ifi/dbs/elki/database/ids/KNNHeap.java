@@ -35,7 +35,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * @apiviz.landmark
  * 
  * @apiviz.uses KNNList - - «serializes to»
- * @apiviz.composedOf DistanceDBIDPair
+ * @apiviz.composedOf DoubleDBIDPair
  */
 public interface KNNHeap {
   /**

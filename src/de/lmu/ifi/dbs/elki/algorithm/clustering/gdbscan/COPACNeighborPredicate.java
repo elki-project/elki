@@ -142,7 +142,6 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * 
    * @param id Query object
    * @param knnneighbors k nearest neighbors
-   * @param epsneighbors Neighbors within radius epsilon
    * @param relation Data relation
    * @return COPAC object model
    */

@@ -323,7 +323,7 @@ public class ROC {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.composedOf DistanceDBIDListIter
+   * @apiviz.composedOf DoubleDBIDListIter
    */
   public static class DistanceResultAdapter implements ScoreIter, DBIDRefIter {
     /**

@@ -49,7 +49,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
  * @author Erich Schubert
  * 
  * @apiviz.uses PrimitiveDistanceQuery
- * @apiviz.uses PrimitiveDistanceFunction
+ * @apiviz.uses EuclideanDistanceFunction
+ * @apiviz.uses SquaredEuclideanDistanceFunction
  */
 public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceKNNQuery<O> implements LinearScanQuery {
   /**

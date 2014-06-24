@@ -71,8 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses KNNQueryFilteredPCAIndex
- * @apiviz.uses PCABasedCorrelationDistanceFunction
+ * @apiviz.uses FilteredLocalPCAIndex
  * 
  * @param <V> the type of NumberVector handled by the algorithm
  */
@@ -283,6 +282,8 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, HiCO.HiCO
    * 
    * @author Elke Achtert
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class HiCOClusterOrderEntry extends CorrelationClusterOrderEntry<HiCOClusterOrderEntry> {
     /**

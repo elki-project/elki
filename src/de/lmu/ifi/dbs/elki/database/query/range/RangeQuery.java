@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses DistanceDBIDList oneway - - «create»
+ * @apiviz.uses DoubleDBIDList oneway - - «create»
  * 
  * @param <O> Object type
  */

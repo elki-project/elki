@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
@@ -74,7 +75,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("SNN: Shared Nearest Neighbor Clustering")
 @Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters 'minPts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
-@Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", booktitle = "Proc. of SIAM Data Mining (SDM), 2003", url = "http://www.siam.org/meetings/sdm03/proceedings/sdm03_05.pdf")
+@Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", //
+title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", //
+booktitle = "Proc. of SIAM Data Mining (SDM), 2003", //
+url = "http://www.siam.org/meetings/sdm03/proceedings/sdm03_05.pdf")
 public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -82,12 +86,12 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
   private static final Logging LOG = Logging.getLogger(SNNClustering.class);
 
   /**
-   * Holds the value of {@link #EPSILON_ID}.
+   * Epsilon radius threshold.
    */
   private int epsilon;
 
   /**
-   * Holds the value of {@link #MINPTS_ID}.
+   * Minimum number of clusters for connectedness.
    */
   private int minpts;
 
@@ -141,9 +145,9 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(relation.size());
     if(relation.size() >= minpts) {
-      for(DBIDIter id = snnInstance.getRelation().iterDBIDs(); id.valid(); id.advance()) {
+      for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
         if(!processedIDs.contains(id)) {
-          expandCluster(snnInstance, DBIDUtil.deref(id), objprog, clusprog);
+          expandCluster(snnInstance, id, objprog, clusprog);
           if(processedIDs.size() == relation.size() && noise.size() == 0) {
             break;
           }
@@ -155,7 +159,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       }
     }
     else {
-      for(DBIDIter id = snnInstance.getRelation().iterDBIDs(); id.valid(); id.advance()) {
+      for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), LOG);
@@ -185,7 +189,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @return the shared nearest neighbors of the specified query object in the
    *         given database
    */
-  protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O> snnInstance, DBID queryObject) {
+  protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O> snnInstance, DBIDRef queryObject) {
     ArrayModifiableDBIDs neighbors = DBIDUtil.newArray();
     for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(snnInstance.similarity(queryObject, iditer) >= epsilon) {
@@ -206,7 +210,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * @param objprog the progress object to report about the progress of
    *        clustering
    */
-  protected void expandCluster(SimilarityQuery<O> snnInstance, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+  protected void expandCluster(SimilarityQuery<O> snnInstance, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     ArrayModifiableDBIDs seeds = findSNNNeighbors(snnInstance, startObjectID);
 
     // startObject is no core-object

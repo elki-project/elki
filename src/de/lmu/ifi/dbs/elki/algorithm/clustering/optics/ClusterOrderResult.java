@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.result.ResultAdapter;
  * 
  * @apiviz.has ClusterOrderEntry oneway - - contains
  * @apiviz.composedOf ClusterOrderResult.ClusterOrderAdapter
- * @apiviz.composedOf ClusterOrderResult.PredecessorAdapter
  * 
  * @param <E> entry type.
  */

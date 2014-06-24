@@ -72,8 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @author Erich Schubert
  * 
- * @apiviz.composedOf KMeansInitialization
- * @apiviz.composedOf EMModelFactory
+ * @apiviz.composedOf EMClusterModelFactory
  * 
  * @param <V> vector type to analyze
  * @param <M> model type to produce
@@ -128,7 +127,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    * 
    * @param k k parameter
    * @param delta delta parameter
-   * @param initializer Class to choose the initial means
+   * @param mfactory EM cluster model factory
    * @param maxiter Maximum number of iterations
    * @param soft Include soft assignments
    */
@@ -270,7 +269,6 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    * 
    * @param relation the database used for assignment to instances
    * @param models Cluster models
-   * @param clusterWeights the weights of the current clusters
    * @param probClusterIGivenX Output storage for cluster probabilities
    * @return the expectation value of the current mixture of distributions
    */

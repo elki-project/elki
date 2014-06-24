@@ -68,8 +68,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Arthur Zimek
  * 
- * @apiviz.uses LocalProjectionIndex
- * @apiviz.uses FilteredLocalPCABasedDistanceFunction
  * @apiviz.has DimensionModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm

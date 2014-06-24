@@ -58,6 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has MeanModel
+ * 
  * @param <V> vector datatype
  */
 @Title("K-Medians")

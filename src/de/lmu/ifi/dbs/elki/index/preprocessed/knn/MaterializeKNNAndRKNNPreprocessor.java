@@ -363,7 +363,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
         break;
       }
     }
-    return new PreprocessorRKNNQuery<>(relation, (MaterializeKNNAndRKNNPreprocessor<O>) this);
+    return new PreprocessorRKNNQuery<>(relation, this);
   }
 
   @Override

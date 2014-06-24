@@ -12,14 +12,14 @@
  * any {@link de.lmu.ifi.dbs.elki.KDDTask} will
  * use the {@link de.lmu.ifi.dbs.elki.database.StaticArrayDatabase} which,
  * in turn, will use a {@link de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection}
- * and a {@link de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser}
+ * and a {@link de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser}
  * to parse a specified data file creating
  * a {@link de.lmu.ifi.dbs.elki.database.StaticArrayDatabase}
  * containing {@link de.lmu.ifi.dbs.elki.data.DoubleVector}-Objects.</p>
  * 
  * <p>Thus, the standard procedure to use a data set of a real-valued vector space
  * is to prepare the data set in a file of the following format
- * (as suitable to {@link de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser}):
+ * (as suitable to {@link de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser}):
  * <ul>
  *  <li>One point per line, attributes separated by whitespace.</li>
  *  <li>Several labels may be given per point. A label must not be parseable as double.</li>

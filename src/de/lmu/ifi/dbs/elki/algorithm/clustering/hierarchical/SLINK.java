@@ -86,6 +86,9 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
   /**
    * Performs the SLINK algorithm on the given database.
+   * 
+   * @param database Database to process
+   * @param relation Data relation to use
    */
   public PointerHierarchyRepresentationResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
@@ -155,9 +158,8 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param id the id of the object to be inserted into the pointer
    *        representation
    * @param processedIDs the already processed ids
+   * @param distQuery Distnace query
    * @param m Data store
-   * @param relation Data relation
-   * @param distFunc Distance function to use
    */
   private void step2(DBIDRef id, DBIDs processedIDs, DistanceQuery<? super O> distQuery, WritableDoubleDataStore m) {
     for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {

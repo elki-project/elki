@@ -163,42 +163,20 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       final KNNList neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
-      if(neighbors instanceof KNNList) {
-        // Fast version for double distances
-        for(DoubleDBIDListIter neighbor = ((KNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-          if(DBIDUtil.equal(neighbor, it)) {
-            continue;
-          }
-          final double nkdist = ((KNNList) knnq.getKNNForDBID(neighbor, k)).getKNNDistance();
-          if(nkdist > 0.) {
-            final double v = Math.max(nkdist, neighbor.doubleValue()) / (h * nkdist);
-            sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
-            count++;
-          }
-          else {
-            sum = Double.POSITIVE_INFINITY;
-            count++;
-            break;
-          }
+      // Fast version for double distances
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        if(DBIDUtil.equal(neighbor, it)) {
+          continue;
         }
-      }
-      else {
-        for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if(DBIDUtil.equal(neighbor, it)) {
-            continue;
-          }
-          final double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance();
-          if(nkdist > 0.) {
-            final double v = Math.max(nkdist, neighbor.doubleValue()) / (h * nkdist);
-            sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
-            count++;
-          }
-          else {
-            sum = Double.POSITIVE_INFINITY;
-            count++;
-            break;
-          }
+        final double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance();
+        if(!(nkdist > 0.)) {
+          sum = Double.POSITIVE_INFINITY;
+          count++;
+          break;
         }
+        final double v = Math.max(nkdist, neighbor.doubleValue()) / (h * nkdist);
+        sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
+        count++;
       }
       ldes.putDouble(it, sum / count);
       LOG.incrementProcessed(densProgress);

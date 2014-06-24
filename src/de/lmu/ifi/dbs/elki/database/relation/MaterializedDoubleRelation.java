@@ -76,7 +76,6 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
    * Constructor.
    * 
    * @param database Database
-   * @param type Type information
    * @param ids IDs
    */
   public MaterializedDoubleRelation(Database database, DBIDs ids) {
@@ -137,6 +136,7 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
     return database;
   }
 
+  @Deprecated
   @Override
   public Double get(DBIDRef id) {
     return content.doubleValue(id);
@@ -155,6 +155,7 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
     }
   }
 
+  @Deprecated
   @Override
   public void set(DBIDRef id, Double val) {
     assert (ids.contains(id));

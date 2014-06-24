@@ -77,7 +77,6 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
    * Constructor for a type request.
    * 
    * @param cls base class
-   * @param serializer Serializer
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
    */

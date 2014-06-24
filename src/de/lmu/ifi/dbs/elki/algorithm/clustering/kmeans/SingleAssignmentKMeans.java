@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has MeanModel
+ * @apiviz.has KMeansModel
  * 
  * @param <V> vector datatype
  */

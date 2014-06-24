@@ -198,7 +198,7 @@ public class IntegerArrayQuickSort {
    * Note that this <em>must</em> only be used with
    * {@code m1 < m2 < m3 < m4 < m5}.
    *
-   * @param keys Keys
+   * @param data Data
    * @param m1 Pivot candidate position
    * @param m2 Pivot candidate position
    * @param m3 Pivot candidate position

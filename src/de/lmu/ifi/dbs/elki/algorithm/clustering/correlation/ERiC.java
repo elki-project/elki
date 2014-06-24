@@ -82,7 +82,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @apiviz.composedOf COPAC
  * @apiviz.composedOf DBSCAN
- * @apiviz.composedOf ERiCDistanceFunction
  * @apiviz.composedOf FirstNEigenPairFilter
  * @apiviz.composedOf PCAFilteredRunner
  * @apiviz.has CorrelationModel
@@ -110,7 +109,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
   /**
    * Constructor.
    * 
-   * @param copacAlgorithm COPAC to use
+   * @param settings ERiC clustering settings
    */
   public ERiC(ERiC.Settings settings) {
     super();

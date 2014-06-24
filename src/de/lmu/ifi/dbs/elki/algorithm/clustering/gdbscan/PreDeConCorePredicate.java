@@ -36,10 +36,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * The PreDeCon core point predicate -- having at least minpts. neighbors, and a
  * maximum preference dimensionality of lambda.
  * 
+ * Reference:
  * <p>
- * Reference: <br>
- * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger: Density Connected Clustering
- * with Local Subspace Preferences. <br>
+ * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger:<br />
+ * Density Connected Clustering with Local Subspace Preferences.<br />
  * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
  * </p>
  * 
@@ -47,7 +47,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @apiviz.has Instance
  */
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
+@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", //
+title = "Density Connected Clustering with Local Subspace Preferences", //
+booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", //
+url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
 public class PreDeConCorePredicate implements CorePredicate {
   /**
    * The PreDeCon settings class.

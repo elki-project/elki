@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @apiviz.landmark
  * 
  * @apiviz.composedOf DBID
- * @apiviz.composedOf Distance
  * 
  * @param <SELF> Type self-reference.
  */

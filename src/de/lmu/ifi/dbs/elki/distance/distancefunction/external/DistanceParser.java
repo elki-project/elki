@@ -40,8 +40,6 @@ public interface DistanceParser {
    * 
    * @param in the stream to parse objects from
    * @param cache Cache writer
-   * @return a list containing those objects parsed from the input stream and
-   *         their associated labels.
    */
   void parse(InputStream in, DistanceCacheWriter cache);
 }

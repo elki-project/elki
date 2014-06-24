@@ -44,7 +44,7 @@ public class SparseItemset extends Itemset {
   /**
    * Constructor.
    * 
-   * @param items Items
+   * @param indices Items
    */
   public SparseItemset(int[] indices) {
     this.indices = indices;
@@ -53,7 +53,7 @@ public class SparseItemset extends Itemset {
   /**
    * Constructor.
    * 
-   * @param items Items
+   * @param indices Items
    * @param support Support
    */
   public SparseItemset(int[] indices, int support) {

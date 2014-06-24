@@ -97,13 +97,6 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
     this.pEpsilon = pEpsilon;
   }
 
-  /**
-   * Provides the Longest Common Subsequence distance between the given two
-   * vectors.
-   * 
-   * @return the Longest Common Subsequence distance between the given two
-   *         vectors as an instance of {@link distance distance}.
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();

@@ -376,7 +376,6 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * Returns the frequent BitSets out of the given BitSets with respect to the
    * given database.
    * 
-   * @param support Support map.
    * @param candidates the candidates to be evaluated
    * @param relation the database to evaluate the candidates on
    * @param needed Minimum support needed

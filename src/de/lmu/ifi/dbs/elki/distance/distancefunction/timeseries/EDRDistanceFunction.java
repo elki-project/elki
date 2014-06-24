@@ -68,13 +68,6 @@ public class EDRDistanceFunction extends DTWDistanceFunction {
     this.delta = delta;
   }
 
-  /**
-   * Provides the Edit Distance on Real Sequence distance between the given two
-   * vectors.
-   * 
-   * @return the Edit Distance on Real Sequence distance between the given two
-   *         vectors as an instance of {@link distance distance}.
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     // Dimensionality, and last valid value in second vector:

@@ -51,8 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses AbstractRStarTree
- * @apiviz.uses SpatialPrimitiveDistanceFunction
+ * @apiviz.uses EuclideanDistanceFunction
+ * @apiviz.uses SquaredEuclideanDistanceFunction
  */
 @Reference(authors = "J. Kuan, P. Lewis", title = "Fast k nearest neighbour search for R-tree family", booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", url = "http://dx.doi.org/10.1109/ICICS.1997.652114")
 public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarTreeRangeQuery<O> {

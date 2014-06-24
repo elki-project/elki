@@ -55,7 +55,7 @@ public interface DoubleRelation extends Relation<Double> {
   public Double get(DBIDRef id);
 
   /**
-   * @deprecated use {@link #set(id, double)} instead.
+   * @deprecated use {@link #set(DBIDRef, double)} instead.
    */
   @Deprecated
   @Override

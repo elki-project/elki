@@ -67,7 +67,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Elke Achtert
  * 
  * @apiviz.uses HiSCPreferenceVectorIndex
- * @apiviz.uses HiSCDistanceFunction
  * 
  * @param <V> the type of NumberVector handled by the algorithm
  */

@@ -70,7 +70,7 @@ public class Subspace {
   /**
    * Creates a new k-dimensional subspace of the original data space.
    * 
-   * @param dimensions the dimensions building this subspace
+   * @param bitset the dimensions building this subspace
    * 
    * @deprecated use bitset.toLongArray() to convert to the preferred
    *             representation; or even better, use the preferred long arrays

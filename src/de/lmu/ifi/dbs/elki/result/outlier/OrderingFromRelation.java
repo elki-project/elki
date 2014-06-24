@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses Relation
+ * @apiviz.uses DoubleRelation
  */
 public class OrderingFromRelation implements OrderingResult {
   /**

@@ -209,7 +209,6 @@ public final class FormatUtil {
    * @param d the double array to be formatted
    * @param sep the separator between the single values of the double array,
    *        e.g. ','
-   * @param nf the number format to be used for formatting
    * @return a String representing the double array d
    */
   public static StringBuilder formatTo(StringBuilder a, double[] d, String sep) {

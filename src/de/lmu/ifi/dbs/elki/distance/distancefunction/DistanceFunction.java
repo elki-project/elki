@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Base interface for any kind of distances.
@@ -36,9 +35,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <O> Object type
  * 
  * @apiviz.landmark
- * @apiviz.has Distance
+ * 
+ * @apiviz.has TypeInformation
  */
-public interface DistanceFunction<O> extends Parameterizable {
+public interface DistanceFunction<O> {
   /**
    * Is this function symmetric?
    * 

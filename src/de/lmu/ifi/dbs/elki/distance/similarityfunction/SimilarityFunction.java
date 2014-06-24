@@ -32,10 +32,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * Interface SimilarityFunction describes the requirements of any similarity
  * function.
  * 
- * @author Elke Achtert
+ * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has Distance
  * 
  * @param <O> object type
  */

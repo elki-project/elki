@@ -113,7 +113,7 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.eclude
+   * @apiviz.exclude
    */
   public static class DistanceEntry implements TextWriteable {
     /**

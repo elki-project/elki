@@ -118,7 +118,6 @@ public class EMClusterVisualization extends AbstractVisFactory {
   /**
    * Test if the given clustering has a mean model.
    * 
-   * @param <NV> Vector type
    * @param c Clustering to inspect
    * @return the clustering cast to return a mean model, null otherwise.
    */

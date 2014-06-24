@@ -269,7 +269,8 @@ public final class MathUtil {
    * Compute the Mahalanobis distance using the given weight matrix.
    * 
    * @param weightMatrix Weight Matrix
-   * @param o1_minus_o2 Delta vector
+   * @param o1 First vector
+   * @param o2 Center vector
    * @return Mahalanobis distance
    */
   public static double mahalanobisDistance(Matrix weightMatrix, Vector o1, Vector o2) {
@@ -284,7 +285,8 @@ public final class MathUtil {
    * Compute the Mahalanobis distance using the given weight matrix.
    * 
    * @param weightMatrix Weight Matrix
-   * @param o1_minus_o2 Delta vector
+   * @param o1 First vector
+   * @param o2 Center vector
    * @return Mahalanobis distance
    */
   public static double mahalanobisDistance(double[][] weightMatrix, double[] o1, double[] o2) {

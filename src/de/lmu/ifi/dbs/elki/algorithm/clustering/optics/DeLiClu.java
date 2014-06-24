@@ -100,7 +100,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
   private KNNJoin<NV, DeLiCluNode, DeLiCluEntry> knnJoin;
 
   /**
-   * Holds the value of {@link #MINPTS_ID}.
+   * Density threshold in number of objects.
    */
   private int minpts;
 

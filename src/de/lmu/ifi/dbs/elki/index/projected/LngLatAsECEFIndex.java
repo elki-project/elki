@@ -123,7 +123,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
     if (innerq == null) {
       return null;
     }
-    return (KNNQuery<O>) new ProjectedKNNQuery(distanceQuery, innerq);
+    return new ProjectedKNNQuery(distanceQuery, innerq);
   }
 
   @SuppressWarnings("unchecked")
@@ -148,7 +148,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
     if (innerq == null) {
       return null;
     }
-    return (RangeQuery<O>) new ProjectedRangeQuery(distanceQuery, innerq);
+    return new ProjectedRangeQuery(distanceQuery, innerq);
   }
 
   @SuppressWarnings("unchecked")
@@ -173,7 +173,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
     if (innerq == null) {
       return null;
     }
-    return (RKNNQuery<O>) new ProjectedRKNNQuery((DistanceQuery<O>) distanceQuery, innerq);
+    return new ProjectedRKNNQuery(distanceQuery, innerq);
   }
 
   /**

@@ -520,7 +520,6 @@ public final class DBIDUtil {
    * 
    * This will use a double heap if appropriate.
    * 
-   * @param distancetype distance prototype
    * @param k K value
    * @return New heap of size k, appropriate for this distance type.
    */

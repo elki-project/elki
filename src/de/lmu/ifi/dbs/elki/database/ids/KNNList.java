@@ -54,7 +54,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @apiviz.landmark
  * 
- * @apiviz.composedOf DistanceDBIDPair
+ * @apiviz.composedOf DoubleDBIDPair
  */
 public interface KNNList extends DoubleDBIDList {
   /**

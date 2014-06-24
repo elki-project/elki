@@ -40,15 +40,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * <p>
  * PreDeCon computes clusters of subspace preference weighted connected points.
  * The algorithm searches for local subgroups of a set of feature vectors having
  * a low variance along one or more (but not all) attributes.
- * </p>
+ * 
+ * Reference:
  * <p>
- * Reference: <br>
- * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger: Density Connected Clustering
- * with Local Subspace Preferences. <br>
+ * C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger:<br />
+ * Density Connected Clustering with Local Subspace Preferences.<br />
  * In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.
  * </p>
  * 
@@ -61,8 +60,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")
-@Description("PreDeCon computes clusters of subspace preference weighted connected points. " + "The algorithm searches for local subgroups of a set of feature vectors having " + "a low variance along one or more (but not all) attributes.")
-@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density Connected Clustering with Local Subspace Preferences", booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
+@Description("PreDeCon computes clusters of subspace preference weighted connected points. "//
+    + "The algorithm searches for local subgroups of a set of feature vectors having " + "a low variance along one or more (but not all) attributes.")
+@Reference(authors = "C. Böhm, K. Kailing, H.-P. Kriegel, P. Kröger", //
+title = "Density Connected Clustering with Local Subspace Preferences", //
+booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", //
+url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
 public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
   /**
    * The logger for this class.
@@ -93,27 +96,27 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
      * Query radius parameter epsilon.
      */
     public double epsilon;
-  
+
     /**
      * The threshold for small eigenvalues.
      */
     public double delta;
-  
+
     /**
      * The kappa penality factor for deviations in preferred dimensions.
      */
     public double kappa = Parameterizer.KAPPA_DEFAULT;
-  
+
     /**
      * DBSCAN Minpts parameter, aka "mu".
      */
     public int minpts;
-  
+
     /**
      * Lambda: Maximum subspace dimensionality.
      */
     public int lambda = Integer.MAX_VALUE;
-  
+
     /**
      * Parameterization class.
      * 
@@ -126,27 +129,27 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        * Parameter Delta: maximum variance allowed
        */
       public static final OptionID DELTA_ID = new OptionID("predecon.delta", "A double specifying the variance threshold for small Eigenvalues.");
-  
+
       /**
        * Parameter Kappa: penalty for deviations in preferred dimensions.
        */
       public static final OptionID KAPPA_ID = new OptionID("predecon.kappa", "Penalty factor for deviations in preferred (low-variance) dimensions.");
-  
+
       /**
        * Default for kappa parameter.
        */
       public static final double KAPPA_DEFAULT = 20.;
-  
+
       /**
        * Parameter Lambda: maximum dimensionality allowed.
        */
       public static final OptionID LAMBDA_ID = new OptionID("predecon.lambda", "Maximum dimensionality to consider for core points.");
-  
+
       /**
        * Settings to build.
        */
       Settings settings;
-  
+
       @Override
       public void makeOptions(Parameterization config) {
         settings = new Settings();
@@ -156,7 +159,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
         configKappa(config);
         configLambda(config);
       }
-  
+
       /**
        * Configure the epsilon radius parameter.
        * 
@@ -169,7 +172,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
           settings.epsilon = epsilonP.doubleValue();
         }
       }
-  
+
       /**
        * Configure the minPts aka "mu" parameter.
        * 
@@ -182,7 +185,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
           settings.minpts = minptsP.intValue();
         }
       }
-  
+
       /**
        * Configure the delta parameter.
        * 
@@ -195,7 +198,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
           settings.delta = deltaP.doubleValue();
         }
       }
-  
+
       /**
        * Configure the kappa parameter.
        * 
@@ -209,7 +212,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
           settings.kappa = kappaP.doubleValue();
         }
       }
-  
+
       /**
        * Configure the delta parameter.
        * 
@@ -223,7 +226,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
           settings.lambda = lambdaP.intValue();
         }
       }
-  
+
       @Override
       public Settings makeInstance() {
         return settings;

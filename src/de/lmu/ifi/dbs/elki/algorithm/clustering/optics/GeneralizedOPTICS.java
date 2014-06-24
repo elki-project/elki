@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * distances, and serves as a base for several other algorithms (HiCO, HiSC).
  * 
  * @author Erich Schubert
+ * 
  * @param <O> the type of DatabaseObjects handled by the algorithm
  * @param <E> the type of entries in the cluster order
  */
@@ -52,7 +53,7 @@ public abstract class GeneralizedOPTICS<O, E extends ClusterOrderEntry<E>> exten
   public static final OptionID MINPTS_ID = new OptionID("optics.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
   /**
-   * Holds the value of {@link #MINPTS_ID}.
+   * Density threshold in number of points.
    */
   private int minpts;
 
@@ -74,7 +75,6 @@ public abstract class GeneralizedOPTICS<O, E extends ClusterOrderEntry<E>> exten
   /**
    * Run OPTICS on the database.
    * 
-   * @param database Database
    * @param relation Relation
    * @return Result
    */
@@ -101,9 +101,7 @@ public abstract class GeneralizedOPTICS<O, E extends ClusterOrderEntry<E>> exten
    * 
    * @param clusterOrder Cluster order result to expand
    * @param relation the data relation to run on
-   * @param rangeQuery the range query to use
    * @param objectID the currently processed object
-   * @param epsilon Epsilon range value
    * @param progress the progress object to actualize the current progress if
    *        the algorithm
    */

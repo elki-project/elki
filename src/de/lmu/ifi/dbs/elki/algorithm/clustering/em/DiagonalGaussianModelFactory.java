@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has DiagonalGaussianModel
+ * 
  * @param <V> vector type
  */
 public class DiagonalGaussianModelFactory<V extends NumberVector> extends AbstractEMModelFactory<V, EMModel> {

@@ -36,7 +36,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses DBIDRange oneway - - defined on
+ * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDRange oneway - - defined on
  */
 public interface DBIDRangeDistanceFunction extends DBIDDistanceFunction {
   /**
