@@ -29,9 +29,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +83,7 @@ public class DocumentReferences {
       System.exit(1);
     }
 
-    List<Pair<Reference, List<Class<?>>>> refs = sortedReferences();
+    List<Pair<Reference, List<Object>>> refs = sortedReferences();
     try {
       File references = new File(args[0]);
       FileOutputStream reffo = new FileOutputStream(references);
@@ -113,7 +115,7 @@ public class DocumentReferences {
     }
   }
 
-  private static Document documentReferences(List<Pair<Reference, List<Class<?>>>> refs) {
+  private static Document documentReferences(List<Pair<Reference, List<Object>>> refs) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -168,25 +170,40 @@ public class DocumentReferences {
     // Main definition list
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
-    for(Pair<Reference, List<Class<?>>> pair : refs) {
+    for(Pair<Reference, List<Object>> pair : refs) {
       // DT = definition term
       Element classdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
       {
         boolean first = true;
-        for(Class<?> cls : pair.second) {
+        for(Object o : pair.second) {
           if(!first) {
             classdt.appendChild(htmldoc.createTextNode(", "));
           }
-          Element classan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-          classan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, cls.getName());
-          classdt.appendChild(classan);
+          if(o instanceof Class<?>) {
+            Class<?> cls = (Class<?>) o;
+            Element classan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+            classan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, cls.getName());
+            classdt.appendChild(classan);
 
-          // Link back to original class
-          Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-          classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(cls.getName()));
-          classa.setTextContent(cls.getName());
-          classdt.appendChild(classa);
+            // Link back to original class
+            Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+            classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(cls.getName()));
+            classa.setTextContent(cls.getName());
+            classdt.appendChild(classa);
+          }
+          else if(o instanceof Package) {
+            Package pkg = (Package) o;
+            Element classan = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+            classan.setAttribute(HTMLUtil.HTML_NAME_ATTRIBUTE, pkg.getName());
+            classdt.appendChild(classan);
+
+            // Link back to original class
+            Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+            classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForPackageName(pkg.getName()));
+            classa.setTextContent(pkg.getName());
+            classdt.appendChild(classa);
+          }
 
           first = false;
         }
@@ -232,20 +249,31 @@ public class DocumentReferences {
     return htmldoc;
   }
 
-  private static void documentReferencesWiki(List<Pair<Reference, List<Class<?>>>> refs, PrintStream refstreamW) {
-    for(Pair<Reference, List<Class<?>>> pair : refs) {
-      // JavaDoc links for relevant classes.
+  private static void documentReferencesWiki(List<Pair<Reference, List<Object>>> refs, PrintStream refstreamW) {
+    for(Pair<Reference, List<Object>> pair : refs) {
+      // JavaDoc links for relevant classes and packages.
       {
         boolean first = true;
-        for(Class<?> cls : pair.second) {
+        for(Object o : pair.second) {
           if(!first) {
             refstreamW.println(",[[br]]");
           }
-          refstreamW.print("[[javadoc(");
-          refstreamW.print(cls.getName());
-          refstreamW.print(",");
-          refstreamW.print(cls.getName());
-          refstreamW.print(")]]");
+          if(o instanceof Class<?>) {
+            Class<?> cls = (Class<?>) o;
+            refstreamW.print("[[javadoc(");
+            refstreamW.print(cls.getName());
+            refstreamW.print(",");
+            refstreamW.print(cls.getName());
+            refstreamW.print(")]]");
+          }
+          else if(o instanceof Package) {
+            Package pkg = (Package) o;
+            refstreamW.print("[[javadoc(");
+            refstreamW.print(pkg.getName());
+            refstreamW.print(",");
+            refstreamW.print(pkg.getName());
+            refstreamW.print(")]]");
+          }
 
           first = false;
         }
@@ -275,27 +303,28 @@ public class DocumentReferences {
     }
   }
 
-  private static List<Pair<Reference, List<Class<?>>>> sortedReferences() {
-    List<Pair<Reference, List<Class<?>>>> refs = new ArrayList<>();
-    Map<Reference, List<Class<?>>> map = new HashMap<>();
+  private static List<Pair<Reference, List<Object>>> sortedReferences() {
+    List<Pair<Reference, List<Object>>> refs = new ArrayList<>();
+    Map<Reference, List<Object>> map = new HashMap<>();
 
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true)) {
+    HashSet<Package> packages = new HashSet<>();
+    for(Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true)) {
       inspectClass(cls, refs, map);
+      if(packages.add(cls.getPackage())) {
+        inspectPackage(cls.getPackage(), refs, map);
+      }
     }
     return refs;
   }
 
-  private static void inspectClass(final Class<?> cls, List<Pair<Reference, List<Class<?>>>> refs, Map<Reference, List<Class<?>>> map) {
+  private static void inspectClass(final Class<?> cls, List<Pair<Reference, List<Object>>> refs, Map<Reference, List<Object>> map) {
+    if(cls.getSimpleName().equals("package-info")) {
+      return;
+    }
     try {
       if(cls.isAnnotationPresent(Reference.class)) {
         Reference ref = cls.getAnnotation(Reference.class);
-        List<Class<?>> list = map.get(ref);
-        if(list == null) {
-          list = new ArrayList<>(5);
-          map.put(ref, list);
-          refs.add(new Pair<>(ref, list));
-        }
-        list.add(cls);
+        addReference(cls, ref, refs, map);
       }
       // Inner classes
       for(Class<?> c2 : cls.getDeclaredClasses()) {
@@ -304,13 +333,13 @@ public class DocumentReferences {
       for(Method m : cls.getDeclaredMethods()) {
         if(m.isAnnotationPresent(Reference.class)) {
           Reference ref = m.getAnnotation(Reference.class);
-          List<Class<?>> list = map.get(ref);
-          if(list == null) {
-            list = new ArrayList<>(5);
-            map.put(ref, list);
-            refs.add(new Pair<>(ref, list));
-          }
-          list.add(cls);
+          addReference(cls, ref, refs, map);
+        }
+      }
+      for(Field f : cls.getDeclaredFields()) {
+        if(f.isAnnotationPresent(Reference.class)) {
+          Reference ref = f.getAnnotation(Reference.class);
+          addReference(cls, ref, refs, map);
         }
       }
     }
@@ -324,13 +353,33 @@ public class DocumentReferences {
     }
   }
 
+  private static void addReference(Object cls, Reference ref, List<Pair<Reference, List<Object>>> refs, Map<Reference, List<Object>> map) {
+    List<Object> list = map.get(ref);
+    if(list == null) {
+      list = new ArrayList<>(3);
+      map.put(ref, list);
+      refs.add(new Pair<>(ref, list));
+    }
+    list.add(cls);
+  }
+
+  private static void inspectPackage(Package p, List<Pair<Reference, List<Object>>> refs, Map<Reference, List<Object>> map) {
+    if(p.isAnnotationPresent(Reference.class)) {
+      Reference ref = p.getAnnotation(Reference.class);
+      addReference(p, ref, refs, map);
+    }
+  }
+
   private static String linkForClassName(String name) {
-    String link = name.replace(".", "/") + ".html";
-    return link;
+    return name.replace(".", "/") + ".html";
+  }
+
+  private static String linkForPackageName(String name) {
+    return name.replace(".", "/") + "/package-summary.html";
   }
 
   /**
-   * Fin all classes that have the reference annotation
+   * Find all classes that have the reference annotation
    * 
    * @return All classes with the reference annotation.
    */
