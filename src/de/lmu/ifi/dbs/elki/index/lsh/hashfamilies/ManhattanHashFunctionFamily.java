@@ -40,8 +40,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses CauchyRandomProjectionFamily
  */
-@Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", title = "Locality-sensitive hashing scheme based on p-stable distributions", booktitle = "Proc. 20th annual symposium on Computational geometry", url = "http://dx.doi.org/10.1145/997817.997857")
+@Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
+title = "Locality-sensitive hashing scheme based on p-stable distributions", //
+booktitle = "Proc. 20th annual symposium on Computational geometry", //
+url = "http://dx.doi.org/10.1145/997817.997857")
 public class ManhattanHashFunctionFamily extends AbstractProjectedHashFunctionFamily {
   /**
    * Constructor.

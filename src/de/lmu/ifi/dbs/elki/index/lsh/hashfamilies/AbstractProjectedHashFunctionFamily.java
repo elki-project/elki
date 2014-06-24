@@ -47,6 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Abstract base class for projection based hash functions.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses RandomProjectionFamily
+ * @apiviz.has MultipleProjectionsLocalitySensitiveHashFunction
  */
 public abstract class AbstractProjectedHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**

@@ -64,6 +64,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has LocalitySensitiveHashFunctionFamily
+ * @apiviz.has Instance
+ * 
  * @param <V> Object type to index
  */
 public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.Instance> {
@@ -115,6 +118,8 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
    * Instance of a LSH index for a single relation.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has LocalitySensitiveHashFunction
    */
   public class Instance extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
     /**
@@ -250,7 +255,6 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
      * @author Erich Schubert
      * 
      * @apiviz.exclude
-     * 
      */
     protected class LSHKNNQuery extends AbstractKNNQuery {
       /**
