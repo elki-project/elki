@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -90,18 +91,20 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
     }
     // Choose initial means
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
-    // Initialize cluster and assign objects
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
+    double[] varsum = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    // Refine result
+    DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
+    // Iterate MacQueen
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      boolean changed = macQueenIterate(relation, means, clusters, assignment);
+      boolean changed = macQueenIterate(relation, means, clusters, assignment, varsum);
+      logVarstat(varstat, varsum);
       if(!changed) {
         break;
       }
@@ -111,7 +114,10 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      KMeansModel model = new KMeansModel(means.get(i));
+      if(ids.size() == 0) {
+        continue;
+      }
+      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;

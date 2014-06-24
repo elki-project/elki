@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
@@ -48,6 +49,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -105,10 +107,12 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param means a list of k means
    * @param clusters cluster assignment
    * @param assignment Current cluster assignment
+   * @param varsum Variance sum output
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
+  protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     boolean changed = false;
+    Arrays.fill(varsum, 0.);
     final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
@@ -121,6 +125,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
           mindist = dist;
         }
       }
+      varsum[minIndex] += mindist;
       changed |= updateAssignment(iditer, clusters, assignment, minIndex);
     }
     return changed;
@@ -234,10 +239,12 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param means Means
    * @param clusters Clusters
    * @param assignment Current cluster assignment
+   * @param varsum Variance sum output
    * @return true when the means have changed
    */
-  protected boolean macQueenIterate(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
+  protected boolean macQueenIterate(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     boolean changed = false;
+    Arrays.fill(varsum, 0.);
 
     // Raw distance function
     final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
@@ -254,6 +261,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
           mindist = dist;
         }
       }
+      varsum[minIndex] += mindist;
       changed |= updateMeanAndAssignment(clusters, means, minIndex, fv, iditer, assignment);
     }
     return changed;
@@ -297,6 +305,24 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   @Override
   public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     this.distanceFunction = distanceFunction;
+  }
+
+  /**
+   * Log statistics on the variance sum.
+   * 
+   * @param varstat Statistics log instance
+   * @param varsum Variance sum per cluster
+   */
+  protected void logVarstat(DoubleStatistic varstat, double[] varsum) {
+    if(varstat == null) {
+      return;
+    }
+    double s = 0.;
+    for(double v : varsum) {
+      s += v;
+    }
+    varstat.setDouble(s);
+    getLogger().statistics(varstat);
   }
 
   /**

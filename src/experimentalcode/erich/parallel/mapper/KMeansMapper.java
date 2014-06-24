@@ -23,6 +23,7 @@ package experimentalcode.erich.parallel.mapper;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,6 +73,11 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
   int[] sizes;
 
   /**
+   * Variance sum.
+   */
+  double[] varsum;
+
+  /**
    * Whether the assignment changed during the last iteration.
    */
   boolean changed = false;
@@ -83,12 +89,14 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
    * @param distance Distance function
    * @param means Initial means
    * @param assignment Cluster assignment
+   * @param varsum Variance sums
    */
-  public KMeansMapper(Relation<V> relation, PrimitiveDistanceFunction<? super NumberVector> distance, WritableIntegerDataStore assignment) {
+  public KMeansMapper(Relation<V> relation, PrimitiveDistanceFunction<? super NumberVector> distance, WritableIntegerDataStore assignment, double[] varsum) {
     super();
     this.distance = distance;
     this.relation = relation;
     this.assignment = assignment;
+    this.varsum = varsum;
   }
 
   /**
@@ -112,6 +120,7 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
     final int dim = means.get(0).getDimensionality();
     centroids = new double[k][dim];
     sizes = new int[k];
+    Arrays.fill(varsum, 0.);
   }
 
   @Override
@@ -123,21 +132,22 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
   public void cleanup(Mapper.Instance inst) {
     @SuppressWarnings("unchecked")
     Instance instance = (Instance) inst;
-    synchronized (this) {
+    synchronized(this) {
       changed |= instance.changed;
-      for (int i = 0; i < centroids.length; i++) {
+      for(int i = 0; i < centroids.length; i++) {
         int sizeb = instance.sizes[i];
-        if (sizeb == 0) {
+        if(sizeb == 0) {
           continue;
         }
         int sizea = sizes[i];
         double sum = sizea + sizeb;
         double[] cent = centroids[i];
-        if (sizea > 0) {
+        if(sizea > 0) {
           VMath.timesEquals(cent, sizea / sum);
         }
         VMath.plusTimesEquals(cent, instance.centroids[i], 1. / sum);
         sizes[i] += sizeb;
+        VMath.plusEquals(varsum, instance.varsum);
       }
     }
   }
@@ -149,8 +159,8 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
    */
   public List<Vector> getMeans() {
     ArrayList<Vector> newmeans = new ArrayList<>(centroids.length);
-    for (int i = 0; i < centroids.length; i++) {
-      if (sizes[i] == 0) {
+    for(int i = 0; i < centroids.length; i++) {
+      if(sizes[i] == 0) {
         newmeans.add(means.get(i)); // Keep old mean.
         continue;
       }
@@ -159,6 +169,11 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
     return newmeans;
   }
 
+  /**
+   * Instance to process part of the data set, for a single iteration.
+   * 
+   * @author Erich Schubert
+   */
   public class Instance implements Mapper.Instance {
     /**
      * Data relation.
@@ -191,6 +206,11 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
     private int[] sizes;
 
     /**
+     * Variance sum.
+     */
+    private double[] varsum;
+
+    /**
      * Changed flag.
      */
     private boolean changed = false;
@@ -211,13 +231,14 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
       final int k = means.size();
       this.means = new Vector[k];
       Iterator<? extends NumberVector> iter = means.iterator();
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         this.means[i] = iter.next().getColumnVector(); // Make local copy!
       }
       // Storage for updated means.
       final int dim = this.means[0].getDimensionality();
       this.centroids = new double[k][dim];
       this.sizes = new int[k];
+      this.varsum = new double[k];
     }
 
     @Override
@@ -226,19 +247,20 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
       // Find minimum:
       double mindist = Double.POSITIVE_INFINITY;
       int minIndex = 0;
-      for (int i = 0; i < means.length; i++) {
+      for(int i = 0; i < means.length; i++) {
         final double dist = distance.distance(fv, means[i]);
-        if (dist < mindist) {
+        if(dist < mindist) {
           minIndex = i;
           mindist = dist;
         }
       }
+      varsum[minIndex] += mindist;
       // Update assignment:
       int prev = assignment.putInt(id, minIndex);
       // Update changed flag:
       changed |= (prev != minIndex);
       double[] cent = centroids[minIndex];
-      for (int d = 0; d < fv.getDimensionality(); d++) {
+      for(int d = 0; d < fv.getDimensionality(); d++) {
         // TODO: improve numerical stability via Kahan summation?
         cent[d] += fv.doubleValue(d);
       }

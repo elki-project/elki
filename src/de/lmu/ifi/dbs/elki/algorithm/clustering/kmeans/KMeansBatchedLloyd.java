@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -120,8 +121,10 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
 
     double[][] meanshift = new double[k][dim];
     int[] changesize = new int[k];
+    double[] varsum = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
+    DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       boolean changed = false;
@@ -132,12 +135,14 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
           Arrays.fill(meanshift[i], 0.);
         }
         Arrays.fill(changesize, 0);
-        changed |= assignToNearestCluster(relation, parts[p], means, meanshift, changesize, clusters, assignment);
+        Arrays.fill(varsum, 0.);
+        changed |= assignToNearestCluster(relation, parts[p], means, meanshift, changesize, clusters, assignment, varsum);
         // Recompute means.
         updateMeans(means, meanshift, clusters, changesize);
         LOG.incrementProcessed(pprog);
       }
       LOG.ensureCompleted(pprog);
+      logVarstat(varstat, varsum);
       // Stop if no cluster assignment changed.
       if(!changed) {
         break;
@@ -148,8 +153,12 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      KMeansModel model = new KMeansModel(means.get(i));
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
+      DBIDs ids = clusters.get(i);
+      if (ids.size() == 0) {
+        continue;
+      }
+      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
+      result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;
   }
@@ -165,9 +174,10 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
    * @param changesize New cluster sizes
    * @param clusters cluster assignment
    * @param assignment Current cluster assignment
+   * @param varsum Sum of variances
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<V> relation, DBIDs ids, List<? extends NumberVector> oldmeans, double[][] meanshift, int[] changesize, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment) {
+  protected boolean assignToNearestCluster(Relation<V> relation, DBIDs ids, List<? extends NumberVector> oldmeans, double[][] meanshift, int[] changesize, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     boolean changed = false;
 
     final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
@@ -182,6 +192,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
           mindist = dist;
         }
       }
+      varsum[minIndex] += mindist;
       changed |= updateAssignment(iditer, fv, clusters, assignment, meanshift, changesize, minIndex);
     }
     return changed;

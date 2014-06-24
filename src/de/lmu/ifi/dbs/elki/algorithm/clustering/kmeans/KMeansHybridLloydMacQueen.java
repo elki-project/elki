@@ -36,11 +36,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
@@ -85,19 +87,23 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-
+    double[] varsum = new double[k];
+    
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
+    DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration += 2) {
       { // MacQueen
         LOG.incrementProcessed(prog);
-        boolean changed = macQueenIterate(relation, means, clusters, assignment);
+        boolean changed = macQueenIterate(relation, means, clusters, assignment, varsum);
+        logVarstat(varstat, varsum);
         if(!changed) {
           break;
         }
       }
       { // Lloyd
         LOG.incrementProcessed(prog);
-        boolean changed = assignToNearestCluster(relation, means, clusters, assignment);
+        boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum);
+        logVarstat(varstat, varsum);
         // Stop if no cluster assignment changed.
         if(!changed) {
           break;
@@ -111,8 +117,12 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      KMeansModel model = new KMeansModel(means.get(i));
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
+      DBIDs ids = clusters.get(i);
+      if (ids.size() == 0) {
+        continue;
+      }
+      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
+      result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;
   }

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyCh
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> vector datatype
  */
-public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
+public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.
    */
@@ -76,7 +76,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
   }
 
   @Override
-  public Clustering<MeanModel> run(Database database, Relation<V> relation) {
+  public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Assignment", "kmeans-assignment");
     }
@@ -88,13 +88,14 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
+    double[] varsum = new double[k];
 
-    assignToNearestCluster(relation, means, clusters, assignment);
+    assignToNearestCluster(relation, means, clusters, assignment, varsum);
 
     // Wrap result
-    Clustering<MeanModel> result = new Clustering<>("Nearest Centroid Clustering", "nearest-center-clustering");
+    Clustering<KMeansModel> result = new Clustering<>("Nearest Centroid Clustering", "nearest-center-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel model = new MeanModel(means.get(i).getColumnVector());
+      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

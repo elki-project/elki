@@ -87,7 +87,8 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
 
     // Store for current cluster assignment.
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
-    KMeansMapper<V> kmm = new KMeansMapper<>(relation, distanceFunction, assignment);
+    double[] varsum = new double[k];
+    KMeansMapper<V> kmm = new KMeansMapper<>(relation, distanceFunction, assignment, varsum);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
@@ -114,8 +115,12 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
 
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for (int i = 0; i < clusters.size(); i++) {
-      KMeansModel model = new KMeansModel(means.get(i));
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
+      DBIDs cids = clusters.get(i);
+      if (cids.size() == 0) {
+        continue;
+      }
+      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
+      result.addToplevelCluster(new Cluster<>(cids, model));
     }
     return result;
   }

@@ -32,11 +32,27 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  */
 public class KMeansModel extends MeanModel {
   /**
+   * Variance sum.
+   */
+  double varsum;
+
+  /**
    * Constructor with mean.
    * 
    * @param mean Mean vector.
+   * @param varsum Variance sum.
    */
-  public KMeansModel(Vector mean) {
+  public KMeansModel(Vector mean, double varsum) {
     super(mean);
+    this.varsum = varsum;
+  }
+
+  /**
+   * Get the variance contribution of the cluster (sum of variances)
+   * 
+   * @return Sum of in-cluster variance
+   */
+  public double getVarianceContribution() {
+    return varsum;
   }
 }

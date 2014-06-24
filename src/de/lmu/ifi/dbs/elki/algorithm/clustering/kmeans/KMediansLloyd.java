@@ -96,11 +96,12 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
+    double[] distsum = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medians iteration", LOG) : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      boolean changed = assignToNearestCluster(relation, medians, clusters, assignment);
+      boolean changed = assignToNearestCluster(relation, medians, clusters, assignment, distsum);
       // Stop if no cluster assignment changed.
       if(!changed) {
         break;
