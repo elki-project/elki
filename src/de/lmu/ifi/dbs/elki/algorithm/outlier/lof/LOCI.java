@@ -286,6 +286,8 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * Array of double-int values.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   protected static class DoubleIntArrayList {
     /**

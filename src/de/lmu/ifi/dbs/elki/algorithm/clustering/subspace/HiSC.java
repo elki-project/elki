@@ -208,6 +208,8 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, HiSC.HiSC
    * 
    * @author Elke Achtert
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class HiSCClusterOrderEntry extends CorrelationClusterOrderEntry<HiSCClusterOrderEntry> {
     /**

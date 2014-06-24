@@ -81,6 +81,8 @@ public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimi
    * Parameterization class.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

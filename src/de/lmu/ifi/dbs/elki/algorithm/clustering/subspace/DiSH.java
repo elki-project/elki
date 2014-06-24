@@ -740,6 +740,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * 
    * @author Elke Achtert
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class DiSHClusterOrderEntry extends CorrelationClusterOrderEntry<DiSHClusterOrderEntry> {
     /**

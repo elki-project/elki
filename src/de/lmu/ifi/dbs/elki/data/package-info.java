@@ -10,6 +10,7 @@
  * @apiviz.exclude java.io.*
  * @apiviz.exclude java.util.*
  * @apiviz.exclude java.lang.*
+ * @apiviz.exclude .*\.Factory$
  */
 /*
 This file is part of ELKI:

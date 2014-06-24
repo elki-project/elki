@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  *
  * @apiviz.has Instance
  */
-public class SimpleLRDProcessor extends AbstractDoubleProcessor {
+public class SimplifiedLRDProcessor extends AbstractDoubleProcessor {
   /**
    * KNN store
    */
@@ -52,7 +52,7 @@ public class SimpleLRDProcessor extends AbstractDoubleProcessor {
    * 
    * @param knns k nearest neighbors
    */
-  public SimpleLRDProcessor(DataStore<? extends KNNList> knns) {
+  public SimplifiedLRDProcessor(DataStore<? extends KNNList> knns) {
     super();
     this.knns = knns;
   }

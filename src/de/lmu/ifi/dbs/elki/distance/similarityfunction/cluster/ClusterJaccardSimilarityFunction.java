@@ -93,6 +93,8 @@ public class ClusterJaccardSimilarityFunction extends AbstractPrimitiveSimilarit
    * Parameterization class.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override

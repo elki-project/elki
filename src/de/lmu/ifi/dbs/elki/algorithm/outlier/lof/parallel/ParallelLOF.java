@@ -62,6 +62,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has LRDProcessor
+ * @apiviz.has LOFProcessor
+ * 
  * @param <O> Object type
  */
 public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {

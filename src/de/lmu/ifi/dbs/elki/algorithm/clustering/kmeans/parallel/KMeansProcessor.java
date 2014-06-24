@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
  * Parallel k-means implementation.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Instance
  */
 public class KMeansProcessor<V extends NumberVector> implements Processor {
   /**

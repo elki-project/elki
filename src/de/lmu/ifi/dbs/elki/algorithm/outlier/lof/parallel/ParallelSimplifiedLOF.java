@@ -61,6 +61,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has SimplifiedLRDProcessor
+ * @apiviz.has LOFProcessor
+ * 
  * @param <O> Object type
  */
 public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
@@ -111,7 +114,7 @@ public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, 
     // Phase two: simplified-lrd
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     {
-      SimpleLRDProcessor lrdm = new SimpleLRDProcessor(knns);
+      SimplifiedLRDProcessor lrdm = new SimplifiedLRDProcessor(knns);
       SharedDouble lrdv = new SharedDouble();
       WriteDoubleDataStoreProcessor storelrd = new WriteDoubleDataStoreProcessor(lrds);
 
