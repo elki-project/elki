@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -54,11 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OneMustBeSetGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Provides the APRIORI algorithm for Mining Association Rules.
@@ -70,6 +68,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Chile, Chile 1994.
  * </p>
  * 
+ * This implementation uses some simple optimizations for 1- and 2-itemsets.
+ * 
  * @author Arthur Zimek
  * @author Erich Schubert
  * 
@@ -78,7 +78,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("APRIORI: Algorithm for Mining Association Rules")
 @Description("Searches for frequent itemsets")
-@Reference(authors = "R. Agrawal, R. Srikant", title = "Fast Algorithms for Mining Association Rules in Large Databases", booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", url = "http://www.acm.org/sigmod/vldb/conf/1994/P487.PDF")
+@Reference(authors = "R. Agrawal, R. Srikant", //
+title = "Fast Algorithms for Mining Association Rules in Large Databases", //
+booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", //
+url = "http://www.acm.org/sigmod/vldb/conf/1994/P487.PDF")
 public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   /**
    * The logger for this class.
@@ -86,30 +89,15 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   private static final Logging LOG = Logging.getLogger(APRIORI.class);
 
   /**
-   * Optional parameter to specify the threshold for minimum frequency, must be
-   * a double greater than or equal to 0 and less than or equal to 1.
-   * Alternatively to parameter {@link #MINSUPP_ID}).
+   * Statistics logging prefix.
    */
-  public static final OptionID MINFREQ_ID = new OptionID("apriori.minfreq", "Threshold for minimum frequency as percentage value " + "(alternatively to parameter apriori.minsupp).");
+  private final String STAT = this.getClass().getName() + ".";
 
   /**
-   * Parameter to specify the threshold for minimum support as minimally
-   * required number of transactions, must be an integer equal to or greater
-   * than 0. Alternatively to parameter {@link #MINFREQ_ID} - setting
-   * {@link #MINSUPP_ID} is slightly preferable over setting {@link #MINFREQ_ID}
-   * in terms of efficiency.
+   * Minimum support. If less than 1, considered to be a relative frequency,
+   * otherwise an absolute count.
    */
-  public static final OptionID MINSUPP_ID = new OptionID("apriori.minsupp", "Threshold for minimum support as minimally required number of transactions " + "(alternatively to parameter apriori.minfreq" + " - setting apriori.minsupp is slightly preferable over setting " + "apriori.minfreq in terms of efficiency).");
-
-  /**
-   * Holds the value of {@link #MINFREQ_ID}.
-   */
-  private double minfreq = Double.NaN;
-
-  /**
-   * Holds the value of {@link #MINSUPP_ID}.
-   */
-  private int minsupp = Integer.MIN_VALUE;
+  private double minfreq;
 
   /**
    * Constructor with minimum frequency.
@@ -122,16 +110,6 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   }
 
   /**
-   * Constructor with minimum support.
-   * 
-   * @param minsupp Minimum support
-   */
-  public APRIORI(int minsupp) {
-    super();
-    this.minsupp = minsupp;
-  }
-
-  /**
    * Performs the APRIORI algorithm on the given database.
    * 
    * @param relation the Relation to process
@@ -141,66 +119,55 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     DBIDs ids = relation.getDBIDs();
     List<Itemset> solution = new ArrayList<>();
     final int size = ids.size();
-    final int needed = (minfreq >= 0.) ? (int) Math.ceil(minfreq * size) : minsupp;
-    
+    final int needed = (int) ((minfreq < 1.) ? Math.ceil(minfreq * size) : minfreq);
+
     // TODO: we don't strictly require a vector field.
     // We could work with knowing just the maximum dimensionality beforehand.
     VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
     if(size > 0) {
       final int dim = meta.getDimensionality();
-      Duration timeone = LOG.newDuration("apriori.1-items.time").begin();
+      Duration timeone = LOG.newDuration(STAT + "1-items.time").begin();
       List<OneItemset> oneitems = buildFrequentOneItemsets(relation, dim, needed);
       LOG.statistics(timeone.end());
-      if(LOG.isVerbose()) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("1-frequentItemsets (itemsets: ").append(oneitems.size()) //
-        .append(") (transactions: ").append(ids.size()).append(")");
-        if(LOG.isDebuggingFine()) {
-          debugDumpCandidates(msg, oneitems, meta);
-        }
-        msg.append('\n');
-        LOG.verbose(msg);
+      if(LOG.isStatistics()) {
+        LOG.statistics(new LongStatistic(STAT + "1-items.frequent", oneitems.size()));
+        LOG.statistics(new LongStatistic(STAT + "1-items.transactions", ids.size()));
+      }
+      if(LOG.isDebuggingFine()) {
+        LOG.debugFine(debugDumpCandidates(new StringBuilder(), oneitems, meta));
       }
       solution.addAll(oneitems);
       if(oneitems.size() >= 2) {
-        Duration timetwo = LOG.newDuration("apriori.2-items.time").begin();
+        Duration timetwo = LOG.newDuration(STAT + "2-items.time").begin();
         ArrayModifiableDBIDs survivors = DBIDUtil.newArray(ids.size());
         List<? extends Itemset> candidates = buildFrequentTwoItemsets(oneitems, relation, dim, needed, ids, survivors);
         ids = survivors; // Continue with reduced set of transactions.
         LOG.statistics(timetwo.end());
-        if(LOG.isVerbose()) {
-          StringBuilder msg = new StringBuilder();
-          msg.append("2-frequentItemsets (itemsets: ").append(candidates.size()) //
-          .append(") (transactions: ").append(ids.size()).append(")");
-          if(LOG.isDebuggingFine()) {
-            debugDumpCandidates(msg, candidates, meta);
-          }
-          msg.append('\n');
-          LOG.verbose(msg);
+        if(LOG.isStatistics()) {
+          LOG.statistics(new LongStatistic(STAT + "2-items.frequent", candidates.size()));
+          LOG.statistics(new LongStatistic(STAT + "2-items.transactions", ids.size()));
+        }
+        if(LOG.isDebuggingFine()) {
+          LOG.debugFine(debugDumpCandidates(new StringBuilder(), candidates, meta));
         }
         solution.addAll(candidates);
         for(int length = 3; candidates.size() >= length; length++) {
-          StringBuilder msg = LOG.isVerbose() ? new StringBuilder() : null;
-          Duration timel = LOG.newDuration("apriori." + length + "-items.time").begin();
+          Duration timel = LOG.newDuration(STAT + length + "-items.time").begin();
           // Join to get the new candidates
           candidates = aprioriGenerate(candidates, length, dim);
-          if(msg != null) {
-            if(length > 2 && LOG.isDebuggingFinest()) {
-              msg.append(length).append("-candidates after pruning (").append(candidates.size()).append(")");
-              debugDumpCandidates(msg, candidates, meta);
-            }
+          if(LOG.isDebuggingFinest()) {
+            LOG.debugFinest(debugDumpCandidates(new StringBuilder().append("Before pruning: "), candidates, meta));
           }
           survivors = DBIDUtil.newArray(ids.size());
           candidates = frequentItemsets(candidates, relation, needed, ids, survivors);
           ids = survivors; // Continue with reduced set of transactions.
           LOG.statistics(timel.end());
-          if(msg != null) {
-            msg.append(length).append("-frequentItemsets (itemsets: ").append(candidates.size()) //
-            .append(") (transactions: ").append(ids.size()).append(")");
-            if(LOG.isDebuggingFine()) {
-              debugDumpCandidates(msg, candidates, meta);
-            }
-            LOG.verbose(msg.toString());
+          if(LOG.isStatistics()) {
+            LOG.statistics(new LongStatistic(STAT + length + "-items.frequent", candidates.size()));
+            LOG.statistics(new LongStatistic(STAT + length + "-items.transactions", ids.size()));
+          }
+          if(LOG.isDebuggingFine()) {
+            LOG.debugFine(debugDumpCandidates(new StringBuilder(), candidates, meta));
           }
           solution.addAll(candidates);
         }
@@ -227,14 +194,17 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         counts[bv.iterDim(it)]++;
       }
     }
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(STAT + "1-items.candidates", dim));
+    }
     // Generate initial candidates of length 1.
-    List<OneItemset> candidates = new ArrayList<>(dim);
+    List<OneItemset> frequent = new ArrayList<>(dim);
     for(int i = 0; i < dim; i++) {
       if(counts[i] >= needed) {
-        candidates.add(new OneItemset(i, counts[i]));
+        frequent.add(new OneItemset(i, counts[i]));
       }
     }
-    return candidates;
+    return frequent;
   }
 
   /**
@@ -254,6 +224,9 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     for(OneItemset supported : oneitems) {
       BitsUtil.setI(mask, supported.item);
       f1++;
+    }
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(STAT + "2-items.candidates", f1 * (long) (f1 - 1)));
     }
     // We quite aggressively size the map, assuming that almost each combination
     // is present somewhere. If this won't fit into memory, we're likely running
@@ -276,18 +249,127 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       }
     }
     // Generate candidates of length 2.
-    List<SparseItemset> candidates = new ArrayList<>(f1 * (int) Math.sqrt(f1));
+    List<SparseItemset> frequent = new ArrayList<>(f1 * (int) Math.sqrt(f1));
     for(TLongIntIterator iter = map.iterator(); iter.hasNext();) {
       iter.advance(); // Trove style iterator - advance first.
       if(iter.value() >= needed) {
         int ii = (int) (iter.key() >>> 32);
         int ij = (int) (iter.key() & -1L);
-        candidates.add(new SparseItemset(new int[] { ii, ij }, iter.value()));
+        frequent.add(new SparseItemset(new int[] { ii, ij }, iter.value()));
       }
     }
     // The hashmap may produce them out of order.
-    Collections.sort(candidates);
-    return candidates;
+    Collections.sort(frequent);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(STAT + "2-items.frequent", frequent.size()));
+    }
+    return frequent;
+  }
+
+  /**
+   * Prunes a given set of candidates to keep only those BitSets where all
+   * subsets of bits flipping one bit are frequent already.
+   * 
+   * @param supported Support map
+   * @param length Itemset length
+   * @param dim Dimensionality
+   * @return itemsets that cannot be pruned by apriori
+   */
+  protected List<Itemset> aprioriGenerate(List<? extends Itemset> supported, int length, int dim) {
+    List<Itemset> candidateList = new ArrayList<>();
+    if(supported.size() < length) {
+      return candidateList;
+    }
+    Itemset ref = supported.get(0);
+    if(ref instanceof SparseItemset) {
+      // TODO: we currently never switch to DenseItemSet. This may however be
+      // beneficial when we have few dimensions and many candidates.
+      // E.g. when length > 32 and dim < 100. But this needs benchmarking!
+      // For length < 5 and dim > 3000, SparseItemset unsurprisingly was faster
+
+      // Scratch item to use for searching.
+      SparseItemset scratch = new SparseItemset(new int[length - 1]);
+
+      long joined = 0L;
+      final int ssize = supported.size();
+      for(int i = 0; i < ssize; i++) {
+        SparseItemset ii = (SparseItemset) supported.get(i);
+        prefix: for(int j = i + 1; j < ssize; j++) {
+          SparseItemset ij = (SparseItemset) supported.get(j);
+          if(!ii.prefixTest(ij)) {
+            break prefix; // Prefix doesn't match
+          }
+          joined++;
+          // Test subsets (re-) using scratch object
+          System.arraycopy(ii.indices, 1, scratch.indices, 0, length - 2);
+          scratch.indices[length - 2] = ij.indices[length - 2];
+          for(int k = length - 3; k >= 0; k--) {
+            scratch.indices[k] = ii.indices[k + 1];
+            int pos = Collections.binarySearch(supported, scratch);
+            if(pos < 0) {
+              // Prefix was okay, but one other subset was not frequent
+              continue prefix;
+            }
+          }
+          int[] items = new int[length];
+          System.arraycopy(ii.indices, 0, items, 0, length - 1);
+          items[length - 1] = ij.indices[length - 2];
+          candidateList.add(new SparseItemset(items));
+        }
+      }
+      if(LOG.isStatistics()) {
+        // Naive pairwise approach
+        LOG.statistics(new LongStatistic(STAT + length + "-items.pairwise", (ssize * ((long) ssize - 1))));
+        LOG.statistics(new LongStatistic(STAT + length + "-items.joined", joined));
+        LOG.statistics(new LongStatistic(STAT + length + "-items.candidates", candidateList.size()));
+      }
+      return candidateList;
+    }
+    if(ref instanceof DenseItemset) {
+      // Scratch item to use for searching.
+      DenseItemset scratch = new DenseItemset(BitsUtil.zero(dim), length - 1);
+
+      long joined = 0L;
+      final int ssize = supported.size();
+      for(int i = 0; i < ssize; i++) {
+        DenseItemset ii = (DenseItemset) supported.get(i);
+        prefix: for(int j = i + 1; j < ssize; j++) {
+          DenseItemset ij = (DenseItemset) supported.get(j);
+          // Prefix test via "|i1 ^ i2| = 2"
+          System.arraycopy(ii.items, 0, scratch.items, 0, ii.items.length);
+          BitsUtil.xorI(scratch.items, ij.items);
+          if(BitsUtil.cardinality(scratch.items) != 2) {
+            break prefix; // No prefix match; since sorted, no more can follow!
+          }
+          ++joined;
+          // Ensure that the first difference is the last item in ii:
+          int first = BitsUtil.nextSetBit(scratch.items, 0);
+          if(BitsUtil.nextSetBit(ii.items, first + 1) > -1) {
+            break prefix; // Different overlap by chance?
+          }
+          BitsUtil.orI(scratch.items, ij.items);
+
+          // Test subsets.
+          for(int l = length, b = BitsUtil.nextSetBit(scratch.items, 0); l > 2; l--, b = BitsUtil.nextSetBit(scratch.items, b + 1)) {
+            BitsUtil.clearI(scratch.items, b);
+            int pos = Collections.binarySearch(supported, scratch);
+            if(pos < 0) {
+              continue prefix;
+            }
+            BitsUtil.setI(scratch.items, b);
+          }
+          candidateList.add(new DenseItemset(scratch.items.clone(), length));
+        }
+      }
+      if(LOG.isStatistics()) {
+        // Naive pairwise approach
+        LOG.statistics(new LongStatistic(STAT + length + "-items.pairwise", (ssize * ((long) ssize - 1))));
+        LOG.statistics(new LongStatistic(STAT + length + "-items.joined", joined));
+        LOG.statistics(new LongStatistic(STAT + length + "-items.candidates", candidateList.size()));
+      }
+      return candidateList;
+    }
+    throw new AbortException("Unexpected itemset type " + ref.getClass());
   }
 
   /**
@@ -318,104 +400,14 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       }
     }
     // Retain only those with minimum support:
-    List<Itemset> supported = new ArrayList<>(candidates.size());
+    List<Itemset> frequent = new ArrayList<>(candidates.size());
     for(Iterator<? extends Itemset> iter = candidates.iterator(); iter.hasNext();) {
       final Itemset candidate = iter.next();
       if(candidate.getSupport() >= needed) {
-        supported.add(candidate);
+        frequent.add(candidate);
       }
     }
-    return supported;
-  }
-
-  /**
-   * Prunes a given set of candidates to keep only those BitSets where all
-   * subsets of bits flipping one bit are frequent already.
-   * 
-   * @param supported Support map
-   * @param length Itemset length
-   * @param dim Dimensionality
-   * @return itemsets that cannot be pruned by apriori
-   */
-  protected List<Itemset> aprioriGenerate(List<? extends Itemset> supported, int length, int dim) {
-    List<Itemset> candidateList = new ArrayList<>();
-    if(supported.size() <= 0) {
-      return candidateList;
-    }
-    Itemset ref = supported.get(0);
-    if(ref instanceof SparseItemset) {
-      // TODO: we currently never switch to DenseItemSet. This may however be
-      // beneficial when we have few dimensions and many candidates.
-      // E.g. when length > 32 and dim < 100. But this needs benchmarking!
-      // For length < 5 and dim > 3000, SparseItemset unsurprisingly was faster
-
-      // Scratch item to use for searching.
-      SparseItemset scratch = new SparseItemset(new int[length - 1]);
-
-      final int ssize = supported.size();
-      for(int i = 0; i < ssize; i++) {
-        SparseItemset ii = (SparseItemset) supported.get(i);
-        prefix: for(int j = i + 1; j < ssize; j++) {
-          SparseItemset ij = (SparseItemset) supported.get(j);
-          if(!ii.prefixTest(ij)) {
-            break prefix; // Prefix doesn't match
-          }
-          // Test subsets (re-) using scratch object
-          System.arraycopy(ii.indices, 1, scratch.indices, 0, length - 2);
-          scratch.indices[length - 2] = ij.indices[length - 2];
-          for(int k = length - 3; k >= 0; k--) {
-            scratch.indices[k] = ii.indices[k + 1];
-            int pos = Collections.binarySearch(supported, scratch);
-            if(pos < 0) {
-              // Prefix was okay, but one other subset was not frequent
-              continue prefix;
-            }
-          }
-          int[] items = new int[length];
-          System.arraycopy(ii.indices, 0, items, 0, length - 1);
-          items[length - 1] = ij.indices[length - 2];
-          candidateList.add(new SparseItemset(items));
-        }
-      }
-      return candidateList;
-    }
-    if(ref instanceof DenseItemset) {
-      // Scratch item to use for searching.
-      DenseItemset scratch = new DenseItemset(BitsUtil.zero(dim), length - 1);
-
-      final int ssize = supported.size();
-      for(int i = 0; i < ssize; i++) {
-        DenseItemset ii = (DenseItemset) supported.get(i);
-        prefix: for(int j = i + 1; j < ssize; j++) {
-          DenseItemset ij = (DenseItemset) supported.get(j);
-          // Prefix test via "|i1 ^ i2| = 2"
-          System.arraycopy(ii.items, 0, scratch.items, 0, ii.items.length);
-          BitsUtil.xorI(scratch.items, ij.items);
-          if(BitsUtil.cardinality(scratch.items) != 2) {
-            break prefix; // No prefix match; since sorted, no more can follow!
-          }
-          // Ensure that the first difference is the last item in ii:
-          int first = BitsUtil.nextSetBit(scratch.items, 0);
-          if(BitsUtil.nextSetBit(ii.items, first + 1) > -1) {
-            break prefix; // Different overlap by chance?
-          }
-          BitsUtil.orI(scratch.items, ij.items);
-
-          // Test subsets.
-          for(int l = length, b = BitsUtil.nextSetBit(scratch.items, 0); l > 2; l--, b = BitsUtil.nextSetBit(scratch.items, b + 1)) {
-            BitsUtil.clearI(scratch.items, b);
-            int pos = Collections.binarySearch(supported, scratch);
-            if(pos < 0) {
-              continue prefix;
-            }
-            BitsUtil.setI(scratch.items, b);
-          }
-          candidateList.add(new DenseItemset(scratch.items.clone(), length));
-        }
-      }
-      return candidateList;
-    }
-    throw new AbortException("Unexpected itemset type " + ref.getClass());
+    return frequent;
   }
 
   /**
@@ -424,14 +416,16 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @param msg Output buffer
    * @param candidates Itemsets to dump
    * @param meta Metadata for item labels
+   * @return Output buffer
    */
-  private void debugDumpCandidates(StringBuilder msg, List<? extends Itemset> candidates, VectorFieldTypeInformation<BitVector> meta) {
+  private StringBuilder debugDumpCandidates(StringBuilder msg, List<? extends Itemset> candidates, VectorFieldTypeInformation<BitVector> meta) {
     msg.append(':');
     for(Itemset itemset : candidates) {
       msg.append(" [");
       itemset.appendTo(msg, meta);
       msg.append(']');
     }
+    return msg;
   }
 
   @Override
@@ -453,47 +447,30 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Parameter for minFreq.
+     * Parameter to specify the minimum support, in absolute or relative terms.
      */
-    protected Double minfreq = null;
+    public static final OptionID MINSUPP_ID = new OptionID("apriori.minsupp", //
+    "Threshold for minimum support as minimally required number of transactions (if > 1) " //
+        + "or the minimum frequency (if <= 1).");
 
     /**
-     * Parameter for minSupp.
+     * Parameter for minimum support.
      */
-    protected Integer minsupp = null;
+    protected double minsupp;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter minfreqP = new DoubleParameter(MINFREQ_ID);
-      minfreqP.setOptional(true);
-      minfreqP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      minfreqP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      if(config.grab(minfreqP)) {
-        minfreq = minfreqP.getValue();
-      }
-
-      IntParameter minsuppP = new IntParameter(MINSUPP_ID);
-      minsuppP.setOptional(true);
-      minsuppP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      DoubleParameter minsuppP = new DoubleParameter(MINSUPP_ID);
+      minsuppP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(minsuppP)) {
         minsupp = minsuppP.getValue();
       }
-
-      // global parameter constraints
-      config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(minfreqP, minsuppP));
-      config.checkConstraint(new OneMustBeSetGlobalConstraint(minfreqP, minsuppP));
     }
 
     @Override
     protected APRIORI makeInstance() {
-      if(minfreq != null) {
-        return new APRIORI(minfreq);
-      }
-      if(minsupp != null) {
-        return new APRIORI(minsupp);
-      }
-      return null;
+      return new APRIORI(minsupp);
     }
   }
 }
