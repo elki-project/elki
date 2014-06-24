@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.parallel;
+package de.lmu.ifi.dbs.elki.parallel.processor;
 
 /*
  This file is part of ELKI:
@@ -23,20 +23,44 @@ package de.lmu.ifi.dbs.elki.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
 
 /**
- * Map executor.
+ * Class to represent a processor factory.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Instance
  */
-public interface MapExecutor {
+public interface Processor {
   /**
-   * Get a channel for this executor.
+   * Create an instance. May be called multiple times, for example for multiple
+   * threads.
    * 
-   * @param parent Channel parent
-   * @return Channel instance
-   * @param <I> Variable type
+   * @param executor Job executor
+   * @return Instance
    */
-  <I extends SharedVariable.Instance<?>> I getInstance(SharedVariable<I> parent);
+  public Instance instantiate(Executor executor);
+
+  /**
+   * Invoke cleanup.
+   * 
+   * @param inst Instance to cleanup.
+   */
+  public void cleanup(Instance inst);
+
+  /**
+   * Instance.
+   * 
+   * @author Erich Schubert
+   */
+  public interface Instance {
+    /**
+     * Process ("map") a single object
+     * 
+     * @param id Object to map.
+     */
+    public void map(DBIDRef id);
+  }
 }

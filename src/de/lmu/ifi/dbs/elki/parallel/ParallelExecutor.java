@@ -34,12 +34,12 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.parallel.mapper.Mapper;
+import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
 
 /**
- * Class to run mappers in parallel, on all available cores.
+ * Class to run processors in parallel, on all available cores.
  * 
  * TODO: add progress
  * 
@@ -48,14 +48,14 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * @apiviz.has BlockArrayRunner
  * @apiviz.uses ParallelCore
  */
-public class ParallelMapExecutor {
+public class ParallelExecutor {
   /**
    * Run a task on all available CPUs.
    * 
    * @param ids IDs to process
-   * @param mapper Mappers to run
+   * @param procs Processors to run
    */
-  public static final void run(DBIDs ids, Mapper... mapper) {
+  public static final void run(DBIDs ids, Processor... procs) {
     // TODO: try different strategies anyway!
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     ParallelCore core = ParallelCore.getCore();
@@ -71,7 +71,7 @@ public class ParallelMapExecutor {
       for(int i = 0; i < numparts; i++) {
         final int start = i * blocksize;
         final int end = (start + blocksize < size) ? start + blocksize : size;
-        Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, start, end, mapper);
+        Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, start, end, procs);
         parts.add(core.submit(run));
       }
 
@@ -80,7 +80,7 @@ public class ParallelMapExecutor {
       }
     }
     catch(ExecutionException e) {
-      throw new RuntimeException("Mapper execution failed.", e);
+      throw new RuntimeException("Processor execution failed.", e);
     }
     catch(InterruptedException e) {
       throw new RuntimeException("Parallel execution interrupted.");
@@ -95,9 +95,9 @@ public class ParallelMapExecutor {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.uses Mapper
+   * @apiviz.uses Processor
    */
-  protected static class BlockArrayRunner implements Callable<ArrayDBIDs>, MapExecutor {
+  protected static class BlockArrayRunner implements Callable<ArrayDBIDs>, Executor {
     /**
      * Array IDs to process
      */
@@ -114,9 +114,9 @@ public class ParallelMapExecutor {
     private int end;
 
     /**
-     * The mapper masters that own the instances.
+     * The processor masters that own the instances.
      */
-    private Mapper[] mapper;
+    private Processor[] procs;
 
     /**
      * Variables map.
@@ -129,21 +129,21 @@ public class ParallelMapExecutor {
      * @param ids IDs to process
      * @param start Starting position
      * @param end End position
-     * @param mapper Mapper functions to run
+     * @param procs Processors to run
      */
-    protected BlockArrayRunner(ArrayDBIDs ids, int start, int end, Mapper[] mapper) {
+    protected BlockArrayRunner(ArrayDBIDs ids, int start, int end, Processor[] procs) {
       super();
       this.ids = ids;
       this.start = start;
       this.end = end;
-      this.mapper = mapper;
+      this.procs = procs;
     }
 
     @Override
     public ArrayDBIDs call() {
-      Mapper.Instance[] instances = new Mapper.Instance[mapper.length];
-      for(int i = 0; i < mapper.length; i++) {
-        instances[i] = mapper[i].instantiate(this);
+      Processor.Instance[] instances = new Processor.Instance[procs.length];
+      for(int i = 0; i < procs.length; i++) {
+        instances[i] = procs[i].instantiate(this);
       }
 
       DBIDArrayIter iter = ids.iter();
@@ -154,7 +154,7 @@ public class ParallelMapExecutor {
         }
       }
       for(int i = 0; i < instances.length; i++) {
-        mapper[i].cleanup(instances[i]);
+        procs[i].cleanup(instances[i]);
       }
       return ids;
     }
@@ -163,7 +163,7 @@ public class ParallelMapExecutor {
     public <I extends Instance<?>> I getInstance(SharedVariable<I> parent) {
       @SuppressWarnings("unchecked")
       I inst = (I) variables.get(parent);
-      if (inst == null) {
+      if(inst == null) {
         inst = parent.instantiate();
         variables.put(parent, inst);
       }

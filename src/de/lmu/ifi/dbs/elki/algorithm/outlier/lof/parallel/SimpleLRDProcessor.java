@@ -28,18 +28,20 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
-import de.lmu.ifi.dbs.elki.parallel.mapper.AbstractDoubleMapper;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
+import de.lmu.ifi.dbs.elki.parallel.processor.AbstractDoubleProcessor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 
 /**
- * Mapper for the "local reachability density" of LOF.
+ * Processor for the "local reachability density" of LOF.
  * 
  * Note: we compute 1/lrd, the local reachability distance.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.has Instance
  */
-public class SimpleLRDMapper extends AbstractDoubleMapper {
+public class SimpleLRDProcessor extends AbstractDoubleProcessor {
   /**
    * KNN store
    */
@@ -50,22 +52,22 @@ public class SimpleLRDMapper extends AbstractDoubleMapper {
    * 
    * @param knns k nearest neighbors
    */
-  public SimpleLRDMapper(DataStore<? extends KNNList> knns) {
+  public SimpleLRDProcessor(DataStore<? extends KNNList> knns) {
     super();
     this.knns = knns;
   }
 
   @Override
-  public Instance instantiate(MapExecutor mapper) {
-    return new Instance(mapper.getInstance(output));
+  public Instance instantiate(Executor master) {
+    return new Instance(master.getInstance(output));
   }
 
   /**
-   * Mapper instance
+   * Instance
    * 
    * @author Erich Schubert
    */
-  private class Instance extends AbstractDoubleMapper.Instance {
+  private class Instance extends AbstractDoubleProcessor.Instance {
     /**
      * Constructor.
      * 

@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.parallel.variables;
  */
 
 /**
- * Variable to share between different mappers (within one thread only!)
+ * Variable to share between different processors (within one thread only!)
  * 
  * @author Erich Schubert
  * 

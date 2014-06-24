@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.parallel.variables;
  */
 
 /**
- * Direct channel connecting two mappers.
+ * Direct channel connecting two processors.
  * 
  * @author Erich Schubert
  * 

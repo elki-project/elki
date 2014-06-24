@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.parallel.mapper;
+package de.lmu.ifi.dbs.elki.parallel.processor;
 
 /*
  This file is part of ELKI:
@@ -24,58 +24,70 @@ package de.lmu.ifi.dbs.elki.parallel.mapper;
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
-import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 
 /**
- * Mapper to compute the kNN distance.
- * 
- * Needs the k nearest neighbors as input, for example from {@link KNNMapper}.
+ * Processor to compute the kNN of each object.
  * 
  * @author Erich Schubert
+ * 
+ * @param <O> Object type
  */
-public class KDistanceMapper extends AbstractDoubleMapper {
+public class KNNProcessor<O> implements Processor {
   /**
    * K parameter
    */
   int k;
 
   /**
+   * KNN query object
+   */
+  KNNQuery<O> knnq;
+
+  /**
+   * Output channel to write to
+   */
+  SharedObject<KNNList> out;
+
+  /**
    * Constructor.
    * 
    * @param k K parameter
+   * @param knnq Distance query to use
    */
-  public KDistanceMapper(int k) {
+  public KNNProcessor(int k, KNNQuery<O> knnq) {
     super();
     this.k = k;
+    this.knnq = knnq;
   }
 
   /**
-   * KNN query object
-   */
-  SharedObject<? extends KNNList> input;
-
-  /**
-   * Connect the input channel.
+   * Connect the output channel.
    * 
-   * @param input Input channel
+   * @param output Output channel
    */
-  public void connectKNNInput(SharedObject<? extends KNNList> input) {
-    this.input = input;
+  public void connectKNNOutput(SharedObject<KNNList> output) {
+    this.out = output;
   }
 
   @Override
-  public Instance instantiate(MapExecutor mapper) {
-    return new Instance(k, mapper.getInstance(input), mapper.getInstance(output));
+  public Instance<O> instantiate(Executor executor) {
+    return new Instance<>(k, knnq, executor.getInstance(out));
+  }
+
+  @Override
+  public void cleanup(Processor.Instance inst) {
+    // Nothing to do.
   }
 
   /**
-   * Mapper instance for precomputing the kNN.
+   * Instance for precomputing the kNN.
    * 
    * @author Erich Schubert
    */
-  public static class Instance extends AbstractDoubleMapper.Instance {
+  public static class Instance<O> implements Processor.Instance {
     /**
      * k Parameter
      */
@@ -84,24 +96,30 @@ public class KDistanceMapper extends AbstractDoubleMapper {
     /**
      * kNN query
      */
-    SharedObject.Instance<? extends KNNList> input;
+    KNNQuery<O> knnq;
+
+    /**
+     * Output data store
+     */
+    SharedObject.Instance<KNNList> out;
 
     /**
      * Constructor.
      * 
      * @param k K parameter
      * @param knnq KNN query
-     * @param store Datastore to write to
+     * @param out Output channel to write to
      */
-    protected Instance(int k, SharedObject.Instance<? extends KNNList> input, SharedDouble.Instance store) {
-      super(store);
+    protected Instance(int k, KNNQuery<O> knnq, SharedObject.Instance<KNNList> out) {
+      super();
       this.k = k;
-      this.input = input;
+      this.knnq = knnq;
+      this.out = out;
     }
 
     @Override
     public void map(DBIDRef id) {
-      output.set(input.get().get(k - 1).doubleValue());
+      out.set(knnq.getKNNForDBID(id, k));
     }
   }
 }

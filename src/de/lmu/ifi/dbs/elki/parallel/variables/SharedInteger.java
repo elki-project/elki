@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.parallel.variables;
  */
 
 /**
- * Direct channel connecting two mappers.
+ * Direct channel connecting two processors.
  * 
  * @author Erich Schubert
  * 
@@ -48,7 +48,7 @@ public class SharedInteger implements SharedVariable<SharedInteger.Instance> {
     private int data = 0xDEADBEEF;
 
     /**
-     * @deprecated use {@link #doubleValue}!
+     * @deprecated use {@link #intValue}!
      */
     @Deprecated
     @Override
@@ -57,7 +57,7 @@ public class SharedInteger implements SharedVariable<SharedInteger.Instance> {
     }
 
     /**
-     * @deprecated use {@link #set(double)}!
+     * @deprecated use {@link #set(int)}!
      */
     @Deprecated
     @Override

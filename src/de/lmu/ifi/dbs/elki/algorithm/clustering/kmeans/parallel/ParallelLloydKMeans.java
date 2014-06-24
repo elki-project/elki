@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.parallel.ParallelMapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
 
 /**
  * Parallel implementation of k-Means clustering.
@@ -87,13 +87,13 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
     // Store for current cluster assignment.
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
-    KMeansMapper<V> kmm = new KMeansMapper<>(relation, distanceFunction, assignment, varsum);
+    KMeansProcessor<V> kmm = new KMeansProcessor<>(relation, distanceFunction, assignment, varsum);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       kmm.nextIteration(means);
-      ParallelMapExecutor.run(ids, kmm);
+      ParallelExecutor.run(ids, kmm);
       // Stop if no cluster assignment changed.
       if (!kmm.changed()) {
         break;

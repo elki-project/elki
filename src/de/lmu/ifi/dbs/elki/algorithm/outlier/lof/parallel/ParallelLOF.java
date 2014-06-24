@@ -43,12 +43,12 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.parallel.ParallelMapExecutor;
-import de.lmu.ifi.dbs.elki.parallel.mapper.DoubleMinMaxMapper;
-import de.lmu.ifi.dbs.elki.parallel.mapper.KDistanceMapper;
-import de.lmu.ifi.dbs.elki.parallel.mapper.KNNMapper;
-import de.lmu.ifi.dbs.elki.parallel.mapper.WriteDataStoreMapper;
-import de.lmu.ifi.dbs.elki.parallel.mapper.WriteDoubleDataStoreMapper;
+import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
+import de.lmu.ifi.dbs.elki.parallel.processor.DoubleMinMaxProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.KDistanceProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.KNNProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.WriteDataStoreProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.WriteDoubleDataStoreProcessor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Parallel implementation of Local Outlier Factor using mappers.
+ * Parallel implementation of Local Outlier Factor using processors.
  * 
  * @author Erich Schubert
  * 
@@ -101,32 +101,32 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
     WritableDataStore<KNNList> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
     {
       // Compute kNN
-      KNNMapper<O> knnm = new KNNMapper<>(k + 1, knnq);
+      KNNProcessor<O> knnm = new KNNProcessor<>(k + 1, knnq);
       SharedObject<KNNList> knnv = new SharedObject<>();
-      WriteDataStoreMapper<KNNList> storek = new WriteDataStoreMapper<>(knns);
+      WriteDataStoreProcessor<KNNList> storek = new WriteDataStoreProcessor<>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
       // Compute k-dist
-      KDistanceMapper kdistm = new KDistanceMapper(k + 1);
+      KDistanceProcessor kdistm = new KDistanceProcessor(k + 1);
       SharedDouble kdistv = new SharedDouble();
-      WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(kdists);
+      WriteDoubleDataStoreProcessor storem = new WriteDoubleDataStoreProcessor(kdists);
       kdistm.connectKNNInput(knnv);
       kdistm.connectOutput(kdistv);
       storem.connectInput(kdistv);
 
-      ParallelMapExecutor.run(ids, knnm, storek, kdistm, storem);
+      ParallelExecutor.run(ids, knnm, storek, kdistm, storem);
     }
 
     // Phase two: lrd
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     {
-      LRDMapper lrdm = new LRDMapper(knns, kdists);
+      LRDProcessor lrdm = new LRDProcessor(knns, kdists);
       SharedDouble lrdv = new SharedDouble();
-      WriteDoubleDataStoreMapper storelrd = new WriteDoubleDataStoreMapper(lrds);
+      WriteDoubleDataStoreProcessor storelrd = new WriteDoubleDataStoreProcessor(lrds);
 
       lrdm.connectOutput(lrdv);
       storelrd.connectInput(lrdv);
-      ParallelMapExecutor.run(ids, lrdm, storelrd);
+      ParallelExecutor.run(ids, lrdm, storelrd);
     }
     kdists.destroy(); // No longer needed.
     kdists = null;
@@ -135,15 +135,15 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     DoubleMinMax minmax;
     {
-      LOFMapper lofm = new LOFMapper(knns, lrds, true);
+      LOFProcessor lofm = new LOFProcessor(knns, lrds, true);
       SharedDouble lofv = new SharedDouble();
-      DoubleMinMaxMapper mmm = new DoubleMinMaxMapper();
-      WriteDoubleDataStoreMapper storelof = new WriteDoubleDataStoreMapper(lofs);
+      DoubleMinMaxProcessor mmm = new DoubleMinMaxProcessor();
+      WriteDoubleDataStoreProcessor storelof = new WriteDoubleDataStoreProcessor(lofs);
 
       lofm.connectOutput(lofv);
       mmm.connectInput(lofv);
       storelof.connectInput(lofv);
-      ParallelMapExecutor.run(ids, lofm, storelof, mmm);
+      ParallelExecutor.run(ids, lofm, storelof, mmm);
 
       minmax = mmm.getMinMax();
     }

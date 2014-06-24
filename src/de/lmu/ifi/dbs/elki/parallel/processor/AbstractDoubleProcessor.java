@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.parallel.mapper;
+package de.lmu.ifi.dbs.elki.parallel.processor;
 
 /*
  This file is part of ELKI:
@@ -24,15 +24,15 @@ package de.lmu.ifi.dbs.elki.parallel.mapper;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 
 /**
- * Abstract base class for double mappers.
+ * Abstract base class for processors that output double values.
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractDoubleMapper implements Mapper {
+public abstract class AbstractDoubleProcessor implements Processor {
   /**
    * Output variable
    */
@@ -48,19 +48,19 @@ public abstract class AbstractDoubleMapper implements Mapper {
   }
 
   @Override
-  public abstract Mapper.Instance instantiate(MapExecutor exectutor);
+  public abstract Processor.Instance instantiate(Executor exectutor);
 
   @Override
-  public void cleanup(Mapper.Instance inst) {
+  public void cleanup(Processor.Instance inst) {
     // Do nothing by default.
   }
 
   /**
-   * Mapper instance.
+   * Instance.
    * 
    * @author Erich Schubert
    */
-  public static abstract class Instance implements Mapper.Instance {
+  public static abstract class Instance implements Processor.Instance {
     /**
      * Output variable
      */

@@ -34,15 +34,15 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
-import de.lmu.ifi.dbs.elki.parallel.mapper.Mapper;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
+import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
 
 /**
  * Parallel k-means implementation.
  * 
  * @author Erich Schubert
  */
-public class KMeansMapper<V extends NumberVector> implements Mapper {
+public class KMeansProcessor<V extends NumberVector> implements Processor {
   /**
    * Data relation.
    */
@@ -88,11 +88,10 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
    * 
    * @param relation Data relation
    * @param distance Distance function
-   * @param means Initial means
    * @param assignment Cluster assignment
    * @param varsum Variance sums
    */
-  public KMeansMapper(Relation<V> relation, PrimitiveDistanceFunction<? super NumberVector> distance, WritableIntegerDataStore assignment, double[] varsum) {
+  public KMeansProcessor(Relation<V> relation, PrimitiveDistanceFunction<? super NumberVector> distance, WritableIntegerDataStore assignment, double[] varsum) {
     super();
     this.distance = distance;
     this.relation = relation;
@@ -125,12 +124,12 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
   }
 
   @Override
-  public Instance instantiate(MapExecutor exectutor) {
+  public Instance instantiate(Executor exectutor) {
     return new Instance(relation, distance, assignment, means);
   }
 
   @Override
-  public void cleanup(Mapper.Instance inst) {
+  public void cleanup(Processor.Instance inst) {
     @SuppressWarnings("unchecked")
     Instance instance = (Instance) inst;
     synchronized(this) {
@@ -175,7 +174,7 @@ public class KMeansMapper<V extends NumberVector> implements Mapper {
    * 
    * @author Erich Schubert
    */
-  public class Instance implements Mapper.Instance {
+  public class Instance implements Processor.Instance {
     /**
      * Data relation.
      */

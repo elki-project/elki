@@ -29,16 +29,18 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
-import de.lmu.ifi.dbs.elki.parallel.mapper.AbstractDoubleMapper;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
+import de.lmu.ifi.dbs.elki.parallel.processor.AbstractDoubleProcessor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 
 /**
- * Mapper for computing the LOF.
+ * Processor for computing the LOF.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.has Instance
  */
-public class LOFMapper extends AbstractDoubleMapper {
+public class LOFProcessor extends AbstractDoubleProcessor {
   /**
    * KNN store
    */
@@ -58,10 +60,10 @@ public class LOFMapper extends AbstractDoubleMapper {
    * Constructor.
    * 
    * @param knns k nearest neighbors
-   * @param kdists k distances
+   * @param lrds Local reachability distances
    * @param noself Exclude self from neighbors
    */
-  public LOFMapper(DataStore<? extends KNNList> knns, DoubleDataStore lrds, boolean noself) {
+  public LOFProcessor(DataStore<? extends KNNList> knns, DoubleDataStore lrds, boolean noself) {
     super();
     this.knns = knns;
     this.lrds = lrds;
@@ -69,16 +71,16 @@ public class LOFMapper extends AbstractDoubleMapper {
   }
 
   @Override
-  public Instance instantiate(MapExecutor mapper) {
-    return new Instance(mapper.getInstance(output));
+  public Instance instantiate(Executor master) {
+    return new Instance(master.getInstance(output));
   }
 
   /**
-   * Mapper instance
+   * Instance
    * 
    * @author Erich Schubert
    */
-  private class Instance extends AbstractDoubleMapper.Instance {
+  private class Instance extends AbstractDoubleProcessor.Instance {
     /**
      * Constructor.
      * 

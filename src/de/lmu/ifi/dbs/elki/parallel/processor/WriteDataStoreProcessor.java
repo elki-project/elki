@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.parallel.mapper;
+package de.lmu.ifi.dbs.elki.parallel.processor;
 
 /*
  This file is part of ELKI:
@@ -23,53 +23,55 @@ package de.lmu.ifi.dbs.elki.parallel.mapper;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
-import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 
 /**
- * Mapper to write double values into a {@link WritableDoubleDataStore}.
+ * Output channel to store data in a {@link WritableDataStore}.
  * 
  * @author Erich Schubert
+ * 
+ * @param <T> data type
  */
-public class WriteDoubleDataStoreMapper implements Mapper {
+public class WriteDataStoreProcessor<T> implements Processor {
   /**
    * Store to write to
    */
-  WritableDoubleDataStore store;
+  WritableDataStore<T> store;
 
   /**
-   * Shared double variable
+   * Input variable
    */
-  SharedDouble input;
+  SharedObject<T> input;
 
   /**
    * Constructor.
    * 
    * @param store Data store to write to
    */
-  public WriteDoubleDataStoreMapper(WritableDoubleDataStore store) {
+  public WriteDataStoreProcessor(WritableDataStore<T> store) {
     super();
     this.store = store;
   }
 
   /**
-   * Connect the input variable
+   * Connect the data source
    * 
-   * @param input Input variable
+   * @param input Input
    */
-  public void connectInput(SharedDouble input) {
+  public void connectInput(SharedObject<T> input) {
     this.input = input;
   }
 
   @Override
-  public Instance instantiate(MapExecutor mapper) {
-    return new Instance(mapper.getInstance(input));
+  public Instance instantiate(Executor executor) {
+    return new Instance(executor.getInstance(input));
   }
 
   @Override
-  public void cleanup(Mapper.Instance inst) {
+  public void cleanup(Processor.Instance inst) {
     // Nothing to do.
   }
 
@@ -78,25 +80,25 @@ public class WriteDoubleDataStoreMapper implements Mapper {
    * 
    * @author Erich Schubert
    */
-  public class Instance implements Mapper.Instance {
+  public class Instance implements Processor.Instance {
     /**
-     * Shared double variable
+     * Variable to exchange data over
      */
-    SharedDouble.Instance input;
+    SharedObject.Instance<T> input;
 
     /**
      * Constructor.
      * 
-     * @param input Input
+     * @param input Input object
      */
-    public Instance(SharedDouble.Instance input) {
+    public Instance(SharedObject.Instance<T> input) {
       super();
       this.input = input;
     }
 
     @Override
     public void map(DBIDRef id) {
-      store.putDouble(id, input.doubleValue());
+      store.put(id, input.get());
     }
   }
 }

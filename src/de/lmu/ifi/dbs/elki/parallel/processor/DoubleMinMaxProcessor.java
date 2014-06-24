@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.parallel.mapper;
+package de.lmu.ifi.dbs.elki.parallel.processor;
 
 /*
  This file is part of ELKI:
@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.parallel.mapper;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 
 /**
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  * 
  * @author Erich Schubert
  */
-public class DoubleMinMaxMapper implements Mapper {
+public class DoubleMinMaxProcessor implements Processor {
   /**
    * The central data store.
    */
@@ -47,7 +47,7 @@ public class DoubleMinMaxMapper implements Mapper {
   /**
    * Constructor.
    */
-  public DoubleMinMaxMapper() {
+  public DoubleMinMaxProcessor() {
     super();
   }
 
@@ -61,17 +61,17 @@ public class DoubleMinMaxMapper implements Mapper {
   }
 
   @Override
-  public Instance instantiate(MapExecutor mapper) {
-    return new Instance(mapper.getInstance(input));
+  public Instance instantiate(Executor executor) {
+    return new Instance(executor.getInstance(input));
   }
 
   @Override
-  public void cleanup(Mapper.Instance inst) {
+  public void cleanup(Processor.Instance inst) {
     merge(((Instance) inst).minmax);
   }
 
   /**
-   * Merge the result of a mapper thread.
+   * Merge the result of an instance.
    * 
    * @param minmax Minmax value
    */
@@ -94,7 +94,7 @@ public class DoubleMinMaxMapper implements Mapper {
    * 
    * @author Erich Schubert
    */
-  private static class Instance implements Mapper.Instance {
+  private static class Instance implements Processor.Instance {
     /**
      * The central data store.
      */

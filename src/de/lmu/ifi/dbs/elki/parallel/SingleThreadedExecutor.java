@@ -27,7 +27,7 @@ import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.parallel.mapper.Mapper;
+import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
 
@@ -40,34 +40,32 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * 
  * @apiviz.has SingleThreadedRunner
  */
-public class SingleThreadedMapExecutor {
+public class SingleThreadedExecutor {
   /**
    * Run a task on a single thread.
    * 
    * @param ids IDs to process
-   * @param mapper Mappers to run
+   * @param procs Processors to run
    */
-  public static final void run(DBIDs ids, Mapper... mapper) {
-    new SingleThreadedRunner(ids, mapper).run();
+  public static final void run(DBIDs ids, Processor... procs) {
+    new SingleThreadedRunner(ids, procs).run();
   }
 
   /**
    * Run for an array part, without step size.
    * 
    * @author Erich Schubert
-   * 
-   * @apiviz.uses Mapper
    */
-  protected static class SingleThreadedRunner implements MapExecutor {
+  protected static class SingleThreadedRunner implements Executor {
     /**
      * Array IDs to process
      */
     private DBIDs ids;
 
     /**
-     * The mapper masters that own the instances.
+     * The process masters that own the instances.
      */
-    private Mapper[] mapper;
+    private Processor[] procs;
 
     /**
      * Variables map.
@@ -78,18 +76,18 @@ public class SingleThreadedMapExecutor {
      * Constructor.
      * 
      * @param ids IDs to process
-     * @param mapper Mapper functions to run
+     * @param procs Processor functions to run
      */
-    protected SingleThreadedRunner(DBIDs ids, Mapper[] mapper) {
+    protected SingleThreadedRunner(DBIDs ids, Processor[] procs) {
       super();
       this.ids = ids;
-      this.mapper = mapper;
+      this.procs = procs;
     }
 
     public void run() {
-      Mapper.Instance[] instances = new Mapper.Instance[mapper.length];
-      for(int i = 0; i < mapper.length; i++) {
-        instances[i] = mapper[i].instantiate(this);
+      Processor.Instance[] instances = new Processor.Instance[procs.length];
+      for(int i = 0; i < procs.length; i++) {
+        instances[i] = procs[i].instantiate(this);
       }
 
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -98,7 +96,7 @@ public class SingleThreadedMapExecutor {
         }
       }
       for(int i = 0; i < instances.length; i++) {
-        mapper[i].cleanup(instances[i]);
+        procs[i].cleanup(instances[i]);
       }
     }
 

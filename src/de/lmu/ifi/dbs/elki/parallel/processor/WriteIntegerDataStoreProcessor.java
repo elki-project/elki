@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.parallel.mapper;
+package de.lmu.ifi.dbs.elki.parallel.processor;
 
 /*
  This file is part of ELKI:
@@ -25,15 +25,15 @@ package de.lmu.ifi.dbs.elki.parallel.mapper;
 
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedInteger;
 
 /**
- * Mapper to write int values into a {@link WritableIntegerDataStore}.
+ * Write int values into a {@link WritableIntegerDataStore}.
  * 
  * @author Erich Schubert
  */
-public class WriteIntegerDataStoreMapper implements Mapper {
+public class WriteIntegerDataStoreProcessor implements Processor {
   /**
    * Store to write to
    */
@@ -49,7 +49,7 @@ public class WriteIntegerDataStoreMapper implements Mapper {
    * 
    * @param store Data store to write to
    */
-  public WriteIntegerDataStoreMapper(WritableIntegerDataStore store) {
+  public WriteIntegerDataStoreProcessor(WritableIntegerDataStore store) {
     super();
     this.store = store;
   }
@@ -64,12 +64,12 @@ public class WriteIntegerDataStoreMapper implements Mapper {
   }
 
   @Override
-  public Instance instantiate(MapExecutor mapper) {
-    return new Instance(mapper.getInstance(input));
+  public Instance instantiate(Executor executor) {
+    return new Instance(executor.getInstance(input));
   }
 
   @Override
-  public void cleanup(Mapper.Instance inst) {
+  public void cleanup(Processor.Instance inst) {
     // Nothing to do.
   }
 
@@ -78,7 +78,7 @@ public class WriteIntegerDataStoreMapper implements Mapper {
    * 
    * @author Erich Schubert
    */
-  public class Instance implements Mapper.Instance {
+  public class Instance implements Processor.Instance {
     /**
      * Shared int variable
      */
