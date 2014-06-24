@@ -27,6 +27,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -49,17 +50,18 @@ public class WithinClusterVarianceQualityMeasure implements KMeansQualityMeasure
     boolean squared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
     double variance = 0.0;
     for(Cluster<MeanModel> cluster : clusterList) {
+      MeanModel model = cluster.getModel();
+      if(model instanceof KMeansModel) {
+        variance += ((KMeansModel) model).getVarianceContribution();
+        continue;
+      }
+      // Re-compute:
       DBIDs ids = cluster.getIDs();
-      Vector mean = cluster.getModel().getMean();
+      Vector mean = model.getMean();
 
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double dist = distanceFunction.distance(relation.get(iter), mean);
-        if(squared) {
-          variance += dist;
-        }
-        else {
-          variance += dist * dist;
-        }
+        variance += squared ? dist : dist * dist;
       }
     }
     return variance;
