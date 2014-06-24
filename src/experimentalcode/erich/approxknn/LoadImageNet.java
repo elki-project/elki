@@ -23,9 +23,6 @@ package experimentalcode.erich.approxknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -45,7 +42,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.Sort
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -93,42 +89,37 @@ public class LoadImageNet {
       MultipleObjectsBundle bundle = null;
       for(File child : new File(folder).listFiles()) {
         if(child.getName().endsWith(".gz")) {
-          try (InputStream in = FileUtil.tryGzipInput(new FileInputStream(child))) {
-            LOG.debugFine("Loading file: " + child);
-            NumberVectorLabelParser<DoubleVector> parser = new NumberVectorLabelParser<>(Pattern.compile(" "), "\"'", null, null, DoubleVector.FACTORY);
-            MultipleObjectsBundle bun;
-            try {
-              bun = (new FileBasedDatabaseConnection(null, parser, in)).loadData();
-            }
-            catch(AbortException e) {
-              // Some files are empty.
-              if(e.getMessage().contains("No vectors were read")) {
-                continue;
-              }
-              throw e;
-            }
-            if(bundle == null) {
-              bundle = bun;
-            }
-            else {
-              if(bun.metaLength() != bundle.metaLength()) {
-                throw new AbortException("Different number of relations! " + child);
-              }
-              for(int i = 0; i < bundle.metaLength(); i++) {
-                if(!bundle.meta(i).isAssignableFromType(bun.meta(i))) {
-                  throw new AbortException("Incompatible relations: " + bundle.meta(i) + " " + bun.meta(i));
-                }
-              }
-              for(int i = 0; i < bundle.metaLength(); i++) {
-                // Merge. Dangerous hack.
-                @SuppressWarnings("unchecked")
-                final ArrayList<Object> modifiable = (ArrayList<Object>) bundle.getColumn(i);
-                modifiable.addAll(bun.getColumn(i));
-              }
-            }
+          LOG.debugFine("Loading file: " + child);
+          NumberVectorLabelParser<DoubleVector> parser = new NumberVectorLabelParser<>(Pattern.compile(" "), "\"'", null, null, DoubleVector.FACTORY);
+          MultipleObjectsBundle bun;
+          try {
+            bun = (new FileBasedDatabaseConnection(null, parser, child)).loadData();
           }
-          catch(IOException e) {
-            throw new AbortException("Error loading file " + child.getName(), e);
+          catch(AbortException e) {
+            // Some files are empty.
+            if(e.getMessage().contains("No vectors were read")) {
+              continue;
+            }
+            throw e;
+          }
+          if(bundle == null) {
+            bundle = bun;
+          }
+          else {
+            if(bun.metaLength() != bundle.metaLength()) {
+              throw new AbortException("Different number of relations! " + child);
+            }
+            for(int i = 0; i < bundle.metaLength(); i++) {
+              if(!bundle.meta(i).isAssignableFromType(bun.meta(i))) {
+                throw new AbortException("Incompatible relations: " + bundle.meta(i) + " " + bun.meta(i));
+              }
+            }
+            for(int i = 0; i < bundle.metaLength(); i++) {
+              // Merge. Dangerous hack.
+              @SuppressWarnings("unchecked")
+              final ArrayList<Object> modifiable = (ArrayList<Object>) bundle.getColumn(i);
+              modifiable.addAll(bun.getColumn(i));
+            }
           }
         }
       }
