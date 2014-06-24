@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.mapper;
+package de.lmu.ifi.dbs.elki.parallel.mapper;
 
 /*
  This file is part of ELKI:
@@ -24,9 +24,9 @@ package experimentalcode.erich.parallel.mapper;
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.variables.SharedDouble;
-import experimentalcode.erich.parallel.variables.SharedObject;
+import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 
 /**
  * Mapper to compute the kNN distance.

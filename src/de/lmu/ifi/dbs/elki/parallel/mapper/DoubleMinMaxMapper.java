@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.mapper;
+package de.lmu.ifi.dbs.elki.parallel.mapper;
 
 /*
  This file is part of ELKI:
@@ -23,43 +23,40 @@ package experimentalcode.erich.parallel.mapper;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.variables.SharedInteger;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 
 /**
- * Mapper to write int values into a {@link WritableIntegerDataStore}.
+ * Sink collecting minimum and maximum values.
  * 
  * @author Erich Schubert
  */
-public class WriteIntegerDataStoreMapper implements Mapper {
+public class DoubleMinMaxMapper implements Mapper {
   /**
-   * Store to write to
+   * The central data store.
    */
-  WritableIntegerDataStore store;
+  DoubleMinMax minmax = new DoubleMinMax();
 
   /**
-   * Shared int variable
+   * Input channel
    */
-  SharedInteger input;
+  SharedDouble input;
 
   /**
    * Constructor.
-   * 
-   * @param store Data store to write to
    */
-  public WriteIntegerDataStoreMapper(WritableIntegerDataStore store) {
+  public DoubleMinMaxMapper() {
     super();
-    this.store = store;
   }
 
   /**
-   * Connect the input variable
+   * Connect an input channel.
    * 
-   * @param input Input variable
+   * @param input Input channel
    */
-  public void connectInput(SharedInteger input) {
+  public void connectInput(SharedDouble input) {
     this.input = input;
   }
 
@@ -70,33 +67,57 @@ public class WriteIntegerDataStoreMapper implements Mapper {
 
   @Override
   public void cleanup(Mapper.Instance inst) {
-    // Nothing to do.
+    merge(((Instance) inst).minmax);
   }
 
   /**
-   * Instance for a sub-channel.
+   * Merge the result of a mapper thread.
+   * 
+   * @param minmax Minmax value
+   */
+  protected synchronized void merge(DoubleMinMax minmax) {
+    this.minmax.put(minmax.getMin());
+    this.minmax.put(minmax.getMax());
+  }
+
+  /**
+   * Get the minmax object.
+   * 
+   * @return Minmax object
+   */
+  public DoubleMinMax getMinMax() {
+    return minmax;
+  }
+
+  /**
+   * Instance for a particular sub-channel / part of the data set.
    * 
    * @author Erich Schubert
    */
-  public class Instance implements Mapper.Instance {
+  private static class Instance implements Mapper.Instance {
     /**
-     * Shared int variable
+     * The central data store.
      */
-    SharedInteger.Instance input;
+    private DoubleMinMax minmax = new DoubleMinMax();
+
+    /**
+     * Input channel instance
+     */
+    private SharedDouble.Instance input;
 
     /**
      * Constructor.
      * 
-     * @param input Input
+     * @param input Input channel instance.
      */
-    public Instance(SharedInteger.Instance input) {
+    public Instance(SharedDouble.Instance input) {
       super();
       this.input = input;
     }
 
     @Override
     public void map(DBIDRef id) {
-      store.putInt(id, input.intValue());
+      minmax.put(input.doubleValue());
     }
   }
 }

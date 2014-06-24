@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.mapper;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel;
 
 /*
  This file is part of ELKI:
@@ -29,8 +29,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.variables.SharedDouble;
+import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.mapper.AbstractDoubleMapper;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 
 /**
  * Mapper for computing the LOF.

@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel;
+package de.lmu.ifi.dbs.elki.parallel;
 
 /*
  This file is part of ELKI:
@@ -34,9 +34,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import experimentalcode.erich.parallel.mapper.Mapper;
-import experimentalcode.erich.parallel.variables.SharedVariable;
-import experimentalcode.erich.parallel.variables.SharedVariable.Instance;
+import de.lmu.ifi.dbs.elki.parallel.mapper.Mapper;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
 
 /**
  * Class to run mappers in parallel, on all available cores.

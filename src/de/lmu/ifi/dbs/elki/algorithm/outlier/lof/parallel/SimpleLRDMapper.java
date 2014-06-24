@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.mapper;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel;
 
 /*
  This file is part of ELKI:
@@ -24,40 +24,35 @@ package experimentalcode.erich.parallel.mapper;
  */
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.variables.SharedDouble;
+import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.mapper.AbstractDoubleMapper;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 
 /**
  * Mapper for the "local reachability density" of LOF.
  * 
+ * Note: we compute 1/lrd, the local reachability distance.
+ * 
  * @author Erich Schubert
  */
-public class LRDMapper extends AbstractDoubleMapper {
+public class SimpleLRDMapper extends AbstractDoubleMapper {
   /**
    * KNN store
    */
   private DataStore<? extends KNNList> knns;
 
   /**
-   * k-distance store
-   */
-  private DoubleDataStore kdists;
-
-  /**
    * Constructor.
    * 
    * @param knns k nearest neighbors
-   * @param kdists k distances
    */
-  public LRDMapper(DataStore<? extends KNNList> knns, DoubleDataStore kdists) {
+  public SimpleLRDMapper(DataStore<? extends KNNList> knns) {
     super();
     this.knns = knns;
-    this.kdists = kdists;
   }
 
   @Override
@@ -76,7 +71,7 @@ public class LRDMapper extends AbstractDoubleMapper {
      * 
      * @param output Output variable
      */
-    protected Instance(SharedDouble.Instance output) {
+    public Instance(SharedDouble.Instance output) {
       super(output);
     }
 
@@ -90,11 +85,11 @@ public class LRDMapper extends AbstractDoubleMapper {
         if(DBIDUtil.equal(n, id)) {
           continue;
         }
-        lrd += Math.max(kdists.doubleValue(n), n.doubleValue());
-        size += 1;
+        lrd += n.doubleValue();
+        size++;
       }
-      // Avoid division by 0:
-      output.set(lrd > 0 ? size / lrd : Double.POSITIVE_INFINITY);
+      // Avoid division by zero.
+      output.set(lrd > 0 ? size / lrd : 0);
     }
   }
 }

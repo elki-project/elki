@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.variables;
+package de.lmu.ifi.dbs.elki.parallel.variables;
 
 /*
  This file is part of ELKI:

@@ -41,18 +41,18 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.parallel.ParallelMapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.mapper.DoubleMinMaxMapper;
+import de.lmu.ifi.dbs.elki.parallel.mapper.KDistanceMapper;
+import de.lmu.ifi.dbs.elki.parallel.mapper.KNNMapper;
+import de.lmu.ifi.dbs.elki.parallel.mapper.WriteDoubleDataStoreMapper;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.erich.parallel.ParallelMapExecutor;
-import experimentalcode.erich.parallel.mapper.DoubleMinMaxMapper;
-import experimentalcode.erich.parallel.mapper.KDistanceMapper;
-import experimentalcode.erich.parallel.mapper.KNNMapper;
-import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
-import experimentalcode.erich.parallel.variables.SharedDouble;
-import experimentalcode.erich.parallel.variables.SharedObject;
 
 /**
  * Parallel implementation of KNN Outlier detection using mappers.

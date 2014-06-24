@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel;
+package de.lmu.ifi.dbs.elki.parallel;
 
 /*
  This file is part of ELKI:
@@ -27,9 +27,9 @@ import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import experimentalcode.erich.parallel.mapper.Mapper;
-import experimentalcode.erich.parallel.variables.SharedVariable;
-import experimentalcode.erich.parallel.variables.SharedVariable.Instance;
+import de.lmu.ifi.dbs.elki.parallel.mapper.Mapper;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
 
 /**
  * Class to process the whole data set in a single thread.

@@ -4,6 +4,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPAM
@@ -27,12 +28,14 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN
 de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleCOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.KDEOS
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelSimplifiedLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuGLSBackwardSearchAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuRandomWalkEC

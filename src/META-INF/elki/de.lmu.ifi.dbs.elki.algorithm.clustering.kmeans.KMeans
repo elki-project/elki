@@ -1,4 +1,5 @@
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.BestOfMultipleKMeans

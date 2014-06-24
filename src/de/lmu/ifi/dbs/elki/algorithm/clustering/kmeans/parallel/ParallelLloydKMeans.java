@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.algorithms;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel;
 
 /*
  This file is part of ELKI:
@@ -47,8 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import experimentalcode.erich.parallel.ParallelMapExecutor;
-import experimentalcode.erich.parallel.mapper.KMeansMapper;
+import de.lmu.ifi.dbs.elki.parallel.ParallelMapExecutor;
 
 /**
  * Parallel implementation of k-Means clustering.

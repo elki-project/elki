@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel;
+package de.lmu.ifi.dbs.elki.parallel.variables;
 
 /*
  This file is part of ELKI:
@@ -23,20 +23,43 @@ package experimentalcode.erich.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import experimentalcode.erich.parallel.variables.SharedVariable;
-
 /**
- * Map executor.
+ * Shared variables storing a particular type.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has SharedVariable.Instance
+ * 
+ * @param <I> Instance type
  */
-public interface MapExecutor {
+public interface SharedVariable<I extends SharedVariable.Instance<?>> {
   /**
-   * Get a channel for this executor.
+   * Instantiate for an execution thread.
    * 
-   * @param parent Channel parent
-   * @return Channel instance
-   * @param <I> Variable type
+   * @return new Instance
    */
-  <I extends SharedVariable.Instance<?>> I getInstance(SharedVariable<I> parent);
+  I instantiate();
+
+  /**
+   * Instance for a single execution thread.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <T> Payload type
+   */
+  public static interface Instance<T> {
+    /**
+     * Get the current value
+     * 
+     * @return Value
+     */
+    T get();
+
+    /**
+     * Set a new value
+     * 
+     * @param data Setter
+     */
+    void set(T data);
+  }
 }

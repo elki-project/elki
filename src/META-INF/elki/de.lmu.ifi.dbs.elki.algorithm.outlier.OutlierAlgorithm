@@ -16,6 +16,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut
 de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.ALOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.FlexibleLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO
@@ -26,6 +27,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.OnlineLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelSimplifiedLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN
 de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF

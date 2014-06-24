@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.variables;
+package de.lmu.ifi.dbs.elki.parallel.mapper;
 
 /*
  This file is part of ELKI:
@@ -23,43 +23,46 @@ package experimentalcode.erich.parallel.variables;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+
 /**
- * Shared variables storing a particular type.
+ * Class to represent a mapper factory.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has SharedVariable.Instance
- * 
- * @param <I> Instance type
+ * @apiviz.composedOf Instance
  */
-public interface SharedVariable<I extends SharedVariable.Instance<?>> {
+public interface Mapper {
   /**
-   * Instantiate for an execution thread.
+   * Create an instance. May be called multiple times, for example for multiple
+   * threads.
    * 
-   * @return new Instance
+   * @param executor Map executor
+   * @return Instance
    */
-  I instantiate();
+  public Instance instantiate(MapExecutor exectutor);
 
   /**
-   * Instance for a single execution thread.
+   * Invoke cleanup.
+   * 
+   * @param inst Instance to cleanup.
+   */
+  public void cleanup(Instance inst);
+
+  /**
+   * Mapper instance.
    * 
    * @author Erich Schubert
-   * 
-   * @param <T> Payload type
    */
-  public static interface Instance<T> {
+  public interface Instance {
     /**
-     * Get the current value
+     * Map a single object
      * 
-     * @return Value
-     */
-    T get();
-
-    /**
-     * Set a new value
+     * @param id Object to map.
      * 
-     * @param data Setter
+     * @return Mapping result
      */
-    void set(T data);
+    public void map(DBIDRef id);
   }
 }

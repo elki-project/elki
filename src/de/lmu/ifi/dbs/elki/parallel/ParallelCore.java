@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel;
+package de.lmu.ifi.dbs.elki.parallel;
 
 /*
  This file is part of ELKI:

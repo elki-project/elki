@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.algorithms;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel;
 
 /*
  This file is part of ELKI:
@@ -43,30 +43,27 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.parallel.ParallelMapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.mapper.DoubleMinMaxMapper;
+import de.lmu.ifi.dbs.elki.parallel.mapper.KNNMapper;
+import de.lmu.ifi.dbs.elki.parallel.mapper.WriteDataStoreMapper;
+import de.lmu.ifi.dbs.elki.parallel.mapper.WriteDoubleDataStoreMapper;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.erich.parallel.ParallelMapExecutor;
-import experimentalcode.erich.parallel.mapper.DoubleMinMaxMapper;
-import experimentalcode.erich.parallel.mapper.KDistanceMapper;
-import experimentalcode.erich.parallel.mapper.KNNMapper;
-import experimentalcode.erich.parallel.mapper.LOFMapper;
-import experimentalcode.erich.parallel.mapper.LRDMapper;
-import experimentalcode.erich.parallel.mapper.WriteDataStoreMapper;
-import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
-import experimentalcode.erich.parallel.variables.SharedDouble;
-import experimentalcode.erich.parallel.variables.SharedObject;
 
 /**
- * Parallel implementation of Local Outlier Factor using mappers.
+ * Parallel implementation of Simplified-LOF Outlier detection using mappers.
  * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  */
-public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class ParallelSimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
    */
@@ -78,7 +75,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelLOF(DistanceFunction<? super O> distanceFunction, int k) {
+  public ParallelSimplifiedLOF(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -86,7 +83,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(ParallelLOF.class);
+  private static final Logging LOG = Logging.getLogger(ParallelSimplifiedLOF.class);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -99,7 +96,6 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
     KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
     // Phase one: KNN and k-dist
-    WritableDoubleDataStore kdists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     WritableDataStore<KNNList> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
     {
       // Compute kNN
@@ -108,21 +104,14 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
       WriteDataStoreMapper<KNNList> storek = new WriteDataStoreMapper<>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
-      // Compute k-dist
-      KDistanceMapper kdistm = new KDistanceMapper(k + 1);
-      SharedDouble kdistv = new SharedDouble();
-      WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(kdists);
-      kdistm.connectKNNInput(knnv);
-      kdistm.connectOutput(kdistv);
-      storem.connectInput(kdistv);
 
-      ParallelMapExecutor.run(ids, knnm, storek, kdistm, storem);
+      ParallelMapExecutor.run(ids, knnm, storek);
     }
 
-    // Phase two: lrd
+    // Phase two: simplified-lrd
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     {
-      LRDMapper lrdm = new LRDMapper(knns, kdists);
+      SimpleLRDMapper lrdm = new SimpleLRDMapper(knns);
       SharedDouble lrdv = new SharedDouble();
       WriteDoubleDataStoreMapper storelrd = new WriteDoubleDataStoreMapper(lrds);
 
@@ -130,10 +119,8 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
       storelrd.connectInput(lrdv);
       ParallelMapExecutor.run(ids, lrdm, storelrd);
     }
-    kdists.destroy(); // No longer needed.
-    kdists = null;
 
-    // Phase three: LOF
+    // Phase three: Simplified-LOF
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     DoubleMinMax minmax;
     {
@@ -150,7 +137,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
       minmax = mmm.getMinMax();
     }
 
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Local Outlier Factor", "lof-outlier", lofs, ids);
+    DoubleRelation scoreres = new MaterializedDoubleRelation("Simplified Local Outlier Factor", "simplified-lof-outlier", lofs, ids);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(meta, scoreres);
   }
@@ -180,14 +167,14 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
       super.makeOptions(config);
 
       IntParameter kP = new IntParameter(LOF.Parameterizer.K_ID);
-      if (config.grab(kP)) {
-        k = kP.intValue();
+      if(config.grab(kP)) {
+        k = kP.getValue();
       }
     }
 
     @Override
-    protected ParallelLOF<O> makeInstance() {
-      return new ParallelLOF<>(distanceFunction, k);
+    protected ParallelSimplifiedLOF<O> makeInstance() {
+      return new ParallelSimplifiedLOF<>(distanceFunction, k);
     }
   }
 }

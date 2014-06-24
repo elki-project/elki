@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.variables;
+package de.lmu.ifi.dbs.elki.parallel.variables;
 
 /*
  This file is part of ELKI:
@@ -24,40 +24,62 @@ package experimentalcode.erich.parallel.variables;
  */
 
 /**
- * Variable to share between different mappers (within one thread only!)
+ * Direct channel connecting two mappers.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has SharedObject.Instance
- * 
- * @param <T> Data type
+ * @apiviz.has SharedInteger.Instance
  */
-public class SharedObject<T> implements SharedVariable<SharedObject.Instance<T>> {
+public class SharedInteger implements SharedVariable<SharedInteger.Instance> {
   @Override
-  public Instance<T> instantiate() {
-    return new Instance<>();
+  public Instance instantiate() {
+    return new Instance();
   }
 
   /**
-   * Instance for a particular thread.
+   * Instance for a sub-channel.
    * 
    * @author Erich Schubert
-   * 
-   * @param <T> Data type
    */
-  public static class Instance<T> implements SharedVariable.Instance<T> {
+  public static class Instance implements SharedVariable.Instance<Integer> {
     /**
      * Cache for last data consumed/produced
      */
-    private T data = null;
+    private int data = 0xDEADBEEF;
 
+    /**
+     * @deprecated use {@link #doubleValue}!
+     */
+    @Deprecated
     @Override
-    public T get() {
+    public Integer get() {
       return data;
     }
 
+    /**
+     * @deprecated use {@link #set(double)}!
+     */
+    @Deprecated
     @Override
-    public void set(T data) {
+    public void set(Integer data) {
+      this.data = data;
+    }
+
+    /**
+     * Get the variables value.
+     * 
+     * @return Integer value
+     */
+    public int intValue() {
+      return data;
+    }
+
+    /**
+     * Set the variables value.
+     * 
+     * @param data New value
+     */
+    public void set(int data) {
       this.data = data;
     }
   }

@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.mapper;
+package de.lmu.ifi.dbs.elki.parallel.mapper;
 
 /*
  This file is part of ELKI:
@@ -23,45 +23,43 @@ package experimentalcode.erich.parallel.mapper;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.variables.SharedObject;
+import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
+import de.lmu.ifi.dbs.elki.parallel.variables.SharedInteger;
 
 /**
- * Output channel to store data in a {@link WritableDataStore}.
+ * Mapper to write int values into a {@link WritableIntegerDataStore}.
  * 
  * @author Erich Schubert
- * 
- * @param <T> data type
  */
-public class WriteDataStoreMapper<T> implements Mapper {
+public class WriteIntegerDataStoreMapper implements Mapper {
   /**
    * Store to write to
    */
-  WritableDataStore<T> store;
+  WritableIntegerDataStore store;
 
   /**
-   * Input variable
+   * Shared int variable
    */
-  SharedObject<T> input;
+  SharedInteger input;
 
   /**
    * Constructor.
    * 
    * @param store Data store to write to
    */
-  public WriteDataStoreMapper(WritableDataStore<T> store) {
+  public WriteIntegerDataStoreMapper(WritableIntegerDataStore store) {
     super();
     this.store = store;
   }
 
   /**
-   * Connect the data source
+   * Connect the input variable
    * 
-   * @param input Input
+   * @param input Input variable
    */
-  public void connectInput(SharedObject<T> input) {
+  public void connectInput(SharedInteger input) {
     this.input = input;
   }
 
@@ -82,23 +80,23 @@ public class WriteDataStoreMapper<T> implements Mapper {
    */
   public class Instance implements Mapper.Instance {
     /**
-     * Variable to exchange data over
+     * Shared int variable
      */
-    SharedObject.Instance<T> input;
+    SharedInteger.Instance input;
 
     /**
      * Constructor.
      * 
-     * @param input Input object
+     * @param input Input
      */
-    public Instance(SharedObject.Instance<T> input) {
+    public Instance(SharedInteger.Instance input) {
       super();
       this.input = input;
     }
 
     @Override
     public void map(DBIDRef id) {
-      store.put(id, input.get());
+      store.putInt(id, input.intValue());
     }
   }
 }
