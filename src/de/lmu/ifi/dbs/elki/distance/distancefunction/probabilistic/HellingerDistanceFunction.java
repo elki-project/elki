@@ -24,6 +24,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -50,6 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Journal für die reine und angewandte Mathematik
  * </p>
  * 
+ * TODO: support acceleration for sparse vectors
+ * 
  * @author Erich Schubert
  */
 @Reference(authors = "E. Hellinger", //
@@ -73,23 +77,32 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
 
   @Override
   public double distance(final NumberVector fv1, final NumberVector fv2) {
-    final int dim = dimensionality(fv1, fv2);
-    double sum = 0.;
-    for(int i = 0; i < dim; i++) {
-      final double v = Math.sqrt(fv1.doubleValue(i)) - Math.sqrt(fv2.doubleValue(i));
-      sum += v * v;
+    final int dim1 = fv1.getDimensionality(), dim2 = fv2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    double agg = 0.;
+    for(int d = 0; d < mindim; d++) {
+      final double v = Math.sqrt(fv1.doubleValue(d)) - Math.sqrt(fv2.doubleValue(d));
+      agg += v * v;
     }
-    return MathUtil.SQRTHALF * Math.sqrt(sum);
+    for(int d = mindim; d < dim1; d++) {
+      agg += Math.abs(fv1.doubleValue(d));
+    }
+    for(int d = mindim; d < dim2; d++) {
+      agg += Math.abs(fv2.doubleValue(d));
+    }
+    return MathUtil.SQRTHALF * Math.sqrt(agg);
   }
 
   @Override
   public double similarity(final NumberVector o1, final NumberVector o2) {
-    final int dim = dimensionality(o1, o2);
-    double sim = 0.;
-    for(int i = 0; i < dim; i++) {
-      sim += Math.sqrt(o1.doubleValue(i) * o2.doubleValue(i));
+    // TODO: accelerate sparse!
+    final int dim1 = o1.getDimensionality(), dim2 = o2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+    double agg = 0.;
+    for(int d = 0; d < mindim; d++) {
+      agg += Math.sqrt(o1.doubleValue(d) * o2.doubleValue(d));
     }
-    return sim;
+    return agg;
   }
 
   @Override
@@ -100,6 +113,11 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
   @Override
   public <T extends NumberVector> DistanceSimilarityQuery<T> instantiate(Relation<T> database) {
     return new PrimitiveDistanceSimilarityQuery<>(database, this, this);
+  }
+
+  @Override
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 
   /**

@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -43,7 +45,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Alias("chisq")
-@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
+@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", //
+title = "Empirical evaluation of dissimilarity measures for color and texture", //
+booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
+url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
 public class ChiSquaredDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance. Use this!
@@ -62,40 +67,82 @@ public class ChiSquaredDistanceFunction extends AbstractSpatialDistanceFunction 
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    final int dim = dimensionality(v1, v2);
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < mindim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double di = xd - yd;
       final double si = xd + yd;
-      if (!(si > 0. || si < 0.) || !(di > 0. || di < 0.)) {
+      if(!(si > 0. || si < 0.) || !(di > 0. || di < 0.)) {
         continue;
       }
       agg += di * di / si;
+    }
+    for(int d = mindim; d < dim1; d++) {
+      final double xd = v1.doubleValue(d);
+      if(xd != xd) { /* avoid NaNs */
+        continue;
+      }
+      agg += xd;
+    }
+    for(int d = mindim; d < dim2; d++) {
+      final double xd = v2.doubleValue(d);
+      if(xd != xd) { /* avoid NaNs */
+        continue;
+      }
+      agg += xd;
     }
     return 2. * agg;
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    final int dim = dimensionality(mbr1, mbr2);
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < mindim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
       final double diff; // Minimum difference
-      if (max1 < min2) {
+      if(max1 < min2) {
         diff = min2 - max1;
-      } else if (max2 < min1) {
+      }
+      else if(max2 < min1) {
         diff = max2 - min1;
-      } else {
+      }
+      else {
         continue; // 0.
       }
       final double si = max1 + max2; // Maximum sum
-      if (!(si > 0. || si < 0.) || !(diff > 0. || diff < 0.)) {
+      if(!(si > 0. || si < 0.) || !(diff > 0. || diff < 0.)) {
         continue;
       }
       agg += diff * diff / si;
+    }
+    for(int d = mindim; d < dim1; d++) {
+      final double min1 = mbr1.getMin(d);
+      if(min1 > 0.) {
+        agg += min1;
+      }
+      else {
+        final double max1 = mbr1.getMax(d);
+        if(max1 < 0.) { // Should never happen.
+          agg += max1;
+        }
+      }
+    }
+    for(int d = mindim; d < dim2; d++) {
+      final double min2 = mbr2.getMin(d);
+      if(min2 > 0.) {
+        agg += min2;
+      }
+      else {
+        final double max2 = mbr2.getMax(d);
+        if(max2 < 0.) { // Should never happen.
+          agg += max2;
+        }
+      }
     }
     return 2. * agg;
   }
@@ -107,16 +154,21 @@ public class ChiSquaredDistanceFunction extends AbstractSpatialDistanceFunction 
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (obj == this) {
+    if(obj == this) {
       return true;
     }
-    if (this.getClass().equals(obj.getClass())) {
+    if(this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);
+  }
+
+  @Override
+  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 
   /**
