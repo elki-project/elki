@@ -25,7 +25,7 @@ package experimentalcode.erich.parallel.mapper;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.SharedDouble;
+import experimentalcode.erich.parallel.variables.SharedDouble;
 
 /**
  * Abstract base class for double mappers.

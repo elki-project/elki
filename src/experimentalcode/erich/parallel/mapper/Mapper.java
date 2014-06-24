@@ -30,6 +30,8 @@ import experimentalcode.erich.parallel.MapExecutor;
  * Class to represent a mapper factory.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Instance
  */
 public interface Mapper {
   /**

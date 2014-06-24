@@ -26,7 +26,7 @@ package experimentalcode.erich.parallel.mapper;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.SharedObject;
+import experimentalcode.erich.parallel.variables.SharedObject;
 
 /**
  * Output channel to store data in a {@link WritableDataStore}.

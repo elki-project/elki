@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.SharedObject;
+import experimentalcode.erich.parallel.variables.SharedObject;
 
 /**
  * Mapper to compute the kNN

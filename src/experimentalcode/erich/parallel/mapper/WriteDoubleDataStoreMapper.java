@@ -26,7 +26,7 @@ package experimentalcode.erich.parallel.mapper;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.SharedDouble;
+import experimentalcode.erich.parallel.variables.SharedDouble;
 
 /**
  * Mapper to write double values into a {@link WritableDoubleDataStore}.

@@ -23,6 +23,8 @@ package experimentalcode.erich.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import experimentalcode.erich.parallel.variables.SharedVariable;
+
 /**
  * Map executor.
  * 

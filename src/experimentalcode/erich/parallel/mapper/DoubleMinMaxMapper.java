@@ -26,7 +26,7 @@ package experimentalcode.erich.parallel.mapper;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.SharedDouble;
+import experimentalcode.erich.parallel.variables.SharedDouble;
 
 /**
  * Sink collecting minimum and maximum values.

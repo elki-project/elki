@@ -49,8 +49,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.erich.parallel.ParallelMapExecutor;
-import experimentalcode.erich.parallel.SharedDouble;
-import experimentalcode.erich.parallel.SharedObject;
 import experimentalcode.erich.parallel.mapper.DoubleMinMaxMapper;
 import experimentalcode.erich.parallel.mapper.KDistanceMapper;
 import experimentalcode.erich.parallel.mapper.KNNMapper;
@@ -58,6 +56,8 @@ import experimentalcode.erich.parallel.mapper.LOFMapper;
 import experimentalcode.erich.parallel.mapper.LRDMapper;
 import experimentalcode.erich.parallel.mapper.WriteDataStoreMapper;
 import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
+import experimentalcode.erich.parallel.variables.SharedDouble;
+import experimentalcode.erich.parallel.variables.SharedObject;
 
 /**
  * Parallel implementation of Local Outlier Factor using mappers.

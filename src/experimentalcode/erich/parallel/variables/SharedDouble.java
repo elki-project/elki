@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel;
+package experimentalcode.erich.parallel.variables;
 
 /*
  This file is part of ELKI:
@@ -24,40 +24,62 @@ package experimentalcode.erich.parallel;
  */
 
 /**
- * Variable to share between different mappers (within one thread only!)
+ * Direct channel connecting two mappers.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has SharedObject.Instance
- * 
- * @param <T> Data type
+ * @apiviz.has SharedDouble.Instance
  */
-public class SharedObject<T> implements SharedVariable<SharedObject.Instance<T>> {
+public class SharedDouble implements SharedVariable<SharedDouble.Instance> {
   @Override
-  public Instance<T> instantiate() {
-    return new Instance<>();
+  public Instance instantiate() {
+    return new Instance();
   }
 
   /**
-   * Instance for a particular thread.
+   * Instance for a sub-channel.
    * 
    * @author Erich Schubert
-   * 
-   * @param <T> Data type
    */
-  public static class Instance<T> implements SharedVariable.Instance<T> {
+  public static class Instance implements SharedVariable.Instance<Double> {
     /**
      * Cache for last data consumed/produced
      */
-    private T data = null;
+    private double data = Double.NaN;
 
+    /**
+     * @deprecated use {@link #doubleValue}!
+     */
+    @Deprecated
     @Override
-    public T get() {
+    public Double get() {
       return data;
     }
 
+    /**
+     * @deprecated use {@link #set(double)}!
+     */
+    @Deprecated
     @Override
-    public void set(T data) {
+    public void set(Double data) {
+      this.data = data;
+    }
+
+    /**
+     * Get the variables value.
+     * 
+     * @return Double value
+     */
+    public double doubleValue() {
+      return data;
+    }
+
+    /**
+     * Set the variables value.
+     * 
+     * @param data New value
+     */
+    public void set(double data) {
       this.data = data;
     }
   }

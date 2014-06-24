@@ -23,71 +23,32 @@ package experimentalcode.erich.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import experimentalcode.erich.parallel.mapper.Mapper;
 import experimentalcode.erich.parallel.variables.SharedVariable;
 import experimentalcode.erich.parallel.variables.SharedVariable.Instance;
 
 /**
- * Class to run mappers in parallel, on all available cores.
+ * Class to process the whole data set in a single thread.
  * 
- * TODO: add progress
+ * Currently not used.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has BlockArrayRunner
- * @apiviz.uses ParallelCore
+ * @apiviz.has SingleThreadedRunner
  */
-public class ParallelMapExecutor {
+public class SingleThreadedMapExecutor {
   /**
-   * Run a task on all available CPUs.
+   * Run a task on a single thread.
    * 
    * @param ids IDs to process
    * @param mapper Mappers to run
    */
   public static final void run(DBIDs ids, Mapper... mapper) {
-    // TODO: try different strategies anyway!
-    ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
-    ParallelCore core = ParallelCore.getCore();
-    try {
-      final int size = aids.size();
-      core.connect();
-      int numparts = core.getParallelism();
-      // TODO: are there better heuristics for choosing this?
-      numparts = (size > numparts * numparts * 16) ? numparts * numparts - 1 : numparts;
-
-      final int blocksize = (size + (numparts - 1)) / numparts;
-      List<Future<ArrayDBIDs>> parts = new ArrayList<>(numparts);
-      for(int i = 0; i < numparts; i++) {
-        final int start = i * blocksize;
-        final int end = (start + blocksize < size) ? start + blocksize : size;
-        Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, start, end, mapper);
-        parts.add(core.submit(run));
-      }
-
-      for(Future<ArrayDBIDs> fut : parts) {
-        fut.get();
-      }
-    }
-    catch(ExecutionException e) {
-      throw new RuntimeException("Mapper execution failed.", e);
-    }
-    catch(InterruptedException e) {
-      throw new RuntimeException("Parallel execution interrupted.");
-    }
-    finally {
-      core.disconnect();
-    }
+    new SingleThreadedRunner(ids, mapper).run();
   }
 
   /**
@@ -97,21 +58,11 @@ public class ParallelMapExecutor {
    * 
    * @apiviz.uses Mapper
    */
-  protected static class BlockArrayRunner implements Callable<ArrayDBIDs>, MapExecutor {
+  protected static class SingleThreadedRunner implements MapExecutor {
     /**
      * Array IDs to process
      */
-    private ArrayDBIDs ids;
-
-    /**
-     * Start position
-     */
-    private int start;
-
-    /**
-     * End position
-     */
-    private int end;
+    private DBIDs ids;
 
     /**
      * The mapper masters that own the instances.
@@ -127,28 +78,21 @@ public class ParallelMapExecutor {
      * Constructor.
      * 
      * @param ids IDs to process
-     * @param start Starting position
-     * @param end End position
      * @param mapper Mapper functions to run
      */
-    protected BlockArrayRunner(ArrayDBIDs ids, int start, int end, Mapper[] mapper) {
+    protected SingleThreadedRunner(DBIDs ids, Mapper[] mapper) {
       super();
       this.ids = ids;
-      this.start = start;
-      this.end = end;
       this.mapper = mapper;
     }
 
-    @Override
-    public ArrayDBIDs call() {
+    public void run() {
       Mapper.Instance[] instances = new Mapper.Instance[mapper.length];
       for(int i = 0; i < mapper.length; i++) {
         instances[i] = mapper[i].instantiate(this);
       }
 
-      DBIDArrayIter iter = ids.iter();
-      iter.seek(start);
-      for(int c = end - start; iter.valid() && c >= 0; iter.advance(), c--) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         for(int i = 0; i < instances.length; i++) {
           instances[i].map(iter);
         }
@@ -156,14 +100,13 @@ public class ParallelMapExecutor {
       for(int i = 0; i < instances.length; i++) {
         mapper[i].cleanup(instances[i]);
       }
-      return ids;
     }
 
     @Override
     public <I extends Instance<?>> I getInstance(SharedVariable<I> parent) {
       @SuppressWarnings("unchecked")
       I inst = (I) variables.get(parent);
-      if (inst == null) {
+      if(inst == null) {
         inst = parent.instantiate();
         variables.put(parent, inst);
       }

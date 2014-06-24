@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.SharedDouble;
+import experimentalcode.erich.parallel.variables.SharedDouble;
 
 /**
  * Mapper for computing the LOF.

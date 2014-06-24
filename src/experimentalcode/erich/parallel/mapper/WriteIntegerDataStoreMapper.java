@@ -26,7 +26,7 @@ package experimentalcode.erich.parallel.mapper;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.SharedInteger;
+import experimentalcode.erich.parallel.variables.SharedInteger;
 
 /**
  * Mapper to write int values into a {@link WritableIntegerDataStore}.

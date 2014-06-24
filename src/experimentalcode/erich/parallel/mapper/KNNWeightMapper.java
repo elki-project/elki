@@ -26,8 +26,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import experimentalcode.erich.parallel.MapExecutor;
-import experimentalcode.erich.parallel.SharedDouble;
-import experimentalcode.erich.parallel.SharedObject;
+import experimentalcode.erich.parallel.variables.SharedDouble;
+import experimentalcode.erich.parallel.variables.SharedObject;
 
 /**
  * Mapper to compute the kNN weight score.
