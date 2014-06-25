@@ -55,7 +55,7 @@ public class TestAggarwalYuNaive extends AbstractSimpleAlgorithmTest implements 
     // run AggarwalYuNaive on database
     OutlierResult result = aggarwalYuNaive.run(db);
 
-    testSingleScore(result, 945, -2.3421601750764798);
-    testAUC(db, "Noise", result, 0.8652037037037);
+    testAUC(db, "Noise", result, 0.9007777777777);
+    testSingleScore(result, 945, -2.862640213982);
   }
 }

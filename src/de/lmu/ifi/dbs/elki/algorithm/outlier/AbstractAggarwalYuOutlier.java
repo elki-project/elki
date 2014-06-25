@@ -24,17 +24,16 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -52,8 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * Abstract base class for the sparse-grid-cell based outlier detection of
  * Aggarwal and Yu.
  * 
+ * Reference:
  * <p>
- * Reference: <br />
  * Outlier detection for high dimensional data<br />
  * C.C. Aggarwal, P. S. Yu<br />
  * International Conference on Management of Data Proceedings of the 2001 ACM
@@ -66,15 +65,20 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * 
  * @param <V> Vector type
  */
-@Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
+@Reference(authors = "C.C. Aggarwal, P. S. Yu", //
+title = "Outlier detection for high dimensional data", //
+booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", //
+url = "http://dx.doi.org/10.1145/375663.375668")
 public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Symbolic value for subspaces not in use.
-   * 
-   * Note: in some places, the implementations may rely on this having the value
-   * 0 currently!
    */
-  public static final int DONT_CARE = 0;
+  public static final short DONT_CARE = -1;
+
+  /**
+   * The first bucket.
+   */
+  public static final short GENE_OFFSET = DONT_CARE + 1;
 
   /**
    * The number of partitions for each dimension.
@@ -109,38 +113,23 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
   protected ArrayList<ArrayList<DBIDs>> buildRanges(Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final int size = relation.size();
-    final DBIDs allids = relation.getDBIDs();
     final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<>();
 
-    // Temporary projection storage of the database
-    final ArrayList<ArrayList<DoubleDBIDPair>> dbAxis = new ArrayList<>(dim);
-    for(int i = 0; i < dim; i++) {
-      ArrayList<DoubleDBIDPair> axis = new ArrayList<>(size);
-      dbAxis.add(i, axis);
-    }
-    // Project
-    for(DBIDIter iter = allids.iter(); iter.valid(); iter.advance()) {
-      final V obj = relation.get(iter);
-      for(int d = 0; d < dim; d++) {
-        dbAxis.get(d).add(DBIDUtil.newPair(obj.doubleValue(d), iter));
-      }
-    }
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+    SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(relation);
     // Split into cells
     final double part = size * 1.0 / phi;
     for(int d = 0; d < dim; d++) {
-      ArrayList<DoubleDBIDPair> axis = dbAxis.get(d);
-      Collections.sort(axis);
+      sorter.setDimension(d);
+      ids.sort(sorter);
       ArrayList<DBIDs> dimranges = new ArrayList<>(phi + 1);
-      dimranges.add(allids);
       int start = 0;
-      for(int r = 0; r < phi; r++) {
-        int end = (int) (part * r);
-        if(r == phi - 1) {
-          end = size;
-        }
-        ArrayModifiableDBIDs currange = DBIDUtil.newArray(phi + 1);
-        for(int i = start; i < end; i++) {
-          currange.add(axis.get(i));
+      DBIDArrayIter iter = ids.iter();
+      for(int r = 1; r <= phi; r++) {
+        int end = (r < phi) ? (int) (part * r) : size;
+        ArrayModifiableDBIDs currange = DBIDUtil.newArray(end - start);
+        for(iter.seek(start); iter.getOffset() < end; iter.advance()) {
+          currange.add(iter);
         }
         start = end;
         dimranges.add(currange);
@@ -178,7 +167,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).first).get(subspace.get(0).second));
     // intersect all selected dimensions
     for(int i = 1; i < subspace.size(); i++) {
-      DBIDs current = ranges.get(subspace.get(i).first).get(subspace.get(i).second);
+      DBIDs current = ranges.get(subspace.get(i).first).get(subspace.get(i).second - GENE_OFFSET);
       ids.retainAll(current);
       if(ids.size() == 0) {
         break;
@@ -194,15 +183,21 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
    * @param ranges Database ranges
    * @return resulting DBIDs
    */
-  protected DBIDs computeSubspaceForGene(int[] gene, ArrayList<ArrayList<DBIDs>> ranges) {
-    HashSetModifiableDBIDs m = DBIDUtil.newHashSet(ranges.get(0).get(gene[0]));
-    // intersect
-    for(int i = 1; i < gene.length; i++) {
+  protected DBIDs computeSubspaceForGene(short[] gene, ArrayList<ArrayList<DBIDs>> ranges) {
+    HashSetModifiableDBIDs m = null;
+    // intersect all present restrictions
+    for(int i = 0; i < gene.length; i++) {
       if(gene[i] != DONT_CARE) {
-        DBIDs current = ranges.get(i).get(gene[i]);
-        m.retainAll(current);
+        DBIDs current = ranges.get(i).get(gene[i] - GENE_OFFSET);
+        if(m == null) {
+          m = DBIDUtil.newHashSet(current);
+        }
+        else {
+          m.retainAll(current);
+        }
       }
     }
+    assert (m != null) : "All genes set to '*', should not happen!";
     return m;
   }
 
@@ -242,13 +237,13 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter kP = new IntParameter(K_ID)//
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      final IntParameter phiP = new IntParameter(PHI_ID);
-      phiP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter phiP = new IntParameter(PHI_ID)//
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(phiP)) {
         phi = phiP.getValue();
       }

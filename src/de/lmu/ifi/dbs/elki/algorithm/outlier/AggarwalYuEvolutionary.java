@@ -23,13 +23,14 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Random;
-import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -43,18 +44,17 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -96,6 +96,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    * Maximum iteration count for evolutionary search.
    */
   protected final static int MAX_ITERATIONS = 1000;
+
+  /**
+   * At which gene homogenity do we have convergence?
+   */
+  protected final static double CONVERGENCE = .85;
 
   /**
    * Holds the value of {@link Parameterizer#M_ID}.
@@ -223,14 +228,16 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
         bestSol.add(ind);
       }
 
+      IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Evolutionary search iterations", LOG) : null;
       int iterations = 0;
       while(!checkConvergence(pop)) {
         Collections.sort(pop);
+        // Fitter members are more likely to survive
         pop = rouletteRankSelection(pop);
-        // Crossover
+        // Crossover survivors
         pop = crossoverOptimized(pop);
         // Mutation with probability 0.25 , 0.25
-        pop = mutation(pop, 0.5, 0.5);
+        pop = mutation(pop, 0.25, 0.25);
         // Avoid duplicates
         ind: for(Individuum ind : pop) {
           for(Heap<Individuum>.UnorderedIter it = bestSol.unorderedIter(); it.valid(); it.advance()) {
@@ -253,10 +260,14 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
           LOG.debugFinest(buf.toString());
         }
         iterations++;
+        LOG.incrementProcessed(prog);
         if(iterations > MAX_ITERATIONS) {
           LOG.warning("Maximum iterations reached.");
           break;
         }
+      }
+      if(prog != null) {
+        prog.setCompleted(LOG);
       }
       return bestSol.unorderedIter();
     }
@@ -276,25 +287,28 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       int[][] occur = new int[dim][phi + 1];
       // Count gene occurrences
       for(Individuum ind : pop) {
-        int[] gene = ind.getGene();
+        short[] gene = ind.getGene();
         for(int d = 0; d < dim; d++) {
-          int val = gene[d] + DONT_CARE;
-          if(val < 0 || val >= phi + 1) {
+          if(gene[d] == DONT_CARE) {
+            occur[d][0] += 1;
+            continue;
+          }
+          int val = gene[d] - GENE_OFFSET;
+          if(val < 0 || val >= phi) {
             LOG.warning("Invalid gene value encountered: " + val + " in " + ind.toString());
             continue;
           }
-          occur[d][val] += 1;
+          occur[d][val + 1] += 1;
         }
       }
 
-      int conv = (int) (pop.size() * 0.95);
+      int conv = (int) Math.floor(pop.size() * CONVERGENCE);
       if(LOG.isDebuggingFine()) {
         LOG.debugFine("Convergence at " + conv + " of " + pop.size() + " individuums.");
       }
       for(int d = 0; d < dim; d++) {
         boolean converged = false;
-
-        for(int val = 0; val < phi + 1; val++) {
+        for(int val = 0; val <= phi; val++) {
           if(occur[d][val] >= conv) {
             converged = true;
             break;
@@ -320,24 +334,23 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       // fill population
       for(int i = 0; i < popsize; i++) {
         // Random Individual
-        int[] gene = new int[dim];
+        short[] gene = new short[dim];
         // fill don't care ( any dimension == don't care)
-        for(int j = 0; j < dim; j++) {
-          gene[j] = DONT_CARE;
-        }
+        Arrays.fill(gene, DONT_CARE);
         // count of don't care positions
         int countDim = k;
         // fill non don't care positions of the Individual
         while(countDim > 0) {
           int z = random.nextInt(dim);
-          if(gene[z] == DONT_CARE) {
-            gene[z] = random.nextInt(phi) + 1;
-            countDim--;
+          if(gene[z] != DONT_CARE) {
+            continue;
           }
+          gene[z] = (short) (random.nextInt(phi) + GENE_OFFSET);
+          countDim--;
         }
         population.add(makeIndividuum(gene));
       }
-      Collections.sort(population);
+      // Collections.sort(population);
       return population;
     }
 
@@ -363,94 +376,56 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       // position of selection
       for(int i = 0; i < popsize; i++) {
         int z = random.nextInt(totalweight);
-        for(int j = 0; j < popsize; j++) {
-          if(z < popsize - j) {
-            // TODO: need clone?
+        for(int j = 0, rank = popsize; j < popsize; ++j, --rank) {
+          if(z < rank) {
             survivors.add(population.get(j));
             break;
           }
-          else {
-            // decrement
-            z -= (popsize - j);
-          }
+          z -= rank;
         }
       }
-      if(survivors.size() != popsize) {
-        throw new AbortException("Selection step failed - implementation error?");
-      }
-      // Don't sort, to avoid biasing the crossover!
-      // Collections.sort(survivors);
+      assert (survivors.size() == popsize) : "Selection step failed - implementation error?";
       return survivors;
     }
 
     /**
-     * Apply the mutation alogrithm.
+     * Apply the mutation algorithm.
      */
     private ArrayList<Individuum> mutation(ArrayList<Individuum> population, double perc1, double perc2) {
       // the Mutations
       ArrayList<Individuum> mutations = new ArrayList<>();
-      // Set of Positions which are don't care in the String
-      TreeSet<Integer> Q = new TreeSet<>();
-      // Set of Positions which are not don't care in the String
-      TreeSet<Integer> R = new TreeSet<>();
+      int[] QR = new int[dim];
 
       // for each individuum
       for(int j = 0; j < population.size(); j++) {
-        // clear the Sets
-        Q.clear();
-        R.clear();
-        // Fill the Sets with the Positions
+        short[] gene = population.get(j).getGene().clone();
+        // Fill position array for mutation process
+        int q = 0, r = dim;
         for(int i = 0; i < dim; i++) {
-          if(population.get(j).getGene()[i] == DONT_CARE) {
-            Q.add(i);
-          }
-          else {
-            R.add(i);
-          }
+          QR[(gene[i] == DONT_CARE) ? (q++) : (--r)] = i;
         }
-        //
-        double r1 = random.nextDouble();
-        if(Q.size() != 0) {
-          // Mutation Variant 1
-          if(r1 <= perc1) {
-            // calc Mutation Spot
-            Integer[] pos = new Integer[Q.size()];
-            pos = Q.toArray(pos);
-            int position = random.nextInt(pos.length);
-            int depth = pos[position];
-            // Mutate don't care into 1....phi
-            population.get(j).getGene()[depth] = random.nextInt(phi) + 1;
-            // update Sets
-            Q.remove(depth);
-            R.add(depth);
-            // calc new Mutation Spot
-            pos = new Integer[R.size()];
-            pos = R.toArray(pos);
-            position = random.nextInt(pos.length);
-            depth = pos[position];
-            // Mutate non don't care into don't care
-            population.get(j).getGene()[depth] = DONT_CARE;
-            // update Sets
-            Q.add(depth);
-            R.remove(depth);
-          }
+        // Mutation variant 1
+        if(q > 0 && r < dim && random.nextDouble() <= perc1) {
+          // Random mutation spots:
+          int rq = random.nextInt(q), rr = random.nextInt(dim - r) + r;
+          int pq = QR[rq], pr = QR[rr];
+          // Mutate don't care (position pq) into 1....phi
+          gene[pq] = (short) (random.nextInt(phi) + GENE_OFFSET);
+          // Mutate non don't care (position pr) into don't care
+          gene[pr] = DONT_CARE;
+          // update sets, by swapping the position vlaues
+          QR[rq] = pr;
+          QR[rr] = pq;
         }
-        r1 = random.nextDouble();
         // Mutation Variant 2
-        if(r1 <= perc2) {
+        if(random.nextDouble() <= perc2) {
           // calc Mutation Spot
-          Integer[] pos = new Integer[R.size()];
-          pos = R.toArray(pos);
-          int position = random.nextInt(pos.length);
-          int depth = pos[position];
+          int pr = random.nextInt(dim - r) + r;
           // Mutate 1...phi into another 1...phi
-          population.get(j).getGene()[depth] = random.nextInt(phi) + 1;
+          gene[QR[pr]] = (short) (random.nextInt(phi) + GENE_OFFSET);
         }
-        int[] gene = population.get(j).getGene();
         mutations.add(makeIndividuum(gene));
-
       }
-      Collections.sort(mutations);
       return mutations;
     }
 
@@ -460,7 +435,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @param gene Gene to evaluate
      * @return new individuum
      */
-    private Individuum makeIndividuum(int[] gene) {
+    private Individuum makeIndividuum(short[] gene) {
       final DBIDs ids = computeSubspaceForGene(gene, ranges);
       final double fitness = (ids.size() > 0) ? sparsity(ids.size(), dbsize, k, phi) : Double.MAX_VALUE;
       return new Individuum(fitness, gene);
@@ -483,7 +458,6 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       if(population.size() % 2 == 1) {
         crossover.add(population.get(population.size() - 1));
       }
-      // Collections.sort(crossover);
       return crossover;
     }
 
@@ -497,9 +471,9 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     private Pair<Individuum, Individuum> recombineOptimized(Individuum parent1, Individuum parent2) {
       Pair<Individuum, Individuum> recombinePair;
       // Set of Positions in which either s1 or s2 are don't care
-      ArrayList<Integer> Q = new ArrayList<>(dim);
+      TIntArrayList Q = new TIntArrayList(dim);
       // Set of Positions in which neither s1 or s2 is don't care
-      ArrayList<Integer> R = new ArrayList<>(dim);
+      TIntArrayList R = new TIntArrayList(dim);
 
       for(int i = 0; i < dim; i++) {
         if((parent1.getGene()[i] == DONT_CARE) && (parent2.getGene()[i] != DONT_CARE)) {
@@ -516,21 +490,21 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       Individuum best = combineRecursive(R, 0, Individuum.nullIndividuum(dim).getGene(), parent1, parent2);
 
       // Extends gene greedily
-      int[] b = best.getGene();
+      short[] b = best.getGene();
       int count = k - R.size();
-      Iterator<Integer> q = Q.iterator();
+      TIntIterator q = Q.iterator();
 
       while(count > 0) {
-        int[] l1 = b.clone();
-        int[] l2 = b.clone();
+        short[] l1 = b.clone();
+        short[] l2 = b.clone();
 
         while(q.hasNext()) {
           int next = q.next();
           // pos = next;
 
           {
-            boolean s1Null = (parent1.getGene()[next] == 0);
-            boolean s2Null = (parent1.getGene()[next] == 0);
+            boolean s1Null = (parent1.getGene()[next] == DONT_CARE);
+            boolean s2Null = (parent1.getGene()[next] == DONT_CARE);
 
             l1[next] = parent1.getGene()[next];
             l2[next] = parent2.getGene()[next];
@@ -556,7 +530,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       }
 
       // create the complementary String
-      int[] comp = new int[dim];
+      short[] comp = new short[dim];
 
       for(int i = 0; i < dim; i++) {
         if(b[i] == parent1.getGene()[i]) {
@@ -584,26 +558,21 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @param parent2 Second parent
      * @return best gene combination
      */
-    private Individuum combineRecursive(ArrayList<Integer> r, int i, int[] current, Individuum parent1, Individuum parent2) {
+    private Individuum combineRecursive(TIntArrayList r, int i, short[] current, Individuum parent1, Individuum parent2) {
       if(i == r.size()) {
         return makeIndividuum(current);
       }
       // Position to modify
       int pos = r.get(i);
       // Build genes
-      int[] gene1 = current.clone();
-      int[] gene2 = current; // .clone();
+      short[] gene1 = current.clone();
+      short[] gene2 = current; // .clone();
       gene1[pos] = parent1.getGene()[pos];
       gene2[pos] = parent2.getGene()[pos];
       Individuum i1 = combineRecursive(r, i + 1, gene1, parent1, parent2);
       Individuum i2 = combineRecursive(r, i + 1, gene2, parent1, parent2);
       // Return the better result.
-      if(i1.getFitness() < i2.getFitness()) {
-        return i1;
-      }
-      else {
-        return i2;
-      }
+      return (i1.getFitness() < i2.getFitness()) ? i1 : i2;
     }
   }
 
@@ -614,14 +583,14 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    * 
    * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.pairs.FCPair
    */
-  private static class Individuum extends FCPair<Double, int[]> {
+  private static class Individuum extends FCPair<Double, short[]> {
     /**
      * Constructor
      * 
      * @param fitness Fitness
      * @param gene Gene information
      */
-    public Individuum(double fitness, int[] gene) {
+    public Individuum(double fitness, short[] gene) {
       super(fitness, gene);
     }
 
@@ -630,7 +599,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * 
      * @return the gene information
      */
-    public int[] getGene() {
+    public short[] getGene() {
       return second;
     }
 
@@ -650,14 +619,29 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @return new individuum
      */
     public static Individuum nullIndividuum(int dim) {
-      int[] gene = new int[dim];
+      short[] gene = new short[dim];
       Arrays.fill(gene, DONT_CARE);
       return new Individuum(0.0, gene);
     }
 
     @Override
     public String toString() {
-      return "I(f=" + first + ",g=" + FormatUtil.format(second) + ")";
+      StringBuilder buf = new StringBuilder();
+      buf.append("I(f=").append(first);
+      buf.append(",g=");
+      for(int i = 0; i < second.length; i++) {
+        if(i > 0) {
+          buf.append(",");
+        }
+        if(second[i] == DONT_CARE) {
+          buf.append("*");
+        }
+        else {
+          buf.append(second[i]);
+        }
+      }
+      buf.append(")");
+      return buf.toString();
     }
 
     @Override

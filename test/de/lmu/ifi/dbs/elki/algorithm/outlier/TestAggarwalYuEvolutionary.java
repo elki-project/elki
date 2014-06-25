@@ -47,7 +47,7 @@ public class TestAggarwalYuEvolutionary extends AbstractSimpleAlgorithmTest impl
     ListParameterization params = new ListParameterization();
     params.addParameter(AggarwalYuEvolutionary.Parameterizer.K_ID, 2);
     params.addParameter(AggarwalYuEvolutionary.Parameterizer.PHI_ID, 8);
-    params.addParameter(AggarwalYuEvolutionary.Parameterizer.M_ID, 5);
+    params.addParameter(AggarwalYuEvolutionary.Parameterizer.M_ID, 20);
     params.addParameter(AggarwalYuEvolutionary.Parameterizer.SEED_ID, 0);
 
     // setup Algorithm
@@ -57,7 +57,7 @@ public class TestAggarwalYuEvolutionary extends AbstractSimpleAlgorithmTest impl
     // run AggarwalYuEvolutionary on database
     OutlierResult result = aggarwalYuEvolutionary.run(db);
 
-    testSingleScore(result, 945, 16.6553612449883);
-    testAUC(db, "Noise", result, 0.5799537037037);
+    testAUC(db, "Noise", result, 0.653888888888);
+    testSingleScore(result, 945, 0.0);
   }
 }

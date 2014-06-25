@@ -106,7 +106,7 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
       // Set of all dim*phi ranges
       ArrayList<IntIntPair> q = new ArrayList<>();
       for(int i = 0; i < dimensionality; i++) {
-        for(int j = 1; j <= phi; j++) {
+        for(int j = 0; j < phi; j++) {
           IntIntPair s = new IntIntPair(i, j);
           q.add(s);
           // Add to first Rk
