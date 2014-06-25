@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.mapper;
+package experimentalcode.erich.parallel.processor;
 
 /*
  This file is part of ELKI:
@@ -25,20 +25,20 @@ package experimentalcode.erich.parallel.mapper;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.parallel.MapExecutor;
-import de.lmu.ifi.dbs.elki.parallel.mapper.AbstractDoubleMapper;
-import de.lmu.ifi.dbs.elki.parallel.mapper.KNNMapper;
+import de.lmu.ifi.dbs.elki.parallel.Executor;
+import de.lmu.ifi.dbs.elki.parallel.processor.AbstractDoubleProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.KNNProcessor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 
 /**
- * Mapper to compute the kNN weight score.
+ * Compute the kNN weight score.
  * 
- * Needs the k nearest neighbors as input, for example from {@link KNNMapper}.
+ * Needs the k nearest neighbors as input, for example from {@link KNNProcessor}.
  * 
  * @author Erich Schubert
  */
-public class KNNWeightMapper extends AbstractDoubleMapper {
+public class KNNWeightProcessor extends AbstractDoubleProcessor {
   /**
    * K parameter
    */
@@ -49,7 +49,7 @@ public class KNNWeightMapper extends AbstractDoubleMapper {
    * 
    * @param k K parameter
    */
-  public KNNWeightMapper(int k) {
+  public KNNWeightProcessor(int k) {
     super();
     this.k = k;
   }
@@ -69,16 +69,16 @@ public class KNNWeightMapper extends AbstractDoubleMapper {
   }
 
   @Override
-  public Instance instantiate(MapExecutor mapper) {
-    return new Instance(k, mapper.getInstance(input), mapper.getInstance(output));
+  public Instance instantiate(Executor executor) {
+    return new Instance(k, executor.getInstance(input), executor.getInstance(output));
   }
 
   /**
-   * Mapper instance for precomputing the kNN.
+   * Instance for precomputing the kNN.
    * 
    * @author Erich Schubert
    */
-  private static class Instance extends AbstractDoubleMapper.Instance {
+  private static class Instance extends AbstractDoubleProcessor.Instance {
     /**
      * k Parameter
      */

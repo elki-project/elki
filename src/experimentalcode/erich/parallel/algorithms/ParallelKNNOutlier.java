@@ -41,11 +41,11 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.parallel.ParallelMapExecutor;
-import de.lmu.ifi.dbs.elki.parallel.mapper.DoubleMinMaxMapper;
-import de.lmu.ifi.dbs.elki.parallel.mapper.KDistanceMapper;
-import de.lmu.ifi.dbs.elki.parallel.mapper.KNNMapper;
-import de.lmu.ifi.dbs.elki.parallel.mapper.WriteDoubleDataStoreMapper;
+import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
+import de.lmu.ifi.dbs.elki.parallel.processor.DoubleMinMaxProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.KDistanceProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.KNNProcessor;
+import de.lmu.ifi.dbs.elki.parallel.processor.WriteDoubleDataStoreProcessor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Parallel implementation of KNN Outlier detection using mappers.
+ * Parallel implementation of KNN Outlier detection.
  * 
  * @author Erich Schubert
  * 
@@ -94,12 +94,12 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
     DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
-    KNNMapper<O> knnm = new KNNMapper<>(k + 1, knnq);
+    KNNProcessor<O> knnm = new KNNProcessor<>(k + 1, knnq);
     SharedObject<KNNList> knnv = new SharedObject<>();
-    KDistanceMapper kdistm = new KDistanceMapper(k + 1);
+    KDistanceProcessor kdistm = new KDistanceProcessor(k + 1);
     SharedDouble kdistv = new SharedDouble();
-    WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(store);
-    DoubleMinMaxMapper mmm = new DoubleMinMaxMapper();
+    WriteDoubleDataStoreProcessor storem = new WriteDoubleDataStoreProcessor(store);
+    DoubleMinMaxProcessor mmm = new DoubleMinMaxProcessor();
 
     knnm.connectKNNOutput(knnv);
     kdistm.connectKNNInput(knnv);
@@ -107,7 +107,7 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
     storem.connectInput(kdistv);
     mmm.connectInput(kdistv);
 
-    ParallelMapExecutor.run(ids, knnm, kdistm, storem, mmm);
+    ParallelExecutor.run(ids, knnm, kdistm, storem, mmm);
 
     DoubleMinMax minmax = mmm.getMinMax();
     DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", "knn-outlier", store, ids);
