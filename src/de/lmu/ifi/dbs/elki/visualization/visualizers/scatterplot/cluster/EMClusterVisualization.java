@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Robert Rödler
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses EMClusterVisualization oneway - - «create»
+ * @apiviz.uses Instance oneway - - «create»
  */
 public class EMClusterVisualization extends AbstractVisFactory {
   /**

@@ -34,6 +34,10 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
  * @author Erich Schubert
  * 
  * @param <O> Object type
+ *
+ * @apiviz.has Instance
+ * @apiviz.uses KNNQuery
+ * @apiviz.has KNNList
  */
 public class KNNProcessor<O> implements Processor {
   /**

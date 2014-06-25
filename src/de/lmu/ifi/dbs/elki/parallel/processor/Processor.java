@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.parallel.Executor;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf Instance
+ * @apiviz.has Instance
  */
 public interface Processor {
   /**

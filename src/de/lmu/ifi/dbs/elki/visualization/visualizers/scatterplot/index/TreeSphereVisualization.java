@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses TreeSphereVisualization oneway - - «create»
+ * @apiviz.uses Instance oneway - - «create»
  */
 public class TreeSphereVisualization extends AbstractVisFactory {
   /**

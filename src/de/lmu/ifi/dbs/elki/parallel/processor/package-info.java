@@ -18,5 +18,7 @@
  * 
  * As we want to write to some storage at the end, the last processor usually will not have
  * an "output", thus the name "map" is not a good match anymore.
+ * 
+ * @apiviz.exclude .*\.Instance$
  */
 package de.lmu.ifi.dbs.elki.parallel.processor;

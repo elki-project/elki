@@ -31,6 +31,9 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  * Abstract base class for processors that output double values.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Instance
+ * @apiviz.uses SharedDouble
  */
 public abstract class AbstractDoubleProcessor implements Processor {
   /**

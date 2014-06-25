@@ -34,6 +34,10 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
  * Needs the k nearest neighbors as input, for example from {@link KNNProcessor}.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.has Instance
+ * @apiviz.uses KNNList
+ * @apiviz.uses SharedObject
  */
 public class KDistanceProcessor extends AbstractDoubleProcessor {
   /**

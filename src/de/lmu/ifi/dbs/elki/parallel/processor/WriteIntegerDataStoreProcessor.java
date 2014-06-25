@@ -32,6 +32,10 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedInteger;
  * Write int values into a {@link WritableIntegerDataStore}.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.has Instance
+ * @apiviz.uses SharedInteger
+ * @apiviz.uses WritableIntegerDataStore
  */
 public class WriteIntegerDataStoreProcessor implements Processor {
   /**

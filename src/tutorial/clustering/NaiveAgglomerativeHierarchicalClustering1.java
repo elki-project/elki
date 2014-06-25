@@ -210,6 +210,8 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.exclude
+   * 
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

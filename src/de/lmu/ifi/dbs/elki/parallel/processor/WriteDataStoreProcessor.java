@@ -34,6 +34,10 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
  * @author Erich Schubert
  * 
  * @param <T> data type
+ *
+ * @apiviz.has Instance
+ * @apiviz.uses SharedObject
+ * @apiviz.uses WritableDataStore
  */
 public class WriteDataStoreProcessor<T> implements Processor {
   /**

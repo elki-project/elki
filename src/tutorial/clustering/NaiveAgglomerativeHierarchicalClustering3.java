@@ -93,6 +93,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    * R. M. Cormack, A Review of Classification
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static enum Linkage {//
     SINGLE {
@@ -352,6 +354,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.exclude
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

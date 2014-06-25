@@ -32,6 +32,10 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  * Sink collecting minimum and maximum values.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.has Instance
+ * @apiviz.uses SharedObject
+ * @apiviz.uses DoubleMinMax
  */
 public class DoubleMinMaxProcessor implements Processor {
   /**
