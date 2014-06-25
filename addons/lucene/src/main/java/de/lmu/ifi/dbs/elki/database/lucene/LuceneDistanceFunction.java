@@ -25,8 +25,7 @@ package de.lmu.ifi.dbs.elki.database.lucene;
 import org.apache.lucene.search.DefaultSimilarity;
 import org.apache.lucene.search.Similarity;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -34,14 +33,14 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-public class LuceneDistanceFunction extends AbstractDBIDDistanceFunction {
+public class LuceneDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**
    * Lucene similarity.
    */
   Similarity sim = new DefaultSimilarity();
 
   @Override
-  public double distance(DBIDRef id1, DBIDRef id2) {
+  public double distance(int i1, int i2) {
     // FIXME: how to compute the same similarity value that lucene uses?
     throw new AbortException("Manual distance computations are not yet implemented!");
   }
