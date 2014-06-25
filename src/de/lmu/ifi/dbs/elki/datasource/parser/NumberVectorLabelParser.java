@@ -295,14 +295,16 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
         labelcolumns.set(i);
       }
       // Else: labels.
-      haslabels = true;
-      final String lbl = tokenizer.getSubstring();
-      String u = unique.get(lbl);
-      if(u == null) {
-        u = lbl;
-        unique.put(u, u);
+      final String lbl = tokenizer.getStrippedSubstring();
+      if(lbl != null && lbl.length() > 0) {
+        haslabels = true;
+        String u = unique.get(lbl);
+        if(u == null) {
+          u = lbl;
+          unique.put(u, u);
+        }
+        labels.add(u);
       }
-      labels.add(u);
     }
     // Maybe a label row?
     if(lineNumber == 1 && attributes.size() == 0) {

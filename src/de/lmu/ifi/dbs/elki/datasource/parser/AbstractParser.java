@@ -94,6 +94,12 @@ public abstract class AbstractParser {
     this.comment = comment;
   }
 
+  /**
+   * Get the length of the string, not taking trailing linefeeds into account.
+   * 
+   * @param line Input line
+   * @return Length
+   */
   public static int lengthWithoutLinefeed(String line) {
     int length = line.length();
     while(length > 0) {

@@ -87,7 +87,7 @@ public class Tokenizer implements Iter {
    * Current positions of result and iterator.
    */
   private int start, end, index;
-  
+
   /**
    * Whether the current token is a quoted string.
    */
@@ -168,6 +168,32 @@ public class Tokenizer implements Iter {
   }
 
   /**
+   * Get the current part as substring
+   * 
+   * @return Current value as substring.
+   */
+  public String getStrippedSubstring() {
+    // TODO: detect Java <6 and make sure we only return the substring?
+    // With java 7, String.substring will arraycopy the characters.
+    int sstart = start, send = end;
+    while(sstart < send) {
+      char c = input.charAt(sstart);
+      if(c == ' ' || c == '\n' || c == '\r' || c == '\t') {
+        break;
+      }
+      ++sstart;
+    }
+    while(--send > sstart) {
+      char c = input.charAt(send);
+      if(c == ' ' || c == '\n' || c == '\r' || c == '\t') {
+        break;
+      }
+    }
+    ++send;
+    return input.subSequence(sstart, send).toString();
+  }
+
+  /**
    * Get current value as double.
    * 
    * @return double value
@@ -219,7 +245,7 @@ public class Tokenizer implements Iter {
     }
     return 0;
   }
-  
+
   /**
    * Test if the current string was quoted.
    * 

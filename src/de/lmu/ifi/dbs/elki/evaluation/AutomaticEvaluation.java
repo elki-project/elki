@@ -73,13 +73,13 @@ public class AutomaticEvaluation implements Evaluator {
 
   protected void autoEvaluateOutliers(HierarchicalResult baseResult, Result newResult) {
     Collection<OutlierResult> outliers = ResultUtil.filterResults(newResult, OutlierResult.class);
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debug("Number of new outlier results: " + outliers.size());
     }
-    if (outliers.size() > 0) {
+    if(outliers.size() > 0) {
       ResultUtil.ensureClusteringResult(ResultUtil.findDatabase(baseResult), baseResult);
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(baseResult, Clustering.class);
-      if (clusterings.size() == 0) {
+      if(clusterings.size() == 0) {
         LOG.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
         return;
       }
@@ -88,24 +88,24 @@ public class AutomaticEvaluation implements Evaluator {
       int min = Integer.MAX_VALUE;
       int total = 0;
       String label = null;
-      if (basec.getAllClusters().size() > 1) {
-        for (Cluster<?> c : basec.getAllClusters()) {
+      if(basec.getAllClusters().size() > 1) {
+        for(Cluster<?> c : basec.getAllClusters()) {
           final int csize = c.getIDs().size();
           total += csize;
-          if (csize < min) {
+          if(csize < min) {
             min = csize;
             label = c.getName();
           }
         }
       }
-      if (label == null) {
+      if(label == null) {
         LOG.warning("Could not evaluate outlier results, as I could not find a minority label.");
         return;
       }
-      if (min == 1) {
+      if(min == 1) {
         LOG.warning("The minority class label had a single object. Try using 'ClassLabelFilter' to identify the class label column.");
       }
-      if (min > 0.05 * total) {
+      if(min > 0.05 * total) {
         LOG.warning("The minority class I discovered (labeled '" + label + "') has " + (min * 100. / total) + "% of objects. Outlier classes should be more rare!");
       }
       LOG.verbose("Evaluating using minority class: " + label);
@@ -123,25 +123,29 @@ public class AutomaticEvaluation implements Evaluator {
 
   protected void autoEvaluateClusterings(HierarchicalResult baseResult, Result newResult) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.warning("Number of new clustering results: " + clusterings.size());
     }
-    for (Iterator<Clustering<?>> c = clusterings.iterator(); c.hasNext();) {
+    for(Iterator<Clustering<?>> c = clusterings.iterator(); c.hasNext();) {
       Clustering<?> test = c.next();
-      if ("allinone-clustering".equals(test.getShortName())) {
+      if("allinone-clustering".equals(test.getShortName())) {
         c.remove();
-      } else if ("allinnoise-clustering".equals(test.getShortName())) {
+      }
+      else if("allinnoise-clustering".equals(test.getShortName())) {
         c.remove();
-      } else if ("bylabel-clustering".equals(test.getShortName())) {
+      }
+      else if("bylabel-clustering".equals(test.getShortName())) {
         c.remove();
-      } else if ("bymodel-clustering".equals(test.getShortName())) {
+      }
+      else if("bymodel-clustering".equals(test.getShortName())) {
         c.remove();
       }
     }
-    if (clusterings.size() > 0) {
+    if(clusterings.size() > 0) {
       try {
         new EvaluateClustering(new ByLabelClustering(), false, true).processNewResult(baseResult, newResult);
-      } catch (NoSupportedDataTypeException e) {
+      }
+      catch(NoSupportedDataTypeException e) {
         // Pass - the data probably did not have labels.
       }
     }
