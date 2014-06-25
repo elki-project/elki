@@ -208,10 +208,10 @@ public class VoronoiVisualization extends AbstractVisFactory {
             double[] mean;
             if (model instanceof MeanModel) {
               MeanModel mmodel = (MeanModel) model;
-              mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
+              mean = mmodel.getMean().getArrayRef();
             } else if (model instanceof MedoidModel) {
               MedoidModel mmodel = (MedoidModel) model;
-              mean = proj.fastProjectDataToRenderSpace(rel.get(mmodel.getMedoid()));
+              mean = rel.get(mmodel.getMedoid()).getColumnVector().getArrayRef();
             } else {
               continue;
             }
@@ -224,7 +224,8 @@ public class VoronoiVisualization extends AbstractVisFactory {
           layer.appendChild(path);
         }
         if (settings.mode == Mode.DELAUNAY || settings.mode == Mode.V_AND_D) {
-          Element path = new SVGPath(means.get(0)).drawTo(means.get(1)).makeElement(svgp);
+          Element path = new SVGPath(proj.fastProjectDataToRenderSpace(means.get(0)))//
+          .drawTo(proj.fastProjectDataToRenderSpace(means.get(1))).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
         }
