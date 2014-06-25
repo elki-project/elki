@@ -35,30 +35,32 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Simple distance based outlier detection algorithms.
  * 
+ * Reference:
  * <p>
- * Reference: E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based
- * Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases
- * (VLDB'98), New York, USA, 1998.
+ * E.M. Knorr, R. T. Ng:<br />
+ * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br />
+ * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
+ * </p>
  * 
  * @author Lisa Reichert
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
+@Reference(authors = "E.M. Knorr, R. T. Ng", //
+title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
+booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
-   * Parameter to specify the size of the D-neighborhood
-   */
-  public static final OptionID D_ID = new OptionID("dbod.d", "size of the D-neighborhood");
-
-  /**
-   * Holds the value of {@link #D_ID}.
+   * Radius parameter d.
    */
   private double d;
 
@@ -66,7 +68,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * Constructor with actual parameters.
    * 
    * @param distanceFunction distance function to use
-   * @param d d value
+   * @param d radius d value
    */
   public AbstractDBOutlier(DistanceFunction<? super O> distanceFunction, double d) {
     super(distanceFunction);
@@ -114,6 +116,11 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    */
   public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
+     * Parameter to specify the size of the D-neighborhood
+     */
+    public static final OptionID D_ID = new OptionID("dbod.d", "size of the D-neighborhood");
+
+    /**
      * Query radius
      */
     protected double d;
@@ -130,7 +137,8 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
      * @param config Parameterization
      */
     protected void configD(Parameterization config, DistanceFunction<?> distanceFunction) {
-      final DoubleParameter param = new DoubleParameter(D_ID);
+      final DoubleParameter param = new DoubleParameter(D_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(param)) {
         d = param.getValue();
       }

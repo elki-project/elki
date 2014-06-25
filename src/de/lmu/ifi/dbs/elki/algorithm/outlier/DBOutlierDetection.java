@@ -48,10 +48,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Simple distanced based outlier detection algorithm. User has to specify two
  * parameters An object is flagged as an outlier if at least a fraction p of all
  * data objects has a distance above d from c
+ * 
+ * Reference:
  * <p>
- * Reference: E.M. Knorr, R. T. Ng: Algorithms for Mining Distance-Based
- * Outliers in Large Datasets, In: Procs Int. Conf. on Very Large Databases
- * (VLDB'98), New York, USA, 1998.
+ * E.M. Knorr, R. T. Ng:<br />
+ * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br />
+ * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
+ * </p>
  * 
  * This paper presents several Distance Based Outlier Detection algorithms.
  * Implemented here is a simple index based algorithm as presented in section
@@ -65,7 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("DBOD: Distance Based Outlier Detection")
 @Description("If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier")
-@Reference(authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
+@Reference(authors = "E.M. Knorr, R. T. Ng", //
+title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
+booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   /**
    * The logger for this class.
@@ -73,13 +78,7 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   private static final Logging LOG = Logging.getLogger(DBOutlierDetection.class);
 
   /**
-   * Parameter to specify the minimum fraction of objects that must be outside
-   * the D- neighborhood of an outlier
-   */
-  public static final OptionID P_ID = new OptionID("dbod.p", "minimum fraction of objects that must be outside the D-neighborhood of an outlier");
-
-  /**
-   * Holds the value of {@link #P_ID}.
+   * Density threshold percentage p.
    */
   private double p;
 
@@ -167,6 +166,15 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
+    /**
+     * Parameter to specify the minimum fraction of objects that must be outside
+     * the D- neighborhood of an outlier
+     */
+    public static final OptionID P_ID = new OptionID("dbod.p", "minimum fraction of objects that must be outside the D-neighborhood of an outlier");
+
+    /**
+     * Density threshold p.
+     */
     protected double p = 0.0;
 
     @Override

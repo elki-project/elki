@@ -45,8 +45,8 @@ public class TestDBOutlierDetection extends AbstractSimpleAlgorithmTest implemen
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(DBOutlierDetection.D_ID, 0.175);
-    params.addParameter(DBOutlierDetection.P_ID, 0.98);
+    params.addParameter(DBOutlierDetection.Parameterizer.D_ID, 0.175);
+    params.addParameter(DBOutlierDetection.Parameterizer.P_ID, 0.98);
 
     // setup Algorithm
     DBOutlierDetection<DoubleVector> dbOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(DBOutlierDetection.class, params);

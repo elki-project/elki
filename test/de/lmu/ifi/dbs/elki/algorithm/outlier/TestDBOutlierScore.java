@@ -45,7 +45,7 @@ public class TestDBOutlierScore extends AbstractSimpleAlgorithmTest implements J
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(DBOutlierScore.D_ID, 0.175);
+    params.addParameter(DBOutlierScore.Parameterizer.D_ID, 0.175);
 
     // setup Algorithm
     DBOutlierScore<DoubleVector> dbOutlierScore = ClassGenericsUtil.parameterizeOrAbort(DBOutlierScore.class, params);

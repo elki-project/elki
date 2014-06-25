@@ -45,6 +45,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * score thus eliminating this parameter and turning the method into a ranking
  * method instead of a labelling one.
  * 
+ * Reference:
+ * <p>
+ * E.M. Knorr, R. T. Ng:<br />
+ * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br />
+ * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
+ * </p>
+ * 
  * @author Lisa Reichert
  * 
  * @apiviz.has RangeQuery
@@ -53,7 +60,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Distance based outlier score")
 @Description("Generalization of the original DB-Outlier approach to a ranking method, by turning the fraction parameter into the output value.")
-@Reference(prefix = "Generalization of a method proposed in", authors = "E.M. Knorr, R. T. Ng", title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
+@Reference(prefix = "Generalization of a method proposed in", //
+authors = "E.M. Knorr, R. T. Ng", //
+title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
+booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
   /**
    * The logger for this class.
