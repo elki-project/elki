@@ -178,19 +178,18 @@ public class Tokenizer implements Iter {
     int sstart = start, send = end;
     while(sstart < send) {
       char c = input.charAt(sstart);
-      if(c == ' ' || c == '\n' || c == '\r' || c == '\t') {
+      if(c != ' ' || c != '\n' || c != '\r' || c != '\t') {
         break;
       }
       ++sstart;
     }
-    while(--send > sstart) {
+    while(--send >= sstart) {
       char c = input.charAt(send);
-      if(c == ' ' || c == '\n' || c == '\r' || c == '\t') {
+      if(c != ' ' || c != '\n' || c != '\r' || c != '\t') {
         break;
       }
     }
-    ++send;
-    return input.subSequence(sstart, send).toString();
+    return input.subSequence(sstart, ++send).toString();
   }
 
   /**
