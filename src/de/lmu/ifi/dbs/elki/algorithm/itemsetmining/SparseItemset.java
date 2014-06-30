@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
-import java.util.Arrays;
-
-import de.lmu.ifi.dbs.elki.data.BitVector;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,6 +22,13 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * APRIORI itemset.
@@ -71,12 +71,7 @@ public class SparseItemset extends Itemset {
     if(ii.item == ij.item) {
       throw new AbortException("SparseItemset constructed from identical 1-itemsets.");
     }
-    if(ii.item < ij.item) {
-      this.indices = new int[] { ii.item, ij.item };
-    }
-    else {
-      this.indices = new int[] { ij.item, ii.item };
-    }
+    this.indices = (ii.item < ij.item) ? new int[] { ii.item, ij.item } : new int[] { ij.item, ii.item };
   }
 
   @Override
@@ -87,8 +82,7 @@ public class SparseItemset extends Itemset {
   @Override
   public boolean containedIn(BitVector bv) {
     for(int item : indices) {
-      // TODO: add a booleanValue method to BitVector?
-      if(bv.longValue(item) == 0L) {
+      if(!bv.booleanValue(item)) {
         return false;
       }
     }

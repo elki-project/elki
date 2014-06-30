@@ -159,7 +159,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
             LOG.debugFinest(debugDumpCandidates(new StringBuilder().append("Before pruning: "), candidates, meta));
           }
           survivors = DBIDUtil.newArray(ids.size());
-          candidates = frequentItemsets(candidates, relation, needed, ids, survivors);
+          candidates = frequentItemsets(candidates, relation, needed, ids, survivors, length);
           ids = survivors; // Continue with reduced set of transactions.
           LOG.statistics(timel.end());
           if(LOG.isStatistics()) {
@@ -231,20 +231,20 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     // We quite aggressively size the map, assuming that almost each combination
     // is present somewhere. If this won't fit into memory, we're likely running
     // OOM somewhere later anyway!
-    TLongIntHashMap map = new TLongIntHashMap((f1 * (f1 - 1)) >> 1);
+    TLongIntHashMap map = new TLongIntHashMap((f1 * (f1 - 1)) >>> 1);
     final long[] scratch = BitsUtil.zero(dim);
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       BitsUtil.setI(scratch, mask);
       relation.get(iditer).andOnto(scratch);
-      boolean lives = false;
+      int lives = 0;
       for(int i = BitsUtil.nextSetBit(scratch, 0); i >= 0; i = BitsUtil.nextSetBit(scratch, i + 1)) {
         for(int j = BitsUtil.nextSetBit(scratch, i + 1); j >= 0; j = BitsUtil.nextSetBit(scratch, j + 1)) {
           long key = (((long) i) << 32) | j;
           map.put(key, 1 + map.get(key));
-          lives = true;
+          ++lives;
         }
       }
-      if(lives) {
+      if(lives > 2) {
         survivors.add(iditer);
       }
     }
@@ -276,10 +276,13 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @return itemsets that cannot be pruned by apriori
    */
   protected List<Itemset> aprioriGenerate(List<? extends Itemset> supported, int length, int dim) {
-    List<Itemset> candidateList = new ArrayList<>();
     if(supported.size() < length) {
-      return candidateList;
+      return Collections.emptyList();
     }
+    long joined = 0L;
+    final int ssize = supported.size();
+    List<Itemset> candidateList = new ArrayList<>();
+
     Itemset ref = supported.get(0);
     if(ref instanceof SparseItemset) {
       // TODO: we currently never switch to DenseItemSet. This may however be
@@ -290,8 +293,6 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       // Scratch item to use for searching.
       SparseItemset scratch = new SparseItemset(new int[length - 1]);
 
-      long joined = 0L;
-      final int ssize = supported.size();
       for(int i = 0; i < ssize; i++) {
         SparseItemset ii = (SparseItemset) supported.get(i);
         prefix: for(int j = i + 1; j < ssize; j++) {
@@ -317,20 +318,11 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
           candidateList.add(new SparseItemset(items));
         }
       }
-      if(LOG.isStatistics()) {
-        // Naive pairwise approach
-        LOG.statistics(new LongStatistic(STAT + length + "-items.pairwise", (ssize * ((long) ssize - 1))));
-        LOG.statistics(new LongStatistic(STAT + length + "-items.joined", joined));
-        LOG.statistics(new LongStatistic(STAT + length + "-items.candidates", candidateList.size()));
-      }
-      return candidateList;
     }
-    if(ref instanceof DenseItemset) {
+    else if(ref instanceof DenseItemset) {
       // Scratch item to use for searching.
       DenseItemset scratch = new DenseItemset(BitsUtil.zero(dim), length - 1);
 
-      long joined = 0L;
-      final int ssize = supported.size();
       for(int i = 0; i < ssize; i++) {
         DenseItemset ii = (DenseItemset) supported.get(i);
         prefix: for(int j = i + 1; j < ssize; j++) {
@@ -361,15 +353,19 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
           candidateList.add(new DenseItemset(scratch.items.clone(), length));
         }
       }
-      if(LOG.isStatistics()) {
-        // Naive pairwise approach
-        LOG.statistics(new LongStatistic(STAT + length + "-items.pairwise", (ssize * ((long) ssize - 1))));
-        LOG.statistics(new LongStatistic(STAT + length + "-items.joined", joined));
-        LOG.statistics(new LongStatistic(STAT + length + "-items.candidates", candidateList.size()));
-      }
-      return candidateList;
     }
-    throw new AbortException("Unexpected itemset type " + ref.getClass());
+    else {
+      throw new AbortException("Unexpected itemset type " + ref.getClass());
+    }
+    if(LOG.isStatistics()) {
+      // Naive pairwise approach
+      LOG.statistics(new LongStatistic(STAT + length + "-items.pairwise", (ssize * ((long) ssize - 1))));
+      LOG.statistics(new LongStatistic(STAT + length + "-items.joined", joined));
+      LOG.statistics(new LongStatistic(STAT + length + "-items.candidates", candidateList.size()));
+    }
+    // Note: candidates should have been generated in strictly ascending order
+    // So we do not need to sort here.
+    return candidateList;
   }
 
   /**
@@ -381,20 +377,36 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @param needed Minimum support needed
    * @param ids Objects to process
    * @param survivors Output: objects that had at least two 1-frequent items.
+   * @param length Itemset length
    * @return Itemsets with sufficient support
    */
-  protected List<? extends Itemset> frequentItemsets(List<? extends Itemset> candidates, Relation<BitVector> relation, int needed, DBIDs ids, ArrayModifiableDBIDs survivors) {
+  protected List<? extends Itemset> frequentItemsets(List<? extends Itemset> candidates, Relation<BitVector> relation, int needed, DBIDs ids, ArrayModifiableDBIDs survivors, int length) {
+    if(candidates.size() < 1) {
+      return Collections.emptyList();
+    }
+    Itemset first = candidates.get(0);
+    // We have an optimized codepath for large and sparse itemsets.
+    // It probably pays off when #cands >> (avlen choose length) but we do not
+    // currently have the average number of items. These thresholds yield
+    // 2700, 6400, 12500, ... and thus will almost always be met until the
+    // number of frequent itemsets is about to break down to 0.
+    if(candidates.size() > length * length * length * 100 && first instanceof SparseItemset) {
+      // Assume that all itemsets are sparse itemsets!
+      @SuppressWarnings("unchecked")
+      List<SparseItemset> sparsecand = (List<SparseItemset>) candidates;
+      return frequentItemsetsSparse(sparsecand, relation, needed, ids, survivors, length);
+    }
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       BitVector bv = relation.get(iditer);
       // TODO: exploit that the candidate set it sorted?
-      boolean lives = false;
+      int lives = 0;
       for(Itemset candidate : candidates) {
         if(candidate.containedIn(bv)) {
           candidate.increaseSupport();
-          lives = true;
+          ++lives;
         }
       }
-      if(lives) {
+      if(lives > length) {
         survivors.add(iditer);
       }
     }
@@ -407,6 +419,132 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       }
     }
     return frequent;
+  }
+
+  /**
+   * Returns the frequent BitSets out of the given BitSets with respect to the
+   * given database. Optimized implementation for SparseItemset.
+   * 
+   * @param candidates the candidates to be evaluated
+   * @param relation the database to evaluate the candidates on
+   * @param needed Minimum support needed
+   * @param ids Objects to process
+   * @param survivors Output: objects that had at least two 1-frequent items.
+   * @param length Itemset length
+   * @return Itemsets with sufficient support
+   */
+  protected List<SparseItemset> frequentItemsetsSparse(List<SparseItemset> candidates, Relation<BitVector> relation, int needed, DBIDs ids, ArrayModifiableDBIDs survivors, int length) {
+    // Current search interval:
+    int begin = 0, end = candidates.size();
+    int[] scratchi = new int[length], iters = new int[length];
+    SparseItemset scratch = new SparseItemset(scratchi);
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+      BitVector bv = relation.get(iditer);
+      if(!initializeSearchItemset(bv, scratchi, iters)) {
+        continue;
+      }
+      int lives = 0;
+      while(begin < end) {
+        begin = binarySearch(candidates, scratch, begin, end);
+        if(begin > 0) {
+          candidates.get(begin).increaseSupport();
+          ++lives;
+        }
+        else {
+          begin = (-begin) - 1;
+        }
+        if(begin >= end || !nextSearchItemset(bv, scratchi, iters)) {
+          break;
+        }
+      }
+      for(Itemset candidate : candidates) {
+        if(candidate.containedIn(bv)) {
+          candidate.increaseSupport();
+          ++lives;
+        }
+      }
+      if(lives > length) {
+        survivors.add(iditer);
+      }
+    }
+    // Retain only those with minimum support:
+    List<SparseItemset> frequent = new ArrayList<>(candidates.size());
+    for(Iterator<SparseItemset> iter = candidates.iterator(); iter.hasNext();) {
+      final SparseItemset candidate = iter.next();
+      if(candidate.getSupport() >= needed) {
+        frequent.add(candidate);
+      }
+    }
+    return frequent;
+  }
+
+  /**
+   * Initialize the scratch itemset.
+   * 
+   * @param bv Bit vector data source
+   * @param scratchi Scratch itemset
+   * @param iters Iterator array
+   * @return {@code true} if the itemset had minimum length
+   */
+  private boolean initializeSearchItemset(BitVector bv, int[] scratchi, int[] iters) {
+    for(int i = 0; i < scratchi.length; i++) {
+      iters[i] = (i == 0) ? bv.iter() : bv.iterAdvance(iters[i - 1]);
+      if(iters[i] < 0) {
+        return false;
+      }
+      scratchi[i] = bv.iterDim(iters[i]);
+    }
+    return true;
+  }
+
+  /**
+   * Advance scratch itemset to the next.
+   * 
+   * @param bv Bit vector data source
+   * @param scratchi Scratch itemset
+   * @param iters Iterator array
+   * @return {@code true} if the itemset had minimum length
+   */
+  private boolean nextSearchItemset(BitVector bv, int[] scratchi, int[] iters) {
+    final int last = scratchi.length - 1;
+    for(int j = last; j >= 0; j--) {
+      int n = bv.iterAdvance(iters[j]);
+      if(n >= 0 && (j == last || n != iters[j + 1])) {
+        iters[j] = n;
+        scratchi[j] = bv.iterDim(n);
+        return true; // Success
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Binary-search for the next-larger element.
+   * 
+   * @param candidates Candidates to search for
+   * @param scratch Scratch space
+   * @param begin Search interval begin
+   * @param end Search interval end
+   * @return Position of first equal-or-larger element
+   */
+  private int binarySearch(List<SparseItemset> candidates, SparseItemset scratch, int begin, int end) {
+    --end;
+    while(begin < end) {
+      final int mid = (begin + end) >>> 1;
+      SparseItemset midVal = candidates.get(mid);
+      int cmp = midVal.compareTo(scratch);
+
+      if(cmp < 0) {
+        begin = mid + 1;
+      }
+      else if(cmp > 0) {
+        end = mid - 1;
+      }
+      else {
+        return mid; // key found
+      }
+    }
+    return -(begin + 1); // key not found, return next
   }
 
   /**
