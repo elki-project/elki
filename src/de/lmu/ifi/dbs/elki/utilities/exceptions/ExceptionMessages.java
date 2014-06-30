@@ -40,12 +40,6 @@ public interface ExceptionMessages {
   public static final String DATABASE_EMPTY = "database empty: must contain elements";
 
   /**
-   * Message when a new label was discovered in a database, that did not exist
-   * before.
-   */
-  public static final String INCONSISTENT_STATE_NEW_LABEL = "inconsistent state of database - found new label";
-
-  /**
    * Message when an empty clustering is encountered.
    */
   public static final String CLUSTERING_EMPTY = "Clustering doesn't contain any cluster.";

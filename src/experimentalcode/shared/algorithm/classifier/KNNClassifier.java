@@ -23,17 +23,24 @@ package experimentalcode.shared.algorithm.classifier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -42,7 +49,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.arthur.AssociationID;
 
 /**
  * KNNClassifier classifies instances based on the class distribution among the
@@ -55,29 +61,11 @@ import experimentalcode.arthur.AssociationID;
  */
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
-public class KNNClassifier<O, L extends ClassLabel> extends DistanceBasedClassifier<O, L, Result> {
+public class KNNClassifier<O, L extends ClassLabel> extends AbstractDistanceBasedAlgorithm<O, Result> implements Classifier<O, L> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(KNNClassifier.class);
-
-  /**
-   * OptionID for
-   * {@link experimentalcode.shared.algorithm.classifier.KNNClassifier#K_PARAM}
-   */
-  public static final OptionID K_ID = new OptionID("knnclassifier.k", "The number of neighbors to take into account for classification.");
-
-  /**
-   * Parameter to specify the number of neighbors to take into account for
-   * classification, must be an integer greater than 0.
-   * <p>
-   * Default value: {@code 1}
-   * </p>
-   * <p>
-   * Key: {@code -knnclassifier.k}
-   * </p>
-   */
-  private final IntParameter K_PARAM = new IntParameter(K_ID, 1).addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
 
   /**
    * Holds the value of @link #K_PARAM}.
@@ -85,62 +73,67 @@ public class KNNClassifier<O, L extends ClassLabel> extends DistanceBasedClassif
   protected int k;
 
   /**
-   * Holds the database where the classification is to base on.
+   * kNN query class.
    */
-  protected Database database;
+  protected KNNQuery<O> knnq;
+
+  /**
+   * Class label representation.
+   */
+  protected Relation<L> labelrep;
 
   /**
    * Provides a KNNClassifier, adding parameter {@link #K_PARAM} to the option
    * handler additionally to parameters of super class.
    */
-  public KNNClassifier(Parameterization config) {
-    super(config);
-    config = config.descend(this);
-    // parameter k
-    if(config.grab(K_PARAM)) {
-      k = K_PARAM.getValue();
-    }
+  public KNNClassifier(DistanceFunction<? super O> distanceFunction, int k) {
+    super(distanceFunction);
+    this.k = k;
   }
 
-  /**
-   * Checks whether the database has the class labels set. Collects the class
-   * labels available n the database. Holds the database to lazily classify new
-   * instances later on.
-   */
   @Override
-  public void buildClassifier(Database database, ArrayList<L> labels) throws IllegalStateException {
-    this.setLabels(labels);
-    this.database = database;
+  public void buildClassifier(Database database, Relation<L> labels) {
+    Relation<O> relation = database.getRelation(getDistanceFunction().getInputTypeRestriction());
+    DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    this.knnq = database.getKNNQuery(distanceQuery, k);
+    this.labelrep = labels;
   }
 
-  /**
-   * Provides a class distribution for the given instance. The distribution is
-   * the relative value for each possible class among the k nearest neighbors of
-   * the given instance in the previously specified database.
-   */
   @Override
-  public double[] classDistribution(O instance) throws IllegalStateException {
-    try {
-      double[] distribution = new double[getLabels().size()];
-      int[] occurences = new int[getLabels().size()];
+  public L classify(O instance) {
+    TObjectIntMap<L> count = new TObjectIntHashMap<>();
+    KNNList query = knnq.getKNNForObject(instance, k);
+    for(DoubleDBIDListIter neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
+      count.adjustOrPutValue(labelrep.get(neighbor), 1, 1);
+    }
 
-      KNNQuery<O> knnq = database.getKNNQuery(getDistanceQuery(), k);
-      KNNList query = knnq.getKNNForObject(instance, k);
-      Relation<ClassLabel> crep = database.getRelation(TypeUtil.CLASSLABEL);
-      for(DoubleDBIDListIter neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
-        int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(crep.get(neighbor))));
-        if(index >= 0) {
-          occurences[index]++;
-        }
+    int bestoccur = Integer.MIN_VALUE;
+    L bestl = null;
+    for(TObjectIntIterator<L> iter = count.iterator(); iter.hasNext();) {
+      iter.advance();
+      if(iter.value() > bestoccur) {
+        bestoccur = iter.value();
+        bestl = iter.key();
       }
-      for(int i = 0; i < distribution.length; i++) {
-        distribution[i] = ((double) occurences[i]) / (double) query.size();
+    }
+    return bestl;
+  }
+
+  public double[] classProbabilities(O instance, ArrayList<L> labels) {
+    int[] occurences = new int[labels.size()];
+
+    KNNList query = knnq.getKNNForObject(instance, k);
+    for(DoubleDBIDListIter neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
+      int index = Collections.binarySearch(labels, labelrep.get(neighbor));
+      if(index >= 0) {
+        occurences[index]++;
       }
-      return distribution;
     }
-    catch(NullPointerException e) {
-      throw new IllegalArgumentException(e);
+    double[] distribution = new double[labels.size()];
+    for(int i = 0; i < distribution.length; i++) {
+      distribution[i] = ((double) occurences[i]) / (double) query.size();
     }
+    return distribution;
   }
 
   @Override
@@ -162,5 +155,49 @@ public class KNNClassifier<O, L extends ClassLabel> extends DistanceBasedClassif
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   *
+   * @param <O> Object type
+   */
+  public static class Parameterizer<O, L extends ClassLabel> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+
+    /**
+     * Parameter to specify the number of neighbors to take into account for
+     * classification, must be an integer greater than 0.
+     * <p>
+     * Default value: {@code 1}
+     * </p>
+     * <p>
+     * Key: {@code -knnclassifier.k}
+     * </p>
+     */
+    public static final OptionID K_ID = new OptionID("knnclassifier.k", "The number of neighbors to take into account for classification.");
+
+    /**
+     * Holds the value of @link #K_PARAM}.
+     */
+    protected int k;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter kP = new IntParameter(K_ID, 1)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
+        k = kP.intValue();
+      }
+    }
+
+    @Override
+    protected KNNClassifier<O, L> makeInstance() {
+      return new KNNClassifier<>(distanceFunction, k);
+    }
   }
 }
