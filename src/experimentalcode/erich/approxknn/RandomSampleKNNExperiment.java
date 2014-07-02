@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
