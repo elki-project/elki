@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -52,6 +53,7 @@ import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -71,9 +73,10 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  * </p>
  * <p>
  * Reference:<br>
- * Y. Pei, O. R. Zaiane, Y. Gao: An Efficient Reference-Based Approach to
- * Outlier Detection in Large Datasets.</br> In: Proc. IEEE Int. Conf. on Data
- * Mining (ICDM'06), Hong Kong, China, 2006.
+ * Y. Pei, O. R. Zaiane, Y. Gao: <br />
+ * An Efficient Reference-Based Approach to Outlier Detection in Large Datasets.
+ * <br />
+ * In: Proc. IEEE Int. Conf. on Data Mining (ICDM'06), Hong Kong, China, 2006.
  * </p>
  * 
  * @author Lisa Reichert
@@ -86,7 +89,11 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  */
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
-@Reference(authors = "Y. Pei, O.R. Zaiane, Y. Gao", title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06), Hong Kong, China, 2006", url = "http://dx.doi.org/10.1109/ICDM.2006.17")
+@Reference(authors = "Y. Pei, O.R. Zaiane, Y. Gao", //
+title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", //
+booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06), Hong Kong, China, 2006", //
+url = "http://dx.doi.org/10.1109/ICDM.2006.17")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection" })
 public class ReferenceBasedOutlierDetection<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

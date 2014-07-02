@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.DBOutlierDetection;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -34,28 +35,28 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the AggarwalYuNaive algorithm.
+ * Tests the DBOutlierDetection algorithm.
  * 
  * @author Lucia Cichella
  */
-public class TestAggarwalYuNaive extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestDBOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testAggarwalYuNaive() {
-    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+  public void testDBOutlierDetection() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(AggarwalYuNaive.Parameterizer.K_ID, 2);
-    params.addParameter(AggarwalYuNaive.Parameterizer.PHI_ID, 8);
+    params.addParameter(DBOutlierDetection.Parameterizer.D_ID, 0.175);
+    params.addParameter(DBOutlierDetection.Parameterizer.P_ID, 0.98);
 
     // setup Algorithm
-    AggarwalYuNaive<DoubleVector> aggarwalYuNaive = ClassGenericsUtil.parameterizeOrAbort(AggarwalYuNaive.class, params);
+    DBOutlierDetection<DoubleVector> dbOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(DBOutlierDetection.class, params);
     testParameterizationOk(params);
 
-    // run AggarwalYuNaive on database
-    OutlierResult result = aggarwalYuNaive.run(db);
+    // run DBOutlierDetection on database
+    OutlierResult result = dbOutlierDetection.run(db);
 
-    testAUC(db, "Noise", result, 0.9007777777777);
-    testSingleScore(result, 945, -2.862640213982);
+    testSingleScore(result, 1025, 0.0);
+    testAUC(db, "Noise", result, 0.97487179);
   }
 }

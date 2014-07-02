@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -25,36 +25,39 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ReferenceBasedOutlierDetection;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.referencepoints.GridBasedReferencePoints;
 
 /**
- * Tests the ABOD algorithm.
- * 
- * Note: we don't implement JUnit4Test, as this test is slow.
+ * Tests the ReferenceBasedOutlierDetection algorithm.
  * 
  * @author Lucia Cichella
  */
-public class TestABOD extends AbstractSimpleAlgorithmTest {
+public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testABOD() {
+  public void testReferenceBasedOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
+    params.addParameter(ReferenceBasedOutlierDetection.K_ID, 11);
+    params.addParameter(GridBasedReferencePoints.GRID_ID, 11);
 
     // setup Algorithm
-    ABOD<DoubleVector> abod = ClassGenericsUtil.parameterizeOrAbort(ABOD.class, params);
+    ReferenceBasedOutlierDetection<DoubleVector> referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
     testParameterizationOk(params);
 
-    // run ABOD on database
-    OutlierResult result = abod.run(db);
+    // run ReferenceBasedOutlierDetection on database
+    OutlierResult result = referenceBasedOutlierDetection.run(db);
 
-    testAUC(db, "Noise", result, 0.94887037037037);
-    testSingleScore(result, 945, 1.88108120738508E-4);
+    testSingleScore(result, 945, 0.9260829537195538);
+    testAUC(db, "Noise", result, 0.9892407407407409);
   }
 }

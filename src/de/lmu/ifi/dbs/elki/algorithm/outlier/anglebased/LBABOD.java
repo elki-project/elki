@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased;
 
 /*
  This file is part of ELKI:
@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
@@ -70,9 +71,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Outlier detection using variance analysis on angles, especially for high
  * dimensional data sets.
  * 
- * H.-P. Kriegel, M. Schubert, and A. Zimek: Angle-Based Outlier Detection in
- * High-dimensional Data. In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge
- * Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.
+ * Reference:
+ * <p>
+ * H.-P. Kriegel, M. Schubert, and A. Zimek:<br />
+ * Angle-Based Outlier Detection in High-dimensional Data.<br />
+ * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
+ * (KDD '08), Las Vegas, NV, 2008.
+ * </p>
  * 
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
@@ -81,7 +86,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("LB-ABOD: Lower Bounded Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
-@Reference(authors = "H.-P. Kriegel, M. Schubert, and A. Zimek", title = "Angle-Based Outlier Detection in High-dimensional Data", booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", url = "http://dx.doi.org/10.1145/1401890.1401946")
+@Reference(authors = "H.-P. Kriegel, M. Schubert, A. Zimek", //
+title = "Angle-Based Outlier Detection in High-dimensional Data", //
+booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
+url = "http://dx.doi.org/10.1145/1401890.1401946")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LBABOD", "lb-abod" })
 public class LBABOD<V extends NumberVector> extends FastABOD<V> {
   /**
    * The logger for this class.

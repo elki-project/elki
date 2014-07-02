@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -59,14 +61,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * <p>
  * V. Hautamäki and I. Kärkkäinen and P Fränti<br />
  * Outlier detection using k-nearest neighbour graph<br />
- * Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004 <br />
+ * Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004
  * </p>
  * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  */
-@Reference(authors = "V. Hautamäki and I. Kärkkäinen and P Fränti", title = "Outlier detection using k-nearest neighbour graph", booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", url = "http://dx.doi.org/10.1109/ICPR.2004.1334558")
+@Reference(authors = "V. Hautamäki and I. Kärkkäinen and P Fränti", //
+title = "Outlier detection using k-nearest neighbour graph", //
+booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", //
+url = "http://dx.doi.org/10.1109/ICPR.2004.1334558")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN" })
 public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.

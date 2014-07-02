@@ -45,7 +45,7 @@ public class TestLoOP extends AbstractSimpleAlgorithmTest implements JUnit4Test 
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LoOP.KCOMP_ID, 15);
+    params.addParameter(LoOP.Parameterizer.KCOMP_ID, 15);
 
     // setup Algorithm
     LoOP<DoubleVector> loop = ClassGenericsUtil.parameterizeOrAbort(LoOP.class, params);

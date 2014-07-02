@@ -75,6 +75,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Distance/density based algorithm similar to LOF to detect outliers, but with
  * statistical methods to achieve better result stability.
  * 
+ * Reference:
+ * <p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek:<br />
+ * LoOP: Local Outlier Probabilities< br />
+ * In Proceedings of the 18th International Conference on Information and
+ * Knowledge Management (CIKM), Hong Kong, China, 2009
+ * </p>
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.has KNNQuery
@@ -83,8 +91,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("LoOP: Local Outlier Probabilities")
 @Description("Variant of the LOF algorithm normalized using statistical values.")
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url = "http://dx.doi.org/10.1145/1645953.1646195")
-@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP", "LoOP", "outlier.LoOP" })
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
+title = "LoOP: Local Outlier Probabilities", //
+booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", //
+url = "http://dx.doi.org/10.1145/1645953.1646195")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP", "LoOP" })
 public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -92,57 +103,27 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
   private static final Logging LOG = Logging.getLogger(LoOP.class);
 
   /**
-   * The distance function to determine the reachability distance between
-   * database objects.
-   */
-  public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = new OptionID("loop.referencedistfunction", "Distance function to determine the density of an object.");
-
-  /**
-   * The distance function to determine the reachability distance between
-   * database objects.
-   */
-  public static final OptionID COMPARISON_DISTANCE_FUNCTION_ID = new OptionID("loop.comparedistfunction", "Distance function to determine the reference set of an object.");
-
-  /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LOOP_SCORE, must be an integer greater than 1.
-   */
-  public static final OptionID KREACH_ID = new OptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
-
-  /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LOOP_SCORE, must be an integer greater than 1.
-   */
-  public static final OptionID KCOMP_ID = new OptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
-
-  /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LOOP_SCORE, must be an integer greater than 1.
-   */
-  public static final OptionID LAMBDA_ID = new OptionID("loop.lambda", "The number of standard deviations to consider for density computation.");
-
-  /**
-   * Holds the value of {@link #KREACH_ID}.
+   * Reachability neighborhood size.
    */
   int kreach;
 
   /**
-   * Holds the value of {@link #KCOMP_ID}.
+   * Comparison neighborhood size.
    */
   int kcomp;
 
   /**
-   * Hold the value of {@link #LAMBDA_ID}.
+   * Lambda parameter.
    */
   double lambda;
 
   /**
-   * Preprocessor Step 1.
+   * Distance function for reachability.
    */
   protected DistanceFunction<? super O> reachabilityDistanceFunction;
 
   /**
-   * Preprocessor Step 2.
+   * Distance function for comparison set.
    */
   protected DistanceFunction<? super O> comparisonDistanceFunction;
 
@@ -187,7 +168,6 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
       if(knnComp == null) {
         LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
         MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, comparisonDistanceFunction, kcomp);
-        database.addIndex(preproc);
         DistanceQuery<O> cdq = database.getDistanceQuery(relation, comparisonDistanceFunction);
         knnComp = preproc.getKNNQuery(cdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
       }
@@ -340,6 +320,36 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
+    /**
+     * The distance function to determine the reachability distance between
+     * database objects.
+     */
+    public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = new OptionID("loop.referencedistfunction", "Distance function to determine the density of an object.");
+
+    /**
+     * The distance function to determine the reachability distance between
+     * database objects.
+     */
+    public static final OptionID COMPARISON_DISTANCE_FUNCTION_ID = new OptionID("loop.comparedistfunction", "Distance function to determine the reference set of an object.");
+
+    /**
+     * Parameter to specify the number of nearest neighbors of an object to be
+     * considered for computing its LOOP_SCORE, must be an integer greater than 1.
+     */
+    public static final OptionID KREACH_ID = new OptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
+
+    /**
+     * Parameter to specify the number of nearest neighbors of an object to be
+     * considered for computing its LOOP_SCORE, must be an integer greater than 1.
+     */
+    public static final OptionID KCOMP_ID = new OptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
+
+    /**
+     * Parameter to specify the number of nearest neighbors of an object to be
+     * considered for computing its LOOP_SCORE, must be an integer greater than 1.
+     */
+    public static final OptionID LAMBDA_ID = new OptionID("loop.lambda", "The number of standard deviations to consider for density computation.");
+
     /**
      * Holds the value of {@link #KREACH_ID}.
      */

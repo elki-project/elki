@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -25,7 +25,9 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -33,30 +35,27 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the LB-ABOD algorithm.
- * 
- * Note: we don't implement JUnit4Test, as this test is slow.
+ * Tests the KNNWeightOutlier algorithm.
  * 
  * @author Lucia Cichella
  */
-public class TestLBABOD extends AbstractSimpleAlgorithmTest {
+public class TestKNNWeightOutlier extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testLBABOD() {
+  public void testKNNWeightOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(FastABOD.Parameterizer.K_ID, 150);
-    params.addParameter(LBABOD.Parameterizer.L_ID, 10);
+    params.addParameter(KNNWeightOutlier.Parameterizer.K_ID, 4);
 
     // setup Algorithm
-    LBABOD<DoubleVector> abod = ClassGenericsUtil.parameterizeOrAbort(LBABOD.class, params);
+    KNNWeightOutlier<DoubleVector> knnWeightOutlier = ClassGenericsUtil.parameterizeOrAbort(KNNWeightOutlier.class, params);
     testParameterizationOk(params);
 
-    // run ABOD on database
-    OutlierResult result = abod.run(db);
+    // run KNNWeightOutlier on database
+    OutlierResult result = knnWeightOutlier.run(db);
 
-    testAUC(db, "Noise", result, 0.928999999999);
-    testSingleScore(result, 945, 1.88108120738508E-4);
+    testSingleScore(result, 945, 2.384117261027324);
+    testAUC(db, "Noise", result, 0.9912777777777778);
   }
 }

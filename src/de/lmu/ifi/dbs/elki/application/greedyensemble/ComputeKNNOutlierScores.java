@@ -32,8 +32,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.xml.bind.DatatypeConverter;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;

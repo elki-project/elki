@@ -124,7 +124,6 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
-      database.addIndex(preproc);
       DistanceQuery<O> rdq = database.getDistanceQuery(relation, getDistanceFunction());
       knnq = preproc.getKNNQuery(rdq, k);
     }

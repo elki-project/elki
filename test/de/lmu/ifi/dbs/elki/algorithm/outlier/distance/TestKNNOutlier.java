@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -34,28 +35,27 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the DBOutlierDetection algorithm.
+ * Tests the KNNOutlier algorithm.
  * 
  * @author Lucia Cichella
  */
-public class TestDBOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestKNNOutlier extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testDBOutlierDetection() {
-    Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
+  public void testKNNOutlier() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(DBOutlierDetection.Parameterizer.D_ID, 0.175);
-    params.addParameter(DBOutlierDetection.Parameterizer.P_ID, 0.98);
+    params.addParameter(KNNOutlier.Parameterizer.K_ID, 1);
 
     // setup Algorithm
-    DBOutlierDetection<DoubleVector> dbOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(DBOutlierDetection.class, params);
+    KNNOutlier<DoubleVector> knnOutlier = ClassGenericsUtil.parameterizeOrAbort(KNNOutlier.class, params);
     testParameterizationOk(params);
 
-    // run DBOutlierDetection on database
-    OutlierResult result = dbOutlierDetection.run(db);
+    // run KNNOutlier on database
+    OutlierResult result = knnOutlier.run(db);
 
-    testSingleScore(result, 1025, 0.0);
-    testAUC(db, "Noise", result, 0.97487179);
+    testSingleScore(result, 945, 0.4793554700168577);
+    testAUC(db, "Noise", result, 0.991462962962963);
   }
 }

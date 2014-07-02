@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
 
 /*
  This file is part of ELKI:
@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.AggarwalYuNaive;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -34,27 +35,28 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the ABOD algorithm.
+ * Tests the AggarwalYuNaive algorithm.
  * 
  * @author Lucia Cichella
  */
-public class TestFastABOD extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestAggarwalYuNaive extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testFastABOD() {
+  public void testAggarwalYuNaive() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(FastABOD.Parameterizer.K_ID, 5);
+    params.addParameter(AggarwalYuNaive.Parameterizer.K_ID, 2);
+    params.addParameter(AggarwalYuNaive.Parameterizer.PHI_ID, 8);
 
     // setup Algorithm
-    FastABOD<DoubleVector> abod = ClassGenericsUtil.parameterizeOrAbort(FastABOD.class, params);
+    AggarwalYuNaive<DoubleVector> aggarwalYuNaive = ClassGenericsUtil.parameterizeOrAbort(AggarwalYuNaive.class, params);
     testParameterizationOk(params);
 
-    // run ABOD on database
-    OutlierResult result = abod.run(db);
+    // run AggarwalYuNaive on database
+    OutlierResult result = aggarwalYuNaive.run(db);
 
-    testAUC(db, "Noise", result, 0.963259259259);
-    testSingleScore(result, 945, 0.68723169783);
+    testAUC(db, "Noise", result, 0.9007777777777);
+    testSingleScore(result, 945, -2.862640213982);
   }
 }

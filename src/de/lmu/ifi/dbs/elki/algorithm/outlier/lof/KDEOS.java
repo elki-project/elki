@@ -176,7 +176,6 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.verbose("Running kNN preprocessor.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(rel, getDistanceFunction(), kmax + 1);
-      database.addIndex(preproc);
       knnq = preproc.getKNNQuery(dq, kmax + 1, DatabaseQuery.HINT_HEAVY_USE);
     }
 

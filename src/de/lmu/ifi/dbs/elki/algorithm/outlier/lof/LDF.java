@@ -87,7 +87,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> the type of objects handled by this Algorithm
  */
-@Reference(authors = "L. J. Latecki, A. Lazarevic, D. Pokrajac", title = "Outlier Detection with Kernel Density Functions", booktitle = "Machine Learning and Data Mining in Pattern Recognition", url = "http://dx.doi.org/10.1007/978-3-540-73499-4_6")
+@Reference(authors = "L. J. Latecki, A. Lazarevic, D. Pokrajac", //
+title = "Outlier Detection with Kernel Density Functions", //
+booktitle = "Machine Learning and Data Mining in Pattern Recognition", //
+url = "http://dx.doi.org/10.1007/978-3-540-73499-4_6")
 public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -150,7 +153,6 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
-      database.addIndex(preproc);
       DistanceQuery<O> rdq = database.getDistanceQuery(relation, getDistanceFunction());
       knnq = preproc.getKNNQuery(rdq, k);
     }

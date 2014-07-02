@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -55,6 +56,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMinHeap;
@@ -93,7 +95,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("Fast Outlier Detection in High Dimensional Spaces")
 @Description("Algorithm to compute outliers using Hilbert space filling curves")
-@Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", url = "http://dx.doi.org/10.1145/375663.375668")
+@Reference(authors = "F. Angiulli, C. Pizzuti", //
+title = "Fast Outlier Detection in High Dimensional Spaces", //
+booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
+url = "http://dx.doi.org/10.1145/375663.375668")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut" })
 public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Scaling function to invert values by computing -1 * Math.log(x)
  * 
  * Useful for example for scaling
- * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD}, but see
+ * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.ABOD}, but see
  * {@link MinusLogStandardDeviationScaling} and {@link MinusLogGammaScaling} for
  * more advanced scalings for this algorithm.
  * 

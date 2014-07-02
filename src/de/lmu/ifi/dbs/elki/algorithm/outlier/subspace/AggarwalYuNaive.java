@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
 
 /*
  This file is part of ELKI:
@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * outliers.
  * 
  * The evolutionary approach is implemented as
- * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary}.
+ * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.AggarwalYuEvolutionary}.
  * 
  * <p>
  * Reference: <br />

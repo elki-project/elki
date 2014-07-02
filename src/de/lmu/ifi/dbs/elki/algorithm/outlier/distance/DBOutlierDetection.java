@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -71,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Reference(authors = "E.M. Knorr, R. T. Ng", //
 title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
 booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection" })
 public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   /**
    * The logger for this class.
