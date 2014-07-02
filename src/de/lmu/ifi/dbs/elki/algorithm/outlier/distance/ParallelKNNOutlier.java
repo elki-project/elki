@@ -1,4 +1,5 @@
-package experimentalcode.erich.parallel.algorithms;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,7 +25,6 @@ package experimentalcode.erich.parallel.algorithms;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -51,16 +51,35 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Parallel implementation of KNN Outlier detection.
  * 
+ * Reference:
+ * <p>
+ * S. Ramaswamy, R. Rastogi, K. Shim:<br />
+ * Efficient Algorithms for Mining Outliers from Large Data Sets.<br />
+ * In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.
+ * </p>
+ * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf KNNProcessor
+ * @apiviz.composedOf KDistanceProcessor
  * 
  * @param <O> Object type
  */
+@Title("KNN outlier: Efficient Algorithms for Mining Outliers from Large Data Sets")
+@Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")
+@Reference(authors = "S. Ramaswamy, R. Rastogi, K. Shim", //
+title = "Efficient Algorithms for Mining Outliers from Large Data Sets", //
+booktitle = "Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000", //
+url = "http://dx.doi.org/10.1145/342009.335437")
 public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
@@ -134,13 +153,13 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
      * K parameter
      */
     int k;
-    
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      
+
       IntParameter kP = new IntParameter(KNNOutlier.Parameterizer.K_ID);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
     }

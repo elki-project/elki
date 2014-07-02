@@ -60,6 +60,8 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.distance.HilOut
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ODIN
+de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ParallelKNNOutlier
+de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ParallelKNNWeightOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ReferenceBasedOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.DWOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.GaussianModel

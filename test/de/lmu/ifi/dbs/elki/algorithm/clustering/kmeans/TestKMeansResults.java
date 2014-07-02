@@ -28,6 +28,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
@@ -61,6 +62,29 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 2);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
+    testParameterizationOk(params);
+
+    // run KMeans on database
+    Clustering<?> result = kmeans.run(db);
+    testFMeasure(db, result, 0.998005);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+  }
+
+  /**
+   * Run KMeans with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testParallelKMeansLloyd() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(KMeans.K_ID, 5);
+    params.addParameter(KMeans.SEED_ID, 2);
+    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(ParallelLloydKMeans.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database

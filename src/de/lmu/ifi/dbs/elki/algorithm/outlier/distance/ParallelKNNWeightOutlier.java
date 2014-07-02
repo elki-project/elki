@@ -1,4 +1,5 @@
-package experimentalcode.erich.parallel.algorithms;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,7 +25,6 @@ package experimentalcode.erich.parallel.algorithms;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -50,17 +50,37 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.erich.parallel.processor.KNNWeightProcessor;
 
 /**
  * Parallel implementation of KNN Weight Outlier detection.
  * 
+ * Reference:
+ * <p>
+ * F. Angiulli, C. Pizzuti:<br />
+ * Fast Outlier Detection in High Dimensional Spaces.<br />
+ * In: Proc. European Conference on Principles of Knowledge Discovery and Data
+ * Mining (PKDD'02), Helsinki, Finland, 2002.
+ * </p>
+ *
  * @author Erich Schubert
+ * 
+ * @apivis.composedOf KNNWeightProcessor
  * 
  * @param <O> Object type
  */
+@Title("KNNWeight outlier detection")
+@Description("Outlier detection based on the sum of distances of an object to its k nearest neighbors.")
+@Reference(authors = "F. Angiulli, C. Pizzuti", //
+title = "Fast Outlier Detection in High Dimensional Spaces", //
+booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002", //
+url = "http://dx.doi.org/10.1007/3-540-45681-3_2")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier", "knnw" })
 public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
@@ -134,13 +154,13 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
      * K parameter
      */
     int k;
-    
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      
+
       IntParameter kP = new IntParameter(KNNWeightOutlier.Parameterizer.K_ID);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.getValue();
       }
     }

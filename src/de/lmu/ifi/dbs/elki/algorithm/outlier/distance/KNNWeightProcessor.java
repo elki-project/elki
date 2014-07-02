@@ -1,4 +1,4 @@
-package experimentalcode.erich.parallel.processor;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 /*
  This file is part of ELKI:
@@ -32,9 +32,9 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 
 /**
- * Compute the kNN weight score.
+ * Compute the kNN weight score, used by {@link ParallelKNNWeightOutlier}.
  * 
- * Needs the k nearest neighbors as input, for example from {@link KNNProcessor}.
+ * Needs the k nearest neighbors as input, for example from {@link KNNProcessor}
  * 
  * @author Erich Schubert
  */
@@ -77,6 +77,8 @@ public class KNNWeightProcessor extends AbstractDoubleProcessor {
    * Instance for precomputing the kNN.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private static class Instance extends AbstractDoubleProcessor.Instance {
     /**
