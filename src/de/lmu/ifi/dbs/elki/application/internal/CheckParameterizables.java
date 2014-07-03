@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @apiviz.landmark
  * @apiviz.uses Parameterizable
+ * @apiviz.uses AbstractParameterizer
  */
 public class CheckParameterizables {
   /**

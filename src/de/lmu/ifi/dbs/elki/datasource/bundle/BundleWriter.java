@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses BundleStreamSource
- * @apiviz.uses WritableByteChannel
+ * @apiviz.uses BundleStreamSource - - «reads»
+ * @apiviz.uses WritableByteChannel - - «writes»
  */
 public class BundleWriter {
   /**

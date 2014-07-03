@@ -75,6 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf LngLatToECEFProjection
+ * 
  * @param <O> Object type
  */
 public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O, O> {

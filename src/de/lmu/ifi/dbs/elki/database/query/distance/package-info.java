@@ -2,6 +2,7 @@
  * <p>Prepared queries for distances.</p>
  * 
  * @apiviz.exclude .*Instance
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.index.distance.*
  */
 /*
 This file is part of ELKI:

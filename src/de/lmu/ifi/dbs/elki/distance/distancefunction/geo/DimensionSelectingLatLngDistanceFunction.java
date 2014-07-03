@@ -56,6 +56,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf EarthModel
  */
 public class DimensionSelectingLatLngDistanceFunction extends AbstractSpatialDistanceFunction {
   /**

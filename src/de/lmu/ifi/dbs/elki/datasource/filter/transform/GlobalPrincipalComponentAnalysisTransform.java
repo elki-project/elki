@@ -55,6 +55,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf PCARunner
+ * @apiviz.composedOf CovarianceMatrix
+ * @apiviz.composedOf EigenPairFilter
+ * 
  * @param <O> Vector type
  */
 @Alias({ "whiten", "whitening", "pca" })

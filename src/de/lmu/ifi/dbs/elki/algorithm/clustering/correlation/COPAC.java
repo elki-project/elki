@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Arthur Zimek
  * 
  * @apiviz.has DimensionModel
+ * @apiviz.composedOf COPACNeighborPredicate
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */

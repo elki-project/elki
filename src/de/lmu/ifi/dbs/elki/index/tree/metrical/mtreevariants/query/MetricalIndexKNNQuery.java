@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
  * @author Erich Schubert
  * 
  * @apiviz.uses AbstractMTree
+ * @apiviz.uses DoubleMTreeDistanceSearchCandidate
  * 
  * @param <O> Object type
  */

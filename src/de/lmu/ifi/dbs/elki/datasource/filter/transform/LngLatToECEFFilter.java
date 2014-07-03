@@ -41,6 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses NumberVector
+ * @apiviz.composedOf EarthModel
+ * 
  * @param <V> Vector type.
  */
 public class LngLatToECEFFilter<V extends NumberVector> extends AbstractStreamConversionFilter<V, V> {

@@ -57,9 +57,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf OPTICSTypeAlgorithm oneway
- * @apiviz.uses ClusterOrderResult oneway
- * @apiviz.has SteepAreaResult
+ * @apiviz.composedOf OPTICSTypeAlgorithm oneway - «runs»
+ * @apiviz.uses ClusterOrderResult oneway - «reads»
+ * @apiviz.has SteepAreaResult oneway - «produces»
  */
 @Alias({ "OPTICSXi", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi" })
 public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {

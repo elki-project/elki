@@ -59,6 +59,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has MAPResult
+ * 
  * @param <O> Object type
  */
 public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlgorithm<O, MeanAveragePrecisionForDistance.MAPResult> {

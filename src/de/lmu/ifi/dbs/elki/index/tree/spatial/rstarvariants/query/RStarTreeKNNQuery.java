@@ -68,8 +68,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @apiviz.uses AbstractRStarTree
  * @apiviz.uses SpatialPrimitiveDistanceFunction
+ * @apiviz.uses DoubleDistanceSearchCandidate
  */
-@Reference(authors = "G. R. Hjaltason, H. Samet", title = "Ranking in spatial databases", booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", url = "http://dx.doi.org/10.1007/3-540-60159-7_6")
+@Reference(authors = "G. R. Hjaltason, H. Samet", //
+title = "Ranking in spatial databases", //
+booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", //
+url = "http://dx.doi.org/10.1007/3-540-60159-7_6")
 public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<O> {
   /**
    * The index to use

@@ -41,7 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses FileChannel
+ * @apiviz.uses MappedByteBuffer - - «reads»
+ * @apiviz.uses FileChannel - - «reads»
  */
 public class BundleReader implements BundleStreamSource {
   /**
@@ -52,7 +53,7 @@ public class BundleReader implements BundleStreamSource {
   /**
    * The stream buffer.
    */
-  MappedByteBuffer buffer;
+  MappedByteBuffer buffer = null;
 
   /**
    * Bundle metadata.
@@ -62,7 +63,7 @@ public class BundleReader implements BundleStreamSource {
   /**
    * Input channel.
    */
-  FileChannel input;
+  FileChannel input = null;
 
   /**
    * Serializers to use.
@@ -77,6 +78,17 @@ public class BundleReader implements BundleStreamSource {
   /**
    * Constructor.
    * 
+   * @param buffer Input buffer
+   */
+  public BundleReader(MappedByteBuffer buffer) {
+    super();
+    this.buffer = buffer;
+    this.input = null;
+  }
+
+  /**
+   * Constructor.
+   * 
    * @param input Input channel
    */
   public BundleReader(FileChannel input) {
@@ -86,7 +98,7 @@ public class BundleReader implements BundleStreamSource {
 
   @Override
   public BundleMeta getMeta() {
-    if (meta == null) {
+    if(meta == null) {
       openBuffer();
       readMeta();
     }
@@ -97,10 +109,13 @@ public class BundleReader implements BundleStreamSource {
    * Map the input file.
    */
   void openBuffer() {
-    try {
-      buffer = input.map(MapMode.READ_ONLY, 0, input.size());
-    } catch (IOException e) {
-      throw new AbortException("Cannot map input bundle.", e);
+    if(buffer == null) {
+      try {
+        buffer = input.map(MapMode.READ_ONLY, 0, input.size());
+      }
+      catch(IOException e) {
+        throw new AbortException("Cannot map input bundle.", e);
+      }
     }
   }
 
@@ -109,7 +124,7 @@ public class BundleReader implements BundleStreamSource {
    */
   void readMeta() {
     final int check = buffer.getInt();
-    if (check != MAGIC) {
+    if(check != MAGIC) {
       throw new AbortException("File does not start with expected magic.");
     }
     final int nummeta = buffer.getInt();
@@ -117,15 +132,17 @@ public class BundleReader implements BundleStreamSource {
     meta = new BundleMeta(nummeta);
     sers = new ArrayList<>(nummeta);
     data = new ArrayList<>(nummeta);
-    for (int i = 0; i < nummeta; i++) {
+    for(int i = 0; i < nummeta; i++) {
       try {
         @SuppressWarnings("unchecked")
         SimpleTypeInformation<? extends Object> type = (SimpleTypeInformation<? extends Object>) TypeInformationSerializer.STATIC.fromByteBuffer(buffer);
         meta.add(type);
         sers.add(type.getSerializer());
-      } catch (UnsupportedOperationException e) {
-        throw new AbortException("Deserialization failed: "+e.getMessage(), e);
-      } catch (IOException e) {
+      }
+      catch(UnsupportedOperationException e) {
+        throw new AbortException("Deserialization failed: " + e.getMessage(), e);
+      }
+      catch(IOException e) {
         throw new AbortException("IO error", e);
       }
     }
@@ -136,12 +153,14 @@ public class BundleReader implements BundleStreamSource {
    */
   void readObject() {
     data.clear();
-    for (ByteBufferSerializer<?> ser : sers) {
+    for(ByteBufferSerializer<?> ser : sers) {
       try {
         data.add(ser.fromByteBuffer(buffer));
-      } catch (UnsupportedOperationException e) {
+      }
+      catch(UnsupportedOperationException e) {
         throw new AbortException("Deserialization failed.", e);
-      } catch (IOException e) {
+      }
+      catch(IOException e) {
         throw new AbortException("IO error", e);
       }
     }
@@ -150,10 +169,10 @@ public class BundleReader implements BundleStreamSource {
   @Override
   public Event nextEvent() {
     // Send initial meta
-    if (meta == null) {
+    if(meta == null) {
       return Event.META_CHANGED;
     }
-    if (buffer.remaining() == 0) {
+    if(buffer.remaining() == 0) {
       ByteArrayUtil.unmapByteBuffer(buffer);
       return Event.END_OF_STREAM;
     }

@@ -67,14 +67,10 @@
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs.EmptyDBIDIterator
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.*Database
  * @apiviz.exclude de.lmu.ifi.dbs.elki.data.Cluster
- * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.filter.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.query.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.distance.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.index.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.result.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.persistent.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.(algorithm|evaluation|parallel|distance|index|result|persistent|utilities).*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.relation.*
  * @apiviz.exclude java.*
  */
 /*

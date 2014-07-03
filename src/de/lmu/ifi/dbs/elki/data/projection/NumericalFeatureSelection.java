@@ -44,6 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses NumberVector
+ * 
  * @param <V> Vector type
  */
 public class NumericalFeatureSelection<V extends NumberVector> implements Projection<V, V> {

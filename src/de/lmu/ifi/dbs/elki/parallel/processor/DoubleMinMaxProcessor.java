@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  * @author Erich Schubert
  *
  * @apiviz.has Instance
- * @apiviz.uses SharedObject
- * @apiviz.uses DoubleMinMax
+ * @apiviz.uses SharedDouble
+ * @apiviz.has DoubleMinMax
  */
 public class DoubleMinMaxProcessor implements Processor {
   /**

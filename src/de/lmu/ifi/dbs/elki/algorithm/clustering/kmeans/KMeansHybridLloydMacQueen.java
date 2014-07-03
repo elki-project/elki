@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.landmark
  * @apiviz.has KMeansModel
  * 
  * @param <V> vector datatype

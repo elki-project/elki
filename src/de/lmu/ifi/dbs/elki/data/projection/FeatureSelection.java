@@ -45,6 +45,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.uses FeatureVector
+ * 
  * @param <V> Vector type
  * @param <F> Feature type
  */

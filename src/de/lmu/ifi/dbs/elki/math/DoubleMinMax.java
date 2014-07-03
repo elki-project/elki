@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * Class to find the minimum and maximum double values in data.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.exclude DoubleMinMaxProcessor
  */
 public class DoubleMinMax extends DoubleDoublePair {
   /**

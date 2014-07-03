@@ -55,6 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf SingularValueDecomposition
+ * 
  * @param <O> Data type
  */
 @Alias({ "mds" })

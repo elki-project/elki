@@ -84,6 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.composedOf DBSCAN
  * @apiviz.composedOf FirstNEigenPairFilter
  * @apiviz.composedOf PCAFilteredRunner
+ * @apiviz.composedOf ERiCNeighborPredicate
  * @apiviz.has CorrelationModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm

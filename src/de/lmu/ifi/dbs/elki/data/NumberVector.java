@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * 
  * @apiviz.landmark
  * @apiviz.has Vector
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.(datasource.filter|data.projection).*
  */
 public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
   @Deprecated

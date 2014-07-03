@@ -80,9 +80,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf ProjectedKNNQuery
- * @apiviz.composedOf ProjectedRangeQuery
- * @apiviz.composedOf ProjectedRKNNQuery
+ * @apiviz.composedOf Projection
+ * @apiviz.has ProjectedKNNQuery
+ * @apiviz.has ProjectedRangeQuery
+ * @apiviz.has ProjectedRKNNQuery
  * 
  * @param <O> Outer object type.
  * @param <I> Inner object type.

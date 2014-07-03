@@ -29,6 +29,8 @@ import java.util.List;
  * Class storing a number of very common constraints.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public final class CommonConstraints {
   /**

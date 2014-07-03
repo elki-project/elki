@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses PCARunner
+ * @apiviz.has PCARunner
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */

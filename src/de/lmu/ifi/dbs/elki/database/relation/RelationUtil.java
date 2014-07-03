@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * 
  * @apiviz.uses Relation oneway
+ * @apiviz.has CollectionFromRelation
+ * @apiviz.has RelationObjectIterator
  */
 public final class RelationUtil {
   /**

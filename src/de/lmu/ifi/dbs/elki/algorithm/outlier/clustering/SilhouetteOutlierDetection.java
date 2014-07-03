@@ -74,6 +74,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has ClusteringAlgorithm
+ * 
  * @param <O> Object type
  */
 @Reference(authors = "P. J. Rousseeuw", //

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
  *
  * @apiviz.has Instance
  * @apiviz.uses KNNQuery
+ * @apiviz.uses SharedObject
  * @apiviz.has KNNList
  */
 public class KNNProcessor<O> implements Processor {

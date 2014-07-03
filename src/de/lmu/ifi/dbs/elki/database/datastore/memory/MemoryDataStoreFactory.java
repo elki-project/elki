@@ -42,10 +42,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses ArrayStore oneway - - «create»
- * @apiviz.uses ArrayRecordStore oneway - - «create»
- * @apiviz.uses MapStore oneway - - «create»
- * @apiviz.uses MapRecordStore oneway - - «create»
+ * @apiviz.has ArrayStore oneway - - «create»
+ * @apiviz.has ArrayRecordStore oneway - - «create»
+ * @apiviz.has MapStore oneway - - «create»
+ * @apiviz.has MapRecordStore oneway - - «create»
  */
 public class MemoryDataStoreFactory implements DataStoreFactory {
   @SuppressWarnings("unchecked")

@@ -57,6 +57,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Arthur Zimek
  * 
+ * @apiviz.composedOf FourCNeighborPredicate
+ * @apiviz.composedOf FourCCorePredicate
+ * 
  * @param <V> type of NumberVector handled by this Algorithm
  */
 @Title("4C: Computing Correlation Connected Clusters")
