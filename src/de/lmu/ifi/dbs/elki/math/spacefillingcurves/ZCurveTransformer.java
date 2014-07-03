@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.math.BigInteger;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -75,17 +74,6 @@ public class ZCurveTransformer {
         maxValues[dim] = Math.max(maxValues[dim], dimValue);
       }
     }
-  }
-
-  /**
-   * Transform a single vector.
-   * 
-   * @param vector Vector to transform
-   * @return Z curve value as bigint
-   */
-  @Deprecated
-  public BigInteger asBigInteger(NumberVector vector) {
-    return new BigInteger(asByteArray(vector));
   }
 
   /**
