@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel;
 
 /*
  This file is part of ELKI:
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -43,7 +44,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
 import de.lmu.ifi.dbs.elki.parallel.processor.DoubleMinMaxProcessor;
-import de.lmu.ifi.dbs.elki.parallel.processor.KDistanceProcessor;
 import de.lmu.ifi.dbs.elki.parallel.processor.KNNProcessor;
 import de.lmu.ifi.dbs.elki.parallel.processor.WriteDoubleDataStoreProcessor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
@@ -51,36 +51,41 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Parallel implementation of KNN Outlier detection.
+ * Parallel implementation of KNN Weight Outlier detection.
  * 
  * Reference:
  * <p>
- * S. Ramaswamy, R. Rastogi, K. Shim:<br />
- * Efficient Algorithms for Mining Outliers from Large Data Sets.<br />
- * In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.
+ * F. Angiulli, C. Pizzuti:<br />
+ * Fast Outlier Detection in High Dimensional Spaces.<br />
+ * In: Proc. European Conference on Principles of Knowledge Discovery and Data
+ * Mining (PKDD'02), Helsinki, Finland, 2002.
+ * </p>
+ *
+ * This parallelized implementation is based on the easy-to-parallelize
+ * generalized pattern discussed in
+ * <p>
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
+ * Local Outlier Detection Reconsidered: a Generalized View on Locality with
+ * Applications to Spatial, Video, and Network Outlier Detection<br />
+ * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.
  * </p>
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf KNNProcessor
- * @apiviz.composedOf KDistanceProcessor
+ * @apiviz.composedOf KNNWeightProcessor
  * 
  * @param <O> Object type
  */
-@Title("KNN outlier: Efficient Algorithms for Mining Outliers from Large Data Sets")
-@Description("Outlier Detection based on the distance of an object to its k nearest neighbor.")
-@Reference(authors = "S. Ramaswamy, R. Rastogi, K. Shim", //
-title = "Efficient Algorithms for Mining Outliers from Large Data Sets", //
-booktitle = "Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000", //
-url = "http://dx.doi.org/10.1145/342009.335437")
-public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
+title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
+booktitle = "Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.", //
+url = "http://dx.doi.org/10.1007/s10618-012-0300-z")
+public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
    */
@@ -92,7 +97,7 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelKNNOutlier(DistanceFunction<? super O> distanceFunction, int k) {
+  public ParallelKNNWeightOutlier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -100,37 +105,47 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(ParallelKNNOutlier.class);
+  private static final Logging LOG = Logging.getLogger(ParallelKNNWeightOutlier.class);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
 
+  /**
+   * Run the parallel kNN weight outlier detector.
+   * 
+   * @param database Database to process
+   * @param relation Relation to analyze
+   * @return Outlier detection result
+   */
   public OutlierResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     DistanceQuery<O> distq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnq = database.getKNNQuery(distq, k + 1);
 
+    // Find kNN
     KNNProcessor<O> knnm = new KNNProcessor<>(k + 1, knnq);
     SharedObject<KNNList> knnv = new SharedObject<>();
-    KDistanceProcessor kdistm = new KDistanceProcessor(k + 1);
-    SharedDouble kdistv = new SharedDouble();
-    WriteDoubleDataStoreProcessor storem = new WriteDoubleDataStoreProcessor(store);
-    DoubleMinMaxProcessor mmm = new DoubleMinMaxProcessor();
-
     knnm.connectKNNOutput(knnv);
+    // Extract outlier score
+    KNNWeightProcessor kdistm = new KNNWeightProcessor(k + 1);
+    SharedDouble kdistv = new SharedDouble();
     kdistm.connectKNNInput(knnv);
     kdistm.connectOutput(kdistv);
+    // Store in output result
+    WriteDoubleDataStoreProcessor storem = new WriteDoubleDataStoreProcessor(store);
     storem.connectInput(kdistv);
+    // And gather statistics for metadata
+    DoubleMinMaxProcessor mmm = new DoubleMinMaxProcessor();
     mmm.connectInput(kdistv);
 
     ParallelExecutor.run(ids, knnm, kdistm, storem, mmm);
 
     DoubleMinMax minmax = mmm.getMinMax();
-    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", "knn-outlier", store, ids);
-    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
+    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN weight Outlier Score", "knnw-outlier", store, ids);
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(meta, scoreres);
   }
 
@@ -158,15 +173,15 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Out
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter kP = new IntParameter(KNNOutlier.Parameterizer.K_ID);
+      IntParameter kP = new IntParameter(KNNWeightOutlier.Parameterizer.K_ID);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
     }
 
     @Override
-    protected ParallelKNNOutlier<O> makeInstance() {
-      return new ParallelKNNOutlier<>(distanceFunction, k);
+    protected ParallelKNNWeightOutlier<O> makeInstance() {
+      return new ParallelKNNWeightOutlier<>(distanceFunction, k);
     }
   }
 }

@@ -66,9 +66,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Reference:
  * <p>
  * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
- * Local outlier detection reconsidered: a generalized view on locality with
- * applications to spatial, video, and network outlier detection<br />
- * In: Data Mining and Knowledge Discovery
+ * Local Outlier Detection Reconsidered: a Generalized View on Locality with
+ * Applications to Spatial, Video, and Network Outlier Detection<br />
+ * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.
  * </p>
  * 
  * @author Erich Schubert
@@ -77,9 +77,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <O> the type of data objects handled by this algorithm
  */
-@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel",//
-title = "Local outlier detection reconsidered: a generalized view on locality with applications to spatial, video, and network outlier detection", //
-booktitle = "Data Mining and Knowledge Discovery", //
+@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
+title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
+booktitle = "Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.", //
 url = "http://dx.doi.org/10.1007/s10618-012-0300-z")
 @Alias({ "SimplifiedLOF", "outlier.SimplifiedLOF", "de.lmu.ifi.dbs.elki.algorithm.outlier.SimplifiedLOF" })
 public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {

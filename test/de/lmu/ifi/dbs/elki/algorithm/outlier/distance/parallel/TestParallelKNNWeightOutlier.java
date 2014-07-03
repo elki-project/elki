@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel;
 
 /*
  This file is part of ELKI:

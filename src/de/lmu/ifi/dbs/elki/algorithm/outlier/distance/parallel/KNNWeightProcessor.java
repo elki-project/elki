@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel;
 
 /*
  This file is part of ELKI:
@@ -95,7 +95,7 @@ public class KNNWeightProcessor extends AbstractDoubleProcessor {
      * Constructor.
      * 
      * @param k K parameter
-     * @param knnq KNN query
+     * @param input kNN list input
      * @param store Datastore to write to
      */
     protected Instance(int k, SharedObject.Instance<? extends KNNList> input, SharedDouble.Instance store) {

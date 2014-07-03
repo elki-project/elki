@@ -3,11 +3,12 @@
  * 
  * This parallelization is based on the generalization of outlier detection published in:
  * 
- * Reference:<p>
+ * Reference:
+ * <p>
  * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
- * Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications
- * to Spatial, Video, and Network Outlier Detection<br />
- * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014. 
+ * Local Outlier Detection Reconsidered: a Generalized View on Locality with
+ * Applications to Spatial, Video, and Network Outlier Detection<br />
+ * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.
  * </p>
  */
 /*

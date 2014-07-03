@@ -54,11 +54,21 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Parallel implementation of Local Outlier Factor using processors.
+ *
+ * This parallelized implementation is based on the easy-to-parallelize
+ * generalized pattern discussed in
+ * <p>
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
+ * Local Outlier Detection Reconsidered: a Generalized View on Locality with
+ * Applications to Spatial, Video, and Network Outlier Detection<br />
+ * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.
+ * </p>
  * 
  * @author Erich Schubert
  * 
@@ -67,6 +77,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <O> Object type
  */
+@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
+title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
+booktitle = "Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.", //
+url = "http://dx.doi.org/10.1007/s10618-012-0300-z")
 public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
@@ -181,7 +195,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierRes
       super.makeOptions(config);
 
       IntParameter kP = new IntParameter(LOF.Parameterizer.K_ID);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.intValue();
       }
     }
