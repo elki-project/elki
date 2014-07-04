@@ -123,7 +123,7 @@ public class NoMissingValuesFilter extends AbstractStreamFilter {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected Object makeInstance() {
+    protected NoMissingValuesFilter makeInstance() {
       return new NoMissingValuesFilter();
     }
   }

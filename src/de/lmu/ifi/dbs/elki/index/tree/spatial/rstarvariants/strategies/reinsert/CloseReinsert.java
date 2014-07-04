@@ -42,7 +42,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "http://dx.doi.org/10.1145/93597.98741")
+@Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", //
+title = "The R*-tree: an efficient and robust access method for points and rectangles", //
+booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", //
+url = "http://dx.doi.org/10.1145/93597.98741")
 public class CloseReinsert extends AbstractPartialReinsert {
   /**
    * Constructor.
@@ -81,7 +84,7 @@ public class CloseReinsert extends AbstractPartialReinsert {
    */
   public static class Parameterizer extends AbstractPartialReinsert.Parameterizer {
     @Override
-    protected Object makeInstance() {
+    protected CloseReinsert makeInstance() {
       return new CloseReinsert(reinsertAmount, distanceFunction);
     }
   }

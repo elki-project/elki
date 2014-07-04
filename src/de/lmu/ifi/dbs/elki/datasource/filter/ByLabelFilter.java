@@ -190,7 +190,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
     }
 
     @Override
-    protected Object makeInstance() {
+    protected ByLabelFilter makeInstance() {
       return new ByLabelFilter(pattern, inverted);
     }
   }

@@ -180,7 +180,7 @@ public class ClassLabelFilter implements ObjectFilter {
     }
 
     @Override
-    protected Object makeInstance() {
+    protected ClassLabelFilter makeInstance() {
       return new ClassLabelFilter(classLabelIndex, classLabelFactory);
     }
   }

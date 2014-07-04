@@ -125,7 +125,7 @@ public class ShuffleObjectsFilter implements ObjectFilter {
     }
 
     @Override
-    protected Object makeInstance() {
+    protected ShuffleObjectsFilter makeInstance() {
       return new ShuffleObjectsFilter(rnd);
     }
   }

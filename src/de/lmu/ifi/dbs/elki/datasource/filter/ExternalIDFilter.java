@@ -143,7 +143,7 @@ public class ExternalIDFilter implements ObjectFilter {
     }
 
     @Override
-    protected Object makeInstance() {
+    protected ExternalIDFilter makeInstance() {
       return new ExternalIDFilter(externalIdIndex);
     }
   }

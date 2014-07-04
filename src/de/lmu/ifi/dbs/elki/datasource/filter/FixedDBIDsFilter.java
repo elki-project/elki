@@ -120,7 +120,7 @@ public class FixedDBIDsFilter extends AbstractStreamFilter {
     }
 
     @Override
-    protected Object makeInstance() {
+    protected FixedDBIDsFilter makeInstance() {
       return new FixedDBIDsFilter(startid);
     }
   }
