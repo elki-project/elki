@@ -29,7 +29,6 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -42,7 +41,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 
 /**
  * Algorithm to materialize all the distances in a data set.
@@ -57,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 // TODO: use DBIDPair -> D map?
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
-public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<CTriple<DBID, DBID, Double>>> {
+public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<MaterializeDistances.DistanceEntry>> {
   /**
    * The logger for this class.
    */
