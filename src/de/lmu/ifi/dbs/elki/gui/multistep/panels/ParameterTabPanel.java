@@ -43,10 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Abstract panel, showing particular options.
@@ -219,8 +218,8 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       parameterTable.setEnabled(false);
 
       parameterTable.clear();
-      for (Pair<Object, Parameter<?>> pair : track.getAllParameters()) {
-        parameterTable.addParameter(pair.first, pair.getSecond(), track);
+      for (TrackedParameter pair : track.getAllParameters()) {
+        parameterTable.addParameter(pair.getOwner(), pair.getParameter(), track);
       }
       // parameters.updateFromTrackParameters(track);
 

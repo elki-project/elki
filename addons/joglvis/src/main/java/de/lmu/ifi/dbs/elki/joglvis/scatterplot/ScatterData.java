@@ -41,10 +41,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to manage the vector data in the GPU.
@@ -144,9 +142,9 @@ public class ScatterData {
         final int d = ((VectorFieldTypeInformation<?>) type).getDimensionality();
         dims[r] = d;
         LinearScale[] rscales = new LinearScale[d];
-        Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(vrel);
+        double[][] minmax = RelationUtil.computeMinMax(vrel);
         for(int i = 0; i < d; i++) {
-          rscales[i] = new LinearScale(minmax.first.doubleValue(i), minmax.second.doubleValue(i));
+          rscales[i] = new LinearScale(minmax[0][i], minmax[1][i]);
         }
         scales[r] = rscales;
         vrels.add(vrel);

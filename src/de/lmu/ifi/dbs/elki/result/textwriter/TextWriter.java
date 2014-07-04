@@ -68,9 +68,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -367,34 +367,34 @@ public class TextWriter {
     if(rs != null) {
       for(SettingsResult settings : rs) {
         Object last = null;
-        for(Pair<Object, Parameter<?>> setting : settings.getSettings()) {
-          if(setting.first != last && setting.first != null) {
+        for(TrackedParameter setting : settings.getSettings()) {
+          if(setting.getOwner() != last && setting.getOwner() != null) {
             if(last != null) {
               out.commentPrintLn("");
             }
             String name;
             try {
-              if(setting.first instanceof Class) {
-                name = ((Class<?>) setting.first).getName();
+              if(setting.getOwner() instanceof Class) {
+                name = ((Class<?>) setting.getOwner()).getName();
               }
               else {
-                name = setting.first.getClass().getName();
+                name = setting.getOwner().getClass().getName();
               }
-              if(ClassParameter.class.isInstance(setting.first)) {
-                name = ((ClassParameter<?>) setting.first).getValue().getName();
+              if(ClassParameter.class.isInstance(setting.getOwner())) {
+                name = ((ClassParameter<?>) setting.getOwner()).getValue().getName();
               }
             }
             catch(NullPointerException e) {
               name = "[null]";
             }
             out.commentPrintLn(name);
-            last = setting.first;
+            last = setting.getOwner();
           }
-          String name = setting.second.getOptionID().getName();
+          String name = setting.getParameter().getOptionID().getName();
           String value = "[unset]";
           try {
-            if(setting.second.isDefined()) {
-              value = setting.second.getValueAsString();
+            if(setting.getParameter().isDefined()) {
+              value = setting.getParameter().getValueAsString();
             }
           }
           catch(NullPointerException e) {

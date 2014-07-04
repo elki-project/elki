@@ -33,10 +33,9 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
@@ -58,7 +57,7 @@ public class KDDTask implements Parameterizable {
   /**
    * The settings used, for settings reporting.
    */
-  private Collection<Pair<Object, Parameter<?>>> settings;
+  private Collection<TrackedParameter> settings;
 
   /**
    * The data input step
@@ -94,7 +93,7 @@ public class KDDTask implements Parameterizable {
    * @param outputStep
    * @param settings
    */
-  public KDDTask(InputStep inputStep, AlgorithmStep algorithmStep, EvaluationStep evaluationStep, OutputStep outputStep, Collection<Pair<Object, Parameter<?>>> settings) {
+  public KDDTask(InputStep inputStep, AlgorithmStep algorithmStep, EvaluationStep evaluationStep, OutputStep outputStep, Collection<TrackedParameter> settings) {
     super();
     this.inputStep = inputStep;
     this.algorithmStep = algorithmStep;
@@ -147,7 +146,7 @@ public class KDDTask implements Parameterizable {
 
     EvaluationStep evaluationStep = null;
 
-    Collection<Pair<Object, Parameter<?>>> settings = null;
+    Collection<TrackedParameter> settings = null;
 
     OutputStep outputStep = null;
 

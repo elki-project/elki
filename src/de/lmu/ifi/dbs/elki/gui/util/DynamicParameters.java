@@ -28,12 +28,12 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Wrapper around a set of parameters for ELKI, that may not yet be complete or
@@ -141,8 +141,8 @@ public class DynamicParameters {
    */
   public synchronized void updateFromTrackParameters(TrackParameters track) {
     parameters.clear();
-    for (Pair<Object, Parameter<?>> p : track.getAllParameters()) {
-      Parameter<?> option = p.getSecond();
+    for (TrackedParameter p : track.getAllParameters()) {
+      Parameter<?> option = p.getParameter();
       String value = null;
       if (option.isDefined()) {
         if (option.tookDefaultValue()) {

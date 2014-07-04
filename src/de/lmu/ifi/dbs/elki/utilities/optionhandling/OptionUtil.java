@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Utility functions related to Option handling.
@@ -123,11 +123,11 @@ public final class OptionUtil {
    * @param indent Indentation string
    * @param options List of options
    */
-  public static void formatForConsole(StringBuilder buf, int width, String indent, Collection<Pair<Object, Parameter<?>>> options) {
-    for(Pair<Object, Parameter<?>> pair : options) {
-      String currentOption = pair.getSecond().getName();
-      String syntax = pair.getSecond().getSyntax();
-      String longDescription = pair.getSecond().getFullDescription();
+  public static void formatForConsole(StringBuilder buf, int width, String indent, Collection<TrackedParameter> options) {
+    for(TrackedParameter pair : options) {
+      String currentOption = pair.getParameter().getName();
+      String syntax = pair.getParameter().getSyntax();
+      String longDescription = pair.getParameter().getFullDescription();
 
       buf.append(SerializedParameterization.OPTION_PREFIX);
       buf.append(currentOption);
@@ -196,7 +196,7 @@ public final class OptionUtil {
       TrackParameters track = new TrackParameters(config);
       @SuppressWarnings("unused")
       Object p = ClassGenericsUtil.tryInstantiate(Object.class, pcls, track);
-      Collection<Pair<Object, Parameter<?>>> options = track.getAllParameters();
+      Collection<TrackedParameter> options = track.getAllParameters();
       if(options.size() > 0) {
         OptionUtil.formatForConsole(buf, width, indent, options);
       }

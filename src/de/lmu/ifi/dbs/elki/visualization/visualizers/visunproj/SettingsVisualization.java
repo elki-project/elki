@@ -32,9 +32,8 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -74,7 +73,7 @@ public class SettingsVisualization extends AbstractVisFactory {
     VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
 
-    Collection<Pair<Object, Parameter<?>>> settings = sr.getSettings();
+    Collection<TrackedParameter> settings = sr.getSettings();
 
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
@@ -82,17 +81,17 @@ public class SettingsVisualization extends AbstractVisFactory {
 
     int i = 0;
     Object last = null;
-    for(Pair<Object, Parameter<?>> setting : settings) {
-      if(setting.first != last && setting.first != null) {
+    for(TrackedParameter setting : settings) {
+      if(setting.getOwner() != last && setting.getOwner() != null) {
         String name;
         try {
-          if(setting.first instanceof Class) {
-            name = ((Class<?>) setting.first).getName();
+          if(setting.getOwner() instanceof Class) {
+            name = ((Class<?>) setting.getOwner()).getName();
           } else {
-            name = setting.first.getClass().getName();
+            name = setting.getOwner().getClass().getName();
           }
-          if(ClassParameter.class.isInstance(setting.first)) {
-            name = ((ClassParameter<?>) setting.first).getValue().getName();
+          if(ClassParameter.class.isInstance(setting.getOwner())) {
+            name = ((ClassParameter<?>) setting.getOwner()).getValue().getName();
           }
         }
         catch(NullPointerException e) {
@@ -102,14 +101,14 @@ public class SettingsVisualization extends AbstractVisFactory {
         object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
         layer.appendChild(object);
         i++;
-        last = setting.first;
+        last = setting.getOwner();
       }
       // get name and value
-      String name = setting.second.getOptionID().getName();
+      String name = setting.getParameter().getOptionID().getName();
       String value = "[unset]";
       try {
-        if(setting.second.isDefined()) {
-          value = setting.second.getValueAsString();
+        if(setting.getParameter().isDefined()) {
+          value = setting.getParameter().getValueAsString();
         }
       }
       catch(NullPointerException e) {

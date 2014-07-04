@@ -34,8 +34,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Utility functions for handling database relation.
@@ -106,10 +104,9 @@ public final class RelationUtil {
    * @param relation the database storing the objects
    * @return Minimum and Maximum vector for the hyperrectangle
    */
-  public static Pair<Vector, Vector> computeMinMax(Relation<? extends NumberVector> relation) {
+  public static double[][] computeMinMax(Relation<? extends NumberVector> relation) {
     int dim = RelationUtil.dimensionality(relation);
-    double[] mins = new double[dim];
-    double[] maxs = new double[dim];
+    double[] mins = new double[dim], maxs = new double[dim];
     for(int i = 0; i < dim; i++) {
       mins[i] = Double.MAX_VALUE;
       maxs[i] = -Double.MAX_VALUE;
@@ -118,11 +115,11 @@ public final class RelationUtil {
       final NumberVector o = relation.get(iditer);
       for(int d = 0; d < dim; d++) {
         final double v = o.doubleValue(d);
-        mins[d] = Math.min(mins[d], v);
-        maxs[d] = Math.max(maxs[d], v);
+        mins[d] = (v < mins[d]) ? v : mins[d];
+        maxs[d] = (v > maxs[d]) ? v : maxs[d];
       }
     }
-    return new Pair<>(new Vector(mins), new Vector(maxs));
+    return new double[][] { mins, maxs };
   }
 
   /**

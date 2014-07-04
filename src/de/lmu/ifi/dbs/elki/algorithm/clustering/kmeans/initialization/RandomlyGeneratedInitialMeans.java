@@ -32,9 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Initialize k-means by generating random vectors (within the data sets value
@@ -55,14 +53,18 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
   @Override
   public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     final int dim = RelationUtil.dimensionality(relation);
-    Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(relation);
+    double[][] minmax = RelationUtil.computeMinMax(relation);
+    double[] min = minmax[0], scale = minmax[1];
+    for(int d = 0; d < dim; d++) {
+      scale[d] = scale[d] - min[d];
+    }
     List<V> means = new ArrayList<>(k);
     final Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < k; i++) {
       double[] r = MathUtil.randomDoubleArray(dim, random);
       // Rescale
       for(int d = 0; d < dim; d++) {
-        r[d] = minmax.first.doubleValue(d) + (minmax.second.doubleValue(d) - minmax.first.doubleValue(d)) * r[d];
+        r[d] = min[d] + scale[d] * r[d];
       }
       means.add(factory.newNumberVector(r));
     }

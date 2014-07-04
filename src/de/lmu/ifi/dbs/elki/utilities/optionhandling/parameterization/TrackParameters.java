@@ -32,11 +32,9 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Utility wrapper to track parameters for a configuration session.
@@ -54,7 +52,7 @@ public class TrackParameters implements Parameterization {
   /**
    * Tracking storage
    */
-  List<Pair<Object, Parameter<?>>> options = new ArrayList<>();
+  List<TrackedParameter> options = new ArrayList<>();
 
   /**
    * Tree information: parent links
@@ -70,7 +68,7 @@ public class TrackParameters implements Parameterization {
   /**
    * Current parent for nested parameterization
    */
-  Object cur = null;
+  Object owner = null;
 
   /**
    * Constructor.
@@ -86,15 +84,15 @@ public class TrackParameters implements Parameterization {
    * Internal constructor, for nested tracking.
    * 
    * @param inner Inner parameterization
-   * @param option Option
+   * @param owner Object owning the current parameters
    * @param options List of options
    * @param parents Parent map
    * @param children Child map
    */
-  private TrackParameters(Parameterization inner, Object option, List<Pair<Object, Parameter<?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
+  private TrackParameters(Parameterization inner, Object owner, List<TrackedParameter> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
     super();
-    this.inner = inner.descend(option);
-    this.cur = option;
+    this.inner = inner.descend(owner);
+    this.owner = owner;
     this.options = options;
     this.parents = parents;
     this.children = children;
@@ -113,7 +111,7 @@ public class TrackParameters implements Parameterization {
   @Override
   public boolean grab(Parameter<?> opt) {
     registerChild(opt);
-    options.add(new Pair<Object, Parameter<?>>(cur, opt));
+    options.add(new TrackedParameter(owner, opt));
     return inner.grab(opt);
   }
 
@@ -130,7 +128,7 @@ public class TrackParameters implements Parameterization {
   @Override
   public boolean setValueForOption(Parameter<?> opt) throws ParameterException {
     registerChild(opt);
-    options.add(new Pair<Object, Parameter<?>>(cur, opt));
+    options.add(new TrackedParameter(owner, opt));
     return inner.setValueForOption(opt);
   }
 
@@ -139,23 +137,8 @@ public class TrackParameters implements Parameterization {
    * 
    * @return Parameters seen
    */
-  public Collection<Pair<Object, Parameter<?>>> getAllParameters() {
+  public Collection<TrackedParameter> getAllParameters() {
     return options;
-  }
-
-  /**
-   * Get the tracked parameters that were actually set.
-   * 
-   * @return Parameters given
-   */
-  public Collection<Pair<OptionID, Object>> getGivenParameters() {
-    ArrayList<Pair<OptionID, Object>> ret = new ArrayList<>();
-    for(Pair<Object, Parameter<?>> pair : options) {
-      if(pair.second.isDefined() && pair.second.getGivenValue() != null) {
-        ret.add(new Pair<>(pair.second.getOptionID(), pair.second.getGivenValue()));
-      }
-    }
-    return ret;
   }
 
   @Override
@@ -164,8 +147,9 @@ public class TrackParameters implements Parameterization {
   }
 
   /**
-   * {@inheritDoc} Track parameters using a shared options list with parent
-   * tracker.
+   * {@inheritDoc}
+   * 
+   * Track parameters using a shared options list with parent tracker.
    */
   @Override
   public Parameterization descend(Object option) {
@@ -174,14 +158,14 @@ public class TrackParameters implements Parameterization {
   }
 
   private void registerChild(Object opt) {
-    if(opt == cur) {
+    if(opt == owner) {
       LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
     }
-    parents.put(opt, cur);
-    List<Object> c = children.get(cur);
+    parents.put(opt, owner);
+    List<Object> c = children.get(owner);
     if(c == null) {
       c = new ArrayList<>();
-      children.put(cur, c);
+      children.put(owner, c);
     }
     if(!c.contains(opt)) {
       c.add(opt);
@@ -204,7 +188,7 @@ public class TrackParameters implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(r, c, this);
     }
     catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
       return null;
     }
   }
@@ -215,7 +199,7 @@ public class TrackParameters implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(c, c, this);
     }
     catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
       return null;
     }
   }

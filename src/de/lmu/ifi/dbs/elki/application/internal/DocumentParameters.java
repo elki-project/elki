@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -244,7 +245,7 @@ public class DocumentParameters {
   }
 
   private static void buildParameterIndex(Map<Class<?>, List<Parameter<?>>> byclass, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
-    final ArrayList<Pair<Object, Parameter<?>>> options = new ArrayList<>();
+    final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       // Doesn't have a proper name?
@@ -294,9 +295,10 @@ public class DocumentParameters {
               throw new RuntimeException(e);
             }
           }
-          for(Pair<Object, Parameter<?>> pair : track.getAllParameters()) {
-            if(pair.first == null) {
-              pair.first = cls;
+          for(TrackedParameter pair : track.getAllParameters()) {
+            if(pair.getOwner() == null) {
+              LOG.warning("No owner for parameter " + pair.getParameter());
+              continue;
             }
             options.add(pair);
           }
@@ -341,19 +343,19 @@ public class DocumentParameters {
       }
     }
     LOG.debug("Documenting " + options.size() + " parameter instances.");
-    for(Pair<Object, Parameter<?>> pp : options) {
-      if(pp.first == null || pp.second == null) {
-        LOG.debugFiner("Null: " + pp.first + " " + pp.second);
+    for(TrackedParameter pp : options) {
+      if(pp.getOwner() == null || pp.getParameter() == null) {
+        LOG.debugFiner("Null: " + pp.getOwner() + " " + pp.getParameter());
         continue;
       }
       Class<?> c;
-      if(pp.first instanceof Class) {
-        c = (Class<?>) pp.first;
+      if(pp.getOwner() instanceof Class) {
+        c = (Class<?>) pp.getOwner();
       }
       else {
-        c = pp.first.getClass();
+        c = pp.getOwner().getClass();
       }
-      Parameter<?> o = pp.second;
+      Parameter<?> o = pp.getParameter();
 
       // just collect unique occurrences
       {

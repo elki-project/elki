@@ -30,14 +30,12 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Grid-based strategy to pick reference points.
@@ -91,7 +89,7 @@ public class GridBasedReferencePoints<V extends NumberVector> implements Referen
   @Override
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = RelationUtil.relationUglyVectorCast(db);
-    Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(database);
+    double[][] minmax = RelationUtil.computeMinMax(database);
     NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
 
     int dim = RelationUtil.dimensionality(db);
@@ -99,7 +97,7 @@ public class GridBasedReferencePoints<V extends NumberVector> implements Referen
     // Compute mean from minmax.
     double[] mean = new double[dim];
     for(int d = 0; d < dim; d++) {
-      mean[d] = (minmax.first.doubleValue(d) + minmax.second.doubleValue(d)) * .5;
+      mean[d] = (minmax[0][d] + minmax[1][d]) * .5;
     }
 
     int gridpoints = Math.max(1, MathUtil.ipowi(gridres + 1, dim));
@@ -108,7 +106,7 @@ public class GridBasedReferencePoints<V extends NumberVector> implements Referen
     if(gridres > 0) {
       double halfgrid = gridres / 2.0;
       for(int d = 0; d < dim; d++) {
-        delta[d] = (minmax.second.doubleValue(d) - minmax.first.doubleValue(d)) / gridres;
+        delta[d] = (minmax[1][d] - minmax[0][d]) / gridres;
       }
 
       double[] vec = new double[dim];

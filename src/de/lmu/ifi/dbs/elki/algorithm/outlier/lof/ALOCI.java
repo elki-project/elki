@@ -63,7 +63,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Fast Outlier Detection Using the "approximate Local Correlation Integral".
@@ -145,13 +144,11 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     // Compute extend of dataset.
     double[] min, max;
     {
-      Pair<Vector, Vector> hbbs = RelationUtil.computeMinMax(relation);
+      double[][] hbbs = RelationUtil.computeMinMax(relation);
+      min = hbbs[0];
+      max = hbbs[1];
       double maxd = 0;
-      min = new double[dim];
-      max = new double[dim];
       for(int i = 0; i < dim; i++) {
-        min[i] = hbbs.first.doubleValue(i);
-        max[i] = hbbs.second.doubleValue(i);
         maxd = Math.max(maxd, max[i] - min[i]);
       }
       // Enlarge bounding box to have equal lengths.

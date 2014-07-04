@@ -40,15 +40,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * AbstractApplication sets the values for flags verbose and help.
@@ -177,7 +176,7 @@ public abstract class AbstractApplication implements Parameterizable {
    * @param options Options to show in usage.
    * @return a usage message explaining all known options
    */
-  public static String usage(Collection<Pair<Object, Parameter<?>>> options) {
+  public static String usage(Collection<TrackedParameter> options) {
     StringBuilder usage = new StringBuilder();
     usage.append(INFORMATION);
 

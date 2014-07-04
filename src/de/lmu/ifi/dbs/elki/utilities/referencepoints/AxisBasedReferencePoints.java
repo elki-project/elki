@@ -29,13 +29,11 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Strategy to pick reference points by placing them on the axis ends.
@@ -75,17 +73,16 @@ public class AxisBasedReferencePoints<V extends NumberVector> implements Referen
   @Override
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = RelationUtil.relationUglyVectorCast(db);
-    Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(database);
+    double[][] minmax = RelationUtil.computeMinMax(database);
     NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
 
     int dim = RelationUtil.dimensionality(db);
 
     // Compute mean and extend from minmax.
-    double[] mean = new double[dim];
-    double[] delta = new double[dim];
+    double[] mean = minmax[0], delta = minmax[1];
     for(int d = 0; d < dim; d++) {
-      mean[d] = (minmax.first.doubleValue(d) + minmax.second.doubleValue(d)) * .5;
-      delta[d] = spacescale * (minmax.second.doubleValue(d) - mean[d]);
+      delta[d] -= mean[d];
+      mean[d] -= delta[d] * .5;
     }
 
     ArrayList<V> result = new ArrayList<>(2 + dim);

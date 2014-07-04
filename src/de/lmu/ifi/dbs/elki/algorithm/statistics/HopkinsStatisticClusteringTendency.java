@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * The Hopkins Statistic of Clustering Tendency measures the probability that a
@@ -231,8 +230,8 @@ public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanc
     // if no parameter for min max compute min max values for each dimension
     // from dataset
     if(minima == null || maxima == null || minima.length == 0 || maxima.length == 0) {
-      Pair<Vector, Vector> minmax = RelationUtil.computeMinMax(relation);
-      final double[] dmin = minmax.first.getArrayRef(), dmax = minmax.second.getArrayRef();
+      double[][] minmax = RelationUtil.computeMinMax(relation);
+      final double[] dmin = minmax[0], dmax = minmax[1];
       for(int d = 0; d < dim; d++) {
         min[d] = dmin[d];
         extend[d] = dmax[d] - dmin[d];

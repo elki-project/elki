@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFun
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -70,7 +69,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Fast Outlier Detection in High Dimensional Spaces
@@ -186,9 +184,9 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
     double[] min;
     double diameter = 0; // Actually "length of edge"
     {
-      Pair<Vector, Vector> hbbs = RelationUtil.computeMinMax(relation);
-      min = hbbs.first.getArrayRef();
-      double[] max = hbbs.second.getArrayRef();
+      double[][] hbbs = RelationUtil.computeMinMax(relation);
+      min = hbbs[0];
+      double[] max = hbbs[1];
       for(int i = 0; i < d; i++) {
         diameter = Math.max(diameter, max[i] - min[i]);
       }

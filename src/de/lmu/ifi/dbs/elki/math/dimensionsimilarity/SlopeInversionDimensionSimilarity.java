@@ -29,10 +29,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Arrange dimensions based on the entropy of the slope spectrum. In contrast to
@@ -78,14 +76,13 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
 
     // FIXME: Get/keep these statistics in the relation, or compute for the
     // sample only.
-    double[] off = new double[dim], scale = new double[dim];
+    double[] off, scale;
     {
-      Pair<Vector, Vector> mm = RelationUtil.computeMinMax(relation);
-      Vector min = mm.first, max = mm.second;
+      double[][] mm = RelationUtil.computeMinMax(relation);
+      off = mm[0]; scale = mm[1];
       for (int d = 0; d < dim; d++) {
-        off[d] = min.doubleValue(matrix.dim(d));
-        final double m = max.doubleValue(matrix.dim(d));
-        scale[d] = (m > off[d]) ? 1. / (m - off[d]) : 1;
+        scale[d] -= off[d];
+        scale[d] = (scale[d] > 0.) ? 1. / scale[d] : 1.;
       }
     }
 

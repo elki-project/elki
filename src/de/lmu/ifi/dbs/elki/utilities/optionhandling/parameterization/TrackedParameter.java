@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.result;
+package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 
 /*
  This file is part of ELKI:
@@ -22,39 +22,50 @@ package de.lmu.ifi.dbs.elki.result;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import java.util.Collection;
-
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
- * Result that keeps track of settings that were used in generating this
- * particular result.
+ * Class containing an object, and the associated value.
  * 
  * @author Erich Schubert
  */
-public class SettingsResult extends BasicResult {
+public class TrackedParameter {
   /**
-   * Settings storage.
+   * Option ID
    */
-  Collection<TrackedParameter> settings;
+  private Object owner;
+
+  /**
+   * Parameter value
+   */
+  private Parameter<?> parameter;
 
   /**
    * Constructor.
-   * 
-   * @param settings Settings to store
+   *
+   * @param owner Object owning the parameter value
+   * @param parameter Parameter
    */
-  public SettingsResult(Collection<TrackedParameter> settings) {
-    super("Settings", "settings");
-    this.settings = settings;
+  public TrackedParameter(Object owner, Parameter<?> parameter) {
+    this.owner = owner;
+    this.parameter = parameter;
   }
 
   /**
-   * Get the settings
+   * Get the owner object.
    * 
-   * @return the settings
+   * @return Parameter owner
    */
-  public Collection<TrackedParameter> getSettings() {
-    return settings;
+  public Object getOwner() {
+    return owner;
+  }
+
+  /**
+   * Get the parameter observed.
+   * 
+   * @return Parameter
+   */
+  public Parameter<?> getParameter() {
+    return parameter;
   }
 }

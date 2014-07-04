@@ -50,12 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -204,7 +203,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * @return generated title
    */
   public static String getTitle(Database db, Result result) {
-    List<Pair<Object, Parameter<?>>> settings = new ArrayList<>();
+    List<TrackedParameter> settings = new ArrayList<>();
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
@@ -212,15 +211,15 @@ public class VisualizerParameterizer implements Parameterizable {
     String distance = null;
     String dataset = null;
 
-    for(Pair<Object, Parameter<?>> setting : settings) {
-      if(setting.second.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
-        algorithm = setting.second.getValue().toString();
+    for(TrackedParameter setting : settings) {
+      if(setting.getParameter().equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
+        algorithm = setting.getParameter().getValue().toString();
       }
-      if(setting.second.equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
-        distance = setting.second.getValue().toString();
+      if(setting.getParameter().equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
+        distance = setting.getParameter().getValue().toString();
       }
-      if(setting.second.equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID)) {
-        dataset = setting.second.getValue().toString();
+      if(setting.getParameter().equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID)) {
+        dataset = setting.getParameter().getValue().toString();
       }
     }
     StringBuilder buf = new StringBuilder();
