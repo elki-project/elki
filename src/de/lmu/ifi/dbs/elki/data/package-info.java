@@ -6,6 +6,7 @@
  * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.(parser|filter).*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.math.linearalgebra.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.data.model.ModelUtil
  * @apiviz.exclude java.io.*
  * @apiviz.exclude java.util.*
  * @apiviz.exclude java.lang.*

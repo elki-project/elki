@@ -31,6 +31,7 @@ import java.util.List;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.composedOf ParameterConstraint
  */
 public final class CommonConstraints {
   /**

@@ -2,6 +2,7 @@
  * <p>Data filtering, in particular for normalization and projection.</p> 
  *
  * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.filter\.(normalization|transform)\.*
  */
 /*
 This file is part of ELKI:

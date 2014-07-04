@@ -94,7 +94,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * 
  * @apiviz.has CASHInterval
- * @apiviz.uses ParameterizationFunction
+ * @apiviz.has ParameterizationFunction
  * @apiviz.has LinearEquationModel
  * 
  * @param <V> Vector type

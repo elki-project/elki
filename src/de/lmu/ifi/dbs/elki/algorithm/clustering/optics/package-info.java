@@ -3,8 +3,11 @@
  * 
  * Note that some OPTICS based algorithms (HiCO, DiSH) are in the
  * subspace and correlation packages, which better describes their use case.
+ * 
+ * @apiviz.exclude ^java\.lang\.
+ * @apiviz.exclude ^de.lmu.ifi.dbs.elki.result.textwriter
+ * @apiviz.exclude ^de.lmu.ifi.dbs.elki.algorithm.Abstract
  */
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures

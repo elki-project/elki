@@ -1,5 +1,7 @@
 /**
  * <p>Distance functions based on subspaces.</p>
+ * 
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.math.dimensionsimilarity
  */
 /*
 This file is part of ELKI:

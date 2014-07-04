@@ -46,9 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @apiviz.landmark
  * 
- * @apiviz.has DBID
  * @apiviz.has DBIDs
- * @apiviz.uses DBIDRef
+ * @apiviz.has DBIDRef
  * @apiviz.composedOf DBIDFactory
  */
 public final class DBIDUtil {
