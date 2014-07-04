@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 
 /**
@@ -67,17 +66,5 @@ class DoubleIntegerDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
   @Override
   public double doubleValue() {
     return value;
-  }
-
-  @Override
-  @Deprecated
-  public Double getFirst() {
-    return new Double(value);
-  }
-
-  @Override
-  @Deprecated
-  public DBID getSecond() {
-    return new IntegerDBID(id);
   }
 }
