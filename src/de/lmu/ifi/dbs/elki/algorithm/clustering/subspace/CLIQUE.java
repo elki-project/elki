@@ -35,9 +35,9 @@ import java.util.TreeMap;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUESubspace;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUEUnit;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUEInterval;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
@@ -341,7 +341,7 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
     List<CLIQUEUnit<V>> units = new ArrayList<>((xsi * dimensionality));
     for(int x = 0; x < xsi; x++) {
       for(int d = 0; d < dimensionality; d++) {
-        units.add(new CLIQUEUnit<V>(new Interval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
+        units.add(new CLIQUEUnit<V>(new CLIQUEInterval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
       }
     }
 

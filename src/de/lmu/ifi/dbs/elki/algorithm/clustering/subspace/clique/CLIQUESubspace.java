@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -86,8 +85,8 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * @param unit the unit to be added.
    */
   public void addDenseUnit(CLIQUEUnit<V> unit) {
-    Collection<Interval> intervals = unit.getIntervals();
-    for(Interval interval : intervals) {
+    Collection<CLIQUEInterval> intervals = unit.getIntervals();
+    for(CLIQUEInterval interval : intervals) {
       if(!BitsUtil.get(getDimensions(), interval.getDimension())) {
         throw new IllegalArgumentException("Unit " + unit + "cannot be added to this subspace, because of wrong dimensions!");
       }
@@ -153,7 +152,7 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * @return the left neighbor of the given unit in the specified dimension
    */
   public CLIQUEUnit<V> leftNeighbor(CLIQUEUnit<V> unit, int dim) {
-    Interval i = unit.getInterval(Integer.valueOf(dim));
+    CLIQUEInterval i = unit.getInterval(dim);
 
     for(CLIQUEUnit<V> u : getDenseUnits()) {
       if(u.containsLeftNeighbor(i)) {
@@ -171,7 +170,7 @@ public class CLIQUESubspace<V extends NumberVector> extends Subspace {
    * @return the right neighbor of the given unit in the specified dimension
    */
   public CLIQUEUnit<V> rightNeighbor(CLIQUEUnit<V> unit, Integer dim) {
-    Interval i = unit.getInterval(dim);
+    CLIQUEInterval i = unit.getInterval(dim);
 
     for(CLIQUEUnit<V> u : getDenseUnits()) {
       if(u.containsRightNeighbor(i)) {

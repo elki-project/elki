@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.data;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
 /*
  This file is part of ELKI:
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @author Elke Achtert
  */
-public class Interval implements Comparable<Interval> {
+public class CLIQUEInterval implements Comparable<CLIQUEInterval> {
   /**
    * The dimension of this interval in the (original) data space.
    */
@@ -53,7 +53,7 @@ public class Interval implements Comparable<Interval> {
    * @param min the minimum (left) value of the interval
    * @param max the maximum (right) value of the interval
    */
-  public Interval(int dimension, double min, double max) {
+  public CLIQUEInterval(int dimension, double min, double max) {
     this.dimension = dimension;
     this.min = min;
     this.max = max;
@@ -109,7 +109,7 @@ public class Interval implements Comparable<Interval> {
    *         less than, equal to, or greater than the specified object.
    */
   @Override
-  public int compareTo(Interval other) {
+  public int compareTo(CLIQUEInterval other) {
     if(dimension < other.dimension) {
       return -1;
     }

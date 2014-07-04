@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -50,13 +49,13 @@ public class CLIQUEUnit<V extends NumberVector> {
   /**
    * The one-dimensional intervals of which this unit is build.
    */
-  private SortedSet<Interval> intervals;
+  private SortedSet<CLIQUEInterval> intervals;
 
   /**
    * Provides a mapping of particular dimensions to the intervals of which this
    * unit is build.
    */
-  private TIntObjectHashMap<Interval> dimensionToInterval;
+  private TIntObjectHashMap<CLIQUEInterval> dimensionToInterval;
 
   /**
    * The ids of the feature vectors this unit contains.
@@ -74,11 +73,11 @@ public class CLIQUEUnit<V extends NumberVector> {
    * @param intervals the intervals belonging to this unit
    * @param ids the ids of the feature vectors belonging to this unit
    */
-  public CLIQUEUnit(SortedSet<Interval> intervals, ModifiableDBIDs ids) {
+  public CLIQUEUnit(SortedSet<CLIQUEInterval> intervals, ModifiableDBIDs ids) {
     this.intervals = intervals;
 
     dimensionToInterval = new TIntObjectHashMap<>();
-    for(Interval interval : intervals) {
+    for(CLIQUEInterval interval : intervals) {
       dimensionToInterval.put(interval.getDimension(), interval);
     }
 
@@ -92,7 +91,7 @@ public class CLIQUEUnit<V extends NumberVector> {
    * 
    * @param interval the interval belonging to this unit
    */
-  public CLIQUEUnit(Interval interval) {
+  public CLIQUEUnit(CLIQUEInterval interval) {
     intervals = new TreeSet<>();
     intervals.add(interval);
 
@@ -113,7 +112,7 @@ public class CLIQUEUnit<V extends NumberVector> {
    *         vector, false otherwise
    */
   public boolean contains(V vector) {
-    for(Interval interval : intervals) {
+    for(CLIQUEInterval interval : intervals) {
       final double value = vector.doubleValue(interval.getDimension());
       if(interval.getMin() > value || value >= interval.getMax()) {
         return false;
@@ -164,7 +163,7 @@ public class CLIQUEUnit<V extends NumberVector> {
    * 
    * @return a sorted set of the intervals of which this unit is build
    */
-  public SortedSet<Interval> getIntervals() {
+  public SortedSet<CLIQUEInterval> getIntervals() {
     return intervals;
   }
 
@@ -174,7 +173,7 @@ public class CLIQUEUnit<V extends NumberVector> {
    * @param dimension the dimension of the interval to be returned
    * @return the interval of the specified dimension
    */
-  public Interval getInterval(Integer dimension) {
+  public CLIQUEInterval getInterval(int dimension) {
     return dimensionToInterval.get(dimension);
   }
 
@@ -186,8 +185,8 @@ public class CLIQUEUnit<V extends NumberVector> {
    * @return true if this unit contains the left neighbor of the specified
    *         interval, false otherwise
    */
-  public boolean containsLeftNeighbor(Interval i) {
-    Interval interval = dimensionToInterval.get(i.getDimension());
+  public boolean containsLeftNeighbor(CLIQUEInterval i) {
+    CLIQUEInterval interval = dimensionToInterval.get(i.getDimension());
     if(interval == null) {
       return false;
     }
@@ -202,8 +201,8 @@ public class CLIQUEUnit<V extends NumberVector> {
    * @return true if this unit contains the right neighbor of the specified
    *         interval, false otherwise
    */
-  public boolean containsRightNeighbor(Interval i) {
-    Interval interval = dimensionToInterval.get(i.getDimension());
+  public boolean containsRightNeighbor(CLIQUEInterval i) {
+    CLIQUEInterval interval = dimensionToInterval.get(i.getDimension());
     if(interval == null) {
       return false;
     }
@@ -246,15 +245,15 @@ public class CLIQUEUnit<V extends NumberVector> {
    *         greater than tau, null otherwise
    */
   public CLIQUEUnit<V> join(CLIQUEUnit<V> other, double all, double tau) {
-    Interval i1 = this.intervals.last();
-    Interval i2 = other.intervals.last();
+    CLIQUEInterval i1 = this.intervals.last();
+    CLIQUEInterval i2 = other.intervals.last();
     if(i1.getDimension() >= i2.getDimension()) {
       return null;
     }
 
-    Iterator<Interval> it1 = this.intervals.iterator();
-    Iterator<Interval> it2 = other.intervals.iterator();
-    SortedSet<Interval> resultIntervals = new TreeSet<>();
+    Iterator<CLIQUEInterval> it1 = this.intervals.iterator();
+    Iterator<CLIQUEInterval> it2 = other.intervals.iterator();
+    SortedSet<CLIQUEInterval> resultIntervals = new TreeSet<>();
     for(int i = 0; i < this.intervals.size() - 1; i++) {
       i1 = it1.next();
       i2 = it2.next();
@@ -285,7 +284,7 @@ public class CLIQUEUnit<V extends NumberVector> {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
-    for(Interval interval : intervals) {
+    for(CLIQUEInterval interval : intervals) {
       result.append(interval).append(' ');
     }
 
