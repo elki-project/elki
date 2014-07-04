@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
  * Object for a priority queue with integer priority. Can be used in the
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  * 
  * @param <O> Stored object type.
  */
-public class IntegerPriorityObject<O> implements PairInterface<Integer, O>, Comparable<IntegerPriorityObject<?>> {
+public class IntegerPriorityObject<O> implements Comparable<IntegerPriorityObject<?>> {
   /**
    * Priority.
    */
@@ -75,17 +74,6 @@ public class IntegerPriorityObject<O> implements PairInterface<Integer, O>, Comp
    * @return object data
    */
   public O getObject() {
-    return object;
-  }
-
-  @Override
-  @Deprecated
-  public Integer getFirst() {
-    return Integer.valueOf(priority);
-  }
-
-  @Override
-  public O getSecond() {
     return object;
   }
 

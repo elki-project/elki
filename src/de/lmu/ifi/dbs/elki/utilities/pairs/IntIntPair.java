@@ -28,13 +28,11 @@ import java.util.Comparator;
 /**
  * Pair storing two integers.
  * 
- * Since int is a native type, this can't be done via the {@link CPair} generic.
- * 
  * @author Erich Schubert
  * 
  * @apiviz.has Comparator
  */
-public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer, Integer> {
+public class IntIntPair implements Comparable<IntIntPair> {
   /**
    * first value
    */
@@ -119,30 +117,12 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
   }
 
   /**
-   * @deprecated use pair.first to avoid boxing!
-   */
-  @Override
-  @Deprecated
-  public final Integer getFirst() {
-    return Integer.valueOf(first);
-  }
-
-  /**
    * Set first value
    * 
    * @param first new value
    */
   public final void setFirst(int first) {
     this.first = first;
-  }
-
-  /**
-   * @deprecated use pair.first to avoid boxing!
-   */
-  @Override
-  @Deprecated
-  public final Integer getSecond() {
-    return Integer.valueOf(second);
   }
 
   /**
@@ -153,14 +133,14 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
   public final void setSecond(int second) {
     this.second = second;
   }
-  
+
   @Override
   public String toString() {
     return "(" + first + ", " + second + ")";
   }
 
   /**
-   * Comparator to compare by second component only 
+   * Comparator to compare by second component only
    */
   public static final Comparator<IntIntPair> BYFIRST_COMPARATOR = new Comparator<IntIntPair>() {
     @Override
@@ -168,9 +148,9 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
       return o1.first - o2.first;
     }
   };
-  
+
   /**
-   * Comparator to compare by second component only 
+   * Comparator to compare by second component only
    */
   public static final Comparator<IntIntPair> BYSECOND_COMPARATOR = new Comparator<IntIntPair>() {
     @Override
@@ -178,7 +158,7 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
       return o1.second - o2.second;
     }
   };
-  
+
   /**
    * Comparator to compare by swapped components
    */

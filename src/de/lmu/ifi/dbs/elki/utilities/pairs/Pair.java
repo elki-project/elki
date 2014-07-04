@@ -26,17 +26,21 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
- * Generic SimplePair<FIRST,SECOND> class.
+ * Simple class wrapping two objects.
  * 
- * Does not implement any "special" interfaces such as Comparable, use
- * {@link CPair} if you want comparable pairs.
+ * <b>Do not use this for primitive types such as {@code Integer} and
+ * {@code Double} - avoid the memory waste and garbage collection overhead!</b>
+ * 
+ * Does not implement any "special" interfaces such as Comparable. If you need
+ * more complicated pairs, please use <em>domain specific</em> code, with more
+ * meaningful field names and comparators.
  * 
  * @author Erich Schubert
  * 
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public class Pair<FIRST, SECOND> implements PairInterface<FIRST, SECOND> {
+public class Pair<FIRST, SECOND> {
   /**
    * First value in pair
    */
@@ -71,7 +75,6 @@ public class Pair<FIRST, SECOND> implements PairInterface<FIRST, SECOND> {
    * 
    * @return first element in pair
    */
-  @Override
   public final FIRST getFirst() {
     return first;
   }
@@ -90,7 +93,6 @@ public class Pair<FIRST, SECOND> implements PairInterface<FIRST, SECOND> {
    * 
    * @return second element in pair
    */
-  @Override
   public final SECOND getSecond() {
     return second;
   }
@@ -145,8 +147,9 @@ public class Pair<FIRST, SECOND> implements PairInterface<FIRST, SECOND> {
       if(other.first != null) {
         return false;
       }
-    } else {
-      if (!this.first.equals(other.first)) {
+    }
+    else {
+      if(!this.first.equals(other.first)) {
         return false;
       }
     }
@@ -154,8 +157,9 @@ public class Pair<FIRST, SECOND> implements PairInterface<FIRST, SECOND> {
       if(other.second != null) {
         return false;
       }
-    } else {
-      if (!this.second.equals(other.second)) {
+    }
+    else {
+      if(!this.second.equals(other.second)) {
         return false;
       }
     }

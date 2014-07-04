@@ -31,7 +31,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * 
  * @param <O> Object type
  */
-public class DoubleObjPair<O> implements PairInterface<Double, O>, Comparable<DoubleObjPair<O>> {
+public class DoubleObjPair<O> implements Comparable<DoubleObjPair<O>> {
   /**
    * Double value
    */
@@ -51,20 +51,6 @@ public class DoubleObjPair<O> implements PairInterface<Double, O>, Comparable<Do
   public DoubleObjPair(double first, O second) {
     this.first = first;
     this.second = second;
-  }
-
-  /**
-   * @deprecated use pair.first to avoid boxing!
-   */
-  @Override
-  @Deprecated
-  public Double getFirst() {
-    return Double.valueOf(first);
-  }
-
-  @Override
-  public O getSecond() {
-    return second;
   }
 
   @Override

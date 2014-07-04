@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
-
 /**
  * Immutable pair of two DBIDs. This can be stored more efficiently than when
  * using {@link de.lmu.ifi.dbs.elki.utilities.pairs.Pair}
@@ -33,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBID
  */
-public interface DBIDPair extends PairInterface<DBID, DBID>, DBIDs {
+public interface DBIDPair extends DBIDs {
   /**
    * Getter for first.
    * 
@@ -42,7 +40,6 @@ public interface DBIDPair extends PairInterface<DBID, DBID>, DBIDs {
    *             recommended when many such accesses are needed.
    */
   @Deprecated
-  @Override
   public DBID getFirst();
 
   /**
@@ -53,6 +50,5 @@ public interface DBIDPair extends PairInterface<DBID, DBID>, DBIDs {
    *             recommended when many such accesses are needed.
    */
   @Deprecated
-  @Override
   public DBID getSecond();
 }

@@ -28,14 +28,11 @@ import java.util.Comparator;
 /**
  * Pair storing two doubles.
  * 
- * Since double is a native type, this can't be done via the {@link CPair}
- * generic.
- * 
  * @author Erich Schubert
  * 
  * @apiviz.has Comparator
  */
-public class DoubleDoublePair implements Comparable<DoubleDoublePair>, PairInterface<Double, Double> {
+public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
   /**
    * first value
    */
@@ -134,30 +131,12 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair>, PairInter
   }
 
   /**
-   * @deprecated use pair.first to avoid boxing!
-   */
-  @Override
-  @Deprecated
-  public final Double getFirst() {
-    return Double.valueOf(first);
-  }
-
-  /**
    * Set first value
    * 
    * @param first new value
    */
   public final void setFirst(double first) {
     this.first = first;
-  }
-
-  /**
-   * @deprecated use pair.first to avoid boxing!
-   */
-  @Override
-  @Deprecated
-  public final Double getSecond() {
-    return Double.valueOf(second);
   }
 
   /**

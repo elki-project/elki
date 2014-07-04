@@ -23,42 +23,19 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
-
 /**
- * Pair of a double value and a DBID
+ * Pair of a double value and a DBID.
+ * 
+ * Note: this interface implements {@link DBIDRef}, i.e. it can be used as DBID
+ * object reference.
  * 
  * @author Erich Schubert
  */
-public interface DoubleDBIDPair extends PairInterface<Double, DBID>, DBIDRef, Comparable<DoubleDBIDPair> {
+public interface DoubleDBIDPair extends DBIDRef, Comparable<DoubleDBIDPair> {
   /**
    * Get the double value of the pair.
    * 
    * @return Double
    */
   public double doubleValue();
-
-  /**
-   * Get the first object - note: this may cause autoboxing, use pair.first for
-   * native pairs!
-   * 
-   * @deprecated Avoid autoboxing. Use {@link #doubleValue}!
-   * 
-   * @return First object
-   */
-  @Override
-  @Deprecated
-  public Double getFirst();
-
-  /**
-   * Get the second object - note: this may cause autoboxing, use pair.second
-   * for native pairs!
-   * 
-   * @deprecated Avoid autoboxing! Use {@link DBIDRef} interface!
-   * 
-   * @return Second object
-   */
-  @Override
-  @Deprecated
-  public DBID getSecond();
 }
