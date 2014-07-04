@@ -60,7 +60,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -580,10 +579,12 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    * Individuum for the evolutionary search.
    * 
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.pairs.FCPair
    */
-  private static class Individuum extends FCPair<Double, short[]> {
+  private static class Individuum implements Comparable<Individuum> {
+    double fitness;
+
+    short[] gene;
+
     /**
      * Constructor
      * 
@@ -591,7 +592,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @param gene Gene information
      */
     public Individuum(double fitness, short[] gene) {
-      super(fitness, gene);
+      this.fitness = fitness;
+      this.gene = gene;
     }
 
     /**
@@ -600,7 +602,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @return the gene information
      */
     public short[] getGene() {
-      return second;
+      return gene;
     }
 
     /**
@@ -609,7 +611,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @return fitness
      */
     public double getFitness() {
-      return first;
+      return fitness;
     }
 
     /**
@@ -627,17 +629,17 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     @Override
     public String toString() {
       StringBuilder buf = new StringBuilder();
-      buf.append("I(f=").append(first);
+      buf.append("I(f=").append(fitness);
       buf.append(",g=");
-      for(int i = 0; i < second.length; i++) {
+      for(int i = 0; i < gene.length; i++) {
         if(i > 0) {
           buf.append(",");
         }
-        if(second[i] == DONT_CARE) {
+        if(gene[i] == DONT_CARE) {
           buf.append("*");
         }
         else {
-          buf.append(second[i]);
+          buf.append(gene[i]);
         }
       }
       buf.append(")");
@@ -650,15 +652,20 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
         return false;
       }
       Individuum other = (Individuum) obj;
-      if(other.second.length != this.second.length) {
+      if(other.gene.length != this.gene.length) {
         return false;
       }
-      for(int i = 0; i < this.second.length; i++) {
-        if(other.second[i] != this.second[i]) {
+      for(int i = 0; i < this.gene.length; i++) {
+        if(other.gene[i] != this.gene[i]) {
           return false;
         }
       }
       return true;
+    }
+
+    @Override
+    public int compareTo(Individuum o) {
+      return Double.compare(this.fitness, o.fitness);
     }
   }
 
