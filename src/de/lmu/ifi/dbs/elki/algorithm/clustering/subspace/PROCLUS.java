@@ -77,7 +77,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -108,19 +107,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   private static final Logging LOG = Logging.getLogger(PROCLUS.class);
 
   /**
-   * Parameter to specify the multiplier for the initial number of medoids, must
-   * be an integer greater than 0.
-   * <p>
-   * Default value: {@code 10}
-   * </p>
-   * <p>
-   * Key: {@code -proclus.mi}
-   * </p>
-   */
-  public static final OptionID M_I_ID = new OptionID("proclus.mi", "The multiplier for the initial number of medoids.");
-
-  /**
-   * Holds the value of {@link #M_I_ID}.
+   * Multiplier for the initial number of medoids.
    */
   private int m_i;
 
@@ -431,7 +418,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     }
 
     TIntSet[] dimensionMap = new TIntSet[medoids.size()];
-    List<CTriple<Double, Integer, Integer>> z_ijs = new ArrayList<>();
+    List<DoubleIntInt> z_ijs = new ArrayList<>();
     for(i = 0; i < medoids.size(); i++) {
       TIntSet dims_i = new TIntHashSet();
       dimensionMap[i] = dims_i;
@@ -454,16 +441,16 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       sigma_i = Math.sqrt(sigma_i);
 
       for(int j = 0; j < dim; j++) {
-        z_ijs.add(new CTriple<>((x_i[j] - y_i) / sigma_i, i, j));
+        z_ijs.add(new DoubleIntInt((x_i[j] - y_i) / sigma_i, i, j));
       }
     }
     Collections.sort(z_ijs);
 
     int max = Math.max(k * l, 2);
     for(int m = 0; m < max; m++) {
-      CTriple<Double, Integer, Integer> z_ij = z_ijs.get(m);
-      TIntSet dims_i = dimensionMap[z_ij.getSecond()];
-      dims_i.add(z_ij.getThird());
+      DoubleIntInt z_ij = z_ijs.get(m);
+      TIntSet dims_i = dimensionMap[z_ij.dimi];
+      dims_i.add(z_ij.dimj);
 
       if(LOG.isDebugging()) {
         StringBuilder msg = new StringBuilder();
@@ -506,7 +493,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       averageDistances[i] = x_i;
     }
 
-    List<CTriple<Double, Integer, Integer>> z_ijs = new ArrayList<>();
+    List<DoubleIntInt> z_ijs = new ArrayList<>();
     for(int i = 0; i < numc; i++) {
       double[] x_i = averageDistances[i];
       // y_i
@@ -526,7 +513,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       sigma_i = Math.sqrt(sigma_i);
 
       for(int j = 0; j < dim; j++) {
-        z_ijs.add(new CTriple<>((x_i[j] - y_i) / sigma_i, i, j));
+        z_ijs.add(new DoubleIntInt((x_i[j] - y_i) / sigma_i, i, j));
       }
     }
     Collections.sort(z_ijs);
@@ -535,13 +522,13 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     TIntSet[] dimensionMap = new TIntSet[numc];
     int max = Math.max(k * l, 2);
     for(int m = 0; m < max; m++) {
-      CTriple<Double, Integer, Integer> z_ij = z_ijs.get(m);
-      TIntSet dims_i = dimensionMap[z_ij.getSecond()];
+      DoubleIntInt z_ij = z_ijs.get(m);
+      TIntSet dims_i = dimensionMap[z_ij.dimi];
       if(dims_i == null) {
         dims_i = new TIntHashSet();
-        dimensionMap[z_ij.getSecond()] = dims_i;
+        dimensionMap[z_ij.dimi] = dims_i;
       }
-      dims_i.add(z_ij.getThird());
+      dims_i.add(z_ij.dimj);
 
       if(LOG.isDebugging()) {
         StringBuilder msg = new StringBuilder();
@@ -754,7 +741,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   private DBIDs computeBadMedoids(ArrayDBIDs m_current, ArrayList<PROCLUSCluster> clusters, int threshold) {
     ModifiableDBIDs badMedoids = DBIDUtil.newHashSet(m_current.size());
     int i = 0;
-    for (DBIDIter it = m_current.iter(); it.valid(); it.advance(), i++) {
+    for(DBIDIter it = m_current.iter(); it.valid(); it.advance(), i++) {
       PROCLUSCluster c_i = clusters.get(i);
       if(c_i == null || c_i.objectIDs.size() < threshold) {
         badMedoids.add(it);
@@ -771,6 +758,36 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  /**
+   * Simple triple.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  private static class DoubleIntInt implements Comparable<DoubleIntInt> {
+    protected double first;
+
+    protected int dimi, dimj;
+
+    public DoubleIntInt(double first, int second, int third) {
+      this.first = first;
+      this.dimi = second;
+      this.dimj = third;
+    }
+
+    @Override
+    public int compareTo(DoubleIntInt o) {
+      if(this.first < o.first) {
+        return -1;
+      }
+      if(this.first > o.first) {
+        return +1;
+      }
+      return 0;
+    }
   }
 
   /**
@@ -855,12 +872,30 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractProjectedClustering.Parameterizer {
     /**
+     * Parameter to specify the multiplier for the initial number of medoids,
+     * must be an integer greater than 0.
+     * <p>
+     * Default value: {@code 10}
+     * </p>
+     * <p>
+     * Key: {@code -proclus.mi}
+     * </p>
+     */
+    public static final OptionID M_I_ID = new OptionID("proclus.mi", "The multiplier for the initial number of medoids.");
+
+    /**
      * Parameter to specify the random generator seed.
      */
     public static final OptionID SEED_ID = new OptionID("proclus.seed", "The random number generator seed.");
 
+    /**
+     * Multiplier for the initial number of medoids.
+     */
     protected int m_i = -1;
 
+    /**
+     * Random generator
+     */
     protected RandomFactory rnd;
 
     @Override
@@ -871,8 +906,8 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       configKI(config);
       configL(config);
 
-      IntParameter m_iP = new IntParameter(M_I_ID, 10);
-      m_iP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter m_iP = new IntParameter(M_I_ID, 10) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(m_iP)) {
         m_i = m_iP.getValue();
       }

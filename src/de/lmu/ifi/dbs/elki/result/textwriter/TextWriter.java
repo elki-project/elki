@@ -64,7 +64,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectArray;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -74,7 +73,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
  * Class to write a result to human-readable text output.
@@ -106,7 +104,6 @@ public class TextWriter {
     TextWriterObjectInline trivialwriter = new TextWriterObjectInline();
     writers.insertHandler(Pair.class, new TextWriterPair());
     writers.insertHandler(DoubleDoublePair.class, new TextWriterDoubleDoublePair());
-    writers.insertHandler(Triple.class, new TextWriterTriple());
     writers.insertHandler(FeatureVector.class, trivialwriter);
     // these object can be serialized inline with toString()
     writers.insertHandler(String.class, trivialwriter);
