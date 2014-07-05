@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.PearsonCorrelation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -125,13 +126,19 @@ public class DistanceCorrelation implements Algorithm{
     DBIDArrayIter iter1 = ids.iter();
     DBIDArrayIter iter2 = ids.iter();
     
+    
     // distance matrices (euclidean norm)
     double[][] dMatrixA = new double[n][n];
     double[][] dMatrixB = new double[n][n];
     for (iter1.seek(0); iter1.valid(); iter1.advance()){
       for (iter2.seek(0);iter2.valid();iter2.advance()){
-        dMatrixA[iter1.getOffset()][iter2.getOffset()] = Math.sqrt(Math.pow(rel.get(iter1).doubleValue(0),2)+Math.pow(rel.get(iter2).doubleValue(0),2));
-        dMatrixB[iter1.getOffset()][iter2.getOffset()] = Math.sqrt(Math.pow(rel.get(iter1).doubleValue(1),2)+Math.pow(rel.get(iter2).doubleValue(1),2));
+       // get 2 data points (x1,y1) and (x2,y2)        
+        double x1 = rel.get(iter1).doubleValue(0);
+        double x2 = rel.get(iter2).doubleValue(0);
+        double y1 = rel.get(iter1).doubleValue(1);
+        double y2 = rel.get(iter2).doubleValue(1);
+        dMatrixA[iter1.getOffset()][iter2.getOffset()] = Math.sqrt(Math.pow(x1,2)+Math.pow(x2,2));
+        dMatrixB[iter1.getOffset()][iter2.getOffset()] = Math.sqrt(Math.pow(y1,2)+Math.pow(y2,2));    
       }
     }
     
@@ -155,6 +162,16 @@ public class DistanceCorrelation implements Algorithm{
       dCor = dCovar/Math.sqrt(dVarA*dVarB);
     }
     LOG.verbose("dCor: " + dCor);
+    
+    // Pearson's Correlation Coefficient
+    PearsonCorrelation pearson = new PearsonCorrelation();
+    for (iter1.seek(0); iter1.valid(); iter1.advance()){
+      double x = rel.get(iter1).doubleValue(0);
+      double y = rel.get(iter1).doubleValue(1);
+      pearson.put(x,y);
+    }
+    LOG.verbose("Pearson: " + pearson.getCorrelation());
+
     return null;
   }
 
