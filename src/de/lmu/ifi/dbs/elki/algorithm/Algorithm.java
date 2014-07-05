@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * <p>
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Arthur Zimek
  */
-public interface Algorithm extends Parameterizable {
+public interface Algorithm {
   /**
    * Runs the algorithm.
    * 

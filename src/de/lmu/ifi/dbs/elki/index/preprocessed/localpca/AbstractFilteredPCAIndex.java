@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -139,7 +138,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractFilteredPCAIndex oneway - - «create»
    */
-  public abstract static class Factory<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
+  public abstract static class Factory<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I> {
     /**
      * Parameter to specify the distance function used for running PCA.
      * 

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource;
  */
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * DatabaseConnection is used to load data into a database.
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.landmark
  * @apiviz.has MultipleObjectsBundle
  */
-public interface DatabaseConnection extends Parameterizable {
+public interface DatabaseConnection {
   /**
    * Returns the initial data for a database.
    * 

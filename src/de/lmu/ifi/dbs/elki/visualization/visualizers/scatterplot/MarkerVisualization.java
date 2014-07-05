@@ -64,8 +64,7 @@ public class MarkerVisualization extends AbstractVisFactory {
   private static final String NAME = "Markers";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public MarkerVisualization() {
     super();

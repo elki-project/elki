@@ -6,6 +6,8 @@
  * of clustering algorithms for axis-parallel subspaces.
  * 
  * @apiviz.exclude ^de.lmu.ifi.dbs.elki.algorithm.Abstract
+ * @apiviz.exclude ^de.lmu.ifi.dbs.elki.algorithm\.clustering\.subspace\.P3C\.(ClusterCandidate|Signature)
+ * @apiviz.exclude ^de.lmu.ifi.dbs.elki.algorithm\.clustering\.subspace\.clique\.
  */
 /*
  This file is part of ELKI:

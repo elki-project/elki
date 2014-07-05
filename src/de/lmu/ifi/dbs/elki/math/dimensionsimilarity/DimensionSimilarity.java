@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface for computing pairwise dimension similarities, used for arranging
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @param <V> Object type
  */
-public interface DimensionSimilarity<V> extends Parameterizable {
+public interface DimensionSimilarity<V> {
   /**
    * Compute the dimension similarity matrix
    * 

@@ -71,8 +71,7 @@ public class HistogramVisualization extends AbstractVisFactory {
   private static final String SERIESID = "series";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public HistogramVisualization() {
     super();

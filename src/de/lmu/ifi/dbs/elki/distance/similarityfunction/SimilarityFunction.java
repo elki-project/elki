@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface SimilarityFunction describes the requirements of any similarity
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @param <O> object type
  */
-public interface SimilarityFunction<O> extends Parameterizable {
+public interface SimilarityFunction<O> {
   /**
    * Is this function symmetric?
    * 

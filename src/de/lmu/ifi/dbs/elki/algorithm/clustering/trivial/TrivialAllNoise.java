@@ -53,8 +53,7 @@ public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implem
   private static final Logging LOG = Logging.getLogger(TrivialAllNoise.class);
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public TrivialAllNoise() {
     super();

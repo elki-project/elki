@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.index;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Factory interface for indexes.
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <V> Input object type
  * @param <I> Index type
  */
-public interface IndexFactory<V, I extends Index> extends Parameterizable {
+public interface IndexFactory<V, I extends Index> {
   /**
    * Sets the database in the distance function of this index (if existing).
    * 

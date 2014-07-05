@@ -23,17 +23,23 @@ package de.lmu.ifi.dbs.elki.application.internal;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -53,96 +59,169 @@ public class CheckParameterizables {
   private static final Logging LOG = Logging.getLogger(CheckParameterizables.class);
 
   /**
+   * Known parameterizable classes/interfaces.
+   */
+  private List<Class<?>> knownParameterizables;
+
+  /**
    * Validate all "Parameterizable" objects for parts of the API contract that
    * cannot be specified in Java interfaces (such as constructors, static
    * methods)
    */
   public void checkParameterizables() {
     LoggingConfiguration.setVerbose(Level.VERBOSE);
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
-      final Constructor<?> constructor;
-      try {
-        constructor = cls.getDeclaredConstructor(Parameterization.class);
-      }
-      catch(NoClassDefFoundError e) {
-        LOG.verbose("Class discovered but not found?!? " + cls.getName());
-        // Not found ?!?
-        continue;
-      }
-      catch(Exception e) {
-        // Not parameterizable.
-        continue;
-      }
-      checkParameterizable(cls, constructor);
-    }
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
-      boolean hasConstructor = false;
-      // check for a V3 Parameterizer class
-      for(Class<?> inner : cls.getDeclaredClasses()) {
-        if(AbstractParameterizer.class.isAssignableFrom(inner)) {
-          try {
-            Class<? extends AbstractParameterizer> pcls = inner.asSubclass(AbstractParameterizer.class);
-            pcls.newInstance();
-            if(checkParameterizer(cls, pcls)) {
-              hasConstructor = true;
-              continue;
-            }
-          }
-          catch(Exception e) {
-            LOG.verbose("Could not run Parameterizer: " + inner.getName() + ": " + e);
-            // continue. Probably non-public
-          }
+    knownParameterizables = new ArrayList<>();
+    URL u = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX);
+    try {
+      for(String prop : new File(u.toURI()).list()) {
+        try {
+          knownParameterizables.add(Class.forName(prop));
+        }
+        catch(ClassNotFoundException e) {
+          LOG.warning("Service file name is not a class name: " + prop);
+          continue;
         }
       }
+    }
+    catch(URISyntaxException e) {
+      throw new AbortException("Cannot check all properties, as some are not in a file: URL.");
+    }
 
-      // check for a V2 factory method.
-      try {
-        ClassGenericsUtil.getParameterizationFactoryMethod(cls, Object.class);
-        hasConstructor = true;
-        // logger.debugFine("Found factory method for class: "+ cls.getName());
-      }
-      catch(NoClassDefFoundError e) {
-        LOG.verbose("Class discovered but not found?!? " + cls.getName());
-        // Not found ?!?
+    final String internal = de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer.class.getPackage().getName();
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+      // Classes in the same package are special and don't cause warnings.
+      if(cls.getName().startsWith(internal)) {
         continue;
       }
-      catch(Exception e) {
-        // do nothing.
-      }
       try {
-        cls.getConstructor(Parameterization.class);
-        hasConstructor = true;
+        State state = State.NO_CONSTRUCTOR;
+        state = checkV3Parameterization(cls, state);
+        if(state == State.ERROR) {
+          continue;
+        }
+        state = checkV2Parameterization(cls, state);
+        if(state == State.ERROR) {
+          continue;
+        }
+        state = checkV1Parameterization(cls, state);
+        if(state == State.ERROR) {
+          continue;
+        }
+        state = checkDefaultConstructor(cls, state);
+        if(state == State.ERROR) {
+          continue;
+        }
+        boolean expectedParameterizer = checkSupertypes(cls);
+        if(state == State.NO_CONSTRUCTOR && expectedParameterizer) {
+          LOG.verbose("Class " + cls.getName() + //
+          " implements a parameterizable interface, but doesn't have a constructor with the appropriate signature!");
+        }
+        if(state == State.INSTANTIABLE && !expectedParameterizer) {
+          LOG.verbose("Class " + cls.getName() + //
+          " has a parameterizer, but there is no service file for any of its interfaces.");
+        }
       }
       catch(NoClassDefFoundError e) {
-        LOG.verbose("Class discovered but not found?!? " + cls.getName());
-        // Not found ?!?
-        continue;
-      }
-      catch(Exception e) {
-        // do nothing.
-      }
-      try {
-        cls.getConstructor();
-        hasConstructor = true;
-      }
-      catch(NoClassDefFoundError e) {
-        LOG.verbose("Class discovered but not found?!? " + cls.getName());
-        // Not found ?!?
-        continue;
-      }
-      catch(Exception e) {
-        // do nothing.
-      }
-      if(!hasConstructor) {
-        LOG.verbose("Class " + cls.getName() + " is Parameterizable but doesn't have a constructor with the appropriate signature!");
+        LOG.verbose("Class discovered but not found: " + cls.getName() + " (missing: " + e.getMessage() + ")");
       }
     }
   }
 
+  private boolean checkSupertypes(Class<?> cls) {
+    for(Class<?> c : knownParameterizables) {
+      if(c.isAssignableFrom(cls))
+        return true;
+    }
+    return false;
+  }
+
+  enum State {
+    NO_CONSTRUCTOR, //
+    INSTANTIABLE, //
+    DEFAULT_INSTANTIABLE, //
+    ERROR, //
+  }
+
+  /** Check for a V1 constructor. */
+  private State checkV1Parameterization(Class<?> cls, State state) throws NoClassDefFoundError {
+    final Constructor<?> constructor;
+    try {
+      constructor = cls.getDeclaredConstructor(Parameterization.class);
+      if(state == State.INSTANTIABLE) {
+        LOG.warning("More than one parameterization method in class " + cls.getName());
+      }
+      LOG.warning("V1 constructor found in class: " + cls.getName());
+      if(!Modifier.isPublic(constructor.getModifiers())) {
+        LOG.verbose("Constructor for class " + cls.getName() + " is not public!");
+      }
+      return State.INSTANTIABLE;
+    }
+    catch(NoSuchMethodException e) {
+      // Not parameterizable?
+      return state;
+    }
+  }
+
+  /** Check for a V2 constructor. */
+  private State checkV2Parameterization(Class<?> cls, State state) throws NoClassDefFoundError {
+    try {
+      ClassGenericsUtil.getParameterizationFactoryMethod(cls, Object.class);
+      if(state == State.INSTANTIABLE) {
+        LOG.warning("More than one parameterization method in class " + cls.getName());
+      }
+      LOG.warning("V2 factory method found in class: " + cls.getName());
+      return State.INSTANTIABLE;
+    }
+    catch(NoSuchMethodException e) {
+      // do nothing.
+      return state;
+    }
+  }
+
+  /** Check for a V3 constructor. */
+  private State checkV3Parameterization(Class<?> cls, State state) throws NoClassDefFoundError {
+    // check for a V3 Parameterizer class
+    for(Class<?> inner : cls.getDeclaredClasses()) {
+      if(AbstractParameterizer.class.isAssignableFrom(inner)) {
+        try {
+          Class<? extends AbstractParameterizer> pcls = inner.asSubclass(AbstractParameterizer.class);
+          pcls.newInstance();
+          if(checkParameterizer(cls, pcls)) {
+            if(state == State.INSTANTIABLE) {
+              LOG.warning("More than one parameterization method in class " + cls.getName());
+            }
+            state = State.INSTANTIABLE;
+          }
+        }
+        catch(Exception e) {
+          LOG.verbose("Could not run Parameterizer: " + inner.getName() + ": " + e.getMessage());
+          // continue. Probably non-public
+        }
+        catch(Error e) {
+          LOG.verbose("Could not run Parameterizer: " + inner.getName() + ": " + e.getMessage());
+          // continue. Probably non-public
+        }
+      }
+    }
+    return state;
+  }
+
+  /** Check for a default constructor. */
+  private State checkDefaultConstructor(Class<?> cls, State state) throws NoClassDefFoundError {
+    try {
+      cls.getConstructor();
+      return State.DEFAULT_INSTANTIABLE;
+    }
+    catch(Exception e) {
+      // do nothing.
+    }
+    return state;
+  }
+
   private boolean checkParameterizer(Class<?> cls, Class<? extends AbstractParameterizer> par) {
+    int checkResult = 0;
     try {
       par.getConstructor();
-      boolean hasMakeInstance = false;
       final Method methods[] = par.getDeclaredMethods();
       for(int i = 0; i < methods.length; ++i) {
         final Method meth = methods[i];
@@ -151,33 +230,26 @@ public class CheckParameterizables {
           if(meth.getParameterTypes().length == 0) {
             // And check for proper return type.
             if(cls.isAssignableFrom(meth.getReturnType())) {
-              hasMakeInstance = true;
+              checkResult = 1;
+            }
+            else if(checkResult == 0) {
+              checkResult = 2; // Nothing better
             }
           }
+          else if(checkResult == 0) {
+            checkResult += 3;
+          }
         }
-      }
-      if(hasMakeInstance) {
-        return true;
       }
     }
     catch(Exception e) {
       LOG.warning("No proper Parameterizer.makeInstance for " + cls.getName() + ": " + e);
       return false;
     }
-    LOG.warning("No proper Parameterizer.makeInstance for " + cls.getName() + " found!");
-    return false;
-  }
-
-  private void checkParameterizable(Class<?> cls, Constructor<?> constructor) {
-    // Classes in the same package are special and don't cause warnings.
-    if(!cls.getName().startsWith(Parameterizable.class.getPackage().getName())) {
-      if(!Modifier.isPublic(constructor.getModifiers())) {
-        LOG.verbose("Constructor for class " + cls.getName() + " is not public!");
-      }
-      if(!Parameterizable.class.isAssignableFrom(cls)) {
-        LOG.verbose("Class " + cls.getName() + " should implement Parameterizable!");
-      }
+    if(checkResult > 1) {
+      LOG.warning("No proper Parameterizer.makeInstance for " + cls.getName() + " found!");
     }
+    return checkResult == 1;
   }
 
   /**

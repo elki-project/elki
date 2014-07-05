@@ -62,12 +62,11 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.UnParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -75,12 +74,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
 /**
- * Class to generate HTML parameter descriptions for all classes implementing
- * the {@link Parameterizable} interface. Used in documentation generation only.
+ * Class to generate HTML parameter descriptions for all classes that have ELKI
+ * {@link Parameter}s. Used in documentation generation only.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.uses Parameterizable
+ *
  * @apiviz.uses Parameter
  */
 public class DocumentParameters {
@@ -247,7 +245,7 @@ public class DocumentParameters {
   private static void buildParameterIndex(Map<Class<?>, List<Parameter<?>>> byclass, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
     final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
         continue;
@@ -259,7 +257,7 @@ public class DocumentParameters {
       }
 
       UnParameterization config = new UnParameterization();
-      final TrackParameters track = new TrackParameters(config);
+      final TrackParameters track = new TrackParameters(config, cls);
       // LoggingUtil.warning("Instantiating " + cls.getName());
       FutureTask<?> instantiator = new FutureTask<>(new Runnable() {
         @Override
@@ -297,7 +295,7 @@ public class DocumentParameters {
           }
           for(TrackedParameter pair : track.getAllParameters()) {
             if(pair.getOwner() == null) {
-              LOG.warning("No owner for parameter " + pair.getParameter());
+              LOG.warning("No owner for parameter " + pair.getParameter() + " expected a " + cls.getName());
               continue;
             }
             options.add(pair);

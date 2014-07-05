@@ -31,8 +31,7 @@ package de.lmu.ifi.dbs.elki.utilities.ensemble;
  */
 public class EnsembleVotingMin implements EnsembleVoting {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public EnsembleVotingMin() {
     // empty

@@ -24,14 +24,13 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * RTree insertion strategy interface.
  * 
  * @author Erich Schubert
  */
-public interface InsertionStrategy extends Parameterizable {
+public interface InsertionStrategy {
   /**
    * Choose insertion rectangle.
    * 

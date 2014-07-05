@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * @author Erich Schubert
  * 
  * @apiviz.uses DBIDRef
+ * @apiviz.exclude TooltipStringVisualization
  * 
  * @param <O> Object type
  */

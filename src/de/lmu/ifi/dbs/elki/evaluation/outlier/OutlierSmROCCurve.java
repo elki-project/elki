@@ -60,20 +60,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * However, this method has some deficiencies when the mean score is not 0.5, as
  * discussed in:
  * <p>
- * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br>
- * On Evaluation of Outlier Rankings and Outlier Scores<br>
+ * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
+ * On Evaluation of Outlier Rankings and Outlier Scores<br />
  * In Proceedings of the 12th SIAM International Conference on Data Mining
  * (SDM), Anaheim, CA, 2012.
  * </p>
  * 
  * @author Erich Schubert
  *
- * @apiviz.landmark
- * 
  * @apiviz.uses OutlierResult
  * @apiviz.has SmROCResult oneway - - «create»
  */
-@Reference(authors = "W. Klement, P. A. Flach, N. Japkowicz, S. Matwin", title = "Smooth Receiver Operating Characteristics (smROC) Curves", booktitle = "In: European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases (ECML-PKDD'11)", url = "http://dx.doi.org/10.1007/978-3-642-23783-6_13")
+@Reference(authors = "W. Klement, P. A. Flach, N. Japkowicz, S. Matwin", //
+title = "Smooth Receiver Operating Characteristics (smROC) Curves", //
+booktitle = "In: European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases (ECML-PKDD'11)", //
+url = "http://dx.doi.org/10.1007/978-3-642-23783-6_13")
 public class OutlierSmROCCurve implements Evaluator {
   /**
    * The label we use for marking ROCAUC values.
@@ -118,7 +119,7 @@ public class OutlierSmROCCurve implements Evaluator {
     int poscnt = 0, negcnt = 0;
     double prevscore = Double.NaN;
     double x = 0, y = 0;
-    for (DBIDIter nei = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter(); nei.valid(); nei.advance()) {
+    for(DBIDIter nei = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter(); nei.valid(); nei.advance()) {
       // Analyze next point
       final double curscore = scores.doubleValue(nei);
       // defer calculation for ties

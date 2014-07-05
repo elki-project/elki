@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.data.projection;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Projection interface.
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <IN> Input data type
  * @param <OUT> Output data type
  */
-public interface Projection<IN, OUT> extends Parameterizable {
+public interface Projection<IN, OUT> {
   /**
    * Initialize
    * 

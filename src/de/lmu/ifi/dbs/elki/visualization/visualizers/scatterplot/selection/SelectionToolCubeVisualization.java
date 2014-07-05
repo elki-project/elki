@@ -76,8 +76,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
   private static final String NAME = "Range Selection";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}.
+   * Constructor.
    */
   public SelectionToolCubeVisualization() {
     super();

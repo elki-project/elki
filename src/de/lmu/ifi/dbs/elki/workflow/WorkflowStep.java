@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.workflow;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
 /**
  * Trivial interface for workflow steps.
  * 
@@ -32,6 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  */
-public interface WorkflowStep extends Parameterizable {
+public interface WorkflowStep {
   // Empty
 }

@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Neighbor predicate with weight support.
@@ -55,7 +54,7 @@ public interface WeightedNeighborSetPredicate {
    * 
    * @param <O> Input relation object type restriction
    */
-  public static interface Factory<O> extends Parameterizable {
+  public static interface Factory<O> {
     /**
      * Instantiation method.
      * 

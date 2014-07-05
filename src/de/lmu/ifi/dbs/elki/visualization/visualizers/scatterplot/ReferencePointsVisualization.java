@@ -59,8 +59,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
   private static final String NAME = "Reference Points";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public ReferencePointsVisualization() {
     super();

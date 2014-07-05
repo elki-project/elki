@@ -60,8 +60,7 @@ public class SettingsVisualization extends AbstractVisFactory {
   private static final String NAME = "Settings";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public SettingsVisualization() {
     super();

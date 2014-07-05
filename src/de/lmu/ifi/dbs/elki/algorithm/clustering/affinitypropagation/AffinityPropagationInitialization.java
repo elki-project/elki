@@ -27,14 +27,13 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Initialization methods for affinity propagation.
  * 
  * @author Erich Schubert
  */
-public interface AffinityPropagationInitialization<O> extends Parameterizable {
+public interface AffinityPropagationInitialization<O> {
   /**
    * Quantile to use for the diagonal entries.
    */

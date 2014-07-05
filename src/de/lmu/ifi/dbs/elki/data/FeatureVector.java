@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Generic FeatureVector class that can contain any type of data (i.e. numerical
@@ -69,7 +68,7 @@ public interface FeatureVector<D> {
    *
    * @param <V> Vector type
    */
-  interface Factory<V extends FeatureVector<? extends D>, D> extends Parameterizable {
+  interface Factory<V extends FeatureVector<? extends D>, D> {
     /**
      * Returns a new FeatureVector of V for the given values.
      * 

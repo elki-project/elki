@@ -66,8 +66,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
   private static final String NAME = "OPTICS Steep Areas";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public OPTICSSteepAreaVisualization() {
     super();

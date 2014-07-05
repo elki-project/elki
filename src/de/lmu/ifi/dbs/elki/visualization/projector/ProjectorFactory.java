@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultProcessor;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * A projector is responsible for adding projections to the visualization by
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @apiviz.has Projector
  */
-public interface ProjectorFactory extends ResultProcessor, Parameterizable {
+public interface ProjectorFactory extends ResultProcessor {
   /**
    * Add projections for the given result (tree) to the result tree.
    * 

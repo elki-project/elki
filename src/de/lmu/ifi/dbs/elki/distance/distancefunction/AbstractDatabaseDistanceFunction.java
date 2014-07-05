@@ -38,9 +38,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  */
 public abstract class AbstractDatabaseDistanceFunction<O> implements DistanceFunction<O> {
   /**
-   * Constructor, supporting
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style
-   * classes.
+   * Constructor.
    */
   public AbstractDatabaseDistanceFunction() {
     super();

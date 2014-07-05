@@ -81,6 +81,18 @@ public class TrackParameters implements Parameterization {
   }
 
   /**
+   * Constructor.
+   * 
+   * @param inner Inner parameterization to wrap.
+   * @param owner Class/instance owning the parameter
+   */
+  public TrackParameters(Parameterization inner, Object owner) {
+    super();
+    this.inner = inner;
+    this.owner = owner;
+  }
+
+  /**
    * Internal constructor, for nested tracking.
    * 
    * @param inner Inner parameterization

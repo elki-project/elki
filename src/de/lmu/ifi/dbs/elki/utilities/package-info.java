@@ -8,7 +8,6 @@
  * <ul>
  * <li>Basic and low-level:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.Util}: Miscellaneous utility functions.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil}: for Pair Comparators.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.logging.LoggingUtil}: simple logging access.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.math.MathUtil}: Mathematics utility functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.data.VectorUtil}: Vector and Matrix functions.</li>

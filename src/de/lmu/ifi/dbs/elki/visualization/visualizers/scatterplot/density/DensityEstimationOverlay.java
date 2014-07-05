@@ -63,8 +63,7 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
   private static final String NAME = "Density estimation overlay";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public DensityEstimationOverlay() {
     super();

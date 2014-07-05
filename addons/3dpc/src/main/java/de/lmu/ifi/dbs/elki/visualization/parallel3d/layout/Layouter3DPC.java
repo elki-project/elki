@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Arrange parallel coordinates on a 2D plane, for 3D parallel coordinates.
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @param <V> Object type
  */
-public interface Layouter3DPC<V> extends Parameterizable {
+public interface Layouter3DPC<V> {
   /**
    * Run the layouting algorithm.
    * 

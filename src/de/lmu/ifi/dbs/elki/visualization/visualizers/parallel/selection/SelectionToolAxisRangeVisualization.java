@@ -74,8 +74,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
   private static final String NAME = "Axis Range Selection";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public SelectionToolAxisRangeVisualization() {
     super();

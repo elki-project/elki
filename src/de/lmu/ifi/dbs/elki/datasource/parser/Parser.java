@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 import java.io.InputStream;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * A Parser shall provide a ParsingResult by parsing an InputStream.
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.uses InputStream
  * @apiviz.has MultipleObjectsBundle oneway - - «create»
  */
-public interface Parser extends Parameterizable {
+public interface Parser {
   /**
    * Returns a list of the objects parsed from the specified input stream.
    * 

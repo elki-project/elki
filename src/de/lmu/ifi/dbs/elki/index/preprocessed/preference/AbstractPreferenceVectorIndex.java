@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Abstract base class for preference vector based algorithms.
@@ -64,7 +63,7 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector> ext
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractPreferenceVectorIndex oneway - - «create»
    */
-  public abstract static class Factory<V extends NumberVector, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I>, Parameterizable {
+  public abstract static class Factory<V extends NumberVector, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I> {
     @Override
     public abstract I instantiate(Relation<V> relation);
 

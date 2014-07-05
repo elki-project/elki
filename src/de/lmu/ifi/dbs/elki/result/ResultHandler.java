@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
 /**
  * Interface for any class that can handle results
  * 
@@ -33,6 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.landmark
  * @apiviz.uses Result oneway - - processes
  */
-public interface ResultHandler extends Parameterizable, ResultProcessor {
+public interface ResultHandler extends ResultProcessor {
   // Empty - moved to ResultProcessor, this interface merely serves UI purposes.
 }

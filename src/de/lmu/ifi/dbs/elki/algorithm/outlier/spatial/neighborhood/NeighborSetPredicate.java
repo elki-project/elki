@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Predicate to obtain the neighbors of a reference object as set.
@@ -54,7 +53,7 @@ public interface NeighborSetPredicate extends Result {
    * 
    * @param <O> Input relation object type restriction
    */
-  public static interface Factory<O> extends Parameterizable {
+  public static interface Factory<O> {
     /**
      * Instantiation method.
      * 

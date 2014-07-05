@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -174,7 +173,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
    * @apiviz.stereotype factory
    * @apiviz.uses SharedNearestNeighborPreprocessor oneway - - «create»
    */
-  public static class Factory<O> implements SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborPreprocessor<O>>, Parameterizable {
+  public static class Factory<O> implements SharedNearestNeighborIndex.Factory<O, SharedNearestNeighborPreprocessor<O>> {
     /**
      * Parameter to indicate the number of neighbors to be taken into account
      * for the shared-nearest-neighbor similarity.

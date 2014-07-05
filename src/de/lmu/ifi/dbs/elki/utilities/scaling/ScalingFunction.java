@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
 /**
  * Interface for scaling functions used e.g. by outlier evaluation such as
  * Histograms and visualization.
@@ -39,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  */
-public interface ScalingFunction extends Parameterizable {
+public interface ScalingFunction {
   /**
    * Transform a given value using the scaling function.
    * 

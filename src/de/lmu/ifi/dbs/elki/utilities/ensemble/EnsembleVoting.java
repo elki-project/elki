@@ -23,14 +23,12 @@ package de.lmu.ifi.dbs.elki.utilities.ensemble;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
 /**
  * Interface for ensemble voting rules
  * 
  * @author Erich Schubert
  */
-public interface EnsembleVoting extends Parameterizable {
+public interface EnsembleVoting {
   /**
    * Combine scores function. Note: it is assumed that the scores are
    * comparable.

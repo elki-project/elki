@@ -59,8 +59,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
   private static final String NAME = "Predecessor Graph";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public ClusterOrderVisualization() {
     super();

@@ -23,14 +23,13 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Statistical distributions, with their common functions.
  * 
  * @author Erich Schubert
  */
-public interface Distribution extends Parameterizable {
+public interface Distribution {
   /**
    * Return the density of an existing value
    * 

@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Normalization performs a normalization on a set of feature vectors and is
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @param <O> object type
  */
-public interface Normalization<O> extends ObjectFilter, Parameterizable {
+public interface Normalization<O> extends ObjectFilter {
   /**
    * Transforms a feature vector to the original attribute ranges.
    *

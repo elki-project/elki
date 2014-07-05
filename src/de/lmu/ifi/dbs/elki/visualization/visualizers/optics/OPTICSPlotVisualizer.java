@@ -58,8 +58,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
   private static final String NAME = "OPTICS Plot";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public OPTICSPlotVisualizer() {
     super();

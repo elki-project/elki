@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -52,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.uses PCAResult oneway - - «create»
  * @apiviz.composedOf CovarianceMatrixBuilder
  */
-public class PCARunner implements Parameterizable {
+public class PCARunner {
   /**
    * Parameter to specify the class to compute the covariance matrix, must be a
    * subclass of {@link CovarianceMatrixBuilder}.

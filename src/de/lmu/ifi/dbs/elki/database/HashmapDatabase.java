@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -67,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf HashSetModifiableDBIDs
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")
-public class HashmapDatabase extends AbstractDatabase implements UpdatableDatabase, Parameterizable {
+public class HashmapDatabase extends AbstractDatabase implements UpdatableDatabase {
   /**
    * Our logger
    */

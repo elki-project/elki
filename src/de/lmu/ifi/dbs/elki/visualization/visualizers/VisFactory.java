@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultProcessor;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 
 /**
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
  * @apiviz.uses Visualization - - «create»
  * @apiviz.uses VisualizationTask - - «create»
  */
-public interface VisFactory extends ResultProcessor, Parameterizable {
+public interface VisFactory extends ResultProcessor {
   /**
    * Add visualizers for the given result (tree) to the context.
    * 

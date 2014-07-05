@@ -53,8 +53,7 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
   double mlogmax;
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public OutlierMinusLogScaling() {
     super();

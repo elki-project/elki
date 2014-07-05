@@ -32,10 +32,9 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
@@ -53,7 +52,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @apiviz.composedOf EvaluationStep
  * @apiviz.composedOf OutputStep
  */
-public class KDDTask implements Parameterizable {
+public class KDDTask {
   /**
    * The settings used, for settings reporting.
    */

@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Abstract class with the task of computing a Covariance matrix to be used in PCA.
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractCovarianceMatrixBuilder implements Parameterizable, CovarianceMatrixBuilder {
+public abstract class AbstractCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   @Override
   public Matrix processDatabase(Relation<? extends NumberVector> database) {
     return processIds(database.getDBIDs(), database);

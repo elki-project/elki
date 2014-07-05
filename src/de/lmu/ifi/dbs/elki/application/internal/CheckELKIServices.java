@@ -98,9 +98,6 @@ public class CheckELKIServices {
     URL u = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX);
     try {
       for(String prop : new File(u.toURI()).list()) {
-        if(".svn".equals(prop)) {
-          continue;
-        }
         if(LOG.isVerbose()) {
           LOG.verbose("Checking property: " + prop);
         }

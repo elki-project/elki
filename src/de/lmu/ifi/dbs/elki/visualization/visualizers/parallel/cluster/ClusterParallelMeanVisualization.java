@@ -64,8 +64,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
   private static final String NAME = "Cluster Means";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}.
+   * Constructor.
    */
   public ClusterParallelMeanVisualization() {
     super();

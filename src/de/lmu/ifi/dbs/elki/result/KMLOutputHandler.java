@@ -58,7 +58,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -81,8 +80,10 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @author Erich Schubert
  */
 // TODO: make configurable color scheme
-@Reference(authors = "E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek", booktitle = "Proc. 12th International Symposium on Spatial and Temporal Databases (SSTD), Minneapolis, MN, 2011", title = "Spatial Outlier Detection: Data, Algorithms, Visualizations")
-public class KMLOutputHandler implements ResultHandler, Parameterizable {
+@Reference(authors = "E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek", //
+booktitle = "Proc. 12th International Symposium on Spatial and Temporal Databases (SSTD), Minneapolis, MN, 2011", //
+title = "Spatial Outlier Detection: Data, Algorithms, Visualizations")
+public class KMLOutputHandler implements ResultHandler {
   /**
    * Logger class to use.
    */

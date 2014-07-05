@@ -69,8 +69,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   private static final String NAME = "OPTICS Cluster Ranges";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public OPTICSClusterVisualization() {
     super();

@@ -60,8 +60,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
   private static final String NAME = "Similarity Matrix Visualizer";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public SimilarityMatrixVisualizer() {
     super();

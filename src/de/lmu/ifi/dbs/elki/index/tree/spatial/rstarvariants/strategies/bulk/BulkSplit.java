@@ -26,14 +26,13 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface for a bulk split strategy.
  * 
  * @author Erich Schubert
  */
-public interface BulkSplit extends Parameterizable {
+public interface BulkSplit {
   /**
    * Partitions the specified feature vectors
    * 

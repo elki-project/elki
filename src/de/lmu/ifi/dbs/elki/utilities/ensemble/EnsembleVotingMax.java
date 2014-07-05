@@ -30,8 +30,7 @@ package de.lmu.ifi.dbs.elki.utilities.ensemble;
  */
 public class EnsembleVotingMax implements EnsembleVoting {
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public EnsembleVotingMax() {
     // empty

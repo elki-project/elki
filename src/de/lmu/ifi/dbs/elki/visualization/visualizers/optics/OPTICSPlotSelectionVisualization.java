@@ -81,8 +81,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
   }
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public OPTICSPlotSelectionVisualization() {
     super();

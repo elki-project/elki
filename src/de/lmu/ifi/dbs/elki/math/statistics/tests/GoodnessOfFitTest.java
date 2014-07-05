@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.tests;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
 /**
  * Interface for the statistical test used by HiCS.
  * 
@@ -34,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Jan Brusis
  * @author Erich Schubert
  */
-public interface GoodnessOfFitTest extends Parameterizable {
+public interface GoodnessOfFitTest {
   /**
    * Measure the deviation of a full sample from a conditional sample.
    * 

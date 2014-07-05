@@ -78,8 +78,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
   public static final String NAME_EID = "External ID Tooltips";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public TooltipStringVisualization() {
     super();

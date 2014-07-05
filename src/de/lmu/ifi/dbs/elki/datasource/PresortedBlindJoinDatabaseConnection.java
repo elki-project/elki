@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 
@@ -43,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @author Erich Schubert
  */
 @Description("Blindly joins multiple data sources, assuming they are ordered the same way.")
-public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnection implements Parameterizable {
+public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * Logger
    */

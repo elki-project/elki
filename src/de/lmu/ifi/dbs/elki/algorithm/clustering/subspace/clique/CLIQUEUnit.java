@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  * 
  * @author Elke Achtert
  * 
+ * @apiviz.composedOf CLIQUEInterval
  * @apiviz.composedOf ModifiableDBIDs
  * 
  * @param <V> the type of NumberVector this unit contains
