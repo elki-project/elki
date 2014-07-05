@@ -1,0 +1,2 @@
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert
+de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.FarReinsert
