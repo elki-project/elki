@@ -36,12 +36,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.gui.util.ClassTree;
+import de.lmu.ifi.dbs.elki.gui.util.ClassTree.ClassNode;
 import de.lmu.ifi.dbs.elki.gui.util.TreePopup;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -158,14 +159,23 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
       return;
     }
     if(e.getSource() == popup) {
-      final DefaultMutableTreeNode sel = (DefaultMutableTreeNode) popup.getTree().getSelectionPath().getLastPathComponent();
-      String newClass = (sel != null) ? (String) sel.getUserObject() : null;
-      if(newClass != null && newClass.length() > 0) {
-        String val = textfield.getText();
-        val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;
-        textfield.setText(val);
+      if (e.getActionCommand() == TreePopup.ACTION_CANCELED) {
         popup.setVisible(false);
-        fireValueChanged();
+        textfield.requestFocus();
+        return;
+      }
+      TreePath path = popup.getTree().getSelectionPath();
+      final Object comp = path.getLastPathComponent();
+      if(comp instanceof ClassNode) {
+        ClassNode sel = (path != null) ? (ClassNode) comp : null;
+        String newClass = (sel != null) ? (String) sel.getUserObject() : null;
+        if(newClass != null && newClass.length() > 0) {
+          String val = textfield.getText();
+          val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;
+          textfield.setText(val);
+          popup.setVisible(false);
+          fireValueChanged();
+        }
       }
       return;
     }

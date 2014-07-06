@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.gui.minigui;
  */
 
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -38,6 +39,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
@@ -47,6 +49,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -99,6 +102,11 @@ public class MiniGUI extends AbstractApplication {
    * ELKI logger for the GUI.
    */
   private static final Logging LOG = Logging.getLogger(MiniGUI.class);
+
+  /**
+   * Quit action, for mnemonics.
+   */
+  protected static final String ACTION_QUIT = "quit";
 
   /**
    * The frame
@@ -313,6 +321,26 @@ public class MiniGUI extends AbstractApplication {
     catch(IOException e) {
       LOG.exception(e);
     }
+
+    {
+      KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Q, Event.CTRL_MASK);
+      panel.getInputMap().put(key, ACTION_QUIT);
+    }
+    {
+      KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.CTRL_MASK);
+      panel.getInputMap().put(key, ACTION_QUIT);
+    }
+    panel.getActionMap().put(ACTION_QUIT, new AbstractAction() {
+      /**
+       * Serial version
+       */
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        frame.dispose();
+      }
+    });
 
     // Finalize the frame.
     frame.setContentPane(panel);

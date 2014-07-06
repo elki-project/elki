@@ -38,12 +38,13 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicArrowButton;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.gui.util.ClassTree;
+import de.lmu.ifi.dbs.elki.gui.util.ClassTree.ClassNode;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
 import de.lmu.ifi.dbs.elki.gui.util.TreePopup;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -165,12 +166,21 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       return;
     }
     if(e.getSource() == popup) {
-      final DefaultMutableTreeNode sel = (DefaultMutableTreeNode) popup.getTree().getSelectionPath().getLastPathComponent();
-      String newClass = (sel != null) ? (String) sel.getUserObject() : null;
-      if(newClass != null && newClass.length() > 0) {
-        textfield.setText(newClass);
+      if (e.getActionCommand() == TreePopup.ACTION_CANCELED) {
         popup.setVisible(false);
-        fireValueChanged();
+        textfield.requestFocus();
+        return;
+      }
+      TreePath path = popup.getTree().getSelectionPath();
+      final Object comp = path.getLastPathComponent();
+      if(comp instanceof ClassNode) {
+        ClassNode sel = (path != null) ? (ClassNode) comp : null;
+        String newClass = (sel != null) ? (String) sel.getUserObject() : null;
+        if(newClass != null && newClass.length() > 0) {
+          textfield.setText(newClass);
+          popup.setVisible(false);
+          fireValueChanged();
+        }
       }
       return;
     }

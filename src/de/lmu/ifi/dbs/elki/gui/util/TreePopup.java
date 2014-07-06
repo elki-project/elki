@@ -33,6 +33,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -60,6 +62,16 @@ public class TreePopup extends JPopupMenu {
    * Serialization version.
    */
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Action string for confirmed operations (enter or click).
+   */
+  public static final String ACTION_SELECTED = "selected";
+
+  /**
+   * Action string for canceled operations (escape button pressed).
+   */
+  public static final String ACTION_CANCELED = "canceled";
 
   /**
    * Tree.
@@ -111,9 +123,6 @@ public class TreePopup extends JPopupMenu {
     tree = createTree();
     scroller = createScroller();
     configurePopup();
-
-    // installTreePopupListeners();
-    // installKeyboardActions();
   }
 
   /**
@@ -258,29 +267,37 @@ public class TreePopup extends JPopupMenu {
    * 
    * @apiviz.exclude
    */
-  protected class Handler implements MouseListener, KeyListener {
+  protected class Handler implements MouseListener, KeyListener, FocusListener {
     @Override
     public void keyTyped(KeyEvent e) {
-      // ignore
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-      if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, "selected", e.getWhen(), e.getModifiers()));
+      if(e.getKeyChar() == '\n') {
         e.consume();
       }
     }
 
     @Override
+    public void keyPressed(KeyEvent e) {
+      if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_SELECTED, e.getWhen(), e.getModifiers()));
+        e.consume();
+        return;
+      }
+      if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_CANCELED, e.getWhen(), e.getModifiers()));
+      }
+    }
+
+    @Override
     public void keyReleased(KeyEvent e) {
-      // ignore
+      if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+        e.consume();
+      }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
       if(e.getButton() == MouseEvent.BUTTON1) {
-        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, "selected", e.getWhen(), e.getModifiers()));
+        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_SELECTED, e.getWhen(), e.getModifiers()));
       }
       // ignore
     }
@@ -303,6 +320,16 @@ public class TreePopup extends JPopupMenu {
     @Override
     public void mouseExited(MouseEvent e) {
       // ignore
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+      // ignore
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+      fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_CANCELED));
     }
   }
 }

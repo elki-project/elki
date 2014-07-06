@@ -59,7 +59,7 @@ public class ClassTree {
     for(Class<?> impl : choices) {
       String name = impl.getName();
       name = (prefix != null && name.startsWith(prefix)) ? name.substring(prefix.length()) : name;
-      MutableTreeNode c = new DefaultMutableTreeNode(name);
+      MutableTreeNode c = new ClassNode(impl.getSimpleName(), name);
 
       MutableTreeNode p = null;
       int l = name.lastIndexOf('.');
@@ -83,5 +83,44 @@ public class ClassTree {
       p.insert(c, p.getChildCount());
     }
     return root;
+  }
+
+  /**
+   * Tree node representing a single class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class ClassNode extends DefaultMutableTreeNode {
+    /**
+     * Class name.
+     */
+    private String clsname;
+
+    /**
+     * Current class name.
+     * 
+     * @param display Displayed name
+     * @param clsname Actual class name
+     */
+    public ClassNode(String display, String clsname) {
+      super(display);
+      this.clsname = clsname;
+    }
+
+    /**
+     * Return the class name.
+     * 
+     * @return Class name
+     */
+    public String getClassName() {
+      return clsname;
+    }
+
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
   }
 }

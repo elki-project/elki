@@ -58,6 +58,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.lmu.ifi.dbs.elki.gui.util.ClassTree.ClassNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -559,28 +560,36 @@ public class ParameterTable extends JTable {
         return;
       }
       if(e.getSource() == popup) {
-        TreePath path = popup.getTree().getSelectionPath();
-        DefaultMutableTreeNode sel = (path != null) ? (DefaultMutableTreeNode) path.getLastPathComponent() : null;
-        String newClass = (sel != null) ? (String) sel.getUserObject() : null;
-        if(newClass != null && newClass.length() > 0) {
-          if(option instanceof ClassListParameter) {
-            String val = textfield.getText();
-            if(val.equals(DynamicParameters.STRING_OPTIONAL)) {
-              val = "";
-            }
-            if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
-              val = "";
-            }
-            val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;
-            textfield.setText(val);
-          }
-          else {
-            textfield.setText(newClass);
-          }
+        if (e.getActionCommand() == TreePopup.ACTION_CANCELED) {
           popup.setVisible(false);
+          textfield.requestFocus();
+          return;
         }
-        fireEditingStopped();
-        textfield.requestFocus();
+        TreePath path = popup.getTree().getSelectionPath();
+        final Object comp = path.getLastPathComponent();
+        if(comp instanceof ClassNode) {
+          ClassNode sel = (path != null) ? (ClassNode) comp : null;
+          String newClass = (sel != null) ? sel.getClassName() : null;
+          if(newClass != null && newClass.length() > 0) {
+            if(option instanceof ClassListParameter) {
+              String val = textfield.getText();
+              if(val.equals(DynamicParameters.STRING_OPTIONAL)) {
+                val = "";
+              }
+              if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+                val = "";
+              }
+              val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;
+              textfield.setText(val);
+            }
+            else {
+              textfield.setText(newClass);
+            }
+            popup.setVisible(false);
+            fireEditingStopped();
+            textfield.requestFocus();
+          }
+        }
         return;
       }
       LoggingUtil.warning("Unrecognized action event in ClassListEditor: " + e);
