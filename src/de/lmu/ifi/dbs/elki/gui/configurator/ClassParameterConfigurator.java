@@ -23,17 +23,29 @@ package de.lmu.ifi.dbs.elki.gui.configurator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JComboBox;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicArrowButton;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 
+import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
+import de.lmu.ifi.dbs.elki.gui.util.ClassTree;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
+import de.lmu.ifi.dbs.elki.gui.util.TreePopup;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -49,41 +61,85 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @apiviz.uses ClassParameter
  */
 public class ClassParameterConfigurator extends AbstractSingleParameterConfigurator<ClassParameter<?>> implements ActionListener, ChangeListener {
-  final JComboBox<String> value;
+  /**
+   * We need a panel to put our components on.
+   */
+  final JPanel panel;
 
+  /**
+   * Text field to store the name
+   */
+  final JTextField textfield;
+
+  /**
+   * The button to open the file selector
+   */
+  final JButton button;
+
+  /**
+   * The popup we use.
+   */
+  final TreePopup popup;
+
+  /**
+   * Configuration panel for child.
+   */
   final ConfiguratorPanel child;
 
+  /**
+   * Constructor.
+   * 
+   * @param cp Class parameter
+   * @param parent Parent component.
+   */
   public ClassParameterConfigurator(ClassParameter<?> cp, JComponent parent) {
     super(cp, parent);
-    // Input field
+    textfield = new JTextField();
+    textfield.setToolTipText(param.getShortDescription());
+    if(cp.isDefined() && !cp.tookDefaultValue()) {
+      textfield.setText(cp.getValueAsString());
+    }
+    textfield.setPreferredSize(new Dimension(400, textfield.getPreferredSize().height));
+    if(!param.tookDefaultValue() && param.isDefined() && param.getGivenValue() != null) {
+      textfield.setText(param.getValueAsString());
+      // FIXME: pre-select the current / default value in tree!
+    }
+
+    // This is a hack, but the BasicArrowButton looks very odd on GTK.
+    if(UIManager.getLookAndFeel().getName().indexOf("GTK") >= 0) {
+      // This is not optimal either, but looks more consistent at least.
+      button = new JButton(StockIcon.getStockIcon(StockIcon.EDIT_FIND));
+    }
+    else {
+      button = new BasicArrowButton(BasicArrowButton.SOUTH);
+    }
+    button.setToolTipText(param.getShortDescription());
+    button.addActionListener(this);
+
+    TreeNode root = ClassTree.build(cp.getKnownImplementations(), cp.getRestrictionClass().getPackage().getName());
+
+    popup = new TreePopup(new DefaultTreeModel(root));
+    popup.getTree().setRootVisible(false);
+    // popup.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
+    popup.addActionListener(this);
+
+    // setup panel
     {
+      panel = new JPanel();
+      panel.setLayout(new BorderLayout());
+      panel.add(textfield, BorderLayout.CENTER);
+      panel.add(button, BorderLayout.EAST);
+
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.weightx = 1.0;
-      value = new JComboBox<>();
-      value.setToolTipText(param.getShortDescription());
-      value.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
-      parent.add(value, constraints);
+      parent.add(panel, constraints);
       finishGridRow();
     }
 
-    if(!param.tookDefaultValue() && param.isDefined() && param.getGivenValue() != null) {
-      value.addItem(param.getValueAsString());
-      value.setSelectedIndex(0);
-    }
+    // FIXME: re-add "none" option for optional parameters!
+    // FIXME: re-highlight default value!
 
-    // For parameters with a default value, offer using the default
-    // For optional parameters, offer not specifying them.
-    if(cp.hasDefaultValue()) {
-      value.addItem(DynamicParameters.STRING_USE_DEFAULT + cp.getDefaultValueAsString());
-    }
-    else if(cp.isOptional()) {
-      value.addItem(DynamicParameters.STRING_OPTIONAL);
-    }
-    // Offer the shorthand version of class names.
-    for(Class<?> impl : cp.getKnownImplementations()) {
-      value.addItem(ClassParameter.canonicalClassName(impl, cp.getRestrictionClass()));
-    }
     // Child options
     {
       GridBagConstraints constraints = new GridBagConstraints();
@@ -95,7 +151,6 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       child.addChangeListener(this);
       parent.add(child, constraints);
     }
-    value.addActionListener(this);
   }
 
   @Override
@@ -105,27 +160,35 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    if(e.getSource() == value) {
-      fireValueChanged();
+    if(e.getSource() == button) {
+      popup.show(panel);
+      return;
     }
-    else {
-      LoggingUtil.warning("actionPerformed triggered by unknown source: " + e.getSource());
+    if(e.getSource() == popup) {
+      final DefaultMutableTreeNode sel = (DefaultMutableTreeNode) popup.getTree().getSelectionPath().getLastPathComponent();
+      String newClass = (String) sel.getUserObject();
+      if(newClass != null && newClass.length() > 0) {
+        textfield.setText(newClass);
+        popup.setVisible(false);
+        fireValueChanged();
+      }
+      return;
     }
+    LoggingUtil.warning("actionPerformed triggered by unknown source: " + e.getSource());
   }
 
   @Override
   public void stateChanged(ChangeEvent e) {
     if(e.getSource() == child) {
       fireValueChanged();
+      return;
     }
-    else {
-      LoggingUtil.warning("stateChanged triggered by unknown source: " + e.getSource());
-    }
+    LoggingUtil.warning("stateChanged triggered by unknown source: " + e.getSource());
   }
 
   @Override
   public String getUserInput() {
-    String val = (String) value.getSelectedItem();
+    String val = textfield.getText();
     if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
       return null;
     }

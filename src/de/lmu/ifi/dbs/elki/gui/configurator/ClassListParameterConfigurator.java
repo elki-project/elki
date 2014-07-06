@@ -27,20 +27,22 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicComboPopup;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 
 import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
+import de.lmu.ifi.dbs.elki.gui.util.ClassTree;
+import de.lmu.ifi.dbs.elki.gui.util.TreePopup;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -54,8 +56,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @author Erich Schubert
  * 
  * @apiviz.uses ClassListParameter
+ * @apiviz.uses ClassTree
  */
 public class ClassListParameterConfigurator extends AbstractSingleParameterConfigurator<ClassListParameter<?>> implements ActionListener, ChangeListener {
+  /**
+   * Configurator for children
+   */
   final ConfiguratorPanel child;
 
   /**
@@ -74,15 +80,16 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   final JButton button;
 
   /**
-   * The combobox we are abusing to produce the popup
+   * The popup we use.
    */
-  final JComboBox<String> combo;
+  final TreePopup popup;
 
   /**
-   * The popup menu.
+   * Constructor.
+   * 
+   * @param cp Class list parameter
+   * @param parent Parent component
    */
-  final SuperPopup popup;
-
   public ClassListParameterConfigurator(ClassListParameter<?> cp, JComponent parent) {
     super(cp, parent);
     textfield = new JTextField();
@@ -95,25 +102,13 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
     button = new JButton(StockIcon.getStockIcon(StockIcon.LIST_ADD));
     button.setToolTipText(param.getShortDescription());
     button.addActionListener(this);
-    // So the first item doesn't get automatically selected
-    combo = new JComboBox<>();
-    combo.setEditable(true);
-    combo.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
-    popup = new SuperPopup(combo);
 
-    // fill dropdown menu
-    {
-      // Offer the shorthand version of class names.
-      String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
-      for(Class<?> impl : cp.getKnownImplementations()) {
-        String name = impl.getName();
-        if(name.startsWith(prefix)) {
-          name = name.substring(prefix.length());
-        }
-        combo.addItem(name);
-      }
-    }
-    combo.addActionListener(this);
+    TreeNode root = ClassTree.build(cp.getKnownImplementations(), cp.getRestrictionClass().getPackage().getName());
+
+    popup = new TreePopup(new DefaultTreeModel(root));
+    popup.getTree().setRootVisible(false);
+    // popup.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
+    popup.addActionListener(this);
 
     // setup panel
     {
@@ -156,82 +151,34 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   public void actionPerformed(ActionEvent e) {
     if(e.getSource() == button) {
       popup.show(panel);
+      return;
     }
-    else if(e.getSource() == combo) {
-      String newClass = (String) combo.getSelectedItem();
+    if(e.getSource() == textfield) {
+      fireValueChanged();
+      return;
+    }
+    if(e.getSource() == popup) {
+      final DefaultMutableTreeNode sel = (DefaultMutableTreeNode) popup.getTree().getSelectionPath().getLastPathComponent();
+      String newClass = (String) sel.getUserObject();
       if(newClass != null && newClass.length() > 0) {
         String val = textfield.getText();
-        if(val.length() > 0) {
-          val = val + ClassListParameter.LIST_SEP + newClass;
-        }
-        else {
-          val = newClass;
-        }
+        val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;
         textfield.setText(val);
-        popup.hide();
+        popup.setVisible(false);
         fireValueChanged();
       }
+      return;
     }
-    else if(e.getSource() == textfield) {
-      fireValueChanged();
-    }
-    else {
-      LoggingUtil.warning("actionPerformed triggered by unknown source: " + e.getSource());
-    }
-  }
-
-  // FIXME: Refactor - duplicate code.
-  /** @apiviz.exclude */
-  class SuperPopup extends BasicComboPopup {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Constructor.
-     * 
-     * @param combo Combo box used for data storage.
-     */
-    public SuperPopup(JComboBox<String> combo) {
-      super(combo);
-    }
-
-    /**
-     * Show the menu on a particular panel.
-     * 
-     * This code is mostly copied from {@link BasicComboPopup#getPopupLocation}
-     * 
-     * @param parent Parent element to show at.
-     */
-    public void show(JPanel parent) {
-      Dimension popupSize = parent.getSize();
-      Insets insets = getInsets();
-
-      // reduce the width of the scrollpane by the insets so that the popup
-      // is the same width as the combo box.
-      popupSize.setSize(popupSize.width - (insets.right + insets.left), getPopupHeightForRowCount(comboBox.getMaximumRowCount()));
-      Rectangle popupBounds = computePopupBounds(0, comboBox.getBounds().height, popupSize.width, popupSize.height);
-      Dimension scrollSize = popupBounds.getSize();
-
-      scroller.setMaximumSize(scrollSize);
-      scroller.setPreferredSize(scrollSize);
-      scroller.setMinimumSize(scrollSize);
-
-      list.revalidate();
-
-      super.show(parent, 0, parent.getBounds().height);
-    }
+    LoggingUtil.warning("actionPerformed triggered by unknown source: " + e.getSource());
   }
 
   @Override
   public void stateChanged(ChangeEvent e) {
     if(e.getSource() == child) {
       fireValueChanged();
+      return;
     }
-    else {
-      LoggingUtil.warning("stateChanged triggered by unknown source: " + e.getSource());
-    }
+    LoggingUtil.warning("stateChanged triggered by unknown source: " + e.getSource());
   }
 
   @Override

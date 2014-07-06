@@ -20,6 +20,7 @@ document-open.png
 document-properties.png
 document-save.png
 edit-clear.png
+edit-find.png
 edit-redo.png
 edit-undo.png
 emblem-important.png
@@ -36,6 +37,7 @@ go-up.png
 help-browser.png
 list-add.png
 list-remove.png
+package.png
 process-stop.png
 ---
 

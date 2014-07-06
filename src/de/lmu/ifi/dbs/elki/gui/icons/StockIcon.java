@@ -58,6 +58,8 @@ public class StockIcon {
 
   public static final String EDIT_UNDO = "edit-undo";
 
+  public static final String EDIT_FIND = "edit-find";
+
   public static final String EMBLEM_IMPORTANT = "emblem-important";
 
   public static final String GO_BOTTOM = "go-bottom";
@@ -86,7 +88,11 @@ public class StockIcon {
 
   public static final String LIST_REMOVE = "list-remove";
 
+  public static final String PACKAGE = "package";
+
   public static final String PROCESS_STOP = "process-stop";
+
+  public static final String SYSTEM_SEARCH = "system-search";
 
   private static final Map<String, SoftReference<Icon>> iconcache = new HashMap<>();
 
