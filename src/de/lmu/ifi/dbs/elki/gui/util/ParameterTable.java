@@ -566,7 +566,7 @@ public class ParameterTable extends JTable {
           return;
         }
         TreePath path = popup.getTree().getSelectionPath();
-        final Object comp = path.getLastPathComponent();
+        final Object comp = (path != null) ? path.getLastPathComponent() : null;
         if(comp instanceof ClassNode) {
           ClassNode sel = (path != null) ? (ClassNode) comp : null;
           String newClass = (sel != null) ? sel.getClassName() : null;

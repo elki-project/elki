@@ -45,7 +45,7 @@ public class ClassTree {
    * @return Root node.
    */
   public static TreeNode build(List<Class<?>> choices, String rootpkg) {
-    MutableTreeNode root = new DefaultMutableTreeNode(rootpkg);
+    MutableTreeNode root = new PackageNode(rootpkg, rootpkg);
     HashMap<String, MutableTreeNode> lookup = new HashMap<>();
     if(rootpkg != null) {
       lookup.put(rootpkg, root);
@@ -59,7 +59,7 @@ public class ClassTree {
     for(Class<?> impl : choices) {
       String name = impl.getName();
       name = (prefix != null && name.startsWith(prefix)) ? name.substring(prefix.length()) : name;
-      MutableTreeNode c = new ClassNode(impl.getSimpleName(), name);
+      MutableTreeNode c = new ClassNode(impl.getName().substring(impl.getPackage().getName().length() + 1), name);
 
       MutableTreeNode p = null;
       int l = name.lastIndexOf('.');
@@ -74,7 +74,7 @@ public class ClassTree {
           break;
         }
         l = pname.lastIndexOf('.');
-        MutableTreeNode tmp = new DefaultMutableTreeNode(l >= 0 ? pname.substring(l + 1) : pname);
+        MutableTreeNode tmp = new PackageNode(l >= 0 ? pname.substring(l + 1) : pname, pname);
         tmp.insert(c, 0);
         c = tmp;
         lookup.put(pname, tmp);
@@ -82,7 +82,92 @@ public class ClassTree {
       }
       p.insert(c, p.getChildCount());
     }
+    // Simplify tree, except for root node
+    for(int i = 0; i < root.getChildCount(); i++) {
+      MutableTreeNode c = (MutableTreeNode) root.getChildAt(i);
+      MutableTreeNode c2 = simplifyTree(c, null);
+      if(c != c2) {
+        root.remove(i);
+        root.insert(c2, i);
+      }
+    }
     return root;
+  }
+
+  /**
+   * Simplify the tree.
+   * 
+   * @param cur Current node
+   * @param prefix Prefix to add
+   * @return Replacement node
+   */
+  private static MutableTreeNode simplifyTree(MutableTreeNode cur, String prefix) {
+    if(cur instanceof PackageNode) {
+      PackageNode node = (PackageNode) cur;
+      if(node.getChildCount() == 1) {
+        String newprefix = (prefix != null) ? prefix + "." + (String) node.getUserObject() : (String) node.getUserObject();
+        cur = simplifyTree((MutableTreeNode) node.getChildAt(0), newprefix);
+      }
+      else {
+        if(prefix != null) {
+          node.setUserObject(prefix + "." + (String) node.getUserObject());
+        }
+        for(int i = 0; i < node.getChildCount(); i++) {
+          MutableTreeNode c = (MutableTreeNode) node.getChildAt(i);
+          MutableTreeNode c2 = simplifyTree(c, null);
+          if(c != c2) {
+            node.remove(i);
+            node.insert(c2, i);
+          }
+        }
+      }
+    }
+    else if(cur instanceof ClassNode) {
+      ClassNode node = (ClassNode) cur;
+      if(prefix != null) {
+        node.setUserObject(prefix + "." + (String) node.getUserObject());
+      }
+    }
+    return cur;
+  }
+
+  /**
+   * Tree node representing a single class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class PackageNode extends DefaultMutableTreeNode {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Class name.
+     */
+    private String pkgname;
+
+    /**
+     * Current class name.
+     * 
+     * @param display Displayed name
+     * @param pkgname Actual class name
+     */
+    public PackageNode(String display, String pkgname) {
+      super(display);
+      this.pkgname = pkgname;
+    }
+
+    /**
+     * Return the package name.
+     * 
+     * @return Package name
+     */
+    public String getPackageName() {
+      return pkgname;
+    }
   }
 
   /**
@@ -93,6 +178,11 @@ public class ClassTree {
    * @apiviz.exclude
    */
   public static class ClassNode extends DefaultMutableTreeNode {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Class name.
      */
@@ -117,10 +207,5 @@ public class ClassTree {
     public String getClassName() {
       return clsname;
     }
-
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 1L;
   }
 }
