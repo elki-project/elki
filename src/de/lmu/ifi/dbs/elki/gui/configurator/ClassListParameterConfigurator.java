@@ -159,7 +159,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
     }
     if(e.getSource() == popup) {
       final DefaultMutableTreeNode sel = (DefaultMutableTreeNode) popup.getTree().getSelectionPath().getLastPathComponent();
-      String newClass = (String) sel.getUserObject();
+      String newClass = (sel != null) ? (String) sel.getUserObject() : null;
       if(newClass != null && newClass.length() > 0) {
         String val = textfield.getText();
         val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;

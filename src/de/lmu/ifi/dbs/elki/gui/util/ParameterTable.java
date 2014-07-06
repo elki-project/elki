@@ -29,11 +29,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
-import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.BitSet;
 
@@ -50,10 +49,14 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
@@ -134,6 +137,51 @@ public class ParameterTable extends JTable {
     col1.setPreferredWidth(150);
     TableColumn col2 = this.getColumnModel().getColumn(1);
     col2.setPreferredWidth(650);
+    this.addKeyListener(new Handler());
+  }
+
+  /**
+   * Internal key listener.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected class Handler implements KeyListener {
+    @Override
+    public void keyTyped(KeyEvent e) {
+      // ignore
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+      if((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+        if(e.getKeyCode() == KeyEvent.VK_SPACE //
+            || e.getKeyCode() == KeyEvent.VK_ENTER //
+            || e.getKeyCode() == KeyEvent.VK_DOWN //
+            || e.getKeyCode() == KeyEvent.VK_KP_DOWN) {
+          final ParameterTable parent = ParameterTable.this;
+          if(!parent.isEditing()) {
+            int leadRow = parent.getSelectionModel().getLeadSelectionIndex();
+            int leadColumn = parent.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+            parent.editCellAt(leadRow, leadColumn);
+            Component editorComponent = getEditorComponent();
+            // This is a hack, to make the content assist open immediately.
+            if(editorComponent instanceof DispatchingPanel) {
+              KeyListener[] l = ((DispatchingPanel) editorComponent).component.getKeyListeners();
+              for(KeyListener li : l) {
+                li.keyPressed(e);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+      // ignore
+    }
   }
 
   /**
@@ -156,16 +204,16 @@ public class ParameterTable extends JTable {
 
     @Override
     public void setValue(Object value) {
-      if (value instanceof String) {
+      if(value instanceof String) {
         setText((String) value);
         setToolTipText(null);
         return;
       }
-      if (value instanceof DynamicParameters.Node) {
+      if(value instanceof DynamicParameters.Node) {
         Parameter<?> o = ((DynamicParameters.Node) value).param;
         // Simulate a tree using indentation - there is no JTreeTable AFAICT
         StringBuilder buf = new StringBuilder();
-        for (int i = 1; i < ((DynamicParameters.Node) value).depth; i++) {
+        for(int i = 1; i < ((DynamicParameters.Node) value).depth; i++) {
           buf.append(' ');
         }
         buf.append(o.getOptionID().getName());
@@ -180,22 +228,27 @@ public class ParameterTable extends JTable {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-      if (!hasFocus) {
-        if (row < parameters.size()) {
+      if(!hasFocus) {
+        if(row < parameters.size()) {
           BitSet flags = parameters.getNode(row).flags;
           // TODO: don't hardcode black - maybe mix the other colors, too?
           c.setForeground(Color.BLACK);
-          if ((flags.get(DynamicParameters.BIT_INVALID))) {
+          if((flags.get(DynamicParameters.BIT_INVALID))) {
             c.setBackground(COLOR_SYNTAX_ERROR);
-          } else if ((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
+          }
+          else if((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
             c.setBackground(COLOR_SYNTAX_ERROR);
-          } else if ((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
+          }
+          else if((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
             c.setBackground(COLOR_INCOMPLETE);
-          } else if ((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
+          }
+          else if((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
             c.setBackground(COLOR_DEFAULT_VALUE);
-          } else if ((flags.get(DynamicParameters.BIT_OPTIONAL))) {
+          }
+          else if((flags.get(DynamicParameters.BIT_OPTIONAL))) {
             c.setBackground(COLOR_OPTIONAL);
-          } else {
+          }
+          else {
             c.setBackground(null);
           }
         }
@@ -209,7 +262,7 @@ public class ParameterTable extends JTable {
    * 
    * @author Erich Schubert
    */
-  private class DropdownEditor extends DefaultCellEditor {
+  private class DropdownEditor extends DefaultCellEditor implements KeyListener {
     /**
      * Serial Version
      */
@@ -239,59 +292,70 @@ public class ParameterTable extends JTable {
     }
 
     @Override
+    public void keyTyped(KeyEvent e) {
+      // Ignore
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+      if((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+        if(e.getKeyCode() == KeyEvent.VK_SPACE //
+            || e.getKeyCode() == KeyEvent.VK_ENTER //
+            || e.getKeyCode() == KeyEvent.VK_DOWN //
+            || e.getKeyCode() == KeyEvent.VK_KP_DOWN) {
+          if(!comboBox.isPopupVisible()) {
+            comboBox.showPopup();
+            e.consume();
+          }
+        }
+      }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+      // Ignore
+    }
+
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       // remove old contents
       comboBox.removeAllItems();
       // Put the current value in first.
       Object val = table.getValueAt(row, column);
-      if (val != null && val instanceof String) {
+      if(val != null && val instanceof String) {
         String sval = (String) val;
-        if (sval.equals(DynamicParameters.STRING_OPTIONAL)) {
+        if(sval.equals(DynamicParameters.STRING_OPTIONAL)) {
           sval = "";
         }
-        if (sval.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+        if(sval.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
           sval = "";
         }
-        if (sval != "") {
+        if(sval != "") {
           comboBox.addItem(sval);
           comboBox.setSelectedIndex(0);
         }
       }
-      if (row < parameters.size()) {
+      if(row < parameters.size()) {
         Parameter<?> option = parameters.getNode(row).param;
-        // We can do dropdown choices for class parameters
-        if (option instanceof ClassParameter<?>) {
-          ClassParameter<?> cp = (ClassParameter<?>) option;
-          // For parameters with a default value, offer using the default
-          // For optional parameters, offer not specifying them.
-          if (cp.hasDefaultValue()) {
-            comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + cp.getDefaultValueAsString());
-          } else if (cp.isOptional()) {
-            comboBox.addItem(DynamicParameters.STRING_OPTIONAL);
-          }
-          // Offer the shorthand version of class names.
-          for (Class<?> impl : cp.getKnownImplementations()) {
-            comboBox.addItem(ClassParameter.canonicalClassName(impl, cp.getRestrictionClass()));
-          }
-        }
-        // and for Flag parameters.
-        else if (option instanceof Flag) {
-          if (!Flag.SET.equals(val)) {
+        // for Flag parameters.
+        if(option instanceof Flag) {
+          if(!Flag.SET.equals(val)) {
             comboBox.addItem(Flag.SET);
           }
-          if (!Flag.NOT_SET.equals(val)) {
+          if(!Flag.NOT_SET.equals(val)) {
             comboBox.addItem(Flag.NOT_SET);
           }
         }
         // and for Enum parameters.
-        else if (option instanceof EnumParameter<?>) {
+        else if(option instanceof EnumParameter<?>) {
           EnumParameter<?> ep = (EnumParameter<?>) option;
-          for (String s : ep.getPossibleValues()) {
-            if (ep.hasDefaultValue() && ep.getDefaultValueAsString().equals(s)) {
-              if (!(DynamicParameters.STRING_USE_DEFAULT + ep.getDefaultValueAsString()).equals(val)) {
+          for(String s : ep.getPossibleValues()) {
+            if(ep.hasDefaultValue() && ep.getDefaultValueAsString().equals(s)) {
+              if(!(DynamicParameters.STRING_USE_DEFAULT + ep.getDefaultValueAsString()).equals(val)) {
                 comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + s);
               }
-            } else if (!s.equals(val)) {
+            }
+            else if(!s.equals(val)) {
               comboBox.addItem(s);
             }
           }
@@ -307,7 +371,7 @@ public class ParameterTable extends JTable {
    * 
    * @author Erich Schubert
    */
-  private class FileNameEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
+  private class FileNameEditor extends AbstractCellEditor implements TableCellEditor, ActionListener, KeyListener {
     /**
      * Serial version number
      */
@@ -334,6 +398,11 @@ public class ParameterTable extends JTable {
     int mode = FileDialog.LOAD;
 
     /**
+     * Default path.
+     */
+    String defaultpath = (new File(".")).getAbsolutePath();
+
+    /**
      * Constructor.
      */
     public FileNameEditor() {
@@ -342,6 +411,7 @@ public class ParameterTable extends JTable {
       panel.setLayout(new BorderLayout());
       panel.add(textfield, BorderLayout.CENTER);
       panel.add(button, BorderLayout.EAST);
+      textfield.addKeyListener(this);
     }
 
     /**
@@ -349,36 +419,45 @@ public class ParameterTable extends JTable {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-      final FileDialog fc = new FileDialog(frame);
-      fc.setDirectory((new File(".")).getAbsolutePath());
+      FileDialog fc = new FileDialog(frame);
+      fc.setDirectory(defaultpath);
       fc.setMode(mode);
       final String curr = textfield.getText();
-      if (curr != null && curr.length() > 0) {
+      if(curr != null && curr.length() > 0) {
         fc.setFile(curr);
       }
       fc.setVisible(true);
       String filename = fc.getFile();
-      if (filename != null) {
+      if(filename != null) {
         textfield.setText(new File(fc.getDirectory(), filename).getPath());
       }
+      fc.setVisible(false);
       fc.dispose();
       textfield.requestFocus();
-
-      // Swing file chooser. Currently much worse on Linux/GTK.
-      // final JFileChooser fc = new JFileChooser(new File("."));
-      // final String curr = textfield.getText();
-      // if (curr != null && curr.length() > 0) {
-      // fc.setSelectedFile(new File(curr));
-      // }
-      // int returnVal = fc.showOpenDialog(button);
-      //
-      // if(returnVal == JFileChooser.APPROVE_OPTION) {
-      // textfield.setText(fc.getSelectedFile().getPath());
-      // }
-      // else {
-      // // Do nothing on cancel.
-      // }
       fireEditingStopped();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+      // Ignore
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+      if((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+        if(e.getKeyCode() == KeyEvent.VK_SPACE //
+            || e.getKeyCode() == KeyEvent.VK_ENTER //
+            || e.getKeyCode() == KeyEvent.VK_DOWN //
+            || e.getKeyCode() == KeyEvent.VK_KP_DOWN) {
+          e.consume();
+          actionPerformed(new ActionEvent(e.getSource(), ActionEvent.ACTION_PERFORMED, "assist"));
+        }
+      }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+      // Ignore
     }
 
     /**
@@ -394,21 +473,16 @@ public class ParameterTable extends JTable {
      */
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-      if (row < parameters.size()) {
+      if(row < parameters.size()) {
         Parameter<?> option = parameters.getNode(row).param;
-        if (option instanceof FileParameter) {
+        if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
           File f = null;
           mode = FileParameter.FileType.INPUT_FILE.equals(fp.getFileType()) ? FileDialog.LOAD : FileDialog.SAVE;
-          if (fp.isDefined()) {
+          if(fp.isDefined()) {
             f = fp.getValue();
           }
-          if (f != null) {
-            String fn = f.getPath();
-            textfield.setText(fn);
-          } else {
-            textfield.setText("");
-          }
+          textfield.setText(f != null ? f.getPath() : "");
         }
       }
       textfield.requestFocus();
@@ -417,11 +491,11 @@ public class ParameterTable extends JTable {
   }
 
   /**
-   * Editor for selecting input and output file and folders names
+   * Editor for choosing classes.
    * 
    * @author Erich Schubert
    */
-  private class ClassListEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
+  private class ClassListEditor extends AbstractCellEditor implements TableCellEditor, ActionListener, KeyListener {
     /**
      * Serial version number
      */
@@ -443,24 +517,30 @@ public class ParameterTable extends JTable {
     final JButton button = new JButton("+");
 
     /**
-     * The combobox we are abusing to produce the popup
-     */
-    final JComboBox<String> combo = new JComboBox<>();
-
-    /**
      * The popup menu.
      */
-    final SuperPopup popup;
+    final TreePopup popup;
+
+    /**
+     * Tree model
+     */
+    private TreeModel model;
+
+    /**
+     * Parameter we are currently editing.
+     */
+    private Parameter<?> option;
 
     /**
      * Constructor.
      */
     public ClassListEditor() {
+      textfield.addKeyListener(this);
       button.addActionListener(this);
-      // So the first item doesn't get automatically selected
-      combo.setEditable(true);
-      combo.addActionListener(this);
-      popup = new SuperPopup(combo);
+      model = new DefaultTreeModel(new DefaultMutableTreeNode());
+      popup = new TreePopup(model);
+      popup.getTree().setRootVisible(false);
+      popup.addActionListener(this);
 
       panel = new DispatchingPanel(textfield);
 
@@ -474,80 +554,36 @@ public class ParameterTable extends JTable {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == button) {
+      if(e.getSource() == button) {
         popup.show(panel);
-      } else if (e.getSource() == combo) {
-        String newClass = (String) combo.getSelectedItem();
-        if (newClass != null && newClass.length() > 0) {
-          String val = textfield.getText();
-          if (val.equals(DynamicParameters.STRING_OPTIONAL)) {
-            val = "";
+        return;
+      }
+      if(e.getSource() == popup) {
+        TreePath path = popup.getTree().getSelectionPath();
+        DefaultMutableTreeNode sel = (path != null) ? (DefaultMutableTreeNode) path.getLastPathComponent() : null;
+        String newClass = (sel != null) ? (String) sel.getUserObject() : null;
+        if(newClass != null && newClass.length() > 0) {
+          if(option instanceof ClassListParameter) {
+            String val = textfield.getText();
+            if(val.equals(DynamicParameters.STRING_OPTIONAL)) {
+              val = "";
+            }
+            if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+              val = "";
+            }
+            val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;
+            textfield.setText(val);
           }
-          if (val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
-            val = "";
+          else {
+            textfield.setText(newClass);
           }
-          if (val.length() > 0) {
-            val = val + ClassListParameter.LIST_SEP + newClass;
-          } else {
-            val = newClass;
-          }
-          textfield.setText(val);
-          popup.hide();
+          popup.setVisible(false);
         }
         fireEditingStopped();
-      } else {
-        LoggingUtil.warning("Unrecognized action event in ClassListEditor: " + e);
+        textfield.requestFocus();
+        return;
       }
-    }
-
-    /**
-     * Modified popup
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    class SuperPopup extends BasicComboPopup {
-      /**
-       * Serial version
-       */
-      private static final long serialVersionUID = 1L;
-
-      /**
-       * Constructor.
-       * 
-       * @param combo Combo box used for data storage.
-       */
-      public SuperPopup(JComboBox<String> combo) {
-        super(combo);
-      }
-
-      /**
-       * Show the menu on a particular panel.
-       * 
-       * This code is mostly copied from
-       * {@link BasicComboPopup#getPopupLocation}
-       * 
-       * @param parent Parent element to show at.
-       */
-      public void show(JPanel parent) {
-        Dimension popupSize = parent.getSize();
-        Insets insets = getInsets();
-
-        // reduce the width of the scrollpane by the insets so that the popup
-        // is the same width as the combo box.
-        popupSize.setSize(popupSize.width - (insets.right + insets.left), getPopupHeightForRowCount(comboBox.getMaximumRowCount()));
-        Rectangle popupBounds = computePopupBounds(0, comboBox.getBounds().height, popupSize.width, popupSize.height);
-        Dimension scrollSize = popupBounds.getSize();
-
-        scroller.setMaximumSize(scrollSize);
-        scroller.setPreferredSize(scrollSize);
-        scroller.setMinimumSize(scrollSize);
-
-        list.revalidate();
-
-        super.show(parent, 0, parent.getBounds().height);
-      }
+      LoggingUtil.warning("Unrecognized action event in ClassListEditor: " + e);
     }
 
     /**
@@ -558,36 +594,65 @@ public class ParameterTable extends JTable {
       return textfield.getText();
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+      // Ignore
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+      if((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+        if(e.getKeyCode() == KeyEvent.VK_SPACE //
+            || e.getKeyCode() == KeyEvent.VK_ENTER //
+            || e.getKeyCode() == KeyEvent.VK_DOWN //
+            || e.getKeyCode() == KeyEvent.VK_KP_DOWN) {
+          if(!popup.isVisible()) {
+            popup.show(ClassListEditor.this.panel);
+            e.consume();
+          }
+        }
+      }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+      // Ignore
+    }
+
     /**
      * Apply the Editor for a selected option.
      */
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-      combo.removeAllItems();
-      if (row < parameters.size()) {
-        Parameter<?> option = parameters.getNode(row).param;
+      if(row < parameters.size()) {
+        this.option = parameters.getNode(row).param;
+        TreeNode root;
         // We can do dropdown choices for class parameters
-        if (option instanceof ClassListParameter<?>) {
+        if(option instanceof ClassListParameter<?>) {
           ClassListParameter<?> cp = (ClassListParameter<?>) option;
-          // Offer the shorthand version of class names.
-          String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
-          for (Class<?> impl : cp.getKnownImplementations()) {
-            String name = impl.getName();
-            if (name.startsWith(prefix)) {
-              name = name.substring(prefix.length());
-            }
-            combo.addItem(name);
-          }
+          root = ClassTree.build(cp.getKnownImplementations(), cp.getRestrictionClass().getPackage().getName());
+          button.setText("+");
         }
-        if (option.isDefined()) {
-          if (option.tookDefaultValue()) {
+        else if(option instanceof ClassParameter<?>) {
+          ClassParameter<?> cp = (ClassParameter<?>) option;
+          root = ClassTree.build(cp.getKnownImplementations(), cp.getRestrictionClass().getPackage().getName());
+          button.setText("v");
+        }
+        else {
+          root = new DefaultMutableTreeNode();
+        }
+        if(option.isDefined()) {
+          if(option.tookDefaultValue()) {
             textfield.setText(DynamicParameters.STRING_USE_DEFAULT + option.getDefaultValueAsString());
-          } else {
+          }
+          else {
             textfield.setText(option.getValueAsString());
           }
-        } else {
+        }
+        else {
           textfield.setText("");
         }
+        popup.getTree().setModel(new DefaultTreeModel(root));
       }
       return panel;
     }
@@ -649,7 +714,7 @@ public class ParameterTable extends JTable {
 
     @Override
     public Object getCellEditorValue() {
-      if (activeEditor == null) {
+      if(activeEditor == null) {
         return null;
       }
       return activeEditor.getCellEditorValue();
@@ -657,31 +722,31 @@ public class ParameterTable extends JTable {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-      if (value instanceof String) {
+      if(value instanceof String) {
         String s = (String) value;
-        if (s.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+        if(s.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
           value = s.substring(DynamicParameters.STRING_USE_DEFAULT.length());
         }
       }
-      if (row < parameters.size()) {
+      if(row < parameters.size()) {
         Parameter<?> option = parameters.getNode(row).param;
-        if (option instanceof Flag) {
+        if(option instanceof Flag) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if (option instanceof ClassListParameter<?>) {
+        if(option instanceof ClassListParameter<?>) {
           activeEditor = classListEditor;
           return classListEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if (option instanceof ClassParameter<?>) {
-          activeEditor = dropdownEditor;
-          return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+        if(option instanceof ClassParameter<?>) {
+          activeEditor = classListEditor;
+          return classListEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if (option instanceof FileParameter) {
+        if(option instanceof FileParameter) {
           activeEditor = fileNameEditor;
           return fileNameEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if (option instanceof EnumParameter<?>) {
+        if(option instanceof EnumParameter<?>) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
@@ -733,10 +798,10 @@ public class ParameterTable extends JTable {
       InputMap map = component.getInputMap(condition);
       ActionMap am = component.getActionMap();
 
-      if (map != null && am != null && isEnabled()) {
+      if(map != null && am != null && isEnabled()) {
         Object binding = map.get(ks);
         Action action = (binding == null) ? null : am.get(binding);
-        if (action != null) {
+        if(action != null) {
           return SwingUtilities.notifyAction(action, ks, e, component, e.getModifiers());
         }
       }

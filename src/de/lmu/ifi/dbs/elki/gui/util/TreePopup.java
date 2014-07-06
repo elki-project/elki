@@ -261,14 +261,15 @@ public class TreePopup extends JPopupMenu {
   protected class Handler implements MouseListener, KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
-      if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, "selected", e.getWhen(), e.getModifiers()));
-      }
+      // ignore
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-      // ignore
+      if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, "selected", e.getWhen(), e.getModifiers()));
+        e.consume();
+      }
     }
 
     @Override
