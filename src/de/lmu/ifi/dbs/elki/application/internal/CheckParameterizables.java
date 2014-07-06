@@ -88,7 +88,7 @@ public class CheckParameterizables {
     }
 
     final String internal = de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer.class.getPackage().getName();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false, false)) {
       // Classes in the same package are special and don't cause warnings.
       if(cls.getName().startsWith(internal)) {
         continue;

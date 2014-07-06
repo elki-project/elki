@@ -308,7 +308,7 @@ public class DocumentReferences {
     Map<Reference, List<Object>> map = new HashMap<>();
 
     HashSet<Package> packages = new HashSet<>();
-    for(Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true)) {
+    for(Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true, false)) {
       inspectClass(cls, refs, map);
       if(packages.add(cls.getPackage())) {
         inspectPackage(cls.getPackage(), refs, map);
@@ -385,7 +385,7 @@ public class DocumentReferences {
    */
   public static ArrayList<Class<?>> findAllClassesWithReferences() {
     ArrayList<Class<?>> references = new ArrayList<>();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true, false)) {
       if(cls.isAnnotationPresent(Reference.class)) {
         references.add(cls);
       }

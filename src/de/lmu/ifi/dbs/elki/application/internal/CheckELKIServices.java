@@ -126,7 +126,7 @@ public class CheckELKIServices {
       LOG.warning("Service file name is not a class name: " + prop);
       return;
     }
-    List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false);
+    List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false, false);
     HashSet<String> names = new HashSet<>();
     for(Class<?> c2 : impls) {
       boolean skip = false;

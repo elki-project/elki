@@ -245,7 +245,7 @@ public class DocumentParameters {
   private static void buildParameterIndex(Map<Class<?>, List<Parameter<?>>> byclass, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
     final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false, true)) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
         continue;

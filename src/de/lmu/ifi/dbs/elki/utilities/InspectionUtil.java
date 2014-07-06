@@ -97,8 +97,8 @@ public class InspectionUtil {
   static {
     String[] classpath = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
     boolean hasnonstatic = false;
-    for (String path : classpath) {
-      if (!path.endsWith(".jar")) {
+    for(String path : classpath) {
+      if(!path.endsWith(".jar")) {
         hasnonstatic = true;
       }
     }
@@ -123,12 +123,12 @@ public class InspectionUtil {
    * @return Found implementations
    */
   public static List<Class<?>> cachedFindAllImplementations(Class<?> c) {
-    if (c == null) {
+    if(c == null) {
       return Collections.emptyList();
     }
     List<Class<?>> res = CLASS_CACHE.get(c);
-    if (res == null) {
-      res = findAllImplementations(c, false);
+    if(res == null) {
+      res = findAllImplementations(c, false, true);
       CLASS_CACHE.put(c, res);
     }
     return res;
@@ -141,39 +141,61 @@ public class InspectionUtil {
    * 
    * @param c Class restriction
    * @param everything include interfaces, abstract and private classes
+   * @param parameterizable only return classes instantiable by the
+   *        parameterizable API
    * @return List of found classes.
    */
-  public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything) {
+  public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything, boolean parameterizable) {
     ArrayList<Class<?>> list = new ArrayList<>();
     // Add all from service files (i.e. jars)
     {
       Iterator<Class<?>> iter = new ELKIServiceLoader(c);
-      while (iter.hasNext()) {
+      while(iter.hasNext()) {
         list.add(iter.next());
       }
     }
-    if (!InspectionUtil.NONSTATIC_CLASSPATH) {
-      if (list.size() == 0) {
+    if(!InspectionUtil.NONSTATIC_CLASSPATH) {
+      if(list.size() == 0) {
         LOG.warning("No implementations for " + c.getName() + " were found using index files.");
       }
-    } else {
+    }
+    else {
       // Duplicate checking
       THashSet<Class<?>> dupes = new THashSet<>(list);
       // Build cache on first use:
-      if (MASTER_CACHE == null) {
+      if(MASTER_CACHE == null) {
         MASTER_CACHE = slowScan();
       }
       Iterator<Class<?>> iter = MASTER_CACHE.iterator();
-      while (iter.hasNext()) {
+      while(iter.hasNext()) {
         Class<?> cls = iter.next();
         // skip abstract / private classes.
-        if (!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+        if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
           continue;
         }
-        if (c.isAssignableFrom(cls) && !dupes.contains(cls)) {
-          list.add(cls);
-          dupes.add(cls);
+        if(!c.isAssignableFrom(cls) || dupes.contains(cls)) {
+          continue;
         }
+        if(parameterizable) {
+          boolean instantiable = false;
+          try {
+            instantiable |= cls.getConstructor().isAccessible();
+          }
+          catch(Exception | Error e) {
+            // ignore
+          }
+          try {
+            instantiable |= ClassGenericsUtil.getParameterizer(cls) != null;
+          }
+          catch(Exception | Error e) {
+            // ignore
+          }
+          if(!instantiable) {
+            continue;
+          }
+        }
+        list.add(cls);
+        dupes.add(cls);
       }
     }
     return list;
@@ -192,33 +214,37 @@ public class InspectionUtil {
     // Try exact class factory first.
     try {
       return (Class<? extends C>) CLASSLOADER.loadClass(value + FACTORY_POSTFIX);
-    } catch (ClassNotFoundException e) {
+    }
+    catch(ClassNotFoundException e) {
       // Ignore, retry
     }
     try {
       return (Class<? extends C>) CLASSLOADER.loadClass(value);
-    } catch (ClassNotFoundException e) {
+    }
+    catch(ClassNotFoundException e) {
       // Ignore, retry
     }
     final String completedName = restrictionClass.getPackage().getName() + "." + value;
     // Try factory for guessed name next
     try {
       return (Class<? extends C>) CLASSLOADER.loadClass(completedName + FACTORY_POSTFIX);
-    } catch (ClassNotFoundException e) {
+    }
+    catch(ClassNotFoundException e) {
       // Ignore, retry
     }
     // Last try: guessed name prefix only
     try {
       return (Class<? extends C>) CLASSLOADER.loadClass(completedName);
-    } catch (ClassNotFoundException e) {
+    }
+    catch(ClassNotFoundException e) {
       // Ignore, retry
     }
     // Try aliases:
-    for (Class<?> c : InspectionUtil.cachedFindAllImplementations(restrictionClass)) {
-      if (c.isAnnotationPresent(Alias.class)) {
+    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(restrictionClass)) {
+      if(c.isAnnotationPresent(Alias.class)) {
         Alias aliases = c.getAnnotation(Alias.class);
-        for (String alias : aliases.value()) {
-          if (alias.equalsIgnoreCase(value) || alias.equalsIgnoreCase(completedName)) {
+        for(String alias : aliases.value()) {
+          if(alias.equalsIgnoreCase(value) || alias.equalsIgnoreCase(completedName)) {
             return (Class<? extends C>) c;
           }
         }
@@ -236,40 +262,46 @@ public class InspectionUtil {
     ArrayList<Class<?>> res = new ArrayList<>();
     try {
       Enumeration<URL> cps = CLASSLOADER.getResources("");
-      while (cps.hasMoreElements()) {
+      while(cps.hasMoreElements()) {
         URL u = cps.nextElement();
         // Scan file sources only.
-        if ("file".equals(u.getProtocol())) {
+        if("file".equals(u.getProtocol())) {
           File path;
           try {
             path = new File(u.toURI());
-          } catch (URISyntaxException e) {
+          }
+          catch(URISyntaxException e) {
             LOG.exception("Error in classpath: " + u, e);
             continue;
           }
           Iterator<String> it = new DirClassIterator(path, DEFAULT_IGNORES);
-          while (it.hasNext()) {
+          while(it.hasNext()) {
             String classname = it.next();
             try {
               Class<?> cls = CLASSLOADER.loadClass(classname);
               // skip classes where we can't get a full name.
-              if (cls.getCanonicalName() == null) {
+              if(cls.getCanonicalName() == null) {
                 continue;
               }
               res.add(cls);
-            } catch (ClassNotFoundException e) {
+            }
+            catch(ClassNotFoundException e) {
               continue;
-            } catch (NoClassDefFoundError e) {
+            }
+            catch(NoClassDefFoundError e) {
               continue;
-            } catch (Exception e) {
+            }
+            catch(Exception e) {
               continue;
-            } catch (Error e) {
+            }
+            catch(Error e) {
               continue;
             }
           }
         }
       }
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       LOG.exception(e);
     }
     Collections.sort(res, new ClassSorter());
@@ -306,7 +338,7 @@ public class InspectionUtil {
     public DirClassIterator(File path, String[] ignorepackages) {
       this.ignorepackages = ignorepackages;
       this.prefix = path.getAbsolutePath();
-      if (prefix.charAt(prefix.length() - 1) != File.separatorChar) {
+      if(prefix.charAt(prefix.length() - 1) != File.separatorChar) {
         prefix = prefix + File.separatorChar;
       }
 
@@ -315,7 +347,7 @@ public class InspectionUtil {
 
     @Override
     public boolean hasNext() {
-      if (files.size() == 0) {
+      if(files.size() == 0) {
         findNext();
       }
       return (files.size() > 0);
@@ -325,19 +357,19 @@ public class InspectionUtil {
      * Find the next entry, since we need to skip some directories.
      */
     private void findNext() {
-      while (folders.size() > 0) {
+      while(folders.size() > 0) {
         Pair<File, String> pair = folders.remove(folders.size() - 1);
         // recurse into directories
-        if (pair.first.isDirectory()) {
-          nextfile: for (String localname : pair.first.list()) {
+        if(pair.first.isDirectory()) {
+          nextfile: for(String localname : pair.first.list()) {
             // Ignore unix-hidden files/dirs
-            if (localname.charAt(0) == '.') {
+            if(localname.charAt(0) == '.') {
               continue;
             }
             // Classes
-            if (localname.endsWith(CLASS_EXT)) {
-              if (localname.indexOf('$') >= 0) {
-                if (!localname.endsWith(FACTORY_FILE_EXT)) {
+            if(localname.endsWith(CLASS_EXT)) {
+              if(localname.indexOf('$') >= 0) {
+                if(!localname.endsWith(FACTORY_FILE_EXT)) {
                   continue;
                 }
               }
@@ -346,10 +378,10 @@ public class InspectionUtil {
             }
             // Recurse into directories
             File newf = new File(pair.first, localname);
-            if (newf.isDirectory()) {
+            if(newf.isDirectory()) {
               String newpref = pair.second + localname + '.';
-              for (String ignore : ignorepackages) {
-                if (ignore.equals(newpref)) {
+              for(String ignore : ignorepackages) {
+                if(ignore.equals(newpref)) {
                   continue nextfile;
                 }
               }
@@ -362,10 +394,10 @@ public class InspectionUtil {
 
     @Override
     public String next() {
-      if (files.size() == 0) {
+      if(files.size() == 0) {
         findNext();
       }
-      if (files.size() > 0) {
+      if(files.size() > 0) {
         return files.remove(files.size() - 1);
       }
       return null;
@@ -389,14 +421,14 @@ public class InspectionUtil {
     public int compare(Class<?> o1, Class<?> o2) {
       Package p1 = o1.getPackage();
       Package p2 = o2.getPackage();
-      if (p1 == null) {
+      if(p1 == null) {
         return -1;
       }
-      if (p2 == null) {
+      if(p2 == null) {
         return 1;
       }
       int pkgcmp = p1.getName().compareTo(p2.getName());
-      if (pkgcmp != 0) {
+      if(pkgcmp != 0) {
         return pkgcmp;
       }
       return o1.getCanonicalName().compareTo(o2.getCanonicalName());
