@@ -68,8 +68,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * <p>
  * Reference: <br>
- * K. Kailing, H.-P. Kriegel, P. Kroeger: Density connected Subspace Clustering
- * for High Dimensional Data. <br>
+ * K. Kailing, H.-P. Kriegel, P. Kröger:<br />
+ * Density connected Subspace Clustering for High Dimensional Data<br />
  * In Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004.
  * </p>
  * 
@@ -82,8 +82,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
 @Title("SUBCLU: Density connected Subspace Clustering")
-@Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. SUBCLU delivers for each subspace the same clusters DBSCAN would have found, when applied to this subspace seperately.")
-@Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", title = "Density connected Subspace Clustering for High Dimensional Data. ", booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004")
+@Description("Algorithm to detect arbitrarily shaped and positioned clusters in subspaces. "//
+    + "SUBCLU delivers for each subspace the same clusters DBSCAN would have found, "//
+    + "when applied to this subspace seperately.")
+@Reference(authors = "K. Kailing, H.-P. Kriegel, P. Kröger", //
+title = "Density connected Subspace Clustering for High Dimensional Data", //
+booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004", //
+url = "http://www.siam.org/meetings/sdm04/proceedings/sdm04_023.pdf")
 public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
