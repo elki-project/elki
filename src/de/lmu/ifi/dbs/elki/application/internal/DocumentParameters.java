@@ -272,7 +272,8 @@ public class DocumentParameters {
               ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
             }
             catch(java.lang.NoSuchMethodException e) {
-              LOG.warning("Could not instantiate class " + cls.getName() + " - no appropriate constructor or parameterizer found.");
+              // LOG.warning("Could not instantiate class " + cls.getName() +
+              // " - no appropriate constructor or parameterizer found.");
             }
             catch(java.lang.reflect.InvocationTargetException e) {
               if(e.getCause() instanceof RuntimeException) {
@@ -286,10 +287,7 @@ public class DocumentParameters {
             catch(RuntimeException e) {
               throw e;
             }
-            catch(Exception e) {
-              throw new RuntimeException(e);
-            }
-            catch(java.lang.Error e) {
+            catch(Exception | java.lang.Error e) {
               throw new RuntimeException(e);
             }
           }

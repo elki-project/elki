@@ -44,8 +44,8 @@ public class AllTests extends TestSuite {
    */
   public static Test suite() {
     TestSuite suite = new TestSuite();
-    List<Class<?>> tests = InspectionUtil.findAllImplementations(TestCase.class, false);
-    tests.addAll(InspectionUtil.findAllImplementations(JUnit4Test.class, false));
+    List<Class<?>> tests = InspectionUtil.findAllImplementations(TestCase.class, false, false);
+    tests.addAll(InspectionUtil.findAllImplementations(JUnit4Test.class, false, false));
     for(Class<?> cls : tests) {
       if(cls == AllTests.class) {
         continue;
