@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Clustering my means of Medoids<br />
  * Kaufman, L. and Rousseeuw, P.J.<br />
- * in: Statistical Data Analysis Based on the L_1–Norm and Related Methods
+ * in: Statistical Data Analysis Based on the L1-Norm and Related Methods
  * </p>
  * 
  * @author Erich Schubert
@@ -77,7 +77,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> vector datatype
  */
 @Title("Partioning Around Medoids")
-@Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
+@Reference(title = "Clustering my means of Medoids", //
+authors = "Kaufman, L. and Rousseeuw, P.J.", //
+booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods")
 public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
