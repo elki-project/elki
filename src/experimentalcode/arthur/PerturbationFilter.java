@@ -32,6 +32,9 @@ import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
@@ -52,9 +55,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * a given percentage of the original standard deviation in the data
  * distribution (assuming a Gaussian distribution there), or to a percentage of
  * the extension in each attribute ({@code maximumValue - minimumValue}).
+ *
+ * This filter has a potentially wide use but has been implemented for the following publication:
+ * 
+ * Reference:
+ * <p>
+ * A. Zimek, R. J. G. B. Campello, J. Sander:</br>
+ * Data Perturbation for Outlier Detection Ensembles.<\br>
+ * In: Proc. 26th International Conference on Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark, 2014.
+ * </p>
  * 
  * @author Arthur Zimek
  */
+@Title("Data Perturbation for Outlier Detection Ensembles")
+@Description("A filter to perturb a datasset on read by an additive noise component, implemented for use in an outlier ensemble (this reference).")
+@Reference(authors = "A. Zimek, R. J. G. B. Campello, J. Sander",//
+title = "Data Perturbation for Outlier Detection Ensembles", //
+booktitle = "Proc. 26th International Conference on Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark, 2014", //
+url = "http://dx.doi.org/10.1145/2618243.2618257")
 public class PerturbationFilter<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> {
   /**
    * Class logger
