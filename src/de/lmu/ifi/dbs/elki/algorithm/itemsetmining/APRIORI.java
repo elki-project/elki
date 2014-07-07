@@ -59,16 +59,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides the APRIORI algorithm for Mining Association Rules.
+ * The APRIORI algorithm for Mining Association Rules.
+ * 
+ * Reference:
  * <p>
- * Reference: <br>
- * R. Agrawal, R. Srikant: Fast Algorithms for Mining Association Rules in Large
- * Databases. <br>
+ * R. Agrawal, R. Srikant:<br />
+ * Fast Algorithms for Mining Association Rules<br />
  * In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de
  * Chile, Chile 1994.
  * </p>
  * 
  * This implementation uses some simple optimizations for 1- and 2-itemsets.
+ * 
+ * Note: this algorithm scales well to a large number of transactions, but not
+ * so well to a large number of frequent itemsets (items). For best results, use
+ * domain-specific preprocessing to aggregate items into groups. Use statistics
+ * logging to keep track of candidate set sizes.
  * 
  * @author Arthur Zimek
  * @author Erich Schubert
@@ -79,9 +85,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("APRIORI: Algorithm for Mining Association Rules")
 @Description("Searches for frequent itemsets")
 @Reference(authors = "R. Agrawal, R. Srikant", //
-title = "Fast Algorithms for Mining Association Rules in Large Databases", //
+title = "Fast Algorithms for Mining Association Rules", //
 booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", //
-url = "http://www.acm.org/sigmod/vldb/conf/1994/P487.PDF")
+url = "http://www.vldb.org/conf/1994/P487.PDF")
 public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   /**
    * The logger for this class.
