@@ -12,7 +12,6 @@ de.lmu.ifi.dbs.elki.datasource.filter.VectorDimensionalityFilter
 de.lmu.ifi.dbs.elki.datasource.filter.DropNaNFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ReplaceNaNWithRandomFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoMissingValuesFilter
-de.lmu.ifi.dbs.elki.datasource.filter.HistogramJitterFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SplitNumberVectorFilter
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization
@@ -34,4 +33,6 @@ de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorFeatureSelectionFilt
 de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorRandomFeatureSelectionFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.LatLngToECEFFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.LngLatToECEFFilter
+de.lmu.ifi.dbs.elki.datasource.filter.transform.PerturbationFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.ProjectionFilter
+de.lmu.ifi.dbs.elki.datasource.filter.transform.HistogramJitterFilter
