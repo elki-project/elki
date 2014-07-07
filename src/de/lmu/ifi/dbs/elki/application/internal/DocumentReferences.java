@@ -232,9 +232,11 @@ public class DocumentReferences {
         titlediv.appendChild(titleb);
         classdd.appendChild(titlediv);
         // Booktitle
-        Element booktitlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
-        booktitlediv.setTextContent("In: " + ref.booktitle());
-        classdd.appendChild(booktitlediv);
+        if(ref.booktitle().length() > 0) {
+          Element booktitlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
+          booktitlediv.setTextContent("In: " + ref.booktitle());
+          classdd.appendChild(booktitlediv);
+        }
         // URL
         if(ref.url().length() > 0) {
           Element urldiv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
@@ -292,7 +294,9 @@ public class DocumentReferences {
         // Title
         refstreamW.println(indent + "'''" + ref.title() + "'''" + " [[br]]");
         // Booktitle
-        refstreamW.println(indent + "In: " + ref.booktitle() + " [[br]]");
+        if(ref.booktitle().length() > 0) {
+          refstreamW.println(indent + "In: " + ref.booktitle() + " [[br]]");
+        }
         // URL
         if(ref.url().length() > 0) {
           refstreamW.println(indent + "Online: [" + ref.url() + "][[br]]");
