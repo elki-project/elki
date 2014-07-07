@@ -40,6 +40,7 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
+import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -58,6 +59,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.lmu.ifi.dbs.elki.gui.icons.StockIcon;
 import de.lmu.ifi.dbs.elki.gui.util.ClassTree.ClassNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
@@ -139,6 +141,9 @@ public class ParameterTable extends JTable {
     TableColumn col2 = this.getColumnModel().getColumn(1);
     col2.setPreferredWidth(650);
     this.addKeyListener(new Handler());
+
+    // Increase row height, to make editors usable.
+    setRowHeight(getRowHeight() + 4);
   }
 
   /**
@@ -543,6 +548,12 @@ public class ParameterTable extends JTable {
       popup.getTree().setRootVisible(false);
       popup.addActionListener(this);
 
+      Icon classIcon = StockIcon.getStockIcon(StockIcon.GO_NEXT);
+      Icon packageIcon = StockIcon.getStockIcon(StockIcon.PACKAGE);
+      TreePopup.Renderer renderer = (TreePopup.Renderer) popup.getTree().getCellRenderer();
+      renderer.setLeafIcon(classIcon);
+      renderer.setFolderIcon(packageIcon);
+
       panel = new DispatchingPanel(textfield);
 
       panel.setLayout(new BorderLayout());
@@ -560,7 +571,7 @@ public class ParameterTable extends JTable {
         return;
       }
       if(e.getSource() == popup) {
-        if (e.getActionCommand() == TreePopup.ACTION_CANCELED) {
+        if(e.getActionCommand() == TreePopup.ACTION_CANCELED) {
           popup.setVisible(false);
           textfield.requestFocus();
           return;
@@ -573,10 +584,8 @@ public class ParameterTable extends JTable {
           if(newClass != null && newClass.length() > 0) {
             if(option instanceof ClassListParameter) {
               String val = textfield.getText();
-              if(val.equals(DynamicParameters.STRING_OPTIONAL)) {
-                val = "";
-              }
-              if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+              if(val.equals(DynamicParameters.STRING_OPTIONAL) //
+                  || val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
                 val = "";
               }
               val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;

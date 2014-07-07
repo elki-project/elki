@@ -30,6 +30,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -111,6 +112,12 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
     // popup.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
     popup.addActionListener(this);
 
+    Icon classIcon = StockIcon.getStockIcon(StockIcon.GO_NEXT);
+    Icon packageIcon = StockIcon.getStockIcon(StockIcon.PACKAGE);
+    TreePopup.Renderer renderer = (TreePopup.Renderer) popup.getTree().getCellRenderer();
+    renderer.setLeafIcon(classIcon);
+    renderer.setFolderIcon(packageIcon);
+    
     // setup panel
     {
       panel = new JPanel();
@@ -159,16 +166,16 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
       return;
     }
     if(e.getSource() == popup) {
-      if (e.getActionCommand() == TreePopup.ACTION_CANCELED) {
+      if(e.getActionCommand() == TreePopup.ACTION_CANCELED) {
         popup.setVisible(false);
         textfield.requestFocus();
         return;
       }
       TreePath path = popup.getTree().getSelectionPath();
-      final Object comp = path.getLastPathComponent();
+      final Object comp = path != null ? path.getLastPathComponent() : null;
       if(comp instanceof ClassNode) {
         ClassNode sel = (path != null) ? (ClassNode) comp : null;
-        String newClass = (sel != null) ? (String) sel.getUserObject() : null;
+        String newClass = (sel != null) ? sel.getClassName() : null;
         if(newClass != null && newClass.length() > 0) {
           String val = textfield.getText();
           val = (val.length() > 0) ? val + ClassListParameter.LIST_SEP + newClass : newClass;

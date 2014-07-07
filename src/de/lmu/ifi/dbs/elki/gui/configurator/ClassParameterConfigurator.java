@@ -30,6 +30,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -124,6 +125,12 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
     // popup.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
     popup.addActionListener(this);
 
+    Icon classIcon = StockIcon.getStockIcon(StockIcon.GO_NEXT);
+    Icon packageIcon = StockIcon.getStockIcon(StockIcon.PACKAGE);
+    TreePopup.Renderer renderer = (TreePopup.Renderer) popup.getTree().getCellRenderer();
+    renderer.setLeafIcon(classIcon);
+    renderer.setFolderIcon(packageIcon);
+    
     // setup panel
     {
       panel = new JPanel();
@@ -172,10 +179,10 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
         return;
       }
       TreePath path = popup.getTree().getSelectionPath();
-      final Object comp = path.getLastPathComponent();
+      final Object comp = path != null ? path.getLastPathComponent() : null;
       if(comp instanceof ClassNode) {
         ClassNode sel = (path != null) ? (ClassNode) comp : null;
-        String newClass = (sel != null) ? (String) sel.getUserObject() : null;
+        String newClass = (sel != null) ? sel.getClassName() : null;
         if(newClass != null && newClass.length() > 0) {
           textfield.setText(newClass);
           popup.setVisible(false);

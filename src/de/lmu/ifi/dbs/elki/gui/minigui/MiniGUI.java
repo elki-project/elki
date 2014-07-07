@@ -64,7 +64,9 @@ import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
 import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
+import de.lmu.ifi.dbs.elki.logging.CLISmartHandler;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -536,7 +538,9 @@ public class MiniGUI extends AbstractApplication {
           }
           gui.doSetParameters(params);
         }
-        catch(UnableToComplyException e) {
+        catch(Exception | Error e) {
+          // Restore error handler, as the GUI is likely broken.
+          LoggingConfiguration.replaceDefaultHandler(new CLISmartHandler());
           LOG.exception(e);
         }
       }

@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.gui.util;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -41,15 +42,20 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 
 /**
@@ -141,6 +147,7 @@ public class TreePopup extends JPopupMenu {
     tree.setFocusable(true);
     tree.addMouseListener(handler);
     tree.addKeyListener(handler);
+    tree.setCellRenderer(new Renderer());
     return tree;
   }
 
@@ -257,6 +264,76 @@ public class TreePopup extends JPopupMenu {
       if(listeners[i] == ActionListener.class) {
         ((ActionListener) listeners[i + 1]).actionPerformed(event);
       }
+    }
+  }
+
+  /**
+   * Tree cell render.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public class Renderer extends JPanel implements TreeCellRenderer {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Label to render
+     */
+    JLabel label;
+
+    /**
+     * Colors
+     */
+    private Color selbg, defbg, selfg, deffg;
+
+    /**
+     * Icons
+     */
+    private Icon leafIcon, folderIcon;
+
+    /**
+     * Constructor.
+     */
+    protected Renderer() {
+      selbg = UIManager.getColor("Tree.selectionBackground");
+      defbg = UIManager.getColor("Tree.textBackground");
+      selfg = UIManager.getColor("Tree.selectionForeground");
+      deffg = UIManager.getColor("Tree.textForeground");
+
+      setLayout(new BorderLayout());
+      add(label = new JLabel("This should never be rendered."));
+    }
+
+    @Override
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+      label.setText((String) ((DefaultMutableTreeNode) value).getUserObject());
+      setForeground(selected ? selfg : deffg);
+      setBackground(selected ? selbg : defbg);
+      label.setIcon(leaf ? leafIcon : folderIcon);
+      setPreferredSize(new Dimension(1000, label.getPreferredSize().height));
+      return this;
+    }
+
+    /**
+     * Set the leaf icon
+     * 
+     * @param leafIcon Leaf icon
+     */
+    public void setLeafIcon(Icon leafIcon) {
+      this.leafIcon = leafIcon;
+    }
+
+    /**
+     * Set the folder icon.
+     * 
+     * @param folderIcon Folder icon
+     */
+    public void setFolderIcon(Icon folderIcon) {
+      this.folderIcon = folderIcon;
     }
   }
 

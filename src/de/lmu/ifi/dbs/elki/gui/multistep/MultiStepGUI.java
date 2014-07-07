@@ -47,7 +47,9 @@ import de.lmu.ifi.dbs.elki.gui.multistep.panels.OutputTabPanel;
 import de.lmu.ifi.dbs.elki.gui.multistep.panels.SavedSettingsTabPanel;
 import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
+import de.lmu.ifi.dbs.elki.logging.CLISmartHandler;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -124,7 +126,8 @@ public class MultiStepGUI extends AbstractApplication {
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     try {
       frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       // Ignore - icon not found is not fatal.
     }
 
@@ -171,9 +174,11 @@ public class MultiStepGUI extends AbstractApplication {
     SavedSettingsFile settings = new SavedSettingsFile(MiniGUI.SAVED_SETTINGS_FILENAME);
     try {
       settings.load();
-    } catch (FileNotFoundException e) {
+    }
+    catch(FileNotFoundException e) {
       LOG.warning("Error loading saved settings.", e);
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       LOG.exception(e);
     }
 
@@ -250,12 +255,16 @@ public class MultiStepGUI extends AbstractApplication {
         try {
           final MultiStepGUI gui = new MultiStepGUI();
           gui.run();
-          if (args != null && args.length > 0) {
+          if(args != null && args.length > 0) {
             gui.setParameters(new SerializedParameterization(args));
-          } else {
+          }
+          else {
             gui.setParameters(new SerializedParameterization());
           }
-        } catch (UnableToComplyException e) {
+        }
+        catch(Exception | Error e) {
+          // Restore error handler, as the GUI is likely broken.
+          LoggingConfiguration.replaceDefaultHandler(new CLISmartHandler());
           LOG.exception(e);
         }
       }
