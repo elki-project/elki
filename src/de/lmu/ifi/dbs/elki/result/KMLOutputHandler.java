@@ -82,7 +82,8 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 // TODO: make configurable color scheme
 @Reference(authors = "E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek", //
 booktitle = "Proc. 12th International Symposium on Spatial and Temporal Databases (SSTD), Minneapolis, MN, 2011", //
-title = "Spatial Outlier Detection: Data, Algorithms, Visualizations")
+title = "Spatial Outlier Detection: Data, Algorithms, Visualizations", //
+url = "http://dx.doi.org/10.1007/978-3-642-22922-0_41")
 public class KMLOutputHandler implements ResultHandler {
   /**
    * Logger class to use.
@@ -133,10 +134,10 @@ public class KMLOutputHandler implements ResultHandler {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     ArrayList<OutlierResult> ors = ResultUtil.filterResults(newResult, OutlierResult.class);
-    if (ors.size() > 1) {
+    if(ors.size() > 1) {
       throw new AbortException("More than one outlier result found. The KML writer only supports a single outlier result!");
     }
-    if (ors.size() == 1) {
+    if(ors.size() == 1) {
       Database database = ResultUtil.findDatabase(baseResult);
       try {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
@@ -149,13 +150,15 @@ public class KMLOutputHandler implements ResultHandler {
         out.closeEntry();
         out.flush();
         out.close();
-        if (autoopen) {
+        if(autoopen) {
           Desktop.getDesktop().open(filename);
         }
-      } catch (XMLStreamException e) {
+      }
+      catch(XMLStreamException e) {
         LOG.exception(e);
         throw new AbortException("XML error in KML output.", e);
-      } catch (IOException e) {
+      }
+      catch(IOException e) {
         LOG.exception(e);
         throw new AbortException("IO error in KML output.", e);
       }
@@ -196,7 +199,7 @@ public class KMLOutputHandler implements ResultHandler {
     }
     {
       // TODO: generate styles from color scheme
-      for (int i = 0; i < NUMSTYLES; i++) {
+      for(int i = 0; i < NUMSTYLES; i++) {
         Color col = getColorForValue(i / (NUMSTYLES - 1.0));
         xmlw.writeStartElement("Style");
         xmlw.writeAttribute("id", "s" + i);
@@ -229,14 +232,14 @@ public class KMLOutputHandler implements ResultHandler {
         writeNewlineOnDebug(xmlw);
       }
     }
-    for (DBIDIter iter = outlierResult.getOrdering().iter(ids).iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = outlierResult.getOrdering().iter(ids).iter(); iter.valid(); iter.advance()) {
       double score = scores.doubleValue(iter);
       PolygonsObject poly = polys.get(iter);
       String label = labels.get(iter);
-      if (Double.isNaN(score)) {
+      if(Double.isNaN(score)) {
         LOG.warning("No score for object " + DBIDUtil.toString(iter));
       }
-      if (poly == null) {
+      if(poly == null) {
         LOG.warning("No polygon for object " + DBIDUtil.toString(iter) + " - skipping.");
         continue;
       }
@@ -258,7 +261,7 @@ public class KMLOutputHandler implements ResultHandler {
       {
         xmlw.writeStartElement("Polygon");
         writeNewlineOnDebug(xmlw);
-        if (compat) {
+        if(compat) {
           xmlw.writeStartElement("altitudeMode");
           xmlw.writeCharacters("relativeToGround");
           xmlw.writeEndElement(); // close altitude mode
@@ -266,10 +269,11 @@ public class KMLOutputHandler implements ResultHandler {
         }
         // First polygon clockwise?
         boolean first = true;
-        for (Polygon p : poly.getPolygons()) {
-          if (first) {
+        for(Polygon p : poly.getPolygons()) {
+          if(first) {
             xmlw.writeStartElement("outerBoundaryIs");
-          } else {
+          }
+          else {
             xmlw.writeStartElement("innerBoundaryIs");
           }
           xmlw.writeStartElement("LinearRing");
@@ -278,19 +282,20 @@ public class KMLOutputHandler implements ResultHandler {
           // Reverse anti-clockwise polygons.
           boolean reverse = (p.testClockwise() >= 0);
           ArrayListIter<Vector> it = p.iter();
-          if (reverse) {
+          if(reverse) {
             it.seek(p.size() - 1);
           }
-          while (it.valid()) {
+          while(it.valid()) {
             Vector v = it.get();
             xmlw.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
-            if (compat && (v.getDimensionality() == 2)) {
+            if(compat && (v.getDimensionality() == 2)) {
               xmlw.writeCharacters(",500");
             }
             xmlw.writeCharacters(" ");
-            if (!reverse) {
+            if(!reverse) {
               it.advance();
-            } else {
+            }
+            else {
               it.retract();
             }
           }
@@ -319,15 +324,15 @@ public class KMLOutputHandler implements ResultHandler {
    */
   private StringBuilder makeDescription(Collection<Relation<?>> relations, DBIDRef id) {
     StringBuilder buf = new StringBuilder();
-    for (Relation<?> rel : relations) {
+    for(Relation<?> rel : relations) {
       Object o = rel.get(id);
-      if (o == null) {
+      if(o == null) {
         continue;
       }
       String s = o.toString();
       // FIXME: strip html characters
-      if (s != null) {
-        if (buf.length() > 0) {
+      if(s != null) {
+        if(buf.length() > 0) {
           buf.append("<br />");
         }
         buf.append(s);
@@ -343,7 +348,7 @@ public class KMLOutputHandler implements ResultHandler {
    * @throws XMLStreamException
    */
   private void writeNewlineOnDebug(XMLStreamWriter out) throws XMLStreamException {
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       out.writeCharacters("\n");
     }
   }
@@ -360,12 +365,12 @@ public class KMLOutputHandler implements ResultHandler {
     // Colors at these positions
     Color[] cols = new Color[] { new Color(0.0f, 0.0f, 0.0f, 0.6f), new Color(0.0f, 0.0f, 1.0f, 0.8f), new Color(1.0f, 0.0f, 0.0f, 0.9f), new Color(1.0f, 1.0f, 0.0f, 1.0f) };
     assert (pos.length == cols.length);
-    if (val < pos[0]) {
+    if(val < pos[0]) {
       val = pos[0];
     }
     // Linear interpolation:
-    for (int i = 1; i < pos.length; i++) {
-      if (val <= pos[i]) {
+    for(int i = 1; i < pos.length; i++) {
+      if(val <= pos[i]) {
         Color prev = cols[i - 1];
         Color next = cols[i];
         final double mix = (val - pos[i - 1]) / (pos[i] - pos[i - 1]);
@@ -440,22 +445,22 @@ public class KMLOutputHandler implements ResultHandler {
       super.makeOptions(config);
       FileParameter outputP = new FileParameter(OutputStep.Parameterizer.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
       outputP.setShortDescription("Filename the KMZ file (compressed KML) is written to.");
-      if (config.grab(outputP)) {
+      if(config.grab(outputP)) {
         filename = outputP.getValue();
       }
 
       ObjectParameter<OutlierScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScalingFunction.class, OutlierLinearScaling.class);
-      if (config.grab(scalingP)) {
+      if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
 
       Flag compatF = new Flag(COMPAT_ID);
-      if (config.grab(compatF)) {
+      if(config.grab(compatF)) {
         compat = compatF.getValue();
       }
 
       Flag autoopenF = new Flag(AUTOOPEN_ID);
-      if (config.grab(autoopenF)) {
+      if(config.grab(autoopenF)) {
         autoopen = autoopenF.getValue();
       }
     }
