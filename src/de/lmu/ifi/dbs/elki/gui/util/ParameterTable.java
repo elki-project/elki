@@ -39,6 +39,7 @@ import java.util.BitSet;
 import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.InputMap;
@@ -295,6 +296,7 @@ public class ParameterTable extends JTable {
       panel = new DispatchingPanel((JComponent) comboBox.getEditor().getEditorComponent());
       panel.setLayout(new BorderLayout());
       panel.add(comboBox, BorderLayout.CENTER);
+      comboBox.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
     }
 
     @Override
@@ -417,6 +419,7 @@ public class ParameterTable extends JTable {
       panel.setLayout(new BorderLayout());
       panel.add(textfield, BorderLayout.CENTER);
       panel.add(button, BorderLayout.EAST);
+      textfield.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
       textfield.addKeyListener(this);
     }
 
@@ -559,6 +562,7 @@ public class ParameterTable extends JTable {
       panel.setLayout(new BorderLayout());
       panel.add(textfield, BorderLayout.CENTER);
       panel.add(button, BorderLayout.EAST);
+      textfield.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
     }
 
     /**
@@ -725,7 +729,9 @@ public class ParameterTable extends JTable {
       final JComboBox<String> combobox = new JComboBox<>();
       combobox.setEditable(true);
       this.dropdownEditor = new DropdownEditor(combobox);
-      this.plaintextEditor = new DefaultCellEditor(new JTextField());
+      JTextField tf = new JTextField();
+      tf.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+      this.plaintextEditor = new DefaultCellEditor(tf);
       this.classListEditor = new ClassListEditor();
       this.fileNameEditor = new FileNameEditor();
     }
