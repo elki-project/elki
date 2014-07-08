@@ -31,10 +31,8 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -92,11 +90,6 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
   int numterms;
 
   /**
-   * Buffer reader.
-   */
-  private BufferedReader reader;
-
-  /**
    * Metadata.
    */
   protected BundleMeta meta;
@@ -105,11 +98,6 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
    * Event to report next.
    */
   Event nextevent;
-
-  /**
-   * Current line number, for error reporting.
-   */
-  int lineNumber;
 
   /**
    * Current clustering.
@@ -154,8 +142,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
 
   @Override
   public void initStream(InputStream in) {
-    reader = new BufferedReader(new InputStreamReader(in));
-    lineNumber = 0;
+    super.initStream(in);
     range = null; // New range
     haslbl = false;
   }
@@ -168,17 +155,13 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
       return ret;
     }
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        // Skip empty lines and comments
-        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
-          continue;
-        }
+      while(nextLineExceptComments()) {
         buf1.clear();
         lbl.clear();
         TIntIntMap csize = new TIntIntHashMap();
         TIntObjectMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
         String name = null;
-        for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
+        for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
           try {
             int cnum = (int) tokenizer.getLongBase10();
             buf1.add(cnum);
@@ -234,12 +217,10 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
         }
         return Event.NEXT_OBJECT;
       }
-      reader.close();
-      reader = null;
       return Event.END_OF_STREAM;
     }
     catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
+      throw new IllegalArgumentException("Error while parsing line " + getLineNumber() + ".");
     }
   }
 

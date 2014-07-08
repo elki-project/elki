@@ -75,7 +75,7 @@ public abstract class AbstractParser {
   /**
    * Comment pattern.
    */
-  protected Matcher comment = null;
+  private Matcher comment = null;
 
   /**
    * String tokenizer.
@@ -92,7 +92,7 @@ public abstract class AbstractParser {
   public AbstractParser(Pattern colSep, String quoteChars, Pattern comment) {
     super();
     this.tokenizer = new Tokenizer(colSep, quoteChars);
-    this.comment = comment.matcher("Dummy text");
+    this.comment = comment.matcher("");
   }
 
   /**
@@ -119,6 +119,26 @@ public abstract class AbstractParser {
    * @return Logger.
    */
   protected abstract Logging getLogger();
+
+  /**
+   * Cleanup internal data structures.
+   */
+  public void cleanup() {
+    tokenizer.cleanup();
+    if(comment != null) {
+      comment.reset("");
+    }
+  }
+
+  /**
+   * Match a comment line.
+   * 
+   * @param line Line to test
+   * @return {@code true} if the line matches the comment pattern.
+   */
+  protected boolean isComment(String line) {
+    return (comment != null && comment.reset(line).matches());
+  }
 
   /**
    * Returns a string representation of the object.

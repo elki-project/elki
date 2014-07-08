@@ -23,7 +23,10 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -31,9 +34,22 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 /**
  * Base class for streaming parsers.
  * 
+ * TODO: build our own replacement for {@link BufferedReader}, which recycles
+ * the string builder.
+ * 
  * @author Erich Schubert
  */
 public abstract class AbstractStreamingParser extends AbstractParser implements StreamingParser {
+  /**
+   * Buffer reader.
+   */
+  private BufferedReader reader;
+
+  /**
+   * Current line number.
+   */
+  private int lineNumber;
+
   /**
    * Constructor.
    * 
@@ -49,5 +65,51 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
   final public MultipleObjectsBundle parse(InputStream in) {
     this.initStream(in);
     return MultipleObjectsBundle.fromStream(this);
+  }
+
+  @Override
+  public void initStream(InputStream in) {
+    reader = new BufferedReader(new InputStreamReader(in));
+    lineNumber = 0;
+  }
+
+  /**
+   * Get the current line number.
+   * 
+   * @return Current line number
+   */
+  protected int getLineNumber() {
+    return lineNumber;
+  }
+
+  /**
+   * Read the next line into the tokenizer.
+   * 
+   * @return The next line, or {@code null}.
+   */
+  protected boolean nextLineExceptComments() throws IOException {
+    String line;
+    while((line = reader.readLine()) != null) {
+      ++lineNumber;
+      final int len = lengthWithoutLinefeed(line);
+      if(len > 0 && !isComment(line)) {
+        tokenizer.initialize(line, 0, len);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public void cleanup() {
+    super.cleanup();
+    try {
+      if(reader != null) {
+        reader.close();
+      }
+    }
+    catch(IOException e) {
+      // Ignore - maybe already closed.
+    }
   }
 }

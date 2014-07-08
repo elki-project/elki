@@ -184,7 +184,8 @@ public class Tokenizer implements Iter {
         break;
       }
     }
-    return input.subSequence(sstart, ++send).toString();
+    ++send;
+    return (sstart < send) ? input.subSequence(sstart, send).toString() : "";
   }
 
   /**
@@ -265,5 +266,13 @@ public class Tokenizer implements Iter {
    */
   public int getEnd() {
     return end;
+  }
+
+  /**
+   * Perform cleanup.
+   */
+  public void cleanup() {
+    input = null;
+    matcher.reset("");
   }
 }

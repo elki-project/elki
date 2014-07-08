@@ -83,13 +83,13 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
     if(parser instanceof StreamingParser) {
       final StreamingParser streamParser = (StreamingParser)parser;
       streamParser.initStream(in);
-
       // normalize objects and transform labels
       if(LOG.isDebugging()) {
-        LOG.debugFine("Invoking filters.");
+        LOG.debugFine("Parsing as stream.");
       }
       Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".load").begin() : null;
       MultipleObjectsBundle objects = MultipleObjectsBundle.fromStream(invokeFilters(streamParser));
+      parser.cleanup();
       if (duration != null) {
         LOG.statistics(duration.end());
       }
@@ -98,6 +98,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
     else {
       Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".parse").begin() : null;
       MultipleObjectsBundle parsingResult = parser.parse(in);
+      parser.cleanup();
       if (duration != null) {
         LOG.statistics(duration.end());
       }

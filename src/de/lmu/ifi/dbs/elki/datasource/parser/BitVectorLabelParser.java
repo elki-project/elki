@@ -25,19 +25,10 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 
 import gnu.trove.list.array.TLongArrayList;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -54,8 +45,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @apiviz.has BitVector
  */
 @Title("Bit Vector Label Parser")
-@Description("Parses the following format of lines:\n" + "A single line provides a single BitVector. Bits are separated by whitespace. Any substring not containing whitespace is tried to be read as Bit. If this fails, it will be appended to a label. (Thus, any label must not be parseable as Bit.) Empty lines and lines beginning with \"#\" will be ignored. If any BitVector differs in its dimensionality from other BitVectors, the parse method will fail with an Exception.")
-public class BitVectorLabelParser extends AbstractParser implements Parser {
+@Description("Parses the following format of lines:\n" + //
+"A single line provides a single BitVector. Bits are separated by whitespace. " + //
+"Any substring not containing whitespace is tried to be read as Bit. " + //
+"If this fails, it will be appended to a label. " + //
+"(Thus, any label must not be parseable as Bit.) " + //
+"Empty lines and lines beginning with \"#\" will be ignored.")
+public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> implements Parser {
   /**
    * Class logger
    */
@@ -74,62 +70,37 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
    * @param comment Comment pattern
    */
   public BitVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment) {
-    super(colSep, quoteChars, comment);
+    super(colSep, quoteChars, comment, null, BitVector.FACTORY);
   }
 
   @Override
-  public MultipleObjectsBundle parse(InputStream in) {
-    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    int lineNumber = 0;
-    int dimensionality = -1;
-    List<BitVector> vectors = new ArrayList<>();
-    List<LabelList> labels = new ArrayList<>();
-    ArrayList<String> ll = new ArrayList<>();
-    try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        // Skip empty lines and comments
-        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
-          continue;
+  protected boolean parseLineInternal() {
+    int curdim = 0;
+    for(; tokenizer.valid(); tokenizer.advance()) {
+      try {
+        final int word = curdim >>> 6;
+        final int off = curdim & 0x3F;
+        if(word >= buf.size()) { // Ensure size.
+          buf.add(0L);
         }
-        buf.clear();
-        ll.clear();
-        int i = 0;
-        for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
-          try {
-            final int word = i >>> 6;
-            final int off = i & 0x3F;
-            if(word >= buf.size()) { // Ensure size.
-              buf.add(0L);
-            }
-            if(tokenizer.getLongBase10() > 0) {
-              buf.set(word, buf.get(word) | (1L << off));
-            }
-            ++i;
-          }
-          catch(NumberFormatException e) {
-            ll.add(tokenizer.getSubstring());
-          }
+        if(tokenizer.getLongBase10() > 0) {
+          buf.set(word, buf.get(word) | (1L << off));
         }
-
-        if(dimensionality < 0) {
-          dimensionality = i;
-        }
-        else if(dimensionality != i) {
-          throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
-        }
-
-        vectors.add(new BitVector(buf.toArray(), dimensionality));
-        labels.add(LabelList.make(ll));
+        ++curdim;
+      }
+      catch(NumberFormatException e) {
+        labels.add(tokenizer.getSubstring());
       }
     }
-    catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
+    if(curdim == 0) { // Maybe a label row
+      return false;
     }
-    return MultipleObjectsBundle.makeSimple(getTypeInformation(dimensionality), vectors, TypeUtil.LABELLIST, labels);
-  }
 
-  protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {
-    return new VectorFieldTypeInformation<>(BitVector.FACTORY, dimensionality);
+    curvec = new BitVector(buf.toArray(), curdim);
+    curlbl = LabelList.make(labels);
+    buf.clear();
+    labels.clear();
+    return true;
   }
 
   @Override

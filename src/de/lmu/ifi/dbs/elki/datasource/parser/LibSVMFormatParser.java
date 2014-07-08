@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,7 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.InputStream;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -82,16 +82,8 @@ public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumb
   }
 
   @Override
-  public void initStream(InputStream in) {
-    super.initStream(in);
-  }
-
-  @Override
-  protected void parseLineInternal(String line) {
-    tokenizer.initialize(line, 0, lengthWithoutLinefeed(line));
-
-    values.clear();
-    labels.clear();
+  protected boolean parseLineInternal() {
+    /* tokenizer initialized by nextLineExceptComments() */
     int thismax = 0;
 
     // TODO: rely on the string being numeric for performance
@@ -114,11 +106,14 @@ public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumb
         if(comment.charAt(0) == '#') {
           break;
         }
-        throw new RuntimeException("Parsing error in line " + lineNumber + ": expected data, got " + comment);
+        throw new RuntimeException("Parsing error in line " + getLineNumber() + ": expected data, got " + comment);
       }
     }
     curvec = sparsefactory.newNumberVector(values, thismax);
     curlbl = LabelList.make(labels);
+    values.clear();
+    labels.clear();
+    return true;
   }
 
   @Override

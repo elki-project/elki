@@ -134,6 +134,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
         throw new AbortException("Loading file " + filestr + " failed: " + e.toString(), e);
       }
     }
+    parser.cleanup();
     // Invoke filters
     if (LOG.isDebugging()) {
       LOG.debugFine("Invoking filters.");

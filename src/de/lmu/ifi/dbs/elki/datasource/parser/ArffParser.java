@@ -629,6 +629,16 @@ public class ArffParser implements Parser {
     }
   }
 
+  @Override
+  public void cleanup() {
+    if (magic_eid != null) {
+      magic_eid.reset("");
+    }
+    if (magic_class != null) {
+      magic_class.reset("");
+    }
+  }
+
   /**
    * Parameterization class.
    * 

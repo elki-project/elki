@@ -28,10 +28,8 @@ import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
@@ -77,11 +75,6 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
   TObjectIntMap<String> keymap;
 
   /**
-   * Buffer reader.
-   */
-  private BufferedReader reader;
-
-  /**
    * Metadata.
    */
   protected BundleMeta meta;
@@ -90,11 +83,6 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
    * Event to report next.
    */
   Event nextevent;
-
-  /**
-   * Current line number, for error reporting.
-   */
-  int lineNumber;
 
   /**
    * Current vector.
@@ -120,8 +108,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
 
   @Override
   public void initStream(InputStream in) {
-    reader = new BufferedReader(new InputStreamReader(in));
-    lineNumber = 0;
+    super.initStream(in);
     nextevent = Event.META_CHANGED; // Initial event.
   }
 
@@ -133,14 +120,10 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
       return ret;
     }
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        // Skip empty lines and comments
-        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
-          continue;
-        }
+      while(nextLineExceptComments()) {
         // Don't reuse bitsets, will not be copied by BitVector constructor.
         buf.clear();
-        for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
+        for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
           String token = tokenizer.getSubstring();
           int t = keymap.get(token);
           if(t < 0) {
@@ -157,8 +140,6 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
         curvec = new BitVector(buf.toArray(), keymap.size());
         return Event.NEXT_OBJECT;
       }
-      reader.close();
-      reader = null;
       nextevent = Event.END_OF_STREAM;
       // Construct final metadata:
       meta = new BundleMeta(1);
@@ -171,10 +152,16 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
       return Event.META_CHANGED; // Force a final meta update.
     }
     catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
+      throw new IllegalArgumentException("Error while parsing line " + getLineNumber() + ".");
     }
   }
 
+  @Override
+  public void cleanup() {
+    super.cleanup();
+    curvec = null;
+  }
+  
   @Override
   public Object data(int rnum) {
     if(rnum == 0) {

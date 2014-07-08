@@ -25,10 +25,8 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 
 import gnu.trove.list.array.TDoubleArrayList;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -82,22 +80,12 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
   /**
    * Keeps the indices of the attributes to be treated as a string label.
    */
-  protected BitSet labelIndices;
+  private BitSet labelIndices;
 
   /**
    * Vector factory class.
    */
   protected NumberVector.Factory<V> factory;
-
-  /**
-   * Buffer reader.
-   */
-  private BufferedReader reader;
-
-  /**
-   * Current line number.
-   */
-  protected int lineNumber;
 
   /**
    * Dimensionality reported.
@@ -113,11 +101,6 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * Column names.
    */
   protected List<String> columnnames = null;
-
-  /**
-   * Bitset to indicate which columns are not numeric.
-   */
-  protected BitSet labelcolumns = null;
 
   /**
    * Whether or not the data set has labels.
@@ -178,18 +161,23 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     this.factory = factory;
   }
 
+  /**
+   * Test if the current column is marked as label column.
+   * 
+   * @param col Column number
+   * @return {@code true} when a label column.
+   */
+  protected boolean isLabelColumn(int col) {
+    return labelIndices != null && labelIndices.get(col);
+  }
+
   @Override
   public void initStream(InputStream in) {
-    reader = new BufferedReader(new InputStreamReader(in));
-    lineNumber = 1;
+    super.initStream(in);
     mindim = Integer.MAX_VALUE;
     maxdim = 0;
     columnnames = null;
     haslabels = false;
-    labelcolumns = new BitSet();
-    if(labelIndices != null) {
-      labelcolumns.or(labelIndices);
-    }
     nextevent = null;
   }
 
@@ -206,39 +194,35 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       return ret;
     }
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        // Skip empty lines and comments
-        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
-          continue;
+      while(nextLineExceptComments()) {
+        if(parseLineInternal()) {
+          final int curdim = curvec.getDimensionality();
+          if(curdim > maxdim || mindim > curdim) {
+            mindim = (curdim < mindim) ? curdim : mindim;
+            maxdim = (curdim > maxdim) ? curdim : maxdim;
+            buildMeta();
+            nextevent = Event.NEXT_OBJECT;
+            return Event.META_CHANGED;
+          }
+          else if(curlbl != null && meta != null && meta.size() == 1) {
+            buildMeta();
+            nextevent = Event.NEXT_OBJECT;
+            return Event.META_CHANGED;
+          }
+          return Event.NEXT_OBJECT;
         }
-        parseLineInternal(line);
-        // Maybe a header column?
-        if(curvec == null) {
-          continue;
-        }
-        final int curdim = curvec.getDimensionality();
-        if(curdim > maxdim || mindim > curdim) {
-          mindim = Math.min(mindim, curdim);
-          maxdim = Math.max(maxdim, curdim);
-          buildMeta();
-          nextevent = Event.NEXT_OBJECT;
-          return Event.META_CHANGED;
-        }
-        else if(curlbl != null && meta != null && meta.size() == 1) {
-          buildMeta();
-          nextevent = Event.NEXT_OBJECT;
-          return Event.META_CHANGED;
-        }
-        return Event.NEXT_OBJECT;
       }
-      reader.close();
-      reader = null;
-      unique.clear();
       return Event.END_OF_STREAM;
     }
     catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
+      throw new IllegalArgumentException("Error while parsing line " + getLineNumber() + ".");
     }
+  }
+
+  @Override
+  public void cleanup() {
+    super.cleanup();
+    unique.clear();
   }
 
   /**
@@ -258,13 +242,10 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
 
   @Override
   public Object data(int rnum) {
-    if(rnum == 0) {
-      return curvec;
+    if(rnum > 1) {
+      throw new ArrayIndexOutOfBoundsException();
     }
-    if(rnum == 1) {
-      return curlbl;
-    }
-    throw new ArrayIndexOutOfBoundsException();
+    return (rnum == 0) ? curvec : curlbl;
   }
 
   /**
@@ -274,29 +255,23 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * 
    * @param line Line to process
    */
-  protected void parseLineInternal(String line) {
-    attributes.reset();
-    labels.clear();
-
+  protected boolean parseLineInternal() {
     // Split into numerical attributes and labels
     int i = 0;
-    for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance(), i++) {
-      if(labelIndices == null || !labelIndices.get(i)) {
-        if(!tokenizer.isQuoted()) {
-          try {
-            double attribute = tokenizer.getDouble();
-            attributes.add(attribute);
-            continue;
-          }
-          catch(NumberFormatException e) {
-            // Ignore attempt, add to labels below.
-          }
+    for(/* initialized by nextLineExceptComents()! */; tokenizer.valid(); tokenizer.advance(), i++) {
+      if(!isLabelColumn(i) && !tokenizer.isQuoted()) {
+        try {
+          double attribute = tokenizer.getDouble();
+          attributes.add(attribute);
+          continue;
         }
-        labelcolumns.set(i);
+        catch(NumberFormatException e) {
+          // Ignore attempt, add to labels below.
+        }
       }
       // Else: labels.
       final String lbl = tokenizer.getStrippedSubstring();
-      if(lbl != null && lbl.length() > 0) {
+      if(lbl.length() > 0) {
         haslabels = true;
         String u = unique.get(lbl);
         if(u == null) {
@@ -307,20 +282,17 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       }
     }
     // Maybe a label row?
-    if(lineNumber == 1 && attributes.size() == 0) {
+    if(getLineNumber() == 1 && attributes.size() == 0) {
       columnnames = new ArrayList<>(labels);
-      labelcolumns.clear();
-      if(labelIndices != null) {
-        labelcolumns.or(labelIndices);
-      }
-      curvec = null;
-      curlbl = null;
       haslabels = false;
-      return;
+      return false;
     }
     // Pass outside via class variables
     curvec = createDBObject(attributes, ArrayLikeUtil.TDOUBLELISTADAPTER);
     curlbl = LabelList.make(labels);
+    attributes.reset();
+    labels.clear();
+    return true;
   }
 
   /**
@@ -343,28 +315,28 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * @return Prototype object
    */
   SimpleTypeInformation<V> getTypeInformation(int mindim, int maxdim) {
+    if(mindim > maxdim) {
+      throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
+    }
     if(mindim == maxdim) {
       String[] colnames = null;
       if(columnnames != null) {
-        if(columnnames.size() - labelcolumns.cardinality() == mindim) {
-          colnames = new String[mindim];
-          for(int i = 0, j = 0; i < columnnames.size(); i++) {
-            if(!labelcolumns.get(i)) {
-              colnames[j] = columnnames.get(i);
-              j++;
-            }
+        colnames = new String[mindim];
+        int j = 0;
+        for(int i = 0; i < mindim; i++) {
+          if(!isLabelColumn(i)) {
+            colnames[j] = columnnames.get(i);
+            j++;
           }
+        }
+        if(j == mindim) {
+          colnames = null; // Did not work
         }
       }
       return new VectorFieldTypeInformation<>(factory, mindim, colnames);
     }
-    else if(mindim < maxdim) {
-      // Variable dimensionality - return non-vector field type
-      return new VectorTypeInformation<>(factory, factory.getDefaultSerializer(), mindim, maxdim);
-    }
-    else {
-      throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
-    }
+    // Variable dimensionality - return non-vector field type
+    return new VectorTypeInformation<>(factory, factory.getDefaultSerializer(), mindim, maxdim);
   }
 
   @Override

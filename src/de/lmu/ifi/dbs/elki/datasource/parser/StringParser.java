@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -57,7 +58,7 @@ public class StringParser implements Parser {
   /**
    * Comment pattern.
    */
-  Pattern comment;
+  Matcher comment;
 
   /**
    * Flag to trim whitespace.
@@ -72,7 +73,7 @@ public class StringParser implements Parser {
    */
   public StringParser(Pattern comment, boolean trimWhitespace) {
     super();
-    this.comment = comment;
+    this.comment = (comment != null) ? comment.matcher("") : null;
     this.trimWhitespace = trimWhitespace;
   }
 
@@ -84,9 +85,9 @@ public class StringParser implements Parser {
     List<LabelList> labels = new ArrayList<>();
     ArrayList<String> ll = new ArrayList<>(1);
     try {
-      for (String line; (line = reader.readLine()) != null; lineNumber++) {
+      for(String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
-        if (line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
           continue;
         }
         final String val = trimWhitespace ? line.trim() : line;
@@ -95,10 +96,16 @@ public class StringParser implements Parser {
         ll.add(val);
         labels.add(LabelList.make(ll));
       }
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
     return MultipleObjectsBundle.makeSimple(TypeUtil.STRING, data, TypeUtil.LABELLIST, labels);
+  }
+
+  @Override
+  public void cleanup() {
+    comment.reset("");
   }
 
   /**
@@ -129,12 +136,12 @@ public class StringParser implements Parser {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       PatternParameter commentP = new PatternParameter(AbstractParser.Parameterizer.COMMENT_ID, "^\\s*#.*$");
-      if (config.grab(commentP)) {
+      if(config.grab(commentP)) {
         comment = commentP.getValue();
       }
 
       Flag trimP = new Flag(TRIM_ID);
-      if (config.grab(trimP)) {
+      if(config.grab(trimP)) {
         trimWhitespace = trimP.isTrue();
       }
     }

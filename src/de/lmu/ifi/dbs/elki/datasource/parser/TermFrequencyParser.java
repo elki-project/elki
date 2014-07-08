@@ -113,35 +113,32 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
   }
 
   @Override
-  protected void parseLineInternal(String line) {
+  protected boolean parseLineInternal() {
     double len = 0;
-    values.clear();
-    labels.clear();
 
     String curterm = null;
-    for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
+    for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
       if(curterm == null) {
         curterm = tokenizer.getSubstring();
+        continue;
       }
-      else {
-        try {
-          double attribute = tokenizer.getDouble();
-          int curdim = keymap.get(curterm);
-          if(curdim < 0) {
-            curdim = numterms;
-            keymap.put(curterm, curdim);
-            ++numterms;
-          }
-          values.put(curdim, attribute);
-          len += attribute;
-          curterm = null;
+      try {
+        double attribute = tokenizer.getDouble();
+        int curdim = keymap.get(curterm);
+        if(curdim < 0) {
+          curdim = numterms;
+          keymap.put(curterm, curdim);
+          ++numterms;
         }
-        catch(NumberFormatException e) {
-          if(curterm != null) {
-            labels.add(curterm);
-          }
-          curterm = tokenizer.getSubstring();
+        values.put(curdim, attribute);
+        len += attribute;
+        curterm = null;
+      }
+      catch(NumberFormatException e) {
+        if(curterm != null) {
+          labels.add(curterm);
         }
+        curterm = tokenizer.getSubstring();
       }
     }
     if(curterm != null) {
@@ -159,6 +156,9 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
 
     curvec = sparsefactory.newNumberVector(values, numterms);
     curlbl = LabelList.make(labels);
+    values.clear();
+    labels.clear();
+    return true;
   }
 
   @Override

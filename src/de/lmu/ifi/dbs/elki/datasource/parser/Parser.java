@@ -44,4 +44,9 @@ public interface Parser {
    * @return a list containing those objects parsed from the input stream
    */
   MultipleObjectsBundle parse(InputStream in);
+
+  /**
+   * Perform cleanup operations after parsing.
+   */
+  void cleanup();
 }

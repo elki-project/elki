@@ -115,13 +115,11 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   }
 
   @Override
-  protected void parseLineInternal(String line) {
-    tokenizer.initialize(line, 0, lengthWithoutLinefeed(line));
+  protected boolean parseLineInternal() {
+    /* tokenizer initialized by nextLineExceptComments() */
     int cardinality = (int) tokenizer.getLongBase10();
     tokenizer.advance();
 
-    values.clear();
-    labels.clear();
     int thismax = 0;
 
     while(tokenizer.valid()) {
@@ -130,9 +128,9 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
           int index = (int) tokenizer.getLongBase10();
           tokenizer.advance();
           // Respect labelIndices.
-          if(labelIndices == null || !labelIndices.get(index)) {
+          if(!isLabelColumn(index)) {
             if(!tokenizer.valid()) {
-              throw new AbortException("Parser expected double value, but line ended too early: " + line);
+              throw new AbortException("Parser expected double value, but line ended too early: " + getLineNumber());
             }
             double attribute = tokenizer.getDouble();
             thismax = Math.max(thismax, index + 1);
@@ -152,6 +150,9 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
     }
     curvec = sparsefactory.newNumberVector(values, thismax);
     curlbl = LabelList.make(labels);
+    values.clear();
+    labels.clear();
+    return true;
   }
 
   @Override

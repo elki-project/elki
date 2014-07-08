@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("Number Distance Parser")
 @Description("Parser for the following line format:\n" //
     + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" //
-    + " The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
+    + "The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
 public class AsciiDistanceParser extends AbstractParser implements DistanceParser {
   /**
    * The logger for this class.
@@ -70,7 +70,7 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
   @Override
   public void parse(InputStream in, DistanceCacheWriter cache) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    int lineNumber = 0;
+    int lineNumber = 1;
 
     int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Parsing distance matrix", LOG) : null;
@@ -78,7 +78,7 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         LOG.incrementProcessed(prog);
         // Skip empty lines and comments
-        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
+        if(line.length() <= 0 || isComment(line)) {
           continue;
         }
         tokenizer.initialize(line, 0, lengthWithoutLinefeed(line));
