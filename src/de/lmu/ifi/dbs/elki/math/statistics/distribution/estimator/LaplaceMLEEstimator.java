@@ -44,7 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LaplaceDistribution
  */
-@Reference(title = "The Double Exponential Distribution: Using Calculus to Find a Maximum Likelihood Estimator", authors = "R. M. Norton", booktitle = "The American Statistician 38 (2)", url = "http://dx.doi.org/10.2307%2F2683252")
+@Reference(title = "The Double Exponential Distribution: Using Calculus to Find a Maximum Likelihood Estimator", //
+authors = "R. M. Norton", booktitle = "The American Statistician 38 (2)", //
+url = "http://dx.doi.org/10.2307/2683252")
 public class LaplaceMLEEstimator implements DistributionEstimator<LaplaceDistribution> {
   /**
    * Static instance.

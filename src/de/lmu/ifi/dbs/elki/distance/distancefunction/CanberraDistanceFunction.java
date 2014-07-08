@@ -37,13 +37,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Reference:<br />
  * G. N. Lance, W. T. Williams<br />
  * Computer programs for hierarchical polythetic classification ("similarity
- * analysis")<br />
+ * analyses")<br />
  * In: Computer Journal, Volume 9, Issue 1
  * </p>
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "G. N. Lance, W. T. Williams", title = "Computer programs for hierarchical polythetic classification (similarity analysis).", booktitle = "Computer Journal, Volume 9, Issue 1", url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
+@Reference(authors = "G. N. Lance, W. T. Williams", //
+title = "Computer programs for hierarchical polythetic classification (similarity analyses)", //
+booktitle = "Computer Journal, Volume 9, Issue 1", //
+url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
 @Alias({ "canberra" })
 public class CanberraDistanceFunction extends AbstractSpatialDistanceFunction {
   /**

@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.clustering;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -41,19 +42,29 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * University of Washington, Seattle, Technical Report 418, 2002
  * </p>
  * <p>
- * Steinbach, M. and Karypis, G. and Kumar, V. and others<br />
+ * Steinbach, M. and Karypis, G. and Kumar, V.<br />
  * A comparison of document clustering techniques<br />
  * KDD workshop on text mining, 2000
+ * </p>
+ * <p>
+ * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo <br />
+ * A comparison of extrinsic clustering evaluation metrics based on formal
+ * constraints<br />
+ * Inf. Retrieval, vol. 12, no. 5, pp. 461–486, 2009
  * </p>
  * 
  * @author Sascha Goldhofer
  */
-@Reference(authors = "Meilă, M", title = "Comparing clusterings", booktitle = "University of Washington, Seattle, Technical Report 418, 2002", url = "http://www.stat.washington.edu/mmp/www.stat.washington.edu/mmp/Papers/compare-colt.pdf")
+@Reference(authors = "Meilă, M", //
+title = "Comparing clusterings", //
+booktitle = "University of Washington, Seattle, Technical Report 418, 2002", //
+url = "http://www.stat.washington.edu/mmp/Papers/compare-colt.pdf")
 public class SetMatchingPurity {
   /**
    * Result cache
    */
-  protected double smPurity = -1.0, smInversePurity = -1.0, smFFirst = -1.0, smFSecond = - 1.0;
+  protected double smPurity = -1.0, smInversePurity = -1.0, smFFirst = -1.0,
+      smFSecond = -1.0;
 
   /**
    * Constructor.
@@ -105,14 +116,17 @@ public class SetMatchingPurity {
    * 
    * @return purity
    */
-  @Reference(authors = "Zhao, Y. and Karypis, G.", title = "Criterion functions for document clustering: Experiments and analysis", booktitle = "University of Minnesota, Department of Computer Science, Technical Report 01-40, 2001", url = "http://www-users.cs.umn.edu/~karypis/publications/Papers/PDF/vscluster.pdf")
+  @Reference(authors = "Zhao, Y. and Karypis, G.", //
+  title = "Criterion functions for document clustering: Experiments and analysis", //
+  booktitle = "University of Minnesota, Department of Computer Science, Technical Report 01-40, 2001", //
+  url = "http://www-users.cs.umn.edu/~karypis/publications/Papers/PDF/vscluster.pdf")
   public double purity() {
     return smPurity;
   }
 
   /**
-   * Get the set matchings inverse purity (second:first clustering)
-   * (normalized, 1 = equal)
+   * Get the set matchings inverse purity (second:first clustering) (normalized,
+   * 1 = equal)
    * 
    * @return Inverse purity
    */
@@ -124,44 +138,57 @@ public class SetMatchingPurity {
    * Get the set matching F1-Measure
    * 
    * <p>
-   * Steinbach, M. and Karypis, G. and Kumar, V. and others<br />
+   * Steinbach, M. and Karypis, G. and Kumar, V.<br />
    * A comparison of document clustering techniques<br />
    * KDD workshop on text mining, 2000
    * </p>
    * 
    * @return Set Matching F1-Measure
    */
-  @Reference(authors = "Steinbach, M. and Karypis, G. and Kumar, V. and others", title = "A comparison of document clustering techniques", booktitle = "KDD workshop on text mining, 2000", url = "http://www-users.itlabs.umn.edu/~karypis/publications/Papers/PDF/doccluster.pdf")
+  @Reference(authors = "Steinbach, M. and Karypis, G. and Kumar, V.", //
+  title = "A comparison of document clustering techniques", //
+  booktitle = "KDD workshop on text mining, 2000", //
+  url = "http://www-users.itlabs.umn.edu/~karypis/publications/Papers/PDF/doccluster.pdf")
   public double f1Measure() {
     return Util.f1Measure(purity(), inversePurity());
   }
-  
+
   /**
    * Get the Van Rijsbergen’s F measure (asymmetric) for first clustering
    * 
    * <p>
    * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo <br />
-   * A comparison of extrinsic clustering evaluation metrics based on formal constraints<br />
+   * A comparison of extrinsic clustering evaluation metrics based on formal
+   * constraints<br />
    * Inf. Retrieval, vol. 12, no. 5, pp. 461–486, 2009
    * </p>
    * 
    * @return Set Matching F-Measure of first clustering
    */
+  @Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo", //
+  title = "A comparison of extrinsic clustering evaluation metrics based on formal constraints", //
+  booktitle = "Inf. Retrieval, vol. 12, no. 5", //
+  url = "http://dx.doi.org/10.1007/s10791-009-9106-z")
   public double fMeasureFirst() {
     return smFFirst;
   }
-  
+
   /**
    * Get the Van Rijsbergen’s F measure (asymmetric) for second clustering
    * 
    * <p>
    * E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo <br />
-   * A comparison of extrinsic clustering evaluation metrics based on formal constraints<br />
+   * A comparison of extrinsic clustering evaluation metrics based on formal
+   * constraints<br />
    * Inf. Retrieval, vol. 12, no. 5, pp. 461–486, 2009
    * </p>
    * 
    * @return Set Matching F-Measure of second clustering
    */
+  @Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, and F. Verdejo", //
+  title = "A comparison of extrinsic clustering evaluation metrics based on formal constraints", //
+  booktitle = "Inf. Retrieval, vol. 12, no. 5", //
+  url = "http://dx.doi.org/10.1007/s10791-009-9106-z")
   public double fMeasureSecond() {
     return smFSecond;
   }

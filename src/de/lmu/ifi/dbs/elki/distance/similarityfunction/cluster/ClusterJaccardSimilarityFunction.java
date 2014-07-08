@@ -39,14 +39,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * <p>
  * P. Jaccard<br />
- * Étude comparative de la distribution florale dans une portion des Alpes et
- * des Jura<br />
+ * Distribution de la florine alpine dans la Bassin de Dranses et dans quelques
+ * regiones voisines<br />
  * Bulletin del la Société Vaudoise des Sciences Naturelles
  * </p>
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "P. Jaccard", title = "Étude comparative de la distribution florale dans une portion des Alpes et des Jura", booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
+@Reference(authors = "P. Jaccard", //
+title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
+booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
 public class ClusterJaccardSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Cluster<?>> implements PrimitiveDistanceFunction<Cluster<?>> {
   /**
    * Static instance.

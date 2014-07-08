@@ -133,7 +133,9 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
       layer.appendChild(itag);
     }
 
-    @Reference(authors = "D. W. Scott", title = "Multivariate density estimation", booktitle = "Multivariate Density Estimation: Theory, Practice, and Visualization", url = "http://dx.doi.org/10.1002/9780470316849.fmatter")
+    @Reference(authors = "D. W. Scott", title = "Multivariate density estimation: Theory, Practice, and Visualization", //
+    booktitle = "Multivariate Density Estimation: Theory, Practice, and Visualization", //
+    url = "http://dx.doi.org/10.1002/9780470316849")
     private double[] initializeBandwidth(double[][] data) {
       MeanVariance mv0 = new MeanVariance();
       MeanVariance mv1 = new MeanVariance();

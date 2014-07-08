@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.clustering;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -36,7 +37,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Sascha Goldhofer
  */
-@Reference(authors = "Meilă, M.", title = "Comparing clusterings by the variation of information", booktitle = "Learning theory and kernel machines", url = "http://dx.doi.org/10.1007/978-3-540-45167-9_14")
+@Reference(authors = "Meilă, M.", //
+title = "Comparing clusterings by the variation of information", //
+booktitle = "Learning theory and kernel machines", //
+url = "http://dx.doi.org/10.1007/978-3-540-45167-9_14")
 public class Entropy {
   /**
    * Entropy in first
@@ -105,8 +109,8 @@ public class Entropy {
   }
 
   /**
-   * Get the entropy of the second clustering using Log_2. (not normalized, 0
-   * = equal)
+   * Get the entropy of the second clustering using Log_2. (not normalized, 0 =
+   * equal)
    * 
    * @return Entropy of second clustering
    */
@@ -144,8 +148,7 @@ public class Entropy {
   }
 
   /**
-   * Get Powers entropy  (normalized, 0 = equal)
-   * Powers = 1 - NMI_Sum
+   * Get Powers entropy (normalized, 0 = equal) Powers = 1 - NMI_Sum
    * 
    * @return Powers
    */
@@ -168,7 +171,7 @@ public class Entropy {
    * @return Joint Normalized Mutual information
    */
   public double entropyNMIJoint() {
-    if (entropyJoint() == 0) {
+    if(entropyJoint() == 0) {
       return 0;
     }
     return (entropyMutualInformation() / entropyJoint());
@@ -207,7 +210,7 @@ public class Entropy {
    * @return Sqrt Normalized Mutual information
    */
   public double entropyNMISqrt() {
-    if (entropyFirst() * entropySecond() <= 0) {
+    if(entropyFirst() * entropySecond() <= 0) {
       return entropyMutualInformation();
     }
     return (entropyMutualInformation() / Math.sqrt(entropyFirst() * entropySecond()));
@@ -223,20 +226,23 @@ public class Entropy {
   }
 
   /**
-   * Get the normalized variation of information (normalized, 0 = equal)
-   * NVI = 1 - NMI_Joint
+   * Get the normalized variation of information (normalized, 0 = equal) NVI = 1
+   * - NMI_Joint
    * 
    * <p>
-   * Vinh, N.X. and Epps, J. and Bailey, J.<br />
-   * Information theoretic measures for clusterings comparison: is a
-   * correction for chance necessary?<br />
-   * In: Proc. ICML '09 Proceedings of the 26th Annual International
-   * Conference on Machine Learning
+   * Nguyen, X. V. and Epps, J. and Bailey, J.<br />
+   * Information theoretic measures for clusterings comparison: is a correction
+   * for chance necessary?<br />
+   * In: Proc. ICML '09 Proceedings of the 26th Annual International Conference
+   * on Machine Learning
    * </p>
    * 
    * @return Normalized Variation of information
    */
-  @Reference(authors = "Vinh, N.X. and Epps, J. and Bailey, J.", title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", booktitle = "Proc. ICML '09 Proceedings of the 26th Annual International Conference on Machine Learning", url = "http://dx.doi.org/10.1145/1553374.1553511")
+  @Reference(authors = "Nguyen, X. V. and Epps, J. and Bailey, J.", //
+  title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
+  booktitle = "Proc. ICML '09 Proceedings of the 26th Annual International Conference on Machine Learning", //
+  url = "http://dx.doi.org/10.1145/1553374.1553511")
   public double normalizedVariationOfInformation() {
     return (1.0 - (entropyMutualInformation() / entropyJoint()));
   }

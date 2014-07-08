@@ -95,7 +95,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DWOF: Dynamic Window Outlier Factor")
 @Description("Algorithm to compute dynamic-window outlier factors in a database based on the neighborhood size parameter 'k'")
-@Reference(authors = "R. Momtaz, N. Mohssen, M. A. Gowayyed", title = "DWOF: A Robust Density-Based OutlierDetection Approach", booktitle = "Pattern Recognition and Image Analysis, Proc. 6th Iberian Conference, IbPRIA 2013, Funchal, Madeira, Portugal, 2013.", url = "http://dx.doi.org/10.1007%2F978-3-642-38628-2_61")
+@Reference(authors = "R. Momtaz, N. Mohssen, M. A. Gowayyed", //
+title = "DWOF: A Robust Density-Based Outlier Detection Approach", //
+booktitle = "Pattern Recognition and Image Analysis, Proc. 6th Iberian Conference, IbPRIA 2013, Funchal, Madeira, Portugal, 2013.", url = "http://dx.doi.org/10.1007%2F978-3-642-38628-2_61")
 public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

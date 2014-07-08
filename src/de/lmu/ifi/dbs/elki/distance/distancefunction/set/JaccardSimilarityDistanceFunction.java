@@ -50,8 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Reference:
  * <p>
  * P. Jaccard<br />
- * Étude comparative de la distribution florale dans une portion des Alpes et
- * des Jura<br />
+ * Distribution de la florine alpine dans la Bassin de Dranses et dans quelques
+ * regiones voisines<br />
  * Bulletin del la Société Vaudoise des Sciences Naturelles
  * </p>
  * 
@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <O> Vector type
  */
 @Reference(authors = "P. Jaccard", //
-title = "Étude comparative de la distribution florale dans une portion des Alpes et des Jura", //
+title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
 booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
 public class JaccardSimilarityDistanceFunction<O extends FeatureVector<?>> extends AbstractSetDistanceFunction<O> implements NormalizedPrimitiveSimilarityFunction<O>, NumberVectorDistanceFunction<O>, PrimitiveDistanceFunction<O> {
   /**

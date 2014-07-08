@@ -77,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> vector datatype
  */
 @Title("Partioning Around Medoids")
-@Reference(title = "Clustering my means of Medoids", //
+@Reference(title = "Clustering by means of Medoids", //
 authors = "Kaufman, L. and Rousseeuw, P.J.", //
 booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods")
 public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {

@@ -180,7 +180,9 @@ public class PairCounting {
    * @return pair-counting Fowlkes-mallows
    */
   // TODO: implement for non-flat clusterings!
-  @Reference(authors = "Fowlkes, E.B. and Mallows, C.L.", title = "A method for comparing two hierarchical clusterings", booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383")
+  @Reference(authors = "Fowlkes, E.B. and Mallows, C.L.", //
+  title = "A method for comparing two hierarchical clusterings", //
+  booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383")
   public double fowlkesMallows() {
     return Math.sqrt(precision() * recall());
   }
@@ -196,7 +198,10 @@ public class PairCounting {
    * 
    * @return The Rand index (RI).
    */
-  @Reference(authors = "Rand, W. M.", title = "Objective Criteria for the Evaluation of Clustering Methods", booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", url = "http://www.jstor.org/stable/10.2307/2284239")
+  @Reference(authors = "Rand, W. M.", //
+  title = "Objective Criteria for the Evaluation of Clustering Methods", //
+  booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
+  url = "http://www.jstor.org/stable/10.2307/2284239")
   public double randIndex() {
     final double sum = pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3];
     return (pairconfuse[0] + pairconfuse[3]) / sum;
