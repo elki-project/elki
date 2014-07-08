@@ -42,11 +42,6 @@ public class Tokenizer implements Iter {
   private static final Logging LOG = Logging.getLogger(Tokenizer.class);
 
   /**
-   * Separator pattern.
-   */
-  private Pattern colSep;
-
-  /**
    * Quote characters
    */
   public static final String QUOTE_CHAR = "\"'";
@@ -64,14 +59,14 @@ public class Tokenizer implements Iter {
    */
   public Tokenizer(Pattern colSep, String quoteChars) {
     super();
-    this.colSep = colSep;
+    this.matcher = colSep.matcher("Dummy text");
     this.quoteChars = quoteChars != null ? quoteChars.toCharArray() : new char[0];
   }
 
   /**
    * Regular expression match helper.
    */
-  private Matcher m = null;
+  private Matcher matcher;
 
   /**
    * Data currently processed.
@@ -103,7 +98,7 @@ public class Tokenizer implements Iter {
   public void initialize(CharSequence input, int begin, int end) {
     this.input = input;
     this.send = end;
-    this.m = colSep.matcher(input).region(begin, end);
+    this.matcher.reset(input).region(begin, end);
     this.index = begin;
     advance();
   }
@@ -116,14 +111,14 @@ public class Tokenizer implements Iter {
   @Override
   public Tokenizer advance() {
     char inquote = isQuote(index);
-    while(m.find()) {
+    while(matcher.find()) {
       // Quoted code path vs. regular code path
       if(inquote != 0) {
         // Matching closing quote found?
-        if(m.start() > index + 1 && input.charAt(m.start() - 1) == inquote) {
+        if(matcher.start() > index + 1 && input.charAt(matcher.start() - 1) == inquote) {
           this.start = index + 1;
-          this.end = m.start() - 1;
-          this.index = m.end();
+          this.end = matcher.start() - 1;
+          this.index = matcher.end();
           this.quoted = true;
           return this;
         }
@@ -131,8 +126,8 @@ public class Tokenizer implements Iter {
       }
       else {
         this.start = index;
-        this.end = m.start();
-        this.index = m.end();
+        this.end = matcher.start();
+        this.index = matcher.end();
         this.quoted = false;
         return this;
       }

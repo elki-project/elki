@@ -88,7 +88,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
-        if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
           continue;
         }
         buf.clear();

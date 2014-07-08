@@ -78,7 +78,7 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         LOG.incrementProcessed(prog);
         // Skip empty lines and comments
-        if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
           continue;
         }
         tokenizer.initialize(line, 0, lengthWithoutLinefeed(line));
@@ -92,7 +92,7 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
           tokenizer.advance();
         }
         catch(NumberFormatException e) {
-          throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is no integer!");
+          throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is not an integer!");
         }
         if(!tokenizer.valid()) {
           throw new IllegalArgumentException("Less than three values in line " + lineNumber);
@@ -103,7 +103,7 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
           tokenizer.advance();
         }
         catch(NumberFormatException e) {
-          throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is no integer!");
+          throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is not an integer!");
         }
         if(!tokenizer.valid()) {
           throw new IllegalArgumentException("Less than three values in line " + lineNumber);

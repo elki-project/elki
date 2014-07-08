@@ -135,7 +135,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         // Skip empty lines and comments
-        if(line.length() <= 0 || (comment != null && comment.matcher(line).matches())) {
+        if(line.length() <= 0 || (comment != null && comment.reset(line).matches())) {
           continue;
         }
         // Don't reuse bitsets, will not be copied by BitVector constructor.

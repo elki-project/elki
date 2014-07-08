@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -45,7 +46,7 @@ public abstract class AbstractParser {
   /**
    * A pattern defining whitespace.
    */
-  public static final String DEFAULT_SEPARATOR = "(\\s+|\\s*[,;]\\s*)";
+  public static final String DEFAULT_SEPARATOR = "\\s*[,;\\s]\\s*";
 
   /**
    * A quote pattern
@@ -74,7 +75,7 @@ public abstract class AbstractParser {
   /**
    * Comment pattern.
    */
-  protected Pattern comment = null;
+  protected Matcher comment = null;
 
   /**
    * String tokenizer.
@@ -91,7 +92,7 @@ public abstract class AbstractParser {
   public AbstractParser(Pattern colSep, String quoteChars, Pattern comment) {
     super();
     this.tokenizer = new Tokenizer(colSep, quoteChars);
-    this.comment = comment;
+    this.comment = comment.matcher("Dummy text");
   }
 
   /**

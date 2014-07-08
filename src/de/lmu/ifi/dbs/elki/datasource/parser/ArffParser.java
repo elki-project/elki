@@ -78,22 +78,22 @@ public class ArffParser implements Parser {
   /**
    * Arff file marker.
    */
-  public static final Pattern ARFF_HEADER_RELATION = Pattern.compile("@relation\\s+(.*)", Pattern.CASE_INSENSITIVE);
+  public static final Matcher ARFF_HEADER_RELATION = Pattern.compile("@relation\\s+(.*)", Pattern.CASE_INSENSITIVE).matcher("");
 
   /**
    * Arff attribute declaration marker.
    */
-  public static final Pattern ARFF_HEADER_ATTRIBUTE = Pattern.compile("@attribute\\s+([^ ]+|['\"].*?['\"])\\s+(numeric|real|integer|string|double|date(\\s.*)|\\{.*\\})\\s*", Pattern.CASE_INSENSITIVE);
+  public static final Matcher ARFF_HEADER_ATTRIBUTE = Pattern.compile("@attribute\\s+([^ ]+|['\"].*?['\"])\\s+(numeric|real|integer|string|double|date(\\s.*)|\\{.*\\})\\s*", Pattern.CASE_INSENSITIVE).matcher("");
 
   /**
    * Arff data marker.
    */
-  public static final Pattern ARFF_HEADER_DATA = Pattern.compile("@data\\s*", Pattern.CASE_INSENSITIVE);
+  public static final Matcher ARFF_HEADER_DATA = Pattern.compile("@data\\s*", Pattern.CASE_INSENSITIVE).matcher("");
 
   /**
    * Comment pattern.
    */
-  public static final Pattern ARFF_COMMENT = Pattern.compile("^\\s*%.*");
+  public static final Matcher ARFF_COMMENT = Pattern.compile("^\\s*%.*").matcher("");
 
   /**
    * Pattern to auto-convert columns to external ids.
@@ -108,22 +108,22 @@ public class ArffParser implements Parser {
   /**
    * Pattern for numeric columns.
    */
-  public static final Pattern ARFF_NUMERIC = Pattern.compile("(numeric|real|integer|double)", Pattern.CASE_INSENSITIVE);
+  public static final Matcher ARFF_NUMERIC = Pattern.compile("(numeric|real|integer|double)", Pattern.CASE_INSENSITIVE).matcher("");
 
   /**
    * Empty line pattern.
    */
-  public static final Pattern EMPTY = Pattern.compile("^\\s*$");
+  public static final Matcher EMPTY = Pattern.compile("^\\s*$").matcher("");
 
   /**
    * Pattern to recognize external ids.
    */
-  Pattern magic_eid;
+  Matcher magic_eid;
 
   /**
    * Pattern to recognize class label columns.
    */
-  Pattern magic_class;
+  Matcher magic_class;
 
   /**
    * (Reused) buffer for building label lists.
@@ -138,8 +138,8 @@ public class ArffParser implements Parser {
    */
   public ArffParser(Pattern magic_eid, Pattern magic_class) {
     super();
-    this.magic_eid = magic_eid;
-    this.magic_class = magic_class;
+    this.magic_eid = magic_eid.matcher("");
+    this.magic_class = magic_class.matcher("");
   }
 
   /**
@@ -477,11 +477,11 @@ public class ArffParser implements Parser {
         throw new AbortException(ARFF_HEADER_RELATION + " not found in file.");
       }
       // Skip comments and empty lines
-      if(ARFF_COMMENT.matcher(line).matches() || EMPTY.matcher(line).matches()) {
+      if(ARFF_COMMENT.reset(line).matches() || EMPTY.reset(line).matches()) {
         continue;
       }
       // Break on relation statement
-      if(ARFF_HEADER_RELATION.matcher(line).matches()) {
+      if(ARFF_HEADER_RELATION.reset(line).matches()) {
         break;
       }
       throw new AbortException("Expected relation declaration: " + line);
@@ -505,15 +505,15 @@ public class ArffParser implements Parser {
         throw new AbortException(ARFF_HEADER_DATA + " not found in file.");
       }
       // Skip comments and empty lines
-      if(ARFF_COMMENT.matcher(line).matches() || EMPTY.matcher(line).matches()) {
+      if(ARFF_COMMENT.reset(line).matches() || EMPTY.reset(line).matches()) {
         continue;
       }
       // Break on data statement to continue
-      if(ARFF_HEADER_DATA.matcher(line).matches()) {
+      if(ARFF_HEADER_DATA.reset(line).matches()) {
         break;
       }
       // Expect an attribute specification
-      Matcher matcher = ARFF_HEADER_ATTRIBUTE.matcher(line);
+      Matcher matcher = ARFF_HEADER_ATTRIBUTE.reset(line);
       if(matcher.matches()) {
         String name = matcher.group(1);
         if(name.charAt(0) == '\'' && name.charAt(name.length() - 1) == '\'') {
@@ -547,7 +547,7 @@ public class ArffParser implements Parser {
   private void processColumnTypes(ArrayList<String> names, ArrayList<String> types, int[] targ, TypeInformation[] etyp, int[] dims) {
     int next = 0;
     for(int i = 0; i < targ.length; i++) {
-      if(magic_eid != null && magic_eid.matcher(names.get(i)).matches()) {
+      if(magic_eid != null && magic_eid.reset(names.get(i)).matches()) {
         // Turn into an external ID column.
         targ[i] = next;
         etyp[next] = TypeUtil.EXTERNALID;
@@ -555,7 +555,7 @@ public class ArffParser implements Parser {
         next++;
         continue;
       }
-      else if(magic_class != null && magic_class.matcher(names.get(i)).matches()) {
+      else if(magic_class != null && magic_class.reset(names.get(i)).matches()) {
         // Type as ClassLabel
         targ[i] = next;
         etyp[next] = TypeUtil.CLASSLABEL;
@@ -563,7 +563,7 @@ public class ArffParser implements Parser {
         next++;
         continue;
       }
-      else if(ARFF_NUMERIC.matcher(types.get(i)).matches()) {
+      else if(ARFF_NUMERIC.reset(types.get(i)).matches()) {
         // Create a number vector field
         if(next > 0 && TypeUtil.NUMBER_VECTOR_FIELD.equals(etyp[next - 1])) {
           targ[i] = next - 1;

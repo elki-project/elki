@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.BitSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -69,14 +70,14 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
   /**
    * Pattern for NaN values.
    */
-  Pattern nanpattern = Pattern.compile("\\?");
+  Matcher nanpattern = Pattern.compile("\\?").matcher("Dummy text");
 
   /**
    * Constructor with defaults.
    * 
    * @param factory Vector factory
    */
-  public CategorialDataAsNumberVectorParser(NumberVector.Factory<V>  factory) {
+  public CategorialDataAsNumberVectorParser(NumberVector.Factory<V> factory) {
     this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHARS, Pattern.compile(COMMENT_PATTERN), null, factory);
   }
 
@@ -89,7 +90,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public CategorialDataAsNumberVectorParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V>  factory) {
+  public CategorialDataAsNumberVectorParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V> factory) {
     super(colSep, quoteChars, comment, labelIndices, factory);
   }
 
@@ -118,7 +119,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
         }
         catch(NumberFormatException e) {
           String s = tokenizer.getSubstring();
-          if(nanpattern.matcher(s).matches()) {
+          if(nanpattern.reset(s).matches()) {
             attributes.add(Double.NaN);
             continue;
           }
