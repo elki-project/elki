@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -44,6 +43,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hash.Unique;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -130,7 +130,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
   /**
    * For String unification.
    */
-  HashMap<String, String> unique = new HashMap<>();
+  Unique<String> unique = new Unique<>();
 
   /**
    * Event to report next.
@@ -270,15 +270,11 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
         }
       }
       // Else: labels.
-      final String lbl = tokenizer.getStrippedSubstring();
+      String lbl = tokenizer.getStrippedSubstring();
       if(lbl.length() > 0) {
         haslabels = true;
-        String u = unique.get(lbl);
-        if(u == null) {
-          u = lbl;
-          unique.put(u, u);
-        }
-        labels.add(u);
+        lbl = unique.addOrGet(lbl);
+        labels.add(lbl);
       }
     }
     // Maybe a label row?
