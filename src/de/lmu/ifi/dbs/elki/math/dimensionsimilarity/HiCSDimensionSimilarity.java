@@ -72,7 +72,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Erich Schubert
  * @author Robert Rödler
  */
-@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
+booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
+url = "http://dx.doi.org/10.1145/2463676.2463696")
 public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**
    * Monte-Carlo iterations

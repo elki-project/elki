@@ -51,7 +51,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @author Robert Rödler
  */
-@Reference(authors = "A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, and D. A. Keim.", title = "Automated Analytical Methods to Support Visual Exploration of High-Dimensional Data", booktitle = "IEEE Trans. Visualization and Computer Graphics, 2011", url = "http://dx.doi.org/10.1109/TVCG.2010.242")
+@Reference(authors = "A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, and D. A. Keim", //
+title = "Automated Analytical Methods to Support Visual Exploration of High-Dimensional Data", //
+booktitle = "IEEE Trans. Visualization and Computer Graphics, 2011", //
+url = "http://dx.doi.org/10.1109/TVCG.2010.242")
 public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**
    * Static instance.
@@ -84,8 +87,8 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
     boolean[][][][] pics = new boolean[dim][dim][][]; // [resolution][resolution];
 
     // Initialize / allocate "pictures":
-    for (int i = 0; i < dim - 1; i++) {
-      for (int j = i + 1; j < dim; j++) {
+    for(int i = 0; i < dim - 1; i++) {
+      for(int j = i + 1; j < dim; j++) {
         pics[i][j] = new boolean[resolution][resolution];
       }
     }
@@ -94,18 +97,19 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
     double[] off, scale;
     {
       double[][] mm = RelationUtil.computeMinMax(relation);
-      off = mm[0]; scale = mm[1];
-      for (int d = 0; d < dim; d++) {
+      off = mm[0];
+      scale = mm[1];
+      for(int d = 0; d < dim; d++) {
         scale[d] -= off[d];
         scale[d] = (scale[d] > 0.) ? 1. / scale[d] : 1.;
       }
     }
     // Iterate dataset
-    for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
+    for(DBIDIter id = subset.iter(); id.valid(); id.advance()) {
       NumberVector pvec = relation.get(id);
-      for (int i = 0; i < dim - 1; i++) {
+      for(int i = 0; i < dim - 1; i++) {
         double xi = (pvec.doubleValue(matrix.dim(i)) - off[i]) * scale[i];
-        for (int j = i + 1; j < dim; j++) {
+        for(int j = i + 1; j < dim; j++) {
           double xj = (pvec.doubleValue(matrix.dim(j)) - off[j]) * scale[j];
           drawLine(0, (int) (resolution * xi), resolution - 1, (int) (resolution * xj), pics[i][j]);
         }
@@ -113,8 +117,8 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
     }
 
     final double stepsq = (double) STEPS * (double) STEPS;
-    for (int x = 0; x < dim; x++) {
-      for (int y = x + 1; y < dim; y++) {
+    for(int x = 0; x < dim; x++) {
+      for(int y = x + 1; y < dim; y++) {
         int[][] hough = houghTransformation(pics[x][y]);
         pics[x][y] = null; // Release picture
         // The original publication said "median", but judging from the text,
@@ -136,9 +140,9 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
    */
   private long sumMatrix(int[][] mat) {
     long ret = 0;
-    for (int i = 0; i < mat.length; i++) {
+    for(int i = 0; i < mat.length; i++) {
       final int[] row = mat[i];
-      for (int j = 0; j < row.length; j++) {
+      for(int j = 0; j < row.length; j++) {
         ret += row[j];
       }
     }
@@ -154,10 +158,10 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
    */
   private int countAboveThreshold(int[][] mat, double threshold) {
     int ret = 0;
-    for (int i = 0; i < mat.length; i++) {
+    for(int i = 0; i < mat.length; i++) {
       int[] row = mat[i];
-      for (int j = 0; j < row.length; j++) {
-        if (row[j] >= threshold) {
+      for(int j = 0; j < row.length; j++) {
+        if(row[j] >= threshold) {
           ret++;
         }
       }
@@ -176,12 +180,12 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
     final double tscale = STEPS * .5 / (xres + yres);
     final int[][] ret = new int[STEPS][STEPS];
 
-    for (int x = 0; x < mat.length; x++) {
-      for (int y = 0; y < mat[0].length; y++) {
-        if (mat[x][y]) {
-          for (int i = 0; i < STEPS; i++) {
+    for(int x = 0; x < mat.length; x++) {
+      for(int y = 0; y < mat[0].length; y++) {
+        if(mat[x][y]) {
+          for(int i = 0; i < STEPS; i++) {
             final int d = (STEPS >> 1) + (int) (tscale * (x * table.cos(i) + y * table.sin(i)));
-            if (d > 0 && d < STEPS) {
+            if(d > 0 && d < STEPS) {
               ret[d][i]++;
             }
           }
@@ -214,18 +218,18 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
     // Error counter
     int err = dx + dy;
 
-    for (;;) {
+    for(;;) {
       pic[x0][y0] = true;
-      if (x0 == x1 && y0 == y1) {
+      if(x0 == x1 && y0 == y1) {
         break;
       }
 
       final int e2 = err << 1;
-      if (e2 > dy) {
+      if(e2 > dy) {
         err += dy;
         x0 += sx;
       }
-      if (e2 < dx) {
+      if(e2 < dx) {
         err += dx;
         y0 += sy;
       }
