@@ -253,7 +253,8 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * as well as block parsing. This saves the building of meta data for each
    * line.
    * 
-   * @param line Line to process
+   * @return {@code true} when a valid line was read, {@code false} on a label
+   *         row.
    */
   protected boolean parseLineInternal() {
     // Split into numerical attributes and labels
@@ -281,6 +282,8 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     if(getLineNumber() == 1 && attributes.size() == 0) {
       columnnames = new ArrayList<>(labels);
       haslabels = false;
+      curvec = null;
+      curlbl = null;
       return false;
     }
     // Pass outside via class variables
