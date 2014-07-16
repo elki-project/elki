@@ -30,15 +30,16 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDatabaseDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Adapter from a normalized similarity function to a distance function.
+ * Adapter from a similarity function to a distance function.
  * 
  * Note: The derived distance function will usually not satisfy the triangle
  * equation.
@@ -51,31 +52,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDistanceFunction<O> {
   /**
-   * Parameter to specify the similarity function to derive the distance between
-   * database objects from. Must extend
-   * {@link de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction}
-   * .
-   * <p>
-   * Key: {@code -adapter.similarityfunction}
-   * </p>
-   * <p>
-   * Default value:
-   * {@link de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction}
-   * </p>
-   */
-  public static final OptionID SIMILARITY_FUNCTION_ID = new OptionID("adapter.similarityfunction", "Similarity function to derive the distance between database objects from.");
-
-  /**
    * Holds the similarity function.
    */
-  protected NormalizedSimilarityFunction<? super O> similarityFunction;
+  protected SimilarityFunction<? super O> similarityFunction;
 
   /**
    * Constructor.
    * 
    * @param similarityFunction Similarity function to use.
    */
-  public AbstractSimilarityAdapter(NormalizedSimilarityFunction<? super O> similarityFunction) {
+  public AbstractSimilarityAdapter(SimilarityFunction<? super O> similarityFunction) {
     super();
     this.similarityFunction = similarityFunction;
   }
@@ -153,19 +139,48 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O> extends AbstractParameterizer {
+  public abstract static class Parameterizer<O, S extends SimilarityFunction<? super O>> extends AbstractParameterizer {
+    /**
+     * Parameter to specify the similarity function to derive the distance
+     * between database objects from. Must extend
+     * {@link de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction}
+     * .
+     * <p>
+     * Key: {@code -adapter.similarityfunction}
+     * </p>
+     */
+    public static final OptionID SIMILARITY_FUNCTION_ID = new OptionID("adapter.similarityfunction", //
+    "Similarity function to derive the distance between database objects from.");
+
     /**
      * Holds the similarity function.
      */
-    protected NormalizedSimilarityFunction<? super O> similarityFunction = null;
+    protected S similarityFunction = null;
+
+    /**
+     * Arbitrary Similarity functions
+     */
+    protected Class<SimilarityFunction<? super O>> ARBITRARY_SIMILARITY = ClassGenericsUtil.uglyCastIntoSubclass(SimilarityFunction.class);
+
+    /**
+     * Normalized similarity functions
+     */
+    protected Class<NormalizedSimilarityFunction<? super O>> NORMALIZED_SIMILARITY = ClassGenericsUtil.uglyCastIntoSubclass(NormalizedSimilarityFunction.class);
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<NormalizedSimilarityFunction<? super O>> param = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
+      final ObjectParameter<S> param = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, getSimilarityRestriction());
       if(config.grab(param)) {
         similarityFunction = param.instantiateClass(config);
       }
     }
+
+    /**
+     * Get the similarity function restriction.
+     * 
+     * @return Distance function supported.
+     */
+    protected abstract Class<? extends S> getSimilarityRestriction();
   }
 }

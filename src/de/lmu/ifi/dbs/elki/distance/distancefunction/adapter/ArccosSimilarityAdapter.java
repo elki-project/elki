@@ -87,10 +87,15 @@ public class ArccosSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O, NormalizedSimilarityFunction<? super O>> {
     @Override
     protected ArccosSimilarityAdapter<O> makeInstance() {
       return new ArccosSimilarityAdapter<>(similarityFunction);
+    }
+
+    @Override
+    protected Class<? extends NormalizedSimilarityFunction<? super O>> getSimilarityRestriction() {
+      return NORMALIZED_SIMILARITY;
     }
   }
 }
