@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses Parameterizable
  * @apiviz.uses AbstractParameterizer
  */
 public class CheckParameterizables {
@@ -135,6 +134,13 @@ public class CheckParameterizables {
     return false;
   }
 
+  /**
+   * Current verification state.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
   enum State {
     NO_CONSTRUCTOR, //
     INSTANTIABLE, //
