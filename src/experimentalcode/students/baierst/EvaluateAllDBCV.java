@@ -25,6 +25,8 @@ package experimentalcode.students.baierst;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -32,9 +34,14 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
@@ -66,12 +73,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class EvaluateDBCV<O> implements Evaluator {
+public class EvaluateAllDBCV<O> implements Evaluator {
 
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateDBCV.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateAllDBCV.class);
 
   /**
    * Distance function to use.
@@ -84,7 +91,7 @@ public class EvaluateDBCV<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateDBCV(PrimitiveDistanceFunction<? super NumberVector> distance) {
+  public EvaluateAllDBCV(PrimitiveDistanceFunction<? super NumberVector> distance) {
     super();
     this.distanceFunction = distance;
   }
@@ -96,8 +103,9 @@ public class EvaluateDBCV<O> implements Evaluator {
    * @param rel Data relation
    * @param dq Distance query
    * @param cl Clustering
+   * @return 
    */
-  public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> cl) {
+  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> cl) {
 
     List<? extends Cluster<?>> clusters = cl.getAllClusters();
 
@@ -105,7 +113,7 @@ public class EvaluateDBCV<O> implements Evaluator {
     List<Double[]> coreDists = new ArrayList<Double[]>();
     List<ArrayDBIDs> clusterIds = new ArrayList<ArrayDBIDs>();
     for(Cluster<?> cluster : clusters) {
-      if(cluster.isNoise()) {
+      if(cluster.isNoise() || cluster.size() < 2) {
         coreDists.add(null);
         clusterIds.add(null);
         continue;
@@ -138,7 +146,7 @@ public class EvaluateDBCV<O> implements Evaluator {
     boolean[] internalNodes = new boolean[clusters.size()];
     for(int c = 0; c < clusters.size(); c++) {
       Cluster<?> cluster = clusters.get(c);
-      if(cluster.isNoise()) {
+      if(cluster.isNoise() || cluster.size() < 2) {
         clusterDegrees.add(null);
         clusterDscMax.add(null);
         continue;
@@ -191,7 +199,7 @@ public class EvaluateDBCV<O> implements Evaluator {
 
     for(int c = 0; c < clusters.size(); c++) {
       Cluster<?> cluster = clusters.get(c);
-      if(cluster.isNoise()) {
+      if(cluster.isNoise() || cluster.size() < 2) {
         continue;
       }
       Double currentDscMax = clusterDscMax.get(c);
@@ -207,10 +215,11 @@ public class EvaluateDBCV<O> implements Evaluator {
           continue;
         }
         NumberVector currentVector = rel.get(ids.get(i));
+             
         double currentCoreDist = clusterCoreDists[i];
         for(int oc = 0; oc < clusters.size(); oc++) {
           Cluster<?> ocluster = clusters.get(oc);
-          if(ocluster.isNoise()) {
+          if(ocluster.isNoise() || ocluster.size() < 2) {
             continue;
           }
           if(cluster == ocluster) {
@@ -233,19 +242,22 @@ public class EvaluateDBCV<O> implements Evaluator {
 
       // compute dbcv
       double vc = (dspcMin - currentDscMax) / Math.max(dspcMin, currentDscMax);
-      double weight = (double) cluster.size() / (double) rel.size();
+      double relSize = (double) rel.size();
+      double weight = (double) cluster.size() / relSize;
       dbcv += weight * vc;
     }
 
+    if(LOG.isVerbose()) {
+      LOG.verbose("DBCV: " + dbcv);
+    }
     
-
-    System.out.println(dbcv);
-
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
     col.add(new DoubleVector(new double[] { dbcv }));
     db.getHierarchy().add(cl, new CollectionResult<>("Density Based Clustering Validation", "dbcv", col));
 
+    return dbcv;
+    
   }
 
   @Override
@@ -256,9 +268,69 @@ public class EvaluateDBCV<O> implements Evaluator {
     }
     Database db = ResultUtil.findDatabase(baseResult);
     Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
-
+    
     for(Clustering<?> cl : crs) {
-      evaluateClustering(db, (Relation<? extends NumberVector>) rel, cl);
+            
+      List<? extends Cluster<?>> clusters = cl.getAllClusters();
+      
+   // precompute all core distances
+      ArrayList<CoredistPair> coreList = new ArrayList<CoredistPair>();
+      
+      for(Cluster<?> cluster : clusters) {        
+        
+        if(cluster.isNoise()) {
+          continue;
+        }
+                
+        ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
+        
+        for(int i = 0; i < ids.size(); i++) {
+          double currentCoreDist = 0;
+          NumberVector currentVector = rel.get(ids.get(i));
+          int dim = currentVector.getDimensionality();
+          DBIDArrayIter it = ids.iter();
+          for(it.seek(0); it.valid(); it.advance()) {
+            if(DBIDUtil.equal(ids.get(i), it)) {
+              continue;
+            }
+            currentCoreDist += Math.pow((1. / distanceFunction.distance(currentVector, rel.get(it))), dim);
+          }
+          currentCoreDist = Math.pow((currentCoreDist / (cluster.size() - 1)), -1. / dim);
+          
+          coreList.add(new CoredistPair(ids.get(i),currentCoreDist,cluster));
+        }
+      }
+      
+      Collections.sort(coreList);
+      
+      double dbcv = evaluateClustering(db, rel, cl);
+      
+      System.out.println(dbcv);
+         
+      int stop = 1;
+      
+      for(int i = 0; i < coreList.size(); i++){
+        if(i == stop)
+          break;        
+        
+        ModifiableDBIDs clusterIds = DBIDUtil.newArray();
+        
+        CoredistPair pair = coreList.get(i);
+        
+        clusterIds.addDBIDs(pair.getCluster().getIDs());
+        
+        clusterIds.remove(pair.getDbid());
+        
+        pair.getCluster().setIDs(clusterIds);
+        
+        dbcv = evaluateClustering(db, rel, cl);
+        
+        
+        System.out.println(i + ": " + dbcv);
+        
+      }
+      
+      
     }
   }
 
@@ -297,8 +369,8 @@ public class EvaluateDBCV<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluateDBCV<O> makeInstance() {
-      return new EvaluateDBCV<>(distance);
+    protected EvaluateAllDBCV<O> makeInstance() {
+      return new EvaluateAllDBCV<>(distance);
     }
   }
 
