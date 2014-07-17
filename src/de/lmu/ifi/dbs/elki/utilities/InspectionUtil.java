@@ -146,59 +146,59 @@ public class InspectionUtil {
    * @return List of found classes.
    */
   public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything, boolean parameterizable) {
-    ArrayList<Class<?>> list = new ArrayList<>();
+    // For removing duplicates:
+    THashSet<Class<?>> dupes = new THashSet<>();
     // Add all from service files (i.e. jars)
     {
       Iterator<Class<?>> iter = new ELKIServiceLoader(c);
       while(iter.hasNext()) {
-        list.add(iter.next());
+        dupes.add(iter.next());
       }
     }
     if(!InspectionUtil.NONSTATIC_CLASSPATH) {
-      if(list.size() == 0) {
-        LOG.warning("No implementations for " + c.getName() + " were found using index files.");
+      if(dupes.size() >= 0) {
+        return new ArrayList<>(dupes);
       }
+      LOG.warning("No implementations for " + c.getName() + " were found using index files.");
     }
-    else {
-      // Duplicate checking
-      THashSet<Class<?>> dupes = new THashSet<>(list);
-      // Build cache on first use:
-      if(MASTER_CACHE == null) {
-        MASTER_CACHE = slowScan();
+    // Build cache on first use:
+    if(MASTER_CACHE == null) {
+      MASTER_CACHE = slowScan();
+    }
+    Iterator<Class<?>> iter = MASTER_CACHE.iterator();
+    while(iter.hasNext()) {
+      Class<?> cls = iter.next();
+      if(dupes.contains(cls)) {
+        continue;
       }
-      Iterator<Class<?>> iter = MASTER_CACHE.iterator();
-      while(iter.hasNext()) {
-        Class<?> cls = iter.next();
-        // skip abstract / private classes.
-        if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+      // skip abstract / private classes.
+      if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+        continue;
+      }
+      if(!c.isAssignableFrom(cls)) {
+        continue;
+      }
+      if(parameterizable) {
+        boolean instantiable = false;
+        try {
+          instantiable |= cls.getConstructor().isAccessible();
+        }
+        catch(Exception | Error e) {
+          // ignore
+        }
+        try {
+          instantiable |= ClassGenericsUtil.getParameterizer(cls) != null;
+        }
+        catch(Exception | Error e) {
+          // ignore
+        }
+        if(!instantiable) {
           continue;
         }
-        if(!c.isAssignableFrom(cls) || dupes.contains(cls)) {
-          continue;
-        }
-        if(parameterizable) {
-          boolean instantiable = false;
-          try {
-            instantiable |= cls.getConstructor().isAccessible();
-          }
-          catch(Exception | Error e) {
-            // ignore
-          }
-          try {
-            instantiable |= ClassGenericsUtil.getParameterizer(cls) != null;
-          }
-          catch(Exception | Error e) {
-            // ignore
-          }
-          if(!instantiable) {
-            continue;
-          }
-        }
-        list.add(cls);
-        dupes.add(cls);
       }
+      dupes.add(cls);
     }
-    return list;
+    return new ArrayList<>(dupes);
   }
 
   /**

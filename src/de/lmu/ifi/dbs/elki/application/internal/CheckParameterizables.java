@@ -24,13 +24,18 @@ package de.lmu.ifi.dbs.elki.application.internal;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
@@ -70,20 +75,44 @@ public class CheckParameterizables {
   public void checkParameterizables() {
     LoggingConfiguration.setVerbose(Level.VERBOSE);
     knownParameterizables = new ArrayList<>();
-    URL u = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX);
     try {
-      for(String prop : new File(u.toURI()).list()) {
-        try {
-          knownParameterizables.add(Class.forName(prop));
+      Enumeration<URL> us = getClass().getClassLoader().getResources(ELKIServiceLoader.PREFIX);
+      while(us.hasMoreElements()) {
+        URL u = us.nextElement();
+        if("file".equals(u.getProtocol())) {
+          for(String prop : new File(u.toURI()).list()) {
+            try {
+              knownParameterizables.add(Class.forName(prop));
+            }
+            catch(ClassNotFoundException e) {
+              LOG.warning("Service file name is not a class name: " + prop);
+              continue;
+            }
+          }
         }
-        catch(ClassNotFoundException e) {
-          LOG.warning("Service file name is not a class name: " + prop);
-          continue;
+        else if(("jar".equals(u.getProtocol()))) {
+          JarURLConnection con = (JarURLConnection) u.openConnection();
+          try (JarFile jar = con.getJarFile();) {
+            Enumeration<JarEntry> entries = jar.entries();
+            while(entries.hasMoreElements()) {
+              String prop = entries.nextElement().getName();
+              if(prop.length() > ELKIServiceLoader.PREFIX.length() && prop.startsWith(ELKIServiceLoader.PREFIX)) {
+                prop = prop.substring(ELKIServiceLoader.PREFIX.length());
+                try {
+                  knownParameterizables.add(Class.forName(prop));
+                }
+                catch(ClassNotFoundException e) {
+                  LOG.warning("Service file name is not a class name: " + prop);
+                  continue;
+                }
+              }
+            }
+          }
         }
       }
     }
-    catch(URISyntaxException e) {
-      throw new AbortException("Cannot check all properties, as some are not in a file: URL.");
+    catch(IOException | URISyntaxException e) {
+      throw new AbortException("Error enumerating service folders.", e);
     }
 
     final String internal = de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer.class.getPackage().getName();
@@ -113,7 +142,7 @@ public class CheckParameterizables {
         boolean expectedParameterizer = checkSupertypes(cls);
         if(state == State.NO_CONSTRUCTOR && expectedParameterizer) {
           LOG.verbose("Class " + cls.getName() + //
-          " implements a parameterizable interface, but doesn't have a constructor with the appropriate signature!");
+          " implements a parameterizable interface, but doesn't have a public and parameterless constructor!");
         }
         if(state == State.INSTANTIABLE && !expectedParameterizer) {
           LOG.verbose("Class " + cls.getName() + //
@@ -126,10 +155,18 @@ public class CheckParameterizables {
     }
   }
 
+  /**
+   * Check all supertypes of a class.
+   * 
+   * @param cls Class to check.
+   * @return {@code true} when at least one supertype is a known parameterizable
+   *         type.
+   */
   private boolean checkSupertypes(Class<?> cls) {
     for(Class<?> c : knownParameterizables) {
-      if(c.isAssignableFrom(cls))
+      if(c.isAssignableFrom(cls)) {
         return true;
+      }
     }
     return false;
   }
