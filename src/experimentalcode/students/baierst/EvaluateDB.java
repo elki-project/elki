@@ -115,7 +115,7 @@ public class EvaluateDB<O> implements Evaluator {
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
     ArrayList<Double> withinGroupDists = new ArrayList<Double>();
     for(Cluster<?> cluster : clusters) {
-
+      
       if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
         countNoise += cluster.size();
         continue;
