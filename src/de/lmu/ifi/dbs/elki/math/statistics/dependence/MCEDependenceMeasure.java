@@ -117,7 +117,7 @@ public class MCEDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Recursive call to further subdivide the array.
    * 
-   * @param it Iterator (will be reset!)
+   * @param idx Object indexes.
    * @param data 1D data, sorted
    * @param ret Output index
    * @param start Interval start
@@ -217,8 +217,8 @@ public class MCEDependenceMeasure extends AbstractDependenceMeasure {
    * Compute the MCE entropy value.
    * 
    * @param mat Partition size matrix
-   * @param psizesx Partition sizes on X
-   * @param psizesy Partition sizes on Y
+   * @param partsx Partitions on X
+   * @param partsy Partitions on Y
    * @param size Data set size
    * @param gridsize Size of grids
    * @param loggrid Logarithm of grid sizes, for normalization
