@@ -1,4 +1,5 @@
 de.lmu.ifi.dbs.elki.math.statistics.dependence.CorrelationMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.DistanceCorrelationDependenceMeasure
 de.lmu.ifi.dbs.elki.math.statistics.dependence.SlopeDependenceMeasure
 de.lmu.ifi.dbs.elki.math.statistics.dependence.SlopeInversionDependenceMeasure
 de.lmu.ifi.dbs.elki.math.statistics.dependence.MCEDependenceMeasure
