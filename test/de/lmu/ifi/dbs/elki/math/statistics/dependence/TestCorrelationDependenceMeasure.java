@@ -33,43 +33,43 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
- * Validate dCor by comparing to output of the official R version.
+ * Validate correlation by comparing to the results of R.
  * 
  * @author Erich Schubert
  */
-public class TestDistanceCorrelationDependenceMeasure implements JUnit4Test {
+public class TestCorrelationDependenceMeasure implements JUnit4Test {
   double[][] data = { //
   { 1, 2, 3, 4 }, //
   { 1, 3, 5, 7 }, //
   { 4, 3, 2, 1 }, //
   { 1, 4, 2, 3 }, //
   { 1, 0, 0, 1 }, //
-  { 0, 0, 0, 0 } };
+  };
 
   double[][] R = { //
   { 1. }, //
   { 1., 1. }, //
-  { 1., 1., 1. }, //
-  { 0.7337994, 0.7337994, 0.7337994, 1. }, //
-  { 0.5266404, 0.5266404, 0.5266404, 0.5266404, 1 }, //
-  { 0., 0., 0., 0., 0., 0. }, //
+  { -1., -1., 1. }, //
+  { 0.4, 0.4, -0.4, 1. }, //
+  { 0., 0., 0., -0.4472136, 1 }, //
   };
 
   @Test
   public void testDistanceCorrelation() {
-    DistanceCorrelationDependenceMeasure dCor = DistanceCorrelationDependenceMeasure.STATIC;
+    CorrelationDependenceMeasure cor = CorrelationDependenceMeasure.STATIC;
+    // Single computations
     for(int i = 0; i < data.length; i++) {
       for(int j = 0; j <= i; j++) {
-        double dcor = dCor.dependence(data[i], data[j]);
-        assertEquals("dCor does not match for " + i + "," + j, R[i][j], dcor, 1e-7);
+        double co = cor.dependence(data[i], data[j]);
+        assertEquals("Cor does not match for " + i + "," + j, R[i][j], co, 1e-7);
       }
     }
     // Bulk computation
-    double[] mat = dCor.dependence(ArrayLikeUtil.DOUBLEARRAYADAPTER, Arrays.asList(data));
+    double[] mat = cor.dependence(ArrayLikeUtil.DOUBLEARRAYADAPTER, Arrays.asList(data));
     for(int i = 0, c = 0; i < data.length; i++) {
       for(int j = 0; j < i; j++) {
         double co = mat[c++];
-        assertEquals("dCor does not match for " + i + "," + j, R[i][j], co, 1e-7);
+        assertEquals("Cor does not match for " + i + "," + j, R[i][j], co, 1e-7);
       }
     }
   }

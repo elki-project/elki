@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -30,12 +32,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Distance correlation.
  * 
+ * The value returned is the square root of the dCor² value. This matches the R
+ * implementation by the original authors.
+ * 
  * Reference:
  * <p>
  * Székely, G. J., Rizzo, M. L., & Bakirov, N. K.<br />
  * Measuring and testing dependence by correlation of distances<br />
  * The Annals of Statistics, 35(6), 2769-2794
  * </p>
+ * 
+ * Implementation notice: we exploit symmetry, and thus use diagonal matrixes.
+ * While initially the diagonal is zero, after double-centering the matrix these
+ * values can become non-zero!
  * 
  * @author Marie Kiermeier
  * @author Erich Schubert
@@ -59,16 +68,48 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int size = size(adapter1, data1, adapter2, data2);
-    double[][] dMatrixA = computeDistances(adapter1, data1);
-    double[][] dMatrixB = computeDistances(adapter2, data2);
+    final int len = size(adapter1, data1, adapter2, data2);
+    double[] dMatrixA = computeDistances(adapter1, data1);
+    double[] dMatrixB = computeDistances(adapter2, data2);
 
     // distance variance
-    double dVarA = computeDCovar(dMatrixA, dMatrixA, size);
-    double dVarB = computeDCovar(dMatrixB, dMatrixB, size);
-    double dCovar = computeDCovar(dMatrixA, dMatrixB, size);
+    double dVarA = computeDCovar(dMatrixA, dMatrixA, len);
+    if(!(dVarA > 0.)) {
+      return 0.;
+    }
+    double dVarB = computeDCovar(dMatrixB, dMatrixB, len);
+    if(!(dVarB > 0.)) {
+      return 0.;
+    }
+    double dCovar = computeDCovar(dMatrixA, dMatrixB, len);
     // distance correlation
-    return (dVarA * dVarB > 0) ? Math.sqrt(dCovar / Math.sqrt(dVarA * dVarB)) : 0.;
+    return Math.sqrt(dCovar / Math.sqrt(dVarA * dVarB));
+  }
+
+  @Override
+  public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
+    final int dims = data.size();
+    final int len = size(adapter, data);
+    double[][] dMatrix = new double[dims][];
+    for(int i = 0; i < dims; i++) {
+      dMatrix[i] = computeDistances(adapter, data.get(i));
+    }
+    double[] dVar = new double[dims];
+    for(int i = 0; i < dims; i++) {
+      dVar[i] = computeDCovar(dMatrix[i], dMatrix[i], len);
+    }
+    double[] dCor = new double[(dims * (dims - 1)) >> 1];
+    for(int y = 1, c = 0; y < dims; y++) {
+      for(int x = 0; x < y; x++) {
+        if(!(dVar[x] * dVar[y] > 0.)) {
+          dCor[c++] = 0.;
+          continue;
+        }
+        double dCovar = computeDCovar(dMatrix[x], dMatrix[y], len);
+        dCor[c++] = Math.sqrt(dCovar / Math.sqrt(dVar[x] * dVar[y]));
+      }
+    }
+    return dCor;
   }
 
   /**
@@ -78,50 +119,50 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
    * @param data Input data
    * @return Double-centered delta matrix.
    */
-  protected static <A> double[][] computeDistances(NumberArrayAdapter<?, A> adapter, A data) {
+  protected static <A> double[] computeDistances(NumberArrayAdapter<?, A> adapter, A data) {
     final int size = adapter.size(data);
-    double[][] dMatrixB = new double[size][size];
-    for(int i = 0; i < size; i++) {
+    double[] dMatrix = new double[(size * (size + 1)) >> 1];
+    for(int i = 0, c = 0; i < size; i++) {
       for(int j = 0; j < i; j++) {
         double dx = adapter.getDouble(data, i) - adapter.getDouble(data, j);
-        dx = (dx < 0) ? -dx : dx; // Absolute difference.
-        dMatrixB[i][j] = dx;
-        dMatrixB[j][i] = dx; // Symmetry.
+        dMatrix[c++] = (dx < 0) ? -dx : dx; // Absolute difference.
       }
+      c++; // Diagonal entry: zero
     }
-    doubleCenterMatrix(dMatrixB);
-    return dMatrixB;
+    doubleCenterMatrix(dMatrix, size);
+    return dMatrix;
   }
 
   /**
    * Computes the distance variance matrix of one axis.
    * 
    * @param dMatrix distance matrix of the axis
+   * @param size Dimensionality
    */
-  public static void doubleCenterMatrix(double[][] dMatrix) {
-    final int size = dMatrix.length;
+  public static void doubleCenterMatrix(double[] dMatrix, int size) {
     double[] rowMean = new double[size];
-    double[] colMean = new double[size];
-    double matrixMean = 0.;
     // row sum
-    for(int i = 0; i < size; i++) {
-      for(int j = 0; j < size; j++) {
-        double v = dMatrix[i][j];
+    for(int i = 0, c = 0; i < size; i++) {
+      for(int j = 0; j < i; j++) {
+        double v = dMatrix[c++];
         rowMean[i] += v;
-        colMean[j] += v;
+        rowMean[j] += v;
       }
-      matrixMean += rowMean[i];
+      assert (dMatrix[c] == 0.);
+      c++; // Diagonal entry. Must be zero!
     }
     // Normalize averages:
+    double matrixMean = 0.;
     for(int i = 0; i < size; i++) {
+      matrixMean += rowMean[i];
       rowMean[i] /= size;
-      colMean[i] /= size;
     }
     matrixMean /= size * size;
 
-    for(int o = 0; o < size; o++) {
-      for(int p = 0; p < size; p++) {
-        dMatrix[o][p] = dMatrix[o][p] - rowMean[o] - colMean[p] + matrixMean;
+    for(int o = 0, c = 0; o < size; o++) {
+      // Including row mean!
+      for(int p = 0; p <= o; p++) {
+        dMatrix[c++] -= rowMean[o] + rowMean[p] - matrixMean;
       }
     }
   }
@@ -133,21 +174,23 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
    * @param dVarMatrixA distance variance matrix of the first axis
    * @param dVarMatrixB distance variance matrix of the second axis
    * @param n number of points
-   * @return
+   * @return distance covariance
    */
-  protected double computeDCovar(double[][] dVarMatrixA, double[][] dVarMatrixB, int n) {
+  protected double computeDCovar(double[] dVarMatrixA, double[] dVarMatrixB, int n) {
     double result = 0.;
-    // TODO: exploit symmetry?
-    for(int i = 0; i < n; i++) {
-      for(int j = 0; j < n; j++) {
-        result += dVarMatrixA[i][j] * dVarMatrixB[i][j];
+    for(int i = 0, c = 0; i < n; i++) {
+      for(int j = 0; j < i; j++) {
+        result += 2. * dVarMatrixA[c] * dVarMatrixB[c];
+        c++;
       }
+      // Diagonal entry.
+      result += dVarMatrixA[c] * dVarMatrixB[c];
+      c++;
     }
     return result / (n * n);
   }
 
   /**
-   * 
    * Parameterization class
    * 
    * @author Marie Kiermeier

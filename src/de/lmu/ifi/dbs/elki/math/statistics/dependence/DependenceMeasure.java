@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
@@ -66,12 +66,12 @@ public interface DependenceMeasure {
    * 10 11 12 13 14  X
    * </pre>
    * 
-   * 
    * @param adapter Data adapter
-   * @param data Data sets
+   * @param data Data sets. Must have fast random access!
+   * @param <A> Array type
    * @return Lower triangular serialized matrix
    */
-  <A> double[] dependence(NumberArrayAdapter<?, A> adapters, ArrayList<A> data);
+  <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data);
 
   /**
    * Measure the dependence of two variables.

@@ -23,7 +23,9 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -41,7 +43,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
   }
 
   @Override
-  public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, ArrayList<A> data) {
+  public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
     final int dims = data.size();
     double[] out = new double[(dims * (dims - 1)) >> 1];
     int o = 0;
@@ -76,10 +78,34 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    * @param <A> First array type
    * @param <B> Second array type
    */
-  public static <B, A> int size(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
+  public static <A, B> int size(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
     final int len = adapter1.size(data1);
     if(len != adapter2.size(data2)) {
       throw new AbortException("Array sizes do not match!");
+    }
+    if(len == 0) {
+      throw new AbortException("Empty array!");
+    }
+    return len;
+  }
+
+  /**
+   * Validate the length of the two data sets (must be the same, and non-zero)
+   * 
+   * @param adapter Data adapter
+   * @param data Data sets
+   * @param <A> First array type
+   */
+  public static <A> int size(NumberArrayAdapter<?, A> adapter, Collection<? extends A> data) {
+    if(data.size() < 2) {
+      throw new AbortException("Need at least two axes to compute dependence measures.");
+    }
+    Iterator<? extends A> iter = data.iterator();
+    final int len = adapter.size(iter.next());
+    while(iter.hasNext()) {
+      if(len != adapter.size(iter.next())) {
+        throw new AbortException("Array sizes do not match!");
+      }
     }
     if(len == 0) {
       throw new AbortException("Empty array!");
