@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -36,6 +38,32 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
   @Override
   public double dependence(double[] data1, double[] data2) {
     return dependence(ArrayLikeUtil.DOUBLEARRAYADAPTER, data1, ArrayLikeUtil.DOUBLEARRAYADAPTER, data2);
+  }
+
+  @Override
+  public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, ArrayList<A> data) {
+    final int dims = data.size();
+    double[] out = new double[(dims * (dims - 1)) >> 1];
+    int o = 0;
+    for(int y = 1; y < dims; y++) {
+      A dy = data.get(y);
+      for(int x = 0; x < y; x++) {
+        out[o++] = dependence(adapter, data.get(x), adapter, dy);
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Index into the serialized array.
+   * 
+   * @param x Column
+   * @param y Row
+   * @return Index in serialized array
+   */
+  protected static int index(int x, int y) {
+    assert (x < y) : "Only lower triangle is allowed.";
+    return ((y * (y - 1)) >> 1) + x;
   }
 
   /**

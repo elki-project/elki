@@ -50,7 +50,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @author Robert Rödler
  */
-@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
+@Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
+booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", //
+url = "http://dx.doi.org/10.1145/2463676.2463696")
 public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity {
   /**
    * Static instance.
@@ -79,8 +82,9 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
     double[] off, scale;
     {
       double[][] mm = RelationUtil.computeMinMax(relation);
-      off = mm[0]; scale = mm[1];
-      for (int d = 0; d < dim; d++) {
+      off = mm[0];
+      scale = mm[1];
+      for(int d = 0; d < dim; d++) {
         scale[d] -= off[d];
         scale[d] = (scale[d] > 0.) ? 1. / scale[d] : 1.;
       }
@@ -88,14 +92,14 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
 
     // Scratch buffer
     double[] vec = new double[dim];
-    for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
+    for(DBIDIter id = subset.iter(); id.valid(); id.advance()) {
       final NumberVector obj = relation.get(id);
       // Map values to 0..1
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         vec[d] = (obj.doubleValue(matrix.dim(d)) - off[d]) * scale[d];
       }
-      for (int i = 0; i < dim - 1; i++) {
-        for (int j = i + 1; j < dim; j++) {
+      for(int i = 0; i < dim - 1; i++) {
+        for(int j = i + 1; j < dim; j++) {
           {
             // This will be on a scale of 0 .. 2:
             final double delta = vec[j] - vec[i] + 1;
@@ -117,13 +121,13 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
     }
 
     // Compute entropy in each combination:
-    for (int x = 0; x < dim; x++) {
-      for (int y = x + 1; y < dim; y++) {
+    for(int x = 0; x < dim; x++) {
+      for(int y = x + 1; y < dim; y++) {
         double entropy = 0., entropyI = 0;
         {
           int[] as = angles[x][y];
-          for (int l = 0; l < PRECISION; l++) {
-            if (as[l] > 0) {
+          for(int l = 0; l < PRECISION; l++) {
+            if(as[l] > 0) {
               final double p = as[l] / (double) size;
               entropy += p * Math.log(p);
             }
@@ -131,17 +135,18 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
         }
         {
           int[] as = angleI[x][y];
-          for (int l = 0; l < PRECISION; l++) {
-            if (as[l] > 0) {
+          for(int l = 0; l < PRECISION; l++) {
+            if(as[l] > 0) {
               final double p = as[l] / (double) size;
               entropyI += p * Math.log(p);
             }
           }
         }
-        if (entropy >= entropyI) {
+        if(entropy >= entropyI) {
           entropy = 1 + entropy / LOG_PRECISION;
           matrix.set(x, y, entropy);
-        } else {
+        }
+        else {
           entropyI = 1 + entropyI / LOG_PRECISION;
           // Negative sign to indicate the axes might be inversely related
           matrix.set(x, y, -entropyI);

@@ -81,7 +81,10 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
     super();
   }
 
-  @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", title = "Subspace Selection for Clustering High-Dimensional Data", booktitle = "IEEE International Conference on Data Mining, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10112")
+  @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", //
+  title = "Subspace Selection for Clustering High-Dimensional Data", //
+  booktitle = "IEEE International Conference on Data Mining, 2004", //
+  url = "http://dx.doi.org/10.1109/ICDM.2004.10112")
   @Override
   public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
