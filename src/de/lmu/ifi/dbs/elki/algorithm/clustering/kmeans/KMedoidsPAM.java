@@ -41,9 +41,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -137,6 +137,26 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
 
+    runPAMOptimization(distQ, ids, medoids, clusters);
+
+    // Wrap result
+    Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
+    for(int i = 0; i < clusters.size(); i++) {
+      MedoidModel model = new MedoidModel(medoids.get(i));
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
+    }
+    return result;
+  }
+
+  /**
+   * Run the PAM optimization phase.
+   * 
+   * @param distQ Distance query
+   * @param ids IDs to process
+   * @param medoids Medoids list
+   * @param clusters Clusters
+   */
+  private void runPAMOptimization(DistanceQuery<V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, List<ModifiableDBIDs> clusters) {
     WritableDoubleDataStore second = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     // Initial assignment to nearest medoids
     // TODO: reuse this information, from the build phase, when possible?
@@ -144,13 +164,13 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
     // Swap phase
+    DBIDVar bestid = DBIDUtil.newVar();
     boolean changed = true;
     while(changed) {
       LOG.incrementProcessed(prog);
       changed = false;
       // Try to swap the medoid with a better cluster member:
       double best = 0;
-      DBID bestid = null;
       int bestcluster = -1;
       int i = 0;
       for(DBIDIter miter = medoids.iter(); miter.valid(); miter.advance(), i++) {
@@ -167,20 +187,16 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
               if(j == i) {
                 // Cases 1 and 2.
                 double distsec = second.doubleValue(iter2);
-                if(distcur > distsec) {
-                  // Case 1, other would switch to a third medoid
-                  cost += distsec - distcur; // Always positive!
-                }
-                else { // Would remain with the candidate
-                  cost += distnew - distcur; // Could be negative
-                }
+                cost += (distcur > distsec) ? //
+                // Case 1, other would switch to a third medoid
+                distsec - distcur // Always positive!
+                : // Would remain with the candidate
+                distnew - distcur; // Could be negative
               }
               else {
                 // Cases 3-4: objects from other clusters
-                if(distcur < distnew) {
-                  // Case 3: no change
-                }
-                else {
+                // Case 3: is no change
+                if(distcur > distnew) {
                   // Case 4: would switch to new medoid
                   cost += distnew - distcur; // Always negative
                 }
@@ -189,7 +205,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
           }
           if(cost < best) {
             best = cost;
-            bestid = DBIDUtil.deref(iter);
+            bestid.set(iter);
             bestcluster = i;
           }
         }
@@ -197,7 +213,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       if(LOG.isDebugging()) {
         LOG.debug("Best cost: " + best);
       }
-      if(bestid != null) {
+      if(best < 0.) {
         changed = true;
         medoids.set(bestcluster, bestid);
       }
@@ -208,14 +224,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       }
     }
     LOG.setCompleted(prog);
-
-    // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      MedoidModel model = new MedoidModel(medoids.get(i));
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
-    }
-    return result;
   }
 
   /**
@@ -234,8 +242,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
 
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
       int minIndex = 0;
-      double mindist = Double.POSITIVE_INFINITY;
-      double mindist2 = Double.POSITIVE_INFINITY;
+      double mindist = Double.POSITIVE_INFINITY, mindist2 = Double.POSITIVE_INFINITY;
       {
         int i = 0;
         for(DBIDIter miter = means.iter(); miter.valid(); miter.advance(), i++) {
@@ -255,10 +262,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
         for(int i = 0; i < k; i++) {
-          if(i != minIndex) {
-            if(clusters.get(i).remove(iditer)) {
-              break;
-            }
+          if(i != minIndex && clusters.get(i).remove(iditer)) {
+            break;
           }
         }
       }
