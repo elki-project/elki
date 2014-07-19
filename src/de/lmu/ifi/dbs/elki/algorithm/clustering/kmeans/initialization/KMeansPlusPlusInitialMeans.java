@@ -118,17 +118,16 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distQ) {
+  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
     @SuppressWarnings("unchecked")
     final Relation<O> rel = (Relation<O>) distQ.getRelation();
 
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
-    DBIDs ids = rel.getDBIDs();
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     Random random = rnd.getSingleThreadedRandom();
-    DBIDRef first = DBIDUtil.randomSample(distQ.getRelation().getDBIDs(), 1, random).iter();
+    DBIDRef first = DBIDUtil.randomSample(ids, 1, random).iter();
     means.add(first);
 
     // Initialize weights

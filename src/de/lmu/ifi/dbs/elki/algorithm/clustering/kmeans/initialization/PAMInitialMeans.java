@@ -79,7 +79,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
     @SuppressWarnings("unchecked")
     final PrimitiveDistanceFunction<? super O> distF = (PrimitiveDistanceFunction<? super O>) distanceFunction;
     final DistanceQuery<O> distQ = database.getDistanceQuery(rel, distF);
-    DBIDs medids = chooseInitialMedoids(k, distQ);
+    DBIDs medids = chooseInitialMedoids(k, rel.getDBIDs(), distQ);
     List<V> medoids = new ArrayList<>(k);
     for(DBIDIter iter = medids.iter(); iter.valid(); iter.advance()) {
       medoids.add(factory.newNumberVector(relation.get(iter)));
@@ -88,9 +88,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distQ) {
-    final DBIDs ids = distQ.getRelation().getDBIDs();
-
+  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
     ArrayModifiableDBIDs medids = DBIDUtil.newArray(k);
     double best = Double.POSITIVE_INFINITY;
     Mean mean = new Mean(); // Mean is numerically more stable than sum.

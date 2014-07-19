@@ -64,8 +64,8 @@ public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<
   }
   
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distanceFunction) {
-    return DBIDUtil.randomSample(distanceFunction.getRelation().getDBIDs(), k, rnd);
+  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distanceFunction) {
+    return DBIDUtil.randomSample(ids, k, rnd);
   }
 
   /**

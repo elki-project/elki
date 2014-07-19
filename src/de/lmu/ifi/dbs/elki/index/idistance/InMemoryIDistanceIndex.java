@@ -151,7 +151,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
 
   @Override
   public void initialize() {
-    referencepoints = DBIDUtil.ensureArray(initialization.chooseInitialMedoids(numref, distanceQuery));
+    referencepoints = DBIDUtil.ensureArray(initialization.chooseInitialMedoids(numref, relation.getDBIDs(), distanceQuery));
     final int k = referencepoints.size(); // should be the same k anyway.
     index = new ModifiableDoubleDBIDList[k];
     for(int i = 0; i < k; i++) {

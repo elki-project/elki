@@ -122,7 +122,7 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
     }
     DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
     // Choose initial medoids
-    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, distQ));
+    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, relation.getDBIDs(), distQ));
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {

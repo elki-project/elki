@@ -121,16 +121,15 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distQ) {
+  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
     @SuppressWarnings("unchecked")
     final Relation<O> relation = (Relation<O>) distQ.getRelation();
 
-    DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
 
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
-    DBIDRef first = DBIDUtil.randomSample(relation.getDBIDs(), 1, rnd).iter();
+    DBIDRef first = DBIDUtil.randomSample(ids, 1, rnd).iter();
     means.add(first);
     O prevmean = relation.get(first);
 

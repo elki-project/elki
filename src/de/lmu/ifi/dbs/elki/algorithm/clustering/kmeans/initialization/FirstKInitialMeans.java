@@ -62,8 +62,8 @@ public class FirstKInitialMeans<O> implements KMeansInitialization<NumberVector>
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super O> distanceFunction) {
-    DBIDIter iter = distanceFunction.getRelation().iterDBIDs();
+  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distanceFunction) {
+    DBIDIter iter = ids.iter();
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {
       means.add(iter);

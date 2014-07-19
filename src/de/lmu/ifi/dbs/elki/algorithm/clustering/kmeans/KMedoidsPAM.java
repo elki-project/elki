@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
@@ -87,12 +88,12 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
   private static final Logging LOG = Logging.getLogger(KMedoidsPAM.class);
 
   /**
-   * Holds the value of {@link AbstractKMeans#K_ID}.
+   * The number of clusters to produce.
    */
   protected int k;
 
   /**
-   * Holds the value of {@link AbstractKMeans#MAXITER_ID}.
+   * The maximum number of iterations.
    */
   protected int maxiter;
 
@@ -130,7 +131,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
     DBIDs ids = relation.getDBIDs();
     // Choose initial medoids
-    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, distQ));
+    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, ids, distQ));
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -156,7 +157,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * @param medoids Medoids list
    * @param clusters Clusters
    */
-  private void runPAMOptimization(DistanceQuery<V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, List<ModifiableDBIDs> clusters) {
+  protected void runPAMOptimization(DistanceQuery<V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, List<ModifiableDBIDs> clusters) {
     WritableDoubleDataStore second = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     // Initial assignment to nearest medoids
     // TODO: reuse this information, from the build phase, when possible?
@@ -179,10 +180,13 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
             continue;
           }
           double cost = 0;
-          DBIDIter olditer = medoids.iter();
-          for(int j = 0; j < k; j++, olditer.advance()) {
+          DBIDIter miter2 = medoids.iter();
+          for(int j = 0; j < k; j++, miter2.advance()) {
             for(DBIDIter iter2 = clusters.get(j).iter(); iter2.valid(); iter2.advance()) {
-              double distcur = distQ.distance(iter2, olditer);
+              if(DBIDUtil.equal(miter2, iter2)) {
+                continue;
+              }
+              double distcur = distQ.distance(iter2, miter2);
               double distnew = distQ.distance(iter2, iter);
               if(j == i) {
                 // Cases 1 and 2.
@@ -240,29 +244,28 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
   protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore second, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V> distQ) {
     boolean changed = false;
 
+    DBIDArrayIter miter = means.iter();
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      int minIndex = 0;
       double mindist = Double.POSITIVE_INFINITY, mindist2 = Double.POSITIVE_INFINITY;
-      {
-        int i = 0;
-        for(DBIDIter miter = means.iter(); miter.valid(); miter.advance(), i++) {
-          double dist = distQ.distance(iditer, miter);
-          if(dist < mindist) {
-            minIndex = i;
-            mindist2 = mindist;
-            mindist = dist;
-          }
-          else if(dist < mindist2) {
-            mindist2 = dist;
-          }
+      int minIndex = 0;
+      miter.seek(0); // Reuse iterator.
+      for(int i = 0; miter.valid(); miter.advance(), i++) {
+        double dist = distQ.distance(iditer, miter);
+        if(dist < mindist) {
+          minIndex = i;
+          mindist2 = mindist;
+          mindist = dist;
+        }
+        else if(dist < mindist2) {
+          mindist2 = dist;
         }
       }
       if(clusters.get(minIndex).add(iditer)) {
         changed = true;
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
-        for(int i = 0; i < k; i++) {
-          if(i != minIndex && clusters.get(i).remove(iditer)) {
+        for(int j = 0; j < k; j++) {
+          if(j != minIndex && clusters.get(j).remove(iditer)) {
             break;
           }
         }
@@ -290,17 +293,26 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+    /**
+     * The number of clusters to produce.
+     */
     protected int k;
 
+    /**
+     * The maximum number of iterations.
+     */
     protected int maxiter;
 
+    /**
+     * Method to choose initial means.
+     */
     protected KMedoidsInitialization<V> initializer;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(KMeans.K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter kP = new IntParameter(KMeans.K_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }
@@ -310,8 +322,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
         initializer = initialP.instantiateClass(config);
       }
 
-      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0);
-      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }

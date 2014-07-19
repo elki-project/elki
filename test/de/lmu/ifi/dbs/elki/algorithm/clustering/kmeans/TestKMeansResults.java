@@ -162,6 +162,30 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
   }
 
   /**
+   * Run CLARA with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testCLARA() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(KMeans.K_ID, 5);
+    params.addParameter(CLARA.Parameterizer.NUMSAMPLES_ID, 2);
+    params.addParameter(CLARA.Parameterizer.SAMPLESIZE_ID, 50);
+    CLARA<DoubleVector> kmedians = ClassGenericsUtil.parameterizeOrAbort(CLARA.class, params);
+    testParameterizationOk(params);
+
+    // run KMedians on database
+    Clustering<MedoidModel> result = kmedians.run(db);
+    testFMeasure(db, result, 0.998005);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+  }
+
+  /**
    * Run KMedoidsEM with fixed parameters and compare the result to a golden
    * standard.
    * 
