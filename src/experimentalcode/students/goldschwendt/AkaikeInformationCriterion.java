@@ -36,13 +36,11 @@ public class AkaikeInformationCriterion<V extends NumberVector, M extends MeanMo
    */
   @Override
   public double evaluate(Relation<V> relation, Clustering<M> clustering, DistanceFunction<? super V> distanceFunction) {
-    // number of clusters
-    int m = clustering.getAllClusters().size();
+
+    double logLikelihood = logLikelihoodClustering(relation, clustering, distanceFunction); // loglik
+    int freeParameters   = numberOfFreeParameters(relation, clustering); // num_parameters
     
-    double aic =
-        2 * m -
-        2 * logLikelihoodClustering(relation, clustering, distanceFunction);
-    
+    double aic = logLikelihood - freeParameters;
     return aic;
   }
 }

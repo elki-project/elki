@@ -31,26 +31,31 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 
 public class BayesianInformationCriterion<V extends NumberVector, M extends MeanModel> extends InformationCriterion<V, M> {
-
+  
   /**
    * Evaluates the BIC of a clustering.
    */
   @Override
   public double evaluate(Relation<V> relation, Clustering<M> clustering, DistanceFunction<? super V> distanceFunction) {
     
+    /*
+     * TODO:
+     * Store or compute number of points in the clustering
+     */
     // number of all data points
-    int n = 0;
+    int n = 0; // owned
     for (Cluster<M> aCluster : clustering.getAllClusters()) {
       n += aCluster.size();
     }
     
-    // number of clusters
-    int m = clustering.getAllClusters().size();
+    double logLikelihood = logLikelihoodClustering(relation, clustering, distanceFunction); // loglik
+    int freeParameters   = numberOfFreeParameters(relation, clustering); // num_parameters
     
     // bayes information criterion for this clustering
+    // original implementation: loglik - num_parameters/2.0*log((double) owned);
     double bic =
-        Math.log(n) * m -
-        2 * logLikelihoodClustering(relation, clustering, distanceFunction);
+        logLikelihood
+        - (freeParameters / 2.0) * Math.log(n);
     
     return bic;
   }

@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.kd.MinimalisticMemoryKDTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -70,9 +69,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <V> Vector type
  * @param <M> Model type
  */
-@Title("X-Means")
-//@Description("Finds a partitioning into k clusters.")
-//@Reference(authors = "S. Lloyd", title = "Least squares quantization in PCM", booktitle = "IEEE Transactions on Information Theory 28 (2): 129–137.", url = "http://dx.doi.org/10.1109/TIT.1982.1056489")
 public class XMeans<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>>, DistanceBasedAlgorithm<V> {
   /**
    * The logger for this class.
@@ -131,27 +127,43 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    */
   private Clustering<M> splitCluster(Relation<V> relation, Cluster<M> parentCluster, Database database) {
     
-    ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
-    
-    // FIXME: Throws exception when there are too few data points in the child cluster
-    splitInitializer.setParentCluster(parentCluster);
-    Clustering<M> childClustering = splitKMeans.run(proxyDB);
-    
     // Transform parent cluster into a clustering
     LinkedList<Cluster<M>> parentClusterList = new LinkedList<Cluster<M>>();
     parentClusterList.add(parentCluster);
     Clustering<M> parentClustering = new Clustering<>(parentCluster.getName(), parentCluster.getName(), parentClusterList);
     
+    if (parentCluster.size() < 2) {
+      // Split is not possbile
+      return parentClustering;
+    }
+    
+    ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
+    
+    splitInitializer.setParentCluster(parentCluster);
+    Clustering<M> childClustering = splitKMeans.run(proxyDB);
+    
     double parentEvaluation   = informationCriterion.evaluate(relation, parentClustering, getDistanceFunction());
     double childrenEvaluation = informationCriterion.evaluate(relation, childClustering, getDistanceFunction());
     
+    if (LOG.isDebugging()) {
+      LOG.debug("parentEvaluation: " + parentEvaluation);
+      LOG.debug("childrenEvaluation: " + childrenEvaluation);
+    }
+    
     // Check if split is an improvement
     if (childrenEvaluation < parentEvaluation) {
+      
+      if (LOG.isDebugging()) {
+        LOG.debug("parent");
+      }
       // Split does not improve clustering.
       // Return old cluster
       return parentClustering;
     }
     else {
+      if (LOG.isDebugging()) {
+        LOG.debug("Children");
+      }
       // Split improves clustering
       // Return the new clusters
       return childClustering;
@@ -162,8 +174,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     
     /**
      * TODO:
-     * Not much speed improvement.
-     * KD Tree used properly?
+     * KD-Tree usage not implmented properly
      */
     
     // Use kd trees for performance improvements
@@ -210,13 +221,18 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       }
     }
     
-    // FIXME: progress is not set properly
     if (prog != null) {
       prog.setTotal(k);
     }
 
+    if (LOG.isDebugging()) {
+      LOG.debug("k: " + k);
+    }
+    
     // add all current clusters to the result
-    return new Clustering<>("X-Means Result", "X-Means", resultClusterList);
+    Clustering<M> result = new Clustering<>("X-Means Result", "X-Means", resultClusterList);
+    
+    return result;
   }
 
   @Override
@@ -248,12 +264,6 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
      */
     public static final OptionID INITIAL_KMEANS_ID = new OptionID("xmeans.initial-kmeans-variant", "Initial kMeans variant");
     
-    /* 
-     * TODO:
-     * My version of k means can be parameterized with two k means variants.
-     * One for the initial k means and the other for the splitting steps.
-     * Is this a good idea or should there only be one? 
-     */
     public static final OptionID SPLIT_KMEANS_ID = new OptionID("xmeans.split-kmeans-variant", "Split kMeans variant");
 
     public static final OptionID K_MIN_ID = new OptionID("xmeans.k_min", "The minimum number of clusters to find.");
@@ -307,15 +317,6 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         ListParameterization initialKMeansVariantParameters = new ListParameterization();
         ListParameterization splitKMeansVariantParameters   = new ListParameterization();
 
-        /*
-         * TODO:
-         * For the splitting step I have to constrain the initial position of the cluster centers.
-         * However, the k means class does not have the required API to set the cluster centers.
-         * I solved the problem by implementen a custom initialization class
-         * where I can set the centers during the execution of x means.
-         * In my opinion, rather clumsy.
-         * Should I leave like this or should the API of k means be adapted?    
-         */
         splitInitializer = new XMeansSplitKMeansInitialization<>(rndP.getValue());
         
         initialKMeansVariantParameters.addParameter(KMeans.K_ID, k_min);
