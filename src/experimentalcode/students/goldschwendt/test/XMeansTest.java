@@ -40,7 +40,7 @@ public class XMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Tes
   
   @Test
   public void testKMeansLloyd() {
-    Database db = makeSimpleDatabase(UNITTEST + "3-gaussian-2d.csv", 930);
+    Database db = makeSimpleDatabase("data/synthetic/outlier-scenarios/3-gaussian-2d.csv", 930);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
