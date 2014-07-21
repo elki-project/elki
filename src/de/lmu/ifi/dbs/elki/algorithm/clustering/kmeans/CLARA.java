@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -52,13 +53,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
- * CLARA is a clustering method for large data sets based on PAM, partitioning
- * around medoids ({@link KMedoidsPAM}) based on sampling.
+ * Clustering Large Applications (CLARA) is a clustering method for large data
+ * sets based on PAM, partitioning around medoids ({@link KMedoidsPAM}) based on
+ * sampling.
+ * 
+ * Reference:
+ * <p>
+ * L. Kaufman, P. J. Rousseeuw<br />
+ * Clustering Large Data Sets (with discussion)<br />
+ * in: Pattern Recognition in Practice II
+ * </p>
  * 
  * @author Erich Schubert
  *
  * @param <V> Vector type
  */
+@Reference(authors = "L. Kaufman, P. J. Rousseeuw",//
+title = "Clustering Large Data Sets (with discussion)", //
+booktitle = "Pattern Recognition in Practice II")
 public class CLARA<V> extends KMedoidsPAM<V> {
   /**
    * Class logger.
@@ -111,7 +123,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
         clusters.add(DBIDUtil.newHashSet(relation.size() / k));
       }
       runPAMOptimization(distQ, rids, medoids, clusters);
-      double score = assignToNearestCluster(medoids, ids, clusters, distQ);
+      double score = assignRemainingToNearestCluster(medoids, ids, rids, clusters, distQ);
       if(score < best) {
         best = score;
         bestmedoids = medoids;
@@ -136,14 +148,19 @@ public class CLARA<V> extends KMedoidsPAM<V> {
    * 
    * @param means Object centroids
    * @param ids Object ids
+   * @param rids Sample that was already assigned
    * @param clusters cluster assignment
    * @param distQ distance query
    * @return Sum of distances.
    */
-  protected double assignToNearestCluster(ArrayDBIDs means, DBIDs ids, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V> distQ) {
+  protected double assignRemainingToNearestCluster(ArrayDBIDs means, DBIDs ids, DBIDs rids, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V> distQ) {
+    rids = DBIDUtil.ensureSet(rids); // Ensure we have fast contains
     double distsum = 0.;
     DBIDArrayIter miter = means.iter();
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+      if(rids.contains(iditer)) {
+        continue;
+      }
       double mindist = Double.POSITIVE_INFINITY;
       int minIndex = 0;
       miter.seek(0); // Reuse iterator.
@@ -154,16 +171,8 @@ public class CLARA<V> extends KMedoidsPAM<V> {
           mindist = dist;
         }
       }
-      distsum += mindist * mindist;
-      if(clusters.get(minIndex).add(iditer)) {
-        // Remove from previous cluster
-        // TODO: keep a list of cluster assignments to save this search?
-        for(int j = 0; j < k; j++) {
-          if(j != minIndex && clusters.get(j).remove(iditer)) {
-            break;
-          }
-        }
-      }
+      distsum += mindist;
+      clusters.get(minIndex).add(iditer);
     }
     return distsum;
   }
@@ -209,13 +218,13 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter numsamplesP = new IntParameter(NUMSAMPLES_ID, 1) //
+      IntParameter numsamplesP = new IntParameter(NUMSAMPLES_ID, 5) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(numsamplesP)) {
         numsamples = numsamplesP.intValue();
       }
 
-      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID, 1) //
+      DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID) //
       .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(samplingP)) {
         sampling = samplingP.doubleValue();
