@@ -81,7 +81,7 @@ public class Unique<E> extends TObjectHash<E> {
     int index = insertKey(obj);
 
     if(index >= 0) {
-      return (E) _set[index];
+      obj = (E) _set[index];
     }
 
     postInsertHook(consumeFreeSlot);
@@ -113,6 +113,7 @@ public class Unique<E> extends TObjectHash<E> {
   @SuppressWarnings("unchecked")
   @Override
   protected void rehash(int newCapacity) {
+    System.err.println("Rehashing to " + newCapacity);
     final int oldCapacity = _set.length, oldSize = size();
     // Replace data storage:
     Object oldSet[] = _set;
