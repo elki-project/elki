@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hash;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Arrays;
-
 import gnu.trove.impl.hash.TObjectHash;
+
+import java.util.Arrays;
 
 /**
  * This hash set is designed to keep only a unique copy of each object (hence
@@ -80,8 +80,8 @@ public class Unique<E> extends TObjectHash<E> {
   public E addOrGet(E obj) {
     int index = insertKey(obj);
 
-    if(index >= 0) {
-      obj = (E) _set[index];
+    if(index < 0) {
+      obj = (E) _set[-index - 1];
     }
 
     postInsertHook(consumeFreeSlot);
