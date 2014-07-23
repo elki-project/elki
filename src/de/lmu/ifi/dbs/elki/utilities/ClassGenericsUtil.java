@@ -106,17 +106,22 @@ public final class ClassGenericsUtil {
     try {
       try {
         instance = type.cast(loader.loadClass(className).newInstance());
-      } catch (ClassNotFoundException e) {
+      }
+      catch(ClassNotFoundException e) {
         // try package of type
         instance = type.cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
-    } catch (InstantiationException e) {
+    }
+    catch(InstantiationException e) {
       throw new UnableToComplyException(e);
-    } catch (IllegalAccessException e) {
+    }
+    catch(IllegalAccessException e) {
       throw new UnableToComplyException(e);
-    } catch (ClassNotFoundException e) {
+    }
+    catch(ClassNotFoundException e) {
       throw new UnableToComplyException(e);
-    } catch (ClassCastException e) {
+    }
+    catch(ClassCastException e) {
       throw new UnableToComplyException(e);
     }
     return instance;
@@ -152,17 +157,22 @@ public final class ClassGenericsUtil {
     try {
       try {
         instance = ((Class<T>) type).cast(loader.loadClass(className).newInstance());
-      } catch (ClassNotFoundException e) {
+      }
+      catch(ClassNotFoundException e) {
         // try package of type
         instance = ((Class<T>) type).cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
-    } catch (InstantiationException e) {
+    }
+    catch(InstantiationException e) {
       throw new UnableToComplyException(e);
-    } catch (IllegalAccessException e) {
+    }
+    catch(IllegalAccessException e) {
       throw new UnableToComplyException(e);
-    } catch (ClassNotFoundException e) {
+    }
+    catch(ClassNotFoundException e) {
       throw new UnableToComplyException(e);
-    } catch (ClassCastException e) {
+    }
+    catch(ClassCastException e) {
       throw new UnableToComplyException(e);
     }
     return instance;
@@ -183,13 +193,13 @@ public final class ClassGenericsUtil {
    */
   public static <C> Method getParameterizationFactoryMethod(Class<C> c, Class<?> ret) throws NoSuchMethodException {
     Method m = c.getMethod(FACTORY_METHOD_NAME, Parameterization.class);
-    if (m == null) {
+    if(m == null) {
       throw new NoSuchMethodException("No parameterization method found.");
     }
-    if (!ret.isAssignableFrom(m.getReturnType())) {
+    if(!ret.isAssignableFrom(m.getReturnType())) {
       throw new NoSuchMethodException("Return type doesn't match: " + m.getReturnType().getName() + ", expected: " + ret.getName());
     }
-    if (!java.lang.reflect.Modifier.isStatic(m.getModifiers())) {
+    if(!java.lang.reflect.Modifier.isStatic(m.getModifiers())) {
       throw new NoSuchMethodException("Factory method is not static.");
     }
     return m;
@@ -202,11 +212,12 @@ public final class ClassGenericsUtil {
    * @return Parameterizer or null.
    */
   public static Parameterizer getParameterizer(Class<?> c) {
-    for (Class<?> inner : c.getDeclaredClasses()) {
-      if (Parameterizer.class.isAssignableFrom(inner)) {
+    for(Class<?> inner : c.getDeclaredClasses()) {
+      if(Parameterizer.class.isAssignableFrom(inner)) {
         try {
           return inner.asSubclass(Parameterizer.class).newInstance();
-        } catch (Exception e) {
+        }
+        catch(Exception e) {
           LOG.warning("Non-usable Parameterizer in class: " + c.getName());
         }
       }
@@ -229,14 +240,14 @@ public final class ClassGenericsUtil {
    * @throws Exception when other instantiation errors occurred
    */
   public static <C> C tryInstantiate(Class<C> r, Class<?> c, Parameterization config) throws InvocationTargetException, NoSuchMethodException, Exception {
-    if (c == null) {
+    if(c == null) {
       // TODO: better class? AbortException maybe?
       throw new UnsupportedOperationException("Trying to instantiate 'null' class!");
     }
     // Try a V3 parameterization class
     Parameterizer par = getParameterizer(c);
     // TODO: API good?
-    if (par instanceof AbstractParameterizer) {
+    if(par instanceof AbstractParameterizer) {
       final Object instance = ((AbstractParameterizer) par).make(config);
       return r.cast(instance);
     }
@@ -245,7 +256,8 @@ public final class ClassGenericsUtil {
       final Method factory = getParameterizationFactoryMethod(c, r);
       final Object instance = factory.invoke(null, config);
       return r.cast(instance);
-    } catch (NoSuchMethodException e) {
+    }
+    catch(NoSuchMethodException e) {
       // continue.
     }
     // Try a regular "parameterization" constructor
@@ -253,7 +265,8 @@ public final class ClassGenericsUtil {
       final Constructor<?> constructor = c.getConstructor(Parameterization.class);
       final Object instance = constructor.newInstance(config);
       return r.cast(instance);
-    } catch (NoSuchMethodException e) {
+    }
+    catch(NoSuchMethodException e) {
       // continue
     }
     // Try a default constructor.
@@ -275,8 +288,13 @@ public final class ClassGenericsUtil {
   @SuppressWarnings("unchecked")
   public static <C> C parameterizeOrAbort(Class<?> c, Parameterization config) {
     try {
-      return tryInstantiate((Class<C>) c, c, config);
-    } catch (Exception e) {
+      C ret = tryInstantiate((Class<C>) c, c, config);
+      if(ret == null) {
+        throw new AbortException("Could not instantiate class. Check parameters.");
+      }
+      return ret;
+    }
+    catch(Exception e) {
       throw new AbortException("Instantiation failed", e);
     }
   }
@@ -324,7 +342,7 @@ public final class ClassGenericsUtil {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static <T> ArrayList<T>[] newArrayOfEmptyArrayList(int len) {
     ArrayList[] result = new ArrayList[len];
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       result[i] = new ArrayList<>();
     }
     return result;
@@ -343,7 +361,7 @@ public final class ClassGenericsUtil {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static <T> HashSet<T>[] newArrayOfEmptyHashSet(int len) {
     HashSet[] result = new HashSet[len];
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       result[i] = new HashSet<>();
     }
     return result;
@@ -398,8 +416,8 @@ public final class ClassGenericsUtil {
    */
   @SuppressWarnings("unchecked")
   public static <BASE, FROM extends BASE, TO extends BASE> Class<TO> uglyCrossCast(Class<FROM> cls, Class<BASE> base) {
-    if (!base.isAssignableFrom(cls)) {
-      if (cls == null) {
+    if(!base.isAssignableFrom(cls)) {
+      if(cls == null) {
         throw new ClassCastException("Attempted to use 'null' as class.");
       }
       throw new ClassCastException(cls.getName() + " is not a superclass of " + base);
@@ -424,7 +442,8 @@ public final class ClassGenericsUtil {
   public static <B, T extends B> T castWithGenericsOrNull(Class<B> base, Object obj) {
     try {
       return (T) base.cast(obj);
-    } catch (ClassCastException e) {
+    }
+    catch(ClassCastException e) {
       return null;
     }
   }
@@ -445,7 +464,8 @@ public final class ClassGenericsUtil {
     try {
       Object n = obj.getClass().getConstructor().newInstance();
       return (T) n;
-    } catch (NullPointerException e) {
+    }
+    catch(NullPointerException e) {
       throw new IllegalArgumentException("Null pointer exception in newInstance()", e);
     }
   }
@@ -473,7 +493,7 @@ public final class ClassGenericsUtil {
    */
   @SuppressWarnings("unchecked")
   public static <T> T[] newArray(Class<? extends T> k, int size) {
-    if (k.isPrimitive()) {
+    if(k.isPrimitive()) {
       throw new IllegalArgumentException("Argument cannot be primitive: " + k);
     }
     Object a = java.lang.reflect.Array.newInstance(k, size);
@@ -505,13 +525,17 @@ public final class ClassGenericsUtil {
       C copy = newInstance(coll);
       copy.addAll(coll);
       return copy;
-    } catch (InstantiationException e) {
+    }
+    catch(InstantiationException e) {
       throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
+    }
+    catch(IllegalAccessException e) {
       throw new RuntimeException(e);
-    } catch (InvocationTargetException e) {
+    }
+    catch(InvocationTargetException e) {
       throw new RuntimeException(e);
-    } catch (NoSuchMethodException e) {
+    }
+    catch(NoSuchMethodException e) {
       throw new RuntimeException(e);
     }
   }
@@ -525,15 +549,15 @@ public final class ClassGenericsUtil {
    * @return new array containing the collection elements
    */
   public static <T> T[] collectionToArray(Collection<T> c, T[] a) {
-    if (a.length < c.size()) {
+    if(a.length < c.size()) {
       a = newArray(a, c.size());
     }
     int i = 0;
-    for (T x : c) {
+    for(T x : c) {
       a[i] = x;
       i++;
     }
-    if (i < a.length) {
+    if(i < a.length) {
       a[i] = null;
     }
     return a;
