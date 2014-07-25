@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
@@ -111,11 +112,7 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
     final Random random = rnd.getSingleThreadedRandom();
 
     // Sorted copies for slicing.
-    int[] s1 = new int[len], s2 = new int[len];
-    for(int i = 0; i < len; i++) {
-      s1[i] = i;
-      s2[i] = i;
-    }
+    int[] s1 = MathUtil.sequence(0, len), s2 = MathUtil.sequence(0, len);
     IntegerArrayQuickSort.sort(s1, new IntegerComparator() {
       @Override
       public int compare(int x, int y) {

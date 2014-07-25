@@ -1081,4 +1081,27 @@ public final class MathUtil {
     }
     return ret;
   }
+
+  /**
+   * Empty integer array.
+   */
+  public static final int[] EMPTY_INTS = new int[0];
+
+  /**
+   * Generate an array of integers.
+   * 
+   * @param start First integer
+   * @param end Last integer (exclusive!)
+   * @return Array of integers of length end-start
+   */
+  public static int[] sequence(int start, int end) {
+    if(start >= end) {
+      return EMPTY_INTS;
+    }
+    int[] ret = new int[end - start];
+    for(int j = 0; start < end; start++, j++) {
+      ret[j] = start;
+    }
+    return ret;
+  }
 }

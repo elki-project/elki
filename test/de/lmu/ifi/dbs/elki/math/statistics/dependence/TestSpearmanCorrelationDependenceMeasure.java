@@ -37,13 +37,13 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * 
  * @author Erich Schubert
  */
-public class TestCorrelationDependenceMeasure implements JUnit4Test {
+public class TestSpearmanCorrelationDependenceMeasure implements JUnit4Test {
   double[][] data = { //
   { 1, 2, 3, 4 }, //
-  { 1, 3, 5, 7 }, //
-  { 4, 3, 2, 1 }, //
-  { 1, 4, 2, 3 }, //
-  { 1, 0, 0, 1 }, //
+  { 1, 3, 5, 700 }, //
+  { 400, 3, 2, 1 }, //
+  { 1, 400, 2, 3 }, //
+  { 100, 0, 0, 100 }, //
   };
 
   double[][] R = { //
@@ -55,8 +55,8 @@ public class TestCorrelationDependenceMeasure implements JUnit4Test {
   };
 
   @Test
-  public void testPearsonCorrelation() {
-    DependenceMeasure cor = CorrelationDependenceMeasure.STATIC;
+  public void testSpearmanCorrelation() {
+    DependenceMeasure cor = SpearmanCorrelationDependenceMeasure.STATIC;
     // Single computations
     for(int i = 0; i < data.length; i++) {
       for(int j = 0; j <= i; j++) {
