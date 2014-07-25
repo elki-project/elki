@@ -37,9 +37,20 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  */
 public abstract class AbstractDependenceMeasure implements DependenceMeasure {
+  // In your subclass, you will need to implement at least this method:
+  // Sorry for the complex use of generics, but this way we can use it with any
+  // type of array, including vectors in rows or columns etc.
+  @Override
+  abstract public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2);
+
   @Override
   public double dependence(double[] data1, double[] data2) {
     return dependence(ArrayLikeUtil.DOUBLEARRAYADAPTER, data1, ArrayLikeUtil.DOUBLEARRAYADAPTER, data2);
+  }
+
+  @Override
+  public <A> double dependence(NumberArrayAdapter<?, A> adapter, A data1, A data2) {
+    return dependence(adapter, data1, adapter, data2);
   }
 
   @Override

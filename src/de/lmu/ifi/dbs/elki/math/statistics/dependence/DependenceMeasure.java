@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,6 +23,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+
 /**
  * Measure the dependence of two variables.
  * 
@@ -48,6 +48,20 @@ public interface DependenceMeasure {
    * @return Dependence measure
    */
   <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2);
+
+  /**
+   * Measure the dependence of two variables.
+   * 
+   * This is the more flexible API, which allows using different internal data
+   * representations.
+   * 
+   * @param adapter Array type adapter
+   * @param data1 First data set
+   * @param data2 Second data set
+   * @param <A> Array type
+   * @return Dependence measure
+   */
+  <A> double dependence(NumberArrayAdapter<?, A> adapter, A data1, A data2);
 
   /**
    * Measure the dependence of two variables.
