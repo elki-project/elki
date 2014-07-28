@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.lmu.ifi.dbs.elki</groupId>
+	<version>0.6.5-SNAPSHOT</version>
+	<artifactId>elki-project</artifactId>
+	<packaging>pom</packaging>
+
+	<name>ELKI Data Mining Framework - Parent Project</name>
+
+	<licenses>
+		<license>
+			<name>GNU Affero General Public License (AGPL) version 3.0</name>
+			<url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
+		</license>
+	</licenses>
+
+	<modules>
+		<module>elki</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<useIncrementalCompilation>false</useIncrementalCompilation>
+					<source>1.7</source>
+					<target>1.7</target>
+					<debuglevel>source,lines</debuglevel>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>net.sf.trove4j</groupId>
+				<artifactId>trove4j</artifactId>
+				<version>[3.0.3,)</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-swing</artifactId>
+				<version>[1.7,)</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-rasterizer</artifactId>
+				<version>[1.7,)</version>
+			</dependency>
+
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>[4.8,)</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<url>http://elki.dbs.ifi.lmu.de/</url>
+	<organization>
+		<url>http://www.dbs.ifi.lmu.de/</url>
+	</organization>
+	<issueManagement>
+		<system>trac</system>
+		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
+	</issueManagement>
+</project>
