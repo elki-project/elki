@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -55,7 +56,7 @@ public class InspectionUtil {
   /**
    * Class loader
    */
-  private static final ClassLoader CLASSLOADER = ClassLoader.getSystemClassLoader();
+  private static final URLClassLoader CLASSLOADER = (URLClassLoader) ClassLoader.getSystemClassLoader();
 
   /**
    * Default package ignores.
@@ -148,16 +149,18 @@ public class InspectionUtil {
   public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything, boolean parameterizable) {
     // For removing duplicates:
     THashSet<Class<?>> dupes = new THashSet<>();
+    ArrayList<Class<?>> known = new ArrayList<>();
     // Add all from service files (i.e. jars)
     {
       Iterator<Class<?>> iter = new ELKIServiceLoader(c);
       while(iter.hasNext()) {
-        dupes.add(iter.next());
+        known.add(iter.next());
       }
+      dupes.addAll(known);
     }
     if(!InspectionUtil.NONSTATIC_CLASSPATH) {
-      if(dupes.size() >= 0) {
-        return new ArrayList<>(dupes);
+      if(known.size() >= 0) {
+        return new ArrayList<>(known);
       }
       LOG.warning("No implementations for " + c.getName() + " were found using index files.");
     }
@@ -196,9 +199,10 @@ public class InspectionUtil {
           continue;
         }
       }
+      known.add(cls);
       dupes.add(cls);
     }
-    return new ArrayList<>(dupes);
+    return known;
   }
 
   /**
@@ -260,49 +264,51 @@ public class InspectionUtil {
    */
   private static List<Class<?>> slowScan() {
     ArrayList<Class<?>> res = new ArrayList<>();
+    Enumeration<URL> cps;
     try {
-      Enumeration<URL> cps = CLASSLOADER.getResources("");
-      while(cps.hasMoreElements()) {
-        URL u = cps.nextElement();
-        // Scan file sources only.
-        if("file".equals(u.getProtocol())) {
-          File path;
+      cps = CLASSLOADER.getResources("");
+    }
+    catch(IOException e) {
+      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+      return res;
+    }
+    while(cps.hasMoreElements()) {
+      URL u = cps.nextElement();
+      // Scan file sources only.
+      if("file".equals(u.getProtocol())) {
+        File path;
+        try {
+          path = new File(u.toURI());
+        }
+        catch(URISyntaxException e) {
+          LOG.exception("Error in classpath: " + u, e);
+          continue;
+        }
+        Iterator<String> it = new DirClassIterator(path, DEFAULT_IGNORES);
+        while(it.hasNext()) {
+          String classname = it.next();
           try {
-            path = new File(u.toURI());
+            Class<?> cls = CLASSLOADER.loadClass(classname);
+            // skip classes where we can't get a full name.
+            if(cls.getCanonicalName() == null) {
+              continue;
+            }
+            res.add(cls);
           }
-          catch(URISyntaxException e) {
-            LOG.exception("Error in classpath: " + u, e);
+          catch(ClassNotFoundException e) {
             continue;
           }
-          Iterator<String> it = new DirClassIterator(path, DEFAULT_IGNORES);
-          while(it.hasNext()) {
-            String classname = it.next();
-            try {
-              Class<?> cls = CLASSLOADER.loadClass(classname);
-              // skip classes where we can't get a full name.
-              if(cls.getCanonicalName() == null) {
-                continue;
-              }
-              res.add(cls);
-            }
-            catch(ClassNotFoundException e) {
-              continue;
-            }
-            catch(NoClassDefFoundError e) {
-              continue;
-            }
-            catch(Exception e) {
-              continue;
-            }
-            catch(Error e) {
-              continue;
-            }
+          catch(NoClassDefFoundError e) {
+            continue;
+          }
+          catch(Exception e) {
+            continue;
+          }
+          catch(Error e) {
+            continue;
           }
         }
       }
-    }
-    catch(IOException e) {
-      LOG.exception(e);
     }
     Collections.sort(res, new ClassSorter());
     return res;
