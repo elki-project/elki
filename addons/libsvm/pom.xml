@@ -6,12 +6,13 @@
 		<groupId>de.lmu.ifi.dbs.elki</groupId>
 		<version>0.6.5-SNAPSHOT</version>
 		<artifactId>elki-project</artifactId>
+		<relativePath>../../</relativePath>
 	</parent>
 
-	<artifactId>elki</artifactId>
+	<artifactId>elki-libsvm</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework</name>
+	<name>ELKI Data Mining Framework - LibSVM based extensions</name>
 
 	<licenses>
 		<license>
@@ -26,32 +27,6 @@
 
 	<build>
 		<plugins>
-			<!-- Launcher -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1</version>
-				<configuration>
-					<mainClass>de.lmu.ifi.dbs.elki.application.ELKILauncher</mainClass>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>java</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- unit tests -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.7.2</version>
-				<configuration>
-					<!-- to have the desired paths to the data files -->
-					<workingDirectory>${project.build.testOutputDirectory}</workingDirectory>
-				</configuration>
-			</plugin>
 			<!-- javadoc -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -73,24 +48,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>net.sf.trove4j</groupId>
-			<artifactId>trove4j</artifactId>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki</artifactId>
+			<version>0.6.5-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
-			<groupId>org.codehaus.mojo</groupId>
-			<artifactId>exec-maven-plugin</artifactId>
-			<version>1.2.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
+			<groupId>tw.edu.ntu.csie</groupId>
+			<artifactId>libsvm</artifactId>
+			<version>3.17</version>
 		</dependency>
 	</dependencies>
-	<url>http://elki.dbs.ifi.lmu.de/</url>
-	<issueManagement>
-		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
-	</issueManagement>
 </project>

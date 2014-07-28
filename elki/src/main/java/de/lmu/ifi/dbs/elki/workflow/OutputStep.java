@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
-import de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer;
 
 /**
  * The "output" step, where data is analyzed.
@@ -66,7 +65,7 @@ public class OutputStep implements WorkflowStep {
    */
   public void runResultHandlers(HierarchicalResult result) {
     // Run result handlers
-    for (ResultHandler resulthandler : resulthandlers) {
+    for(ResultHandler resulthandler : resulthandlers) {
       Thread.currentThread().setName(resulthandler.toString());
       resulthandler.processNewResult(result, result);
     }
@@ -83,9 +82,18 @@ public class OutputStep implements WorkflowStep {
   /**
    * Set the default handler to the {@link ResultVisualizer}.
    */
+  @SuppressWarnings("unchecked")
   public static void setDefaultHandlerVisualizer() {
     defaultHandlers = new ArrayList<>(1);
-    defaultHandlers.add(ResultVisualizer.class);
+    Class<? extends ResultHandler> clz;
+    try {
+      clz = (Class<? extends ResultHandler>) ClassLoader.getSystemClassLoader().loadClass(//
+      "de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer");
+    }
+    catch(ClassNotFoundException e) {
+      clz = ResultWriter.class;
+    }
+    defaultHandlers.add(clz);
   }
 
   protected static ArrayList<Class<? extends ResultHandler>> defaultHandlers = null;
@@ -130,10 +138,10 @@ public class OutputStep implements WorkflowStep {
       super.makeOptions(config);
       // result handlers
       final ObjectListParameter<ResultHandler> resultHandlerParam = new ObjectListParameter<>(RESULT_HANDLER_ID, ResultHandler.class);
-      if (defaultHandlers != null) {
+      if(defaultHandlers != null) {
         resultHandlerParam.setDefaultValue(defaultHandlers);
       }
-      if (config.grab(resultHandlerParam)) {
+      if(config.grab(resultHandlerParam)) {
         resulthandlers = resultHandlerParam.instantiateClasses(config);
       }
     }

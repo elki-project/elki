@@ -6,12 +6,13 @@
 		<groupId>de.lmu.ifi.dbs.elki</groupId>
 		<version>0.6.5-SNAPSHOT</version>
 		<artifactId>elki-project</artifactId>
+		<relativePath>../../</relativePath>
 	</parent>
 
-	<artifactId>elki</artifactId>
+	<artifactId>elki-joglviz</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework</name>
+	<name>ELKI Data Mining Framework - OpenGL-based Visualization</name>
 
 	<licenses>
 		<license>
@@ -26,32 +27,6 @@
 
 	<build>
 		<plugins>
-			<!-- Launcher -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1</version>
-				<configuration>
-					<mainClass>de.lmu.ifi.dbs.elki.application.ELKILauncher</mainClass>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>java</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- unit tests -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.7.2</version>
-				<configuration>
-					<!-- to have the desired paths to the data files -->
-					<workingDirectory>${project.build.testOutputDirectory}</workingDirectory>
-				</configuration>
-			</plugin>
 			<!-- javadoc -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -73,24 +48,24 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>net.sf.trove4j</groupId>
-			<artifactId>trove4j</artifactId>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki</artifactId>
+			<version>0.6.5-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
-			<groupId>org.codehaus.mojo</groupId>
-			<artifactId>exec-maven-plugin</artifactId>
-			<version>1.2.1</version>
+			<groupId>org.jogamp.jogl</groupId>
+			<artifactId>jogl-all-main</artifactId>
+			<version>2.1.5-01</version>
 		</dependency>
-
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
+			<groupId>org.jogamp.gluegen</groupId>
+			<artifactId>gluegen-rt-main</artifactId>
+			<version>2.1.5-01</version>
+		</dependency>
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-batik-visualization</artifactId>
+			<version>0.6.5-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	<url>http://elki.dbs.ifi.lmu.de/</url>
-	<issueManagement>
-		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
-	</issueManagement>
 </project>

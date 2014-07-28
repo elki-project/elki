@@ -40,6 +40,41 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>svg</id>
+			<modules>
+				<module>addons/batikvis</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>imagesearch</id>
+			<modules>
+				<module>addons/imagesearch</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>svm</id>
+			<modules>
+				<module>addons/libsvm</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>lucene</id>
+			<modules>
+				<module>addons/lucene</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>jogl</id>
+			<modules>
+				<module>addons/batikvis</module>
+				<module>addons/3dpc</module>
+				<module>addons/joglviz</module>
+			</modules>
+		</profile>
+	</profiles>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
