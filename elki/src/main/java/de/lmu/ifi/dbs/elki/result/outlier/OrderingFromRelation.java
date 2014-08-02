@@ -23,13 +23,11 @@ package de.lmu.ifi.dbs.elki.result.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Comparator;
-
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
 /**
@@ -48,8 +46,8 @@ public class OrderingFromRelation implements OrderingResult {
   /**
    * Factor for ascending (+1) and descending (-1) ordering.
    */
-  protected int ascending = +1;
-  
+  protected boolean ascending = false;
+
   /**
    * Constructor for outlier orderings
    * 
@@ -59,16 +57,16 @@ public class OrderingFromRelation implements OrderingResult {
   public OrderingFromRelation(DoubleRelation scores, boolean ascending) {
     super();
     this.scores = scores;
-    this.ascending = ascending ? +1 : -1;
+    this.ascending = ascending;
   }
-  
+
   /**
    * Ascending constructor.
    * 
    * @param scores
    */
   public OrderingFromRelation(DoubleRelation scores) {
-    this(scores, true);
+    this(scores, false);
   }
 
   @Override
@@ -79,33 +77,19 @@ public class OrderingFromRelation implements OrderingResult {
   @Override
   public ArrayModifiableDBIDs iter(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
-    sorted.sort(new ImpliedComparator());
+    sorted.sort(ascending ? //
+    new RelationUtil.AscendingByDoubleRelation(scores) //
+    : new RelationUtil.DescendingByDoubleRelation(scores));
     return sorted;
   }
 
   @Override
   public String getLongName() {
-    return scores.getLongName()+" Order";
+    return scores.getLongName() + " Order";
   }
 
   @Override
   public String getShortName() {
-    return scores.getShortName()+"_order";
-  }
-
-  /**
-   * Internal comparator, accessing the map to sort objects
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  protected final class ImpliedComparator implements Comparator<DBIDRef> {
-    @Override
-    public int compare(DBIDRef id1, DBIDRef id2) {
-      double k1 = scores.doubleValue(id1);
-      double k2 = scores.doubleValue(id2);
-      return ascending * Double.compare(k2, k1);
-    }
+    return scores.getShortName() + "_order";
   }
 }

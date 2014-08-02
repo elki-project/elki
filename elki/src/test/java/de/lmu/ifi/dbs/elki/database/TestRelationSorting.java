@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.database;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -58,13 +57,6 @@ public class TestRelationSorting implements JUnit4Test {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, filename);
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
-    if (params.hasUnusedParameters()) {
-      fail("Unused parameters: " + params.getRemainingParameters());
-    }
-    if (params.hasErrors()) {
-      params.logAndClearReportedErrors();
-      fail("Parameterization errors.");
-    }
     db.initialize();
     Relation<? extends NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
@@ -74,14 +66,14 @@ public class TestRelationSorting implements JUnit4Test {
     int dims = RelationUtil.dimensionality(rel);
     SortDBIDsBySingleDimension sorter = new VectorUtil.SortDBIDsBySingleDimension(rel);
 
-    for (int d = 0; d < dims; d++) {
+    for(int d = 0; d < dims; d++) {
       sorter.setDimension(d);
       ids.sort(sorter);
       assertEquals("Lost some DBID during sorting?!?", size, DBIDUtil.newHashSet(ids).size());
 
       DBIDArrayIter it = ids.iter();
       double prev = rel.get(it).doubleValue(d);
-      for (it.advance(); it.valid(); it.advance()) {
+      for(it.advance(); it.valid(); it.advance()) {
         double next = rel.get(it).doubleValue(d);
         assertTrue("Not correctly sorted: " + prev + " > " + next + " at pos " + it.getOffset(), prev <= next);
         prev = next;

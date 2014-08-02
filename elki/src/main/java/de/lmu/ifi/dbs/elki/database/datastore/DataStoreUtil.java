@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Comparator;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -122,5 +125,63 @@ public final class DataStoreUtil {
    */
   public static WritableRecordStore makeRecordStorage(DBIDs ids, int hints, Class<?>... dataclasses) {
     return DataStoreFactory.FACTORY.makeRecordStorage(ids, hints, dataclasses);
+  }
+
+  /**
+   * Sort objects by a double relation
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class AscendingByDoubleDataStore implements Comparator<DBIDRef> {
+    /**
+     * Scores to use for sorting.
+     */
+    private final DoubleDataStore scores;
+    
+    /**
+     * Constructor.
+     *
+     * @param scores Scores for sorting
+     */
+    public AscendingByDoubleDataStore(DoubleDataStore scores) {
+      super();
+      this.scores = scores;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      return Double.compare(scores.doubleValue(id1), scores.doubleValue(id2));
+    }
+  }
+
+  /**
+   * Sort objects by a double relation
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class DescendingByDoubleDataStore implements Comparator<DBIDRef> {
+    /**
+     * Scores to use for sorting.
+     */
+    private final DoubleDataStore scores;
+    
+    /**
+     * Constructor.
+     *
+     * @param scores Scores for sorting
+     */
+    public DescendingByDoubleDataStore(DoubleDataStore scores) {
+      super();
+      this.scores = scores;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      return Double.compare(scores.doubleValue(id2), scores.doubleValue(id1));
+    }
   }
 }

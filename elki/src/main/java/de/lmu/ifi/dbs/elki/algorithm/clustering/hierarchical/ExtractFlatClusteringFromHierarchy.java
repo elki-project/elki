@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import gnu.trove.list.array.TDoubleArrayList;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -196,7 +195,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     // a) to determine the stop distance from "minclusters" parameter
     // b) to process arrows in decreasing / increasing order
     ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
-    order.sort(new CompareByDoubleLambda(lambda));
+    order.sort(new DataStoreUtil.AscendingByDoubleDataStore(lambda));
     DBIDArrayIter it = order.iter(); // Used multiple times!
 
     int split;
@@ -435,36 +434,6 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return algorithm.getInputTypeRestriction();
-  }
-
-  /**
-   * Order a DBID collection by the lambda value.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private static final class CompareByDoubleLambda implements Comparator<DBIDRef> {
-    /**
-     * Lambda storage
-     */
-    private final DoubleDataStore lambda;
-
-    /**
-     * Constructor.
-     * 
-     * @param lambda Lambda storage
-     */
-    protected CompareByDoubleLambda(DoubleDataStore lambda) {
-      this.lambda = lambda;
-    }
-
-    @Override
-    public int compare(DBIDRef id1, DBIDRef id2) {
-      double k1 = lambda.doubleValue(id1);
-      double k2 = lambda.doubleValue(id2);
-      return Double.compare(k1, k2);
-    }
   }
 
   /**

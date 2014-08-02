@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
 
 import java.util.AbstractCollection;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
@@ -33,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -288,6 +290,64 @@ public final class RelationUtil {
     @Override
     public int size() {
       return db.size();
+    }
+  }
+
+  /**
+   * Sort objects by a double relation
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class AscendingByDoubleRelation implements Comparator<DBIDRef> {
+    /**
+     * Scores to use for sorting.
+     */
+    private final DoubleRelation scores;
+    
+    /**
+     * Constructor.
+     *
+     * @param scores Scores for sorting
+     */
+    public AscendingByDoubleRelation(DoubleRelation scores) {
+      super();
+      this.scores = scores;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      return Double.compare(scores.doubleValue(id1), scores.doubleValue(id2));
+    }
+  }
+
+  /**
+   * Sort objects by a double relation
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class DescendingByDoubleRelation implements Comparator<DBIDRef> {
+    /**
+     * Scores to use for sorting.
+     */
+    private final DoubleRelation scores;
+    
+    /**
+     * Constructor.
+     *
+     * @param scores Scores for sorting
+     */
+    public DescendingByDoubleRelation(DoubleRelation scores) {
+      super();
+      this.scores = scores;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      return Double.compare(scores.doubleValue(id2), scores.doubleValue(id1));
     }
   }
 }

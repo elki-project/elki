@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -295,6 +296,11 @@ public final class ClassGenericsUtil {
       return ret;
     }
     catch(Exception e) {
+      if (config.hasErrors()) {
+        for (ParameterException err : config.getErrors()) {
+          LOG.warning(err.toString());
+        }
+      }
       throw new AbortException("Instantiation failed", e);
     }
   }
