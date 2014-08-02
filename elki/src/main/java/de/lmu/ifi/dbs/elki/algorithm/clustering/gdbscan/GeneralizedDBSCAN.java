@@ -76,7 +76,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf CorePredicate
  * @apiviz.composedOf NeighborPredicate
  */
-@Reference(authors = "Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", booktitle = "Data Mining and Knowledge Discovery", url = "http://dx.doi.org/10.1023/A:1009745219419")
+@Reference(authors = "Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", //
+title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", //
+booktitle = "Data Mining and Knowledge Discovery", //
+url = "http://dx.doi.org/10.1023/A:1009745219419")
 public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
@@ -114,8 +117,8 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
   @Override
   public Clustering<Model> run(Database database) {
-    for (SimpleTypeInformation<?> t : npred.getOutputType()) {
-      if (corepred.acceptsType(t)) {
+    for(SimpleTypeInformation<?> t : npred.getOutputType()) {
+      if(corepred.acceptsType(t)) {
         return new Instance<>(npred.instantiate(database, t), corepred.instantiate(database, t), coremodel).run();
       }
     }
@@ -144,12 +147,12 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     /**
      * Unprocessed IDs
      */
-    private static final int UNPROCESSED = 0;
+    protected static final int UNPROCESSED = 0;
 
     /**
      * Noise IDs
      */
-    private static final int NOISE = 1;
+    protected static final int NOISE = 1;
 
     /**
      * The neighborhood predicate
@@ -201,23 +204,24 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       // reduced memory use in the HashMap!
       int clusterid = NOISE + 1;
       // Iterate over all objects in the database.
-      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         // Skip already processed ids.
-        if (clusterids.intValue(id) != UNPROCESSED) {
+        if(clusterids.intValue(id) != UNPROCESSED) {
           continue;
         }
         // Evaluate Neighborhood predicate
         final T neighbors = npred.getNeighbors(id);
         // Evaluate Core-Point predicate:
-        if (corepred.isCorePoint(id, neighbors)) {
+        if(corepred.isCorePoint(id, neighbors)) {
           clusterids.putInt(id, clusterid);
           clustersizes.add(expandCluster(clusterid, clusterids, neighbors, progress));
           // start next cluster on next iteration.
           ++clusterid;
-          if (clusprogress != null) {
+          if(clusprogress != null) {
             clusprogress.setProcessed(clusterid, LOG);
           }
-        } else {
+        }
+        else {
           // otherwise, it's a noise point
           clusterids.putInt(id, NOISE);
           clustersizes.set(NOISE, clustersizes.get(NOISE) + 1);
@@ -233,31 +237,32 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       ArrayList<ArrayModifiableDBIDs> clusterlists = new ArrayList<>(clusterid);
       ArrayList<ArrayModifiableDBIDs> corelists = coremodel ? new ArrayList<ArrayModifiableDBIDs>(clusterid) : null;
       // add storage containers for clusters
-      for (int i = 0; i < clustersizes.size(); i++) {
+      for(int i = 0; i < clustersizes.size(); i++) {
         clusterlists.add(DBIDUtil.newArray(clustersizes.get(i)));
-        if (corelists != null) {
+        if(corelists != null) {
           corelists.add(DBIDUtil.newArray(clustersizes.get(i)));
         }
       }
       // do the actual inversion
-      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         // Negative values are non-core points:
         int cid = clusterids.intValue(id);
         int cluster = Math.abs(cid);
         clusterlists.get(cluster).add(id);
-        if (corelists != null && cid > NOISE) {
+        if(corelists != null && cid > NOISE) {
           corelists.get(cluster).add(id);
         }
       }
       clusterids.destroy();
 
       Clustering<Model> result = new Clustering<>("GDBSCAN", "gdbscan-clustering");
-      for (int cid = NOISE; cid < clusterlists.size(); cid++) {
+      for(int cid = NOISE; cid < clusterlists.size(); cid++) {
         boolean isNoise = (cid == NOISE);
         Cluster<Model> c;
-        if (corelists != null) {
+        if(corelists != null) {
           c = new Cluster<Model>(clusterlists.get(cid), isNoise, new CoreObjectsModel(corelists.get(cid)));
-        } else {
+        }
+        else {
           c = new Cluster<Model>(clusterlists.get(cid), isNoise, ClusterModel.CLUSTER);
         }
         result.addToplevelCluster(c);
@@ -281,26 +286,28 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       npred.addDBIDs(activeSet, neighbors);
       // run expandCluster as long as this set is non-empty (non-recursive
       // implementation)
-      while (!activeSet.isEmpty()) {
+      while(!activeSet.isEmpty()) {
         final DBID id = activeSet.remove(activeSet.size() - 1);
         // Assign object to cluster
         final int oldclus = clusterids.intValue(id);
-        if (oldclus == NOISE) {
+        if(oldclus == NOISE) {
           clustersize += 1;
           // Non core point cluster member:
           clusterids.putInt(id, -clusterid);
-        } else if (oldclus == UNPROCESSED) {
+        }
+        else if(oldclus == UNPROCESSED) {
           clustersize += 1;
           // expandCluster again:
           // Evaluate Neighborhood predicate
           final T newneighbors = npred.getNeighbors(id);
           // Evaluate Core-Point predicate
-          if (corepred.isCorePoint(id, newneighbors)) {
+          if(corepred.isCorePoint(id, newneighbors)) {
             // Note: the recursion is unrolled into iteration over the active
             // set.
             npred.addDBIDs(activeSet, newneighbors);
             clusterids.putInt(id, clusterid);
-          } else {
+          }
+          else {
             // Non core point cluster member:
             clusterids.putInt(id, -clusterid);
           }
@@ -353,18 +360,18 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     protected void makeOptions(Parameterization config) {
       // Neighborhood predicate
       ObjectParameter<NeighborPredicate> npredOpt = new ObjectParameter<>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class);
-      if (config.grab(npredOpt)) {
+      if(config.grab(npredOpt)) {
         npred = npredOpt.instantiateClass(config);
       }
 
       // Core point predicate
       ObjectParameter<CorePredicate> corepredOpt = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
-      if (config.grab(corepredOpt)) {
+      if(config.grab(corepredOpt)) {
         corepred = corepredOpt.instantiateClass(config);
       }
 
       Flag coremodelOpt = new Flag(COREMODEL_ID);
-      if (config.grab(coremodelOpt)) {
+      if(config.grab(coremodelOpt)) {
         coremodel = coremodelOpt.isTrue();
       }
     }

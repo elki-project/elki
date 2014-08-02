@@ -134,6 +134,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.beginStep(stepprog, 1, "Materializing LOF neighborhoods.");
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
+      preproc.initialize();
       knnq = preproc.getKNNQuery(dq, k);
     }
     DBIDs ids = relation.getDBIDs();
