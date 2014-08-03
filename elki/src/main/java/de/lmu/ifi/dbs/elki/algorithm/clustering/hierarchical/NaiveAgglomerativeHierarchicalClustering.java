@@ -49,11 +49,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * This tutorial will step you through implementing a well known clustering
- * algorithm, agglomerative hierarchical clustering, in multiple steps.
- * 
- * This is the third step, where we add support for different linkage
- * strategies.
+ * Hierarchical Agglomerative Clustering (HAC) is a classic hierarchical
+ * clustering algorithm. Initially, each element is its own cluster; the closest
+ * clusters are merged at every step, until all the data has become a single
+ * cluster.
  * 
  * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
@@ -79,7 +78,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-@Reference(authors = "G. N. Lance and W. T. Williams", title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", booktitle = "The computer journal 9.4", url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
+@Reference(authors = "G. N. Lance and W. T. Williams", //
+title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
+booktitle = "The computer journal 9.4", //
+url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
 public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
@@ -114,10 +116,10 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
-    if (size > 0x10000) {
+    if(size > 0x10000) {
       throw new AbortException("This implementation does not scale to data sets larger than " + 0x10000 + " instances (~17 GB RAM), which results in an integer overflow.");
     }
-    if (SingleLinkageMethod.class.isInstance(linkage)) {
+    if(SingleLinkageMethod.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
 
@@ -127,11 +129,11 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
     // Position counter - must agree with computeOffset!
     int pos = 0;
     boolean square = WardLinkageMethod.class.isInstance(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
-    for (ix.seek(0); ix.valid(); ix.advance()) {
-      for (iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
+    for(ix.seek(0); ix.valid(); ix.advance()) {
+      for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
         scratch[pos] = dq.distance(ix, iy);
         // Ward uses variances -- i.e. squared values
-        if (square) {
+        if(square) {
           scratch[pos] *= scratch[pos];
         }
         pos++;
@@ -142,7 +144,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableIntegerDataStore csize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       pi.put(it, it);
       lambda.put(it, Double.POSITIVE_INFINITY);
       csize.put(it, 1);
@@ -150,20 +152,20 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
-    for (int i = 1; i < size; i++) {
+    for(int i = 1; i < size; i++) {
       double mindist = Double.POSITIVE_INFINITY;
       int x = -1, y = -1;
-      for (ix.seek(0); ix.valid(); ix.advance()) {
-        if (lambda.doubleValue(ix) < Double.POSITIVE_INFINITY) {
+      for(ix.seek(0); ix.valid(); ix.advance()) {
+        if(lambda.doubleValue(ix) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int xbase = triangleSize(ix.getOffset());
-        for (iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
-          if (lambda.doubleValue(iy) < Double.POSITIVE_INFINITY) {
+        for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
+          if(lambda.doubleValue(iy) < Double.POSITIVE_INFINITY) {
             continue;
           }
           final int idx = xbase + iy.getOffset();
-          if (scratch[idx] <= mindist) {
+          if(scratch[idx] <= mindist) {
             mindist = scratch[idx];
             x = ix.getOffset();
             y = iy.getOffset();
@@ -174,7 +176,7 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
       // Avoid allocating memory, by reusing existing iterators:
       ix.seek(x);
       iy.seek(y);
-      if (LOG.isDebuggingFine()) {
+      if(LOG.isDebuggingFine()) {
         LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy));
       }
       // Perform merge in data structure: x -> y
@@ -193,8 +195,8 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
 
       ij.seek(0);
       // Write to (y, j), with j < y
-      for (; ij.getOffset() < y; ij.advance()) {
-        if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+      for(; ij.getOffset() < y; ij.advance()) {
+        if(lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int sizej = csize.intValue(ij);
@@ -202,8 +204,8 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
       }
       ij.advance(); // Skip y
       // Write to (j, y), with y < j < x
-      for (; ij.getOffset() < x; ij.advance()) {
-        if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+      for(; ij.getOffset() < x; ij.advance()) {
+        if(lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int jbase = triangleSize(ij.getOffset());
@@ -212,8 +214,8 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
       }
       ij.advance(); // Skip x
       // Write to (j, y), with y < x < j
-      for (; ij.valid(); ij.advance()) {
-        if (lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+      for(; ij.valid(); ij.advance()) {
+        if(lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int sizej = csize.intValue(ij);
@@ -272,13 +274,13 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
     protected void makeOptions(Parameterization config) {
       // We don't call super, because we want a different default distance.
       ObjectParameter<DistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, DistanceFunction.class);
-      if (config.grab(distanceFunctionP)) {
+      if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
 
       ObjectParameter<LinkageMethod> linkageP = new ObjectParameter<>(LINKAGE_ID, LinkageMethod.class);
       linkageP.setDefaultValue(WardLinkageMethod.class);
-      if (config.grab(linkageP)) {
+      if(config.grab(linkageP)) {
         linkage = linkageP.instantiateClass(config);
       }
     }
