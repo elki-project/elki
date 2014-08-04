@@ -41,7 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", title = "Locality-sensitive hashing scheme based on p-stable distributions", booktitle = "Proc. 20th annual symposium on Computational geometry", url = "http://dx.doi.org/10.1145/997817.997857")
+@Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
+title = "Locality-sensitive hashing scheme based on p-stable distributions", //
+booktitle = "Proc. 20th annual symposium on Computational geometry", //
+url = "http://dx.doi.org/10.1145/997817.997857")
 public class MultipleProjectionsLocalitySensitiveHashFunction implements LocalitySensitiveHashFunction<NumberVector> {
   /**
    * Projection matrix.
@@ -54,9 +57,9 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
   double[] shift;
 
   /**
-   * Scaling factor.
+   * Scaling factor: inverse of width.
    */
-  double width;
+  double iwidth;
 
   /**
    * Random numbers for mixing the hash codes of the individual functions
@@ -73,28 +76,33 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
   public MultipleProjectionsLocalitySensitiveHashFunction(RandomProjectionFamily.Projection projection, double width, Random rnd) {
     super();
     this.projection = projection;
-    this.width = width;
+    this.iwidth = 1. / width;
     // Generate random shifts:
     final int num = projection.getOutputDimensionality();
     this.shift = new double[num];
     this.randoms1 = new int[num];
-    for (int i = 0; i < num; i++) {
+    for(int i = 0; i < num; i++) {
       shift[i] = rnd.nextDouble() * width;
       // Produce a large random number; although 7FFFFFFF would likely be large
       // enough, we try to stick to the suggested approach (which assumes
       // unsigned integers).
-      randoms1[i] = (rnd.nextInt(0x7FFFFFFD) << 1) + rnd.nextInt(1) + 1;
+      randoms1[i] = (rnd.nextInt(0x10000D) << 16) + rnd.nextInt(0xFFFFD) + 1;
     }
   }
+
+  /**
+   * Bit mask for signed int to unsigned long conversion.
+   */
+  private final static long MASK32 = 0xFFFFFFFFL;
 
   @Override
   public int hashObject(NumberVector vec) {
     long t1sum = 0L;
     // Project the vector:
     final double[] proj = projection.project(vec);
-    for (int i = 0; i < shift.length; i++) {
-      int ai = (int) Math.floor((proj[i] + shift[i]) / width);
-      t1sum += randoms1[i] * (long) ai;
+    for(int i = 0; i < shift.length; i++) {
+      int ai = (int) Math.floor((proj[i] + shift[i]) * iwidth);
+      t1sum += (randoms1[i] & MASK32) * ai; // unsigned math!
     }
     return fastModPrime(t1sum);
   }
@@ -111,7 +119,7 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
     // Use fast multiplication with 5 for high:
     int alpha = ((int) data) + (high << 2 + high);
     // Note that in Java, PRIME will be negative.
-    if (alpha < 0 && alpha > -5) {
+    if(alpha < 0 && alpha > -5) {
       alpha = alpha + 5;
     }
     return alpha;
