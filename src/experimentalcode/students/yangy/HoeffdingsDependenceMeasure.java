@@ -32,6 +32,22 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 
+/**
+ * Calculate the Hoeffding's D as a measure of dependence.
+ * 
+ * Reference:
+ * <p>
+ * Hoeffding W. (1948): A non-parametric test of independence. Ann Math Stat 19:546–57.
+ * </p>
+ * 
+ * Based on:
+ * <p> 
+ * http://support.sas.com/documentation/cdl/en/procstat/63104/HTML/default/viewer.htm#procstat_corr_sect016.htm
+ * </p>
+ * 
+ * @author Yinchong Yang
+ */
+
 public class HoeffdingsDependenceMeasure extends AbstractDependenceMeasure{
   
   protected HoeffdingsDependenceMeasure() {
@@ -53,10 +69,6 @@ public class HoeffdingsDependenceMeasure extends AbstractDependenceMeasure{
       d3 = d3 + (r[i] - 2) * (s[i] - 2) * (q[i] - 1); 
     }
     
-//    System.out.println("d1 = " + d1);
-//    System.out.println("d2 = " + d2);
-//    System.out.println("d3 = " + d3);
-    
     int d = 30 * ( (n-2)*(n-3)*d1 + d2 - 2*(n-2)*d3 ) / (n*(n-1)*(n-2)*(n-3)*(n-4)); 
     
     // Normalization: the Hoeffding's D lies between -0.5 and 1 in case of no ties in data
@@ -67,6 +79,7 @@ public class HoeffdingsDependenceMeasure extends AbstractDependenceMeasure{
     
   }
   
+  // univariate ranks 
   public static <A> int[] computeRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
     // Sort the objects:
     int[] s1 = MathUtil.sequence(0, len);
@@ -88,10 +101,10 @@ public class HoeffdingsDependenceMeasure extends AbstractDependenceMeasure{
         ret[s1[j]] = score;
       }
     }
-//    System.out.println(Arrays.toString(ret));
     return ret;
   }
   
+  // bivariate ranks
   public static <A, B> int[] computeRanks(NumberArrayAdapter<?, A> adapter1, A data1, 
                                           NumberArrayAdapter<?, B> adapter2, B data2, int len) {
     
@@ -107,7 +120,6 @@ public class HoeffdingsDependenceMeasure extends AbstractDependenceMeasure{
         }
       }
     }
-//    System.out.println(Arrays.toString(ret));
     return ret;
     
   }
