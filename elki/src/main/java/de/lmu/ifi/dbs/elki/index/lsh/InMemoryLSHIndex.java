@@ -210,8 +210,8 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
             }
           }
         }
-        LOG.statistics(new LongStatistic(this.getClass().getName() + ".fill.min", max));
-        LOG.statistics(new LongStatistic(this.getClass().getName() + ".fill.max", min));
+        LOG.statistics(new LongStatistic(this.getClass().getName() + ".fill.min", min));
+        LOG.statistics(new LongStatistic(this.getClass().getName() + ".fill.max", max));
         LOG.statistics(new LongStatistic(this.getClass().getName() + ".hashtables", hashtables.size()));
       }
     }
