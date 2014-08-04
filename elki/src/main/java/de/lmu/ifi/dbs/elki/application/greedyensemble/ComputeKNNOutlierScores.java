@@ -55,10 +55,10 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -166,12 +166,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
 
     // If there is no kNN preprocessor already, then precompute.
-    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);
-    if(!(knnq instanceof PreprocessorKNNQuery)) {
-      LOG.verbose("Running preprocessor ...");
-      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distf, maxk + 2);
-      database.addIndex(preproc);
-    }
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, distf, maxk + 2);
 
     // Test that we now get a proper index query
     knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);

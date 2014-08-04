@@ -38,16 +38,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -59,6 +55,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -170,17 +167,10 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<O> rel) {
-    final DistanceQuery<O> dq = database.getDistanceQuery(rel, getDistanceFunction());
     final DBIDs ids = rel.getDBIDs();
 
-    // We need each neighborhood twice - use "HEAVY" flag.
-    KNNQuery<O> knnq = database.getKNNQuery(dq, kmax + 1, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    // No optimized kNN query - use a preprocessor!
-    if(!(knnq instanceof PreprocessorKNNQuery)) {
-      LOG.verbose("Running kNN preprocessor.");
-      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(rel, getDistanceFunction(), kmax + 1);
-      knnq = preproc.getKNNQuery(dq, kmax + 1, DatabaseQuery.HINT_HEAVY_USE);
-    }
+    LOG.verbose("Running kNN preprocessor.");
+    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, rel, getDistanceFunction(), kmax + 1);
 
     // Initialize store for densities
     WritableDataStore<double[]> densities = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, double[].class);

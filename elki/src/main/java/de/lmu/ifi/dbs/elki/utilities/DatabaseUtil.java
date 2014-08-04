@@ -35,8 +35,14 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.ConvertToStringView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 
 /**
  * Class with Database-related utility functions such as centroid computation,
@@ -172,5 +178,48 @@ public final class DatabaseUtil {
       }
     }
     return ret;
+  }
+
+  /**
+   * Get (or create) a precomputed kNN query for the database.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @param dq Distance query
+   * @param k required number of neighbors
+   * @return KNNQuery for the given relation, that is precomputed.
+   */
+  public static <O> KNNQuery<O> precomputedKNNQuery(Database database, Relation<O> relation, DistanceQuery<O> dq, int k) {
+    // "HEAVY" flag for knn query since it is used more than once
+    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    // No optimized kNN query - use a preprocessor!
+    if(knnq instanceof PreprocessorKNNQuery) {
+      return knnq;
+    }
+    MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistanceFunction(), k);
+    preproc.initialize();
+    return preproc.getKNNQuery(dq, k);
+  }
+
+  /**
+   * Get (or create) a precomputed kNN query for the database.
+   * 
+   * @param database Database
+   * @param relation Relation
+   * @param distf Distance function
+   * @param k required number of neighbors
+   * @return KNNQuery for the given relation, that is precomputed.
+   */
+  public static <O> KNNQuery<O> precomputedKNNQuery(Database database, Relation<O> relation, DistanceFunction<? super O> distf, int k) {
+    DistanceQuery<O> dq = database.getDistanceQuery(relation, distf);
+    // "HEAVY" flag for knn query since it is used more than once
+    KNNQuery<O> knnq = database.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    // No optimized kNN query - use a preprocessor!
+    if(knnq instanceof PreprocessorKNNQuery) {
+      return knnq;
+    }
+    MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistanceFunction(), k);
+    preproc.initialize();
+    return preproc.getKNNQuery(dq, k);
   }
 }

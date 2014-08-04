@@ -37,15 +37,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -56,6 +53,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -159,21 +157,10 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
    * @return result
    */
   protected Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
-    KNNQuery<O> knnComp;
-    KNNQuery<O> knnReach;
+    KNNQuery<O> knnComp, knnReach;
     if(comparisonDistanceFunction == reachabilityDistanceFunction || comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
-      // We need each neighborhood twice - use "HEAVY" flag.
-      knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, Math.max(kreach, kcomp), DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-      // No optimized kNN query - use a preprocessor!
-      if(knnComp == null) {
-        LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
-        MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, comparisonDistanceFunction, kcomp);
-        DistanceQuery<O> cdq = database.getDistanceQuery(relation, comparisonDistanceFunction);
-        knnComp = preproc.getKNNQuery(cdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
-      }
-      else {
-        LOG.beginStep(stepprog, 1, "Optimized neighborhoods provided by database.");
-      }
+      LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
+      knnComp = DatabaseUtil.precomputedKNNQuery(database, relation, comparisonDistanceFunction, kcomp);
       knnReach = knnComp;
     }
     else {
@@ -334,19 +321,22 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its LOOP_SCORE, must be an integer greater than 1.
+     * considered for computing its LOOP_SCORE, must be an integer greater than
+     * 1.
      */
     public static final OptionID KREACH_ID = new OptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
 
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its LOOP_SCORE, must be an integer greater than 1.
+     * considered for computing its LOOP_SCORE, must be an integer greater than
+     * 1.
      */
     public static final OptionID KCOMP_ID = new OptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
 
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its LOOP_SCORE, must be an integer greater than 1.
+     * considered for computing its LOOP_SCORE, must be an integer greater than
+     * 1.
      */
     public static final OptionID LAMBDA_ID = new OptionID("loop.lambda", "The number of standard deviations to consider for density computation.");
 
