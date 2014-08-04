@@ -22,6 +22,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleCOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.ALOCI
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.COF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.FlexibleLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.KDEOS

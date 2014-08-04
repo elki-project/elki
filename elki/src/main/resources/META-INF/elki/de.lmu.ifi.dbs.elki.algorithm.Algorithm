@@ -4,6 +4,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation.AffinityPropagationClusteringAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN
+de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.LSDBC
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.ExtractFlatClusteringFromHierarchy
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
@@ -72,6 +73,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleCOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.ALOCI
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.COF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.FlexibleLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.KDEOS
