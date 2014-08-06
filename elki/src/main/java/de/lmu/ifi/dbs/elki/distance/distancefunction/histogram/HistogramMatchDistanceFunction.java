@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.histogram;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2014
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.histogram;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -54,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 title = "Markov processes over denumerable products of spaces describing large systems of automata", //
 booktitle = "Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission, 5:3", //
 url = "http://mi.mathnet.ru/eng/ppi1811")
-public class HistogramMatchDistanceFunction extends AbstractNumberVectorDistanceFunction {
+public class HistogramMatchDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance. Use this!
    */
@@ -78,6 +79,20 @@ public class HistogramMatchDistanceFunction extends AbstractNumberVectorDistance
       xs += v1.doubleValue(i);
       ys += v2.doubleValue(i);
       agg += Math.abs(xs - ys);
+    }
+    return agg;
+  }
+
+  @Override
+  public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim = dimensionality(mbr1, mbr2);
+    double xmin = 0., xmax = 0., ymin = 0., ymax = 0., agg = 0.;
+    for(int i = 0; i < dim; i++) {
+      xmin += mbr1.getMin(i);
+      xmax += mbr1.getMax(i);
+      ymin += mbr2.getMin(i);
+      ymax += mbr2.getMax(i);
+      agg += (ymin > xmax) ? (ymin - xmax) : (xmin > ymax) ? (xmin - ymax) : 0.;
     }
     return agg;
   }
