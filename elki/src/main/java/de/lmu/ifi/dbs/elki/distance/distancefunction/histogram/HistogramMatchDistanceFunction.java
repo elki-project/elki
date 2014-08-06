@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.histogram;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -34,8 +35,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * This distance function assumes there exist a natural order in the vectors,
  * i.e. they should be some 1-dimensional histogram.
  * 
+ * This is also known as Earth Movers Distance (EMD), 1st Mallows distance or
+ * 1st Wasserstein metric (also Vasershtein metric), for the special case of a
+ * one-dimensional histogram, where the cost is linear in the number of bins to
+ * transport.
+ * 
+ * Reference:
+ * <p>
+ * L.N. Vaserstein<br />
+ * Markov processes over denumerable products of spaces describing large systems
+ * of automata <br />
+ * Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission 5:3
+ * </p>
+ * 
  * @author Erich Schubert
  */
+@Reference(authors = "L.N. Vaserstein", //
+title = "Markov processes over denumerable products of spaces describing large systems of automata", //
+booktitle = "Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission, 5:3", //
+url = "http://mi.mathnet.ru/eng/ppi1811")
 public class HistogramMatchDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Static instance. Use this!
@@ -62,6 +80,11 @@ public class HistogramMatchDistanceFunction extends AbstractNumberVectorDistance
       agg += Math.abs(xs - ys);
     }
     return agg;
+  }
+
+  @Override
+  public boolean isMetric() {
+    return true;
   }
 
   @Override
