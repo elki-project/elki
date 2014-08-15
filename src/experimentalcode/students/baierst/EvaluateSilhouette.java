@@ -156,7 +156,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     MeanVariance msilAlt = new MeanVariance();
     for(Cluster<?> cluster : clusters) {
 
-      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+      if((cluster.isNoise() || cluster.size() < 2) && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
         countNoise += cluster.size();
         continue;
       }
@@ -182,7 +182,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
         double min = Double.POSITIVE_INFINITY;
         for(Cluster<?> ocluster : clusters) {
 
-          if(ocluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+          if((ocluster.isNoise() || ocluster.size() < 2) && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) ) {
             continue;
           }
 
@@ -226,8 +226,8 @@ public class EvaluateSilhouette<O> implements Evaluator {
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
     col.add(new DoubleVector(new double[] { msilMean }));
-    col.add(new DoubleVector(new double[] { msilAltMean }));
-    db.getHierarchy().add(c, new CollectionResult<>("Silhouette coefficient", "silhouette-coefficient", col));
+//    col.add(new DoubleVector(new double[] { msilAltMean }));
+    db.getHierarchy().add(c, new CollectionResult<>("Silhouette coefficient", "swc", col));
   }
 
   @Override

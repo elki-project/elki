@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -202,8 +203,8 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
     // Build a primitive result attachment:
     Collection<DoubleVector> col = new ArrayList<>();
     col.add(new DoubleVector(new double[] { mssilMean }));
-    col.add(new DoubleVector(new double[] { mssilAltMean }));
-    db.getHierarchy().add(c, new CollectionResult<>("Simplified Silhouette coefficient", "simplified-silhouette-coefficient", col));
+//    col.add(new DoubleVector(new double[] { mssilAltMean }));
+    db.getHierarchy().add(c, new CollectionResult<>("Simplified Silhouette coefficient", "sswc", col));
   }
 
   @Override
@@ -262,7 +263,7 @@ public class EvaluateSilhouetteSimplified<O> implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }
