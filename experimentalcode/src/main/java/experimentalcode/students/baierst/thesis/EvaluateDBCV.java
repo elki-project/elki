@@ -1,4 +1,4 @@
-package experimentalcode.students.baierst;
+package experimentalcode.students.baierst.thesis;
 
 /*
  This file is part of ELKI:
@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Compute the silhouette of a data set and the alternative silhouette.
+ * Compute the Desnity-Based Clustering Validation Index.
  * 
  * Reference:
  * <p>
@@ -82,7 +82,6 @@ public class EvaluateDBCV<O> implements Evaluator {
    * Constructor.
    * 
    * @param distance Distance function
-   * @param mergenoise Flag to treat noise as clusters, not singletons
    */
   public EvaluateDBCV(PrimitiveDistanceFunction<? super NumberVector> distance) {
     super();
@@ -94,24 +93,23 @@ public class EvaluateDBCV<O> implements Evaluator {
    * 
    * @param db Database
    * @param rel Data relation
-   * @param dq Distance query
    * @param cl Clustering
+   * 
+   * @return dbcv DBCV-index
    */
-  public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> cl) {
+  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> cl) {
 
     List<? extends Cluster<?>> clusters = cl.getAllClusters();
 
     // precompute all core distances
     List<Double[]> coreDists = new ArrayList<Double[]>();
-    List<ArrayDBIDs> clusterIds = new ArrayList<ArrayDBIDs>();
     for(Cluster<?> cluster : clusters) {
-      if(cluster.isNoise()) {
+      // Singletons are considered as Noise, because they have no sparseness
+      if(cluster.isNoise() || cluster.size() < 2) {
         coreDists.add(null);
-        clusterIds.add(null);
         continue;
       }
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-      clusterIds.add(ids);
       Double[] clusterCoreDists = new Double[ids.size()];
       for(int i = 0; i < ids.size(); i++) {
         double currentCoreDist = 0;
@@ -131,24 +129,25 @@ public class EvaluateDBCV<O> implements Evaluator {
     }
 
     // compute density sparseness of all clusters
-    double dbcv = 0;
-
     List<Integer[]> clusterDegrees = new ArrayList<Integer[]>();
     List<Double> clusterDscMax = new ArrayList<Double>();
-    boolean[] internalNodes = new boolean[clusters.size()];
+    boolean[] internalEdges = new boolean[clusters.size()]; // describes if a
+                                                            // cluster contains
+                                                            // any internal
+                                                            // edges
     for(int c = 0; c < clusters.size(); c++) {
       Cluster<?> cluster = clusters.get(c);
-      if(cluster.isNoise()) {
+      if(cluster.isNoise() || cluster.size() < 2) {
         clusterDegrees.add(null);
         clusterDscMax.add(null);
         continue;
       }
       Double[] clusterCoreDists = coreDists.get(c);
-      ArrayDBIDs ids = clusterIds.get(c);
+      ArrayDBIDs ids = DBIDUtil.ensureArray(clusters.get(c).getIDs());
       double dscMax = 0; // Density Sparseness of the Cluster
       double[][] distances = new double[cluster.size()][cluster.size()];
 
-      // create mutability distance matrix
+      // create mutability distance matrix for Minimum Spanning Tree
       for(int i = 0; i < ids.size(); i++) {
         NumberVector currentVector = rel.get(ids.get(i));
         double currentCoreDist = clusterCoreDists[i];
@@ -159,7 +158,7 @@ public class EvaluateDBCV<O> implements Evaluator {
         }
       }
 
-      // generate minimal spanning tree
+      // generate Minimum Spanning Tree
       int[] nodes = PrimsMinimumSpanningTree.processDense(distances);
 
       // get degree of all nodes in the spanning tree
@@ -167,19 +166,26 @@ public class EvaluateDBCV<O> implements Evaluator {
       for(int i = 0; i < nodes.length; i++) {
         if(degree[nodes[i]] != null) {
           degree[nodes[i]]++;
-          internalNodes[c] = true;
         }
         else {
           degree[nodes[i]] = 1;
         }
       }
-
+      // check if cluster contains any internal edges
+      for(int i = 0; i < nodes.length; i=i+2) {
+        if(degree[nodes[i]] > 1 && degree[nodes[i+1]] > 1) {
+          internalEdges[c] = true;
+        }
+      }
+      
       clusterDegrees.add(degree);
 
-      // find maximum sparseness in the minimum spanning tree
+      // find maximum sparseness in the Minimum Spanning Tree
       for(int i = 0; i < nodes.length; i = i + 2) {
         if(distances[nodes[i]][nodes[i + 1]] > dscMax) {
-          if((internalNodes[c] && degree[nodes[i]] > 1 && degree[nodes[i + 1]] > 1) || (!internalNodes[c])) {
+          // We only consider edges where both vertices are internal nodes. If a
+          // cluster has no internal nodes we consider all edges.
+          if((internalEdges[c] && degree[nodes[i]] > 1 && degree[nodes[i + 1]] > 1) || (!internalEdges[c])) {
             dscMax = distances[nodes[i]][nodes[i + 1]];
           }
         }
@@ -188,29 +194,31 @@ public class EvaluateDBCV<O> implements Evaluator {
     }
 
     // compute density separation of all clusters
-
+    double dbcv = 0;
     for(int c = 0; c < clusters.size(); c++) {
       Cluster<?> cluster = clusters.get(c);
-      if(cluster.isNoise()) {
+      if(cluster.isNoise() || cluster.size() < 2) {
         continue;
       }
       Double currentDscMax = clusterDscMax.get(c);
       double dspcMin = Double.POSITIVE_INFINITY; // minimal Density Separation
                                                  // of the Cluster
-      ArrayDBIDs ids = clusterIds.get(c);
+      ArrayDBIDs ids = DBIDUtil.ensureArray(clusters.get(c).getIDs());
 
       Double[] clusterCoreDists = coreDists.get(c);
       Integer[] currentDegree = clusterDegrees.get(c);
 
       for(int i = 0; i < ids.size(); i++) {
-        if(currentDegree[i] < 2 && internalNodes[c]) {
+        // We again ignore external nodes, if the cluster has any internal
+        // nodes.
+        if(currentDegree[i] < 2 && internalEdges[c]) {
           continue;
         }
         NumberVector currentVector = rel.get(ids.get(i));
         double currentCoreDist = clusterCoreDists[i];
         for(int oc = 0; oc < clusters.size(); oc++) {
           Cluster<?> ocluster = clusters.get(oc);
-          if(ocluster.isNoise()) {
+          if(ocluster.isNoise() || ocluster.size() < 2) {
             continue;
           }
           if(cluster == ocluster) {
@@ -218,9 +226,9 @@ public class EvaluateDBCV<O> implements Evaluator {
           }
           Integer[] oDegree = clusterDegrees.get(oc);
           Double[] oclusterCoreDists = coreDists.get(oc);
-          ArrayDBIDs oids = clusterIds.get(oc);
+          ArrayDBIDs oids = DBIDUtil.ensureArray(clusters.get(oc).getIDs());
           for(int j = 0; j < oids.size(); j++) {
-            if(oDegree[j] < 2 && internalNodes[oc]) {
+            if(oDegree[j] < 2 && internalEdges[oc]) {
               continue;
             }
             double mutualReachDist = Math.max(Math.max(currentCoreDist, oclusterCoreDists[j]), distanceFunction.distance(currentVector, rel.get(oids.get(j))));
@@ -231,20 +239,17 @@ public class EvaluateDBCV<O> implements Evaluator {
         }
       }
 
-      // compute dbcv
+      // compute DBCV
       double vc = (dspcMin - currentDscMax) / Math.max(dspcMin, currentDscMax);
       double weight = (double) cluster.size() / (double) rel.size();
       dbcv += weight * vc;
     }
 
+    if(LOG.isVerbose()) {
+      LOG.verbose("DBCV: " + dbcv);
+    }
     
-
-    System.out.println(dbcv);
-
-    // Build a primitive result attachment:
-    Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { dbcv }));
-    db.getHierarchy().add(cl, new CollectionResult<>("Density Based Clustering Validation", "dbcv", col));
+    return dbcv;
 
   }
 
@@ -258,7 +263,12 @@ public class EvaluateDBCV<O> implements Evaluator {
     Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
 
     for(Clustering<?> cl : crs) {
-      evaluateClustering(db, (Relation<? extends NumberVector>) rel, cl);
+      double dbcv = evaluateClustering(db, (Relation<? extends NumberVector>) rel, cl);
+      
+      // Build a primitive result attachment:
+      Collection<DoubleVector> col = new ArrayList<>();
+      col.add(new DoubleVector(new double[] { dbcv }));
+      db.getHierarchy().add(cl, new CollectionResult<>("Density Based Clustering Validation", "dbcv", col));
     }
   }
 
@@ -274,11 +284,6 @@ public class EvaluateDBCV<O> implements Evaluator {
      * Parameter for choosing the distance function.
      */
     public static final OptionID DISTANCE_ID = new OptionID("dbcv.distance", "Distance function to use for computing the dbcv.");
-
-    /**
-     * Parameter for the option, how noise should be treated.
-     */
-    public static final OptionID NOISE_OPTION_ID = new OptionID("dbcv.noiseoption", "option, how noise should be treated.");
 
     /**
      * Distance function to use.
