@@ -182,7 +182,27 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   @Override
   public String getValuesDescription() {
     if(restrictionClass != null && restrictionClass != Object.class) {
-      return restrictionString();
+      StringBuilder info = new StringBuilder();
+      if(restrictionClass.isInterface()) {
+        info.append("Implementing ");
+      }
+      else {
+        info.append("Extending ");
+      }
+      info.append(restrictionClass.getName());
+      info.append(FormatUtil.NEWLINE);
+      
+      List<Class<?>> known = getKnownImplementations();
+      if(!known.isEmpty()) {
+        info.append("Known classes (default package " + restrictionClass.getPackage().getName() + "):");
+        info.append(FormatUtil.NEWLINE);
+        for(Class<?> c : known) {
+          info.append("->").append(FormatUtil.NONBREAKING_SPACE);
+          info.append(canonicalClassName(c, getRestrictionClass()));
+          info.append(FormatUtil.NEWLINE);
+        }
+      }
+      return info.toString();
     }
     return "";
   }
@@ -249,37 +269,6 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
    */
   public List<Class<?>> getKnownImplementations() {
     return InspectionUtil.cachedFindAllImplementations(getRestrictionClass());
-  }
-
-  /**
-   * Provides a description string listing all classes for the given superclass
-   * or interface as specified in the properties.
-   * 
-   * @return a description string listing all classes for the given superclass
-   *         or interface as specified in the properties
-   */
-  public String restrictionString() {
-    StringBuilder info = new StringBuilder();
-    if(restrictionClass.isInterface()) {
-      info.append("Implementing ");
-    }
-    else {
-      info.append("Extending ");
-    }
-    info.append(restrictionClass.getName());
-    info.append(FormatUtil.NEWLINE);
-
-    List<Class<?>> known = getKnownImplementations();
-    if(!known.isEmpty()) {
-      info.append("Known classes (default package " + restrictionClass.getPackage().getName() + "):");
-      info.append(FormatUtil.NEWLINE);
-      for(Class<?> c : known) {
-        info.append("->" + FormatUtil.NONBREAKING_SPACE);
-        info.append(canonicalClassName(c, getRestrictionClass()));
-        info.append(FormatUtil.NEWLINE);
-      }
-    }
-    return info.toString();
   }
 
   /**

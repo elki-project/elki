@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -111,16 +112,17 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
 
   @Override
   protected E parseValue(Object obj) throws ParameterException {
-    if (obj == null) {
+    if(obj == null) {
       throw new UnspecifiedParameterException(this);
     }
-    if (enumClass.isInstance(obj)) {
+    if(enumClass.isInstance(obj)) {
       return enumClass.cast(obj);
     }
-    if (obj instanceof String) {
+    if(obj instanceof String) {
       try {
         return Enum.valueOf(enumClass, (String) obj);
-      } catch (IllegalArgumentException ex) {
+      }
+      catch(IllegalArgumentException ex) {
         throw new WrongParameterValueException("Enum parameter " + getName() + " is invalid (must be one of [" + joinEnumNames(", ") + "].");
       }
     }
@@ -133,6 +135,26 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
   }
 
   /**
+   * This class sometimes provides a list of value descriptions.
+   * 
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#hasValuesDescription()
+   */
+  @Override
+  public boolean hasValuesDescription() {
+    return true;
+  }
+
+  @Override
+  public String getValuesDescription() {
+    StringBuilder buf = new StringBuilder();
+    buf.append("One of:").append(FormatUtil.NEWLINE);
+    for(String s : getPossibleValues()) {
+      buf.append("->").append(FormatUtil.NONBREAKING_SPACE).append(s).append(FormatUtil.NEWLINE);
+    }
+    return buf.toString();
+  }
+
+  /**
    * Get a list of possible values for this enum parameter.
    * 
    * @return list of strings representing possible enum values.
@@ -141,7 +163,7 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
     // Convert to string array
     final E[] enums = enumClass.getEnumConstants();
     ArrayList<String> values = new ArrayList<>(enums.length);
-    for (E t : enums) {
+    for(E t : enums) {
       values.add(t.name());
     }
     return values;
@@ -157,8 +179,8 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
   private String joinEnumNames(String separator) {
     E[] enumTypes = enumClass.getEnumConstants();
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < enumTypes.length; ++i) {
-      if (i > 0) {
+    for(int i = 0; i < enumTypes.length; ++i) {
+      if(i > 0) {
         sb.append(separator);
       }
       sb.append(enumTypes[i].name());
