@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.datasource.filter;
 
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.StreamFromBundle;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,6 +22,10 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.StreamFromBundle;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+
 /**
  * Abstract base class for streaming filters.
  * 
@@ -39,12 +39,27 @@ public abstract class AbstractStreamFilter implements StreamFilter {
 
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
-    init(new StreamFromBundle(objects));
-    return MultipleObjectsBundle.fromStream(this);
+    return init(objects.asStream()).asMultipleObjectsBundle();
   }
 
   @Override
-  public void init(BundleStreamSource source) {
+  public BundleStreamSource init(BundleStreamSource source) {
     this.source = source;
+    return this;
+  }
+
+  @Override
+  public boolean hasDBIDs() {
+    return source.hasDBIDs();
+  }
+
+  @Override
+  public boolean assignDBID(DBIDVar var) {
+    return source.assignDBID(var);
+  }
+
+  @Override
+  public MultipleObjectsBundle asMultipleObjectsBundle() {
+    return MultipleObjectsBundle.fromStream(this);
   }
 }

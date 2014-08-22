@@ -23,12 +23,7 @@ package de.lmu.ifi.dbs.elki.datasource;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -70,11 +65,7 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
   @Override
   public MultipleObjectsBundle loadData() {
     MultipleObjectsBundle b = new MultipleObjectsBundle();
-    List<DBID> ids = new ArrayList<>(count);
-    for(int i = 0; i < count; i++) {
-      ids.add(DBIDUtil.importInteger(start + i));
-    }
-    b.appendColumn(TypeUtil.DBID, ids);
+    b.setDBIDs(DBIDFactory.FACTORY.generateStaticDBIDRange(start, count));
     return b;
   }
 
@@ -109,13 +100,13 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter startp = new IntParameter(START_ID, Integer.valueOf(0));
+      IntParameter startp = new IntParameter(START_ID, 0);
       if(config.grab(startp)) {
-        start = startp.getValue().intValue();
+        start = startp.intValue();
       }
       IntParameter countp = new IntParameter(COUNT_ID);
       if(config.grab(countp)) {
-        count = countp.getValue().intValue();
+        count = countp.intValue();
       }
     }
 

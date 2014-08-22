@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 
 /**
@@ -82,6 +83,17 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
     return lineNumber;
   }
 
+  @Override
+  public boolean hasDBIDs() {
+    return false;
+  }
+
+  @Override
+  public boolean assignDBID(DBIDVar var) {
+    var.unset();
+    return false;
+  }
+
   /**
    * Read the next line into the tokenizer.
    * 
@@ -111,5 +123,10 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
     catch(IOException e) {
       // Ignore - maybe already closed.
     }
+  }
+
+  @Override
+  public MultipleObjectsBundle asMultipleObjectsBundle() {
+    return MultipleObjectsBundle.fromStream(this);
   }
 }

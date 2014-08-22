@@ -26,10 +26,12 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
-import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformationSerializer;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -68,12 +70,17 @@ public class BundleReader implements BundleStreamSource {
   /**
    * Serializers to use.
    */
-  ArrayList<ByteBufferSerializer<?>> sers;
+  ByteBufferSerializer<?>[] sers;
 
   /**
    * Current object.
    */
-  ArrayList<Object> data;
+  Object[] data;
+
+  /**
+   * Whether or not we have DBIDs.
+   */
+  boolean hasids = false;
 
   /**
    * Constructor.
@@ -128,16 +135,21 @@ public class BundleReader implements BundleStreamSource {
       throw new AbortException("File does not start with expected magic.");
     }
     final int nummeta = buffer.getInt();
-    assert (nummeta > 0);
+    assert (nummeta > 0) : "Empty bundle?";
     meta = new BundleMeta(nummeta);
-    sers = new ArrayList<>(nummeta);
-    data = new ArrayList<>(nummeta);
+    sers = new ByteBufferSerializer<?>[nummeta];
+    data = new Object[nummeta];
     for(int i = 0; i < nummeta; i++) {
       try {
         @SuppressWarnings("unchecked")
         SimpleTypeInformation<? extends Object> type = (SimpleTypeInformation<? extends Object>) TypeInformationSerializer.STATIC.fromByteBuffer(buffer);
-        meta.add(type);
-        sers.add(type.getSerializer());
+        sers[i] = type.getSerializer();
+        if(i == 0 && TypeUtil.DBID.isAssignableFromType(type)) {
+          hasids = true;
+        }
+        else {
+          meta.add(type);
+        }
       }
       catch(UnsupportedOperationException e) {
         throw new AbortException("Deserialization failed: " + e.getMessage(), e);
@@ -152,10 +164,9 @@ public class BundleReader implements BundleStreamSource {
    * Read an object.
    */
   void readObject() {
-    data.clear();
-    for(ByteBufferSerializer<?> ser : sers) {
+    for(int i = 0; i < sers.length; ++i) {
       try {
-        data.add(ser.fromByteBuffer(buffer));
+        data[i] = sers[i].fromByteBuffer(buffer);
       }
       catch(UnsupportedOperationException e) {
         throw new AbortException("Deserialization failed.", e);
@@ -182,6 +193,25 @@ public class BundleReader implements BundleStreamSource {
 
   @Override
   public Object data(int rnum) {
-    return data.get(rnum);
+    return data[!hasids ? rnum : (rnum + 1)];
+  }
+
+  @Override
+  public boolean hasDBIDs() {
+    return hasids;
+  }
+
+  @Override
+  public boolean assignDBID(DBIDVar var) {
+    if(!hasids) {
+      return false;
+    }
+    var.set((DBID) data[0]);
+    return true;
+  }
+
+  @Override
+  public MultipleObjectsBundle asMultipleObjectsBundle() {
+    return MultipleObjectsBundle.fromStream(this);
   }
 }

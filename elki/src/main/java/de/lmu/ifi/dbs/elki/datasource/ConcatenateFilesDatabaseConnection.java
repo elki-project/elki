@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource.Event;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.StreamFromBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
@@ -86,35 +85,37 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
   public MultipleObjectsBundle loadData() {
     MultipleObjectsBundle objects = new MultipleObjectsBundle();
     objects.appendColumn(TypeUtil.STRING, new ArrayList<>());
-    for (File file : files) {
+    for(File file : files) {
       String filestr = file.getPath();
       try {
         InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
         inputStream = FileUtil.tryGzipInput(inputStream);
 
         final BundleStreamSource source;
-        if (parser instanceof StreamingParser) {
+        if(parser instanceof StreamingParser) {
           final StreamingParser streamParser = (StreamingParser) parser;
           streamParser.initStream(inputStream);
           source = streamParser;
-        } else {
+        }
+        else {
           MultipleObjectsBundle parsingResult = parser.parse(inputStream);
           // normalize objects and transform labels
-          source = new StreamFromBundle(parsingResult);
+          source = parsingResult.asStream();
         }
         BundleMeta meta = null; // NullPointerException on invalid streams
-        loop: for (Event e = source.nextEvent();; e = source.nextEvent()) {
-          switch(e) {
+        loop: for(Event e = source.nextEvent();; e = source.nextEvent()) {
+          switch(e){
           case END_OF_STREAM:
             break loop;
           case META_CHANGED:
             meta = source.getMeta();
-            for (int i = 0; i < meta.size(); i++) {
-              if (i + 1 >= objects.metaLength()) {
+            for(int i = 0; i < meta.size(); i++) {
+              if(i + 1 >= objects.metaLength()) {
                 objects.appendColumn(meta.get(i), new ArrayList<>());
-              } else {
+              }
+              else {
                 // Ensure compatibility:
-                if (!objects.meta(i + 1).isAssignableFromType(meta.get(i))) {
+                if(!objects.meta(i + 1).isAssignableFromType(meta.get(i))) {
                   throw new AbortException("Incompatible files loaded. Cannot concatenate with unaligned columns, please preprocess manually.");
                 }
               }
@@ -123,23 +124,24 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
           case NEXT_OBJECT:
             Object[] o = new Object[objects.metaLength()];
             o[0] = filestr;
-            for (int i = 0; i < meta.size(); i++) {
+            for(int i = 0; i < meta.size(); i++) {
               o[i + 1] = source.data(i);
             }
             objects.appendSimple(o);
             break; // switch
           }
         }
-      } catch (IOException e) {
+      }
+      catch(IOException e) {
         throw new AbortException("Loading file " + filestr + " failed: " + e.toString(), e);
       }
     }
     parser.cleanup();
     // Invoke filters
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debugFine("Invoking filters.");
     }
-    return invokeFilters(objects);
+    return invokeBundleFilters(objects);
   }
 
   @Override
@@ -164,7 +166,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       FileListParameter filesP = new FileListParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, FilesType.INPUT_FILES);
-      if (config.grab(filesP)) {
+      if(config.grab(filesP)) {
         files = filesP.getValue();
       }
       configFilters(config);

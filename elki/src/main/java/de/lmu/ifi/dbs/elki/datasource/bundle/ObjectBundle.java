@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.datasource.bundle;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 
 /**
  * Abstract interface for object packages.
@@ -72,4 +73,13 @@ public interface ObjectBundle {
    * @return Contained data
    */
   public Object data(int onum, int rnum);
+
+  /**
+   * Assign the object DBID to a variable
+   * 
+   * @param onum Object number
+   * @param var Variable
+   * @return {@code false} if there was no predefined DBID.
+   */
+  public boolean assignDBID(int onum, DBIDVar var);
 }

@@ -29,7 +29,6 @@ import java.nio.channels.FileChannel;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleReader;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf BundleStreamSource 
+ * @apiviz.composedOf BundleStreamSource
  */
 public class BundleDatabaseConnection extends AbstractDatabaseConnection {
   /**
@@ -76,12 +75,12 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
     try {
       FileInputStream fis = new FileInputStream(infile);
       FileChannel channel = fis.getChannel();
-      BundleStreamSource src = invokeFilters(new BundleReader(channel));
-      MultipleObjectsBundle bundle = MultipleObjectsBundle.fromStream(src);
+      MultipleObjectsBundle bundle = invokeStreamFilters(new BundleReader(channel)).asMultipleObjectsBundle();
       channel.close();
       fis.close();
       return bundle;
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new AbortException("IO error loading bundle", e);
     }
   }
@@ -114,7 +113,7 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
       super.makeOptions(config);
       configFilters(config);
       FileParameter infileP = new FileParameter(BUNDLE_ID, FileParameter.FileType.INPUT_FILE);
-      if (config.grab(infileP)) {
+      if(config.grab(infileP)) {
         infile = infileP.getValue();
       }
     }

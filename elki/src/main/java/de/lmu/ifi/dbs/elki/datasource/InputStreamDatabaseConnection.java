@@ -80,26 +80,28 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
     if(LOG.isDebugging()) {
       LOG.debugFine("Invoking parsers.");
     }
+    // Streaming parsers may yield to stream filters immediately.
     if(parser instanceof StreamingParser) {
-      final StreamingParser streamParser = (StreamingParser)parser;
+      final StreamingParser streamParser = (StreamingParser) parser;
       streamParser.initStream(in);
       // normalize objects and transform labels
       if(LOG.isDebugging()) {
         LOG.debugFine("Parsing as stream.");
       }
       Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".load").begin() : null;
-      MultipleObjectsBundle objects = MultipleObjectsBundle.fromStream(invokeFilters(streamParser));
+      MultipleObjectsBundle objects = invokeStreamFilters(streamParser).asMultipleObjectsBundle();
       parser.cleanup();
-      if (duration != null) {
+      if(duration != null) {
         LOG.statistics(duration.end());
       }
       return objects;
     }
     else {
+      // For non-streaming parsers, we first parse, then filter
       Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".parse").begin() : null;
       MultipleObjectsBundle parsingResult = parser.parse(in);
       parser.cleanup();
-      if (duration != null) {
+      if(duration != null) {
         LOG.statistics(duration.end());
       }
 
@@ -108,8 +110,8 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
         LOG.debugFine("Invoking filters.");
       }
       Duration fduration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".filter").begin() : null;
-      MultipleObjectsBundle objects = invokeFilters(parsingResult);
-      if (fduration != null) {
+      MultipleObjectsBundle objects = invokeBundleFilters(parsingResult);
+      if(fduration != null) {
         LOG.statistics(fduration.end());
       }
       return objects;

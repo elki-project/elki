@@ -48,7 +48,7 @@ public class SimpleDBIDFactory extends AbstractIntegerDBIDFactory {
    * The starting point for static DBID range allocations.
    */
   int rangestart = 0;
-  
+
   /**
    * Constructor.
    */
@@ -77,6 +77,16 @@ public class SimpleDBIDFactory extends AbstractIntegerDBIDFactory {
     }
     DBIDRange alloc = new IntegerDBIDRange(rangestart, size);
     rangestart += size;
+    return alloc;
+  }
+
+  @Override
+  public DBIDRange generateStaticDBIDRange(int begin, int size) {
+    if(begin + size >= Integer.MAX_VALUE) {
+      throw new AbortException("DBID range allocation error - too many objects allocated!");
+    }
+    DBIDRange alloc = new IntegerDBIDRange(begin, size);
+    rangestart = Math.max(rangestart, begin + size);
     return alloc;
   }
 

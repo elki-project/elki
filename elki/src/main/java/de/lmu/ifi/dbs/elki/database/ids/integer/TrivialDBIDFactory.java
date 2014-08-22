@@ -55,7 +55,7 @@ final public class TrivialDBIDFactory extends AbstractIntegerDBIDFactory {
   @Override
   final public DBID generateSingleDBID() {
     final int id = next.getAndIncrement();
-    if (id == Integer.MAX_VALUE) {
+    if(id == Integer.MAX_VALUE) {
       throw new AbortException("DBID allocation error - too many objects allocated!");
     }
     DBID ret = new IntegerDBID(id);
@@ -70,10 +70,26 @@ final public class TrivialDBIDFactory extends AbstractIntegerDBIDFactory {
   @Override
   final public DBIDRange generateStaticDBIDRange(int size) {
     final int start = next.getAndAdd(size);
-    if (start > next.get()) {
+    if(start > next.get()) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
     DBIDRange alloc = new IntegerDBIDRange(start, size);
+    return alloc;
+  }
+
+  @Override
+  public DBIDRange generateStaticDBIDRange(int begin, int size) {
+    final int end = begin + size;
+    if(end > Integer.MAX_VALUE) {
+      throw new AbortException("DBID range allocation error - too many objects allocated!");
+    }
+    DBIDRange alloc = new IntegerDBIDRange(begin, size);
+    int v;
+    while((v = next.get()) < end) {
+      if(next.compareAndSet(v, end)) {
+        break;
+      }
+    }
     return alloc;
   }
 

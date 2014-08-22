@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -97,11 +96,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
   public MultipleObjectsBundle loadData() {
     MultipleObjectsBundle b = new MultipleObjectsBundle();
     if(startid != null) {
-      List<DBID> ids = new ArrayList<>(data.length);
-      for(int i = 0; i < data.length; i++) {
-        ids.add(DBIDUtil.importInteger(startid.intValue() + i));
-      }
-      b.appendColumn(TypeUtil.DBID, Arrays.asList(labels));
+      b.setDBIDs(DBIDFactory.FACTORY.generateStaticDBIDRange(startid, data.length));
     }
 
     int mind = Integer.MAX_VALUE;
@@ -112,13 +107,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
       maxd = Math.max(maxd, data[i].length);
       vecs.add(new DoubleVector(data[i]));
     }
-    SimpleTypeInformation<DoubleVector> type;
-    if(mind == maxd) {
-      type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, mind);
-    }
-    else {
-      type = new SimpleTypeInformation<>(DoubleVector.class);
-    }
+    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, mind, maxd, DoubleVector.FACTORY.getDefaultSerializer());
     b.appendColumn(type, vecs);
     if(labels != null) {
       if(labels.length != data.length) {

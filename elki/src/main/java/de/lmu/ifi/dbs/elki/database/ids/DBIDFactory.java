@@ -100,6 +100,15 @@ public interface DBIDFactory {
   DBIDRange generateStaticDBIDRange(int size);
 
   /**
+   * Generate a static DBID range.
+   * 
+   * @param begin Range begin
+   * @param size Requested size
+   * @return DBID range
+   */
+  DBIDRange generateStaticDBIDRange(int begin, int size);
+
+  /**
    * Deallocate a static DBID range.
    * 
    * @param range Range to deallocate

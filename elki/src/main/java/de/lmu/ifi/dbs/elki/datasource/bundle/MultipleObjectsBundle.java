@@ -27,6 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -41,6 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  */
 public class MultipleObjectsBundle implements ObjectBundle {
   /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(MultipleObjectsBundle.class);
+
+  /**
    * Storing the meta data.
    */
   private BundleMeta meta;
@@ -51,38 +61,16 @@ public class MultipleObjectsBundle implements ObjectBundle {
   private List<List<?>> columns;
 
   /**
+   * DBIDs for these objects, but may be null.
+   */
+  private ArrayDBIDs ids;
+
+  /**
    * Constructor.
    */
   public MultipleObjectsBundle() {
     this.meta = new BundleMeta();
     this.columns = new ArrayList<>();
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param meta Meta data contained.
-   * @param columns Content in columns
-   */
-  @Deprecated
-  public MultipleObjectsBundle(BundleMeta meta, List<List<?>> columns) {
-    super();
-    this.meta = meta;
-    this.columns = columns;
-    if(this.columns.size() != this.meta.size()) {
-      throw new AbortException("Meta size and columns do not agree!");
-    }
-    int len = -1;
-    for(List<?> col : columns) {
-      if(len < 0) {
-        len = col.size();
-      }
-      else {
-        if(col.size() != len) {
-          throw new AbortException("Column lengths do not agree.");
-        }
-      }
-    }
   }
 
   @Override
@@ -106,8 +94,18 @@ public class MultipleObjectsBundle implements ObjectBundle {
   }
 
   @Override
+  public boolean assignDBID(int onum, DBIDVar var) {
+    if(ids == null) {
+      var.unset();
+      return false;
+    }
+    ids.assignVar(onum, var);
+    return true;
+  }
+
+  @Override
   public int dataLength() {
-    return (columns.size() == 0) ? 0 : columns.get(0).size();
+    return (ids != null) ? ids.size() : (columns.size() == 0) ? 0 : columns.get(0).size();
   }
 
   /**
@@ -138,6 +136,24 @@ public class MultipleObjectsBundle implements ObjectBundle {
     meta.add(type);
     columns.add(data);
     return this;
+  }
+
+  /**
+   * Set the DBID range for this bundle.
+   * 
+   * @param ids DBIDs
+   */
+  public void setDBIDs(ArrayDBIDs ids) {
+    this.ids = ids;
+  }
+
+  /**
+   * Get the DBIDs, may be {@code null}.
+   * 
+   * @return DBIDs
+   */
+  public ArrayDBIDs getDBIDs() {
+    return ids;
   }
 
   /**
@@ -202,6 +218,15 @@ public class MultipleObjectsBundle implements ObjectBundle {
   }
 
   /**
+   * Process this bundle as stream.
+   * 
+   * @return Stream
+   */
+  public BundleStreamSource asStream() {
+    return new StreamFromBundle(this);
+  }
+
+  /**
    * Convert an object stream to a bundle
    * 
    * @param source Object stream
@@ -210,6 +235,9 @@ public class MultipleObjectsBundle implements ObjectBundle {
   public static MultipleObjectsBundle fromStream(BundleStreamSource source) {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     boolean stop = false;
+    DBIDVar var = null;
+    ArrayModifiableDBIDs ids = null;
+    int size = 0;
     while(!stop) {
       BundleStreamSource.Event ev = source.nextEvent();
       switch(ev){
@@ -227,17 +255,33 @@ public class MultipleObjectsBundle implements ObjectBundle {
           List<Object> data = new ArrayList<>(bundle.dataLength() + 1);
           bundle.appendColumn(smeta.get(i), data);
         }
+        if(var == null && source.hasDBIDs()) {
+          var = DBIDUtil.newVar();
+          ids = DBIDUtil.newArray();
+        }
         continue;
       case NEXT_OBJECT:
+        if(var != null && source.assignDBID(var)) {
+          ids.add(var);
+        }
         for(int i = 0; i < bundle.metaLength(); i++) {
           @SuppressWarnings("unchecked")
           final List<Object> col = (List<Object>) bundle.columns.get(i);
           col.add(source.data(i));
         }
+        ++size;
         continue;
       default:
         LoggingUtil.warning("Unknown event: " + ev);
         continue;
+      }
+    }
+    if(ids != null) {
+      if(size != ids.size()) {
+        LOG.warning("Not every object had an DBID - discarding DBIDs: " + size + " != " + ids.size());
+      }
+      else {
+        bundle.setDBIDs(ids);
       }
     }
     return bundle;

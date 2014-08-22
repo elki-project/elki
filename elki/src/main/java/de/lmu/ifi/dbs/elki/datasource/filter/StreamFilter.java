@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.datasource.filter;
 
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,9 +23,11 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
+
 /**
- * Streaming filters are often more efficient (less memory use) and can be used
- * in more settings.
+ * Streaming filters are often more efficient (less memory use) as they do not
+ * keep a reference to earlier data.
  * 
  * @author Erich Schubert
  * 
@@ -41,5 +41,5 @@ public interface StreamFilter extends ObjectFilter, BundleStreamSource {
    * 
    * @param source Stream source
    */
-  public void init(BundleStreamSource source);
+  public BundleStreamSource init(BundleStreamSource source);
 }

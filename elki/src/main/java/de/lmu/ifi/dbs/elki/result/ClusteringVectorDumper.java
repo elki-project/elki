@@ -162,7 +162,7 @@ public class ClusteringVectorDumper implements ResultHandler {
       for(Iter<Result> iter = hierarchy.iterAll(); iter.valid(); iter.advance()) {
         Result parent = iter.get();
         if(parent instanceof Database) {
-          DBIDs pids = ((Database) parent).getRelation(TypeUtil.DBID).getDBIDs();
+          DBIDs pids = ((Database) parent).getRelation(TypeUtil.ANY).getDBIDs();
           if(pids instanceof DBIDRange) {
             ids = (DBIDRange) pids;
             break;

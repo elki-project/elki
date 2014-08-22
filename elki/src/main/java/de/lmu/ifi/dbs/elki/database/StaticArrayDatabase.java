@@ -27,12 +27,10 @@ import java.util.BitSet;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -71,7 +69,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
   /**
    * IDs of this database
    */
-  private ArrayDBIDs ids;
+  private ArrayStaticDBIDs ids;
 
   /**
    * The DBID representation we use
@@ -122,26 +120,22 @@ public class StaticArrayDatabase extends AbstractDatabase {
       // Run at most once.
       databaseConnection = null;
 
-      // Find DBID column
-      int idrepnr = findDBIDColumn(objpackages);
-      // Build DBID array
-      final int numObjects = objpackages.dataLength();
-      if(LOG.isDebugging()) {
-        LOG.debugFine("Importing " + numObjects + " instances.");
-      }
-      if(idrepnr == -1) {
-        this.ids = DBIDUtil.generateStaticDBIDRange(numObjects);
-      }
-      else {
-        final ArrayModifiableDBIDs newids = DBIDUtil.newArray(numObjects);
-        for(int j = 0; j < numObjects; j++) {
-          DBID newid = (DBID) objpackages.data(j, idrepnr);
-          newids.add(newid);
+      // Find DBIDs for bundle
+      int numObjects = objpackages.dataLength();
+      {
+        DBIDs bids = objpackages.getDBIDs();
+        if(bids instanceof ArrayStaticDBIDs) {
+          this.ids = (ArrayStaticDBIDs) bids;
         }
-        this.ids = newids;
+        else if(bids == null) {
+          this.ids = DBIDUtil.generateStaticDBIDRange(objpackages.dataLength());
+        }
+        else {
+          this.ids = (ArrayStaticDBIDs) DBIDUtil.makeUnmodifiable(bids);
+        }
       }
-      // Replace id representation.
-      // TODO: this is an ugly hack
+      // Replace id representation (it would be nicer if we would not need
+      // DBIDView at all)
       this.idrep = new DBIDView(this, this.ids);
       relations.add(this.idrep);
       getHierarchy().add(this, idrep);
@@ -153,10 +147,6 @@ public class StaticArrayDatabase extends AbstractDatabase {
       for(int j = 0; j < numObjects; j++, newid.advance()) {
         // insert object
         for(int i = 0; i < targets.length; i++) {
-          // DBIDs were handled above.
-          if(i == idrepnr) {
-            continue;
-          }
           @SuppressWarnings("unchecked")
           final Relation<Object> relation = (Relation<Object>) targets[i];
           relation.set(newid, objpackages.data(j, i));
@@ -196,22 +186,6 @@ public class StaticArrayDatabase extends AbstractDatabase {
     this.indexes.add(index);
     // TODO: actually add index to the representation used?
     this.addChildResult(index);
-  }
-
-  /**
-   * Find an DBID column.
-   * 
-   * @param pack Package to process
-   * @return DBID column
-   */
-  protected int findDBIDColumn(ObjectBundle pack) {
-    for(int i = 0; i < pack.metaLength(); i++) {
-      SimpleTypeInformation<?> meta = pack.meta(i);
-      if(TypeUtil.DBID.isAssignableFromType(meta)) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   /**

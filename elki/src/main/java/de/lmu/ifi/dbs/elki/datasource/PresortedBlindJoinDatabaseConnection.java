@@ -83,7 +83,7 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
       }
     }
 
-    return invokeFilters(first);
+    return invokeBundleFilters(first);
   }
 
   @Override

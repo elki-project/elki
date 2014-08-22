@@ -23,12 +23,13 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -40,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @apiviz.has DBID oneway - - «produces»
  */
-public class FixedDBIDsFilter extends AbstractStreamFilter {
+public class FixedDBIDsFilter implements ObjectFilter {
   /**
    * The filtered meta
    */
@@ -62,35 +63,11 @@ public class FixedDBIDsFilter extends AbstractStreamFilter {
   }
 
   @Override
-  public BundleMeta getMeta() {
-    return meta;
-  }
-
-  @Override
-  public Event nextEvent() {
-    Event ev = source.nextEvent();
-    if(ev == Event.META_CHANGED) {
-      if(meta == null) {
-        meta = new BundleMeta();
-        meta.add(TypeUtil.DBID);
-      }
-      BundleMeta origmeta = source.getMeta();
-      // Note -1 for the injected DBID column
-      for(int i = meta.size() - 1; i < origmeta.size(); i++) {
-        meta.add(origmeta.get(i));
-      }
-    }
-    return ev;
-  }
-
-  @Override
-  public Object data(int rnum) {
-    if(rnum == 0) {
-      DBID ret = DBIDUtil.importInteger(curid);
-      curid++;
-      return ret;
-    }
-    return source.data(rnum - 1);
+  public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
+    DBIDRange ids = DBIDFactory.FACTORY.generateStaticDBIDRange(curid, objects.dataLength());
+    objects.setDBIDs(ids);
+    curid += objects.dataLength();
+    return objects;
   }
 
   /**
@@ -108,14 +85,19 @@ public class FixedDBIDsFilter extends AbstractStreamFilter {
      * </p>
      */
     public static final OptionID IDSTART_ID = new OptionID("dbc.startid", "Object ID to start counting with");
-    int startid = -1;
+
+    /**
+     * First ID to use.
+     */
+    int startid = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter startidParam = new IntParameter(IDSTART_ID);
+      IntParameter startidParam = new IntParameter(IDSTART_ID, 0) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(startidParam)) {
-        startid = startidParam.getValue().intValue();
+        startid = startidParam.intValue();
       }
     }
 

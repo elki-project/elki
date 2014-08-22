@@ -154,11 +154,11 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
       configFilters(config);
       IntParameter dimParam = new IntParameter(DIM_ID);
       if(config.grab(dimParam)) {
-        dim = dimParam.getValue().intValue();
+        dim = dimParam.intValue();
       }
       IntParameter sizeParam = new IntParameter(SIZE_ID);
       if(config.grab(sizeParam)) {
-        size = sizeParam.getValue().intValue();
+        size = sizeParam.intValue();
       }
       RandomParameter rndP = new RandomParameter(SEED_ID);
       if(config.grab(rndP)) {

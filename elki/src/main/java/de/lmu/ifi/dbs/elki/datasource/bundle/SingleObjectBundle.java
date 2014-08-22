@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 
 /**
  * This class represents a "packaged" object, which is a transfer container for
@@ -47,6 +49,11 @@ public class SingleObjectBundle implements ObjectBundle {
   private List<Object> contents;
 
   /**
+   * Object ID
+   */
+  private DBID id;
+
+  /**
    * Constructor.
    */
   public SingleObjectBundle() {
@@ -62,6 +69,21 @@ public class SingleObjectBundle implements ObjectBundle {
   public SingleObjectBundle(BundleMeta meta, List<Object> contents) {
     super();
     this.meta = meta;
+    this.contents = contents;
+    assert (meta.size() == contents.size());
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param meta Metadata
+   * @param id ID of object
+   * @param contents Object values
+   */
+  public SingleObjectBundle(BundleMeta meta, DBID id, List<Object> contents) {
+    super();
+    this.meta = meta;
+    this.id = id;
     this.contents = contents;
     assert (meta.size() == contents.size());
   }
@@ -102,6 +124,16 @@ public class SingleObjectBundle implements ObjectBundle {
       throw new ArrayIndexOutOfBoundsException();
     }
     return contents.get(rnum);
+  }
+
+  @Override
+  public boolean assignDBID(int onum, DBIDVar var) {
+    if(id == null) {
+      var.unset();
+      return false;
+    }
+    var.set(id);
+    return true;
   }
 
   /**

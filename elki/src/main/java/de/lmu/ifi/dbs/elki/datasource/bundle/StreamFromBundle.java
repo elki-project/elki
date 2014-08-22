@@ -23,8 +23,12 @@ package de.lmu.ifi.dbs.elki.datasource.bundle;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+
 /**
- * Convert a MultipleObjectsBundle to a stream
+ * Convert a MultipleObjectsBundle to a stream.
+ * 
+ * To use this, invoke {@link MultipleObjectsBundle#asStream()}.
  * 
  * @author Erich Schubert
  */
@@ -60,6 +64,16 @@ public class StreamFromBundle implements BundleStreamSource {
   }
 
   @Override
+  public boolean hasDBIDs() {
+    return bundle.getDBIDs() != null;
+  }
+
+  @Override
+  public boolean assignDBID(DBIDVar var) {
+    return bundle.assignDBID(onum, var);
+  }
+
+  @Override
   public Event nextEvent() {
     onum += 1;
     if(onum < 0) {
@@ -69,5 +83,10 @@ public class StreamFromBundle implements BundleStreamSource {
       return Event.END_OF_STREAM;
     }
     return Event.NEXT_OBJECT;
+  }
+
+  @Override
+  public MultipleObjectsBundle asMultipleObjectsBundle() {
+    return bundle;
   }
 }

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.datasource.bundle;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,14 +31,13 @@ package de.lmu.ifi.dbs.elki.datasource.bundle;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf BundleMeta
+ * @apiviz.has BundleStreamSource.Event
  */
 public interface BundleStreamSource {
   /**
    * Events
    * 
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
    */
   public static enum Event {
     // Metadata has changed
@@ -63,9 +64,31 @@ public interface BundleStreamSource {
   public Object data(int rnum);
 
   /**
+   * Indicate whether the stream contains DBIDs.
+   * 
+   * @return {@code true} if the stream contains DBIDs.
+   */
+  public boolean hasDBIDs();
+
+  /**
+   * Assign the current object ID to a {@link DBIDVar}.
+   * 
+   * @param var Variable to assign the object id to
+   * @return {@code false} when no object id is available
+   */
+  public boolean assignDBID(DBIDVar var);
+
+  /**
    * Get the next event
    * 
    * @return Event type
    */
   public Event nextEvent();
+
+  /**
+   * Return (or collect) the stream as bundle.
+   * 
+   * @return Bundle
+   */
+  public MultipleObjectsBundle asMultipleObjectsBundle();
 }

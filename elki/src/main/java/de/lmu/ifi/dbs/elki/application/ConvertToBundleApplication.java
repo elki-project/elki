@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleWriter;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.StreamFromBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -86,7 +85,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
     try {
       FileOutputStream fos = new FileOutputStream(outfile);
       FileChannel channel = fos.getChannel();
-      writer.writeBundleStream(new StreamFromBundle(bundle), channel);
+      writer.writeBundleStream(bundle.asStream(), channel);
       channel.close();
       fos.close();
     }

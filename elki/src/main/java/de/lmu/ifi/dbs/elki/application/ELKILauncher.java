@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.application;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -57,6 +58,9 @@ public class ELKILauncher {
         Object a = Arrays.copyOfRange(args, 1, args.length);
         try {
           m.invoke(null, a);
+        }
+        catch(InvocationTargetException e) {
+          LoggingUtil.exception(e.getCause());
         }
         catch(Exception e) {
           LoggingUtil.exception(e);
