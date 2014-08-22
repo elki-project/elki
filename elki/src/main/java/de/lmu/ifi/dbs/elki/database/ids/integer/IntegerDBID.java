@@ -252,7 +252,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected DynamicSerializer() {
+    public DynamicSerializer() {
       super();
     }
 
@@ -281,7 +281,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected StaticSerializer() {
+    public StaticSerializer() {
       super();
     }
 
