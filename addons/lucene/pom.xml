@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
 			<artifactId>elki</artifactId>
-			<version>0.6.5-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>

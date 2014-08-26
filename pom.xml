@@ -22,10 +22,12 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<skipTests>true</skipTests>
 	</properties>
 
 	<build>
 		<plugins>
+			<!-- compilation -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -35,8 +37,24 @@
 					<source>1.7</source>
 					<target>1.7</target>
 					<debuglevel>source,lines</debuglevel>
+					<failOnError>true</failOnError>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
+			<!-- unit tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.7.2</version>
+				<configuration>
+					<!-- to have the desired paths to the data files -->
+					<workingDirectory>${project.build.testOutputDirectory}</workingDirectory>
+					<skipTests>${skipTests}</skipTests>
+				</configuration>
+			</plugin>
+			<!-- packaging -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
