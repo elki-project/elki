@@ -92,7 +92,7 @@ public class CheckParameterizables {
         }
         else if(("jar".equals(u.getProtocol()))) {
           JarURLConnection con = (JarURLConnection) u.openConnection();
-          try (JarFile jar = con.getJarFile();) {
+          try (JarFile jar = con.getJarFile()) {
             Enumeration<JarEntry> entries = jar.entries();
             while(entries.hasMoreElements()) {
               String prop = entries.nextElement().getName();

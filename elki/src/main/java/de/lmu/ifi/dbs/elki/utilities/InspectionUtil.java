@@ -84,27 +84,9 @@ public class InspectionUtil {
   };
 
   /**
-   * If we have a non-static classpath, we do more extensive scanning for user
-   * extensions.
-   */
-  public static final boolean NONSTATIC_CLASSPATH;
-
-  /**
    * Factory class postfix.
    */
   public static final String FACTORY_POSTFIX = "$Factory";
-
-  // Check for non-jar entries in classpath.
-  static {
-    String[] classpath = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
-    boolean hasnonstatic = false;
-    for(String path : classpath) {
-      if(!path.endsWith(".jar")) {
-        hasnonstatic = true;
-      }
-    }
-    NONSTATIC_CLASSPATH = hasnonstatic;
-  }
 
   /**
    * Weak hash map for class lookups
@@ -157,12 +139,6 @@ public class InspectionUtil {
         known.add(iter.next());
       }
       dupes.addAll(known);
-    }
-    if(!InspectionUtil.NONSTATIC_CLASSPATH) {
-      if(known.size() >= 0) {
-        return new ArrayList<>(known);
-      }
-      LOG.warning("No implementations for " + c.getName() + " were found using index files.");
     }
     // Build cache on first use:
     if(MASTER_CACHE == null) {

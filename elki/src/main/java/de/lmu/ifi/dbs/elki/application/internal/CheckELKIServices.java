@@ -27,15 +27,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,47 +72,66 @@ public class CheckELKIServices {
   private Pattern strip = Pattern.compile("^[\\s#]*(?:deprecated:\\s*)?(.*?)[\\s]*$");
 
   /**
-   * Package to skip matches in - unreleased code.
-   */
-  private String[] skippackages = { "experimentalcode.", "project." };
-
-  /**
    * Main method.
    * 
    * @param argv Command line arguments
    */
   public static void main(String[] argv) {
-    boolean update = false, noskip = false;
-    for(String arg : argv) {
-      if("-update".equals(arg)) {
-        update = true;
-      }
-      if("-all".equals(arg)) {
-        noskip = true;
-      }
+    String update = null;
+    if(argv.length == 2 && "-update".equals(argv[0])) {
+      update = argv[1];
+      LOG.info("Updating service files in folder: " + update);
     }
-    new CheckELKIServices().checkServices(update, noskip);
+    else if(argv.length != 0) {
+      throw new AbortException("Incorrect command line parameters.");
+    }
+    new CheckELKIServices().checkServices(update);
   }
 
   /**
    * Retrieve all properties and check them.
    * 
-   * @param update Flag to enable automatic updating
-   * @param noskip Override filters, include all (in particular,
-   *        experimentalcode)
+   * @param update Folder to update service files in
    */
-  public void checkServices(boolean update, boolean noskip) {
-    URL u = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX);
+  public void checkServices(String update) {
+    TreeSet<String> props = new TreeSet<>();
+    Enumeration<URL> us;
     try {
-      for(String prop : new File(u.toURI()).list()) {
-        if(LOG.isVerbose()) {
-          LOG.verbose("Checking property: " + prop);
-        }
-        checkService(prop, update, noskip);
-      }
+      us = getClass().getClassLoader().getResources(ELKIServiceLoader.PREFIX);
     }
-    catch(URISyntaxException e) {
-      throw new AbortException("Cannot check all properties, as some are not in a file: URL.");
+    catch(IOException e) {
+      throw new AbortException("Error enumerating service folders.", e);
+    }
+    while(us.hasMoreElements()) {
+      URL u = us.nextElement();
+      try {
+        if(("jar".equals(u.getProtocol()))) {
+          JarURLConnection con = (JarURLConnection) u.openConnection();
+          try (JarFile jar = con.getJarFile()) {
+            Enumeration<JarEntry> entries = jar.entries();
+            while(entries.hasMoreElements()) {
+              String prop = entries.nextElement().getName();
+              if(prop.length() > ELKIServiceLoader.PREFIX.length() && prop.startsWith(ELKIServiceLoader.PREFIX)) {
+                props.add(prop.substring(ELKIServiceLoader.PREFIX.length()));
+              }
+            }
+          }
+          continue;
+        }
+        if("file".equals(u.getProtocol())) {
+          props.addAll(Arrays.asList(new File(u.toURI()).list()));
+        }
+      }
+      catch(IOException | URISyntaxException e) {
+        throw new AbortException("Error enumerating service folders.", e);
+      }
+
+    }
+    for(String prop : props) {
+      if(LOG.isVerbose()) {
+        LOG.verbose("Checking property: " + prop);
+      }
+      checkService(prop, update);
     }
   }
 
@@ -113,11 +139,9 @@ public class CheckELKIServices {
    * Check a single service class
    * 
    * @param prop Class name.
-   * @param update Flag to enable automatic updating
-   * @param noskip Override filters, include all (in particular,
-   *        experimentalcode)
+   * @param update Folder to update service files in
    */
-  private void checkService(String prop, boolean update, boolean noskip) {
+  private void checkService(String prop, String update) {
     Class<?> cls;
     try {
       cls = Class.forName(prop);
@@ -129,42 +153,33 @@ public class CheckELKIServices {
     List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false, false);
     HashSet<String> names = new HashSet<>();
     for(Class<?> c2 : impls) {
-      boolean skip = false;
-      for(String pkg : skippackages) {
-        if(c2.getName().startsWith(pkg)) {
-          skip = true;
-          break;
-        }
-      }
-      if(!noskip && skip) {
-        continue;
-      }
       names.add(c2.getName());
     }
 
+    Matcher m = strip.matcher("");
     try {
-      InputStream is = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX + cls.getName()).openStream();
-      BufferedReader r = new BufferedReader(new InputStreamReader(is, "utf-8"));
-      for(String line;;) {
-        line = r.readLine();
-        // End of stream:
-        if(line == null) {
-          break;
-        }
-        Matcher m = strip.matcher(line);
-        if(m.matches()) {
+      Enumeration<URL> us = getClass().getClassLoader().getResources(ELKIServiceLoader.PREFIX + cls.getName());
+      while(us.hasMoreElements()) {
+        URL u = us.nextElement();
+        boolean injar = "jar".equals(u.getProtocol());
+        BufferedReader r = new BufferedReader(new InputStreamReader(u.openStream(), "utf-8"));
+        for(String line;;) {
+          line = r.readLine();
+          // End of stream:
+          if(line == null) {
+            break;
+          }
+          m.reset(line);
+          if(!m.matches()) {
+            LOG.warning("Line: " + line + " didn't match regexp.");
+            continue;
+          }
           String stripped = m.group(1);
           if(stripped.length() > 0) {
-            if(names.contains(stripped)) {
-              names.remove(stripped);
-            }
-            else {
-              LOG.warning("Name " + stripped + " found for property " + prop + " but no class discovered (or referenced twice?).");
+            if(!names.remove(stripped) && !injar) {
+              LOG.warning("Name " + stripped + " found for property " + prop + " but no class discovered (or listed twice).");
             }
           }
-        }
-        else {
-          LOG.warning("Line: " + line + " didn't match regexp.");
         }
       }
     }
@@ -176,40 +191,30 @@ public class CheckELKIServices {
       ArrayList<String> sorted = new ArrayList<>(names);
       // TODO: sort by package, then classname
       Collections.sort(sorted);
-      if(!update) {
+      if(update == null) {
         StringBuilder message = new StringBuilder();
         message.append("Class ").append(prop).append(" lacks suggestions:").append(FormatUtil.NEWLINE);
         for(String remaining : sorted) {
           message.append("# ").append(remaining).append(FormatUtil.NEWLINE);
         }
         LOG.warning(message.toString());
+        return;
       }
-      else {
-        // Try to automatically update:
-        URL f = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX + cls.getName());
-        String fnam = f.getFile();
-        if(fnam == null) {
-          LOG.warning("Cannot update: " + f + " seems to be in a jar file.");
+      // Try to automatically update:
+      try {
+        Files.createDirectories(Paths.get(update + File.separator + ELKIServiceLoader.PREFIX));
+        String fname = update + File.separator + ELKIServiceLoader.PREFIX + prop;
+        PrintStream pr = new PrintStream(new FileOutputStream(fname, true));
+        pr.println(); // In case there was no linefeed at the end.
+        pr.println("### Automatically appended entries:");
+        for(String remaining : sorted) {
+          pr.println(remaining);
         }
-        else {
-          try {
-            FileOutputStream out = new FileOutputStream(fnam, true);
-            PrintStream pr = new PrintStream(out);
-            pr.println();
-            pr.println("### Automatically appended entries:");
-            for(String remaining : sorted) {
-              pr.println(remaining);
-            }
-            pr.flush();
-            pr.close();
-            out.flush();
-            out.close();
-            LOG.warning("Updated: " + fnam);
-          }
-          catch(IOException e) {
-            LOG.exception(e);
-          }
-        }
+        pr.close();
+        LOG.warning("Updated service file: " + fname);
+      }
+      catch(IOException e) {
+        LOG.exception(e);
       }
     }
   }
