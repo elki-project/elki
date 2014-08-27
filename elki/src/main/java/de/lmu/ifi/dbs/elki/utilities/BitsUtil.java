@@ -1024,6 +1024,27 @@ public final class BitsUtil {
   }
 
   /**
+   * Convert the bitset into a decimal representation, e.g. <tt>0, 3, 5</tt>
+   * 
+   * @param v Value
+   * @param sep Value separator
+   * @param offset Counting offset (usually, 0 or 1)
+   * @return String representation
+   */
+  public static String toString(long[] v, String sep, int offset) {
+    int p = nextSetBit(v, 0);
+    if(p < 0) {
+      return "";
+    }
+    StringBuilder buf = new StringBuilder();
+    buf.append(p + offset);
+    for(p = nextSetBit(v, p + 1); p >= 0; p = nextSetBit(v, p + 1)) {
+      buf.append(sep).append(p + offset);
+    }
+    return buf.toString();
+  }
+
+  /**
    * Find the number of trailing zeros.
    * 
    * @param v Bitset
@@ -1447,7 +1468,7 @@ public final class BitsUtil {
    */
   public static int intersectionSize(long[] x, long[] y) {
     final int lx = x.length, ly = y.length;
-    final int min = (lx < ly) ? lx: ly;
+    final int min = (lx < ly) ? lx : ly;
     int res = 0;
     for(int i = 0; i < min; i++) {
       res += Long.bitCount(x[i] & y[i]);
@@ -1475,7 +1496,7 @@ public final class BitsUtil {
    */
   public static int unionSize(long[] x, long[] y) {
     final int lx = x.length, ly = y.length;
-    final int min = (lx < ly) ? lx: ly;
+    final int min = (lx < ly) ? lx : ly;
     int i = 0, res = 0;
     for(; i < min; i++) {
       res += Long.bitCount(x[i] | y[i]);
@@ -1511,7 +1532,7 @@ public final class BitsUtil {
    */
   public static int hammingDistance(long[] x, long[] y) {
     final int lx = x.length, ly = y.length;
-    final int min = (lx < ly) ? lx: ly;
+    final int min = (lx < ly) ? lx : ly;
     int i = 0, h = 0;
     for(; i < min; i++) {
       h += Long.bitCount(x[i] ^ y[i]);
