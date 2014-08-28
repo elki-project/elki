@@ -23,8 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -74,8 +73,8 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
       return;
     }
 
-    for(List<Double> vec : vector.getValue()) {
-      if(vec.size() != size.intValue()) {
+    for(Vector vec : vector.getValue()) {
+      if(vec.getDimensionality() != size.intValue()) {
         throw new WrongParameterValueException("Global Parameter Constraint Error.\n" + "The vectors of vector list parameter " + vector.getName() + " have not the required dimension of " + size.getValue() + " given by integer parameter " + size.getName() + ".");
       }
     }

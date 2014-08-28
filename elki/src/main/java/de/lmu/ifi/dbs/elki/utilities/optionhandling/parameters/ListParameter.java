@@ -49,9 +49,9 @@ public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> exte
   public static final String LIST_SEP = ",";
 
   /**
-   * A pattern defining a &quot:&quot.
+   * A pattern defining a &quot:&quot or &quot;;&quot;.
    */
-  public static final Pattern VECTOR_SPLIT = Pattern.compile(":");
+  public static final Pattern VECTOR_SPLIT = Pattern.compile("[:;]");
 
   /**
    * Vector separator character - &quot;:&quot;
@@ -93,7 +93,7 @@ public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> exte
    * @return the size of this list parameter.
    */
   public int getListSize() {
-    if (getValue() == null && isOptional()) {
+    if(getValue() == null && isOptional()) {
       return 0;
     }
 
@@ -106,15 +106,15 @@ public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> exte
    */
   // TODO: keep? remove?
   protected String asString() {
-    if (getValue() == null) {
+    if(getValue() == null) {
       return "";
     }
     StringBuilder buffer = new StringBuilder();
     buffer.append('[');
 
-    for (int i = 0; i < getValue().size(); i++) {
+    for(int i = 0; i < getValue().size(); i++) {
       buffer.append(getValue().get(i).toString());
-      if (i != getValue().size() - 1) {
+      if(i != getValue().size() - 1) {
         buffer.append(',');
       }
     }

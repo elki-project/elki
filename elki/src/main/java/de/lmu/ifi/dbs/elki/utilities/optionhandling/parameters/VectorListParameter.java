@@ -23,10 +23,13 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.array.TDoubleArrayList;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -39,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class VectorListParameter extends ListParameter<VectorListParameter, List<Double>> {
+public class VectorListParameter extends ListParameter<VectorListParameter, Vector> {
   /**
    * Constructs a vector list parameter with the given name and description.
    * 
@@ -47,7 +50,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    * @param constraint Constraint
    * @param defaultValue Default value
    */
-  public VectorListParameter(OptionID optionID, ParameterConstraint<List<List<Double>>> constraint, List<List<Double>> defaultValue) {
+  public VectorListParameter(OptionID optionID, ParameterConstraint<List<Vector>> constraint, List<Vector> defaultValue) {
     super(optionID, defaultValue);
     addConstraint(constraint);
   }
@@ -59,7 +62,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    * @param constraint Constraint
    * @param optional Optional flag
    */
-  public VectorListParameter(OptionID optionID, ParameterConstraint<List<List<Double>>> constraint, boolean optional) {
+  public VectorListParameter(OptionID optionID, ParameterConstraint<List<Vector>> constraint, boolean optional) {
     super(optionID, optional);
     addConstraint(constraint);
   }
@@ -70,7 +73,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    * @param optionID Option ID
    * @param constraint Constraint
    */
-  public VectorListParameter(OptionID optionID, ParameterConstraint<List<List<Double>>> constraint) {
+  public VectorListParameter(OptionID optionID, ParameterConstraint<List<Vector>> constraint) {
     super(optionID);
     addConstraint(constraint);
   }
@@ -83,8 +86,8 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    */
   // Indiscernible from optionID, constraints
   /*
-   * public VectorListParameter(OptionID optionID, List<List<Double>>
-   * defaultValue) { super(optionID, defaultValue); }
+   * public VectorListParameter(OptionID optionID, List<Vector> defaultValue) {
+   * super(optionID, defaultValue); }
    */
 
   /**
@@ -109,17 +112,10 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
   @Override
   public String getValueAsString() {
     StringBuilder buf = new StringBuilder();
-    List<List<Double>> val = getValue();
-    Iterator<List<Double>> valiter = val.iterator();
+    List<Vector> val = getValue();
+    Iterator<Vector> valiter = val.iterator();
     while(valiter.hasNext()) {
-      List<Double> vec = valiter.next();
-      Iterator<Double> veciter = vec.iterator();
-      while(veciter.hasNext()) {
-        buf.append(veciter.next().toString());
-        if(veciter.hasNext()) {
-          buf.append(LIST_SEP);
-        }
-      }
+      buf.append(FormatUtil.format(valiter.next().getArrayRef(), LIST_SEP));
       // Append separation character
       if(valiter.hasNext()) {
         buf.append(VECTOR_SEP);
@@ -130,7 +126,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
 
   @SuppressWarnings("unchecked")
   @Override
-  protected List<List<Double>> parseValue(Object obj) throws ParameterException {
+  protected List<Vector> parseValue(Object obj) throws ParameterException {
     try {
       List<?> l = List.class.cast(obj);
       // do extra validation:
@@ -144,7 +140,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
       }
       // TODO: can we use reflection to get extra checks?
       // TODO: Should we copy the list and vectors?
-      return (List<List<Double>>) l;
+      return (List<Vector>) l;
     }
     catch(ClassCastException e) {
       // continue with other attempts.
@@ -154,11 +150,12 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
       if(vectors.length == 0) {
         throw new WrongParameterValueException("Wrong parameter format! Given list of vectors for parameter \"" + getName() + "\" is empty!");
       }
-      ArrayList<List<Double>> vecs = new ArrayList<>();
+      ArrayList<Vector> vecs = new ArrayList<>();
 
+      TDoubleArrayList vectorCoord = new TDoubleArrayList();
       for(String vector : vectors) {
+        vectorCoord.clear();
         String[] coordinates = SPLIT.split(vector);
-        ArrayList<Double> vectorCoord = new ArrayList<>();
         for(String coordinate : coordinates) {
           try {
             vectorCoord.add(FormatUtil.parseDouble(coordinate));
@@ -167,11 +164,11 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
             throw new WrongParameterValueException("Wrong parameter format! Coordinates of vector \"" + vector + "\" are not valid!");
           }
         }
-        vecs.add(vectorCoord);
+        vecs.add(new Vector(vectorCoord.toArray()));
       }
       return vecs;
     }
-    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Double values!");
+    throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of double values!");
   }
 
   /**
