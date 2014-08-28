@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 /**
  * Interface for computing the quality of a K-Means clustering.
  * 
+ * Important note: some measures are ascending, others are descending!
+ * 
  * @author Erich Schubert
  * 
  * @param <O> Input Object restriction type
@@ -48,5 +50,22 @@ public interface KMeansQualityMeasure<O extends NumberVector> {
    * 
    * @return quality measure
    */
-  <V extends O> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation);
+  <V extends O> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation);
+
+  /**
+   * Use ascending or descending ordering.
+   * 
+   * @return {@code true} when larger scores are better.
+   */
+  boolean ascending();
+
+  /**
+   * Compare two scores.
+   * 
+   * @param newScore New (candiate) scorer
+   * @param oldScore Existing score (may be {@code NaN})
+   * @return {@code true} when the new score is better, or the old score is
+   *         {@code NaN}.
+   */
+  boolean isBetter(double currentCost, double bestCost);
 }

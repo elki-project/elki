@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * (ICML 2000)
  * </p>
  * 
- * See also:
+ * A different version of logLikelihood is derived in:
  * <p>
  * Q. Zhao, M. Xu, P. Fränti:<br />
  * Knee Point Detection on Bayesian Information Criterion<br />
@@ -116,16 +116,19 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
   }
 
   /**
-   * Computes log likelihood of an entire clustering
+   * Computes log likelihood of an entire clustering.
    * 
-   * @param relation
-   * @param clustering
-   * @return
+   * Version as used in the X-means publication.
+   * 
+   * @param relation Data relation
+   * @param clustering Clustering
+   * @param distanceFunction Distance function
+   * @return Log Likelihood.
    */
-  @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
-  title = "Knee Point Detection on Bayesian Information Criterion", //
-  booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
-  url = "http://dx.doi.org/10.1109/ICTAI.2008.154")
+  @Reference(authors = "D. Pelleg, A. Moore", //
+  booktitle = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+  title = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+  url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
   public static double logLikelihood(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // dimensionality of data points
@@ -164,6 +167,55 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
     }
     logLikelihood -= n * Math.log(n); // Prior entropy, sum_i Rn log R
 
+    return logLikelihood;
+  }
+
+  /**
+   * Computes log likelihood of an entire clustering.
+   * 
+   * Version as used by Zhao et al.
+   * 
+   * @param relation Data relation
+   * @param clustering Clustering
+   * @param distanceFunction Distance function
+   * @return Log Likelihood.
+   */
+  @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
+  title = "Knee Point Detection on Bayesian Information Criterion", //
+  booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
+  url = "http://dx.doi.org/10.1109/ICTAI.2008.154")
+  public static double logLikelihoodAlternate(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+    List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
+    // dimensionality of data points
+    final int dim = RelationUtil.dimensionality(relation);
+    // number of clusters
+    final int m = clusters.size();
+
+    // number of objects in the clustering
+    int n = 0;
+    // cluster sizes
+    int[] n_i = new int[m];
+    // variances
+    double[] d_i = new double[m];
+
+    // Iterate over clusters:
+    Iterator<? extends Cluster<? extends MeanModel>> it = clusters.iterator();
+    for(int i = 0; it.hasNext(); ++i) {
+      Cluster<? extends MeanModel> cluster = it.next();
+      n += n_i[i] = cluster.size();
+      d_i[i] = varianceOfCluster(cluster, distanceFunction, relation);
+    }
+
+    // log likelihood of this clustering
+    double logLikelihood = 0.;
+
+    // Aggregate
+    for(int i = 0; i < m; i++) {
+      logLikelihood += n_i[i] * Math.log(n_i[i] / (double) n) // ni log ni/n
+          - n_i[i] * dim * .5 * MathUtil.LOGTWOPI // ni*d/2 log2pi
+          - n_i[i] * .5 * Math.log(d_i[i]) // ni/2 log sigma_i
+          - (n_i[i] - m) * .5; // (ni-m)/2
+    }
     return logLikelihood;
   }
 

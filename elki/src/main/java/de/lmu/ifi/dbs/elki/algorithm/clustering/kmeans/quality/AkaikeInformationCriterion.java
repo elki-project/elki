@@ -57,7 +57,18 @@ title = "On entropy maximization principle", //
 booktitle = "Application of statistics, 1977, North-Holland")
 public class AkaikeInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
     return logLikelihood(relation, clustering, distanceFunction) - numberOfFreeParameters(relation, clustering);
+  }
+
+  @Override
+  public boolean ascending() {
+    return true;
+  }
+
+  @Override
+  public boolean isBetter(double currentCost, double bestCost) {
+    // Careful: bestCost may be NaN!
+    return !(currentCost <= bestCost);
   }
 }

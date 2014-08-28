@@ -59,8 +59,19 @@ booktitle = "The annals of statistics 6.2", //
 url = "http://dx.doi.org/10.1214/aos/1176344136")
 public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
     return logLikelihood(relation, clustering, distanceFunction) //
         - (.5 * numberOfFreeParameters(relation, clustering)) * Math.log(numPoints(clustering));
+  }
+
+  @Override
+  public boolean ascending() {
+    return true;
+  }
+
+  @Override
+  public boolean isBetter(double currentCost, double bestCost) {
+    // Careful: bestCost may be NaN!
+    return !(currentCost <= bestCost);
   }
 }

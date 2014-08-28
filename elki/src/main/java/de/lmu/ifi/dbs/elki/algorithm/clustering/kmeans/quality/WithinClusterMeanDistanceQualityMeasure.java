@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  */
 public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
     double clusterDistanceSum = 0;
     for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
       DBIDs ids = cluster.getIDs();
@@ -57,5 +57,16 @@ public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMea
     }
 
     return clusterDistanceSum / clustering.getAllClusters().size();
+  }
+
+  @Override
+  public boolean ascending() {
+    return false;
+  }
+
+  @Override
+  public boolean isBetter(double currentCost, double bestCost) {
+    // Careful: bestCost may be NaN!
+    return !(currentCost >= bestCost);
   }
 }

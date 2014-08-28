@@ -25,17 +25,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.BayesianInformationCriterion;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import experimentalcode.students.goldschwendt.XMeans;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.BayesianInformationCriterion;
 
 public class XMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   
@@ -46,7 +46,7 @@ public class XMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Tes
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(XMeans.Parameterizer.K_MIN_ID, 2);
-    params.addParameter(XMeans.Parameterizer.K_MAX_ID, 10);
+    params.addParameter(XMeans.Parameterizer.K_MAX_ID, 20);
     params.addParameter(XMeans.Parameterizer.INITIAL_KMEANS_ID, KMeansLloyd.class);
     params.addParameter(XMeans.Parameterizer.SPLIT_KMEANS_ID, KMeansLloyd.class);
     params.addParameter(XMeans.Parameterizer.INFORMATION_CRITERION_ID, BayesianInformationCriterion.class);

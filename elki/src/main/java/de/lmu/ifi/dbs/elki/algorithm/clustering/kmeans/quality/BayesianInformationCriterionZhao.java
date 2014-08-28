@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
 
 /*
- This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
  Copyright (C) 2014
  Ludwig-Maximilians-Universität München
@@ -22,37 +23,45 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Class for computing the variance in a clustering result (sum-of-squares).
+ * Different version of the BIC criterion.
  * 
- * @author Stephan Baier
+ * Reference:
+ * <p>
+ * Q. Zhao, M. Xu, P. Fränti:<br />
+ * Knee Point Detection on Bayesian Information Criterion<br />
+ * 20th IEEE International Conference on Tools with Artificial Intelligence
+ * </p>
+ * 
+ * @author Tibor Goldschwendt
  * @author Erich Schubert
  */
-public class WithinClusterVarianceQualityMeasure extends AbstractKMeansQualityMeasure<NumberVector> {
+@Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
+title = "Knee Point Detection on Bayesian Information Criterion", //
+booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
+url = "http://dx.doi.org/10.1109/ICTAI.2008.154")
+public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
-    double variance = 0.;
-    for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
-      variance += varianceOfCluster(cluster, distanceFunction, relation);
-    }
-    return variance;
+    return logLikelihoodAlternate(relation, clustering, distanceFunction) //
+        - (.5 * clustering.getAllClusters().size()) * Math.log(numPoints(clustering));
   }
 
   @Override
   public boolean ascending() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isBetter(double currentCost, double bestCost) {
     // Careful: bestCost may be NaN!
-    return !(currentCost >= bestCost);
+    return !(currentCost <= bestCost);
   }
 }

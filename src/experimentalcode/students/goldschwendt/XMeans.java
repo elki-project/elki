@@ -208,8 +208,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     splitInitializer.setParentCluster(parentCluster);
     Clustering<M> childClustering = splitKMeans.run(proxyDB);
 
-    double parentEvaluation = informationCriterion.calculateCost(parentClustering, dist, relation);
-    double childrenEvaluation = informationCriterion.calculateCost(childClustering, dist, relation);
+    double parentEvaluation = informationCriterion.quality(parentClustering, dist, relation);
+    double childrenEvaluation = informationCriterion.quality(childClustering, dist, relation);
 
     if(LOG.isDebugging()) {
       LOG.debug("parentEvaluation: " + parentEvaluation);
@@ -217,7 +217,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     }
 
     // Check if split is an improvement:
-    return (childrenEvaluation < parentEvaluation) ? parentClustering : childClustering;
+    return (childrenEvaluation > parentEvaluation) ^ informationCriterion.ascending() ? parentClustering : childClustering;
   }
 
   @Override
