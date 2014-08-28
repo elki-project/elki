@@ -130,6 +130,11 @@ public final class TypeUtil {
   public static final VectorFieldTypeInformation<? super NumberVector> NUMBER_VECTOR_FIELD_2D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 2, 2);
 
   /**
+   * Type request for multivariate time series.
+   */
+  public static final MultivariateSeriesTypeInformation<NumberVector> MULTIVARIATE_SERIES = MultivariateSeriesTypeInformation.typeRequest(NumberVector.class);
+
+  /**
    * Input type for algorithms that require number vector fields.
    * 
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
