@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 
 /*
  This file is part of ELKI:
@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;

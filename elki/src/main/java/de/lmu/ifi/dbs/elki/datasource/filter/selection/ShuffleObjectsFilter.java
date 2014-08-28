@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter;
+package de.lmu.ifi.dbs.elki.datasource.filter.selection;
 
 /*
  This file is part of ELKI:
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;

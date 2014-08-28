@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter;
+package de.lmu.ifi.dbs.elki.datasource.filter.typeconversions;
 
 /*
  This file is part of ELKI:
@@ -26,39 +26,49 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.ExternalID;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Class that turns a label column into an external ID column.
+ * Class that turns a label column into a class label column.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.uses LabelList oneway - - «reads»
- * @apiviz.has ExternalID oneway - - «produces»
+ * @apiviz.has ClassLabel
  */
-// TODO: use a non-string class for external ids?
-public class ExternalIDFilter implements ObjectFilter {
+public class ClassLabelFilter implements ObjectFilter {
   /**
-   * The index of the label to be used as external Id.
+   * The index of the label to be used as class label, null if no class label is
+   * specified.
    */
-  private final int externalIdIndex;
+  private final int classLabelIndex;
+
+  /**
+   * The class label class to use.
+   */
+  private final ClassLabel.Factory<?> classLabelFactory;
 
   /**
    * Constructor.
    * 
-   * @param externalIdIndex
+   * @param classLabelIndex The index to convert
+   * @param classLabelFactory The class label factory to use
    */
-  public ExternalIDFilter(int externalIdIndex) {
+  public ClassLabelFilter(int classLabelIndex, ClassLabel.Factory<?> classLabelFactory) {
     super();
-    this.externalIdIndex = externalIdIndex;
+    this.classLabelIndex = classLabelIndex;
+    this.classLabelFactory = classLabelFactory;
   }
 
   @Override
@@ -77,16 +87,22 @@ public class ExternalIDFilter implements ObjectFilter {
       done = true;
 
       // We split the label column into two parts
-      List<ExternalID> eidcol = new ArrayList<>(objects.dataLength());
+      List<ClassLabel> clscol = new ArrayList<>(objects.dataLength());
       List<LabelList> lblcol = new ArrayList<>(objects.dataLength());
 
-      // Split the column
       ArrayList<String> lbuf = new ArrayList<>();
+      // Split the column
       for(Object obj : objects.getColumn(i)) {
         if(obj != null) {
           LabelList ll = (LabelList) obj;
-          int off = externalIdIndex >= 0 ? externalIdIndex : (ll.size() - externalIdIndex);
-          eidcol.add(new ExternalID(ll.get(off)));
+          int off = (classLabelIndex >= 0) ? classLabelIndex : (ll.size() - classLabelIndex);
+          try {
+            ClassLabel lbl = classLabelFactory.makeFromString(ll.get(off));
+            clscol.add(lbl);
+          }
+          catch(Exception e) {
+            throw new AbortException("Cannot initialize class labels: " + e.getMessage(), e);
+          }
           lbuf.clear();
           for(int j = 0; j < ll.size(); j++) {
             if(j == off) {
@@ -95,17 +111,16 @@ public class ExternalIDFilter implements ObjectFilter {
             lbuf.add(ll.get(j));
           }
           lblcol.add(LabelList.make(lbuf));
-          if(ll.size() > 0) {
+          if(lbuf.size() > 0) {
             keeplabelcol = true;
           }
         }
         else {
-          eidcol.add(null);
+          clscol.add(null);
           lblcol.add(null);
         }
       }
-
-      bundle.appendColumn(TypeUtil.EXTERNALID, eidcol);
+      bundle.appendColumn(classLabelFactory.getTypeInformation(), clscol);
       // Only add the label column when it's not empty.
       if(keeplabelcol) {
         bundle.appendColumn(meta, lblcol);
@@ -123,28 +138,51 @@ public class ExternalIDFilter implements ObjectFilter {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Parameter that specifies the index of the label to be used as external
-     * Id, starting at 0. Negative numbers are counted from the end.
+     * Optional parameter that specifies the index of the label to be used as
+     * class label, must be an integer equal to or greater than 0.
      * <p>
-     * Key: {@code -dbc.externalIdIndex}
+     * Key: {@code -dbc.classLabelIndex}
      * </p>
      */
-    public static final OptionID EXTERNALID_INDEX_ID = new OptionID("dbc.externalIdIndex", "The index of the label to be used as external Id. The first label is 0; negative indexes are relative to the end.");
+    public static final OptionID CLASS_LABEL_INDEX_ID = new OptionID("dbc.classLabelIndex", "The index of the label to be used as class label. The first label is 0, negative indexes are relative to the end.");
 
-    int externalIdIndex = -1;
+    /**
+     * Parameter to specify the class of occurring class labels.
+     * <p>
+     * Key: {@code -dbc.classLabelClass}
+     * </p>
+     */
+    public static final OptionID CLASS_LABEL_CLASS_ID = new OptionID("dbc.classLabelClass", "Class label class to use.");
+
+    /**
+     * The index of the label to be used as class label, null if no class label
+     * is specified.
+     */
+    protected int classLabelIndex;
+
+    /**
+     * The class label factory to use.
+     */
+    private ClassLabel.Factory<?> classLabelFactory;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter externalIdIndexParam = new IntParameter(EXTERNALID_INDEX_ID);
-      if(config.grab(externalIdIndexParam)) {
-        externalIdIndex = externalIdIndexParam.intValue();
+      // parameter class label index
+      final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID);
+      final ObjectParameter<ClassLabel.Factory<?>> classlabelClassParam = new ObjectParameter<>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
+
+      config.grab(classLabelIndexParam);
+      config.grab(classlabelClassParam);
+      if(classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
+        classLabelIndex = classLabelIndexParam.intValue();
+        classLabelFactory = classlabelClassParam.instantiateClass(config);
       }
     }
 
     @Override
-    protected ExternalIDFilter makeInstance() {
-      return new ExternalIDFilter(externalIdIndex);
+    protected ClassLabelFilter makeInstance() {
+      return new ClassLabelFilter(classLabelIndex, classLabelFactory);
     }
   }
 }

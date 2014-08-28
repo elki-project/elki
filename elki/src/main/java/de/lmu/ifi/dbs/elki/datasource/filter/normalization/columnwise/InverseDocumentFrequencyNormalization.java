@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 
 /*
  This file is part of ELKI:
@@ -29,11 +29,12 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
- * Normalization for text frequency vectors, using the inverse document
- * frequency.
+ * Normalization for text frequency (TF) vectors, using the inverse document
+ * frequency (IDF).
  * 
  * @author Erich Schubert
  * 

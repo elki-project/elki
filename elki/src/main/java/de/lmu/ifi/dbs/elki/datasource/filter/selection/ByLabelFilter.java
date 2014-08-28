@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter;
+package de.lmu.ifi.dbs.elki.datasource.filter.selection;
 
 /*
  This file is part of ELKI:
@@ -23,11 +23,13 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -36,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
- * A filter to sort the data set by some label.
+ * A filter to select data set by their label.
  * 
  * @author Erich Schubert
  * 
@@ -49,9 +51,9 @@ public class ByLabelFilter extends AbstractStreamFilter {
   private static final Logging LOG = Logging.getLogger(ByLabelFilter.class);
 
   /**
-   * The filter pattern
+   * The filter pattern matcher
    */
-  private final Pattern pattern;
+  private final Matcher matcher;
 
   /**
    * Inversion flag
@@ -71,7 +73,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
    */
   public ByLabelFilter(Pattern pattern, boolean inverted) {
     super();
-    this.pattern = pattern;
+    this.matcher = pattern.matcher("");
     this.inverted = inverted;
   }
 
@@ -91,7 +93,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
       Event ev = source.nextEvent();
       switch(ev){
       case END_OF_STREAM:
-        if (lblcol < 0) {
+        if(lblcol < 0) {
           LOG.warning("By label filter was used, but never saw a label relation!");
         }
         return Event.END_OF_STREAM;
@@ -114,7 +116,8 @@ public class ByLabelFilter extends AbstractStreamFilter {
             boolean good = false;
             final LabelList ll = (LabelList) l;
             for(int i = 0; i < ll.size(); i++) {
-              if(pattern.matcher(ll.get(i)).matches()) {
+              matcher.reset(ll.get(i));
+              if(matcher.matches()) {
                 good = true;
                 break;
               }
@@ -124,7 +127,8 @@ public class ByLabelFilter extends AbstractStreamFilter {
             }
           }
           else {
-            if(!pattern.matcher(l.toString()).matches()) {
+            matcher.reset(l.toString());
+            if(!matcher.matches()) {
               continue;
             }
           }

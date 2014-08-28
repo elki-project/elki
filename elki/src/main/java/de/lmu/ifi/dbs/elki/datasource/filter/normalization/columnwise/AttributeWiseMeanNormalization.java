@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 
 /*
  This file is part of ELKI:
@@ -26,105 +26,92 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Class to perform and undo a normalization on real vectors with respect to
- * given mean and standard deviation in each dimension.
+ * Normalization designed for data with a <em>meaningful zero</em>: Each
+ * attribute is scaled to have the same mean (but 0 is not changed).
  * 
  * @author Erich Schubert
  * @param <V> vector type
  * 
  * @apiviz.uses NumberVector
  */
-public class AttributeWiseVarianceNormalization<V extends NumberVector> extends AbstractNormalization<V> {
+public class AttributeWiseMeanNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(AttributeWiseVarianceNormalization.class);
+  private static final Logging LOG = Logging.getLogger(AttributeWiseMeanNormalization.class);
 
   /**
    * Stores the mean in each dimension.
    */
-  private double[] mean;
-
-  /**
-   * Stores the standard deviation in each dimension.
-   */
-  private double[] stddev;
+  private double[] mean = null;
 
   /**
    * Temporary storage used during initialization.
    */
-  MeanVariance[] mvs = null;
+  double[] sums = null;
+
+  /**
+   * Count the number of values seen.
+   */
+  int c = 0;
 
   /**
    * Constructor.
    * 
    * @param mean Mean value
-   * @param stddev Standard deviation
    */
-  public AttributeWiseVarianceNormalization(double[] mean, double[] stddev) {
+  public AttributeWiseMeanNormalization(double[] mean) {
     super();
     this.mean = mean;
-    this.stddev = stddev;
   }
 
   /**
    * Constructor.
    */
-  public AttributeWiseVarianceNormalization() {
+  public AttributeWiseMeanNormalization() {
     super();
   }
 
   @Override
   protected boolean prepareStart(SimpleTypeInformation<V> in) {
-    return (mean == null || stddev == null || mean.length == 0 || stddev.length == 0);
+    return (mean == null || mean.length == 0);
   }
 
   @Override
   protected void prepareProcessInstance(V featureVector) {
     // First object? Then init. (We didn't have a dimensionality before!)
-    if(mvs == null || mvs.length == 0) {
+    if(sums == null || sums.length == 0) {
       int dimensionality = featureVector.getDimensionality();
-      mvs = MeanVariance.newArray(dimensionality);
+      sums = new double[dimensionality];
     }
     for(int d = 0; d < featureVector.getDimensionality(); d++) {
-      mvs[d].put(featureVector.doubleValue(d));
+      sums[d] += featureVector.doubleValue(d);
     }
+    ++c;
   }
 
   @Override
   protected void prepareComplete() {
     StringBuilder buf = LOG.isVerbose() ? new StringBuilder() : null;
-    final int dimensionality = mvs.length;
+    final int dimensionality = sums.length;
     mean = new double[dimensionality];
-    stddev = new double[dimensionality];
     if(buf != null) {
       buf.append("Normalization parameters: ");
     }
     for(int d = 0; d < dimensionality; d++) {
-      mean[d] = mvs[d].getMean();
-      stddev[d] = mvs[d].getSampleStddev();
-      if(stddev[d] == 0 || Double.isNaN(stddev[d])) {
-        stddev[d] = 1.0;
-      }
+      mean[d] = sums[d] / c;
       if(buf != null) {
-        buf.append(" m: ").append(mean[d]).append(" v: ").append(stddev[d]);
+        buf.append(" m: ").append(mean[d]);
       }
     }
-    mvs = null;
+    sums = null;
     if(buf != null) {
       LOG.debugFine(buf.toString());
     }
@@ -160,7 +147,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
    */
   private double normalize(int d, double val) {
     d = (mean.length == 1) ? 0 : d;
-    return (val - mean[d]) / stddev[d];
+    return val / mean[d];
   }
 
   /**
@@ -172,7 +159,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
    */
   private double restore(int d, double val) {
     d = (mean.length == 1) ? 0 : d;
-    return (val * stddev[d]) + mean[d];
+    return val * mean[d];
   }
 
   @Override
@@ -186,8 +173,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
       for(int r = 0; r < coeff.length; r++) {
         double sum = 0.0;
         for(int c = 0; c < coeff[0].length; c++) {
-          sum += mean[c] * coeff[row[r]][col[c]] / stddev[c];
-          coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / stddev[c];
+          sum += coeff[row[r]][col[c]] / mean[c];
+          coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / mean[c];
         }
         rhs[row[r]] = rhs[row[r]] + sum;
       }
@@ -202,8 +189,6 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     result.append("normalization class: ").append(getClass().getName());
     result.append('\n');
     result.append("normalization means: ").append(FormatUtil.format(mean));
-    result.append('\n');
-    result.append("normalization stddevs: ").append(FormatUtil.format(stddev));
 
     return result.toString();
   }
@@ -216,62 +201,5 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
   @Override
   protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
-
-  /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
-    /**
-     * Parameter for means.
-     */
-    public static final OptionID MEAN_ID = new OptionID("normalize.mean", "a comma separated concatenation of the mean values in each dimension that are mapped to 0. If no value is specified, the mean value of the attribute range in this dimension will be taken.");
-
-    /**
-     * Parameter for stddevs.
-     */
-    public static final OptionID STDDEV_ID = new OptionID("normalize.stddev", "a comma separated concatenation of the standard deviations in each dimension that are scaled to 1. If no value is specified, the standard deviation of the attribute range in this dimension will be taken.");
-
-    /**
-     * Stores the mean in each dimension.
-     */
-    private double[] mean = new double[0];
-
-    /**
-     * Stores the standard deviation in each dimension.
-     */
-    private double[] stddev = new double[0];
-
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      DoubleListParameter meanP = new DoubleListParameter(MEAN_ID) //
-      .setOptional(true);
-      if(config.grab(meanP)) {
-        mean = ArrayLikeUtil.toPrimitiveDoubleArray(meanP.getValue());
-      }
-      DoubleListParameter stddevP = new DoubleListParameter(STDDEV_ID) //
-      .setOptional(true);
-      if(config.grab(stddevP)) {
-        stddev = ArrayLikeUtil.toPrimitiveDoubleArray(stddevP.getValue());
-
-        for(double d : stddev) {
-          if(d == 0.) {
-            config.reportError(new WrongParameterValueException("Standard deviations must not be 0."));
-          }
-        }
-      }
-      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(meanP, stddevP));
-      config.checkConstraint(new EqualSizeGlobalConstraint(meanP, stddevP));
-    }
-
-    @Override
-    protected AttributeWiseVarianceNormalization<V> makeInstance() {
-      return new AttributeWiseVarianceNormalization<>(mean, stddev);
-    }
   }
 }

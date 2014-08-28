@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 /*
  This file is part of ELKI:
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -85,10 +86,10 @@ public class HellingerHistogramNormalization<V extends NumberVector> extends Abs
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected HellingerHistogramNormalization<V> makeInstance() {
-      return new HellingerHistogramNormalization<>();
+    protected HellingerHistogramNormalization<NumberVector> makeInstance() {
+      return STATIC;
     }
   }
 }

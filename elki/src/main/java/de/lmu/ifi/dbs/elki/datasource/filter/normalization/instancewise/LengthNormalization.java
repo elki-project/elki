@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
+package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 
 /*
  This file is part of ELKI:
@@ -26,52 +26,42 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Normalize the data set by applying log(1+|x|*b)/log(b+1) to any value. If the
- * input data was in [0;1], then the resulting values will be in the same range.
+ * Class to perform a normalization on vectors to norm 1.
  * 
- * By default b=1, and thus the transformation is log2(1+|x|).
- * 
+ * @author Heidi Kolb
  * @author Erich Schubert
  * 
  * @param <V> vector type
  */
-public class Log1PlusNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+public class LengthNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
   /**
-   * Static instance.
+   * Norm to use.
    */
-  public static final Log1PlusNormalization<NumberVector> STATIC = new Log1PlusNormalization<>(1.);
-
-  /**
-   * Boosting factor, and scaling coefficient.
-   */
-  protected double boost, scale;
+  Norm<? super V> norm;
 
   /**
    * Constructor.
    * 
-   * @param boost Boosting parameter
+   * @param norm Norm to use
    */
-  public Log1PlusNormalization(double boost) {
+  public LengthNormalization(Norm<? super V> norm) {
     super();
-    this.boost = boost;
-    this.scale = 1. / Math.log1p(boost);
+    this.norm = norm;
   }
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    double[] data = new double[featureVector.getDimensionality()];
-    for(int d = 0; d < data.length; ++d) {
-      data[d] = featureVector.doubleValue(d);
-      data[d] = Math.log1p((data[d] > 0 ? data[d] : -data[d]) * boost) * scale;
-    }
-    return factory.newNumberVector(data);
+    final double d = norm.norm(featureVector);
+    return factory.newNumberVector(featureVector.getColumnVector().timesEquals(1 / d).getArrayRef());
   }
 
   @Override
@@ -88,29 +78,27 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractStrea
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
-     * Boosting factor parameter.
+     * Option ID for normalization norm.
      */
-    public static final OptionID BOOST_ID = new OptionID("log1pscale.boost", "Boosting factor. Larger values will yield a steeper curve.");
+    public static final OptionID NORM_ID = new OptionID("normalization.norm", "Norm (length function) to use for computing the vector length.");
 
     /**
-     * Boosting factor.
+     * Norm to use.
      */
-    protected double boost;
+    Norm<? super V> norm;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-
-      DoubleParameter boostP = new DoubleParameter(BOOST_ID, 1.) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(boostP)) {
-        boost = boostP.doubleValue();
+      ObjectParameter<Norm<? super V>> normP = new ObjectParameter<>(NORM_ID, Norm.class, EuclideanDistanceFunction.class);
+      if(config.grab(normP)) {
+        norm = normP.instantiateClass(config);
       }
     }
 
     @Override
-    protected Log1PlusNormalization<V> makeInstance() {
-      return new Log1PlusNormalization<>(boost);
+    protected LengthNormalization<V> makeInstance() {
+      return new LengthNormalization<>(norm);
     }
   }
 }
