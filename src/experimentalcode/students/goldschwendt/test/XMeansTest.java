@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import org.junit.Test;
+
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -31,10 +32,10 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import experimentalcode.students.goldschwendt.BayesianInformationCriterion;
 import experimentalcode.students.goldschwendt.XMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.BayesianInformationCriterion;
 
 public class XMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   

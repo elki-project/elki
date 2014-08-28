@@ -93,30 +93,25 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
     }
     @SuppressWarnings("unchecked")
     final PrimitiveDistanceFunction<? super NumberVector> df = (PrimitiveDistanceFunction<? super NumberVector>) innerkMeans.getDistanceFunction();
-    // TODO: double-check that we have a valid distance function!
+
     Clustering<M> bestResult = null;
-    if(trials > 1) {
-      double bestCost = Double.POSITIVE_INFINITY;
-      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("K-means iterations", trials, LOG) : null;
-      for(int i = 0; i < trials; i++) {
-        Clustering<M> currentCandidate = innerkMeans.run(database, relation);
-        double currentCost = qualityMeasure.calculateCost(currentCandidate, df, relation);
+    double bestCost = Double.POSITIVE_INFINITY;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("K-means iterations", trials, LOG) : null;
+    for(int i = 0; i < trials; i++) {
+      Clustering<M> currentCandidate = innerkMeans.run(database, relation);
+      double currentCost = qualityMeasure.calculateCost(currentCandidate, df, relation);
 
-        if(LOG.isVerbose()) {
-          LOG.verbose("Cost of candidate " + i + ": " + currentCost);
-        }
-
-        if(currentCost < bestCost) {
-          bestResult = currentCandidate;
-          bestCost = currentCost;
-        }
-        LOG.incrementProcessed(prog);
+      if(LOG.isVerbose()) {
+        LOG.verbose("Cost of candidate " + i + ": " + currentCost);
       }
-      LOG.ensureCompleted(prog);
+
+      if(currentCost < bestCost) {
+        bestResult = currentCandidate;
+        bestCost = currentCost;
+      }
+      LOG.incrementProcessed(prog);
     }
-    else {
-      bestResult = innerkMeans.run(database);
-    }
+    LOG.ensureCompleted(prog);
 
     return bestResult;
   }

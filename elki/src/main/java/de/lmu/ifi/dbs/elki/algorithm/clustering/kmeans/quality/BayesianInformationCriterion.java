@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
 
 /*
- This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
  Copyright (C) 2014
  Ludwig-Maximilians-Universität München
@@ -22,40 +23,44 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Class for computing the average overall distance.
+ * Bayesian Information Criterion (BIC), also known as Schwarz criterion (SBC,
+ * SBIC) for the use with evaluating k-means results.
  * 
- * The average of all average pairwise distances in a cluster.
+ * Reference:
+ * <p>
+ * G. Schwarz<br />
+ * Estimating the dimension of a model<br />
+ * The annals of statistics 6.2.
+ * </p>
  * 
- * @author Stephan Baier
+ * The use for k-means was popularized by:
+ * <p>
+ * D. Pelleg, A. Moore:<br />
+ * X-means: Extending K-means with Efficient Estimation on the Number of
+ * Clusters<br />
+ * In: Proceedings of the 17th International Conference on Machine Learning
+ * (ICML 2000)
+ * </p>
+ * 
+ * @author Tibor Goldschwendt
+ * @author Erich Schubert
  */
-public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
+@Reference(authors = "G. Schwarz", //
+title = "Estimating the dimension of a model", //
+booktitle = "The annals of statistics 6.2", //
+url = "http://dx.doi.org/10.1214/aos/1176344136")
+public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
-    double clusterDistanceSum = 0;
-    for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
-      DBIDs ids = cluster.getIDs();
-
-      // Compute sum of pairwise distances:
-      double clusterPairwiseDistanceSum = 0;
-      for(DBIDIter iter1 = ids.iter(); iter1.valid(); iter1.advance()) {
-        V obj1 = relation.get(iter1);
-        for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          clusterPairwiseDistanceSum += distanceFunction.distance(obj1, relation.get(iter2));
-        }
-      }
-      clusterDistanceSum += clusterPairwiseDistanceSum / (ids.size() * ids.size());
-    }
-
-    return clusterDistanceSum / clustering.getAllClusters().size();
+    return logLikelihood(relation, clustering, distanceFunction) //
+        - (.5 * numberOfFreeParameters(relation, clustering)) * Math.log(numPoints(clustering));
   }
 }

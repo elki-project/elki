@@ -22,47 +22,25 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Class for computing the variance in a clustering result (sum-of-squares).
  * 
  * @author Stephan Baier
+ * @author Erich Schubert
  */
-public class WithinClusterVarianceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
+public class WithinClusterVarianceQualityMeasure extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double calculateCost(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
-    @SuppressWarnings("unchecked")
-    final List<Cluster<MeanModel>> clusterList = (List<Cluster<MeanModel>>) (List<?>) clustering.getAllClusters();
-
-    boolean squared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
-    double variance = 0.0;
-    for(Cluster<MeanModel> cluster : clusterList) {
-      MeanModel model = cluster.getModel();
-      if(model instanceof KMeansModel) {
-        variance += ((KMeansModel) model).getVarianceContribution();
-        continue;
-      }
-      // Re-compute:
-      DBIDs ids = cluster.getIDs();
-      Vector mean = model.getMean();
-
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        double dist = distanceFunction.distance(relation.get(iter), mean);
-        variance += squared ? dist : dist * dist;
-      }
+    double variance = 0.;
+    for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
+      variance += varianceOfCluster(cluster, distanceFunction, relation);
     }
     return variance;
   }
