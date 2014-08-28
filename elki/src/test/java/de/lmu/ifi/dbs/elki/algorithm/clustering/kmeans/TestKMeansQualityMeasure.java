@@ -73,7 +73,7 @@ public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implem
     KMeansQualityMeasure<? super DoubleVector> variance = new WithinClusterVarianceQualityMeasure();
     final PrimitiveDistanceFunction<? super NumberVector> dist = kmeans.getDistanceFunction();
 
-    final double quality = variance.calculateCost(result2, dist, rel);
+    final double quality = variance.quality(result2, dist, rel);
     assertEquals("Within cluster variance incorrect", 3.16666666666, quality, 1e-10);
   }
 
@@ -101,7 +101,7 @@ public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implem
 
     // Test Cluster Average Overall Distance
     KMeansQualityMeasure<? super DoubleVector> overall = new WithinClusterMeanDistanceQualityMeasure();
-    final double quality = overall.calculateCost(result, dist, rel);
+    final double quality = overall.quality(result, dist, rel);
 
     assertEquals("Avarage overall distance not as expected.", 0.8888888888888888, quality, 1e-10);
   }
