@@ -26,8 +26,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
+import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -78,6 +80,21 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
    */
   public void setInitialMeans(List<? extends NumberVector> initialMeans) {
     this.initialMeans = initialMeans;
+  }
+
+  /**
+   * Set the initial means.
+   * 
+   * Important notice: Use with care - the means are <em>not copied</em>!
+   * 
+   * @param initialMeans initial means.
+   */
+  public void setInitialClusters(List<? extends Cluster<? extends MeanModel>> initialMeans) {
+    List<Vector> vecs = new ArrayList<>(initialMeans.size());
+    for(Cluster<? extends MeanModel> cluster : initialMeans) {
+      vecs.add(cluster.getModel().getMean().copy());
+    }
+    this.initialMeans = vecs;
   }
 
   /**

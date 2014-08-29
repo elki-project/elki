@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -40,13 +39,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Pseudo-k-Means variations, that assigns each object to the nearest center.
@@ -122,21 +117,9 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     protected void makeOptions(Parameterization config) {
       // Do NOT invoke super.makeOptions, as we don't want to have the maxiter
       // parameter, nor a warning for other distance functions.
-      ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-      }
-
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
-      if(config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
+      getParameterDistanceFunction(config);
+      getParameterK(config);
+      getParameterInitialization(config);
     }
 
     @Override

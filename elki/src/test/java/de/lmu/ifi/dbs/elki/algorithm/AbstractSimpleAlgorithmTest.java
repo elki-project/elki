@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -30,7 +31,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -78,10 +79,10 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param config Parameterization to test
    */
   protected void testParameterizationOk(ListParameterization config) {
-    if (config.hasUnusedParameters()) {
+    if(config.hasUnusedParameters()) {
       fail("Unused parameters: " + config.getRemainingParameters());
     }
-    if (config.hasErrors()) {
+    if(config.hasErrors()) {
       config.logAndClearReportedErrors();
       fail("Parameterization errors.");
     }
@@ -101,8 +102,8 @@ public abstract class AbstractSimpleAlgorithmTest {
 
     List<Class<?>> filterlist = new ArrayList<>();
     filterlist.add(FixedDBIDsFilter.class);
-    if (filters != null) {
-      for (Class<?> filter : filters) {
+    if(filters != null) {
+      for(Class<?> filter : filters) {
         filterlist.add(filter);
       }
     }
@@ -157,7 +158,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
     ct.process(clustering, rbl);
     double score = ct.getPaircount().f1Measure();
-    if (logger.isVerbose()) {
+    if(logger.isVerbose()) {
       logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
     }
     org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match.", expected, score, 0.0001);
@@ -170,29 +171,18 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param expected Expected cluster sizes
    */
   protected void testClusterSizes(Clustering<?> clustering, int[] expected) {
-    List<Integer> sizes = new java.util.ArrayList<>();
-    for (Cluster<?> cl : clustering.getAllClusters()) {
-      sizes.add(cl.size());
+    List<? extends Cluster<?>> clusters = clustering.getAllClusters();
+    int[] sizes = new int[clusters.size()];
+    for(int i = 0; i < sizes.length; ++i) {
+      sizes[i] = clusters.get(i).size();
     }
     // Sort both
-    Collections.sort(sizes);
+    Arrays.sort(sizes);
     Arrays.sort(expected);
-    // Report
-    // if(logger.isVerbose()) {
-    StringBuilder buf = new StringBuilder();
-    buf.append("Cluster sizes: [");
-    for (int i = 0; i < sizes.size(); i++) {
-      if (i > 0) {
-        buf.append(", ");
-      }
-      buf.append(sizes.get(i));
-    }
-    buf.append("]");
-    // }
     // Test
-    org.junit.Assert.assertEquals("Number of clusters does not match expectations. " + buf.toString(), expected.length, sizes.size());
-    for (int i = 0; i < expected.length; i++) {
-      org.junit.Assert.assertEquals("Cluster size does not match at position " + i + " in " + buf.toString(), expected[i], (int) sizes.get(i));
+    assertEquals("Number of clusters does not match expectations. " + FormatUtil.format(sizes), expected.length, sizes.length);
+    for(int i = 0; i < expected.length; i++) {
+      assertEquals("Cluster size does not match at position " + i + " in " + FormatUtil.format(sizes), expected[i], (int) sizes[i]);
     }
   }
 
@@ -210,7 +200,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     OutlierROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(OutlierROCCurve.class, params);
 
     // Ensure the result has been added to the hierarchy:
-    if (db.getHierarchy().numParents(result) < 1) {
+    if(db.getHierarchy().numParents(result) < 1) {
       db.getHierarchy().add(db, result);
     }
 

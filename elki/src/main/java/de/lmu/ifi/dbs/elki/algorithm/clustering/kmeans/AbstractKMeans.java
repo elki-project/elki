@@ -349,6 +349,31 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
     @Override
     protected void makeOptions(Parameterization config) {
+      getParameterK(config);
+      getParameterInitialization(config);
+      getParameterDistanceFunction(config);
+      getParameterMaxIter(config);
+    }
+
+    /**
+     * Get the k parameter.
+     * 
+     * @param config Parameterization
+     */
+    protected void getParameterK(Parameterization config) {
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+    }
+
+    /**
+     * Get the distance function parameter.
+     * 
+     * @param config Parameterization
+     */
+    protected void getParameterDistanceFunction(Parameterization config) {
       ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
@@ -356,18 +381,26 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
           getLogger().warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
         }
       }
+    }
 
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
+    /**
+     * Get the initialization method parameter.
+     * 
+     * @param config Parameterization
+     */
+    protected void getParameterInitialization(Parameterization config) {
       ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
+    }
 
+    /**
+     * Get the max iterations parameter.
+     * 
+     * @param config Parameterization
+     */
+    protected void getParameterMaxIter(Parameterization config) {
       IntParameter maxiterP = new IntParameter(MAXITER_ID, 0);
       maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxiterP)) {
