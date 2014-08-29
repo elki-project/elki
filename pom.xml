@@ -145,4 +145,24 @@
 		<system>trac</system>
 		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
 	</issueManagement>
+	<!-- temporary, until migration is complete. -->
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>trove4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-swing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-rasterizer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>compile,test</scope>
+		</dependency>
+	</dependencies>
 </project>
