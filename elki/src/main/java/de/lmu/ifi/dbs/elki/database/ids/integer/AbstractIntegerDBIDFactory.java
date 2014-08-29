@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
 
 /**
  * Abstract base class for DBID factories.

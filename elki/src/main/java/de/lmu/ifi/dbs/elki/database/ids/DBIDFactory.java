@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory;
-import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
 
 /**
  * Factory interface for generating DBIDs. See {@link #FACTORY} for the static

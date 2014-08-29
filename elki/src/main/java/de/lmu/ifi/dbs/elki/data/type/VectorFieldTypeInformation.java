@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  */
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
  * Type information to specify that a type has a fixed dimensionality.

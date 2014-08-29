@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.index.vafile;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
  * Object in a VA approximation.

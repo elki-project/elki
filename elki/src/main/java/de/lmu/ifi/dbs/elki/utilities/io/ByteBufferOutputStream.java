@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.persistent;
+package de.lmu.ifi.dbs.elki.utilities.io;
 
 /*
  This file is part of ELKI:
@@ -23,17 +23,17 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 /**
- * Wrap an existing ByteBuffer as InputStream.
+ * Wrap an existing ByteBuffer as OutputStream.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has ByteBuffer
  */
-public class ByteBufferInputStream extends InputStream {
+public class ByteBufferOutputStream extends OutputStream {
   /**
    * The actual buffer we're using.
    */
@@ -44,24 +44,18 @@ public class ByteBufferInputStream extends InputStream {
    * 
    * @param buffer ByteBuffer to wrap.
    */
-  public ByteBufferInputStream(ByteBuffer buffer) {
+  public ByteBufferOutputStream(ByteBuffer buffer) {
     super();
     this.buffer = buffer;
   }
-
+  
   @Override
-  public int read() {
-    if(buffer.hasRemaining()) {
-      return -1;
-    }
-    // Note: is this and 0xFF needed?
-    return (buffer.get() & 0xFF);
+  public void write(int b) {
+    buffer.put((byte) b);
   }
 
   @Override
-  public int read(byte[] b, int off, int len) {
-    final int maxread = Math.min(len, buffer.remaining());
-    buffer.get(b, off, maxread);
-    return maxread == 0 ? -1 : maxread;
+  public void write(byte[] b, int off, int len) {
+    buffer.put(b, off, len);
   }
 }

@@ -32,6 +32,7 @@ import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.FileLock;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
  * On Disc Array storage for records of a given size.

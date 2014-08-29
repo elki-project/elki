@@ -34,6 +34,7 @@ import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferInputStream;
 
 /**
  * A OnDiskArrayPageFile stores objects persistently that implement the

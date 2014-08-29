@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.persistent;
+package de.lmu.ifi.dbs.elki.utilities.io;
 
 /*
  This file is part of ELKI:
@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.persistent;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 
 /**
  * Serializers with a fixed length serialization.
