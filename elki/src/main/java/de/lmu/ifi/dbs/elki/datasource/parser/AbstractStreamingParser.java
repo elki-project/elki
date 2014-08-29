@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.utilities.io.LineReader;
 
 /**
  * Base class for streaming parsers.
@@ -42,9 +43,14 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  */
 public abstract class AbstractStreamingParser extends AbstractParser implements StreamingParser {
   /**
-   * Buffer reader.
+   * Line reader.
    */
-  private BufferedReader reader;
+  private LineReader reader;
+
+  /**
+   * The buffer we read the data into.
+   */
+  private StringBuilder buf = new StringBuilder();
 
   /**
    * Current line number.
@@ -70,7 +76,7 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
 
   @Override
   public void initStream(InputStream in) {
-    reader = new BufferedReader(new InputStreamReader(in));
+    reader = new LineReader(new InputStreamReader(in));
     lineNumber = 0;
   }
 
@@ -100,12 +106,11 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
    * @return The next line, or {@code null}.
    */
   protected boolean nextLineExceptComments() throws IOException {
-    String line;
-    while((line = reader.readLine()) != null) {
+    while(reader.readLine(buf.delete(0, buf.length()))) {
       ++lineNumber;
-      final int len = lengthWithoutLinefeed(line);
-      if(len > 0 && !isComment(line)) {
-        tokenizer.initialize(line, 0, len);
+      final int len = lengthWithoutLinefeed(buf);
+      if(len > 0 && !isComment(buf)) {
+        tokenizer.initialize(buf, 0, len);
         return true;
       }
     }
@@ -119,6 +124,8 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
       if(reader != null) {
         reader.close();
       }
+      buf.setLength(0);
+      buf.trimToSize();
     }
     catch(IOException e) {
       // Ignore - maybe already closed.

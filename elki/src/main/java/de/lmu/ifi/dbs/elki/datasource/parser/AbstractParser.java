@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -101,7 +102,7 @@ public abstract class AbstractParser {
    * @param line Input line
    * @return Length
    */
-  public static int lengthWithoutLinefeed(String line) {
+  public static int lengthWithoutLinefeed(CharSequence line) {
     int length = line.length();
     while(length > 0) {
       char last = line.charAt(length - 1);
@@ -136,7 +137,7 @@ public abstract class AbstractParser {
    * @param line Line to test
    * @return {@code true} if the line matches the comment pattern.
    */
-  protected boolean isComment(String line) {
+  protected boolean isComment(CharSequence line) {
     return (comment != null && comment.reset(line).matches());
   }
 

@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 
 /**
  * Simple unit test for testing the new tokenizer
