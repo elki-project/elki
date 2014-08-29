@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Class that turns sparse float vectors into a proper vector field, by setting
@@ -39,6 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @param <V> Vector type
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.SparseVectorFieldFilter" })
 public class SparseVectorFieldFilter<V extends SparseNumberVector> extends AbstractConversionFilter<V, V> {
   /**
    * Class logger.
@@ -81,7 +83,7 @@ public class SparseVectorFieldFilter<V extends SparseNumberVector> extends Abstr
 
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
-    SparseNumberVector.Factory<V>  factory = (SparseNumberVector.Factory<V> ) FilterUtil.guessFactory(in);
+    SparseNumberVector.Factory<V> factory = (SparseNumberVector.Factory<V>) FilterUtil.guessFactory(in);
     return new VectorFieldTypeInformation<>(factory, maxdim);
   }
 

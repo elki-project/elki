@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -69,6 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @apiviz.uses DistributionEstimator
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseCDFNormalization"})
 public class AttributeWiseCDFNormalization<V extends NumberVector> implements Normalization<V> {
   /**
    * Class logger.

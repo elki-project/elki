@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -41,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ShuffleObjectsFilter" })
 public class ShuffleObjectsFilter implements ObjectFilter {
   /**
    * Class logger
@@ -74,18 +76,18 @@ public class ShuffleObjectsFilter implements ObjectFilter {
 
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debug("Shuffling the data set");
     }
     final Random random = rnd.getSingleThreadedRandom();
 
     final int size = objects.dataLength();
     final int[] offsets = new int[size];
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       offsets[i] = i;
     }
     // Randomize the offset array
-    for (int i = size; i > 1; i--) {
+    for(int i = size; i > 1; i--) {
       final int j = random.nextInt(i);
       // Swap the elements at positions j and i - 1:
       final int temp = offsets[j];
@@ -94,11 +96,11 @@ public class ShuffleObjectsFilter implements ObjectFilter {
     }
 
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    for (int j = 0; j < objects.metaLength(); j++) {
+    for(int j = 0; j < objects.metaLength(); j++) {
       // Reorder column accordingly
       List<?> in = objects.getColumn(j);
       List<Object> data = new ArrayList<>(size);
-      for (int i = 0; i < size; i++) {
+      for(int i = 0; i < size; i++) {
         data.add(in.get(offsets[i]));
       }
       bundle.appendColumn(objects.meta(j), data);
@@ -120,7 +122,7 @@ public class ShuffleObjectsFilter implements ObjectFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       RandomParameter rndP = new RandomParameter(SEED_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }

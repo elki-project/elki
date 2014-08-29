@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -44,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.DropNaNFilter" })
 public class DropNaNFilter extends AbstractStreamFilter {
   /**
    * Class logger
@@ -74,33 +76,33 @@ public class DropNaNFilter extends AbstractStreamFilter {
 
   @Override
   public Event nextEvent() {
-    while (true) {
+    while(true) {
       Event ev = source.nextEvent();
-      switch(ev) {
+      switch(ev){
       case END_OF_STREAM:
         return ev;
       case META_CHANGED:
         updateMeta(source.getMeta());
         return ev;
       case NEXT_OBJECT:
-        if (densecols == null) {
+        if(densecols == null) {
           updateMeta(source.getMeta());
         }
         boolean good = true;
-        for (int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
+        for(int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
           NumberVector v = (NumberVector) source.data(j);
-          if (v == null) {
+          if(v == null) {
             good = false;
             break;
           }
-          for (int i = 0; i < v.getDimensionality(); i++) {
-            if (Double.isNaN(v.doubleValue(i))) {
+          for(int i = 0; i < v.getDimensionality(); i++) {
+            if(Double.isNaN(v.doubleValue(i))) {
               good = false;
               break;
             }
           }
         }
-        if (good) {
+        if(good) {
           return ev;
         }
         continue;
@@ -115,21 +117,22 @@ public class DropNaNFilter extends AbstractStreamFilter {
    */
   private void updateMeta(BundleMeta meta) {
     int cols = meta.size();
-    if (densecols == null) {
+    if(densecols == null) {
       densecols = new BitSet();
-    } else {
+    }
+    else {
       densecols.clear();
     }
-    for (int i = 0; i < cols; i++) {
-      if (TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
+    for(int i = 0; i < cols; i++) {
+      if(TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
         throw new AbortException("Filtering sparse vectors is not yet supported by this filter. Please contribute.");
       }
       // TODO: only check for double and float?
-      if (TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
+      if(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
         densecols.set(i);
         continue;
       }
-      if (TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
+      if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
         densecols.set(i);
         continue;
       }
@@ -138,32 +141,32 @@ public class DropNaNFilter extends AbstractStreamFilter {
 
   @Override
   public MultipleObjectsBundle filter(final MultipleObjectsBundle objects) {
-    if (LOG.isDebuggingFinest()) {
+    if(LOG.isDebuggingFinest()) {
       LOG.debugFinest("Removing records with NaN values.");
     }
 
     updateMeta(objects.meta());
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    for (int j = 0; j < objects.metaLength(); j++) {
+    for(int j = 0; j < objects.metaLength(); j++) {
       bundle.appendColumn(objects.meta(j), new ArrayList<>());
     }
-    for (int i = 0; i < objects.dataLength(); i++) {
+    for(int i = 0; i < objects.dataLength(); i++) {
       final Object[] row = objects.getRow(i);
       boolean good = true;
-      for (int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
+      for(int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
         NumberVector v = (NumberVector) row[j];
-        if (v == null) {
+        if(v == null) {
           good = false;
           break;
         }
-        for (int d = 0; d < v.getDimensionality(); d++) {
-          if (Double.isNaN(v.doubleValue(d))) {
+        for(int d = 0; d < v.getDimensionality(); d++) {
+          if(Double.isNaN(v.doubleValue(d))) {
             good = false;
             break;
           }
         }
       }
-      if (good) {
+      if(good) {
         bundle.appendSimple(row);
       }
     }

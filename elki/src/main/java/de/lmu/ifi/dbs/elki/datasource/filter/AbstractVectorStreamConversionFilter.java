@@ -37,7 +37,7 @@ public abstract class AbstractVectorStreamConversionFilter<I, O extends NumberVe
   /**
    * Number vector factory.
    */
-  protected NumberVector.Factory<O>  factory;
+  protected NumberVector.Factory<O> factory;
 
   /**
    * Initialize factory from a data type.
@@ -47,5 +47,4 @@ public abstract class AbstractVectorStreamConversionFilter<I, O extends NumberVe
   protected void initializeOutputType(SimpleTypeInformation<O> type) {
     factory = FilterUtil.guessFactory(type);
   }
-
 }

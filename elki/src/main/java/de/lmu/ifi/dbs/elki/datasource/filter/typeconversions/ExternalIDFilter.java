@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.uses LabelList oneway - - «reads»
  * @apiviz.has ExternalID oneway - - «produces»
  */
-// TODO: use a non-string class for external ids?
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ExternalIDFilter" })
 public class ExternalIDFilter implements ObjectFilter {
   /**
    * The index of the label to be used as external Id.

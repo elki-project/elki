@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -64,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @apiviz.uses NumberVector
  * @apiviz.uses DistributionEstimator
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseBetaNormalization"})
 public class AttributeWiseBetaNormalization<V extends NumberVector> implements Normalization<V> {
   /**
    * Class logger.

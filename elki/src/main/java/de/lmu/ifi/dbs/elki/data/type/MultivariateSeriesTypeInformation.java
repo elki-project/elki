@@ -79,8 +79,9 @@ public class MultivariateSeriesTypeInformation<V extends FeatureVector<?>> exten
   /**
    * Get the multiplicity of the vector.
    * 
-   * @return
+   * @return Multiplicity
    */
+  @Override
   public int getMultiplicity() {
     return multiplicity;
   }

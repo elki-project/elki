@@ -31,10 +31,11 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Normalization for text frequency (TF) vectors, using the inverse document
- * frequency (IDF).
+ * frequency (IDF). See also: TF-IDF for text analysis.
  * 
  * @author Erich Schubert
  * 
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @param <V> Vector type
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization" })
 public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.

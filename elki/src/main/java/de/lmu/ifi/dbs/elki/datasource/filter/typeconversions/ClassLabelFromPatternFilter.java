@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.datasource.filter.typeconversions;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -32,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamFilter;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -43,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * 
  * @author Erich Schubert
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ClassLabelFromPatternFilter" })
 public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
   /**
    * Current meta data
@@ -52,7 +55,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
   /**
    * Bitset of label columns
    */
-  BitSet labelcols = new BitSet();
+  TIntArrayList labelcols = new TIntArrayList();
 
   /**
    * Label to return for positive matches.
@@ -99,16 +102,16 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
 
   @Override
   public BundleMeta getMeta() {
-    if (meta == null) {
+    if(meta == null) {
       // Rebuild metadata.
       BundleMeta origmeta = source.getMeta();
       meta = new BundleMeta(origmeta.size() + 1);
       meta.add(TypeUtil.SIMPLE_CLASSLABEL);
       labelcols.clear();
-      for (int i = 0; i < origmeta.size(); i++) {
+      for(int i = 0; i < origmeta.size(); i++) {
         final SimpleTypeInformation<?> orig = origmeta.get(i);
-        if (TypeUtil.GUESSED_LABEL.isAssignableFromType(orig)) {
-          labelcols.set(i);
+        if(TypeUtil.GUESSED_LABEL.isAssignableFromType(orig)) {
+          labelcols.add(i);
         }
         meta.add(orig);
       }
@@ -118,27 +121,27 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
 
   @Override
   public Object data(int rnum) {
-    if (rnum > 0) {
+    if(rnum > 0) {
       return source.data(rnum - 1);
     }
-    if (meta == null) {
+    if(meta == null) {
       getMeta(); // Trigger build
     }
-    for (int i = labelcols.nextSetBit(0); i >= 0; i = labelcols.nextSetBit(i + 1)) {
-      Object o = source.data(i);
-      if (o == null) {
+    for(int i = 0; i < labelcols.size(); i++) {
+      Object o = source.data(labelcols.get(i));
+      if(o == null) {
         continue;
       }
-      if (o instanceof LabelList) {
+      if(o instanceof LabelList) {
         final LabelList ll = (LabelList) o;
         for(int j = 0; j < ll.size(); j++) {
-          if (pattern.matcher(ll.get(j)).find()) {
+          if(pattern.matcher(ll.get(j)).find()) {
             return positive;
           }
         }
         continue;
       }
-      if (pattern.matcher(o.toString()).find()) {
+      if(pattern.matcher(o.toString()).find()) {
         return positive;
       }
     }
@@ -148,7 +151,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
   @Override
   public Event nextEvent() {
     final Event ev = source.nextEvent();
-    if (Event.META_CHANGED.equals(ev)) {
+    if(Event.META_CHANGED.equals(ev)) {
       meta = null;
     }
     return ev;
@@ -192,17 +195,17 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
       super.makeOptions(config);
 
       PatternParameter patternP = new PatternParameter(PATTERN_ID);
-      if (config.grab(patternP)) {
+      if(config.grab(patternP)) {
         pattern = patternP.getValue();
       }
 
       StringParameter positiveP = new StringParameter(POSITIVE_ID, "positive");
-      if (config.grab(positiveP)) {
+      if(config.grab(positiveP)) {
         positive = positiveP.getValue();
       }
 
       StringParameter negativeP = new StringParameter(NEGATIVE_ID, "negative");
-      if (config.grab(negativeP)) {
+      if(config.grab(negativeP)) {
         negative = negativeP.getValue();
       }
     }

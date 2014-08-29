@@ -8,6 +8,8 @@ de.lmu.ifi.dbs.elki.datasource.filter.cleaning.ReplaceNaNWithRandomFilter
 de.lmu.ifi.dbs.elki.datasource.filter.cleaning.NoMissingValuesFilter
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.LengthNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.HellingerHistogramNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceMeanVarianceNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceMinMaxNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.Log1PlusNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorFeatureSelectionFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorRandomFeatureSelectionFilter

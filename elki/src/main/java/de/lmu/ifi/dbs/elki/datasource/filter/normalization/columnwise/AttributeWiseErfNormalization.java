@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Attribute-wise Normalization using the error function. This mostly makes
@@ -40,6 +41,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
  * 
  * @apiviz.uses NumberVector
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization"})
 public class AttributeWiseErfNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.

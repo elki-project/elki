@@ -150,7 +150,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
    * @return the factory
    */
   public FeatureVector.Factory<V, ?> getFactory() {
-    if (factory == null) {
+    if(factory == null) {
       throw new UnsupportedOperationException("Requesting factory for a type request!");
     }
     return factory;
@@ -178,6 +178,15 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
       throw new UnsupportedOperationException("Requesting dimensionality for a request without defined dimensionality!");
     }
     return maxdim;
+  }
+
+  /**
+   * Get the multiplicity of the vector.
+   * 
+   * @return Multiplicity {@code 1} (except for subclasses)
+   */
+  public int getMultiplicity() {
+    return 1;
   }
 
   @Override

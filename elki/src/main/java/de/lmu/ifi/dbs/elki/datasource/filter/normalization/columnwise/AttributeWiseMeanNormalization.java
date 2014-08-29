@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -41,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.uses NumberVector
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMeanNormalization"})
 public class AttributeWiseMeanNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.

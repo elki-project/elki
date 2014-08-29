@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 
@@ -45,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
  * 
  * @author Erich Schubert
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.IntegerRankTieNormalization"})
 public class IntegerRankTieNormalization implements ObjectFilter {
   /**
    * Constructor.

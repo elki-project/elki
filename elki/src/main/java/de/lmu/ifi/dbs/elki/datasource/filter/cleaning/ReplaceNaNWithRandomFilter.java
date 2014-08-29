@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -48,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ReplaceNaNWithRandomFilter" })
 public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
   /**
    * Class logger
@@ -57,7 +59,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
   /**
    * Columns to check.
    */
-  private NumberVector.Factory<?> [] densecols = null;
+  private NumberVector.Factory<?>[] densecols = null;
 
   /**
    * Distribution to generate replacement values with.
@@ -89,28 +91,28 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
 
   @Override
   public Event nextEvent() {
-    while (true) {
+    while(true) {
       Event ev = source.nextEvent();
-      switch(ev) {
+      switch(ev){
       case END_OF_STREAM:
         return ev;
       case META_CHANGED:
         updateMeta(source.getMeta());
         return ev;
       case NEXT_OBJECT:
-        if (densecols == null) {
+        if(densecols == null) {
           updateMeta(source.getMeta());
         }
         rows.clear();
-        for (int j = 0; j < densecols.length; j++) {
+        for(int j = 0; j < densecols.length; j++) {
           Object o = source.data(j);
-          if (densecols[j] != null) {
+          if(densecols[j] != null) {
             NumberVector v = (NumberVector) o;
             double[] ro = null; // replacement
-            if (v != null) {
-              for (int i = 0; i < v.getDimensionality(); i++) {
-                if (Double.isNaN(v.doubleValue(i))) {
-                  if (ro != null) {
+            if(v != null) {
+              for(int i = 0; i < v.getDimensionality(); i++) {
+                if(Double.isNaN(v.doubleValue(i))) {
+                  if(ro != null) {
                     ro = v.getColumnVector().getArrayRef();
                   }
                   ro[i] = dist.nextRandom();
@@ -133,19 +135,19 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
    */
   private void updateMeta(BundleMeta meta) {
     final int cols = meta.size();
-    densecols = new NumberVector.Factory<?> [cols];
-    for (int i = 0; i < cols; i++) {
-      if (TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
+    densecols = new NumberVector.Factory<?>[cols];
+    for(int i = 0; i < cols; i++) {
+      if(TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
         throw new AbortException("Filtering sparse vectors is not yet supported by this filter. Please contribute.");
       }
-      if (TypeUtil.FLOAT_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
+      if(TypeUtil.FLOAT_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
         VectorFieldTypeInformation<?> vmeta = (VectorFieldTypeInformation<?>) meta.get(i);
-        densecols[i] = (NumberVector.Factory<?> ) vmeta.getFactory();
+        densecols[i] = (NumberVector.Factory<?>) vmeta.getFactory();
         continue;
       }
-      if (TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
+      if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
         VectorFieldTypeInformation<?> vmeta = (VectorFieldTypeInformation<?>) meta.get(i);
-        densecols[i] = (NumberVector.Factory<?> ) vmeta.getFactory();
+        densecols[i] = (NumberVector.Factory<?>) vmeta.getFactory();
         continue;
       }
     }
@@ -153,25 +155,25 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
 
   @Override
   public MultipleObjectsBundle filter(final MultipleObjectsBundle objects) {
-    if (LOG.isDebuggingFinest()) {
+    if(LOG.isDebuggingFinest()) {
       LOG.debugFinest("Removing records with NaN values.");
     }
 
     updateMeta(objects.meta());
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    for (int j = 0; j < objects.metaLength(); j++) {
+    for(int j = 0; j < objects.metaLength(); j++) {
       bundle.appendColumn(objects.meta(j), new ArrayList<>());
     }
-    for (int i = 0; i < objects.dataLength(); i++) {
+    for(int i = 0; i < objects.dataLength(); i++) {
       final Object[] row = objects.getRow(i);
-      for (int j = 0; j < densecols.length; j++) {
-        if (densecols[j] != null) {
+      for(int j = 0; j < densecols.length; j++) {
+        if(densecols[j] != null) {
           NumberVector v = (NumberVector) row[j];
           double[] ro = null; // replacement
-          if (v != null) {
-            for (int d = 0; d < v.getDimensionality(); d++) {
-              if (Double.isNaN(v.doubleValue(d))) {
-                if (ro != null) {
+          if(v != null) {
+            for(int d = 0; d < v.getDimensionality(); d++) {
+              if(Double.isNaN(v.doubleValue(d))) {
+                if(ro != null) {
                   ro = v.getColumnVector().getArrayRef();
                 }
                 ro[d] = dist.nextRandom();
@@ -208,7 +210,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<Distribution> distP = new ObjectParameter<>(REPLACEMENT_DISTRIBUTION, Distribution.class);
-      if (config.grab(distP)) {
+      if(config.grab(distP)) {
         dist = distP.instantiateClass(config);
       }
     }

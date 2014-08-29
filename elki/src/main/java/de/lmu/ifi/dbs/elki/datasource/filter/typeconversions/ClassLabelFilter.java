@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -47,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.uses LabelList oneway - - «reads»
  * @apiviz.has ClassLabel
  */
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ClassLabelFilter" })
 public class ClassLabelFilter implements ObjectFilter {
   /**
    * The index of the label to be used as class label, null if no class label is
