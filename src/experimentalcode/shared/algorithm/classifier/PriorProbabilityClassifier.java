@@ -46,12 +46,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * the database.
  * 
  * @author Arthur Zimek
- *
- * @param <L> the type of the ClassLabel the Classifier is assigning
  */
 @Title("Prior Probability Classifier")
 @Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")
-public class PriorProbabilityClassifier<L extends ClassLabel> extends AbstractAlgorithm<Result> implements Classifier<Object, L> {
+public class PriorProbabilityClassifier extends AbstractAlgorithm<Result> implements Classifier<Object> {
   /**
    * The logger for this class.
    */
@@ -65,12 +63,12 @@ public class PriorProbabilityClassifier<L extends ClassLabel> extends AbstractAl
   /**
    * Index of the most abundant class.
    */
-  protected L prediction;
+  protected ClassLabel prediction;
 
   /**
    * Class labels seen.
    */
-  protected ArrayList<L> labels;
+  protected ArrayList<ClassLabel> labels;
 
   /**
    * Provides a classifier always predicting the prior probabilities.
@@ -83,8 +81,8 @@ public class PriorProbabilityClassifier<L extends ClassLabel> extends AbstractAl
    * Learns the prior probability for all classes.
    */
   @Override
-  public void buildClassifier(Database database, Relation<L> labelrep) {
-    TObjectIntMap<L> count = new TObjectIntHashMap<>();
+  public void buildClassifier(Database database, Relation<? extends ClassLabel> labelrep) {
+    TObjectIntMap<ClassLabel> count = new TObjectIntHashMap<>();
     for(DBIDIter iter = labelrep.iterDBIDs(); iter.valid(); iter.advance()) {
       count.adjustOrPutValue(labelrep.get(iter), 1, 1);
     }
@@ -93,7 +91,7 @@ public class PriorProbabilityClassifier<L extends ClassLabel> extends AbstractAl
 
     distribution = new double[count.size()];
     labels = new ArrayList<>(count.size());
-    TObjectIntIterator<L> iter = count.iterator();
+    TObjectIntIterator<ClassLabel> iter = count.iterator();
     for(int i = 0; iter.hasNext(); ++i) {
       iter.advance();
       distribution[i] = iter.value() / size;
@@ -105,13 +103,13 @@ public class PriorProbabilityClassifier<L extends ClassLabel> extends AbstractAl
     }
   }
 
-  public double[] classProbabilities(Object instance, ArrayList<L> labels) {
+  public double[] classProbabilities(Object instance, ArrayList<ClassLabel> labels) {
     // FIXME: labels may be sorted differently!
     return distribution;
   }
   
   @Override
-  public L classify(Object instance) {
+  public ClassLabel classify(Object instance) {
     return prediction;
   }
 

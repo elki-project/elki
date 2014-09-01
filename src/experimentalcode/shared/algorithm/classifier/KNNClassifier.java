@@ -56,12 +56,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <D> the type of Distance used by this Algorithm
- * @param <L> the type of the ClassLabel the Classifier is assigning
  */
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
-public class KNNClassifier<O, L extends ClassLabel> extends AbstractDistanceBasedAlgorithm<O, Result> implements Classifier<O, L> {
+public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> implements Classifier<O> {
   /**
    * The logger for this class.
    */
@@ -80,7 +78,7 @@ public class KNNClassifier<O, L extends ClassLabel> extends AbstractDistanceBase
   /**
    * Class label representation.
    */
-  protected Relation<L> labelrep;
+  protected Relation<? extends ClassLabel> labelrep;
 
   /**
    * Provides a KNNClassifier, adding parameter {@link #K_PARAM} to the option
@@ -92,7 +90,7 @@ public class KNNClassifier<O, L extends ClassLabel> extends AbstractDistanceBase
   }
 
   @Override
-  public void buildClassifier(Database database, Relation<L> labels) {
+  public void buildClassifier(Database database, Relation<? extends ClassLabel> labels) {
     Relation<O> relation = database.getRelation(getDistanceFunction().getInputTypeRestriction());
     DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     this.knnq = database.getKNNQuery(distanceQuery, k);
@@ -100,16 +98,16 @@ public class KNNClassifier<O, L extends ClassLabel> extends AbstractDistanceBase
   }
 
   @Override
-  public L classify(O instance) {
-    TObjectIntMap<L> count = new TObjectIntHashMap<>();
+  public ClassLabel classify(O instance) {
+    TObjectIntMap<ClassLabel> count = new TObjectIntHashMap<>();
     KNNList query = knnq.getKNNForObject(instance, k);
     for(DoubleDBIDListIter neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
       count.adjustOrPutValue(labelrep.get(neighbor), 1, 1);
     }
 
     int bestoccur = Integer.MIN_VALUE;
-    L bestl = null;
-    for(TObjectIntIterator<L> iter = count.iterator(); iter.hasNext();) {
+    ClassLabel bestl = null;
+    for(TObjectIntIterator<ClassLabel> iter = count.iterator(); iter.hasNext();) {
       iter.advance();
       if(iter.value() > bestoccur) {
         bestoccur = iter.value();
@@ -119,7 +117,7 @@ public class KNNClassifier<O, L extends ClassLabel> extends AbstractDistanceBase
     return bestl;
   }
 
-  public double[] classProbabilities(O instance, ArrayList<L> labels) {
+  public double[] classProbabilities(O instance, ArrayList<ClassLabel> labels) {
     int[] occurences = new int[labels.size()];
 
     KNNList query = knnq.getKNNForObject(instance, k);
@@ -166,7 +164,7 @@ public class KNNClassifier<O, L extends ClassLabel> extends AbstractDistanceBase
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O, L extends ClassLabel> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
 
     /**
      * Parameter to specify the number of neighbors to take into account for
@@ -196,7 +194,7 @@ public class KNNClassifier<O, L extends ClassLabel> extends AbstractDistanceBase
     }
 
     @Override
-    protected KNNClassifier<O, L> makeInstance() {
+    protected KNNClassifier<O> makeInstance() {
       return new KNNClassifier<>(distanceFunction, k);
     }
   }

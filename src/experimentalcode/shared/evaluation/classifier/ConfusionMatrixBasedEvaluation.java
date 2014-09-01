@@ -25,16 +25,13 @@ package experimentalcode.shared.evaluation.classifier;
 
 import java.io.PrintStream;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import experimentalcode.shared.algorithm.classifier.Classifier;
-
 /**
  * Provides the prediction performance measures for a classifier based on the
  * confusion matrix.
  *
  * @author Arthur Zimek
  */
-public class ConfusionMatrixBasedEvaluation<O, L extends ClassLabel, C extends Classifier<O, L>> implements EvaluationResult {
+public class ConfusionMatrixBasedEvaluation implements EvaluationResult {
   /**
    * Holds the confusion matrix.
    */

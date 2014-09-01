@@ -35,16 +35,15 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * @author Arthur Zimek
  *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public interface Classifier<O, L extends ClassLabel> extends Algorithm {
+public interface Classifier<O> extends Algorithm {
   /**
    * Performs the training. Sets available labels.
    * 
    * @param database the database to build the model on
    * @param classLabels the classes to be learned
    */
-  public void buildClassifier(Database database, Relation<L> classLabels);
+  public void buildClassifier(Database database, Relation<? extends ClassLabel> classLabels);
 
   /**
    * Provides a classification for a given instance. The classification is the
@@ -53,7 +52,7 @@ public interface Classifier<O, L extends ClassLabel> extends Algorithm {
    * @param instance an instance to classify
    * @return a classification for the given instance
    */
-  public L classify(O instance);
+  public ClassLabel classify(O instance);
 
   /**
    * Provides a String representation of the classification model.
