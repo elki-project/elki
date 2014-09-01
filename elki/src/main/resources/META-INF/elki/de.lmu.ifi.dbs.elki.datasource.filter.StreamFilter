@@ -1,5 +1,6 @@
 de.lmu.ifi.dbs.elki.datasource.filter.NoOpFilter
 de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFromPatternFilter
+de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.MultivariateTimeSeriesFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.ByLabelFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.RandomSamplingStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.cleaning.VectorDimensionalityFilter

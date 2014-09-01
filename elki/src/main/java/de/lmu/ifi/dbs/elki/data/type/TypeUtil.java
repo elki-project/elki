@@ -220,7 +220,7 @@ public final class TypeUtil {
   /**
    * Any feature vector type.
    */
-  public static final SimpleTypeInformation<FeatureVector<?>> FEATURE_VECTORS = new SimpleTypeInformation<>(FeatureVector.class);
+  public static final VectorTypeInformation<FeatureVector<?>> FEATURE_VECTORS = VectorTypeInformation.typeRequest(FeatureVector.class);
 
   /**
    * Make a type array easily.
