@@ -10,3 +10,4 @@ de.lmu.ifi.dbs.elki.datasource.EmptyDatabaseConnection
 de.lmu.ifi.dbs.elki.datasource.PresortedBlindJoinDatabaseConnection
 # de.lmu.ifi.dbs.elki.datasource.InputStreamDatabaseConnection
 # de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection
+# de.lmu.ifi.dbs.elki.datasource.MultipleObjectsBundleDatabaseConnection
