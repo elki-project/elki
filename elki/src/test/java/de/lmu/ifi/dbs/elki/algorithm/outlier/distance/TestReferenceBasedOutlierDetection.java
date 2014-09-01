@@ -47,7 +47,7 @@ public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmT
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(ReferenceBasedOutlierDetection.K_ID, 11);
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
     params.addParameter(GridBasedReferencePoints.GRID_ID, 11);
 
     // setup Algorithm

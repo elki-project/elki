@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
  */
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
@@ -48,7 +47,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -67,16 +66,18 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.GridBasedReferencePoints;
 import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
 
 /**
+ * Reference-Based Outlier Detection algorithm, an algorithm that computes kNN
+ * distances approximately, using reference points.
+ * 
+ * kNN distances are approximated by the difference in distance from a reference
+ * point. For this approximation to be of high quality, triangle inequality is
+ * required; but the algorithm can also process non-metric distances.
+ * 
+ * Reference:
  * <p>
- * provides the Reference-Based Outlier Detection algorithm, an algorithm that
- * computes kNN distances approximately, using reference points.
- * </p>
- * <p>
- * Reference:<br>
- * Y. Pei, O. R. Zaiane, Y. Gao: <br />
- * An Efficient Reference-Based Approach to Outlier Detection in Large Datasets.
- * <br />
- * In: Proc. IEEE Int. Conf. on Data Mining (ICDM'06), Hong Kong, China, 2006.
+ * Y. Pei, O. R. Zaiane, Y. Gao<br />
+ * An Efficient Reference-Based Approach to Outlier Detection in Large Datasets<br />
+ * In: Proc. IEEE Int. Conf. on Data Mining (ICDM'06), Hong Kong, China, 2006
  * </p>
  * 
  * @author Lisa Reichert
@@ -84,41 +85,28 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  * 
  * @apiviz.composedOf ReferencePointsHeuristic
  * 
- * @param <V> a type of {@link NumberVector} as a suitable data object for this
- *        algorithm
+ * @param <V> Object type to process.
  */
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")
 @Reference(authors = "Y. Pei, O.R. Zaiane, Y. Gao", //
 title = "An Efficient Reference-based Approach to Outlier Detection in Large Datasets", //
-booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06), Hong Kong, China, 2006", //
+booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
 url = "http://dx.doi.org/10.1109/ICDM.2006.17")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection" })
-public class ReferenceBasedOutlierDetection<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(ReferenceBasedOutlierDetection.class);
 
   /**
-   * Parameter for the reference points heuristic.
-   */
-  public static final OptionID REFP_ID = new OptionID("refod.refp", "The heuristic for finding reference points.");
-
-  /**
-   * Parameter to specify the number of nearest neighbors of an object, to be
-   * considered for computing its REFOD_SCORE, must be an integer greater than
-   * 1.
-   */
-  public static final OptionID K_ID = new OptionID("refod.k", "The number of nearest neighbors");
-
-  /**
-   * Holds the value of {@link #K_ID}.
+   * Holds the number of neighbors to use for density estimation.
    */
   private int k;
 
   /**
-   * Stores the reference point strategy
+   * Stores the reference point strategy.
    */
   private ReferencePointsHeuristic<V> refp;
 
@@ -151,64 +139,42 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector> extends Abst
   public OutlierResult run(Database database, Relation<V> relation) {
     DistanceQuery<V> distFunc = database.getDistanceQuery(relation, distanceFunction);
     Collection<V> refPoints = refp.getReferencePoints(relation);
+    if(refPoints.size() < 1) {
+      throw new AbortException("Cannot compute ROS without reference points!");
+    }
 
     DBIDs ids = relation.getDBIDs();
+    if(k >= ids.size()) {
+      throw new AbortException("k must not be chosen larger than the database size!");
+    }
     // storage of distance/score values.
-    WritableDoubleDataStore rbod_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_HOT);
+    WritableDoubleDataStore rbod_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_HOT, Double.NaN);
 
     // Compute density estimation:
-    {
-      // compute density for one reference point, to initialize the first
-      // density
-      // value for each object, then update
-      final Iterator<V> iter = refPoints.iterator();
-      if(!iter.hasNext()) {
-        throw new AbortException("Cannot compute ROS without reference points!");
-      }
-      V firstRef = iter.next();
-      // compute distance vector for the first reference point
-      DoubleDBIDList firstReferenceDists = computeDistanceVector(firstRef, relation, distFunc);
-      for(int l = 0; l < firstReferenceDists.size(); l++) {
-        double density = computeDensity(firstReferenceDists, l);
-        // Initial value
-        rbod_score.putDouble(firstReferenceDists.get(l), density);
-      }
-      // compute density values for all remaining reference points
-      while(iter.hasNext()) {
-        V refPoint = iter.next();
-        DoubleDBIDList referenceDists = computeDistanceVector(refPoint, relation, distFunc);
-        // compute density value for each object
-        for(int l = 0; l < referenceDists.size(); l++) {
-          double density = computeDensity(referenceDists, l);
-          // Update minimum
-          if(density < rbod_score.doubleValue(referenceDists.get(l))) {
-            rbod_score.putDouble(referenceDists.get(l), density);
-          }
-        }
-      }
+    for(V refPoint : refPoints) {
+      DoubleDBIDList referenceDists = computeDistanceVector(refPoint, relation, distFunc);
+      updateDensities(rbod_score, referenceDists);
     }
     // compute maximum density
-    double maxDensity = 0.0;
+    DoubleMinMax mm = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double dens = rbod_score.doubleValue(iditer);
-      if(dens > maxDensity) {
-        maxDensity = dens;
-      }
+      mm.put(rbod_score.doubleValue(iditer));
     }
     // compute ROS
+    double scale = mm.getMax() > 0. ? 1. / mm.getMax() : 1.;
+    mm.reset(); // Reuse
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double score = 1 - (rbod_score.doubleValue(iditer) / maxDensity);
+      double score = 1 - (rbod_score.doubleValue(iditer) * scale);
+      mm.put(score);
       rbod_score.putDouble(iditer, score);
     }
 
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Reference-points Outlier Scores", "reference-outlier", rbod_score, relation.getDBIDs());
+    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0., 1., 0.);
+    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // adds reference points to the result. header information for the
     // visualizer to find the reference points in the result
-    ReferencePointsResult<V> refp = new ReferencePointsResult<>("Reference points", "reference-points", refPoints);
-
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Reference-points Outlier Scores", "reference-outlier", rbod_score, relation.getDBIDs());
-    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(refp);
+    result.addChildResult(new ReferencePointsResult<>("Reference points", "reference-points", refPoints));
     return result;
   }
 
@@ -232,6 +198,25 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector> extends Abst
   }
 
   /**
+   * Update the density estimates for each object.
+   * 
+   * @param rbod_score Density storage
+   * @param referenceDists Distances from current reference point
+   */
+  protected void updateDensities(WritableDoubleDataStore rbod_score, DoubleDBIDList referenceDists) {
+    DoubleDBIDListIter it = referenceDists.iter();
+    for(int l = 0; l < referenceDists.size(); l++) {
+      double density = computeDensity(referenceDists, it, l);
+      // computeDensity modified the iterator, reset:
+      it.seek(l);
+      // NaN indicates the first run.
+      if(!(density > rbod_score.doubleValue(it))) {
+        rbod_score.putDouble(it, density);
+      }
+    }
+  }
+
+  /**
    * Computes the density of an object. The density of an object is the
    * distances to the k nearest neighbors. Neighbors and distances are computed
    * approximately. (approximation for kNN distance: instead of a normal NN
@@ -239,63 +224,56 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector> extends Abst
    * to a reference point. The k- nearest neighbors of an object are those
    * objects that lay close to the object in the reference distance vector)
    * 
-   * @param referenceDists vector of the reference distances,
+   * @param referenceDists vector of the reference distances
+   * @param iter Iterator to this list (will be reused)
    * @param index index of the current object
    * @return density for one object and reference point
    */
-  protected double computeDensity(DoubleDBIDList referenceDists, int index) {
-    final DoubleDBIDPair x = referenceDists.get(index);
-    final double xDist = x.doubleValue();
+  protected double computeDensity(DoubleDBIDList referenceDists, DoubleDBIDListIter iter, int index) {
+    final int size = referenceDists.size();
+    final double xDist = iter.seek(index).doubleValue();
 
-    int lef = index - 1;
-    int rig = index + 1;
-    Mean mean = new Mean();
-    double lef_d = (lef >= 0) ? referenceDists.get(lef).doubleValue() : Double.NEGATIVE_INFINITY;
-    double rig_d = (rig < referenceDists.size()) ? referenceDists.get(rig).doubleValue() : Double.NEGATIVE_INFINITY;
-    while(mean.getCount() < k) {
-      if(lef >= 0 && rig < referenceDists.size()) {
+    int lef = index, rig = index;
+    double sum = 0.;
+    double lef_d = (--lef >= 0) ? xDist - iter.seek(lef).doubleValue() : Double.POSITIVE_INFINITY;
+    double rig_d = (++rig < size) ? iter.seek(rig).doubleValue() - xDist : Double.POSITIVE_INFINITY;
+    for(int i = 0; i < k; ++i) {
+      if(lef >= 0 && rig < size) {
         // Prefer n or m?
-        if(Math.abs(lef_d - xDist) < Math.abs(rig_d - xDist)) {
-          mean.put(Math.abs(lef_d - xDist));
-          // Update n
-          lef--;
-          lef_d = (lef >= 0) ? referenceDists.get(lef).doubleValue() : Double.NEGATIVE_INFINITY;
+        if(lef_d < rig_d) {
+          sum += lef_d;
+          // Update left
+          lef_d = (--lef >= 0) ? xDist - iter.seek(lef).doubleValue() : Double.POSITIVE_INFINITY;
         }
         else {
-          mean.put(Math.abs(rig_d - xDist));
+          sum += rig_d;
           // Update right
-          rig++;
-          rig_d = (rig < referenceDists.size()) ? referenceDists.get(rig).doubleValue() : Double.NEGATIVE_INFINITY;
+          rig_d = (++rig < size) ? iter.seek(rig).doubleValue() - xDist : Double.POSITIVE_INFINITY;
         }
+      }
+      else if(lef >= 0) {
+        // Choose left, since right is not available.
+        sum += lef_d;
+        // update left
+        lef_d = (--lef >= 0) ? xDist - iter.seek(lef).doubleValue() : Double.POSITIVE_INFINITY;
+      }
+      else if(rig < size) {
+        // Choose right, since left is not available
+        sum += rig_d;
+        // Update right
+        rig_d = (++rig < size) ? iter.seek(rig).doubleValue() - xDist : Double.POSITIVE_INFINITY;
       }
       else {
-        if(lef >= 0) {
-          // Choose left, since right is not available.
-          mean.put(Math.abs(lef_d - xDist));
-          // update left
-          lef--;
-          lef_d = (lef >= 0) ? referenceDists.get(lef).doubleValue() : Double.NEGATIVE_INFINITY;
-        }
-        else if(rig < referenceDists.size()) {
-          // Choose right, since left is not available
-          mean.put(Math.abs(rig_d - xDist));
-          // Update right
-          rig++;
-          rig_d = (rig < referenceDists.size()) ? referenceDists.get(rig).doubleValue() : Double.NEGATIVE_INFINITY;
-        }
-        else {
-          // Not enough objects in database?
-          throw new IndexOutOfBoundsException();
-        }
+        // Not enough objects in database?
+        throw new IndexOutOfBoundsException("Less than k objects?");
       }
     }
-
-    return 1.0 / mean.getMean();
+    return k / sum;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(distanceFunction.getInputTypeRestriction());
   }
 
   @Override
@@ -312,6 +290,18 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector> extends Abst
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
+     * Parameter for the reference points heuristic.
+     */
+    public static final OptionID REFP_ID = new OptionID("refod.refp", "The heuristic for finding reference points.");
+
+    /**
+     * Parameter to specify the number of nearest neighbors of an object, to be
+     * considered for computing its REFOD_SCORE, must be an integer greater than
+     * 1.
+     */
+    public static final OptionID K_ID = new OptionID("refod.k", "The number of nearest neighbors");
+
+    /**
      * Holds the value of {@link #K_ID}.
      */
     private int k;
@@ -324,8 +314,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector> extends Abst
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter pK = new IntParameter(K_ID);
-      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter pK = new IntParameter(K_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(pK)) {
         k = pK.getValue();
       }
