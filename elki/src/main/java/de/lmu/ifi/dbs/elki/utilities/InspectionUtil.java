@@ -160,13 +160,13 @@ public class InspectionUtil {
       if(parameterizable) {
         boolean instantiable = false;
         try {
-          instantiable |= cls.getConstructor().isAccessible();
+          instantiable = cls.getConstructor() != null;
         }
         catch(Exception | Error e) {
           // ignore
         }
         try {
-          instantiable |= ClassGenericsUtil.getParameterizer(cls) != null;
+          instantiable = instantiable || ClassGenericsUtil.getParameterizer(cls) != null;
         }
         catch(Exception | Error e) {
           // ignore
