@@ -83,7 +83,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
   public VectorTypeInformation(Class<? super V> cls, int mindim, int maxdim) {
     super(cls);
     this.factory = null;
-    assert (this.mindim <= this.maxdim);
+    assert (mindim <= maxdim);
     this.mindim = mindim;
     this.maxdim = maxdim;
   }
@@ -99,7 +99,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
   public VectorTypeInformation(FeatureVector.Factory<V, ?> factory, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim) {
     super(factory.getRestrictionClass(), serializer);
     this.factory = factory;
-    assert (this.mindim <= this.maxdim);
+    assert (mindim <= maxdim);
     this.mindim = mindim;
     this.maxdim = maxdim;
   }
