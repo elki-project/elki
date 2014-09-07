@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -185,10 +184,6 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
     // refinement of candidates, if k < k_max
     ArrayModifiableDBIDs candidateIDs = DBIDUtil.newArray(candidates);
-    for(int i = 0; i < candidates.size(); i++) {
-      DoubleDBIDPair candidate = (DoubleDBIDPair) candidates.get(i);
-      candidateIDs.add(candidate);
-    }
     candidateIDs.sort();
     List<? extends KNNList> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
 
@@ -234,10 +229,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     // perform a knn query for the candidates
     ArrayModifiableDBIDs candidateIDs = DBIDUtil.newArray();
     for(ModifiableDoubleDBIDList candidates : candidateMap.values()) {
-      for(int i = 0; i < candidates.size(); i++) {
-        DoubleDBIDPair candidate = (DoubleDBIDPair) candidates.get(i);
-        candidateIDs.add(candidate);
-      }
+      candidateIDs.addDBIDs(candidates);
     }
     candidateIDs.sort();
     List<? extends KNNList> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
