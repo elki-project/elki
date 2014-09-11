@@ -208,7 +208,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
       KNNList neighbors = knnq.getKNNForDBID(iter, kmax + 1);
       int k = 1, idx = 0;
       double sum = 0.;
-      for(DoubleDBIDListIter kneighbor = neighbors.iter(); k < kmax && kneighbor.valid(); kneighbor.advance(), k++) {
+      for(DoubleDBIDListIter kneighbor = neighbors.iter(); k <= kmax && kneighbor.valid(); kneighbor.advance(), k++) {
         sum += kneighbor.doubleValue();
         if(k < kmin) {
           continue;
