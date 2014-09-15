@@ -60,14 +60,10 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
     // Compute list size
     if(k < inner.getK()) {
       DoubleIntegerDBIDListIter iter = inner.iter();
-      iter.seek(k);
-      double dist = iter.doubleValue();
+      final double kdist = iter.seek(k - 1).doubleValue();
+      // Add all values tied:
       int i = k;
-      while(iter.valid()) {
-        iter.advance();
-        if(dist < iter.doubleValue()) {
-          break;
-        }
+      for(iter.advance(); iter.valid() && iter.doubleValue() <= kdist; iter.advance()) {
         i++;
       }
       size = i;
