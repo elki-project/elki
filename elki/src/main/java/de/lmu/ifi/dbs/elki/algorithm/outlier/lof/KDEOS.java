@@ -216,7 +216,13 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
         final double ibw = Math.min(k / (sum * scale), iminbw);
         final double sca = MathUtil.powi(ibw, dim);
         for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          final double dens = sca * kernel.density(neighbor.doubleValue() * ibw);
+          final double dens;
+          if(sca < Double.POSITIVE_INFINITY) { // NaNs with duplicate points!
+            dens = sca * kernel.density(neighbor.doubleValue() * ibw);
+          }
+          else {
+            dens = neighbor.doubleValue() == 0. ? 1. : 0.;
+          }
           densities.get(neighbor)[idx] += dens;
           if(dens < CUTOFF) {
             break;
@@ -224,7 +230,6 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
         }
         ++idx; // Only if k >= kmin
       }
-      assert (k == kmax) : "K is " + k + " size: " + neighbors.size();
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -270,7 +275,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double[] dens = densities.get(iter);
-      KNNList neighbors = knnq.getKNNForDBID(iter, kmax + 1);
+      KNNList neighbors = knnq.getKNNForDBID(iter, kmax);
       if(scratch[0].length < neighbors.size()) {
         // Resize scratch. Add some extra margin again.
         scratch = new double[knum][neighbors.size() + 5];
@@ -287,14 +292,14 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
       }
       // Compute means and stddevs for each k
       double score = 0.;
-      for(int k = 0; k < knum; k++) {
+      for(int i = 0; i < knum; i++) {
         mv.reset();
         for(int j = 0; j < neighbors.size(); j++) {
-          mv.put(scratch[k][j]);
+          mv.put(scratch[i][j]);
         }
         final double mean = mv.getMean(), stddev = mv.getSampleStddev();
         if(stddev > 0.) {
-          score += (mean - dens[k]) / stddev;
+          score += (mean - dens[i]) / stddev;
         }
       }
       score /= knum; // average
