@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.evaluation.roc;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -65,12 +65,12 @@ public class TestComputeROC implements JUnit4Test {
 
     XYCurve roccurve = ROC.materializeROC(new ROC.DBIDsTest(positive), new ROC.DistanceResultAdapter(distances.iter()));
     // System.err.println(roccurve);
-    Assert.assertEquals("ROC curve too complex", 6, roccurve.size());
+    assertEquals("ROC curve too complex", 6, roccurve.size());
 
     double auc = XYCurve.areaUnderCurve(roccurve);
-    Assert.assertEquals("ROC AUC not right.", 0.6, auc, 1e-14);
+    assertEquals("ROC AUC (curve) not correct.", 0.6, auc, 1e-14);
     double auc2 = ROC.computeROCAUC(positive, distances);
-    Assert.assertEquals("ROC AUC not right.", 0.6, auc2, 1e-14);
+    assertEquals("ROC AUC (direct) not correct.", 0.6, auc2, 1e-14);
   }
 
   /**
@@ -97,7 +97,39 @@ public class TestComputeROC implements JUnit4Test {
     distances.add(6.0, DBIDUtil.importInteger(5)); // Precision: 5/9.
     // (1+1+.6+4/7.+5/9.)/5 = 0.7453968253968254
 
-    double ap = ROC.computeAveragePrecision(new ROC.DBIDsTest(positive), new ROC.DistanceResultAdapter(distances.iter()));
-    Assert.assertEquals("Average precision not right.", 0.7453968253968254, ap, 1e-14);
+    double ap = ROC.computeAveragePrecision(positive, distances);
+    assertEquals("Average precision not correct.", 0.7453968253968254, ap, 1e-14);
+  }
+
+  /**
+   * Test Average Precision score computation.
+   */
+  @Test
+  public void testPrecisionAtK() {
+    HashSetModifiableDBIDs positive = DBIDUtil.newHashSet();
+    positive.add(DBIDUtil.importInteger(1));
+    positive.add(DBIDUtil.importInteger(2));
+    positive.add(DBIDUtil.importInteger(3));
+    positive.add(DBIDUtil.importInteger(4));
+    positive.add(DBIDUtil.importInteger(5));
+
+    final ModifiableDoubleDBIDList distances = DBIDUtil.newDistanceDBIDList();
+    distances.add(0.0, DBIDUtil.importInteger(1)); // Precision: 1.0
+    distances.add(1.0, DBIDUtil.importInteger(2)); // Precision: 1.0
+    distances.add(2.0, DBIDUtil.importInteger(6)); //
+    distances.add(3.0, DBIDUtil.importInteger(7)); //
+    distances.add(3.0, DBIDUtil.importInteger(3)); // Precision: 0.6
+    distances.add(4.0, DBIDUtil.importInteger(8)); //
+    distances.add(4.0, DBIDUtil.importInteger(4)); // Precision: 4/7.
+    distances.add(5.0, DBIDUtil.importInteger(9)); //
+    distances.add(6.0, DBIDUtil.importInteger(5)); // Precision: 5/9.
+    // (1+1+.6+4/7.+5/9.)/5 = 0.7453968253968254
+
+    double[] precision = new double[] { 1., 1., 2. / 3., 2.5 / 4., 3 / 5., 3.5 / 6., 4. / 7., 4. / 8., 5 / 9. };
+
+    for(int k = 0; k < precision.length; ++k) {
+      double pk = ROC.computePrecisionAtK(positive, distances, k + 1);
+      assertEquals("Precision at k=" + (k + 1) + " not correct.", precision[k], pk, 1e-14);
+    }
   }
 }

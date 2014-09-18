@@ -255,6 +255,72 @@ public class ROC {
   }
 
   /**
+   * Compute the precision at k given a set of positive IDs and a sorted list of
+   * (comparable, ID)s, where the comparable object is used to decided when two
+   * objects are interchangeable.
+   * 
+   * This implementation pays attention to ties.
+   * 
+   * @param <I> Iterator type
+   * @param predicate Predicate to test for positive objects
+   * @param iter Iterator over results, with ties.
+   * @param k Number of top elements to evaluate.
+   * @return precision at k
+   */
+  public static <I extends ScoreIter> double computePrecisionAtK(Predicate<? super I> predicate, I iter, int k) {
+    int total = 0;
+    double score = 0.;
+    while(iter.valid() && total < k) {
+      int posthis = 0, cntthis = 0;
+      // positive or negative match?
+      do {
+        if(predicate.test(iter)) {
+          ++posthis;
+        }
+        ++cntthis;
+        iter.advance();
+      } // Loop while tied:
+      while(iter.valid() && iter.tiedToPrevious());
+      // Special tie computations only when we reach k.
+      if(total + cntthis > k) {
+        // p = posthis / cntthis chance of being positive
+        // n = (k-total) draws.
+        // expected value = n * p
+        score += posthis / (double) cntthis * (k - total);
+        total = k;
+        break;
+      }
+      score += posthis;
+      total += cntthis;
+    }
+    return score / total;
+  }
+
+  /**
+   * Compute the precision at kfor a set of DBIDs and a ranking.
+   * 
+   * @param ids Collection of positive IDs, should support efficient contains()
+   * @param nei Query Result
+   * @param k Number of top elements to evaluate.
+   * @return precision at k
+   */
+  public static double computePrecisionAtK(DBIDs ids, DoubleDBIDList nei, int k) {
+    return computePrecisionAtK(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()), k);
+  }
+
+  /**
+   * Compute the precision at kfor a set of outliers and an outlier scoring.
+   * 
+   * @param ids Collection of positive IDs, should support efficient contains()
+   * @param outlier Outlier result
+   * @param k Number of top elements to evaluate.
+   * @return precision at k
+   */
+  public static double computePrecisionAtK(DBIDs ids, OutlierResult outlier, int k) {
+    return computePrecisionAtK(new DBIDsTest(DBIDUtil.ensureSet(ids)), new OutlierScoreAdapter(outlier), k);
+  }
+
+  /**
    * This adapter can be used for an arbitrary collection of Integers, and uses
    * that id1.compareTo(id2) != 0 for id1 != id2 to satisfy the comparability.
    * 
