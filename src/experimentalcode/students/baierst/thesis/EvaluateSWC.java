@@ -1,4 +1,4 @@
-package experimentalcode.students.baierst;
+package experimentalcode.students.baierst.thesis;
 
 /*
  This file is part of ELKI:
@@ -72,7 +72,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.students.baierst.ClusteringUtils;
@@ -97,11 +96,11 @@ import experimentalcode.students.baierst.NoiseOption;
 title = "Silhouettes: A graphical aid to the interpretation and validation of cluster analysis", //
 booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
 url = "http://dx.doi.org/10.1016%2F0377-0427%2887%2990125-7")
-public class EvaluateSilhouette<O> implements Evaluator {
+public class EvaluateSWC<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateSWC.class);
 
   /**
    * Option for noise handling.
@@ -114,21 +113,15 @@ public class EvaluateSilhouette<O> implements Evaluator {
   private DistanceFunction<? super O> distance;
 
   /**
-   * Epsilon parameter for alternative silhouette computation.
-   */
-  private double eps;
-
-  /**
    * Constructor.
    * 
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateSilhouette(DistanceFunction<? super O> distance, NoiseOption noiseOpt, double eps) {
+  public EvaluateSWC(DistanceFunction<? super O> distance, NoiseOption noiseOpt) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
-    this.eps = eps;
   }
 
   /**
@@ -139,7 +132,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * @param dq Distance query
    * @param c Clustering
    */
-  public void evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+  public double evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
 
     List<? extends Cluster<?>> clusters;
 
@@ -153,7 +146,6 @@ public class EvaluateSilhouette<O> implements Evaluator {
     int countNoise = 0;
 
     MeanVariance msil = new MeanVariance();
-    MeanVariance msilAlt = new MeanVariance();
     for(Cluster<?> cluster : clusters) {
 
       if((cluster.isNoise() || cluster.size() < 2) && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
@@ -182,7 +174,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
         double min = Double.POSITIVE_INFINITY;
         for(Cluster<?> ocluster : clusters) {
 
-          if((ocluster.isNoise() || ocluster.size() < 2) && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) ) {
+          if((ocluster.isNoise() || ocluster.size() < 2) && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
             continue;
           }
 
@@ -200,12 +192,10 @@ public class EvaluateSilhouette<O> implements Evaluator {
           }
         }
         msil.put((min - a) / Math.max(min, a));
-        msilAlt.put(min / (a + this.eps));
       }
     }
 
-    double msilMean = msil.getMean();
-    double msilAltMean = msilAlt.getMean();
+    double swc = msil.getMean();
 
     if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
 
@@ -215,19 +205,14 @@ public class EvaluateSilhouette<O> implements Evaluator {
         penalty = ((double) rel.size() - (double) countNoise) / (double) rel.size();
       }
 
-      msilMean = penalty * msilMean;
-      msilAltMean = penalty * msilAltMean;
+      swc = penalty * swc;
     }
 
     if(LOG.isVerbose()) {
-      LOG.verbose("Mean Silhouette: " + msilMean);
-      LOG.verbose("Mean Silhouette Alternative: " + msilAltMean);
+      LOG.verbose("Mean Silhouette: " + swc);
     }
-    // Build a primitive result attachment:
-    Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { msilMean }));
-//    col.add(new DoubleVector(new double[] { msilAltMean }));
-    db.getHierarchy().add(c, new CollectionResult<>("Silhouette coefficient", "swc", col));
+
+    return swc;
   }
 
   @Override
@@ -240,7 +225,11 @@ public class EvaluateSilhouette<O> implements Evaluator {
     Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, rel, dq, c);
+      double swc = evaluateClustering(db, rel, dq, c);
+
+      Collection<DoubleVector> col = new ArrayList<>();
+      col.add(new DoubleVector(new double[] { swc }));
+      db.getHierarchy().add(c, new CollectionResult<>("Silhouette coefficient", "swc", col));
     }
   }
 
@@ -263,11 +252,6 @@ public class EvaluateSilhouette<O> implements Evaluator {
     public static final OptionID NOISE_OPTION_ID = new OptionID("silhouette.noiseoption", "option, how noise should be treated.");
 
     /**
-     * Parameter for epsilon value of alternative silhouette.
-     */
-    public static final OptionID EPS_ID = new OptionID("silhouette.alternative_eps", "Epsilon parameter for alternative silhouette.");
-
-    /**
      * Distance function to use.
      */
     private DistanceFunction<? super O> distance;
@@ -276,11 +260,6 @@ public class EvaluateSilhouette<O> implements Evaluator {
      * Option, how noise should be treated.
      */
     private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
-
-    /**
-     * Epsilon for alternative silhouette.
-     */
-    private double eps;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -294,17 +273,11 @@ public class EvaluateSilhouette<O> implements Evaluator {
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }
-
-      DoubleParameter epsP = new DoubleParameter(EPS_ID, 1e-6);
-      if(config.grab(epsP)) {
-        eps = epsP.doubleValue();
-      }
-
     }
 
     @Override
-    protected EvaluateSilhouette<O> makeInstance() {
-      return new EvaluateSilhouette<>(distance, noiseOption, eps);
+    protected EvaluateSWC<O> makeInstance() {
+      return new EvaluateSWC<>(distance, noiseOption);
     }
   }
 }
