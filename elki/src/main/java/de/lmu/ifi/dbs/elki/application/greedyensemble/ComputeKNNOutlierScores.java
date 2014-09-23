@@ -276,7 +276,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       runForEachK(new AlgRunner() {
         @Override
         public void run(int k, String kstr) {
-          LDOF<O> ldof = new LDOF<>(distf, k + 1);
+          LDOF<O> ldof = new LDOF<>(distf, k);
           OutlierResult ldofresult = ldof.run(database, relation);
           writeResult(fout, ids, ldofresult, scaling, "LDOF-" + kstr);
           database.getHierarchy().removeSubtree(ldofresult);

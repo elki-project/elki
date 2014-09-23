@@ -45,7 +45,7 @@ public class TestLDOF extends AbstractSimpleAlgorithmTest implements JUnit4Test 
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LDOF.K_ID, 25);
+    params.addParameter(LDOF.K_ID, 24);
 
     // setup Algorithm
     LDOF<DoubleVector> ldof = ClassGenericsUtil.parameterizeOrAbort(LDOF.class, params);

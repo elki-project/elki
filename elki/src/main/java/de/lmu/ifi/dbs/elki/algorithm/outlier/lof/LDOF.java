@@ -127,7 +127,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k);
+    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k + 1);
 
     // track the maximum value for normalization
     DoubleMinMax ldofminmax = new DoubleMinMax();
@@ -138,21 +138,23 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     if(LOG.isVerbose()) {
       LOG.verbose("Computing LDOFs");
     }
-    FiniteProgress progressLDOFs = LOG.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", relation.size(), LOG) : null;
+    FiniteProgress progressLDOFs = LOG.isVerbose() ? new FiniteProgress("LDOF for objects", relation.size(), LOG) : null;
 
     Mean dxp = new Mean(), Dxp = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNList neighbors = knnQuery.getKNNForDBID(iditer, k);
-      // skip the point itself
+      KNNList neighbors = knnQuery.getKNNForDBID(iditer, k + 1);
       dxp.reset();
       Dxp.reset();
-      for(DoubleDBIDListIter neighbor1 = neighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
+      DoubleDBIDListIter neighbor1 = neighbors.iter(), neighbor2 = neighbors.iter();
+      for(; neighbor1.valid(); neighbor1.advance()) {
+        // skip the point itself
         if(DBIDUtil.equal(neighbor1, iditer)) {
           continue;
         }
         dxp.put(neighbor1.doubleValue());
-        for(DoubleDBIDListIter neighbor2 = neighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
-          if(DBIDUtil.equal(neighbor1, neighbor2) || DBIDUtil.equal(neighbor2, iditer)) {
+        for(neighbor2.seek(neighbor1.getOffset() + 1); neighbor2.valid(); neighbor2.advance()) {
+          // skip the point itself
+          if(DBIDUtil.equal(neighbor2, iditer)) {
             continue;
           }
           Dxp.put(distFunc.distance(neighbor1, neighbor2));
@@ -200,7 +202,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }

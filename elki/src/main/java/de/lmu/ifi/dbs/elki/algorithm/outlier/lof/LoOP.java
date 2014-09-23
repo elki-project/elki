@@ -46,8 +46,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -80,6 +81,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * In Proceedings of the 18th International Conference on Information and
  * Knowledge Management (CIKM), Hong Kong, China, 2009
  * </p>
+ * 
+ * Implementation notes:
+ * <ul>
+ * <li>The lambda parameter was removed from the pdist term, because it cancels
+ * out.</li>
+ * <li>In ELKI 0.7.0, the {@code k} parameters have changed by 1 to make them
+ * similar to other methods and more intuitive.</li>
+ * </ul>
  * 
  * @author Erich Schubert
  * 
@@ -126,11 +135,6 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
   protected DistanceFunction<? super O> comparisonDistanceFunction;
 
   /**
-   * Include object itself in kNN neighborhood.
-   */
-  static boolean objectIsInKNN = false;
-
-  /**
    * Constructor with parameters.
    * 
    * @param kreach k for reachability
@@ -160,13 +164,13 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     KNNQuery<O> knnComp, knnReach;
     if(comparisonDistanceFunction == reachabilityDistanceFunction || comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
-      knnComp = DatabaseUtil.precomputedKNNQuery(database, relation, comparisonDistanceFunction, kcomp);
+      knnComp = DatabaseUtil.precomputedKNNQuery(database, relation, comparisonDistanceFunction, kcomp + 1);
       knnReach = knnComp;
     }
     else {
       LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
-      knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, kreach);
-      knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kcomp);
+      knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, kreach + 1);
+      knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kcomp + 1);
     }
     return new Pair<>(knnComp, knnReach);
   }
@@ -179,8 +183,6 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    final double sqrt2 = Math.sqrt(2.0);
-
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(5) : null;
 
     Pair<KNNQuery<O>, KNNQuery<O>> pair = getKNNQueries(database, relation, stepprog);
@@ -195,89 +197,111 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
       throw new AbortException("No kNN queries supported by database for density estimation distance function.");
     }
 
+    // FIXME: tie handling!
+
     // Probabilistic distances
-    WritableDoubleDataStore pdists = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    Mean mean = new Mean();
-    {// computing PRDs
-      LOG.beginStep(stepprog, 3, "Computing pdists");
-      FiniteProgress prdsProgress = LOG.isVerbose() ? new FiniteProgress("pdists", relation.size(), LOG) : null;
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        final KNNList neighbors = knnReach.getKNNForDBID(iditer, kreach);
-        mean.reset();
-        // use first kref neighbors as reference set
-        int ks = 0;
-        for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iditer)) {
-            double d = neighbor.doubleValue();
-            mean.put(d * d);
-            ks++;
-            if(ks >= kreach) {
-              break;
-            }
-          }
-        }
-        double pdist = lambda * Math.sqrt(mean.getMean());
-        pdists.putDouble(iditer, pdist);
-        LOG.incrementProcessed(prdsProgress);
-      }
-    }
+    WritableDoubleDataStore pdists = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB);
+    LOG.beginStep(stepprog, 3, "Computing pdists");
+    computePDists(relation, knnReach, pdists);
     // Compute PLOF values.
     WritableDoubleDataStore plofs = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    MeanVariance mvplof = new MeanVariance();
-    {// compute LOOP_SCORE of each db object
-      LOG.beginStep(stepprog, 4, "Computing PLOF");
+    LOG.beginStep(stepprog, 4, "Computing PLOF");
+    double nplof = computePLOFs(relation, knnComp, pdists, plofs);
 
-      FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
-      MeanVariance mv = new MeanVariance();
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        final KNNList neighbors = knnComp.getKNNForDBID(iditer, kcomp);
-        mv.reset();
-        // use first kref neighbors as comparison set.
-        int ks = 0;
-        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iditer)) {
-            mv.put(pdists.doubleValue(neighbor));
-            ks++;
-            if(ks >= kcomp) {
-              break;
-            }
-          }
-        }
-        double plof = Math.max(pdists.doubleValue(iditer) / mv.getMean(), 1.0);
-        if(Double.isNaN(plof) || Double.isInfinite(plof)) {
-          plof = 1.0;
-        }
-        plofs.putDouble(iditer, plof);
-        mvplof.put((plof - 1.0) * (plof - 1.0));
-
-        LOG.incrementProcessed(progressPLOFs);
-      }
-    }
-
-    double nplof = lambda * Math.sqrt(mvplof.getMean());
-    if(LOG.isDebugging()) {
-      LOG.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean() + " " + mvplof.getSampleStddev());
-    }
-
-    // Compute final LoOP values.
-    WritableDoubleDataStore loops = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    // Normalize the outlier scores.
+    DoubleMinMax mm = new DoubleMinMax();
     {// compute LOOP_SCORE of each db object
       LOG.beginStep(stepprog, 5, "Computing LoOP scores");
 
       FiniteProgress progressLOOPs = LOG.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), LOG) : null;
+      final double norm = 1. / (nplof * MathUtil.SQRT2);
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        loops.putDouble(iditer, NormalDistribution.erf((plofs.doubleValue(iditer) - 1) / (nplof * sqrt2)));
-
+        double loop = NormalDistribution.erf((plofs.doubleValue(iditer) - 1.) * norm);
+        plofs.putDouble(iditer, loop);
+        mm.put(loop);
         LOG.incrementProcessed(progressLOOPs);
       }
+      LOG.ensureCompleted(progressLOOPs);
     }
 
     LOG.setCompleted(stepprog);
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Probabilities", "loop-outlier", loops, relation.getDBIDs());
-    OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Outlier Probabilities", "loop-outlier", plofs, relation.getDBIDs());
+    OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore(mm.getMin(), mm.getMax(), 0.);
     return new OutlierResult(scoreMeta, scoreResult);
+  }
+
+  /**
+   * Compute the probabilistic distances used by LoOP.
+   * 
+   * @param relation Data relation
+   * @param knn kNN query
+   * @param pdists Storage for distances
+   */
+  protected void computePDists(Relation<O> relation, KNNQuery<O> knn, WritableDoubleDataStore pdists) {
+    // computing PRDs
+    FiniteProgress prdsProgress = LOG.isVerbose() ? new FiniteProgress("pdists", relation.size(), LOG) : null;
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      final KNNList neighbors = knn.getKNNForDBID(iditer, kreach + 1);
+      // use first kref neighbors as reference set
+      int ks = 0;
+      double ssum = 0.;
+      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid() && ks < kreach; neighbor.advance()) {
+        if(DBIDUtil.equal(neighbor, iditer)) {
+          continue;
+        }
+        final double d = neighbor.doubleValue();
+        ssum += d * d;
+        ks++;
+      }
+      double pdist = ks > 0 ? Math.sqrt(ssum / ks) : 0.;
+      pdists.putDouble(iditer, pdist);
+      LOG.incrementProcessed(prdsProgress);
+    }
+    LOG.ensureCompleted(prdsProgress);
+  }
+
+  /**
+   * Compute the LOF values, using the pdist distances.
+   * 
+   * @param relation Data relation
+   * @param knn kNN query
+   * @param pdists Precomputed distances
+   * @param plofs Storage for PLOFs.
+   * @return Normalization factor.
+   */
+  protected double computePLOFs(Relation<O> relation, KNNQuery<O> knn, WritableDoubleDataStore pdists, WritableDoubleDataStore plofs) {
+    FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
+    Mean mvplof = new Mean();
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      final KNNList neighbors = knn.getKNNForDBID(iditer, kcomp + 1);
+      // use first kref neighbors as comparison set.
+      int ks = 0;
+      double sum = 0.;
+      for(DBIDIter neighbor = neighbors.iter(); neighbor.valid() && ks < kcomp; neighbor.advance()) {
+        if(DBIDUtil.equal(neighbor, iditer)) {
+          continue;
+        }
+        sum += pdists.doubleValue(neighbor);
+        ks++;
+      }
+      double plof = Math.max(pdists.doubleValue(iditer) * ks / sum, 1.0);
+      if(Double.isNaN(plof) || Double.isInfinite(plof)) {
+        plof = 1.0;
+      }
+      plofs.putDouble(iditer, plof);
+      mvplof.put((plof - 1.0) * (plof - 1.0));
+
+      LOG.incrementProcessed(progressPLOFs);
+    }
+    LOG.ensureCompleted(progressPLOFs);
+
+    double nplof = lambda * Math.sqrt(mvplof.getMean());
+    if(LOG.isDebugging()) {
+      LOG.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean());
+    }
+    return nplof;
   }
 
   @Override
@@ -369,7 +393,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kcompP = new IntParameter(KCOMP_ID);
-      kcompP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      kcompP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kcompP)) {
         kcomp = kcompP.intValue();
       }
@@ -380,7 +404,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
       }
 
       final IntParameter kreachP = new IntParameter(KREACH_ID);
-      kreachP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      kreachP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       kreachP.setOptional(true);
       if(config.grab(kreachP)) {
         kreach = kreachP.intValue();
