@@ -45,7 +45,7 @@ public class TestINFLO extends AbstractSimpleAlgorithmTest implements JUnit4Test
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(INFLO.K_ID, 29);
+    params.addParameter(INFLO.Parameterizer.K_ID, 30);
 
     // setup Algorithm
     INFLO<DoubleVector> inflo = ClassGenericsUtil.parameterizeOrAbort(INFLO.class, params);
@@ -54,7 +54,7 @@ public class TestINFLO extends AbstractSimpleAlgorithmTest implements JUnit4Test
     // run INFLO on database
     OutlierResult result = inflo.run(db);
 
-    testSingleScore(result, 945, 1.215459716);
-    testAUC(db, "Noise", result, 0.9389259259259);
+    testAUC(db, "Noise", result, 0.9401666);
+    testSingleScore(result, 945, 1.23659841);
   }
 }
