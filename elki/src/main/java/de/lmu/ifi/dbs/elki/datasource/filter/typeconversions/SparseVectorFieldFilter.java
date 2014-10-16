@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * 
  * @param <V> Vector type
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.SparseVectorFieldFilter" })
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.SparseVectorFieldFilter" })
 public class SparseVectorFieldFilter<V extends SparseNumberVector> extends AbstractConversionFilter<V, V> {
   /**
    * Class logger.

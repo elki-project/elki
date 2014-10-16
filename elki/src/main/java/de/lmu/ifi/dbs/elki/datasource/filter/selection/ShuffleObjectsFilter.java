@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ShuffleObjectsFilter" })
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter" })
 public class ShuffleObjectsFilter implements ObjectFilter {
   /**
    * Class logger

@@ -115,6 +115,16 @@ public class Logging {
     public Level(String name, int value) {
       super(name, value);
     }
+
+    /**
+     * Parse a logging level.
+     * 
+     * @param levelName Name of level to parse.
+     * @return {@link java.util.logging.Level} level
+     */
+    public static java.util.logging.Level parse(String levelName) {
+      return java.util.logging.Level.parse(levelName);
+    }
   }
 
   /**
