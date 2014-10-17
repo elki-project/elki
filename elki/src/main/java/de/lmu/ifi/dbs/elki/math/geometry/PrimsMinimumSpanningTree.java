@@ -45,7 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @apiviz.composedOf Adapter
  */
-@Reference(authors = "R. C. Prim", title = "Shortest connection networks and some generalizations", booktitle = "Bell System Technical Journal, 36 (1957)")
+@Reference(authors = "R. C. Prim", //
+title = "Shortest connection networks and some generalizations", //
+booktitle = "Bell System Technical Journal, 36 (1957)")
 public class PrimsMinimumSpanningTree {
   /**
    * Adapter class for double[][] matrixes.

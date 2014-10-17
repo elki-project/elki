@@ -43,7 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @apiviz.has Polygon
  */
-@Reference(authors = "Paul Graham", title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", booktitle = "Information Processing Letters 1")
+@Reference(authors = "Paul Graham", //
+title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", //
+booktitle = "Information Processing Letters 1")
 public class GrahamScanConvexHull2D {
   /**
    * The current set of points

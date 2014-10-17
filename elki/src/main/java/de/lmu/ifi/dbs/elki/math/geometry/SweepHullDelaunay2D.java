@@ -49,7 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  *
  * @apiviz.has Polygon
  */
-@Reference(authors = "David Sinclair", title = "S-hull: a fast sweep-hull routine for Delaunay triangulation", booktitle = "Online: http://s-hull.org/")
+@Reference(authors = "David Sinclair", //
+title = "S-hull: a fast sweep-hull routine for Delaunay triangulation", //
+booktitle = "Online: http://s-hull.org/")
 public class SweepHullDelaunay2D {
   /**
    * Class logger
@@ -655,7 +657,7 @@ public class SweepHullDelaunay2D {
    * @param a Starting point
    * @param b Reference point
    * @param d Test point
-   * @return true when on the left side 
+   * @return true when on the left side
    */
   boolean leftOf(Vector a, Vector b, Vector d) {
     final double bax = b.get(0) - a.get(0);
@@ -700,7 +702,7 @@ public class SweepHullDelaunay2D {
      * Circumcircle parameters
      */
     public double r2 = -1;
-    
+
     /**
      * Center vector
      */
@@ -890,7 +892,7 @@ public class SweepHullDelaunay2D {
 
       // Compute D
       final double D = 2 * (abx * acy - aby * acx);
-      
+
       // No circumcircle:
       if(D == 0) {
         return false;
@@ -900,7 +902,6 @@ public class SweepHullDelaunay2D {
       final double offx = (acy * ablen - aby * aclen) / D;
       final double offy = (abx * aclen - acx * ablen) / D;
 
-      
       // Avoid degeneration:
       r2 = offx * offx + offy * offy;
       if((r2 > 1e10 * ablen || r2 > 1e10 * aclen)) {
