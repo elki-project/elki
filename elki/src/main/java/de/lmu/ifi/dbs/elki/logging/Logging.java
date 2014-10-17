@@ -123,6 +123,9 @@ public class Logging {
      * @return {@link java.util.logging.Level} level
      */
     public static java.util.logging.Level parse(String levelName) {
+      // While this is a pass-through to the parent class,
+      // it ensures our own level have been added.
+      // Otherwise, levels such as "STATISTICS" might not work!
       return java.util.logging.Level.parse(levelName);
     }
   }
