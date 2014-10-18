@@ -1,4 +1,4 @@
-package experimentalcode.students.baierst.thesis;
+package experimentalcode.students.baierst.thesis.utils;
 
 import java.util.LinkedList;
 import java.util.List;
