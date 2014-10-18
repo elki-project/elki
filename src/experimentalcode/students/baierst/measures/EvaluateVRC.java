@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import experimentalcode.students.baierst.thesis.ClusteringUtils;
+import experimentalcode.students.baierst.thesis.utils.NoiseOption;
 
 /*
  This file is part of ELKI:
