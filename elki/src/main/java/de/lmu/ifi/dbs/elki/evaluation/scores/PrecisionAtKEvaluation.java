@@ -1,11 +1,26 @@
 package de.lmu.ifi.dbs.elki.evaluation.scores;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+
 /**
- * Evaluate using Precision@k.
+ * Evaluate using Precision@k, or R-precision (when {@code k=0}).
+ * 
+ * When {@code k=0}, then it is set to the number of positive objects, and the
+ * returned value is the R-precision, or the precision-recall break-even-point
+ * (BEP).
  *
  * @author Erich Schubert
  */
 public class PrecisionAtKEvaluation extends AbstractScoreEvaluation {
+  /**
+   * Static instance
+   */
+  public static final PrecisionAtKEvaluation RPRECISION = new PrecisionAtKEvaluation(0);
+
   /**
    * Parameter k.
    */
@@ -14,7 +29,7 @@ public class PrecisionAtKEvaluation extends AbstractScoreEvaluation {
   /**
    * Constructor.
    *
-   * @param k k to evaluate at.
+   * @param k k to evaluate at. May be 0.
    */
   public PrecisionAtKEvaluation(int k) {
     this.k = k;
@@ -22,6 +37,7 @@ public class PrecisionAtKEvaluation extends AbstractScoreEvaluation {
 
   @Override
   public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
+    final int k = (this.k > 0) ? this.k : predicate.numPositive();
     int total = 0;
     double score = 0.;
     while(iter.valid() && total < k) {
@@ -50,4 +66,40 @@ public class PrecisionAtKEvaluation extends AbstractScoreEvaluation {
     return score / total;
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Option ID for the k parameter.
+     */
+    public static final OptionID K_ID = new OptionID("precision.k", //
+    "k value for precision@k. Can be set to 0, to get R-precision, or the precision-recall-break-even-point.");
+
+    /**
+     * K parameter
+     */
+    int k;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      IntParameter kP = new IntParameter(K_ID) //
+      .setDefaultValue(0) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      if(config.grab(kP)) {
+        k = kP.intValue();
+      }
+    }
+
+    @Override
+    protected PrecisionAtKEvaluation makeInstance() {
+      return k > 0 ? new PrecisionAtKEvaluation(k) : RPRECISION;
+    }
+  }
 }

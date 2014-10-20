@@ -1,11 +1,18 @@
 package de.lmu.ifi.dbs.elki.evaluation.scores;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 /**
  * Evaluate using average precision.
  * 
  * @author Erich Schubert
  */
 public class AveragePrecisionEvaluation extends AbstractScoreEvaluation {
+  /**
+   * Static instance
+   */
+  public static final AveragePrecisionEvaluation STATIC = new AveragePrecisionEvaluation();
+
   @Override
   public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
     int poscnt = 0, negcnt = 0, pospre = 0;
@@ -31,4 +38,17 @@ public class AveragePrecisionEvaluation extends AbstractScoreEvaluation {
     return (poscnt > 0) ? acc / poscnt : 0.;
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected AveragePrecisionEvaluation makeInstance() {
+      return STATIC;
+    }
+  }
 }

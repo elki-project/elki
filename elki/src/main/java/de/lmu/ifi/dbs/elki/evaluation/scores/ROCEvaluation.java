@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.evaluation.scores;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Compute ROC (Receiver Operating Characteristics) curves.
@@ -46,6 +47,11 @@ import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
  * @apiviz.has XYCurve
  */
 public class ROCEvaluation extends AbstractScoreEvaluation {
+  /**
+   * Static instance
+   */
+  public static final ROCEvaluation STATIC = new ROCEvaluation();
+
   @Override
   public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
     return computeROCAUC(predicate, iter);
@@ -123,5 +129,19 @@ public class ROCEvaluation extends AbstractScoreEvaluation {
     }
     acc /= negcnt * (long) poscnt;
     return acc == acc ? acc : 0.5; /* Detect NaN */
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected ROCEvaluation makeInstance() {
+      return STATIC;
+    }
   }
 }

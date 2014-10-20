@@ -1,11 +1,18 @@
 package de.lmu.ifi.dbs.elki.evaluation.scores;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 /**
  * Evaluate using the maximum F1 score.
  * 
  * @author Erich Schubert
  */
 public class MaximumF1Evaluation extends AbstractScoreEvaluation {
+  /**
+   * Static instance
+   */
+  public static final MaximumF1Evaluation STATIC = new MaximumF1Evaluation();
+
   @Override
   public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
     final int postot = predicate.numPositive();
@@ -29,5 +36,19 @@ public class MaximumF1Evaluation extends AbstractScoreEvaluation {
       }
     }
     return maxf1;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected MaximumF1Evaluation makeInstance() {
+      return STATIC;
+    }
   }
 }
