@@ -39,7 +39,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DecreasingVectorIter;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.VectorNonZero;
+import de.lmu.ifi.dbs.elki.evaluation.scoring.AbstractScoreEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -147,7 +149,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     final NumberVector refvec = relation.get(firstid);
 
     // Build the truth vector
-    ROC.VectorNonZero pos = new ROC.VectorNonZero(refvec);
+    VectorNonZero pos = new VectorNonZero(refvec);
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
     ids.remove(firstid);
@@ -165,7 +167,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         final NumberVector veca = relation.get(id);
         // Direct AUC score:
         {
-          double auc = ROC.computeROCAUC(pos, new ROC.DecreasingVectorIter(veca));
+          double auc = AbstractScoreEvaluation.computeROCAUC(pos, new DecreasingVectorIter(veca));
           data[a][a] = auc;
           // minmax.put(auc);
           LOG.incrementProcessed(prog);
@@ -181,7 +183,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
             buf[1] = vecb.doubleValue(d);
             combined[d] = voting.combine(buf);
           }
-          double auc = ROC.computeROCAUC(pos, new ROC.DecreasingVectorIter(new Vector(combined)));
+          double auc = AbstractScoreEvaluation.computeROCAUC(pos, new DecreasingVectorIter(new Vector(combined)));
           // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
           // labels.get(ids.get(b)));
           data[a][b] = auc;
