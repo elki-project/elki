@@ -42,7 +42,9 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.OutlierScoreAdapter;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -91,7 +93,7 @@ public class RandomSampleKNNExperiment {
         }
       }
     }
-    ROC.DBIDsTest positive = new ROC.DBIDsTest(pos);
+    DBIDsTest positive = new DBIDsTest(pos);
     
     // Collect the data for output
     double[][] data = new double[iters][6];
@@ -108,7 +110,7 @@ public class RandomSampleKNNExperiment {
           final int k = i * step;
           KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
-          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
+          double auc = new ROCEvaluation().evaluate(positive, new OutlierScoreAdapter(res));
           data[i - 1][0] = auc;
           LOG.incrementProcessed(prog);
         }
@@ -121,7 +123,7 @@ public class RandomSampleKNNExperiment {
           final int k = i * step;
           LOF<NumberVector> lof = new LOF<>(k, distanceFunction);
           OutlierResult res = lof.run(database, rel);
-          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
+          double auc = new ROCEvaluation().evaluate(positive, new OutlierScoreAdapter(res));
           data[i - 1][3] = auc;
           LOG.incrementProcessed(prog);
         }
@@ -154,28 +156,28 @@ public class RandomSampleKNNExperiment {
         {
           KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, maxk);
           OutlierResult res = knn.run(database, rel);
-          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
+          double auc = new ROCEvaluation().evaluate(positive, new OutlierScoreAdapter(res));
           data[i - 1][1] = auc;
         }
         // Scaled k kNNOutlier run
         {
           KNNOutlier<NumberVector> knn = new KNNOutlier<>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
-          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
+          double auc = new ROCEvaluation().evaluate(positive, new OutlierScoreAdapter(res));
           data[i - 1][2] = auc;
         }
         // Max k LOF run
         {
           LOF<NumberVector> lof = new LOF<>(maxk, distanceFunction);
           OutlierResult res = lof.run(database, rel);
-          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
+          double auc = new ROCEvaluation().evaluate(positive, new OutlierScoreAdapter(res));
           data[i - 1][4] = auc;
         }
         // Scaled k LOF run
         {
           LOF<NumberVector> lof = new LOF<>(k, distanceFunction);
           OutlierResult res = lof.run(database, rel);
-          double auc = ROC.computeROCAUC(positive, new ROC.OutlierScoreAdapter(res));
+          double auc = new ROCEvaluation().evaluate(positive, new OutlierScoreAdapter(res));
           data[i - 1][5] = auc;
         }
         // Remove preprocessor
