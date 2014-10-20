@@ -102,7 +102,7 @@ public class TestComputeROC implements JUnit4Test {
   }
 
   /**
-   * Test Average Precision score computation.
+   * Test Precision@k score computation.
    */
   @Test
   public void testPrecisionAtK() {
@@ -131,5 +131,32 @@ public class TestComputeROC implements JUnit4Test {
       double pk = ROC.computePrecisionAtK(positive, distances, k + 1);
       assertEquals("Precision at k=" + (k + 1) + " not correct.", precision[k], pk, 1e-14);
     }
+  }
+
+  /**
+   * Test maximum F1 score computation
+   */
+  @Test
+  public void testMaximumF1() {
+    HashSetModifiableDBIDs positive = DBIDUtil.newHashSet();
+    positive.add(DBIDUtil.importInteger(1));
+    positive.add(DBIDUtil.importInteger(2));
+    positive.add(DBIDUtil.importInteger(3));
+    positive.add(DBIDUtil.importInteger(4));
+    positive.add(DBIDUtil.importInteger(5));
+
+    final ModifiableDoubleDBIDList distances = DBIDUtil.newDistanceDBIDList();
+    distances.add(0.0, DBIDUtil.importInteger(1)); // P: 1.0 R: 0.2
+    distances.add(1.0, DBIDUtil.importInteger(2)); // P: 1.0 R: 0.4
+    distances.add(2.0, DBIDUtil.importInteger(6)); // P: 2/3 R: 0.4
+    distances.add(3.0, DBIDUtil.importInteger(7)); // P: 0.5 R: 0.4
+    distances.add(3.0, DBIDUtil.importInteger(3)); // P: 0.6 R: 0.6
+    distances.add(4.0, DBIDUtil.importInteger(8)); // P: 0.5 R: 0.6
+    distances.add(4.0, DBIDUtil.importInteger(4)); // P: 4/7 R: 0.8
+    distances.add(5.0, DBIDUtil.importInteger(9)); // P: 0.5 R: 0.8
+    distances.add(6.0, DBIDUtil.importInteger(5)); // P: 5/9 R: 1.0
+
+    double maxf1 = ROC.computeMaximumF1(positive, distances);
+    assertEquals("Maximum F1 not correct.", 0.7142857142857143, maxf1, 1e-14);
   }
 }

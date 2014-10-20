@@ -321,6 +321,62 @@ public class ROC {
   }
 
   /**
+   * Compute the maximum F1 value given a set of positive IDs and a sorted list
+   * of (comparable, ID)s, where the comparable object is used to decided when
+   * two objects are interchangeable.
+   * 
+   * @param <I> Iterator type
+   * @param predicate Predicate to test for positive objects
+   * @param iter Iterator over results, with ties.
+   * @param postot Number of positive elements
+   * @return average precision
+   */
+  public static <I extends ScoreIter> double computeMaximumF1(Predicate<? super I> predicate, I iter, int postot) {
+    int poscnt = 0, cnt = 0;
+    double maxf1 = 0.;
+    while(iter.valid()) {
+      // positive or negative match?
+      do {
+        if(predicate.test(iter)) {
+          ++poscnt;
+        }
+        ++cnt;
+        iter.advance();
+      } // Loop while tied:
+      while(iter.valid() && iter.tiedToPrevious());
+      // New F1 value:
+      double p = poscnt / (double) cnt, r = poscnt / (double) postot;
+      double f1 = 2. * p * r / (p + r);
+      if(f1 > maxf1) {
+        maxf1 = f1;
+      }
+    }
+    return maxf1;
+  }
+
+  /**
+   * Compute the maximum F1 value for a set of DBIDs and a ranking.
+   * 
+   * @param ids Collection of positive IDs, should support efficient contains()
+   * @param nei Query Result
+   * @return average precision
+   */
+  public static double computeMaximumF1(DBIDs ids, DoubleDBIDList nei) {
+    return computeMaximumF1(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()), ids.size());
+  }
+
+  /**
+   * Compute the maximum F1 value for a set of outliers and an outlier scoring.
+   * 
+   * @param ids Collection of positive IDs, should support efficient contains()
+   * @param outlier Outlier result
+   * @return average precision
+   */
+  public static double computeMaximumF1(DBIDs ids, OutlierResult outlier) {
+    return computeMaximumF1(new DBIDsTest(DBIDUtil.ensureSet(ids)), new OutlierScoreAdapter(outlier), ids.size());
+  }
+
+  /**
    * This adapter can be used for an arbitrary collection of Integers, and uses
    * that id1.compareTo(id2) != 0 for id1 != id2 to satisfy the comparability.
    * 
