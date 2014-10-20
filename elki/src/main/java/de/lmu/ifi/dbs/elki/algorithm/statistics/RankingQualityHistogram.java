@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -125,7 +125,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
     for(Cluster<?> clus : split) {
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
         KNNList knn = knnQuery.getKNNForDBID(iter, relation.size());
-        double result = ROC.computeROCAUC(clus, knn);
+        double result = new ROCEvaluation().evaluate(clus, knn);
 
         mv.put(result);
         hist.increment(result, 1. / relation.size());

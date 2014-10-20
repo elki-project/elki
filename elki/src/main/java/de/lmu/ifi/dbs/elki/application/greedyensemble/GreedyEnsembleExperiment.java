@@ -50,7 +50,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearson
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DecreasingVectorIter;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.VectorNonZero;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -195,7 +197,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final NumberVector refvec = relation.get(firstid);
 
     // Build the positive index set for ROC AUC.
-    ROC.Predicate<ROC.DecreasingVectorIter> positive = new ROC.VectorNonZero(refvec);
+    VectorNonZero positive = new VectorNonZero(refvec);
 
     final int desired_outliers = (int) (rate * dim);
     int union_outliers = 0;
@@ -204,7 +206,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // candidates.
     {
       int k = 0;
-      ArrayList<ROC.DecreasingVectorIter> iters = new ArrayList<>(numcand);
+      ArrayList<DecreasingVectorIter> iters = new ArrayList<>(numcand);
       if(minvote >= numcand) {
         minvote = Math.max(1, numcand - 1);
       }
@@ -213,10 +215,10 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         if(DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
-        iters.add(new ROC.DecreasingVectorIter(relation.get(iditer)));
+        iters.add(new DecreasingVectorIter(relation.get(iditer)));
       }
       loop: while(union_outliers < desired_outliers) {
-        for(ROC.DecreasingVectorIter iter : iters) {
+        for(DecreasingVectorIter iter : iters) {
           if(!iter.valid()) {
             LOG.warning("Union_outliers=" + union_outliers + " < desired_outliers=" + desired_outliers + " minvote=" + minvote);
             break loop;
@@ -282,7 +284,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         final NumberVector vec = relation.get(iditer);
         singleEnsemble(greedyensemble, vec);
         final Vector v2 = new Vector(greedyensemble);
-        double auc = ROC.computeROCAUC(positive, new ROC.DecreasingVectorIter(v2));
+        double auc = ROCEvaluation.computeROCAUC(positive, new DecreasingVectorIter(v2));
         double estimated = wdist.distance(v2, estimated_truth_vec);
         double cost = tdist.distance(v2, refvec);
         LOG.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(iditer));
@@ -370,13 +372,13 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
           // logger.verbose("Discarding: " + labels.get(bestadd));
           if(refine_truth) {
             // Update target vectors and weights
-            ArrayList<ROC.DecreasingVectorIter> iters = new ArrayList<>(numcand);
+            ArrayList<DecreasingVectorIter> iters = new ArrayList<>(numcand);
             for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
               // Skip "by label", obviously
               if(DBIDUtil.equal(firstid, iditer) || dropped.contains(iditer)) {
                 continue;
               }
-              iters.add(new ROC.DecreasingVectorIter(relation.get(iditer)));
+              iters.add(new DecreasingVectorIter(relation.get(iditer)));
             }
             if(minvote >= iters.size()) {
               minvote = iters.size() - 1;
@@ -385,7 +387,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
             union_outliers = 0;
             Arrays.fill(outliers_seen, 0);
             while(union_outliers < desired_outliers) {
-              for(ROC.DecreasingVectorIter iter : iters) {
+              for(DecreasingVectorIter iter : iters) {
                 if(!iter.valid()) {
                   break;
                 }
@@ -430,14 +432,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Evaluate the naive ensemble and the "shrunk" ensemble
     double naiveauc, naivecost;
     {
-      naiveauc = ROC.computeROCAUC(positive, new ROC.DecreasingVectorIter(naivevec));
+      naiveauc = ROCEvaluation.computeROCAUC(positive, new DecreasingVectorIter(naivevec));
       naivecost = tdist.distance(naivevec, refvec);
       LOG.verbose("Naive ensemble AUC:   " + naiveauc + " cost: " + naivecost);
       LOG.verbose("Naive ensemble Gain:  " + gain(naiveauc, bestauc, 1) + " cost gain: " + gain(naivecost, bestcost, 0));
     }
     double greedyauc, greedycost;
     {
-      greedyauc = ROC.computeROCAUC(positive, new ROC.DecreasingVectorIter(greedyvec));
+      greedyauc = ROCEvaluation.computeROCAUC(positive, new DecreasingVectorIter(greedyvec));
       greedycost = tdist.distance(greedyvec, refvec);
       LOG.verbose("Greedy ensemble AUC:  " + greedyauc + " cost: " + greedycost);
       LOG.verbose("Greedy ensemble Gain to best:  " + gain(greedyauc, bestauc, 1) + " cost gain: " + gain(greedycost, bestcost, 0));
@@ -467,7 +469,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         }
         applyScaling(randomensemble, scaling);
         NumberVector randomvec = factory.newNumberVector(randomensemble);
-        double auc = ROC.computeROCAUC(positive, new ROC.DecreasingVectorIter(randomvec));
+        double auc = ROCEvaluation.computeROCAUC(positive, new DecreasingVectorIter(randomvec));
         meanauc.put(auc);
         double cost = tdist.distance(randomvec, refvec);
         meancost.put(cost);

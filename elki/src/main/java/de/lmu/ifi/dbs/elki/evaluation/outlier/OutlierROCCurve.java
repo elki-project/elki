@@ -31,7 +31,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.OutlierScoreAdapter;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.SimpleAdapter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -103,30 +106,26 @@ public class OutlierROCCurve implements Evaluator {
   }
 
   private ROCResult computeROCResult(int size, SetDBIDs positiveids, DBIDs order) {
-    if (order.size() != size) {
+    if(order.size() != size) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    XYCurve roccurve = ROC.materializeROC(new ROC.DBIDsTest(positiveids), new ROC.SimpleAdapter(order.iter()));
+    XYCurve roccurve = ROCEvaluation.materializeROC(new DBIDsTest(positiveids), new SimpleAdapter(order.iter()));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose(ROCAUC_LABEL + ": " + rocauc);
     }
 
-    final ROCResult rocresult = new ROCResult(roccurve, rocauc);
-
-    return rocresult;
+    return new ROCResult(roccurve, rocauc);
   }
 
   private ROCResult computeROCResult(int size, SetDBIDs positiveids, OutlierResult or) {
-    XYCurve roccurve = ROC.materializeROC(new ROC.DBIDsTest(positiveids), new ROC.OutlierScoreAdapter(or));
+    XYCurve roccurve = ROCEvaluation.materializeROC(new DBIDsTest(positiveids), new OutlierScoreAdapter(or));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose(ROCAUC_LABEL + ": " + rocauc);
     }
 
-    final ROCResult rocresult = new ROCResult(roccurve, rocauc);
-
-    return rocresult;
+    return new ROCResult(roccurve, rocauc);
   }
 
   @Override
@@ -135,7 +134,7 @@ public class OutlierROCCurve implements Evaluator {
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
-    if (positiveids.size() == 0) {
+    if(positiveids.size() == 0) {
       LOG.warning("Computing a ROC curve failed - no objects matched.");
       return;
     }
@@ -144,7 +143,7 @@ public class OutlierROCCurve implements Evaluator {
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
-    for (OutlierResult o : oresults) {
+    for(OutlierResult o : oresults) {
       db.getHierarchy().add(o, computeROCResult(o.getScores().size(), positiveids, o));
       // Process them only once.
       orderings.remove(o.getOrdering());
@@ -153,13 +152,13 @@ public class OutlierROCCurve implements Evaluator {
 
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
-    for (OrderingResult or : orderings) {
+    for(OrderingResult or : orderings) {
       DBIDs sorted = or.iter(or.getDBIDs());
       db.getHierarchy().add(or, computeROCResult(or.getDBIDs().size(), positiveids, sorted));
       nonefound = false;
     }
 
-    if (nonefound) {
+    if(nonefound) {
       return;
       // logger.warning("No results found to process with ROC curve analyzer. Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }
@@ -229,7 +228,7 @@ public class OutlierROCCurve implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      if (config.grab(positiveClassNameP)) {
+      if(config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }
     }

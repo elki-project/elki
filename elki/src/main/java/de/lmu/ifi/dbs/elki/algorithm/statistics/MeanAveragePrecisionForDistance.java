@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
+import de.lmu.ifi.dbs.elki.evaluation.scores.AveragePrecisionEvaluation;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.Mean;
@@ -139,9 +140,9 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
         if(nlist.size() != relation.size() - (includeSelf ? 0 : 1)) {
           LOG.warning("Neighbor list does not have the desired size: " + nlist.size());
         }
-        map.put(ROC.computeAveragePrecision(posn, nlist));
+        map.put(new AveragePrecisionEvaluation().evaluate(posn, nlist));
         // We may as well compute ROC AUC while we're at it.
-        mroc.put(ROC.computeROCAUC(posn, nlist));
+        mroc.put(new ROCEvaluation().evaluate(posn, nlist));
       }
       LOG.incrementProcessed(objloop);
     }

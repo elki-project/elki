@@ -30,7 +30,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -38,21 +42,30 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -62,6 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
@@ -76,6 +90,10 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * in Proc. 12th International Symposium on Spatial and Temporal Databases
  * (SSTD), Minneapolis, MN, 2011
  * </p>
+ * 
+ * Note: This class - currently - is an ugly hack. This code needs to be
+ * modularized to make it more reusable, to support multiple results and
+ * different result types.
  * 
  * @author Erich Schubert
  */
@@ -134,17 +152,46 @@ public class KMLOutputHandler implements ResultHandler {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     ArrayList<OutlierResult> ors = ResultUtil.filterResults(newResult, OutlierResult.class);
-    if(ors.size() > 1) {
-      throw new AbortException("More than one outlier result found. The KML writer only supports a single outlier result!");
+    ArrayList<Clustering<?>> crs = ResultUtil.filterResults(newResult, Clustering.class);
+    if(ors.size() + crs.size() > 1) {
+      throw new AbortException("More than one visualizable result found. The KML writer only supports a single result!");
     }
-    if(ors.size() == 1) {
+    for(OutlierResult outlierResult : ors) {
       Database database = ResultUtil.findDatabase(baseResult);
       try {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(filename));
         out.putNextEntry(new ZipEntry("doc.kml"));
         final XMLStreamWriter xmlw = factory.createXMLStreamWriter(out);
-        writeKMLData(xmlw, ors.get(0), database);
+        writeOutlierResult(xmlw, outlierResult, database);
+        xmlw.flush();
+        xmlw.close();
+        out.closeEntry();
+        out.flush();
+        out.close();
+        if(autoopen) {
+          Desktop.getDesktop().open(filename);
+        }
+      }
+      catch(XMLStreamException e) {
+        LOG.exception(e);
+        throw new AbortException("XML error in KML output.", e);
+      }
+      catch(IOException e) {
+        LOG.exception(e);
+        throw new AbortException("IO error in KML output.", e);
+      }
+    }
+    for(Clustering<?> clusteringResult : crs) {
+      Database database = ResultUtil.findDatabase(baseResult);
+      try {
+        XMLOutputFactory factory = XMLOutputFactory.newInstance();
+        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(filename));
+        out.putNextEntry(new ZipEntry("doc.kml"));
+        final XMLStreamWriter xmlw = factory.createXMLStreamWriter(out);
+        @SuppressWarnings("unchecked")
+        Clustering<Model> cres = (Clustering<Model>) clusteringResult;
+        writeClusteringResult(xmlw, cres, database);
         xmlw.flush();
         xmlw.close();
         out.closeEntry();
@@ -165,20 +212,9 @@ public class KMLOutputHandler implements ResultHandler {
     }
   }
 
-  private void writeKMLData(XMLStreamWriter xmlw, OutlierResult outlierResult, Database database) throws XMLStreamException {
-    DoubleRelation scores = outlierResult.getScores();
+  private void writeOutlierResult(XMLStreamWriter xmlw, OutlierResult outlierResult, Database database) throws XMLStreamException {
     Relation<PolygonsObject> polys = database.getRelation(TypeUtil.POLYGON_TYPE);
     Relation<String> labels = DatabaseUtil.guessObjectLabelRepresentation(database);
-
-    Collection<Relation<?>> otherrel = new LinkedList<>(database.getRelations());
-    otherrel.remove(scores);
-    otherrel.remove(polys);
-    otherrel.remove(labels);
-    otherrel.remove(database.getRelation(TypeUtil.DBID));
-
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(scores.getDBIDs());
-
-    scaling.prepare(outlierResult);
 
     xmlw.writeStartDocument();
     xmlw.writeCharacters("\n");
@@ -232,6 +268,18 @@ public class KMLOutputHandler implements ResultHandler {
         writeNewlineOnDebug(xmlw);
       }
     }
+
+    DoubleRelation scores = outlierResult.getScores();
+    Collection<Relation<?>> otherrel = new LinkedList<>(database.getRelations());
+    otherrel.remove(scores);
+    otherrel.remove(polys);
+    otherrel.remove(labels);
+    otherrel.remove(database.getRelation(TypeUtil.DBID));
+
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(scores.getDBIDs());
+
+    scaling.prepare(outlierResult);
+
     for(DBIDIter iter = outlierResult.getOrdering().iter(ids).iter(); iter.valid(); iter.advance()) {
       double score = scores.doubleValue(iter);
       PolygonsObject poly = polys.get(iter);
@@ -315,6 +363,187 @@ public class KMLOutputHandler implements ResultHandler {
     xmlw.writeEndDocument();
   }
 
+  private void writeClusteringResult(XMLStreamWriter xmlw, Clustering<Model> clustering, Database database) throws XMLStreamException {
+    xmlw.writeStartDocument();
+    xmlw.writeCharacters("\n");
+    xmlw.writeStartElement("kml");
+    xmlw.writeDefaultNamespace("http://earth.google.com/kml/2.2");
+    xmlw.writeStartElement("Document");
+    {
+      // TODO: can we automatically generate more helpful data here?
+      xmlw.writeStartElement("name");
+      xmlw.writeCharacters("ELKI KML output for " + clustering.getLongName());
+      xmlw.writeEndElement(); // name
+      writeNewlineOnDebug(xmlw);
+      // TODO: e.g. list the settings in the description?
+      xmlw.writeStartElement("description");
+      xmlw.writeCharacters("ELKI KML output for " + clustering.getLongName());
+      xmlw.writeEndElement(); // description
+      writeNewlineOnDebug(xmlw);
+    }
+
+    List<Cluster<Model>> clusters = clustering.getAllClusters();
+    Relation<NumberVector> coords = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D);
+    List<Cluster<Model>> topc = clustering.getToplevelClusters();
+    Hierarchy<Cluster<Model>> hier = clustering.getClusterHierarchy();
+    Map<Object, DoubleObjPair<Polygon>> hullmap = new HashMap<>();
+    for(Cluster<Model> clu : topc) {
+      buildHullsRecursively(clu, hier, hullmap, coords);
+    }
+
+    int numc = clusters.size();
+    {
+      final double projarea = 90. * 90.; // 1/8 of earth
+      // TODO: generate styles from color scheme
+      Iterator<Cluster<Model>> it = clusters.iterator();
+      for(int i = 0; it.hasNext(); i++) {
+        Cluster<Model> clus = it.next();
+        Color col = Color.getHSBColor(i * 51.f / (float) numc, 1.f, .5f);
+        DoubleObjPair<Polygon> pair = hullmap.get(clus);
+        // Approximate area (using bounding box)
+        double hullarea = SpatialUtil.volume(pair.second);
+        final double relativeArea = 1. - (hullarea / projarea);
+        // final double relativeSize = pair.first / coords.size();
+        final double opacity = 1. * Math.sqrt(relativeArea);
+        xmlw.writeStartElement("Style");
+        xmlw.writeAttribute("id", "s" + i);
+        writeNewlineOnDebug(xmlw);
+        {
+          xmlw.writeStartElement("LineStyle");
+          xmlw.writeStartElement("width");
+          xmlw.writeCharacters("0");
+          xmlw.writeEndElement(); // width
+
+          xmlw.writeEndElement(); // LineStyle
+        }
+        writeNewlineOnDebug(xmlw);
+        {
+          xmlw.writeStartElement("PolyStyle");
+          xmlw.writeStartElement("color");
+          // KML uses AABBGGRR format!
+          xmlw.writeCharacters(String.format("%02x%02x%02x%02x", (int) (255 * Math.min(1., opacity)), col.getBlue(), col.getGreen(), col.getRed()));
+          xmlw.writeEndElement(); // color
+          // out.writeStartElement("fill");
+          // out.writeCharacters("1"); // Default 1
+          // out.writeEndElement(); // fill
+          xmlw.writeStartElement("outline");
+          xmlw.writeCharacters("0");
+          xmlw.writeEndElement(); // outline
+          xmlw.writeEndElement(); // PolyStyle
+        }
+        writeNewlineOnDebug(xmlw);
+        xmlw.writeEndElement(); // Style
+        writeNewlineOnDebug(xmlw);
+      }
+    }
+
+    Cluster<?> ignore = topc.size() == 1 ? topc.get(0) : null;
+    Iterator<Cluster<Model>> it = clusters.iterator();
+    for(int cnum = 0; it.hasNext(); cnum++) {
+      Cluster<?> c = it.next();
+      // Ignore sole toplevel cluster (usually: noise)
+      if(c == ignore) {
+        continue;
+      }
+      Polygon p = hullmap.get(c).second;
+      xmlw.writeStartElement("Placemark");
+      {
+        xmlw.writeStartElement("name");
+        xmlw.writeCharacters(c.getNameAutomatic());
+        xmlw.writeEndElement(); // name
+        xmlw.writeStartElement("description");
+        xmlw.writeCData(makeDescription(c).toString());
+        xmlw.writeEndElement(); // description
+        xmlw.writeStartElement("styleUrl");
+        xmlw.writeCharacters("#s" + cnum);
+        xmlw.writeEndElement(); // styleUrl
+      }
+      {
+        xmlw.writeStartElement("Polygon");
+        writeNewlineOnDebug(xmlw);
+        if(compat) {
+          xmlw.writeStartElement("altitudeMode");
+          xmlw.writeCharacters("relativeToGround");
+          xmlw.writeEndElement(); // close altitude mode
+          writeNewlineOnDebug(xmlw);
+        }
+        {
+          xmlw.writeStartElement("outerBoundaryIs");
+          xmlw.writeStartElement("LinearRing");
+          xmlw.writeStartElement("coordinates");
+
+          // Reverse anti-clockwise polygons.
+          boolean reverse = (p.testClockwise() >= 0);
+          ArrayListIter<Vector> itp = p.iter();
+          if(reverse) {
+            itp.seek(p.size() - 1);
+          }
+          while(itp.valid()) {
+            Vector v = itp.get();
+            xmlw.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
+            if(compat && (v.getDimensionality() == 2)) {
+              xmlw.writeCharacters(",500");
+            }
+            xmlw.writeCharacters(" ");
+            if(!reverse) {
+              itp.advance();
+            }
+            else {
+              itp.retract();
+            }
+          }
+          xmlw.writeEndElement(); // close coordinates
+          xmlw.writeEndElement(); // close LinearRing
+          xmlw.writeEndElement(); // close *BoundaryIs
+        }
+        writeNewlineOnDebug(xmlw);
+        xmlw.writeEndElement(); // Polygon
+      }
+      xmlw.writeEndElement(); // Placemark
+      writeNewlineOnDebug(xmlw);
+    }
+    xmlw.writeEndElement(); // Document
+    xmlw.writeEndElement(); // kml
+    xmlw.writeEndDocument();
+  }
+
+  /**
+   * Recursively step through the clusters to build the hulls.
+   * 
+   * @param clu Current cluster
+   * @param hier Clustering hierarchy
+   * @param hulls Hull map
+   */
+  private DoubleObjPair<Polygon> buildHullsRecursively(Cluster<Model> clu, Hierarchy<Cluster<Model>> hier, Map<Object, DoubleObjPair<Polygon>> hulls, Relation<? extends NumberVector> coords) {
+    final DBIDs ids = clu.getIDs();
+
+    GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      hull.add(coords.get(iter).getColumnVector());
+    }
+    double weight = ids.size();
+    if(hier != null && hulls != null) {
+      final int numc = hier.numChildren(clu);
+      if(numc > 0) {
+        for(Iter<Cluster<Model>> iter = hier.iterChildren(clu); iter.valid(); iter.advance()) {
+          final Cluster<Model> iclu = iter.get();
+          DoubleObjPair<Polygon> poly = hulls.get(iclu);
+          if(poly == null) {
+            poly = buildHullsRecursively(iclu, hier, hulls, coords);
+          }
+          // Add inner convex hull to outer convex hull.
+          for(ArrayListIter<Vector> vi = poly.second.iter(); vi.valid(); vi.advance()) {
+            hull.add(vi.get());
+          }
+          weight += poly.first / numc;
+        }
+      }
+    }
+    DoubleObjPair<Polygon> pair = new DoubleObjPair<>(weight, hull.getHull());
+    hulls.put(clu, pair);
+    return pair;
+  }
+
   /**
    * Make an HTML description.
    * 
@@ -338,6 +567,23 @@ public class KMLOutputHandler implements ResultHandler {
         buf.append(s);
       }
     }
+    return buf;
+  }
+
+  /**
+   * Make an HTML description.
+   * 
+   * @param relations Relations
+   * @param c Cluster
+   * @return Buffer
+   */
+  private StringBuilder makeDescription(Cluster<?> c) {
+    StringBuilder buf = new StringBuilder();
+    buf.append("<div>");
+    buf.append(c.getNameAutomatic());
+    buf.append("<br />");
+    buf.append("Size: " + c.size());
+    buf.append("</div>");
     return buf;
   }
 
