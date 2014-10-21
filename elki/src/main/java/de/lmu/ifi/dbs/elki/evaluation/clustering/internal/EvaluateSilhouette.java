@@ -22,13 +22,10 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -41,8 +38,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -111,6 +112,11 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * Distance function to use.
    */
   private DistanceFunction<? super O> distance;
+
+  /**
+   * Key for logging statistics.
+   */
+  private String key = EvaluateSilhouette.class.getName();
 
   /**
    * Constructor.
@@ -183,13 +189,16 @@ public class EvaluateSilhouette<O> implements Evaluator {
         msil.put((min - a) / Math.max(min, a));
       }
     }
-    if(LOG.isVerbose()) {
-      LOG.verbose("Mean Silhouette: " + msil);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(key + ".silhouette.noise", mergenoise ? 1L : 0L));
+      LOG.statistics(new DoubleStatistic(key + ".silhouette.mean", msil.getMean()));
+      LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", msil.getSampleStddev()));
     }
-    // Build a primitive result attachment:
-    Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { msil.getMean(), msil.getSampleStddev() }));
-    db.getHierarchy().add(c, new CollectionResult<>("Silhouette coefficient", "silhouette-coefficient", col));
+
+    EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
+    MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
+    g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(msil.getSampleStddev()), msil.getMean(), 1.);
+    db.getHierarchy().add(c, ev);
   }
 
   @Override
