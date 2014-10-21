@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.OutlierScoreAdapter;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.SimpleAdapter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -83,6 +84,11 @@ public class OutlierRankingEvaluation implements Evaluator {
   private Pattern positiveClassName;
 
   /**
+   * Key prefix for statistics logging.
+   */
+  private String key = OutlierRankingEvaluation.class.getName();
+
+  /**
    * Constructor.
    * 
    * @param positive_class_name Positive class name pattern
@@ -105,6 +111,12 @@ public class OutlierRankingEvaluation implements Evaluator {
     g.addMeasure("R-Precision", rprec, 1.0);
     double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
     g.addMeasure("Maximum F1", maxf1, 1.0);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".precision.average", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".precision.r", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".f1.maximum", rocauc));
+    }
     return res;
   }
 
@@ -125,6 +137,12 @@ public class OutlierRankingEvaluation implements Evaluator {
     g.addMeasure("R-Precision", rprec, 1.0);
     double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
     g.addMeasure("Maximum F1", maxf1, 1.0);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".precision.average", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".precision.r", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".f1.maximum", rocauc));
+    }
     return res;
   }
 
