@@ -32,12 +32,12 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -156,7 +156,9 @@ public class EvaluateClustering implements Evaluator {
       ClusterContingencyTable contmat = new ClusterContingencyTable(selfPairing, noiseSpecialHandling);
       contmat.process(refc, c);
 
-      db.getHierarchy().add(c, new ScoreResult(contmat));
+      ScoreResult sr = new ScoreResult(contmat);
+      sr.addHeader(c.getLongName());
+      db.getHierarchy().add(c, sr);
     }
   }
 
@@ -184,7 +186,7 @@ public class EvaluateClustering implements Evaluator {
    * 
    * @apiviz.composedOf ClusterContingencyTable
    */
-  public static class ScoreResult extends BasicResult implements TextWriteable {
+  public static class ScoreResult extends EvaluationResult {
     /**
      * Cluster contingency table
      */
@@ -198,6 +200,43 @@ public class EvaluateClustering implements Evaluator {
     public ScoreResult(ClusterContingencyTable contmat) {
       super("Cluster-Evalation", "cluster-evaluation");
       this.contmat = contmat;
+
+      PairCounting paircount = contmat.getPaircount();
+      MeasurementGroup g = newGroup("Pair counting measures");
+      g.addMeasure("Jaccard", paircount.jaccard(), 1);
+      g.addMeasure("F1-Measure", paircount.f1Measure(), 1);
+      g.addMeasure("Precision", paircount.precision(), 1);
+      g.addMeasure("Recall", paircount.recall(), 1);
+      g.addMeasure("Rand", paircount.randIndex(), 1);
+      g.addMeasure("ARI", paircount.adjustedRandIndex(), 1);
+      g.addMeasure("FowlkesMallows", paircount.fowlkesMallows(), 1);
+
+      Entropy entropy = contmat.getEntropy();
+      g = newGroup("Entropy based measures");
+      g.addMeasure("NMI Joint", entropy.entropyNMIJoint(), 1);
+      g.addMeasure("NMI Sqrt", entropy.entropyNMISqrt(), 1);
+
+      BCubed bcubed = contmat.getBCubed();
+      g = newGroup("BCubed-based measures");
+      g.addMeasure("F1-Measure", bcubed.f1Measure(), 1);
+      g.addMeasure("Recall", bcubed.recall(), 1);
+      g.addMeasure("Precision", bcubed.precision(), 1);
+
+      SetMatchingPurity setm = contmat.getSetMatching();
+      g = newGroup("Set-Matching-based measures");
+      g.addMeasure("F1-Measure", setm.f1Measure(), 1);
+      g.addMeasure("Purity", setm.purity(), 1);
+      g.addMeasure("Inverse Purity", setm.inversePurity(), 1);
+
+      EditDistance edit = contmat.getEdit();
+      g = newGroup("Editing-distance measures");
+      g.addMeasure("F1-Measure", edit.f1Measure(), 1);
+      g.addMeasure("Precision", edit.editDistanceFirst(), 1);
+      g.addMeasure("Recall", edit.editDistanceSecond(), 1);
+
+      MeanVariance gini = contmat.averageSymmetricGini();
+      g = newGroup("Gini measures");
+      g.addMeasure("Mean +-" + FormatUtil.NF4.format(gini.getCount() > 1. ? gini.getSampleStddev() : 0.), gini.getMean(), 1);
     }
 
     /**
@@ -207,47 +246,6 @@ public class EvaluateClustering implements Evaluator {
      */
     public ClusterContingencyTable getContingencyTable() {
       return contmat;
-    }
-
-    @Override
-    public void writeToText(TextWriterStream out, String label) {
-      out.commentPrint("Pair-F1, ");
-      out.commentPrint("Pair-Precision, ");
-      out.commentPrint("Pair-Recall, ");
-      out.commentPrint("Pair-Rand, ");
-      out.commentPrint("Pair-AdjustedRand, ");
-      out.commentPrint("Pair-FowlkesMallows, ");
-      out.commentPrint("Pair-Jaccard, ");
-      out.commentPrint("Pair-Mirkin, ");
-      out.commentPrint("Entropy-VI, ");
-      out.commentPrint("Entropy-NormalizedVI, ");
-      out.commentPrint("Entropy-F1, ");
-      out.commentPrint("Edit-F1, ");
-      out.commentPrint("SM-InvPurity, ");
-      out.commentPrint("SM-Purity, ");
-      out.commentPrint("SM-F1, ");
-      out.commentPrint("BCubed-Precision, ");
-      out.commentPrint("BCubed-Recall, ");
-      out.commentPrint("BCubed-F1");
-      out.flush();
-      out.inlinePrint(contmat.getPaircount().f1Measure());
-      out.inlinePrint(contmat.getPaircount().precision());
-      out.inlinePrint(contmat.getPaircount().recall());
-      out.inlinePrint(contmat.getPaircount().randIndex());
-      out.inlinePrint(contmat.getPaircount().adjustedRandIndex());
-      out.inlinePrint(contmat.getPaircount().fowlkesMallows());
-      out.inlinePrint(contmat.getPaircount().jaccard());
-      out.inlinePrint(contmat.getPaircount().mirkin());
-      out.inlinePrint(contmat.getEntropy().variationOfInformation());
-      out.inlinePrint(contmat.getEntropy().normalizedVariationOfInformation());
-      out.inlinePrint(contmat.getEdit().f1Measure());
-      out.inlinePrint(contmat.getSetMatching().inversePurity());
-      out.inlinePrint(contmat.getSetMatching().purity());
-      out.inlinePrint(contmat.getSetMatching().f1Measure());
-      out.inlinePrint(contmat.getBCubed().precision());
-      out.inlinePrint(contmat.getBCubed().recall());
-      out.inlinePrint(contmat.getBCubed().f1Measure());
-      out.flush();
     }
   }
 

@@ -36,7 +36,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionToolAx
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionToolLineVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments.CircleSegmentsVisualizer
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisualization
-de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.ClusterEvaluationVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.EvaluationVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.XYCurveVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.PixmapVisualizer

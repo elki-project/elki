@@ -28,20 +28,12 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.BCubed;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.EditDistance;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.Entropy;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.PairCounting;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.SetMatchingPurity;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -63,11 +55,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  *             de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.ScoreResult
  *             oneway - - visualizes
  */
-public class ClusterEvaluationVisualization extends AbstractVisFactory {
+public class EvaluationVisualization extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
-  private static final String NAME = "Cluster Evaluation";
+  private static final String NAME = "Evaluation Bar Chart";
 
   /**
    * Constant: width of score bars
@@ -82,14 +74,14 @@ public class ClusterEvaluationVisualization extends AbstractVisFactory {
   /**
    * Constructor.
    */
-  public ClusterEvaluationVisualization() {
+  public EvaluationVisualization() {
     super();
   }
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    final ArrayList<EvaluateClustering.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluateClustering.ScoreResult.class);
-    for (EvaluateClustering.ScoreResult sr : srs) {
+    final ArrayList<EvaluationResult> srs = ResultUtil.filterResults(newResult, EvaluationResult.class);
+    for(EvaluationResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.width = .4;
       task.height = 1.5;
@@ -120,71 +112,29 @@ public class ClusterEvaluationVisualization extends AbstractVisFactory {
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
     // TODO: make a utility class to wrap SVGPlot + parent layer + ypos.
+    // TODO: use CSSClass and StyleLibrary
 
     double ypos = -.5; // Skip space before first header
     SVGPlot svgp = task.getPlot();
     Element parent = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    EvaluateClustering.ScoreResult sr = task.getResult();
-    ClusterContingencyTable cont = sr.getContingencyTable();
+    EvaluationResult sr = task.getResult();
 
-    for (Hierarchy.Iter<Result> parents = task.getContext().getHierarchy().iterParents(sr); parents.valid(); parents.advance()) {
-      Result r = parents.get();
-      if (r instanceof Clustering) {
-        ypos = addHeader(svgp, parent, ypos, r.getLongName());
+    for(String header : sr.getHeaderLines()) {
+      ypos = addHeader(svgp, parent, ypos, header);
+    }
+
+    for(EvaluationResult.MeasurementGroup g : sr) {
+      ypos = addHeader(svgp, parent, ypos, g.getName());
+      for(MeasurementGroup.Measurement m : g) {
+        ypos = addBarChart(svgp, parent, ypos, m.getName(), m.getMax(), m.getVal());
       }
     }
-    // TODO: use CSSClass and StyleLibrary
-
-    ypos = addHeader(svgp, parent, ypos, "Pair counting measures");
-
-    PairCounting paircount = cont.getPaircount();
-    ypos = addBarChart(svgp, parent, ypos, "Jaccard", 1, paircount.jaccard());
-    ypos = addBarChart(svgp, parent, ypos, "F1-Measure", 1, paircount.f1Measure());
-    ypos = addBarChart(svgp, parent, ypos, "Precision", 1, paircount.precision());
-    ypos = addBarChart(svgp, parent, ypos, "Recall", 1, paircount.recall());
-    ypos = addBarChart(svgp, parent, ypos, "Rand", 1, paircount.randIndex());
-    ypos = addBarChart(svgp, parent, ypos, "ARI", 1, paircount.adjustedRandIndex());
-    ypos = addBarChart(svgp, parent, ypos, "FowlkesMallows", 1, paircount.fowlkesMallows());
-
-    ypos = addHeader(svgp, parent, ypos, "Entropy based measures");
-
-    Entropy entropy = cont.getEntropy();
-    ypos = addBarChart(svgp, parent, ypos, "NMI Joint", 1, entropy.entropyNMIJoint());
-    ypos = addBarChart(svgp, parent, ypos, "NMI Sqrt", 1, entropy.entropyNMISqrt());
-
-    ypos = addHeader(svgp, parent, ypos, "BCubed-based measures");
-
-    BCubed bcubed = cont.getBCubed();
-    ypos = addBarChart(svgp, parent, ypos, "F1-Measure", 1, bcubed.f1Measure());
-    ypos = addBarChart(svgp, parent, ypos, "Recall", 1, bcubed.recall());
-    ypos = addBarChart(svgp, parent, ypos, "Precision", 1, bcubed.precision());
-
-    ypos = addHeader(svgp, parent, ypos, "Set-Matching-based measures");
-
-    SetMatchingPurity setm = cont.getSetMatching();
-    ypos = addBarChart(svgp, parent, ypos, "F1-Measure", 1, setm.f1Measure());
-    ypos = addBarChart(svgp, parent, ypos, "Purity", 1, setm.purity());
-    ypos = addBarChart(svgp, parent, ypos, "Inverse Purity", 1, setm.inversePurity());
-
-    ypos = addHeader(svgp, parent, ypos, "Editing-distance measures");
-
-    EditDistance edit = cont.getEdit();
-    ypos = addBarChart(svgp, parent, ypos, "F1-Measure", 1, edit.f1Measure());
-    ypos = addBarChart(svgp, parent, ypos, "Precision", 1, edit.editDistanceFirst());
-    ypos = addBarChart(svgp, parent, ypos, "Recall", 1, edit.editDistanceSecond());
-
-    ypos = addHeader(svgp, parent, ypos, "Gini measures");
-
-    final MeanVariance gini = cont.averageSymmetricGini();
-    ypos = addBarChart(svgp, parent, ypos, "Mean +-" + FormatUtil.NF4.format(gini.getCount() > 1. ? gini.getSampleStddev() : 0.), 1, gini.getMean());
 
     // scale vis
-    double cols = 10; // Math.max(10, (int) (i * task.getHeight() /
-    // task.getWidth()));
-    double rows = ypos;
+    double cols = 10;
     final StyleLibrary style = task.getContext().getStyleResult().getStyleLibrary();
     final double margin = style.getSize(StyleLibrary.MARGIN);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
+    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, ypos, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(parent, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     return new StaticVisualizationInstance(task, parent);

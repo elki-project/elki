@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DecreasingVectorIter;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.VectorNonZero;
-import de.lmu.ifi.dbs.elki.evaluation.scoring.AbstractScoreEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -139,7 +139,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
-    if (!firstlabel.matches(".*by.?label.*")) {
+    if(!firstlabel.matches(".*by.?label.*")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
     relation = GreedyEnsembleExperiment.applyPrescaling(prescaling, relation, firstid);
@@ -163,11 +163,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing ensemble gain.", size * (size + 1) >> 1, LOG) : null;
       double[] buf = new double[2]; // Vote combination buffer.
       int a = 0;
-      for (DBIDIter id = ids.iter(); id.valid(); id.advance(), a++) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance(), a++) {
         final NumberVector veca = relation.get(id);
         // Direct AUC score:
         {
-          double auc = AbstractScoreEvaluation.computeROCAUC(pos, new DecreasingVectorIter(veca));
+          double auc = ROCEvaluation.computeROCAUC(pos, new DecreasingVectorIter(veca));
           data[a][a] = auc;
           // minmax.put(auc);
           LOG.incrementProcessed(prog);
@@ -175,15 +175,15 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         // Compare to others, exploiting symmetry
         DBIDArrayIter id2 = ids.iter();
         id2.seek(a + 1);
-        for (int b = a + 1; b < size; b++, id2.advance()) {
+        for(int b = a + 1; b < size; b++, id2.advance()) {
           final NumberVector vecb = relation.get(id2);
           double[] combined = new double[dim];
-          for (int d = 0; d < dim; d++) {
+          for(int d = 0; d < dim; d++) {
             buf[0] = veca.doubleValue(d);
             buf[1] = vecb.doubleValue(d);
             combined[d] = voting.combine(buf);
           }
-          double auc = AbstractScoreEvaluation.computeROCAUC(pos, new DecreasingVectorIter(new Vector(combined)));
+          double auc = ROCEvaluation.computeROCAUC(pos, new DecreasingVectorIter(new Vector(combined)));
           // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
           // labels.get(ids.get(b)));
           data[a][b] = auc;
@@ -195,8 +195,8 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       }
       LOG.ensureCompleted(prog);
     }
-    for (int a = 0; a < size; a++) {
-      for (int b = a + 1; b < size; b++) {
+    for(int a = 0; a < size; a++) {
+      for(int b = a + 1; b < size; b++) {
         double ref = Math.max(data[a][a], data[b][b]);
         data[a][b] = (data[a][b] - ref) / (1 - ref);
         data[b][a] = (data[b][a] - ref) / (1 - ref);
@@ -205,7 +205,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         minmax.put(data[a][b]);
       }
     }
-    for (int a = 0; a < size; a++) {
+    for(int a = 0; a < size; a++) {
       data[a][a] = 0;
     }
 
@@ -213,25 +213,27 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     boolean hasneg = (minmax.getMin() < -1E-3);
     LinearScaling scale;
-    if (!hasneg) {
+    if(!hasneg) {
       scale = LinearScaling.fromMinMax(0., minmax.getMax());
-    } else {
+    }
+    else {
       scale = LinearScaling.fromMinMax(0.0, Math.max(minmax.getMax(), -minmax.getMin()));
     }
     scale = LinearScaling.fromMinMax(0., .5);
 
     BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
-    for (int x = 0; x < size; x++) {
-      for (int y = x; y < size; y++) {
+    for(int x = 0; x < size; x++) {
+      for(int y = x; y < size; y++) {
         double val = data[x][y];
         val = Math.max(-1, Math.min(1., scale.getScaled(val)));
         // Compute color:
         final int col;
         {
-          if (val >= 0) {
+          if(val >= 0) {
             int ival = 0xFF & (int) (255 * val);
             col = 0xff000000 | (ival << 8);
-          } else {
+          }
+          else {
             int ival = 0xFF & (int) (255 * -val);
             col = 0xff000000 | (ival << 16);
           }
@@ -250,8 +252,8 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     factory.processNewResult(database, database);
 
     List<VisualizationTask> tasks = ResultUtil.filterResults(database, VisualizationTask.class);
-    for (VisualizationTask task : tasks) {
-      if (task.getFactory() == factory) {
+    for(VisualizationTask task : tasks) {
+      if(task.getFactory() == factory) {
         showVisualization(context, factory, task);
       }
     }
@@ -315,12 +317,12 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       // Prescaling
       ObjectParameter<ScalingFunction> prescalingP = new ObjectParameter<>(GreedyEnsembleExperiment.Parameterizer.PRESCALING_ID, ScalingFunction.class);
       prescalingP.setOptional(true);
-      if (config.grab(prescalingP)) {
+      if(config.grab(prescalingP)) {
         prescaling = prescalingP.instantiateClass(config);
       }
 
       ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(GreedyEnsembleExperiment.Parameterizer.VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class);
-      if (config.grab(votingP)) {
+      if(config.grab(votingP)) {
         voting = votingP.instantiateClass(config);
       }
     }
