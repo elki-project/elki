@@ -32,8 +32,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 /**
  * Abstract evaluation result.
  * 
- * TODO: add indicator whether high values are better or low.
- * 
  * @author Erich Schubert
  * 
  * @apiviz.composedOf EvaluationResult.MeasurementGroup
@@ -75,9 +73,11 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
   public void writeToText(TextWriterStream out, String label) {
     for(EvaluationResult.MeasurementGroup g : groups) {
       out.commentPrintLn(g.getName());
+      out.flush();
       for(Measurement m : g) {
         out.inlinePrintNoQuotes(m.name);
         out.inlinePrintNoQuotes(m.val);
+        out.flush();
       }
     }
   }

@@ -45,6 +45,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
  * 
+ * TODO: add indicator whether high values are better or low.
+ * 
+ * TODO: add indication/warning when values are out-of-bounds.
+ * 
  * @author Erich Schubert
  * @author Sascha Goldhofer
  * 
