@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionAtKCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
+import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierRankingEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -110,6 +111,8 @@ public class AutomaticEvaluation implements Evaluator {
       }
       LOG.verbose("Evaluating using minority class: " + label);
       Pattern pat = Pattern.compile("^" + Pattern.quote(label) + "$");
+      // Evaluate rankings.
+      new OutlierRankingEvaluation(pat).processNewResult(baseResult, newResult);
       // Compute ROC curve
       new OutlierROCCurve(pat).processNewResult(baseResult, newResult);
       // Compute Precision at k
