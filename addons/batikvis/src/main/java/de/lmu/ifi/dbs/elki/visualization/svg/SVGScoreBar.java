@@ -37,14 +37,9 @@ import org.w3c.dom.Element;
 // TODO: refactor to get a progress bar?
 public class SVGScoreBar {
   /**
-   * Fill value
+   * Value, minimum and maximum values
    */
-  protected double fill = 0.0;
-
-  /**
-   * Total size
-   */
-  protected double size = 1.0;
+  protected double val, min = 0., max = 1.;
 
   /**
    * Label (on the right)
@@ -66,12 +61,14 @@ public class SVGScoreBar {
   /**
    * Set the fill of the score bar.
    * 
-   * @param fill Fill value
-   * @param size Total size
+   * @param val Value
+   * @param min Minimum value
+   * @param max Maximum value
    */
-  public void setFill(double fill, double size) {
-    this.fill = fill;
-    this.size = size;
+  public void setFill(double val, double min, double max) {
+    this.val = val;
+    this.min = min;
+    this.max = max;
   }
 
   /**
@@ -112,8 +109,8 @@ public class SVGScoreBar {
     bar.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, String.valueOf(height * 0.01));
     barchart.appendChild(bar);
 
-    if(fill >= 0 && fill <= size + 1) {
-      double fpos = (fill / size) * (width - (0.04 * height));
+    if(val >= min && val <= max && min < max) {
+      double fpos = (val - min) / (max - min) * (width - (0.04 * height));
       Element chart = svgp.svgRect(x + 0.02 * height, y + 0.02 * height, fpos, height - 0.04 * height);
       chart.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#d4e4f1");
       chart.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
@@ -123,7 +120,7 @@ public class SVGScoreBar {
 
     // Draw the values:
     if(format != null) {
-      String num = Double.isNaN(fill) ? "NaN" : format.format(fill);
+      String num = Double.isNaN(val) ? "NaN" : format.format(val);
       Element lbl = svgp.svgText(x + 0.05 * width, y + 0.75 * height, num);
       lbl.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + 0.75 * height + "; font-weight: bold");
       barchart.appendChild(lbl);

@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 /**
  * Abstract evaluation result.
  * 
+ * TODO: add indicator whether high values are better or low.
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.composedOf EvaluationResult.MeasurementGroup
@@ -73,7 +75,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
   public void writeToText(TextWriterStream out, String label) {
     for(EvaluationResult.MeasurementGroup g : groups) {
       out.commentPrintLn(g.getName());
-      for(MeasurementGroup.Measurement m : g) {
+      for(Measurement m : g) {
         out.inlinePrintNoQuotes(m.name);
         out.inlinePrintNoQuotes(m.val);
       }
@@ -108,9 +110,9 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.composedOf MeasurementGroup.Measurement
+   * @apiviz.composedOf EvaluationResult.Measurement
    */
-  public static class MeasurementGroup implements Iterable<MeasurementGroup.Measurement> {
+  public static class MeasurementGroup implements Iterable<Measurement> {
     /**
      * Group name
      */
@@ -119,7 +121,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
     /**
      * Measurements in this group.
      */
-    private ArrayList<MeasurementGroup.Measurement> measurements = new ArrayList<>();
+    private ArrayList<Measurement> measurements = new ArrayList<>();
 
     /**
      * Constructor.
@@ -144,75 +146,160 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
      * 
      * @param name Measurement name
      * @param val Observed value
+     * @param min Minimum value
      * @param max Maximum value
+     * @param lowerisbetter Flag
+     * @return {@code this} (Builder pattern)
      */
-    public void addMeasure(String name, double val, double max) {
-      measurements.add(new Measurement(name, val, max));
+    public MeasurementGroup addMeasure(String name, double val, double min, double max, boolean lowerisbetter) {
+      measurements.add(new Measurement(name, val, min, max, lowerisbetter));
+      return this;
+    }
+
+    /**
+     * Add a single measurement.
+     * 
+     * @param name Measurement name
+     * @param val Observed value
+     * @param min Minimum value
+     * @param exp Expected value
+     * @param lowerisbetter Flag
+     * @return {@code this} (Builder pattern)
+     */
+    public MeasurementGroup addMeasure(String name, double val, double min, double max, double exp, boolean lowerisbetter) {
+      measurements.add(new Measurement(name, val, min, max, exp, lowerisbetter));
+      return this;
     }
 
     @Override
     public Iterator<Measurement> iterator() {
       return measurements.iterator();
     }
+  }
+
+  /**
+   * Class representing a single measurement.
+   * 
+   * TODO: indicate whether high or low is better.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Measurement {
+    /**
+     * Measurement name.
+     */
+    String name;
 
     /**
-     * Class representing a single measurement.
-     * 
-     * TODO: add minimum and optimal fields, too?
-     * 
-     * @author Erich Schubert
+     * Observed value, minimum, maximum, expected value.
      */
-    public static class Measurement {
-      /**
-       * Constructor.
-       *
-       * @param name Name
-       * @param val Value
-       * @param max Maximum
-       */
-      protected Measurement(String name, double val, double max) {
-        super();
-        this.name = name;
-        this.val = val;
-        this.max = max;
-      }
+    double val;
 
-      /**
-       * Measurement name.
-       */
-      String name;
+    /**
+     * Observed value, minimum, maximum, expected value.
+     */
+    double min;
 
-      /**
-       * Observed value, maximum value.
-       */
-      double val, max;
+    /**
+     * Observed value, minimum, maximum, expected value.
+     */
+    double max;
 
-      /**
-       * Get the name of this measurement.
-       * 
-       * @return Measurement name.
-       */
-      public String getName() {
-        return name;
-      }
+    /**
+     * Observed value, minimum, maximum, expected value.
+     */
+    double exp;
 
-      /**
-       * Get the observed value.
-       * 
-       * @return observed value.
-       */
-      public double getVal() {
-        return val;
-      }
+    /**
+     * Indicates low values are better.
+     */
+    private boolean lowerisbetter;
 
-      /**
-       * Get the maximum value.
-       * 
-       * @return Maximum value.
-       */
-      public double getMax() {
-        return max;
-      }
+    /**
+     * Constructor.
+     *
+     * @param name Name
+     * @param val Value
+     * @param min Minimum
+     * @param max Maximum
+     * @param lowerisbetter Flag
+     */
+    protected Measurement(String name, double val, double min, double max, boolean lowerisbetter) {
+      this(name, val, min, max, Double.NaN, lowerisbetter);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name Name
+     * @param val Value
+     * @param min Minimum
+     * @param max Maximum
+     * @param exp Expected value
+     * @param lowerisbetter Flag
+     */
+    protected Measurement(String name, double val, double min, double max, double exp, boolean lowerisbetter) {
+      super();
+      this.name = name;
+      this.val = val;
+      this.min = min;
+      this.max = max;
+      this.exp = exp;
+      this.lowerisbetter = lowerisbetter;
+    }
+
+    /**
+     * Get the name of this measurement.
+     * 
+     * @return Measurement name.
+     */
+    public String getName() {
+      return name;
+    }
+
+    /**
+     * Get the observed value.
+     * 
+     * @return observed value.
+     */
+    public double getVal() {
+      return val;
+    }
+
+    /**
+     * Get the minimum value.
+     * 
+     * @return Minimum value.
+     */
+    public double getMin() {
+      return min;
+    }
+
+    /**
+     * Get the maximum value.
+     * 
+     * @return Maximum value.
+     */
+    public double getMax() {
+      return max;
+    }
+
+    /**
+     * Get the expected value. May be {@code Double.NaN}.
+     * 
+     * @return Expected value.
+     */
+    public double getExp() {
+      return exp;
+    }
+
+    /**
+     * Return {@code true} if low values are better.
+     * 
+     * @return {@code true} when low values are better.
+     */
+    public boolean lowerIsBetter() {
+      return lowerisbetter;
     }
   }
 }

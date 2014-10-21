@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -90,9 +89,9 @@ public class EvaluationVisualization extends AbstractVisFactory {
     }
   }
 
-  private double addBarChart(SVGPlot svgp, Element parent, double ypos, String label, double maxValue, double value) {
+  private double addBarChart(SVGPlot svgp, Element parent, double ypos, String label, double value, double minValue, double maxValue, double baseValue) {
     SVGScoreBar barchart = new SVGScoreBar();
-    barchart.setFill(value, maxValue);
+    barchart.setFill(value, baseValue == baseValue ? baseValue : minValue, maxValue);
     barchart.showValues(FormatUtil.NF4);
     barchart.addLabel(label);
     parent.appendChild(barchart.build(svgp, 0.0, ypos, BARLENGTH, BARHEIGHT));
@@ -125,8 +124,8 @@ public class EvaluationVisualization extends AbstractVisFactory {
 
     for(EvaluationResult.MeasurementGroup g : sr) {
       ypos = addHeader(svgp, parent, ypos, g.getName());
-      for(MeasurementGroup.Measurement m : g) {
-        ypos = addBarChart(svgp, parent, ypos, m.getName(), m.getMax(), m.getVal());
+      for(EvaluationResult.Measurement m : g) {
+        ypos = addBarChart(svgp, parent, ypos, m.getName(), m.getVal(), m.getMin(), m.getMax(), m.getExp());
       }
     }
 

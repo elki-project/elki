@@ -104,13 +104,13 @@ public class OutlierRankingEvaluation implements Evaluator {
 
     MeasurementGroup g = res.newGroup("Evaluation measures");
     double rocauc = ROCEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("ROC AUC", rocauc, 1.0);
+    g.addMeasure("ROC AUC", rocauc, 0., 1. ,.5, false);
     double avep = AveragePrecisionEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("Average Precision", avep, 1.0);
+    g.addMeasure("Average Precision", avep, 0., 1., 0., false);
     double rprec = PrecisionAtKEvaluation.RPRECISION.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("R-Precision", rprec, 1.0);
+    g.addMeasure("R-Precision", rprec, 0., 1., 0., false);
     double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("Maximum F1", maxf1, 1.0);
+    g.addMeasure("Maximum F1", maxf1, 0., 1., 0., false);
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
       LOG.statistics(new DoubleStatistic(key + ".precision.average", rocauc));
@@ -130,13 +130,13 @@ public class OutlierRankingEvaluation implements Evaluator {
 
     MeasurementGroup g = res.newGroup("Evaluation measures");
     double rocauc = ROCEvaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("ROC AUC", rocauc, 1.0);
+    g.addMeasure("ROC AUC", rocauc, 0., 1. ,.5, false);
     double avep = AveragePrecisionEvaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("Average Precision", avep, 1.0);
+    g.addMeasure("Average Precision", avep, 0., 1., 0., false);
     double rprec = PrecisionAtKEvaluation.RPRECISION.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("R-Precision", rprec, 1.0);
+    g.addMeasure("R-Precision", rprec, 0., 1., 0., false);
     double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("Maximum F1", maxf1, 1.0);
+    g.addMeasure("Maximum F1", maxf1, 0., 1., 0., false);
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
       LOG.statistics(new DoubleStatistic(key + ".precision.average", rocauc));

@@ -197,7 +197,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
 
     EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
-    g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(msil.getSampleStddev()), msil.getMean(), 1.);
+    g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(msil.getSampleStddev()), msil.getMean(), -1., 1., 0., false);
     db.getHierarchy().add(c, ev);
   }
 

@@ -203,40 +203,40 @@ public class EvaluateClustering implements Evaluator {
 
       PairCounting paircount = contmat.getPaircount();
       MeasurementGroup g = newGroup("Pair counting measures");
-      g.addMeasure("Jaccard", paircount.jaccard(), 1);
-      g.addMeasure("F1-Measure", paircount.f1Measure(), 1);
-      g.addMeasure("Precision", paircount.precision(), 1);
-      g.addMeasure("Recall", paircount.recall(), 1);
-      g.addMeasure("Rand", paircount.randIndex(), 1);
-      g.addMeasure("ARI", paircount.adjustedRandIndex(), 1);
-      g.addMeasure("FowlkesMallows", paircount.fowlkesMallows(), 1);
+      g.addMeasure("Jaccard", paircount.jaccard(), 0, 1, false);
+      g.addMeasure("F1-Measure", paircount.f1Measure(), 0, 1, false);
+      g.addMeasure("Precision", paircount.precision(), 0, 1, false);
+      g.addMeasure("Recall", paircount.recall(), 0, 1, false);
+      g.addMeasure("Rand", paircount.randIndex(), 0, 1, false);
+      g.addMeasure("ARI", paircount.adjustedRandIndex(), 0, 1, false);
+      g.addMeasure("FowlkesMallows", paircount.fowlkesMallows(), 0, 1, false);
 
       Entropy entropy = contmat.getEntropy();
       g = newGroup("Entropy based measures");
-      g.addMeasure("NMI Joint", entropy.entropyNMIJoint(), 1);
-      g.addMeasure("NMI Sqrt", entropy.entropyNMISqrt(), 1);
+      g.addMeasure("NMI Joint", entropy.entropyNMIJoint(), 0, 1, false);
+      g.addMeasure("NMI Sqrt", entropy.entropyNMISqrt(), 0, 1, false);
 
       BCubed bcubed = contmat.getBCubed();
       g = newGroup("BCubed-based measures");
-      g.addMeasure("F1-Measure", bcubed.f1Measure(), 1);
-      g.addMeasure("Recall", bcubed.recall(), 1);
-      g.addMeasure("Precision", bcubed.precision(), 1);
+      g.addMeasure("F1-Measure", bcubed.f1Measure(), 0, 1, false);
+      g.addMeasure("Recall", bcubed.recall(), 0, 1, false);
+      g.addMeasure("Precision", bcubed.precision(), 0, 1, false);
 
       SetMatchingPurity setm = contmat.getSetMatching();
       g = newGroup("Set-Matching-based measures");
-      g.addMeasure("F1-Measure", setm.f1Measure(), 1);
-      g.addMeasure("Purity", setm.purity(), 1);
-      g.addMeasure("Inverse Purity", setm.inversePurity(), 1);
+      g.addMeasure("F1-Measure", setm.f1Measure(), 0, 1, false);
+      g.addMeasure("Purity", setm.purity(), 0, 1, false);
+      g.addMeasure("Inverse Purity", setm.inversePurity(), 0, 1, false);
 
       EditDistance edit = contmat.getEdit();
       g = newGroup("Editing-distance measures");
-      g.addMeasure("F1-Measure", edit.f1Measure(), 1);
-      g.addMeasure("Precision", edit.editDistanceFirst(), 1);
-      g.addMeasure("Recall", edit.editDistanceSecond(), 1);
+      g.addMeasure("F1-Measure", edit.f1Measure(), 0, 1, false);
+      g.addMeasure("Precision", edit.editDistanceFirst(), 0, 1, false);
+      g.addMeasure("Recall", edit.editDistanceSecond(), 0, 1, false);
 
       MeanVariance gini = contmat.averageSymmetricGini();
       g = newGroup("Gini measures");
-      g.addMeasure("Mean +-" + FormatUtil.NF4.format(gini.getCount() > 1. ? gini.getSampleStddev() : 0.), gini.getMean(), 1);
+      g.addMeasure("Mean +-" + FormatUtil.NF4.format(gini.getCount() > 1. ? gini.getSampleStddev() : 0.), gini.getMean(), 0, 1, false);
     }
 
     /**
