@@ -1,4 +1,4 @@
-package experimentalcode.shared.evaluation.classifier;
+package de.lmu.ifi.dbs.elki.evaluation.classification;
 
 /*
  This file is part of ELKI:
@@ -23,15 +23,19 @@ package experimentalcode.shared.evaluation.classifier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.PrintStream;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Provides the prediction performance measures for a classifier based on the
  * confusion matrix.
+ * 
+ * Note: this API is non-final, and will be refactored soon.
  *
  * @author Arthur Zimek
  */
-public class ConfusionMatrixBasedEvaluation implements EvaluationResult {
+public class ConfusionMatrixEvaluationResult implements Result, TextWriteable {
   /**
    * Holds the confusion matrix.
    */
@@ -52,31 +56,31 @@ public class ConfusionMatrixBasedEvaluation implements EvaluationResult {
    * @param testset the test set this evaluation is based on
    * @param evaluationName name of the evaluation procedure used
    */
-  public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, String evaluationName) {
+  public ConfusionMatrixEvaluationResult(ConfusionMatrix confusionmatrix, String evaluationName) {
     super();
     this.confusionmatrix = confusionmatrix;
     this.evaluationName = evaluationName;
   }
 
   @Override
-  public void outputEvaluationResult(PrintStream out) {
-    out.println("\nEvaluation:");
-    out.println(evaluationName);
+  public void writeToText(TextWriterStream out, String label) {
+    out.commentPrintLn("Evaluation:");
+    out.commentPrintLn(evaluationName);
     // out.println(evaluationProcedure.setting());
-    out.print("\nAccuracy: \n  correctly classified instances: ");
-    out.println(confusionmatrix.truePositives());
-    out.print("true positive rate:         ");
+    out.commentPrintLn("Accuracy: \n  correctly classified instances: ");
+    out.commentPrintLn(confusionmatrix.truePositives());
+    out.commentPrintLn("true positive rate:         ");
     double tpr = confusionmatrix.truePositiveRate();
-    out.println(tpr);
-    out.print("false positive rate:        ");
-    out.println(confusionmatrix.falsePositiveRate());
-    out.print("positive predicted value:   ");
+    out.commentPrintLn(tpr);
+    out.commentPrintLn("false positive rate:        ");
+    out.commentPrintLn(confusionmatrix.falsePositiveRate());
+    out.commentPrintLn("positive predicted value:   ");
     double ppv = confusionmatrix.positivePredictedValue();
-    out.println(ppv);
-    out.print("F1-measure:                 ");
-    out.println((2 * ppv * tpr) / (ppv + tpr));
-    out.println("\nconfusion matrix:\n");
-    out.println(confusionmatrix.toString());
+    out.commentPrintLn(ppv);
+    out.commentPrintLn("F1-measure:                 ");
+    out.commentPrintLn((2 * ppv * tpr) / (ppv + tpr));
+    out.commentPrintLn("\nconfusion matrix:\n");
+    out.commentPrintLn(confusionmatrix.toString());
   }
 
   @Override

@@ -23,4 +23,4 @@
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package experimentalcode.shared.algorithm.classifier;
+package de.lmu.ifi.dbs.elki.algorithm.classification;

@@ -53,6 +53,7 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.ValidateApproximativeKNNIndex
+de.lmu.ifi.dbs.elki.algorithm.classification.KNNClassifier
 de.lmu.ifi.dbs.elki.algorithm.KNNDistancesSampler
 de.lmu.ifi.dbs.elki.algorithm.KNNJoin
 de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances

@@ -1,4 +1,4 @@
-package experimentalcode.shared.evaluation.classifier;
+package de.lmu.ifi.dbs.elki.evaluation.classification;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures

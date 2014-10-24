@@ -1,8 +1,9 @@
 de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI
 de.lmu.ifi.dbs.elki.application.KDDCLIApplication
 de.lmu.ifi.dbs.elki.gui.multistep.MultiStepGUI
-de.lmu.ifi.dbs.elki.application.GeneratorXMLSpec
+de.lmu.ifi.dbs.elki.application.ClassifierHoldoutEvaluationTask
 de.lmu.ifi.dbs.elki.application.ConvertToBundleApplication
+de.lmu.ifi.dbs.elki.application.GeneratorXMLSpec
 de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceInOnDiskMatrix
 de.lmu.ifi.dbs.elki.application.cache.CacheFloatDistanceInOnDiskMatrix
 de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceKNNLists

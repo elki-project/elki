@@ -1,4 +1,4 @@
-package experimentalcode.shared.evaluation.classifier;
+package de.lmu.ifi.dbs.elki.application;
 
 /*
  This file is part of ELKI:
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.algorithm.classification.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
@@ -38,6 +38,11 @@ import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.MultipleObjectsBundleDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.evaluation.classification.ConfusionMatrix;
+import de.lmu.ifi.dbs.elki.evaluation.classification.holdout.AbstractHoldout;
+import de.lmu.ifi.dbs.elki.evaluation.classification.holdout.Holdout;
+import de.lmu.ifi.dbs.elki.evaluation.classification.holdout.StratifiedCrossValidation;
+import de.lmu.ifi.dbs.elki.evaluation.classification.holdout.TrainingAndTestSet;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
@@ -69,16 +74,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
-import experimentalcode.shared.algorithm.classifier.Classifier;
-import experimentalcode.shared.evaluation.classifier.holdout.AbstractHoldout;
-import experimentalcode.shared.evaluation.classifier.holdout.Holdout;
-import experimentalcode.shared.evaluation.classifier.holdout.StratifiedCrossValidation;
-import experimentalcode.shared.evaluation.classifier.holdout.TrainingAndTestSet;
 
 /**
  * Evaluate a classifier.
  * 
- * TODO: move AbstractApplication into a separate class?
+ * TODO: split into application and task.
  * 
  * TODO: add support for predefined test and training pairs!
  * 
@@ -112,6 +112,14 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
    */
   protected Holdout holdout;
 
+  /**
+   * Constructor.
+   *
+   * @param databaseConnection Data source
+   * @param indexFactories Data indexes
+   * @param algorithm Classification algorithm
+   * @param holdout Evaluation holdout
+   */
   public ClassifierHoldoutEvaluationTask(DatabaseConnection databaseConnection, Collection<IndexFactory<?, ?>> indexFactories, Classifier<O> algorithm, Holdout holdout) {
     this.databaseConnection = databaseConnection;
     this.indexFactories = indexFactories;
@@ -173,7 +181,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
     /**
      * Parameter to specify the holdout for evaluation, must extend
-     * {@link experimentalcode.shared.evaluation.classifier.holdout.Holdout}.
+     * {@link de.lmu.ifi.dbs.elki.evaluation.classification.holdout.Holdout}.
      * <p>
      * Key: {@code -classifier.holdout}
      * </p>

@@ -1,4 +1,4 @@
-package experimentalcode.shared.algorithm.classifier;
+package de.lmu.ifi.dbs.elki.algorithm.classification;
 
 /*
  This file is part of ELKI:
