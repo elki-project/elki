@@ -27,8 +27,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -65,6 +68,114 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
       }
     }
     return out;
+  }
+
+  /**
+   * Clamp values to a given minimum and maximum.
+   * 
+   * @param value True value
+   * @param min Minimum
+   * @param max Maximum
+   * @return {@code value}, unless smaller than {@code min} or larger than
+   *         {@code max}.
+   */
+  protected static double clamp(double value, double min, double max) {
+    return value < min ? min : value > max ? max : value;
+  }
+
+  /**
+   * Compute ranks of all objects, normalized to [0;1] (where 0 is the smallest
+   * value, 1 is the largest).
+   * 
+   * @param adapter Data adapter
+   * @param data Data array
+   * @param len Length of data
+   * @return Array of scores
+   */
+  protected static <A> double[] computeNormalizedRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
+    // Sort the objects:
+    int[] s1 = MathUtil.sequence(0, len);
+    IntegerArrayQuickSort.sort(s1, new IntegerComparator() {
+      @Override
+      public int compare(int x, int y) {
+        return Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y));
+      }
+    });
+    final double norm = .5 / (len - 1);
+    double[] ret = new double[len];
+    for(int i = 0; i < len;) {
+      final int start = i++;
+      final double val = adapter.getDouble(data, s1[start]);
+      while(i < len && adapter.getDouble(data, s1[i]) <= val) {
+        i++;
+      }
+      final double score = (start + i - 1) * norm;
+      for(int j = start; j < i; j++) {
+        ret[s1[j]] = score;
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * Compute ranks of all objects, ranging from 1 to len.
+   * 
+   * @param adapter Data adapter
+   * @param data Data array
+   * @param len Length of data
+   * @return Array of scores
+   */
+  protected static <A> int[] computeIntegerRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
+    // Sort the objects:
+    int[] s1 = MathUtil.sequence(0, len);
+    IntegerArrayQuickSort.sort(s1, new IntegerComparator() {
+      @Override
+      public int compare(int x, int y) {
+        return Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y));
+      }
+    });
+    int[] ret = new int[len];
+    for(int i = 0; i < len;) {
+      final int start = i++;
+      final double val = adapter.getDouble(data, s1[start]);
+      while(i < len && adapter.getDouble(data, s1[i]) <= val) {
+        i++;
+      }
+      final int score = ((start + i - 1) >> 1) + 1;
+      for(int j = start; j < i; j++) {
+        ret[s1[j]] = score;
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * Discretize a data set into equi-width bin numbers.
+   * 
+   * @param adapter Data adapter
+   * @param data Data array
+   * @param len Length of data
+   * @param bins Number of bins
+   * @return Array of bin numbers [0;bin[
+   */
+  protected static <A> int[] discretize(NumberArrayAdapter<?, A> adapter, A data, final int len, final int bins) {
+    double min = adapter.getDouble(data, 0), max = min;
+    for(int i = 1; i < len; i++) {
+      double v = adapter.getDouble(data, i);
+      if(v < min) {
+        min = v;
+      }
+      else if(v > max) {
+        max = v;
+      }
+    }
+    final double scale = (max > min) ? bins / (max - min) : 1;
+    int[] discData = new int[len];
+    for(int i = 0; i < len; i++) {
+      int bin = (int) Math.floor((adapter.getDouble(data, i) - min) * scale);
+      discData[i] = bin < 0 ? 0 : bin >= bins ? bins - 1 : bin;
+    }
+    return discData;
   }
 
   /**
