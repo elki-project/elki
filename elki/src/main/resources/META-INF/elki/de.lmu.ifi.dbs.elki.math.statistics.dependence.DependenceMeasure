@@ -4,6 +4,7 @@ de.lmu.ifi.dbs.elki.math.statistics.dependence.DistanceCorrelationDependenceMeas
 de.lmu.ifi.dbs.elki.math.statistics.dependence.SlopeDependenceMeasure
 de.lmu.ifi.dbs.elki.math.statistics.dependence.SlopeInversionDependenceMeasure
 de.lmu.ifi.dbs.elki.math.statistics.dependence.MCEDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.MutualInformationEquiwidthDependenceMeasure
 de.lmu.ifi.dbs.elki.math.statistics.dependence.HSMDependenceMeasure
 de.lmu.ifi.dbs.elki.math.statistics.dependence.HiCSDependenceMeasure
 de.lmu.ifi.dbs.elki.math.statistics.dependence.SURFINGDependenceMeasure
