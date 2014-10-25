@@ -94,13 +94,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    */
   protected static <A> double[] computeNormalizedRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
     // Sort the objects:
-    int[] s1 = MathUtil.sequence(0, len);
-    IntegerArrayQuickSort.sort(s1, new IntegerComparator() {
-      @Override
-      public int compare(int x, int y) {
-        return Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y));
-      }
-    });
+    int[] s1 = sortedIndex(adapter, data, len);
     final double norm = .5 / (len - 1);
     double[] ret = new double[len];
     for(int i = 0; i < len;) {
@@ -119,14 +113,57 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
 
   /**
    * Compute ranks of all objects, ranging from 1 to len.
-   * 
+   *
+   * Ties are given the average rank.
+   *
    * @param adapter Data adapter
    * @param data Data array
    * @param len Length of data
    * @return Array of scores
    */
-  protected static <A> int[] computeIntegerRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
+  protected static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
     // Sort the objects:
+    int[] s1 = sortedIndex(adapter, data, len);
+    return ranks(adapter, data, s1);
+  }
+
+  /**
+   * Compute ranks of all objects, ranging from 1 to len.
+   *
+   * Ties are given the average rank.
+   *
+   * @param adapter Data adapter
+   * @param data Data array
+   * @param idx Data index
+   * @return Array of scores
+   */
+  protected static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx) {
+    final int len = idx.length;
+    double[] ret = new double[len];
+    for(int i = 0; i < len;) {
+      final int start = i++;
+      final double val = adapter.getDouble(data, idx[start]);
+      // Include ties:
+      while(i < len && adapter.getDouble(data, idx[i]) <= val) {
+        i++;
+      }
+      final double score = (start + i - 1) * .5 + 1;
+      for(int j = start; j < i; j++) {
+        ret[idx[j]] = score;
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * Build a sorted index of objects.
+   *
+   * @param adapter Data adapter
+   * @param data Data array
+   * @param len Length of data
+   * @return Sorted index
+   */
+  protected static <A> int[] sortedIndex(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
     int[] s1 = MathUtil.sequence(0, len);
     IntegerArrayQuickSort.sort(s1, new IntegerComparator() {
       @Override
@@ -134,19 +171,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
         return Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y));
       }
     });
-    int[] ret = new int[len];
-    for(int i = 0; i < len;) {
-      final int start = i++;
-      final double val = adapter.getDouble(data, s1[start]);
-      while(i < len && adapter.getDouble(data, s1[i]) <= val) {
-        i++;
-      }
-      final int score = ((start + i - 1) >> 1) + 1;
-      for(int j = start; j < i; j++) {
-        ret[s1[j]] = score;
-      }
-    }
-    return ret;
+    return s1;
   }
 
   /**

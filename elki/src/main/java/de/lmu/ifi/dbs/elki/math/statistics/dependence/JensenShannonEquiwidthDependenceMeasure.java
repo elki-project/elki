@@ -23,34 +23,31 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Mutual Information (MI) dependence measure by dividing each attribute into
- * equal-width bins. MI can be seen as Kullback–Leibler divergence of the joint
- * distribution and the product of the marginal distributions.
+ * Jensen-Shannon Divergence is closely related to mutual information.
  * 
- * For normalization, the resulting values are scaled by {@code mi/log(nbins)}.
- * This both cancels out the logarithm base, and normalizes for the number of
- * bins (a uniform distribution will yield a MI with itself of 1).
+ * The output value is normalized, such that an evenly distributed and identical
+ * distribution will yield a value of 1. Independent distributions may still
+ * yield values close to .25, though.
  * 
  * TODO: Offer normalized and non-normalized variants?
  * 
- * For a median-based discretization, see {@link MCEDependenceMeasure}.
- * 
  * @author Erich Schubert
  */
-public class MutualInformationEquiwidthDependenceMeasure extends AbstractDependenceMeasure {
+public class JensenShannonEquiwidthDependenceMeasure extends AbstractDependenceMeasure {
   /**
    * Static instance.
    */
-  public static final MutualInformationEquiwidthDependenceMeasure STATIC = new MutualInformationEquiwidthDependenceMeasure();
+  public static final JensenShannonEquiwidthDependenceMeasure STATIC = new JensenShannonEquiwidthDependenceMeasure();
 
   /**
    * Constructor - use {@link #STATIC} instance.
    */
-  protected MutualInformationEquiwidthDependenceMeasure() {
+  protected JensenShannonEquiwidthDependenceMeasure() {
     super();
   }
 
@@ -103,22 +100,31 @@ public class MutualInformationEquiwidthDependenceMeasure extends AbstractDepende
         continue;
       }
       // Inverse pX
-      final double ipX = len / (double) sum1;
+      final double pX = sum1 / (double) len;
       final int[] row = counts[bin1];
       for(int bin2 = 0; bin2 < row.length; bin2++) {
-        final int cell = row[bin2];
-        // Skip empty cells.
-        if(cell != 0) {
-          // Mutual information pXY / (pX * pY)
+        final int sum2 = margin2[bin2];
+        if(sum2 > 0) {
+          final int cell = row[bin2];
+          // JS divergence of pXY and (pX * pY)
           double pXY = cell / (double) len;
-          // Inverse pXpY: 1 / (pX*pY)
-          final double ipXpY = ipX * len / margin2[bin2];
-          e += pXY * Math.log(pXY * ipXpY);
+          final double pXpY = pX * sum2 / len;
+          final double iavg = 2. / (pXY + pXpY);
+          e += pXY > 0. ? pXY * Math.log(pXY * iavg) : 0.;
+          e += pXpY * Math.log(pXpY * iavg);
         }
       }
     }
-    // Expected value for uniform identical: log(bins)!
-    return e / Math.log(bins);
+    // Expected value for evenly distributed and identical:
+    // pX = pY = 1/b and thus pXpY = 1/b^2.
+    // for i==j, pXY=1/b and thus iavg = 2*b*b/(b+1)
+    // otherwise, pXY=0 and thus iavg = 2*b*b
+    // pXY: e += log(b*2/(b+1)) = log(b) + log(2/(b+1))
+    // pXpY1: e += 1/b*log(2/(b+1)) = 1/b*log(2/(b+1))
+    // pXpY2: e += (b-1)/b*log(2) = (b-1)/b*log(2)
+    final double exp = Math.log(bins) + (1. + 1. / bins) * Math.log(2. / (bins + 1)) + (bins - 1.) / bins * MathUtil.LOG2;
+    // e *= .5; // Average, but we need to adjust exp then, too!
+    return e / exp;
   }
 
   /**
@@ -130,7 +136,7 @@ public class MutualInformationEquiwidthDependenceMeasure extends AbstractDepende
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected MutualInformationEquiwidthDependenceMeasure makeInstance() {
+    protected JensenShannonEquiwidthDependenceMeasure makeInstance() {
       return STATIC;
     }
   }
