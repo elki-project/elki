@@ -29,6 +29,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -42,19 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * surrounding cube.
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector type
  */
-public class AxisBasedReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
-  /**
-   * Parameter to specify the extra scaling of the space, to allow
-   * out-of-data-space reference points.
-   * <p>
-   * Key: {@code -axisref.scale}
-   * </p>
-   */
-  public static final OptionID SPACE_SCALE_ID = new OptionID("axisref.scale", "Scale the data space extension by the given factor.");
-
+public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
   /**
    * Holds the value of {@link #SPACE_SCALE_ID}.
    */
@@ -71,11 +61,8 @@ public class AxisBasedReferencePoints<V extends NumberVector> implements Referen
   }
 
   @Override
-  public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
-    Relation<V> database = RelationUtil.relationUglyVectorCast(db);
-    double[][] minmax = RelationUtil.computeMinMax(database);
-    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
-
+  public Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db) {
+    double[][] minmax = RelationUtil.computeMinMax(db);
     int dim = RelationUtil.dimensionality(db);
 
     // Compute mean and extend from minmax.
@@ -85,18 +72,18 @@ public class AxisBasedReferencePoints<V extends NumberVector> implements Referen
       mean[d] -= delta[d] * .5;
     }
 
-    ArrayList<V> result = new ArrayList<>(2 + dim);
+    ArrayList<Vector> result = new ArrayList<>(2 + dim);
 
     double[] vec = new double[dim];
     // Use min and max
     for(int d = 0; d < dim; d++) {
       vec[d] = mean[d] - delta[d];
     }
-    result.add(factory.newNumberVector(vec));
+    result.add(new Vector(vec));
     for(int d = 0; d < dim; d++) {
       vec[d] = mean[d] + delta[d];
     }
-    result.add(factory.newNumberVector(vec));
+    result.add(new Vector(vec));
 
     // Plus axis end points:
     for(int i = 0; i < dim; i++) {
@@ -108,7 +95,7 @@ public class AxisBasedReferencePoints<V extends NumberVector> implements Referen
           vec[d] = mean[d] + delta[d];
         }
       }
-      result.add(factory.newNumberVector(vec));
+      result.add(new Vector(vec));
     }
 
     return result;
@@ -121,7 +108,16 @@ public class AxisBasedReferencePoints<V extends NumberVector> implements Referen
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the extra scaling of the space, to allow
+     * out-of-data-space reference points.
+     * <p>
+     * Key: {@code -axisref.scale}
+     * </p>
+     */
+    public static final OptionID SPACE_SCALE_ID = new OptionID("axisref.scale", "Scale the data space extension by the given factor.");
+
     /**
      * Holds the value of {@link #SPACE_SCALE_ID}.
      */
@@ -130,16 +126,16 @@ public class AxisBasedReferencePoints<V extends NumberVector> implements Referen
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter spacescaleP = new DoubleParameter(SPACE_SCALE_ID, 1.0);
-      spacescaleP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      DoubleParameter spacescaleP = new DoubleParameter(SPACE_SCALE_ID, 1.0)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(spacescaleP)) {
         spacescale = spacescaleP.getValue();
       }
     }
 
     @Override
-    protected AxisBasedReferencePoints<V> makeInstance() {
-      return new AxisBasedReferencePoints<>(spacescale);
+    protected AxisBasedReferencePoints makeInstance() {
+      return new AxisBasedReferencePoints(spacescale);
     }
   }
 }

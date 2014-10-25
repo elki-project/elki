@@ -25,8 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -41,11 +40,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
@@ -94,7 +93,7 @@ title = "An Efficient Reference-based Approach to Outlier Detection in Large Dat
 booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
 url = "http://dx.doi.org/10.1109/ICDM.2006.17")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection" })
-public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ReferenceBasedOutlierDetection extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -108,12 +107,7 @@ public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<Outlier
   /**
    * Stores the reference point strategy.
    */
-  private ReferencePointsHeuristic<V> refp;
-
-  /**
-   * Distance function to use.
-   */
-  private DistanceFunction<V> distanceFunction;
+  private ReferencePointsHeuristic refp;
 
   /**
    * Constructor with parameters.
@@ -122,10 +116,9 @@ public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<Outlier
    * @param distanceFunction distance function
    * @param refp Reference points heuristic
    */
-  public ReferenceBasedOutlierDetection(int k, DistanceFunction<V> distanceFunction, ReferencePointsHeuristic<V> refp) {
-    super();
+  public ReferenceBasedOutlierDetection(int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, ReferencePointsHeuristic refp) {
+    super(distanceFunction);
     this.k = k;
-    this.distanceFunction = distanceFunction;
     this.refp = refp;
   }
 
@@ -136,9 +129,10 @@ public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<Outlier
    * @param relation Relation to process
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<V> relation) {
-    DistanceQuery<V> distFunc = database.getDistanceQuery(relation, distanceFunction);
-    Collection<V> refPoints = refp.getReferencePoints(relation);
+  public OutlierResult run(Database database, Relation<? extends NumberVector> relation) {
+    @SuppressWarnings("unchecked")
+    PrimitiveDistanceQuery<? super NumberVector> distq = (PrimitiveDistanceQuery<? super NumberVector>) database.getDistanceQuery(relation, distanceFunction);
+    Collection<? extends NumberVector> refPoints = refp.getReferencePoints(relation);
     if(refPoints.size() < 1) {
       throw new AbortException("Cannot compute ROS without reference points!");
     }
@@ -151,8 +145,8 @@ public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<Outlier
     WritableDoubleDataStore rbod_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_HOT, Double.NaN);
 
     // Compute density estimation:
-    for(V refPoint : refPoints) {
-      DoubleDBIDList referenceDists = computeDistanceVector(refPoint, relation, distFunc);
+    for(NumberVector refPoint : refPoints) {
+      DoubleDBIDList referenceDists = computeDistanceVector(refPoint, relation, distq);
       updateDensities(rbod_score, referenceDists);
     }
     // compute maximum density
@@ -188,7 +182,7 @@ public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<Outlier
    * @return array containing the distance to one reference point for each
    *         database object and the object id
    */
-  protected DoubleDBIDList computeDistanceVector(V refPoint, Relation<V> database, DistanceQuery<V> distFunc) {
+  protected DoubleDBIDList computeDistanceVector(NumberVector refPoint, Relation<? extends NumberVector> database, PrimitiveDistanceQuery<? super NumberVector> distFunc) {
     ModifiableDoubleDBIDList referenceDists = DBIDUtil.newDistanceDBIDList(database.size());
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
       referenceDists.add(distFunc.distance(iditer, refPoint), iditer);
@@ -288,7 +282,7 @@ public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<Outlier
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector> {
     /**
      * Parameter for the reference points heuristic.
      */
@@ -309,7 +303,7 @@ public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<Outlier
     /**
      * Stores the reference point strategy
      */
-    private ReferencePointsHeuristic<V> refp;
+    private ReferencePointsHeuristic refp;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -319,15 +313,15 @@ public class ReferenceBasedOutlierDetection<V> extends AbstractAlgorithm<Outlier
       if(config.grab(pK)) {
         k = pK.getValue();
       }
-      final ObjectParameter<ReferencePointsHeuristic<V>> refpP = new ObjectParameter<>(REFP_ID, ReferencePointsHeuristic.class, GridBasedReferencePoints.class);
+      final ObjectParameter<ReferencePointsHeuristic> refpP = new ObjectParameter<>(REFP_ID, ReferencePointsHeuristic.class, GridBasedReferencePoints.class);
       if(config.grab(refpP)) {
         refp = refpP.instantiateClass(config);
       }
     }
 
     @Override
-    protected ReferenceBasedOutlierDetection<V> makeInstance() {
-      return new ReferenceBasedOutlierDetection<>(k, distanceFunction, refp);
+    protected ReferenceBasedOutlierDetection makeInstance() {
+      return new ReferenceBasedOutlierDetection(k, distanceFunction, refp);
     }
   }
 }

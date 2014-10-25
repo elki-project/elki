@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -41,27 +42,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * Star-based strategy to pick reference points.
  * 
  * @author Erich Schubert
- * 
- * @param <V> Object type
  */
-public class StarBasedReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
-  /**
-   * Parameter to specify the grid resolution.
-   * <p>
-   * Key: {@code -star.nocenter}
-   * </p>
-   */
-  public static final OptionID NOCENTER_ID = new OptionID("star.nocenter", "Do not use the center as extra reference point.");
-
-  /**
-   * Parameter to specify the extra scaling of the space, to allow
-   * out-of-data-space reference points.
-   * <p>
-   * Key: {@code -star.scale}
-   * </p>
-   */
-  public static final OptionID SCALE_ID = new OptionID("star.scale", "Scale the reference points by the given factor. This can be used to obtain reference points outside the used data space.");
-
+public class StarBasedReferencePoints implements ReferencePointsHeuristic {
   /**
    * Holds the value of {@link #NOCENTER_ID}.
    */
@@ -85,10 +67,7 @@ public class StarBasedReferencePoints<V extends NumberVector> implements Referen
   }
 
   @Override
-  public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
-    Relation<V> database = RelationUtil.relationUglyVectorCast(db);
-    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
-
+  public Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db) {
     int dim = RelationUtil.dimensionality(db);
 
     // Compute minimum, maximum and centroid
@@ -100,10 +79,10 @@ public class StarBasedReferencePoints<V extends NumberVector> implements Referen
       min[d] = Double.MAX_VALUE;
       max[d] = -Double.MAX_VALUE;
     }
-    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      V obj = database.get(iditer);
+    for(DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      NumberVector obj = db.get(iditer);
       for(int d = 0; d < dim; d++) {
-        double val = obj.doubleValue(d + 1);
+        double val = obj.doubleValue(d);
         centroid[d] += val;
         min[d] = Math.min(min[d], val);
         max[d] = Math.max(max[d], val);
@@ -111,14 +90,14 @@ public class StarBasedReferencePoints<V extends NumberVector> implements Referen
     }
     // finish centroid, scale min, max
     for(int d = 0; d < dim; d++) {
-      centroid[d] = centroid[d] / database.size();
+      centroid[d] = centroid[d] / db.size();
       min[d] = (min[d] - centroid[d]) * scale + centroid[d];
       max[d] = (max[d] - centroid[d]) * scale + centroid[d];
     }
 
-    ArrayList<V> result = new ArrayList<>(2 * dim + 1);
+    ArrayList<Vector> result = new ArrayList<>(2 * dim + 1);
     if(!nocenter) {
-      result.add(factory.newNumberVector(centroid));
+      result.add(new Vector(centroid));
     }
     // Plus axis end points through centroid
     double[] vec = new double[dim];
@@ -129,9 +108,9 @@ public class StarBasedReferencePoints<V extends NumberVector> implements Referen
         }
       }
       vec[i] = min[i];
-      result.add(factory.newNumberVector(vec));
+      result.add(new Vector(vec));
       vec[i] = max[i];
-      result.add(factory.newNumberVector(vec));
+      result.add(new Vector(vec));
     }
 
     return result;
@@ -144,7 +123,24 @@ public class StarBasedReferencePoints<V extends NumberVector> implements Referen
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the grid resolution.
+     * <p>
+     * Key: {@code -star.nocenter}
+     * </p>
+     */
+    public static final OptionID NOCENTER_ID = new OptionID("star.nocenter", "Do not use the center as extra reference point.");
+
+    /**
+     * Parameter to specify the extra scaling of the space, to allow
+     * out-of-data-space reference points.
+     * <p>
+     * Key: {@code -star.scale}
+     * </p>
+     */
+    public static final OptionID SCALE_ID = new OptionID("star.scale", "Scale the reference points by the given factor. This can be used to obtain reference points outside the used data space.");
+
     /**
      * Holds the value of {@link #NOCENTER_ID}.
      */
@@ -163,16 +159,16 @@ public class StarBasedReferencePoints<V extends NumberVector> implements Referen
         nocenter = nocenterF.getValue();
       }
 
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0);
-      scaleP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(scaleP)) {
         scale = scaleP.getValue();
       }
     }
 
     @Override
-    protected StarBasedReferencePoints<V> makeInstance() {
-      return new StarBasedReferencePoints<>(nocenter, scale);
+    protected StarBasedReferencePoints makeInstance() {
+      return new StarBasedReferencePoints(nocenter, scale);
     }
   }
 }

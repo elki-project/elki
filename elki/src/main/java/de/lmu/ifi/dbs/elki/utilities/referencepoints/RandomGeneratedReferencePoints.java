@@ -29,6 +29,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -40,35 +41,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Reference points generated randomly within the used data space.
  * 
  * @author Erich Schubert
- * 
- * @param <V> Object type
  */
-// TODO: Erich: use reproducible random
-public class RandomGeneratedReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
+// TODO: use reproducible random
+public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic {
   /**
-   * Parameter to specify the number of requested reference points.
-   * <p>
-   * Key: {@code -generate.n}
-   * </p>
-   */
-  public static final OptionID N_ID = new OptionID("generate.n", "The number of reference points to be generated.");
-
-  /**
-   * Parameter for additional scaling of the space, to allow out-of-space
-   * reference points.
-   * <p>
-   * Key: {@code -generate.scale}
-   * </p>
-   */
-  public static final OptionID SCALE_ID = new OptionID("generate.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
-
-  /**
-   * Holds the value of {@link #N_ID}.
+   * Holds the sample size.
    */
   protected int samplesize;
 
   /**
-   * Holds the value of {@link #SCALE_ID}.
+   * Holds the scaling factor.
    */
   protected double scale = 1.0;
 
@@ -85,11 +67,8 @@ public class RandomGeneratedReferencePoints<V extends NumberVector> implements R
   }
 
   @Override
-  public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
-    Relation<V> database = RelationUtil.relationUglyVectorCast(db);
-    double[][] minmax = RelationUtil.computeMinMax(database);
-    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
-
+  public Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db) {
+    double[][] minmax = RelationUtil.computeMinMax(db);
     int dim = RelationUtil.dimensionality(db);
 
     // Compute mean and extend from minmax.
@@ -99,13 +78,13 @@ public class RandomGeneratedReferencePoints<V extends NumberVector> implements R
       mean[d] -= delta[d] * .5;
     }
 
-    ArrayList<V> result = new ArrayList<>(samplesize);
+    ArrayList<Vector> result = new ArrayList<>(samplesize);
     double[] vec = new double[dim];
     for(int i = 0; i < samplesize; i++) {
       for(int d = 0; d < dim; d++) {
         vec[d] = mean[d] + (Math.random() - 0.5) * scale * delta[d];
       }
-      V newp = factory.newNumberVector(vec);
+      Vector newp = new Vector(vec);
       // logger.debug("New reference point: " + FormatUtil.format(vec));
       result.add(newp);
     }
@@ -120,7 +99,24 @@ public class RandomGeneratedReferencePoints<V extends NumberVector> implements R
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the number of requested reference points.
+     * <p>
+     * Key: {@code -generate.n}
+     * </p>
+     */
+    public static final OptionID N_ID = new OptionID("generate.n", "The number of reference points to be generated.");
+
+    /**
+     * Parameter for additional scaling of the space, to allow out-of-space
+     * reference points.
+     * <p>
+     * Key: {@code -generate.scale}
+     * </p>
+     */
+    public static final OptionID SCALE_ID = new OptionID("generate.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
+
     /**
      * Holds the value of {@link #N_ID}.
      */
@@ -135,22 +131,22 @@ public class RandomGeneratedReferencePoints<V extends NumberVector> implements R
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter samplesizeP = new IntParameter(N_ID);
-      samplesizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter samplesizeP = new IntParameter(N_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(samplesizeP)) {
         samplesize = samplesizeP.getValue();
       }
 
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0);
-      scaleP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(scaleP)) {
         scale = scaleP.getValue();
       }
     }
 
     @Override
-    protected RandomGeneratedReferencePoints<V> makeInstance() {
-      return new RandomGeneratedReferencePoints<>(samplesize, scale);
+    protected RandomGeneratedReferencePoints makeInstance() {
+      return new RandomGeneratedReferencePoints(samplesize, scale);
     }
   }
 }

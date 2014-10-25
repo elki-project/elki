@@ -25,14 +25,14 @@ package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -44,27 +44,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Random-Sampling strategy for picking reference points.
  * 
  * @author Erich Schubert
- * 
- * @param <V> Vector type
  */
-public class RandomSampleReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
-  // TODO: use reproducible Random
-
+public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
   /**
-   * Parameter to specify the sample size.
-   * <p>
-   * Key: {@code -sample.n}
-   * </p>
-   */
-  public static final OptionID N_ID = new OptionID("sample.n", "The number of samples to draw.");
-
-  /**
-   * Constant used in choosing optimal table sizes.
-   */
-  private static final double LOG4 = Math.log(4);
-
-  /**
-   * Holds the value of {@link #N_ID}.
+   * Sample size.
    */
   private int samplesize;
 
@@ -79,58 +62,18 @@ public class RandomSampleReferencePoints<V extends NumberVector> implements Refe
   }
 
   @Override
-  public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
+  public Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db) {
     if(samplesize >= db.size()) {
-      LoggingUtil.warning("Sample size is larger than database size!");
-
-      ArrayList<V> selection = new ArrayList<>(db.size());
-      for(DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        selection.add(db.get(iditer));
-      }
-      return selection;
+      LoggingUtil.warning("Requested sample size is larger than database size!");
+      return new RelationUtil.CollectionFromRelation<>(db);
     }
 
-    ArrayList<V> result = new ArrayList<>(samplesize);
-    int dbsize = db.size();
+    ArrayList<NumberVector> result = new ArrayList<>(samplesize);
+    DBIDs sample = DBIDUtil.randomSample(db.getDBIDs(), samplesize, new Random());
 
-    // Guess the memory requirements of a hashmap.
-    // The values are based on Python code, and might need modification for
-    // Java!
-    // If the hashmap is likely to become too big, lazy-shuffle a list instead.
-    int setsize = 21;
-    if(samplesize > 5) {
-      setsize += 2 << (int) Math.ceil(Math.log(samplesize * 3) / LOG4);
+    for(DBIDIter it = sample.iter(); it.valid(); it.advance()) {
+      result.add(db.get(it));
     }
-    // logger.debug("Setsize: "+setsize);
-    ArrayDBIDs ids = DBIDUtil.ensureArray(db.getDBIDs());
-    boolean fastrandomaccess = false;
-    if(ArrayList.class.isAssignableFrom(ids.getClass())) {
-      fastrandomaccess = true;
-    }
-    if(samplesize <= setsize || !fastrandomaccess) {
-      // use pool approach
-      // if getIDs() is an array list, we don't need to copy it again.
-      ArrayModifiableDBIDs pool = ((ArrayModifiableDBIDs.class.isAssignableFrom(ids.getClass())) ? (ArrayModifiableDBIDs) ids : DBIDUtil.newArray(ids));
-      for(int i = 0; i < samplesize; i++) {
-        int j = (int) Math.floor(Math.random() * (dbsize - i));
-        result.add(db.get(pool.get(j)));
-        pool.set(j, pool.get(dbsize - i - 1));
-      }
-      ids = null; // dirty!
-    }
-    else {
-      HashSet<Integer> selected = new HashSet<>();
-      for(int i = 0; i < samplesize; i++) {
-        int j = (int) Math.floor(Math.random() * dbsize);
-        // Redraw from pool.
-        while(selected.contains(j)) {
-          j = (int) Math.floor(Math.random() * dbsize);
-        }
-        selected.add(j);
-        result.add(db.get(ids.get(j)));
-      }
-    }
-    assert (result.size() == samplesize);
     return result;
   }
 
@@ -141,7 +84,17 @@ public class RandomSampleReferencePoints<V extends NumberVector> implements Refe
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
+    // TODO: use reproducible Random
+
+    /**
+     * Parameter to specify the sample size.
+     * <p>
+     * Key: {@code -sample.n}
+     * </p>
+     */
+    public static final OptionID N_ID = new OptionID("sample.n", "The number of samples to draw.");
+
     /**
      * Holds the value of {@link #N_ID}.
      */
@@ -150,16 +103,16 @@ public class RandomSampleReferencePoints<V extends NumberVector> implements Refe
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter samplesizeP = new IntParameter(N_ID);
-      samplesizeP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter samplesizeP = new IntParameter(N_ID)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(samplesizeP)) {
         samplesize = samplesizeP.intValue();
       }
     }
 
     @Override
-    protected RandomSampleReferencePoints<V> makeInstance() {
-      return new RandomSampleReferencePoints<>(samplesize);
+    protected RandomSampleReferencePoints makeInstance() {
+      return new RandomSampleReferencePoints(samplesize);
     }
   }
 }

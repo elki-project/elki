@@ -33,10 +33,8 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * Strategy to use the complete database as reference points.
  * 
  * @author Erich Schubert
- * 
- * @param <O> Object type.
  */
-public class FullDatabaseReferencePoints<O extends NumberVector> implements ReferencePointsHeuristic<O> {
+public class FullDatabaseReferencePoints implements ReferencePointsHeuristic {
   /**
    * Constructor, Parameterizable style.
    */
@@ -45,7 +43,7 @@ public class FullDatabaseReferencePoints<O extends NumberVector> implements Refe
   }
 
   @Override
-  public <T extends O> Collection<O> getReferencePoints(Relation<T> db) {
-    return new RelationUtil.CollectionFromRelation<O>(db);
+  public Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db) {
+    return new RelationUtil.CollectionFromRelation<>(db);
   }
 }

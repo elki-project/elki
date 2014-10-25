@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -41,36 +42,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Grid-based strategy to pick reference points.
  * 
  * @author Erich Schubert
- * 
- * @param <V> Object type
  */
-public class GridBasedReferencePoints<V extends NumberVector> implements ReferencePointsHeuristic<V> {
-  // TODO: add "grid sampling" option.
-
+public class GridBasedReferencePoints implements ReferencePointsHeuristic {
   /**
-   * Parameter to specify the grid resolution.
-   * <p>
-   * Key: {@code -grid.size}
-   * </p>
-   */
-  public static final OptionID GRID_ID = new OptionID("grid.size", "The number of partitions in each dimension. Points will be placed on the edges of the grid, except for a grid size of 0, where only the mean is generated as reference point.");
-
-  /**
-   * Parameter to specify the extra scaling of the space, to allow
-   * out-of-data-space reference points.
-   * <p>
-   * Key: {@code -grid.oversize}
-   * </p>
-   */
-  public static final OptionID GRID_SCALE_ID = new OptionID("grid.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
-
-  /**
-   * Holds the value of {@link #GRID_ID}.
+   * Holds the grid resolution.
    */
   protected int gridres;
 
   /**
-   * Holds the value of {@link #GRID_SCALE_ID}.
+   * Holds the grid scale.
    */
   protected double gridscale;
 
@@ -87,11 +67,8 @@ public class GridBasedReferencePoints<V extends NumberVector> implements Referen
   }
 
   @Override
-  public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
-    Relation<V> database = RelationUtil.relationUglyVectorCast(db);
-    double[][] minmax = RelationUtil.computeMinMax(database);
-    NumberVector.Factory<V>  factory = RelationUtil.getNumberVectorFactory(database);
-
+  public Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db) {
+    double[][] minmax = RelationUtil.computeMinMax(db);
     int dim = RelationUtil.dimensionality(db);
 
     // Compute mean from minmax.
@@ -101,7 +78,7 @@ public class GridBasedReferencePoints<V extends NumberVector> implements Referen
     }
 
     int gridpoints = Math.max(1, MathUtil.ipowi(gridres + 1, dim));
-    ArrayList<V> result = new ArrayList<>(gridpoints);
+    ArrayList<Vector> result = new ArrayList<>(gridpoints);
     double[] delta = new double[dim];
     if(gridres > 0) {
       double halfgrid = gridres / 2.0;
@@ -117,13 +94,13 @@ public class GridBasedReferencePoints<V extends NumberVector> implements Referen
           acc = acc / (gridres + 1);
           vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
         }
-        V newp = factory.newNumberVector(vec);
+        Vector newp = new Vector(vec);
         // logger.debug("New reference point: " + FormatUtil.format(vec));
         result.add(newp);
       }
     }
     else {
-      result.add(factory.newNumberVector(mean));
+      result.add(new Vector(mean));
       // logger.debug("New reference point: " + FormatUtil.format(mean));
     }
 
@@ -137,7 +114,26 @@ public class GridBasedReferencePoints<V extends NumberVector> implements Referen
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
+    // TODO: add "grid sampling" option.
+
+    /**
+     * Parameter to specify the grid resolution.
+     * <p>
+     * Key: {@code -grid.size}
+     * </p>
+     */
+    public static final OptionID GRID_ID = new OptionID("grid.size", "The number of partitions in each dimension. Points will be placed on the edges of the grid, except for a grid size of 0, where only the mean is generated as reference point.");
+
+    /**
+     * Parameter to specify the extra scaling of the space, to allow
+     * out-of-data-space reference points.
+     * <p>
+     * Key: {@code -grid.oversize}
+     * </p>
+     */
+    public static final OptionID GRID_SCALE_ID = new OptionID("grid.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
+
     /**
      * Holds the value of {@link #GRID_ID}.
      */
@@ -165,8 +161,8 @@ public class GridBasedReferencePoints<V extends NumberVector> implements Referen
     }
 
     @Override
-    protected GridBasedReferencePoints<V> makeInstance() {
-      return new GridBasedReferencePoints<>(gridres, gridscale);
+    protected GridBasedReferencePoints makeInstance() {
+      return new GridBasedReferencePoints(gridres, gridscale);
     }
   }
 }
