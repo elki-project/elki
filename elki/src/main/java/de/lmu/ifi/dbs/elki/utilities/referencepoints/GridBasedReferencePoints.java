@@ -94,14 +94,11 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
           acc = acc / (gridres + 1);
           vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
         }
-        Vector newp = new Vector(vec);
-        // logger.debug("New reference point: " + FormatUtil.format(vec));
-        result.add(newp);
+        result.add(new Vector(vec));
       }
     }
     else {
       result.add(new Vector(mean));
-      // logger.debug("New reference point: " + FormatUtil.format(mean));
     }
 
     return result;

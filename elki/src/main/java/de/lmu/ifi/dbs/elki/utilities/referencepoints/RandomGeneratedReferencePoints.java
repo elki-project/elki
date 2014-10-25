@@ -30,19 +30,20 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Reference points generated randomly within the used data space.
  * 
  * @author Erich Schubert
  */
-// TODO: use reproducible random
 public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic {
   /**
    * Holds the sample size.
@@ -55,15 +56,22 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
   protected double scale = 1.0;
 
   /**
+   * Random generator.
+   */
+  protected RandomFactory rnd;
+
+  /**
    * Constructor.
    * 
    * @param samplesize Size of desired sample set
    * @param scale Scaling factor
+   * @param rnd Random generator
    */
-  public RandomGeneratedReferencePoints(int samplesize, double scale) {
+  public RandomGeneratedReferencePoints(int samplesize, double scale, RandomFactory rnd) {
     super();
     this.samplesize = samplesize;
     this.scale = scale;
+    this.rnd = rnd;
   }
 
   @Override
@@ -118,6 +126,14 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
     public static final OptionID SCALE_ID = new OptionID("generate.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
 
     /**
+     * Parameter to specify the sample size.
+     * <p>
+     * Key: {@code -generate.random}
+     * </p>
+     */
+    public static final OptionID RANDOM_ID = new OptionID("generate.random", "Random generator seed.");
+
+    /**
      * Holds the value of {@link #N_ID}.
      */
     protected int samplesize;
@@ -126,6 +142,11 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
      * Holds the value of {@link #SCALE_ID}.
      */
     protected double scale = 1.0;
+
+    /**
+     * Random generator.
+     */
+    protected RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -142,11 +163,16 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
       if(config.grab(scaleP)) {
         scale = scaleP.getValue();
       }
+
+      RandomParameter randomP = new RandomParameter(RANDOM_ID);
+      if(config.grab(randomP)) {
+        rnd = randomP.getValue();
+      }
     }
 
     @Override
     protected RandomGeneratedReferencePoints makeInstance() {
-      return new RandomGeneratedReferencePoints(samplesize, scale);
+      return new RandomGeneratedReferencePoints(samplesize, scale, rnd);
     }
   }
 }

@@ -45,12 +45,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 public class StarBasedReferencePoints implements ReferencePointsHeuristic {
   /**
-   * Holds the value of {@link #NOCENTER_ID}.
+   * Exclude the center vector.
    */
   protected boolean nocenter;
 
   /**
-   * Holds the value of {@link #SCALE_ID}.
+   * Scaling factor.
    */
   protected double scale;
 
@@ -100,15 +100,11 @@ public class StarBasedReferencePoints implements ReferencePointsHeuristic {
       result.add(new Vector(centroid));
     }
     // Plus axis end points through centroid
-    double[] vec = new double[dim];
     for(int i = 0; i < dim; i++) {
-      for(int d = 0; d < dim; d++) {
-        if(d != i) {
-          vec[d] = centroid[d];
-        }
-      }
+      double[] vec = centroid.clone();
       vec[i] = min[i];
       result.add(new Vector(vec));
+      vec = centroid.clone();
       vec[i] = max[i];
       result.add(new Vector(vec));
     }

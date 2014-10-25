@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -34,11 +33,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Random-Sampling strategy for picking reference points.
@@ -49,16 +50,22 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
   /**
    * Sample size.
    */
-  private int samplesize;
+  protected int samplesize;
+
+  /**
+   * Random generator.
+   */
+  protected RandomFactory rnd;
 
   /**
    * Constructor.
    * 
    * @param samplesize Sampling size
    */
-  public RandomSampleReferencePoints(int samplesize) {
+  public RandomSampleReferencePoints(int samplesize, RandomFactory rnd) {
     super();
     this.samplesize = samplesize;
+    this.rnd = rnd;
   }
 
   @Override
@@ -69,7 +76,7 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
     }
 
     ArrayList<NumberVector> result = new ArrayList<>(samplesize);
-    DBIDs sample = DBIDUtil.randomSample(db.getDBIDs(), samplesize, new Random());
+    DBIDs sample = DBIDUtil.randomSample(db.getDBIDs(), samplesize, rnd);
 
     for(DBIDIter it = sample.iter(); it.valid(); it.advance()) {
       result.add(db.get(it));
@@ -85,8 +92,6 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    // TODO: use reproducible Random
-
     /**
      * Parameter to specify the sample size.
      * <p>
@@ -96,9 +101,22 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
     public static final OptionID N_ID = new OptionID("sample.n", "The number of samples to draw.");
 
     /**
-     * Holds the value of {@link #N_ID}.
+     * Parameter to specify the sample size.
+     * <p>
+     * Key: {@code -sample.random}
+     * </p>
+     */
+    public static final OptionID RANDOM_ID = new OptionID("sample.random", "Random generator seed.");
+
+    /**
+     * Sample size.
      */
     protected int samplesize;
+
+    /**
+     * Random generator.
+     */
+    protected RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -108,11 +126,15 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
       if(config.grab(samplesizeP)) {
         samplesize = samplesizeP.intValue();
       }
+      RandomParameter randomP = new RandomParameter(RANDOM_ID);
+      if(config.grab(randomP)) {
+        rnd = randomP.getValue();
+      }
     }
 
     @Override
     protected RandomSampleReferencePoints makeInstance() {
-      return new RandomSampleReferencePoints(samplesize);
+      return new RandomSampleReferencePoints(samplesize, rnd);
     }
   }
 }
