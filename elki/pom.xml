@@ -30,9 +30,14 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
-				<configuration>
-				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<!-- jar packaging -->
 			<plugin>
@@ -48,6 +53,19 @@
 						</manifest>
 					</archive>
 				</configuration>
+			</plugin>
+			<!-- attach sources -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<!-- Jar dependencies -->
 			<plugin>
@@ -85,4 +103,67 @@
 	<issueManagement>
 		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
 	</issueManagement>
+	
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- include JavaDoc -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.10.1</version>
+						<configuration>
+							<stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+							<notree>false</notree>
+							<noindex>false</noindex>
+							<nonavbar>false</nonavbar>
+							<nohelp>true</nohelp>
+							<splitindex>true</splitindex>
+							<author>true</author>
+							<use>true</use>
+							<show>private</show>
+							<nodeprecated>false</nodeprecated>
+							<nodeprecatedlist>false</nodeprecatedlist>
+							<docfilessubdirs>true</docfilessubdirs>
+
+							<overview>${basedir}/src/main/javadoc/overview.html</overview>
+							<doctitle>ELKI</doctitle>
+							<windowtitle>ELKI: Environment for DeveLoping KDD-Applications
+								Supported by Index-Structures</windowtitle>
+							<groups>
+								<group>
+									<title>Algorithms</title>
+									<packages>de.lmu.ifi.dbs.elki.algorithm*</packages>
+								</group>
+								<group>
+									<title>Databases and Index Structures</title>
+									<packages>de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.datasource*:de.lmu.ifi.dbs.elki.persistent*</packages>
+								</group>
+								<group>
+									<title>Datatypes and Distance Functions</title>
+									<packages>de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance*</packages>
+								</group>
+								<group>
+									<title>Evaluation</title>
+									<packages>de.lmu.ifi.dbs.elki.evalu*</packages>
+								</group>
+								<group>
+									<title>GUI and Visualization</title>
+									<packages>de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis*</packages>
+								</group>
+								<group>
+									<title>Utilities and Miscellaneous</title>
+									<packages>de.lmu.ifi.dbs.elki*</packages>
+								</group>
+							</groups>
+							<header><![CDATA[<img src="{@docRoot}/resources/figures/elki-logo-200.png" width="200">]]></header>
+							<footer><![CDATA[ELKI Version ${project.version}]]></footer>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

@@ -76,6 +76,58 @@
 
 	<profiles>
 		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- include JavaDoc -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.10.1</version>
+						<configuration>
+							<notree>false</notree>
+							<noindex>false</noindex>
+							<nonavbar>false</nonavbar>
+							<nohelp>true</nohelp>
+							<splitindex>true</splitindex>
+							<author>true</author>
+							<use>true</use>
+							<show>private</show>
+							<nodeprecated>false</nodeprecated>
+							<nodeprecatedlist>false</nodeprecatedlist>
+							<docfilessubdirs>true</docfilessubdirs>
+							<useStandardDocletOptions>true</useStandardDocletOptions>
+							<charset>UTF-8</charset>
+							<encoding>UTF-8</encoding>
+							<docencoding>UTF-8</docencoding>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- include source -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>svg</id>
 			<modules>
 				<module>addons/batikvis</module>
@@ -162,7 +214,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>compile,test</scope>
 		</dependency>
 	</dependencies>
 </project>
