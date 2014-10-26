@@ -41,7 +41,6 @@ import java.io.Reader;
  * Usage example:
  * 
  * <pre>
- * {@code
  * StringBuilder buf = new StringBuilder();
  * LineReader reader = new LineReader(inputStream);
  * // Clear buffer, and append next line.
