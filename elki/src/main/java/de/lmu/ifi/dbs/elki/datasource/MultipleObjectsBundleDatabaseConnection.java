@@ -26,8 +26,8 @@ package de.lmu.ifi.dbs.elki.datasource;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 
 /**
- * Data source to feed a precomputed {@link MultipleObjectsDatabaseConnection}
- * into a database.
+ * Data source to feed a precomputed {@link MultipleObjectsBundle} into a
+ * database.
  * 
  * @author Erich Schubert
  */
