@@ -62,8 +62,8 @@ public interface KMeansQualityMeasure<O extends NumberVector> {
   /**
    * Compare two scores.
    * 
-   * @param newScore New (candiate) scorer
-   * @param oldScore Existing score (may be {@code NaN})
+   * @param currentCost New (candiate) cost/score
+   * @param bestCost Existing best cost/score (may be {@code NaN})
    * @return {@code true} when the new score is better, or the old score is
    *         {@code NaN}.
    */

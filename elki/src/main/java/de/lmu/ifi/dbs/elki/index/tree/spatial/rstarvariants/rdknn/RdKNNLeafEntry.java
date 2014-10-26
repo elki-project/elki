@@ -57,7 +57,7 @@ public class RdKNNLeafEntry extends SpatialPointLeafEntry implements RdKNNEntry 
    * Constructs a new RDkNNLeafEntry object with the given parameters.
    * 
    * @param id the unique id of the underlying data object
-   * @param values the values of the underlying data object
+   * @param vector the underlying data object
    * @param knnDistance the knn distance of the underlying data object
    */
   public RdKNNLeafEntry(DBID id, NumberVector vector, double knnDistance) {

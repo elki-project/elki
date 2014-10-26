@@ -81,8 +81,10 @@ public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> 
   protected Relation<? extends ClassLabel> labelrep;
 
   /**
-   * Provides a KNNClassifier, adding parameter {@link #K_PARAM} to the option
-   * handler additionally to parameters of super class.
+   * Constructor.
+   * 
+   * @param distanceFunction Distance function
+   * @param k Number of nearest neighbors to access.
    */
   public KNNClassifier(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);

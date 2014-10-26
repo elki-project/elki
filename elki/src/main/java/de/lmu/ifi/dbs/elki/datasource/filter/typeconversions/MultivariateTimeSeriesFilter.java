@@ -58,7 +58,7 @@ public class MultivariateTimeSeriesFilter<V extends FeatureVector<?>> extends Ab
   /**
    * Constructor.
    * 
-   * @param Number of variates.
+   * @param variates Number of variates.
    */
   public MultivariateTimeSeriesFilter(int variates) {
     super();

@@ -55,7 +55,8 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
   /**
    * Constructor.
    * 
-   * @param norm Norm to use
+   * @param min Desired minimum value
+   * @param max Desired maximum value
    */
   public InstanceMinMaxNormalization(double min, double max) {
     super();
@@ -64,7 +65,7 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
   }
 
   /**
-   * Constructor.
+   * Constructor, normalizing to {@code [0;1]}
    */
   public InstanceMinMaxNormalization() {
     this(0., 1.);

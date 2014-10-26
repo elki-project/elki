@@ -75,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * 
  * @author Elke Achtert
  * 
- * @apiviz.has RdKNNNode oneway - - contains
+ * @apiviz.has RdKNNNode
  * @apiviz.has RdKNNTreeHeader
  * 
  * @param <O> Object type
@@ -573,7 +573,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
    * Inserts the specified objects into this index. If a bulk load mode is
    * implemented, the objects are inserted in one bulk.
    * 
-   * @param objects the objects to be inserted
+   * @param ids the objects to be inserted
    */
   @Override
   public final void insertAll(DBIDs ids) {

@@ -83,8 +83,6 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf ReferencePointsHeuristic
- * 
- * @param <V> Object type to process.
  */
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
 @Description("Computes kNN distances approximately, using reference points with various reference point strategies.")

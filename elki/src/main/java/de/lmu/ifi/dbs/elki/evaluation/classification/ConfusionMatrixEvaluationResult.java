@@ -51,9 +51,6 @@ public class ConfusionMatrixEvaluationResult implements Result, TextWriteable {
    *
    * @param confusionmatrix the confusion matrix to provide the prediction
    *        performance measures for
-   * @param classifier the classifier this evaluation is based on
-   * @param rep the training set this evaluation is based on
-   * @param testset the test set this evaluation is based on
    * @param evaluationName name of the evaluation procedure used
    */
   public ConfusionMatrixEvaluationResult(ConfusionMatrix confusionmatrix, String evaluationName) {

@@ -573,7 +573,6 @@ public class KMLOutputHandler implements ResultHandler {
   /**
    * Make an HTML description.
    * 
-   * @param relations Relations
    * @param c Cluster
    * @return Buffer
    */

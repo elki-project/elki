@@ -218,7 +218,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * @param kdist k-distance of current
    * @param neighbors Neighbor points
    * @param kdists kNN distances
-   * @return
+   * @return {@code true} when the point is a local maximum
    */
   private boolean isLocalMaximum(double kdist, DBIDs neighbors, WritableDoubleDataStore kdists) {
     for(DBIDIter it = neighbors.iter(); it.valid(); it.advance()) {
