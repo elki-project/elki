@@ -80,7 +80,7 @@ public class OutputStep implements WorkflowStep {
   }
 
   /**
-   * Set the default handler to the {@link ResultVisualizer}.
+   * Set the default handler to the Batik addon visualizer, if available.
    */
   @SuppressWarnings("unchecked")
   public static void setDefaultHandlerVisualizer() {
