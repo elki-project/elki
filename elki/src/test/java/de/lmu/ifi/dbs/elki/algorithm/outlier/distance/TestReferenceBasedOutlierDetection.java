@@ -27,8 +27,6 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ReferenceBasedOutlierDetection;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -48,16 +46,16 @@ public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmT
     // Parameterization
     ListParameterization params = new ListParameterization();
     params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
-    params.addParameter(GridBasedReferencePoints.GRID_ID, 11);
+    params.addParameter(GridBasedReferencePoints.Parameterizer.GRID_ID, 3);
 
     // setup Algorithm
-    ReferenceBasedOutlierDetection<DoubleVector> referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
     testParameterizationOk(params);
 
     // run ReferenceBasedOutlierDetection on database
     OutlierResult result = referenceBasedOutlierDetection.run(db);
 
-    testSingleScore(result, 945, 0.9260829537195538);
-    testAUC(db, "Noise", result, 0.9892407407407409);
+    testAUC(db, "Noise", result, 0.969370370370);
+    testSingleScore(result, 945, 0.9335744552478);
   }
 }
