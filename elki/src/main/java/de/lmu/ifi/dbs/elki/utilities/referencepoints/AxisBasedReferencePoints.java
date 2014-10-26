@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
   /**
-   * Holds the value of {@link #SPACE_SCALE_ID}.
+   * Scaling factor.
    */
   protected double spacescale;
 
