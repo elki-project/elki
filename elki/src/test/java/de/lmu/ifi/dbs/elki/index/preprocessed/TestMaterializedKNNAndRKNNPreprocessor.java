@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.index.preprocessed;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;

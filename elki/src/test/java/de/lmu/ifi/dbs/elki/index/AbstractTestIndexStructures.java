@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -139,7 +139,7 @@ public abstract class AbstractTestIndexStructures implements JUnit4Test {
       int i = 0;
       for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
-        assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue());
+        assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
@@ -158,7 +158,7 @@ public abstract class AbstractTestIndexStructures implements JUnit4Test {
       int i = 0;
       for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
-        assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue());
+        assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);

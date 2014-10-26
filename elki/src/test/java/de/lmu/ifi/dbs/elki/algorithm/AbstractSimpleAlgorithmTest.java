@@ -182,7 +182,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     // Test
     assertEquals("Number of clusters does not match expectations. " + FormatUtil.format(sizes), expected.length, sizes.length);
     for(int i = 0; i < expected.length; i++) {
-      assertEquals("Cluster size does not match at position " + i + " in " + FormatUtil.format(sizes), expected[i], (int) sizes[i]);
+      assertEquals("Cluster size does not match at position " + i + " in " + FormatUtil.format(sizes), expected[i], sizes[i]);
     }
   }
 
