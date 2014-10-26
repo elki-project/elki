@@ -29,8 +29,10 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -44,6 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  */
 public class GridBasedReferencePoints implements ReferencePointsHeuristic {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(GridBasedReferencePoints.class);
+
   /**
    * Holds the grid resolution.
    */
@@ -69,7 +76,7 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
   @Override
   public Collection<? extends NumberVector> getReferencePoints(Relation<? extends NumberVector> db) {
     double[][] minmax = RelationUtil.computeMinMax(db);
-    int dim = RelationUtil.dimensionality(db);
+    final int dim = minmax[0].length;
 
     // Compute mean from minmax.
     double[] mean = new double[dim];
@@ -77,30 +84,37 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
       mean[d] = (minmax[0][d] + minmax[1][d]) * .5;
     }
 
-    int gridpoints = Math.max(1, MathUtil.ipowi(gridres + 1, dim));
+    if(gridres <= 0) {
+      LOG.warning("Grid of resolution " + gridres + " will have a single point only.");
+      ArrayList<Vector> result = new ArrayList<>(1);
+      result.add(new Vector(mean));
+      return result;
+    }
+    final int grids = gridres + 1;
+    final int gridpoints = MathUtil.ipowi(grids, dim);
+    if(gridpoints < 0) {
+      throw new AbortException("Grids with more than 2^31 are not supported, or meaningful.");
+    }
+    if(gridpoints < 0 || gridpoints > db.size()) {
+      LOG.warning("Grid has " + gridpoints + " points, but you only have " + db.size() + " observations.");
+    }
     ArrayList<Vector> result = new ArrayList<>(gridpoints);
     double[] delta = new double[dim];
-    if(gridres > 0) {
-      double halfgrid = gridres / 2.0;
+    for(int d = 0; d < dim; d++) {
+      delta[d] = (minmax[1][d] - minmax[0][d]) / gridres;
+    }
+
+    double halfgrid = gridres * .5;
+    for(int i = 0; i < gridpoints; i++) {
+      double[] vec = new double[dim]; // Will be returned!
+      int acc = i;
       for(int d = 0; d < dim; d++) {
-        delta[d] = (minmax[1][d] - minmax[0][d]) / gridres;
+        int coord = acc % grids;
+        acc /= grids;
+        vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
       }
-
-      double[] vec = new double[dim];
-      for(int i = 0; i < gridpoints; i++) {
-        int acc = i;
-        for(int d = 0; d < dim; d++) {
-          int coord = acc % (gridres + 1);
-          acc = acc / (gridres + 1);
-          vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
-        }
-        result.add(new Vector(vec));
-      }
+      result.add(new Vector(vec));
     }
-    else {
-      result.add(new Vector(mean));
-    }
-
     return result;
   }
 
