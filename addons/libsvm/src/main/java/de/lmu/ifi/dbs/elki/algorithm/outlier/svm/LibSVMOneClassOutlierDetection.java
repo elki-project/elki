@@ -73,7 +73,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * 
  * @param V vector type
  */
-@Reference(authors = "B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson", title = "Estimating the support of a high-dimensional distribution", booktitle = "Neural computation 13.7")
+@Reference(authors = "B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson", //
+title = "Estimating the support of a high-dimensional distribution", //
+booktitle = "Neural computation 13.7")
 public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
@@ -124,7 +126,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     param.svm_type = svm_parameter.ONE_CLASS;
     param.kernel_type = svm_parameter.LINEAR;
     param.degree = 3;
-    switch(kernel) {
+    switch(kernel){
     case LINEAR:
       param.kernel_type = svm_parameter.LINEAR;
       break;
@@ -166,11 +168,11 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     prob.y = new double[prob.l];
     {
       DBIDIter iter = ids.iter();
-      for (int i = 0; i < prob.l && iter.valid(); iter.advance(), i++) {
+      for(int i = 0; i < prob.l && iter.valid(); iter.advance(), i++) {
         V vec = relation.get(iter);
         // TODO: support compact sparse vectors, too!
         svm_node[] x = new svm_node[dim];
-        for (int d = 0; d < dim; d++) {
+        for(int d = 0; d < dim; d++) {
           x[d] = new svm_node();
           x[d].index = d + 1;
           x[d].value = vec.doubleValue(d);
@@ -180,16 +182,16 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
       }
     }
 
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("Training one-class SVM...");
     }
     String err = svm.svm_check_parameter(prob, param);
-    if (err != null) {
+    if(err != null) {
       LOG.warning("svm_check_parameter: " + err);
     }
     svm_model model = svm.svm_train(prob, param);
 
-    if (LOG.isVerbose()) {
+    if(LOG.isVerbose()) {
       LOG.verbose("Predicting...");
     }
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
@@ -197,10 +199,10 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     {
       DBIDIter iter = ids.iter();
       double[] buf = new double[svm.svm_get_nr_class(model)];
-      for (int i = 0; i < prob.l && iter.valid(); iter.advance(), i++) {
+      for(int i = 0; i < prob.l && iter.valid(); iter.advance(), i++) {
         V vec = relation.get(iter);
         svm_node[] x = new svm_node[dim];
-        for (int d = 0; d < dim; d++) {
+        for(int d = 0; d < dim; d++) {
           x[d] = new svm_node();
           x[d].index = d + 1;
           x[d].value = vec.doubleValue(d);
@@ -233,7 +235,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
   static final svm_print_interface LOG_HELPER = new svm_print_interface() {
     @Override
     public void print(String arg0) {
-      if (LOG.isVerbose()) {
+      if(LOG.isVerbose()) {
         LOG.verbose(arg0);
       }
     }
@@ -264,7 +266,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
       super.makeOptions(config);
 
       EnumParameter<SVMKernel> kernelP = new EnumParameter<>(KERNEL_ID, SVMKernel.class, SVMKernel.RBF);
-      if (config.grab(kernelP)) {
+      if(config.grab(kernelP)) {
         kernel = kernelP.getValue();
       }
     }
