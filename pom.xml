@@ -58,6 +58,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
@@ -79,12 +80,53 @@
 			<id>release</id>
 			<build>
 				<plugins>
-					<!-- include JavaDoc -->
+					<!-- copy additional javadoc resources -->
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.7</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/apidocs/</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${basedir}/elki/src/main/javadoc</directory>
+											<excludes>
+												<exclude>${basedir}/elki/src/main/javadoc/overview.html</exclude>
+											</excludes>
+										</resource>
+										<resource>
+											<directory>${basedir}/elki/target/api-docs</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Build JavaDoc -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>2.10.1</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<phase>package</phase>
+								<goals>
+									<goal>aggregate</goal>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
 						<configuration>
+							<reportOutputDirectory>${project.build.directory}/apidocs</reportOutputDirectory>
+							<aggregate>true</aggregate>
+							<stylesheetfile>${basedir}/elki/src/main/javadoc/stylesheet.css</stylesheetfile>
 							<notree>false</notree>
 							<noindex>false</noindex>
 							<nonavbar>false</nonavbar>
@@ -93,36 +135,47 @@
 							<author>true</author>
 							<use>true</use>
 							<show>private</show>
+							<quiet>true</quiet>
 							<nodeprecated>false</nodeprecated>
 							<nodeprecatedlist>false</nodeprecatedlist>
 							<docfilessubdirs>true</docfilessubdirs>
-							<useStandardDocletOptions>true</useStandardDocletOptions>
-							<charset>UTF-8</charset>
-							<encoding>UTF-8</encoding>
-							<docencoding>UTF-8</docencoding>
+							<overview>${basedir}/elki/src/main/javadoc/overview.html</overview>
+							<doctitle>ELKI</doctitle>
+							<windowtitle>ELKI: Environment for DeveLoping KDD-Applications
+								Supported by Index-Structures</windowtitle>
+							<groups>
+								<group>
+									<title>Algorithms</title>
+									<packages>de.lmu.ifi.dbs.elki.algorithm*</packages>
+								</group>
+								<group>
+									<title>Databases and Index Structures</title>
+									<packages>de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.datasource*:de.lmu.ifi.dbs.elki.persistent*</packages>
+								</group>
+								<group>
+									<title>Datatypes and Distance Functions</title>
+									<packages>de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance*</packages>
+								</group>
+								<group>
+									<title>Evaluation</title>
+									<packages>de.lmu.ifi.dbs.elki.evalu*</packages>
+								</group>
+								<group>
+									<title>GUI and Visualization</title>
+									<packages>de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis*</packages>
+								</group>
+								<group>
+									<title>Utilities and Miscellaneous</title>
+									<packages>de.lmu.ifi.dbs.elki:de.lmu.ifi.dbs.elki.*</packages>
+								</group>
+								<group>
+									<title>Tutorial Code and Examples</title>
+									<packages>tutorial:tutorial.*</packages>
+								</group>
+							</groups>
+							<header><![CDATA[<img src="{@docRoot}/figures/elki-logo-200.png" width="200">]]></header>
+							<footer><![CDATA[ELKI Version ${project.version}]]></footer>
 						</configuration>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- include source -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
