@@ -271,7 +271,7 @@ public class DocumentParameters {
             try {
               ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
             }
-            catch(java.lang.NoSuchMethodException e) {
+            catch(java.lang.NoSuchMethodException | java.lang.IllegalAccessException e) {
               // LOG.warning("Could not instantiate class " + cls.getName() +
               // " - no appropriate constructor or parameterizer found.");
             }

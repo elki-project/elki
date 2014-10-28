@@ -78,7 +78,7 @@ public class DocumentReferences {
       LoggingUtil.warning("I need exactly one or two file names to operate!");
       System.exit(1);
     }
-    if(!args[0].endsWith(".html") || (args.length > 1 && !args[1].endsWith(".wiki"))) {
+    if(!args[0].endsWith(".html") || (args.length > 1 && !args[1].endsWith(".trac"))) {
       LoggingUtil.warning("File name doesn't end in expected extension!");
       System.exit(1);
     }
