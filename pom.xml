@@ -23,6 +23,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<skipTests>true</skipTests>
+		<elki.projdir>${basedir}</elki.projdir>
 	</properties>
 
 	<build>
@@ -95,13 +96,13 @@
 									<outputDirectory>${project.build.directory}/apidocs/</outputDirectory>
 									<resources>
 										<resource>
-											<directory>${basedir}/elki/src/main/javadoc</directory>
+											<directory>${elki.projdir}/elki/src/main/javadoc</directory>
 											<excludes>
-												<exclude>${basedir}/elki/src/main/javadoc/overview.html</exclude>
+												<exclude>${elki.projdir}/elki/src/main/javadoc/overview.html</exclude>
 											</excludes>
 										</resource>
 										<resource>
-											<directory>${basedir}/elki/target/api-docs</directory>
+											<directory>${elki.projdir}/elki/target/apidocs</directory>
 										</resource>
 									</resources>
 								</configuration>
@@ -126,7 +127,7 @@
 						<configuration>
 							<reportOutputDirectory>${project.build.directory}/apidocs</reportOutputDirectory>
 							<aggregate>true</aggregate>
-							<stylesheetfile>${basedir}/elki/src/main/javadoc/stylesheet.css</stylesheetfile>
+							<stylesheetfile>${elki.projdir}/elki/src/main/javadoc/stylesheet.css</stylesheetfile>
 							<notree>false</notree>
 							<noindex>false</noindex>
 							<nonavbar>false</nonavbar>
@@ -139,10 +140,12 @@
 							<nodeprecated>false</nodeprecated>
 							<nodeprecatedlist>false</nodeprecatedlist>
 							<docfilessubdirs>true</docfilessubdirs>
-							<overview>${basedir}/elki/src/main/javadoc/overview.html</overview>
+							<overview>${elki.projdir}/elki/src/main/javadoc/overview.html</overview>
 							<doctitle>ELKI</doctitle>
-							<windowtitle>ELKI: Environment for DeveLoping KDD-Applications
-								Supported by Index-Structures</windowtitle>
+							<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
+							<docletPath>${elki.projdir}/lib/apiviz-1.3.1.GA+erich2.jar</docletPath>
+							<doclet>org.jboss.apiviz.APIviz</doclet>
+							<additionalparam>-nopackagediagram</additionalparam>
 							<groups>
 								<group>
 									<title>Algorithms</title>
@@ -176,6 +179,22 @@
 							<header><![CDATA[<img src="{@docRoot}/figures/elki-logo-200.png" width="200">]]></header>
 							<footer><![CDATA[ELKI Version ${project.version}]]></footer>
 						</configuration>
+					</plugin>
+					<!-- attach sources -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<phase>package</phase>
+								<goals>
+									<goal>aggregate</goal>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>

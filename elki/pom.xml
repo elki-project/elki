@@ -6,6 +6,7 @@
 		<groupId>de.lmu.ifi.dbs.elki</groupId>
 		<version>0.6.5-SNAPSHOT</version>
 		<artifactId>elki-project</artifactId>
+		<relativePath>../</relativePath>
 	</parent>
 
 	<artifactId>elki</artifactId>
@@ -13,6 +14,10 @@
 
 	<name>ELKI Data Mining Framework</name>
 
+	<url>http://elki.dbs.ifi.lmu.de/</url>
+	<issueManagement>
+		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
+	</issueManagement>
 	<licenses>
 		<license>
 			<name>GNU Affero General Public License (AGPL) version 3.0</name>
@@ -21,7 +26,7 @@
 	</licenses>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<elki.projdir>${basedir}/..</elki.projdir>
 	</properties>
 
 	<build>
@@ -41,71 +46,7 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<!-- attach sources -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- Jar dependencies -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.8</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${outputDir}</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>exec-maven-plugin</artifactId>
-										<versionRange>[1.3.2,)</versionRange>
-										<goals>
-											<goal>exec</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute>
-											<runOnIncremental>false</runOnIncremental>
-										</execute>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 	<dependencies>
@@ -120,10 +61,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<url>http://elki.dbs.ifi.lmu.de/</url>
-	<issueManagement>
-		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
-	</issueManagement>
 
 	<profiles>
 		<profile>
@@ -212,7 +149,6 @@
 							</execution>
 						</executions>
 						<configuration>
-							<stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
 							<notree>false</notree>
 							<noindex>false</noindex>
 							<nonavbar>false</nonavbar>
@@ -227,8 +163,8 @@
 							<docfilessubdirs>true</docfilessubdirs>
 							<overview>${basedir}/src/main/javadoc/overview.html</overview>
 							<doctitle>ELKI</doctitle>
-							<windowtitle>ELKI: Environment for DeveLoping KDD-Applications
-								Supported by Index-Structures</windowtitle>
+							<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
+							<additionalparam>-nopackagediagram</additionalparam>
 							<groups>
 								<group>
 									<title>Algorithms</title>
