@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.scores.adapter;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,10 +22,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 
 /**
- * This adapter is used to process a list of (double, DBID) objects, but
- * allows skipping one object in the ranking. The list <em>must</em> be sorted
+ * This adapter is used to process a list of (double, DBID) objects, but allows
+ * skipping one object in the ranking. The list <em>must</em> be sorted
  * appropriately, the score is only used to detect ties.
  * 
  * @author Erich Schubert
