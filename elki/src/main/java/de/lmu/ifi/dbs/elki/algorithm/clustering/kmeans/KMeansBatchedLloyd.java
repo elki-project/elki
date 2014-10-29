@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
- * Provides the k-means algorithm, using Lloyd-style bulk iterations.
+ * An algorithm for k-means, using Lloyd-style bulk iterations.
  * 
  * However, in contrast to Lloyd's k-means and similar to MacQueen, we do update
  * the mean vectors multiple times, not only at the very end of the iteration.
@@ -154,7 +154,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if (ids.size() == 0) {
+      if(ids.size() == 0) {
         continue;
       }
       KMeansModel model = new KMeansModel(means.get(i), varsum[i]);

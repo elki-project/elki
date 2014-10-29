@@ -265,7 +265,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
   }
 
   /**
-   * Provides the number of rows of the data matrix.
+   * The number of rows of the data matrix.
    * 
    * @return the number of rows of the data matrix
    */
@@ -274,7 +274,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
   }
 
   /**
-   * Provides the number of columns of the data matrix.
+   * The number of columns of the data matrix.
    * 
    * @return the number of columns of the data matrix
    */

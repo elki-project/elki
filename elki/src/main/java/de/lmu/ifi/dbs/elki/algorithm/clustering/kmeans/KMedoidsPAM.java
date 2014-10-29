@@ -60,8 +60,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Provides the k-medoids clustering algorithm, using the
- * "Partitioning Around Medoids" approach.
+ * The original PAM algorithm or k-medoids clustering, as proposed by Kaufman
+ * and Rousseeuw in "Partitioning Around Medoids".
  * 
  * Reference:
  * <p>

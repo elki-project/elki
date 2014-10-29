@@ -54,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Provides the COPAC algorithm, an algorithm to partition a database according
- * to the correlation dimension of its objects and to then perform an arbitrary
- * clustering algorithm over the partitions.
+ * COPAC is an algorithm to partition a database according to the correlation
+ * dimension of its objects and to then perform an arbitrary clustering
+ * algorithm over the partitions.
  * 
  * Reference:
  * <p>

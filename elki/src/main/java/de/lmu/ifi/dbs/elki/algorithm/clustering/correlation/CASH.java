@@ -81,8 +81,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Provides the CASH algorithm, an subspace clustering algorithm based on the
- * Hough transform.
+ * The CASH algorithm is a subspace clustering algorithm based on the Hough
+ * transform.
  * 
  * Reference:
  * <p>

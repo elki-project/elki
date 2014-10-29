@@ -60,8 +60,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Provides the EM algorithm (clustering by expectation maximization), also
- * known as Gaussian Mixture Modeling (GMM).
+ * Clustering by expectation maximization (EM-Algorithm), also known as Gaussian
+ * Mixture Modeling (GMM).
  * 
  * <p>
  * Reference: A. P. Dempster, N. M. Laird, D. B. Rubin:<br />

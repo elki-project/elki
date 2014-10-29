@@ -49,7 +49,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Provides the k-means algorithm, using MacQueen style incremental updates.
+ * The original k-means algorithm, using MacQueen style incremental updates;
+ * making this effectively an "online" (streaming) algorithm.
+ * 
+ * This implementation will by default iterate over the data set until
+ * convergence, although MacQueen likely only meant to do a single pass over the
+ * data.
  * 
  * <p>
  * Reference:<br />
@@ -64,8 +69,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <V> vector type to use
  */
 @Title("K-Means")
-@Description("Finds a partitioning into k clusters.")
-@Reference(authors = "J. MacQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
+@Description("Finds a least-squares partitioning into k clusters.")
+@Reference(authors = "J. MacQueen", //
+title = "Some Methods for Classification and Analysis of Multivariate Observations", //
+booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", //
+url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
 public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

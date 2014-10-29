@@ -46,8 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Provides the k-medians clustering algorithm, using Lloyd-style bulk
- * iterations.
+ * k-medians clustering algorithm, but using Lloyd-style bulk iterations instead
+ * of the more complicated approach suggested by Kaufman and Rousseeuw (see
+ * {@link KMedoidsPAM} instead).
  * 
  * Reference:
  * <p>

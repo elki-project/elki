@@ -46,8 +46,8 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
- * Provides the k-means algorithm, alternating between MacQueen-style
- * incremental processing and Lloyd-Style batch steps.
+ * A hybrid k-means algorithm, alternating between MacQueen-style incremental
+ * processing and Lloyd-Style batch steps.
  * 
  * @author Erich Schubert
  * 
@@ -87,7 +87,7 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
-    
+
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration += 2) {
@@ -117,7 +117,7 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      if (ids.size() == 0) {
+      if(ids.size() == 0) {
         continue;
       }
       KMeansModel model = new KMeansModel(means.get(i), varsum[i]);

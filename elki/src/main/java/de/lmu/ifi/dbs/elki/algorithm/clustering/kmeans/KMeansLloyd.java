@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Provides the k-means algorithm, using Lloyd-style bulk iterations.
+ * The standard k-means algorithm, using Lloyd-style bulk iterations.
  * 
  * <p>
  * Reference:<br />
@@ -67,8 +67,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @param <V> vector datatype
  */
 @Title("K-Means")
-@Description("Finds a partitioning into k clusters.")
-@Reference(authors = "S. Lloyd", title = "Least squares quantization in PCM", booktitle = "IEEE Transactions on Information Theory 28 (2): 129–137.", url = "http://dx.doi.org/10.1109/TIT.1982.1056489")
+@Description("Finds a least-squared partitioning into k clusters.")
+@Reference(authors = "S. Lloyd", //
+title = "Least squares quantization in PCM", //
+booktitle = "IEEE Transactions on Information Theory 28 (2): 129–137.", //
+url = "http://dx.doi.org/10.1109/TIT.1982.1056489")
 public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.
