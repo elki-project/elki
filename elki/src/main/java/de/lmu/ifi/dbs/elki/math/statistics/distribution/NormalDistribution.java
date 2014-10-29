@@ -308,7 +308,7 @@ public class NormalDistribution extends AbstractDistribution {
    * @return PDF of the given normal distribution at x.
    */
   public static double standardNormalPDF(double x) {
-    return Math.exp(-.5 * x * x) * MathUtil.SQRTHALF;
+    return Math.exp(-.5 * x * x) * MathUtil.ONE_BY_SQRTTWOPI;
   }
 
   /**
