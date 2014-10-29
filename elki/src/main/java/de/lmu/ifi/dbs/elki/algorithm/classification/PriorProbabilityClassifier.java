@@ -1,4 +1,4 @@
-package experimentalcode.shared.algorithm.classifier;
+package de.lmu.ifi.dbs.elki.algorithm.classification;
 
 /*
  This file is part of ELKI:
@@ -29,8 +29,6 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.classification.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -44,13 +42,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Classifier to classify instances based on the prior probability of classes in
- * the database.
+ * the database, without using the actual data values.
  * 
  * @author Arthur Zimek
  */
 @Title("Prior Probability Classifier")
 @Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")
-public class PriorProbabilityClassifier extends AbstractAlgorithm<Result> implements Classifier<Object> {
+public class PriorProbabilityClassifier extends AbstractClassifier<Object, Result> {
   /**
    * The logger for this class.
    */
@@ -72,7 +70,7 @@ public class PriorProbabilityClassifier extends AbstractAlgorithm<Result> implem
   protected ArrayList<ClassLabel> labels;
 
   /**
-   * Provides a classifier always predicting the prior probabilities.
+   * Constructor.
    */
   public PriorProbabilityClassifier() {
     super();
@@ -105,10 +103,9 @@ public class PriorProbabilityClassifier extends AbstractAlgorithm<Result> implem
   }
 
   public double[] classProbabilities(Object instance, ArrayList<ClassLabel> labels) {
-    // FIXME: labels may be sorted differently!
-    return distribution;
+    return alignLabels(this.labels, distribution, labels);
   }
-  
+
   @Override
   public ClassLabel classify(Object instance) {
     return prediction;
@@ -124,12 +121,6 @@ public class PriorProbabilityClassifier extends AbstractAlgorithm<Result> implem
       output.append('\n');
     }
     return output.toString();
-  }
-
-  @Override
-  public Result run(Database database) {
-    // FIXME Implement sensible default behavior.
-    return null;
   }
 
   @Override

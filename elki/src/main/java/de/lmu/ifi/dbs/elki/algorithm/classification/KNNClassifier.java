@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -142,9 +143,9 @@ public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> 
   }
 
   @Override
+  @Deprecated
   public Result run(Database database) throws IllegalStateException {
-    // TODO Implement sensible default behavior.
-    return null;
+    throw new AbortException("Classifiers cannot auto-run on a database, but need to be trained and can then predict.");
   }
 
   @Override

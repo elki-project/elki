@@ -46,16 +46,15 @@ public interface Classifier<O> extends Algorithm {
   public void buildClassifier(Database database, Relation<? extends ClassLabel> classLabels);
 
   /**
-   * Provides a classification for a given instance. The classification is the
-   * index of the class-label.
+   * Classify a single instance.
    * 
    * @param instance an instance to classify
-   * @return a classification for the given instance
+   * @return predicted class label of the given instance
    */
   public ClassLabel classify(O instance);
 
   /**
-   * Provides a String representation of the classification model.
+   * Produce a String representation of the classification model.
    * 
    * @return a String representation of the classification model
    */
