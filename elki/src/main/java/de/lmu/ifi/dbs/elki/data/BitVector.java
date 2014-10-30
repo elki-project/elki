@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Vector using a dense bit set encoding, based on {@link long[]} storage.
+ * Vector using a dense bit set encoding, based on {@code long[]} storage.
  * 
  * @author Arthur Zimek
  * 

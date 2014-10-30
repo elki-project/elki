@@ -38,12 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * <p>
- * A SparseByteVector is to store real values as double values.
- * </p>
- * 
- * A SparseByteVector only requires storage for those attribute values that
- * are non-zero.
+ * Sparse vector type, using {@code byte[]} for storing the values, and
+ * {@code int[]} for storing the indexes, approximately 5 bytes per non-zero
+ * value (limited to -128..+127).
  * 
  * @author Arthur Zimek
  */
@@ -255,8 +252,7 @@ public class SparseByteVector extends AbstractNumberVector implements SparseNumb
 
   /**
    * <p>
-   * Provides a String representation of this SparseByteVector as suitable
-   * for
+   * Provides a String representation of this SparseByteVector as suitable for
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}
    * .
    * </p>
@@ -264,9 +260,9 @@ public class SparseByteVector extends AbstractNumberVector implements SparseNumb
    * <p>
    * The returned String is a single line with entries separated by
    * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
-   * number of values actually not zero. Following entries are pairs of Byte
-   * and Byte where the Byte gives the index of the dimensionality and the
-   * Byte gives the corresponding value.
+   * number of values actually not zero. Following entries are pairs of Byte and
+   * Byte where the Byte gives the index of the dimensionality and the Byte
+   * gives the corresponding value.
    * </p>
    * 
    * <p>

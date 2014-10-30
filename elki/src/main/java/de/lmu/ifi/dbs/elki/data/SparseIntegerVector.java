@@ -38,12 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * <p>
- * A SparseIntegerVector is to store real values as double values.
- * </p>
- * 
- * A SparseIntegerVector only requires storage for those attribute values that
- * are non-zero.
+ * Sparse vector type, using {@code int[]} for storing the values, and
+ * {@code int[]} for storing the indexes, approximately 8 bytes per non-zero
+ * integer value.
  * 
  * @author Arthur Zimek
  */

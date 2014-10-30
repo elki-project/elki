@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * An ShortVector is to store Short values.
+ * Vector type using {@code short[]} storage.
  * 
  * @author Erich Schubert
  */
@@ -66,9 +66,10 @@ public class ShortVector extends AbstractNumberVector {
    * @param nocopy Flag to use without copying.
    */
   private ShortVector(short[] values, boolean nocopy) {
-    if (nocopy) {
+    if(nocopy) {
       this.values = values;
-    } else {
+    }
+    else {
       this.values = new short[values.length];
       System.arraycopy(values, 0, this.values, 0, values.length);
     }
@@ -140,7 +141,7 @@ public class ShortVector extends AbstractNumberVector {
   @Override
   public Vector getColumnVector() {
     double[] data = new double[values.length];
-    for (int i = 0; i < values.length; i++) {
+    for(int i = 0; i < values.length; i++) {
       data[i] = values[i];
     }
     return new Vector(data);
@@ -149,9 +150,9 @@ public class ShortVector extends AbstractNumberVector {
   @Override
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
-    for (int i = 0; i < values.length; i++) {
+    for(int i = 0; i < values.length; i++) {
       featureLine.append(values[i]);
-      if (i + 1 < values.length) {
+      if(i + 1 < values.length) {
         featureLine.append(ATTRIBUTE_SEPARATOR);
       }
     }
@@ -170,7 +171,7 @@ public class ShortVector extends AbstractNumberVector {
     public <A> ShortVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       short[] values = new short[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i).shortValue();
       }
       return new ShortVector(values, true);
@@ -180,7 +181,7 @@ public class ShortVector extends AbstractNumberVector {
     public <A> ShortVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       short[] values = new short[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.getShort(array, i);
       }
       return new ShortVector(values, true);
@@ -226,7 +227,7 @@ public class ShortVector extends AbstractNumberVector {
       final short dimensionality = buffer.getShort();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_SHORT * dimensionality);
       final short[] values = new short[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getShort();
       }
       return new ShortVector(values, true);
@@ -237,7 +238,7 @@ public class ShortVector extends AbstractNumberVector {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_SHORT * vec.values.length);
       buffer.putShort((short) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putShort(vec.values[i]);
       }
     }
@@ -262,7 +263,7 @@ public class ShortVector extends AbstractNumberVector {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * dimensionality);
       final short[] values = new short[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = (short) ByteArrayUtil.readSignedVarint(buffer);
       }
       return new ShortVector(values, true);
@@ -272,7 +273,7 @@ public class ShortVector extends AbstractNumberVector {
     public void toByteBuffer(ByteBuffer buffer, ShortVector vec) throws IOException {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         ByteArrayUtil.writeSignedVarint(buffer, vec.values[i]);
       }
     }
@@ -281,7 +282,7 @@ public class ShortVector extends AbstractNumberVector {
     public int getByteSize(ShortVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       int len = ByteArrayUtil.getUnsignedVarintSize(vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         len += ByteArrayUtil.getSignedVarintSize(vec.values[i]);
       }
       return len;

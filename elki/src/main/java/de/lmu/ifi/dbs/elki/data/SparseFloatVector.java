@@ -40,12 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * <p>
- * A SparseFloatVector is to store real values approximately as float values.
- * </p>
- * 
- * A SparseFloatVector only requires storage for those attribute values that are
- * non-zero.
+ * Sparse vector type, using {@code float[]} for storing the values, and
+ * {@code int[]} for storing the indexes, approximately 8 bytes per non-zero
+ * value.
  * 
  * @author Arthur Zimek
  */

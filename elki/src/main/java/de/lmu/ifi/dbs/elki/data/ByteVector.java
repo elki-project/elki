@@ -34,8 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * A ByteVector stores the data using bytes. This is beneficial e.g. when using
- * SIFT vectors based on byte values.
+ * Vector using {@code byte[]} storage.
  * 
  * @author Erich Schubert
  */
@@ -67,9 +66,10 @@ public class ByteVector extends AbstractNumberVector {
    * @param nocopy Flag to use without copying.
    */
   private ByteVector(byte[] values, boolean nocopy) {
-    if (nocopy) {
+    if(nocopy) {
       this.values = values;
-    } else {
+    }
+    else {
       this.values = new byte[values.length];
       System.arraycopy(values, 0, this.values, 0, values.length);
     }
@@ -125,7 +125,7 @@ public class ByteVector extends AbstractNumberVector {
   @Override
   public Vector getColumnVector() {
     double[] data = new double[values.length];
-    for (int i = 0; i < values.length; i++) {
+    for(int i = 0; i < values.length; i++) {
       data[i] = values[i];
     }
     return new Vector(data);
@@ -134,9 +134,9 @@ public class ByteVector extends AbstractNumberVector {
   @Override
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
-    for (int i = 0; i < values.length; i++) {
+    for(int i = 0; i < values.length; i++) {
       featureLine.append(values[i]);
-      if (i + 1 < values.length) {
+      if(i + 1 < values.length) {
         featureLine.append(ATTRIBUTE_SEPARATOR);
       }
     }
@@ -155,7 +155,7 @@ public class ByteVector extends AbstractNumberVector {
     public <A> ByteVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       byte[] values = new byte[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i).byteValue();
       }
       return new ByteVector(values, true);
@@ -165,7 +165,7 @@ public class ByteVector extends AbstractNumberVector {
     public <A> ByteVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       byte[] values = new byte[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.getByte(array, i);
       }
       return new ByteVector(values, true);
@@ -210,7 +210,7 @@ public class ByteVector extends AbstractNumberVector {
       final byte dimensionality = buffer.get();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_BYTE * dimensionality);
       final byte[] values = new byte[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.get();
       }
       return new ByteVector(values, true);
@@ -221,7 +221,7 @@ public class ByteVector extends AbstractNumberVector {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_BYTE * vec.values.length);
       buffer.put((byte) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.put(vec.values[i]);
       }
     }
@@ -248,7 +248,7 @@ public class ByteVector extends AbstractNumberVector {
       final short dimensionality = buffer.getShort();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_BYTE * dimensionality);
       final byte[] values = new byte[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.get();
       }
       return new ByteVector(values, true);
@@ -259,7 +259,7 @@ public class ByteVector extends AbstractNumberVector {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_BYTE * vec.values.length);
       buffer.putShort((short) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.put(vec.values[i]);
       }
     }

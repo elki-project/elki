@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * A DoubleVector is to store real values approximately as double values.
+ * Vector type using {@code double[]} storage for real numbers.
  * 
  * @author Arthur Zimek
  * 

@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * A FloatVector is to store real values with lower memory requirements by using
- * float values.
+ * Vector type using {@code float[]} storage, thus needing approximately half as
+ * much memory as {@link DoubleVector}.
  * 
  * @author Elke Achtert
  */

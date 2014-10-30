@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * An IntegerVector is to store integer values.
+ * Vector type using {@code int[]} storage.
  * 
  * @author Erich Schubert
  */
