@@ -2,4 +2,4 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistance
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction

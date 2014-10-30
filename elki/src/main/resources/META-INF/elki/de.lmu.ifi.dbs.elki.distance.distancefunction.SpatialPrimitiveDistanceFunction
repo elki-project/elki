@@ -26,8 +26,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.HistogramMatchDistanceFu
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDivergenceDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction

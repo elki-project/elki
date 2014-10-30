@@ -50,11 +50,11 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.set.HammingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.set.JaccardSimilarityDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.strings.LevenshteinDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.strings.NormalizedLevenshteinDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DTWDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.EDRDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.ERPDistanceFunction
