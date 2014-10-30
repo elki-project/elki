@@ -8,6 +8,11 @@
 	<packaging>pom</packaging>
 
 	<name>ELKI Data Mining Framework - Parent Project</name>
+	<url>http://elki.dbs.ifi.lmu.de/</url>
+	<organization>
+		<name>ELKI Development Team, Lehr- und Forschungseinheit für Datenbanksysteme, Ludwig-Maximilians-Universität München</name>
+		<url>http://www.dbs.ifi.lmu.de/</url>
+	</organization>
 
 	<licenses>
 		<license>
@@ -196,6 +201,20 @@
 							</execution>
 						</executions>
 					</plugin>
+					<!-- jar plugin -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<version>2.4</version>
+						<configuration>
+							<archive>
+								<manifestFile>${elki.projdir}/elki/src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+								<manifest>
+									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+								</manifest>
+							</archive>
+						</configuration>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -261,10 +280,8 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<url>http://elki.dbs.ifi.lmu.de/</url>
-	<organization>
-		<url>http://www.dbs.ifi.lmu.de/</url>
-	</organization>
+	
+	
 	<issueManagement>
 		<system>trac</system>
 		<url>http://elki.dbs.ifi.lmu.de/newticket</url>

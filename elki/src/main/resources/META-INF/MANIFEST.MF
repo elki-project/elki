@@ -1,5 +1,12 @@
 Comment: ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures
 
+Name: de/lmu/ifi/dbs/elki
+Comment: ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures
+Implementation-Title: ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures
+Implementation-Version: 0.6.0-SNAPSHOT
+Implementation-Vendor: ELKI Development Team, Lehr- und Forschungseinheit für Datenbanksysteme, Ludwig-Maximilians-Universität München
+Implementation-URL: http://elki.dbs.ifi.lmu.de/
+
 Name: junit
 Comment: JUnit 4.5
 Implementation-Title: JUnit

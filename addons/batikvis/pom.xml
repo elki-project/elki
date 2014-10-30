@@ -34,6 +34,7 @@
 				<version>2.3.1</version>
 				<configuration>
 					<archive>
+						<manifestFile>${elki.projdir}/elki/src/main/resources/META-INF/MANIFEST.MF</manifestFile>
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<mainClass>de.lmu.ifi.dbs.elki.application.ELKILauncher</mainClass>

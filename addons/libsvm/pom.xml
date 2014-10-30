@@ -22,6 +22,7 @@
 	</licenses>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<elki.projdir>${basedir}/../..</elki.projdir>
 	</properties>
 
