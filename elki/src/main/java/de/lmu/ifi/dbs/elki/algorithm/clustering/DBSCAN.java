@@ -56,12 +56,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * DBSCAN provides the DBSCAN algorithm, an algorithm to find density-connected
- * sets in a database.
+ * Density-Based Clustering of Applications with Noise (DBSCAN), an algorithm to
+ * find density-connected sets in a database.
  * <p>
  * Reference: <br>
- * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: A Density-Based Algorithm for
- * Discovering Clusters in Large Spatial Databases with Noise. <br>
+ * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu:<br />
+ * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
+ * with Noise<br />
  * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
  * Portland, OR, 1996.
  * </p>
@@ -71,7 +72,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
+@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", //
+title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
+booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
+url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
 public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.

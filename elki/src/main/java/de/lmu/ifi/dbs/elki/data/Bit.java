@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.regex.Pattern;
 
 /**
- * Provides a bit number. The bit is internally represented as boolean.
+ * A boolean number type.
  * 
  * @author Arthur Zimek
  */

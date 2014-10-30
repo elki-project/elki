@@ -31,7 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Provides an abstract algorithm already setting the distance function.
+ * Abstract base class for distance-based algorithms that need to work with
+ * synthetic objects such as mean vectors.
  * 
  * This class only allows distances that are defined on arbitrary objects, not
  * only database objects!

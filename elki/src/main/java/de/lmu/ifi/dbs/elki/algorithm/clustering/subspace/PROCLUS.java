@@ -81,8 +81,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * <p/>
- * Provides the PROCLUS algorithm, an algorithm to find subspace clusters in
- * high dimensional spaces.
+ * The PROCLUS algorithm, an algorithm to find subspace clusters in high
+ * dimensional spaces.
  * </p>
  * <p/>
  * Reference: <br>
@@ -99,7 +99,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("PROCLUS: PROjected CLUStering")
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
-@Reference(authors = "C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304188")
+@Reference(authors = "C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", //
+title = "Fast Algorithms for Projected Clustering", //
+booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
+url = "http://dx.doi.org/10.1145/304181.304188")
 public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering<Clustering<SubspaceModel>, V> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.

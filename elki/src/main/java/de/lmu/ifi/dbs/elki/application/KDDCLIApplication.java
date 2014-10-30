@@ -30,10 +30,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
- * Provides a KDDCLIApplication that can be used to perform any algorithm
- * implementing {@link Algorithm Algorithm} using any DatabaseConnection
- * implementing {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection
- * DatabaseConnection}.
+ * Basic command line application for Knowledge Discovery in Databases use
+ * cases. It allows running unsupervised {@link Algorithm}s to run on any
+ * {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection DatabaseConnection}.
  * 
  * @author Arthur Zimek
  * 

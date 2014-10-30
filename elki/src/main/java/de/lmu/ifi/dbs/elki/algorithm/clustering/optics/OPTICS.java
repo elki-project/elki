@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * OPTICS provides the OPTICS algorithm.
+ * The OPTICS algorithm for density-based hierarchical clustering.
  * 
  * Reference:
  * <p>

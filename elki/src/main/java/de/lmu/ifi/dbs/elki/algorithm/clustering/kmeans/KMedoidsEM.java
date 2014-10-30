@@ -54,8 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Provides the k-medoids clustering algorithm, using a "bulk" variation of the
- * "Partitioning Around Medoids" approach.
+ * A k-medoids clustering algorithm, implemented as EM-style bulk algorithm.
  * 
  * In contrast to PAM, which will in each iteration update one medoid with one
  * (arbitrary) non-medoid, this implementation follows the EM pattern. In the

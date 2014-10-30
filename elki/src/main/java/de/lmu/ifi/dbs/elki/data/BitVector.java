@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides a BitVector wrapping a BitSet.
+ * Vector using a dense bit set encoding, based on {@link long[]} storage.
  * 
  * @author Arthur Zimek
  * 

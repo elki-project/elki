@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Provides an abstract algorithm already setting the distance function.
+ * Abstract base class for distance-based algorithms.
  * 
  * @author Arthur Zimek
  * 

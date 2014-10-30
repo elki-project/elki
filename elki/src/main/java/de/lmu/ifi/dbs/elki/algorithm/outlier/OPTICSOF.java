@@ -60,8 +60,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * OPTICSOF provides the Optics-of algorithm, an algorithm to find Local
- * Outliers in a database.
+ * Optics-OF outlier detection algorithm, an algorithm to find Local Outliers in
+ * a database based on ideas from {@link OPTICS} clustering.
  * <p>
  * Reference:<br>
  * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander:<br />
@@ -79,7 +79,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("OPTICS-OF: Identifying Local Outliers")
 @Description("Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter 'minpts'")
-@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", title = "OPTICS-OF: Identifying Local Outliers", booktitle = "Proc. of the 3rd European Conference on Principles of Knowledge Discovery and Data Mining (PKDD), Prague, Czech Republic", url = "http://springerlink.metapress.com/content/76bx6413gqb4tvta/")
+@Reference(authors = "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander", //
+title = "OPTICS-OF: Identifying Local Outliers", //
+booktitle = "Proc. of the 3rd European Conference on Principles of Knowledge Discovery and Data Mining (PKDD), Prague, Czech Republic", //
+url = "http://springerlink.metapress.com/content/76bx6413gqb4tvta/")
 public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

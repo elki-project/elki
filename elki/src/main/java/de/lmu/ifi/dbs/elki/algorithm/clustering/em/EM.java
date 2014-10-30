@@ -78,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <M> model type to produce
  */
 @Title("EM-Clustering: Clustering by Expectation Maximization")
-@Description("Provides k Gaussian mixtures maximizing the probability of the given data")
+@Description("Cluster data via Gaussian mixture modeling and the EM algorithm")
 @Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", //
 title = "Maximum Likelihood from Incomplete Data via the EM algorithm", //
 booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", //

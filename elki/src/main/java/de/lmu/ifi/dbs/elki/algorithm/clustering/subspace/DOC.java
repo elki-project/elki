@@ -65,8 +65,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * <p>
- * Provides the DOC algorithm, and it's heuristic variant, FastDOC. DOC is a
- * sampling based subspace clustering algorithm.
+ * The DOC algorithm, and it's heuristic variant, FastDOC. DOC is a sampling
+ * based subspace clustering algorithm.
  * </p>
  * 
  * <p>
@@ -83,7 +83,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <V> the type of NumberVector handled by this Algorithm.
  */
 @Title("DOC: Density-based Optimal projective Clustering")
-@Reference(authors = "C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali", title = "A Monte Carlo algorithm for fast projective clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", url = "http://dx.doi.org/10.1145/564691.564739")
+@Reference(authors = "C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali", //
+title = "A Monte Carlo algorithm for fast projective clustering", //
+booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", //
+url = "http://dx.doi.org/10.1145/564691.564739")
 public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.

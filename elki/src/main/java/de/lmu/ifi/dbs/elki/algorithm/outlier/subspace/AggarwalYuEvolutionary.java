@@ -63,8 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * EAFOD provides the evolutionary outlier detection algorithm, an algorithm to
- * detect outliers for high dimensional data.
+ * Evolutionary variant (EAFOD) of the high-dimensional outlier detection
+ * algorithm by Aggarwal and Yu.
  * <p>
  * Reference: <br />
  * Outlier detection for high dimensional data<br />

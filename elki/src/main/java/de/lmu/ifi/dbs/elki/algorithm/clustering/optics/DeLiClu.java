@@ -65,8 +65,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * DeLiClu provides the DeLiClu algorithm, a hierarchical algorithm to find
- * density-connected sets in a database.
+ * DeliClu: Density-Based Hierarchical Clustering, a hierarchical algorithm to
+ * find density-connected sets in a database.
  * <p>
  * Reference: <br>
  * E. Achtert, C. Böhm, P. Kröger: DeLiClu: Boosting Robustness, Completeness,
@@ -81,7 +81,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DeliClu: Density-Based Hierarchical Clustering")
 @Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
-@Reference(authors = "E. Achtert, C. Böhm, P. Kröger", title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", url = "http://dx.doi.org/10.1007/11731139_16")
+@Reference(authors = "E. Achtert, C. Böhm, P. Kröger", //
+title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", //
+booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", //
+url = "http://dx.doi.org/10.1007/11731139_16")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu" })
 public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgorithm<NV, ClusterOrderResult<DoubleDistanceClusterOrderEntry>> implements OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> {
   /**

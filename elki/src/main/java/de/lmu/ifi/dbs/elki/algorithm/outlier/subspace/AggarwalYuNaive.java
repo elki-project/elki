@@ -46,12 +46,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
- * BruteForce provides a naive brute force algorithm in which all k-subsets of
- * dimensions are examined and calculates the sparsity coefficient to find
- * outliers.
+ * BruteForce variant of the high-dimensional outlier detection algorithm by
+ * Aggarwal and Yu.
  * 
  * The evolutionary approach is implemented as
- * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.AggarwalYuEvolutionary}.
+ * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.AggarwalYuEvolutionary}
+ * .
  * 
  * <p>
  * Reference: <br />
@@ -148,7 +148,7 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
       final double sparsityC = sparsity(ids.size(), size, k, phi);
 
       if(sparsityC < 0) {
-        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           double prev = sparsity.doubleValue(iter);
           if(Double.isNaN(prev) || sparsityC < prev) {
             sparsity.putDouble(iter, sparsityC);

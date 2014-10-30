@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
- * Provides an entry in a cluster order.
+ * Entry in a {@link ClusterOrderResult}.
  * 
  * @author Elke Achtert
  */
