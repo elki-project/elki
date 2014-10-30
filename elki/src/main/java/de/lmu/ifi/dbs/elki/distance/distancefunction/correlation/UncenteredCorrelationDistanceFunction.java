@@ -42,7 +42,7 @@ public class UncenteredCorrelationDistanceFunction extends AbstractNumberVectorD
   public static final UncenteredCorrelationDistanceFunction STATIC = new UncenteredCorrelationDistanceFunction();
 
   /**
-   * Provides a PearsonCorrelationDistanceFunction.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */

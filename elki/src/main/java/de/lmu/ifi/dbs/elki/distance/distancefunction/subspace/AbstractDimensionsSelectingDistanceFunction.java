@@ -36,18 +36,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
 /**
- * Provides a distance function that computes the distance (which is a double
- * distance) between feature vectors only in specified dimensions.
+ * Abstract base class for distances computed only in subspaces.
+ * 
+ * Selected dimensions are encuded as bits in a {@code long[]}.
  * 
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public abstract class AbstractDimensionsSelectingDistanceFunction<V extends FeatureVector<?>> extends AbstractPrimitiveDistanceFunction<V> implements PrimitiveDistanceFunction<V>, DimensionSelectingSubspaceDistanceFunction<V> {
-  /**
-   * Dimensions parameter.
-   */
-  public static final OptionID DIMS_ID = new OptionID("distance.dims", "a comma separated array of integer values, where 0 <= d_i < the dimensionality of the feature space specifying the dimensions to be considered for distance computation. If this parameter is not set, no dimensions will be considered, i.e. the distance between two objects is always 0.");
-
   /**
    * The dimensions to be considered for distance computation.
    */
@@ -102,14 +98,19 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Dimensions parameter.
+     */
+    public static final OptionID DIMS_ID = new OptionID("distance.dims", "a comma separated array of integer values, where 0 <= d_i < the dimensionality of the feature space specifying the dimensions to be considered for distance computation. If this parameter is not set, no dimensions will be considered, i.e. the distance between two objects is always 0.");
+
     protected long[] dimensions = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntListParameter dimsP = new IntListParameter(DIMS_ID);
-      dimsP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
-      dimsP.setOptional(true);
+      final IntListParameter dimsP = new IntListParameter(DIMS_ID)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
+      .setOptional(true);
       if(config.grab(dimsP)) {
         final List<Integer> value = dimsP.getValue();
         int maxd = 0;

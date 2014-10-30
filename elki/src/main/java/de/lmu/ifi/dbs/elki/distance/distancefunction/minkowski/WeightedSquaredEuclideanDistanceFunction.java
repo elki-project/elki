@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Provides the squared Euclidean distance for FeatureVectors. This results in
- * the same rankings, but saves computing the square root as often.
+ * Squared Euclidean distance for {@link NumberVector}s. This results in the
+ * same rankings as Euclidean distance, but saves computing the square root.
  * 
  * @author Arthur Zimek
  */
@@ -49,19 +49,13 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNor
   /**
    * Constructor.
    * 
-   * @param weights
+   * @param weights Weight vector
    */
   public WeightedSquaredEuclideanDistanceFunction(double[] weights) {
     super();
     this.weights = weights;
   }
 
-  /**
-   * Provides the squared Euclidean distance between the given two vectors.
-   * 
-   * @return the squared Euclidean distance between the given two vectors as raw
-   *         double value
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2, weights.length);

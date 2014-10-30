@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides the Jeffrey Divergence Distance for FeatureVectors.
+ * Jeffrey Divergence Distance for {@link NumberVector}s.
  * 
  * Reference:
  * <p>
@@ -41,7 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title = "Empirical evaluation of dissimilarity measures for color and texture", booktitle = "Proc. 7th IEEE International Conference on Computer Vision", url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
+@Reference(authors = "J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", //
+title = "Empirical evaluation of dissimilarity measures for color and texture", //
+booktitle = "Proc. 7th IEEE International Conference on Computer Vision", //
+url = "http://dx.doi.org/10.1109/ICCV.1999.790412")
 public class JeffreyDivergenceDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance. Use this!
@@ -49,7 +52,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractSpatialDistanceFu
   public static final JeffreyDivergenceDistanceFunction STATIC = new JeffreyDivergenceDistanceFunction();
 
   /**
-   * Constructor for the Jeffrey divergence.
+   * Constructor for the Jeffrey divergence - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */
@@ -62,19 +65,19 @@ public class JeffreyDivergenceDistanceFunction extends AbstractSpatialDistanceFu
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      if (xd == yd) {
+      if(xd == yd) {
         continue;
       }
       final double md = .5 * (xd + yd);
-      if (!(md > 0. || md < 0.)) {
+      if(!(md > 0. || md < 0.)) {
         continue;
       }
-      if (xd > 0.) {
+      if(xd > 0.) {
         agg += xd * Math.log(xd / md);
       }
-      if (yd > 0.) {
+      if(yd > 0.) {
         agg += yd * Math.log(yd / md);
       }
     }
@@ -85,17 +88,17 @@ public class JeffreyDivergenceDistanceFunction extends AbstractSpatialDistanceFu
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double agg = 0;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
       final double md = .5 * (max1 + max2);
-      if (!(md > 0. || md < 0.)) {
+      if(!(md > 0. || md < 0.)) {
         continue;
       }
-      if (min1 > 0.) {
+      if(min1 > 0.) {
         agg += min1 * Math.log(min1 / md);
       }
-      if (min2 > 0.) {
+      if(min2 > 0.) {
         agg += min2 * Math.log(min2 / md);
       }
     }
@@ -109,13 +112,13 @@ public class JeffreyDivergenceDistanceFunction extends AbstractSpatialDistanceFu
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (obj == this) {
+    if(obj == this) {
       return true;
     }
-    if (this.getClass().equals(obj.getClass())) {
+    if(this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);

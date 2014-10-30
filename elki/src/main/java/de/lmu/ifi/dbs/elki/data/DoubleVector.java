@@ -80,7 +80,7 @@ public class DoubleVector extends AbstractNumberVector {
   }
 
   /**
-   * Provides a DoubleVector consisting of the given double values.
+   * Create a DoubleVector consisting of the given double values.
    * 
    * @param values the values to be set as values of the DoubleVector
    */

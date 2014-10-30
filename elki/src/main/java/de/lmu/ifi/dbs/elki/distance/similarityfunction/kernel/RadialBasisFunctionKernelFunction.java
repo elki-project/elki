@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides the Gaussian radial basis function kernel (RBF Kernel).
+ * Gaussian radial basis function kernel (RBF Kernel).
  * 
  * @author Erich Schubert
  */

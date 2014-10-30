@@ -28,8 +28,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanc
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides a linear Kernel function that computes a similarity between the two
- * feature vectors V1 and V2 defined by V1^T*V2.
+ * Linear Kernel function that computes a similarity between the two feature
+ * vectors V1 and V2 defined by V1^T*V2.
  * 
  * Note: this is effectively equivalent to using
  * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
@@ -54,7 +54,7 @@ public class LinearKernelFunction extends PolynomialKernelFunction {
   public double similarity(final NumberVector o1, final NumberVector o2) {
     final int dim = AbstractNumberVectorDistanceFunction.dimensionality(o1, o2);
     double sim = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       sim += o1.doubleValue(i) * o2.doubleValue(i);
     }
     return sim;

@@ -28,8 +28,8 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
- * Provides a distance function that computes the Euclidean distance between
- * feature vectors only in specified dimensions.
+ * Maximum distance function between {@link NumberVector}s only in specified
+ * dimensions.
  * 
  * @author Elke Achtert
  */
@@ -43,15 +43,6 @@ public class SubspaceMaximumDistanceFunction extends SubspaceLPNormDistanceFunct
     super(1.0, dimensions);
   }
 
-  /**
-   * Provides the Euclidean distance between two given feature vectors in the
-   * selected dimensions.
-   * 
-   * @param v1 first feature vector
-   * @param v2 second feature vector
-   * @return the Euclidean distance between two given feature vectors in the
-   *         selected dimensions
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {

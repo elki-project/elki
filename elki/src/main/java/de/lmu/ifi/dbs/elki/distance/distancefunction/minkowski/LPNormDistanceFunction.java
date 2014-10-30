@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides a LP-Norm for FeatureVectors.
+ * LP-Norm for {@link NumberVector}s.
  * 
  * @author Arthur Zimek
  * 
@@ -45,12 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Alias({ "lp", "minkowski", "p", "de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction" })
 public class LPNormDistanceFunction extends AbstractSpatialNorm {
   /**
-   * OptionID for the "p" parameter
-   */
-  public static final OptionID P_ID = new OptionID("lpnorm.p", "the degree of the L-P-Norm (positive number)");
-
-  /**
-   * Keeps the currently set p and its inverse
+   * p parameter and its inverse.
    */
   protected double p, invp;
 
@@ -279,6 +274,10 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * OptionID for the "p" parameter
+     */
+    public static final OptionID P_ID = new OptionID("lpnorm.p", "the degree of the L-P-Norm (positive number)");
     /**
      * The value of p.
      */

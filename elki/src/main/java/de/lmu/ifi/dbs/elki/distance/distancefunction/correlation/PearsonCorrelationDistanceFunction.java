@@ -50,7 +50,7 @@ public class PearsonCorrelationDistanceFunction extends AbstractNumberVectorDist
   public static final PearsonCorrelationDistanceFunction STATIC = new PearsonCorrelationDistanceFunction();
 
   /**
-   * Provides a PearsonCorrelationDistanceFunction.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */

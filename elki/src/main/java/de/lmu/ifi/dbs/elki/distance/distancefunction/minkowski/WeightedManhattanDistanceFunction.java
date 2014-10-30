@@ -33,7 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Weighted version of the Minkowski L_p metrics distance function.
+ * Weighted version of the Minkowski L_p metrics distance function for
+ * {@link NumberVector}s.
  * 
  * @author Erich Schubert
  */

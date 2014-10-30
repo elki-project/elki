@@ -303,10 +303,8 @@ public final class MathUtil {
   }
 
   /**
-   * <p>
-   * Provides the Pearson product-moment correlation coefficient for two
+   * Compute the Pearson product-moment correlation coefficient for two
    * NumberVectors.
-   * </p>
    * 
    * @param x first NumberVector
    * @param y second NumberVector
@@ -358,10 +356,8 @@ public final class MathUtil {
   }
 
   /**
-   * <p>
-   * Provides the Pearson product-moment correlation coefficient for two
+   * Compute the Pearson product-moment correlation coefficient for two
    * NumberVectors.
-   * </p>
    * 
    * @param x first NumberVector
    * @param y second NumberVector
@@ -408,10 +404,8 @@ public final class MathUtil {
   }
 
   /**
-   * <p>
-   * Provides the Pearson product-moment correlation coefficient for two
+   * Compute the Pearson product-moment correlation coefficient for two
    * FeatureVectors.
-   * </p>
    * 
    * @param x first FeatureVector
    * @param y second FeatureVector
@@ -458,10 +452,8 @@ public final class MathUtil {
   }
 
   /**
-   * <p>
-   * Provides the Pearson product-moment correlation coefficient for two
+   * Compute the Pearson product-moment correlation coefficient for two
    * FeatureVectors.
-   * </p>
    * 
    * @param x first FeatureVector
    * @param y second FeatureVector
@@ -505,10 +497,8 @@ public final class MathUtil {
   }
 
   /**
-   * <p>
-   * Provides the Pearson product-moment correlation coefficient for two
+   * Compute the Pearson product-moment correlation coefficient for two
    * FeatureVectors.
-   * </p>
    * 
    * @param x first FeatureVector
    * @param y second FeatureVector

@@ -341,7 +341,7 @@ public final class VectorUtil {
   }
 
   /**
-   * Provides the scalar product (inner product) of this and the given
+   * Compute the scalar product (inner product) of this and the given
    * DoubleVector.
    * 
    * @param d1 the first vector to compute the scalar product for
@@ -521,7 +521,7 @@ public final class VectorUtil {
   }
 
   /**
-   * Provides a new NumberVector as a projection on the specified attributes.
+   * Project a number vector to the specified attributes.
    * 
    * @param v a NumberVector to project
    * @param selectedAttributes the attributes selected for projection

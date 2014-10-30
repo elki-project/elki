@@ -86,8 +86,7 @@ public class MultipleLinearRegression {
   private final double sst;
 
   /**
-   * Provides a new multiple linear regression model with the specified
-   * parameters.
+   * Constructor.
    * 
    * @param y the (n x 1) - vector holding the response values (y1, ..., yn)^T.
    * @param x the (n x p+1)-matrix holding the explanatory values, where the

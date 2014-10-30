@@ -48,7 +48,7 @@ public class AbsolutePearsonCorrelationDistanceFunction extends AbstractNumberVe
   public static final AbsolutePearsonCorrelationDistanceFunction STATIC = new AbsolutePearsonCorrelationDistanceFunction();
 
   /**
-   * Provides a PearsonCorrelationDistanceFunction.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */

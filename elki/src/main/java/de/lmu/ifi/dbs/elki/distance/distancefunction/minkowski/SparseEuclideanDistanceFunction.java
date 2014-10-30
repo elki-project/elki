@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Euclidean distance function. Optimized for sparse vectors.
+ * Euclidean distance function, optimized for {@link SparseNumberVector}s.
  * 
  * @author Erich Schubert
  */
@@ -38,7 +38,7 @@ public class SparseEuclideanDistanceFunction extends SparseLPNormDistanceFunctio
   public static final SparseEuclideanDistanceFunction STATIC = new SparseEuclideanDistanceFunction();
 
   /**
-   * Constructor.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance instead.
    */

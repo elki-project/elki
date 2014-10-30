@@ -41,7 +41,7 @@ public class LeaveOneOut extends AbstractHoldout {
   private int len, pos;
 
   /**
-   * Provides a leave-one-out partitioner.
+   * Constructor.
    */
   public LeaveOneOut() {
     super();

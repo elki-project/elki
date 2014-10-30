@@ -195,9 +195,9 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
   }
 
   /**
-   * Provides the k nearest neighbors in terms of the shared nearest neighbor
+   * Get the k nearest neighbors in terms of the shared nearest neighbor
    * distance.
-   * <p/>
+   *
    * The query object is excluded from the knn list.
    * 
    * FIXME: move this to the database layer.

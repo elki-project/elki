@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Provides the weighted Euclidean distance for NumberVectors.
+ * Weighted Euclidean distance for {@link NumberVector}s.
  * 
  * @author Erich Schubert
  */

@@ -55,9 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Provides a mapping for associations based on a Hashtable and functions to get
- * the next usable ID for insertion, making IDs reusable after deletion of the
- * entry.
+ * Database storing data using hashtable storage, and thus allowing additional
+ * and removal of objects.
  * 
  * @author Arthur Zimek
  * @author Erich Schubert

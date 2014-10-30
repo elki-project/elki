@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides a distance function that computes the Euclidean distance between
- * feature vectors only in specified dimensions.
+ * LP-Norm distance function between {@link NumberVector}s only in specified
+ * dimensions.
  * 
  * @author Elke Achtert
  */
@@ -70,15 +70,6 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
     return p;
   }
 
-  /**
-   * Provides the Euclidean distance between two given feature vectors in the
-   * selected dimensions.
-   * 
-   * @param v1 first feature vector
-   * @param v2 second feature vector
-   * @return the Euclidean distance between two given feature vectors in the
-   *         selected dimensions
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
@@ -188,7 +179,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
     @Override
     protected void makeOptions(Parameterization config) {
-      final DoubleParameter paramP = new DoubleParameter(LPNormDistanceFunction.P_ID);
+      final DoubleParameter paramP = new DoubleParameter(LPNormDistanceFunction.Parameterizer.P_ID);
       paramP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(paramP)) {
         p = paramP.getValue();

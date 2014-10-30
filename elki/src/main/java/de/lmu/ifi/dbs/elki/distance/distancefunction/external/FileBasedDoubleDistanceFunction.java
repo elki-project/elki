@@ -44,8 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Provides a DistanceFunction that is based on double distances given by a
- * distance matrix of an external file.
+ * Distance function that is based on double distances given by a distance
+ * matrix of an external ascii file.
  * 
  * See {@link AsciiDistanceParser} for the default input format.
  * 

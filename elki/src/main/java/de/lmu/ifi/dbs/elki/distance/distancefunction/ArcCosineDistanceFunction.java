@@ -47,7 +47,7 @@ public class ArcCosineDistanceFunction extends AbstractSpatialDistanceFunction {
   public static final ArcCosineDistanceFunction STATIC = new ArcCosineDistanceFunction();
 
   /**
-   * Provides a CosineDistanceFunction.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */
@@ -69,7 +69,7 @@ public class ArcCosineDistanceFunction extends AbstractSpatialDistanceFunction {
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     double d = Math.acos(VectorUtil.cosAngle(v1, v2));
-    if (d < 0) {
+    if(d < 0) {
       d = 0;
     }
     return d;
@@ -78,7 +78,7 @@ public class ArcCosineDistanceFunction extends AbstractSpatialDistanceFunction {
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = Math.acos(VectorUtil.minCosAngle(mbr1, mbr2));
-    if (d < 0) {
+    if(d < 0) {
       d = 0;
     }
     return d;
@@ -91,10 +91,10 @@ public class ArcCosineDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (obj == this) {
+    if(obj == this) {
       return true;
     }
     return this.getClass().equals(obj.getClass());

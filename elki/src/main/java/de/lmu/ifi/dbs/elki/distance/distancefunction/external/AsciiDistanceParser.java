@@ -37,11 +37,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Provides a parser for parsing one distance value per line.
- * <p/>
- * A line must have the following format: id1 id2 distanceValue, where id1 and
- * id2 are integers representing the two ids belonging to the distance value.
- * Lines starting with &quot;#&quot; will be ignored.
+ * Parser for parsing one distance value per line.
+ *
+ * A line must have the following format: {@code id1 id2 distanceValue}, where
+ * id1 and id2 are integers representing the two ids belonging to the distance
+ * value. Lines starting with &quot;#&quot; will be ignored.
  * 
  * @author Elke Achtert
  * @author Erich Schubert

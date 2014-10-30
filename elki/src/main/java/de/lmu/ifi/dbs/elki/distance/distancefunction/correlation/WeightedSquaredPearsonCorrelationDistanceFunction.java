@@ -59,7 +59,7 @@ public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractN
   private double[] weights;
 
   /**
-   * Provides a SquaredPearsonCorrelationDistanceFunction.
+   * Constructor.
    * 
    * @param weights Weights
    */

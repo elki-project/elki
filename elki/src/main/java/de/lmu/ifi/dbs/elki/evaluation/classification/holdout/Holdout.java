@@ -43,8 +43,7 @@ public interface Holdout {
   void initialize(MultipleObjectsBundle bundle);
 
   /**
-   * Provides a range of partitions of a database to pairs of training and test
-   * data sets.
+   * Get the next partitioning of the given holdout.
    * 
    * @return Next partitioning of the data set
    */

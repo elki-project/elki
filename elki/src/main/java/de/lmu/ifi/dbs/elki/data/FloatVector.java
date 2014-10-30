@@ -77,7 +77,7 @@ public class FloatVector extends AbstractNumberVector {
   }
 
   /**
-   * Provides a FloatVector consisting of the given float values.
+   * Create a FloatVector consisting of the given float values.
    * 
    * @param values the values to be set as values of the float vector
    */

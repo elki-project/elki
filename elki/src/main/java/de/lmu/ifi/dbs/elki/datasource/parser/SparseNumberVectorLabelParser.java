@@ -44,8 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * <p>
- * Provides a parser for parsing one point per line, attributes separated by
- * whitespace.
+ * Parser for parsing one point per line, attributes separated by whitespace.
  * </p>
  * <p>
  * Several labels may be given per point. A label must not be parseable as

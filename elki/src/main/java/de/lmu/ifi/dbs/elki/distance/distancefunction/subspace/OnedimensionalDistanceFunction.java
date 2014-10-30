@@ -36,17 +36,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Provides a distance function that computes the distance between feature
- * vectors as the absolute difference of their values in a specified dimension.
+ * Distance function that computes the distance between feature vectors as the
+ * absolute difference of their values in a specified dimension only.
  * 
  * @author Elke Achtert
  */
-public class DimensionSelectingDistanceFunction extends AbstractSpatialNorm implements DimensionSelectingSubspaceDistanceFunction<NumberVector> {
-  /**
-   * Parameter for dimensionality.
-   */
-  public static final OptionID DIM_ID = new OptionID("dim", "an integer between 1 and the dimensionality of the " + "feature space 1 specifying the dimension to be considered " + "for distance computation.");
-
+public class OnedimensionalDistanceFunction extends AbstractSpatialNorm implements DimensionSelectingSubspaceDistanceFunction<NumberVector> {
   /**
    * The dimension to be considered for distance computation.
    */
@@ -57,7 +52,7 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialNorm impl
    * 
    * @param dim Dimension
    */
-  public DimensionSelectingDistanceFunction(int dim) {
+  public OnedimensionalDistanceFunction(int dim) {
     super();
     this.dim = dim;
   }
@@ -77,8 +72,8 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialNorm impl
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
 
-    double manhattan = v1.doubleValue(dim) - v2.doubleValue(dim);
-    return Math.abs(manhattan);
+    double delta = v1.doubleValue(dim) - v2.doubleValue(dim);
+    return delta >= 0 ? delta : -delta;
   }
 
   @Override
@@ -87,22 +82,15 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialNorm impl
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
 
-    double m1, m2;
-    if(mbr1.getMax(dim) < mbr2.getMin(dim)) {
-      m1 = mbr1.getMax(dim);
-      m2 = mbr2.getMin(dim);
+    final double max1 = mbr1.getMax(dim), min2 = mbr2.getMin(dim);
+    if(max1 < min2) {
+      return min2 - max1;
     }
-    else if(mbr1.getMin(dim) > mbr2.getMax(dim)) {
-      m1 = mbr1.getMin(dim);
-      m2 = mbr2.getMax(dim);
+    final double min1 = mbr1.getMin(dim), max2 = mbr2.getMax(dim);
+    if(min1 > max2) {
+      return min1 - max2;
     }
-    else { // The mbrs intersect!
-      m1 = 0;
-      m2 = 0;
-    }
-    double manhattan = m1 - m2;
-
-    return Math.abs(manhattan);
+    return 0;
   }
 
   @Override
@@ -152,7 +140,7 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialNorm impl
     if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
-    return this.dim == ((DimensionSelectingDistanceFunction) obj).dim;
+    return this.dim == ((OnedimensionalDistanceFunction) obj).dim;
   }
 
   /**
@@ -163,21 +151,29 @@ public class DimensionSelectingDistanceFunction extends AbstractSpatialNorm impl
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter for dimensionality.
+     */
+    public static final OptionID DIM_ID = new OptionID("dim", "an integer between 1 and the dimensionality of the " + "feature space 1 specifying the dimension to be considered " + "for distance computation.");
+
+    /**
+     * Selected dimension.
+     */
     protected int dim = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimP = new IntParameter(DIM_ID);
-      dimP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      final IntParameter dimP = new IntParameter(DIM_ID)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(dimP)) {
         dim = dimP.getValue();
       }
     }
 
     @Override
-    protected DimensionSelectingDistanceFunction makeInstance() {
-      return new DimensionSelectingDistanceFunction(dim);
+    protected OnedimensionalDistanceFunction makeInstance() {
+      return new OnedimensionalDistanceFunction(dim);
     }
   }
 }

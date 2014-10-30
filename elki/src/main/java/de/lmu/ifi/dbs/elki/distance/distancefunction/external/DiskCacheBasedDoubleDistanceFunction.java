@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
- * Provides a DistanceFunction that is based on double distances given by a
- * distance matrix of an external file.
+ * Distance function that is based on double distances given by a distance
+ * matrix of an external binary matrix file.
  * 
  * @author Erich Schubert
  */
@@ -104,7 +104,7 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
    */
   public static class Parameterizer extends AbstractParameterizer {
     // TODO: constructor with file.
-    
+
     /**
      * Parameter that specifies the name of the distance matrix file.
      * <p>
@@ -113,6 +113,7 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
      */
     public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
     "The name of the file containing the distance matrix.");
+
     protected OnDiskUpperTriangleMatrix cache = null;
 
     @Override

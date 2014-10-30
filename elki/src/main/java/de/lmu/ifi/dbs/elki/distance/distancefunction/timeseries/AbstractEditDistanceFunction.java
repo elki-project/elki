@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides the Edit Distance for FeatureVectors.
+ * Edit Distance for FeatureVectors.
  * 
  * @author Thomas Bernecker
  */

@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides the Euclidean distance for FeatureVectors.
+ * Euclidean distance for {@link NumberVector}s.
  * 
  * @author Arthur Zimek
  */
@@ -41,8 +41,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
   public static final EuclideanDistanceFunction STATIC = new EuclideanDistanceFunction();
 
   /**
-   * Provides a Euclidean distance function that can compute the Euclidean
-   * distance (that is a distance) for FeatureVectors.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */

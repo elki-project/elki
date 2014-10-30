@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Maximum distance function. Optimized for sparse vectors.
+ * Maximum distance, optimized for {@link SparseNumberVector}s.
  * 
  * @author Erich Schubert
  */
@@ -37,7 +37,7 @@ public class SparseMaximumDistanceFunction extends SparseLPNormDistanceFunction 
   public static final SparseMaximumDistanceFunction STATIC = new SparseMaximumDistanceFunction();
 
   /**
-   * Constructor.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance
    */

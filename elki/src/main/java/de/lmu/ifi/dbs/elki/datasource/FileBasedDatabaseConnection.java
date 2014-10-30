@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
- * Provides a file based database connection based on the parser to be set.
+ * File based database connection based on the parser to be set.
  * 
  * @author Arthur Zimek
  * 

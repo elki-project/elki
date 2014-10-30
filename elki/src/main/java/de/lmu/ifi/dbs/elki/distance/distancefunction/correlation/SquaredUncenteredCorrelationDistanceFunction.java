@@ -42,7 +42,7 @@ public class SquaredUncenteredCorrelationDistanceFunction extends AbstractNumber
   public static final SquaredUncenteredCorrelationDistanceFunction STATIC = new SquaredUncenteredCorrelationDistanceFunction();
 
   /**
-   * Provides a SquaredUncenteredCorrelationDistanceFunction.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */

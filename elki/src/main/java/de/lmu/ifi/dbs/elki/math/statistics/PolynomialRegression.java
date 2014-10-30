@@ -51,7 +51,7 @@ public class PolynomialRegression extends MultipleLinearRegression {
   public final int p;
 
   /**
-   * Provides a new polynomial regression model with the specified parameters.
+   * Constructor.
    * 
    * @param y the (n x 1) - vector holding the response values (y1, ..., yn)^T.
    * @param x the (n x 1)-vector holding the x-values (x1, ..., xn)^T.

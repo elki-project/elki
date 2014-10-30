@@ -34,19 +34,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides a LP-Norm for FeatureVectors.
+ * LP-Norm, optimized for {@link SparseNumberVector}s.
  * 
  * @author Erich Schubert
  */
 // TODO: implement SpatialDistanceFunction
 public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector> implements Norm<SparseNumberVector> {
   /**
-   * Keeps the currently set p.
+   * P parameter and its inverse.
    */
   private double p, invp;
 
   /**
-   * Provides a LP-Norm for FeatureVectors.
+   * Constructor.
    */
   public SparseLPNormDistanceFunction(double p) {
     super();
@@ -132,7 +132,7 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter pP = new DoubleParameter(LPNormDistanceFunction.P_ID);
+      DoubleParameter pP = new DoubleParameter(LPNormDistanceFunction.Parameterizer.P_ID);
       pP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(pP)) {
         p = pP.getValue();

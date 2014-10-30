@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -49,7 +50,7 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
@@ -383,10 +384,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    *         preference vectors
    */
   private RangeQuery<V>[] initRangeQueries(Relation<V> relation, int dimensionality) {
+    Database db = relation.getDatabase();
     Class<RangeQuery<V>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
     RangeQuery<V>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {
-      rangeQueries[d] = relation.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<>(relation, new DimensionSelectingDistanceFunction(d)));
+      rangeQueries[d] = db.getRangeQuery(new PrimitiveDistanceQuery<>(relation, new OnedimensionalDistanceFunction(d)));
     }
     return rangeQueries;
   }

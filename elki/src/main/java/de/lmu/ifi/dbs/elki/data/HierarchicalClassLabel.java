@@ -168,7 +168,7 @@ public class HierarchicalClassLabel extends ClassLabel {
   }
 
   /**
-   * Provides a String representation of this ClassLabel comprising only the
+   * Create a String representation of this ClassLabel comprising only the
    * first <code>level</code> levels.
    * 
    * @param level the lowest level to include in the String representation.

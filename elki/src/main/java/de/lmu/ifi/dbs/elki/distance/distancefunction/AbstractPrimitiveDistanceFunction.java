@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  */
 public abstract class AbstractPrimitiveDistanceFunction<O> implements PrimitiveDistanceFunction<O> {
   /**
-   * Provides an abstract DistanceFunction.
+   * Constructor.
    */
   public AbstractPrimitiveDistanceFunction() {
     // EMPTY

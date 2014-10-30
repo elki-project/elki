@@ -48,9 +48,7 @@ public class NormalizingEigenPairFilter implements EigenPairFilter {
   private static final Logging LOG = Logging.getLogger(NormalizingEigenPairFilter.class);
 
   /**
-   * Provides a new EigenPairFilter that normalizes all eigenvectors s.t.
-   * eigenvalue * <eigenvector, eigenvector> = 1, where <,> is the standard dot
-   * product
+   * Constructor.
    */
   public NormalizingEigenPairFilter() {
     super();

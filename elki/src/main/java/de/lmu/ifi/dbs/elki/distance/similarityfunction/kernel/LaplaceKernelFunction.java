@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides the laplace / exponential radial basis function kernel.
+ * Laplace / exponential radial basis function kernel.
  * 
  * @author Erich Schubert
  */

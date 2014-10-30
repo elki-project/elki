@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
- * Provides a DistanceFunction that is based on float distances given by a
- * distance matrix of an external file.
+ * Distance function that is based on float distances given by a distance matrix
+ * of an external binary matrix file.
  * 
  * @author Erich Schubert
  */

@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Provides a polynomial Kernel function that computes a similarity between the
- * two feature vectors V1 and V2 defined by (V1^T*V2)^degree.
+ * Polynomial Kernel function that computes a similarity between the two feature
+ * vectors V1 and V2 defined by (V1^T*V2)^degree.
  * 
  * @author Simon Paradies
  */

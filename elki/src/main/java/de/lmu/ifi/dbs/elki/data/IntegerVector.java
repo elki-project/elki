@@ -80,13 +80,12 @@ public class IntegerVector extends AbstractNumberVector {
   }
 
   /**
-   * Provides an IntegerVector consisting of the given integer values.
+   * Create an IntegerVector consisting of the given integer values.
    * 
    * @param values the values to be set as values of the IntegerVector
    */
   public IntegerVector(int[] values) {
-    this.values = new int[values.length];
-    System.arraycopy(values, 0, this.values, 0, values.length);
+    this.values = values.clone();
   }
 
   @Override

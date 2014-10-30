@@ -56,7 +56,7 @@ class MkMaxLeafEntry extends MTreeLeafEntry implements MkMaxEntry {
   }
 
   /**
-   * Provides a new MkMaxLeafEntry with the given parameters.
+   * Constructor.
    * 
    * @param objectID the id of the underlying data object
    * @param parentDistance the distance from the underlying data object to its

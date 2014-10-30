@@ -83,7 +83,7 @@ public class Bit extends Number {
   private boolean bit;
 
   /**
-   * Provides a new bit according to the specified boolean value.
+   * Create a new bit according to the specified boolean value.
    * 
    * @param bit the boolean value of this bit
    * 
@@ -95,7 +95,7 @@ public class Bit extends Number {
   }
 
   /**
-   * Provides a new bit according to the specified integer value. The bit value
+   * Create a new bit according to the specified integer value. The bit value
    * is 1 for true and 0 for false.
    * 
    * @param bit 1 for true and 0 for false
@@ -110,38 +110,21 @@ public class Bit extends Number {
     this.bit = (bit == 1);
   }
 
-  /**
-   * Provides an integer representation of the bit.
-   * 
-   * @return 1 if the bit is set, 0 otherwise
-   */
   @Override
   public int intValue() {
     return bit ? 1 : 0;
   }
 
-  /**
-   * Provides a long value for the integer representation of this Bit as given
-   * by {@link #intValue() intValue()}.
-   */
   @Override
   public long longValue() {
     return intValue();
   }
 
-  /**
-   * Provides a float value for the integer representation of this Bit as given
-   * by {@link #intValue() intValue()}.
-   */
   @Override
   public float floatValue() {
     return intValue();
   }
 
-  /**
-   * Provides a double value for the integer representation of this Bit as given
-   * by {@link #intValue() intValue()}.
-   */
   @Override
   public double doubleValue() {
     return intValue();
@@ -156,12 +139,6 @@ public class Bit extends Number {
     return this.bit;
   }
 
-  /**
-   * Provides the String representation of the integer representation of this
-   * Bit as given by {@link #intValue() intValue()}.
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     return Integer.toString(intValue());

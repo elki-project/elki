@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.tests;
 /**
  * Interface for the statistical test used by HiCS.
  * 
- * Provides a single method that calculates the deviation between two data
+ * Constists of a single method that calculates the deviation between two data
  * samples, given as arrays of double values
  * 
  * @author Jan Brusis

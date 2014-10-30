@@ -66,10 +66,10 @@ public class BitVector extends AbstractNumberVector implements SparseNumberVecto
   private int dimensionality;
 
   /**
-   * Provides a new BitVector corresponding to the specified bits and of the
+   * Create a new BitVector corresponding to the specified bits and of the
    * specified dimensionality.
    * 
-   * @param bits the bits to be set in this BitVector
+   * @param bits the bits to be set in this BitVector.
    * @param dimensionality the dimensionality of this BitVector
    */
   public BitVector(long[] bits, int dimensionality) {

@@ -50,7 +50,7 @@ public class SquaredPearsonCorrelationDistanceFunction extends AbstractNumberVec
   public static final SquaredPearsonCorrelationDistanceFunction STATIC = new SquaredPearsonCorrelationDistanceFunction();
 
   /**
-   * Provides a SquaredPearsonCorrelationDistanceFunction.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated use static instance!
    */

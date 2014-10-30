@@ -69,7 +69,7 @@ public class Assignments<E extends MTreeEntry> {
   private List<DistanceEntry<E>> secondAssignments;
 
   /**
-   * Provides an assignment during a split of an MTree node.
+   * Constructor.
    * 
    * @param id1 the first routing object
    * @param id2 the second routing object

@@ -38,8 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Provides a database connection expecting input from an input stream such as
- * stdin.
+ * Database connection expecting input from an input stream such as stdin.
  * 
  * @author Arthur Zimek
  * 

@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
- * Provides the Weighted distance for feature vectors.
+ * Weighted distance for feature vectors.
  * 
  * @author Elke Achtert
  */
@@ -42,7 +42,7 @@ public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistance
   protected Matrix weightMatrix;
 
   /**
-   * Provides the Weighted distance for feature vectors.
+   * Constructor.
    * 
    * @param weightMatrix weight matrix
    */

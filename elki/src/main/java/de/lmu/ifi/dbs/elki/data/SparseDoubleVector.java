@@ -85,7 +85,7 @@ public class SparseDoubleVector extends AbstractNumberVector implements SparseNu
   }
 
   /**
-   * Provides a SparseDoubleVector consisting of double values according to the
+   * Create a SparseDoubleVector consisting of double values according to the
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
@@ -138,7 +138,7 @@ public class SparseDoubleVector extends AbstractNumberVector implements SparseNu
   }
 
   /**
-   * Provides a SparseDoubleVector consisting of double values according to the
+   * Create a SparseDoubleVector consisting of double values according to the
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
@@ -240,24 +240,18 @@ public class SparseDoubleVector extends AbstractNumberVector implements SparseNu
   }
 
   /**
-   * <p>
-   * Provides a String representation of this SparseDoubleVector as suitable for
+   * Create a String representation of this SparseDoubleVector as suitable for
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}
    * .
-   * </p>
    * 
-   * <p>
    * The returned String is a single line with entries separated by
    * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
    * number of values actually not zero. Following entries are pairs of Integer
    * and Double where the Integer gives the index of the dimensionality and the
    * Double gives the corresponding value.
-   * </p>
    * 
-   * <p>
    * Example: a vector (0,1.2,1.3,0)<sup>T</sup> would result in the String<br>
    * <code>2 2 1.2 3 1.3</code><br>
-   * </p>
    * 
    * @return a String representation of this SparseDoubleVector
    */

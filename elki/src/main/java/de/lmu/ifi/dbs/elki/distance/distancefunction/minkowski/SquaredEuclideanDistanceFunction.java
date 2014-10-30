@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -32,8 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Provides the squared Euclidean distance for FeatureVectors. This results in
- * the same rankings, but saves computing the square root as often.
+ * Squared Euclidean distance, optimized for {@link SparseNumberVector}s. This
+ * results in the same rankings as regular Euclidean distance, but saves
+ * computing the square root.
  * 
  * @author Arthur Zimek
  */
@@ -45,8 +47,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
   public static final SquaredEuclideanDistanceFunction STATIC = new SquaredEuclideanDistanceFunction();
 
   /**
-   * Provides a Euclidean distance function that can compute the Euclidean
-   * distance (that is a distance) for FeatureVectors.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */

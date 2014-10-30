@@ -32,8 +32,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * Provides a LP-Norm for number vectors. Optimized version for integer values
- * of p. This will likely not have huge impact, but YMMV.
+ * LP-Norm for {@link NumberVector}s, optimized version for integer values of p.
+ * This will likely not have huge impact, but may vary from CPU and virtual
+ * machine version.
  * 
  * @author Erich Schubert
  * 
@@ -194,7 +195,7 @@ public class LPIntegerNormDistanceFunction extends LPNormDistanceFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter paramP = new IntParameter(P_ID);
+      final IntParameter paramP = new IntParameter(LPNormDistanceFunction.Parameterizer.P_ID);
       paramP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(paramP)) {
         p = paramP.getValue();

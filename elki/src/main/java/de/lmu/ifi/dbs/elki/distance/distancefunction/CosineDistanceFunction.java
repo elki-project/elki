@@ -47,7 +47,7 @@ public class CosineDistanceFunction extends AbstractSpatialDistanceFunction {
   public static final CosineDistanceFunction STATIC = new CosineDistanceFunction();
 
   /**
-   * Provides a CosineDistanceFunction.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance
    */

@@ -34,8 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Provides a parser for parsing one BitVector per line, bits separated by
- * whitespace.
+ * Parser for parsing one BitVector per line, bits separated by whitespace.
  * <p/>
  * Several labels may be given per BitVector. A label must not be parseable as
  * Bit. Lines starting with &quot;#&quot; will be ignored.

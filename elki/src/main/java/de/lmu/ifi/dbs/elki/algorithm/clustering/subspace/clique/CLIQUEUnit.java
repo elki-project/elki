@@ -53,8 +53,8 @@ public class CLIQUEUnit<V extends NumberVector> {
   private SortedSet<CLIQUEInterval> intervals;
 
   /**
-   * Provides a mapping of particular dimensions to the intervals of which this
-   * unit is build.
+   * Mapping of particular dimensions to the intervals of which this unit is
+   * build.
    */
   private TIntObjectHashMap<CLIQUEInterval> dimensionToInterval;
 

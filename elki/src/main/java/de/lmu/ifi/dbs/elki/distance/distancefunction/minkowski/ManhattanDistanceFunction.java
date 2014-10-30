@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Manhattan distance function to compute the Manhattan distance for a pair of
- * FeatureVectors.
+ * Manhattan distance for {@link NumberVector}s.
  * 
  * @author Arthur Zimek
  */
@@ -42,8 +41,7 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
   public static final ManhattanDistanceFunction STATIC = new ManhattanDistanceFunction();
 
   /**
-   * Provides a Manhattan distance function that can compute the Manhattan
-   * distance (that is a distance) for FeatureVectors.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */
@@ -53,7 +51,7 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
   }
 
   private final double preDistance(NumberVector v1, NumberVector v2, int start, int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = (xd >= yd) ? xd - yd : yd - xd;
       agg += delta;
@@ -62,13 +60,13 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
   }
 
   private final double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = value - mbr.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += delta;
       }
     }
@@ -76,12 +74,12 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
   }
 
   private final double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = mbr1.getMin(d) - mbr2.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += delta;
       }
     }
@@ -89,7 +87,7 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
   }
 
   private final double preNorm(NumberVector v, int start, int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
       final double delta = (xd >= 0.) ? xd : -xd;
       agg += delta;
@@ -98,12 +96,12 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
   }
 
   private final double preNormMBR(SpatialComparable mbr, int start, int end, double agg) {
-    for (int d = start; d < end; d++) {
+    for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if (delta < 0.) {
+      if(delta < 0.) {
         delta = -mbr.getMax(d);
       }
-      if (delta > 0.) {
+      if(delta > 0.) {
         agg += delta;
       }
     }
@@ -115,9 +113,10 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = preDistance(v1, v2, 0, mindim, 0.);
-    if (dim1 > mindim) {
+    if(dim1 > mindim) {
       agg = preNorm(v1, mindim, dim1, agg);
-    } else if (dim2 > mindim) {
+    }
+    else if(dim2 > mindim) {
       agg = preNorm(v2, mindim, dim2, agg);
     }
     return agg;
@@ -137,32 +136,37 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
     final NumberVector v2 = (mbr2 instanceof NumberVector) ? (NumberVector) mbr2 : null;
 
     double agg = 0.;
-    if (v1 != null) {
-      if (v2 != null) {
+    if(v1 != null) {
+      if(v2 != null) {
         agg = preDistance(v1, v2, 0, mindim, agg);
-      } else {
+      }
+      else {
         agg = preDistanceVM(v1, mbr2, 0, mindim, agg);
       }
-    } else {
-      if (v2 != null) {
+    }
+    else {
+      if(v2 != null) {
         agg = preDistanceVM(v2, mbr1, 0, mindim, agg);
-      } else {
+      }
+      else {
         agg = preDistanceMBR(mbr1, mbr2, 0, mindim, agg);
       }
     }
     // first object has more dimensions.
-    if (dim1 > mindim) {
-      if (v1 != null) {
+    if(dim1 > mindim) {
+      if(v1 != null) {
         agg = preNorm(v1, mindim, dim1, agg);
-      } else {
+      }
+      else {
         agg = preNormMBR(v1, mindim, dim1, agg);
       }
     }
     // second object has more dimensions.
-    if (dim2 > mindim) {
-      if (v2 != null) {
+    if(dim2 > mindim) {
+      if(v2 != null) {
         agg = preNorm(v2, mindim, dim2, agg);
-      } else {
+      }
+      else {
         agg = preNormMBR(mbr2, mindim, dim2, agg);
       }
     }
@@ -181,13 +185,13 @@ public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (obj == this) {
+    if(obj == this) {
       return true;
     }
-    if (this.getClass().equals(obj.getClass())) {
+    if(this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);

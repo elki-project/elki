@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -41,9 +40,8 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
- * Provides a KDDTask that can be used to perform any algorithm implementing
- * {@link Algorithm Algorithm} using any DatabaseConnection implementing
- * {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection DatabaseConnection}.
+ * KDDTask encapsulates the common workflow of an <i>unsupervised</i> knowledge
+ * discovery task.
  * 
  * @author Arthur Zimek
  * 

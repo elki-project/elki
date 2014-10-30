@@ -28,8 +28,8 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
- * Provides a distance function that computes the Euclidean distance between
- * feature vectors only in specified dimensions.
+ * Euclidean distance function between {@link NumberVector}s only in specified
+ * dimensions.
  * 
  * @author Elke Achtert
  */
@@ -44,8 +44,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
   }
 
   /**
-   * Provides the Euclidean distance between two given feature vectors in the
-   * selected dimensions.
+   * Constructor.
    * 
    * @param v1 first feature vector
    * @param v2 second feature vector

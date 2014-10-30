@@ -53,7 +53,7 @@ class MkTabDirectoryEntry extends MTreeDirectoryEntry implements MkTabEntry {
   }
 
   /**
-   * Provides a new MkMaxDirectoryEntry with the given parameters.
+   * Constructor.
    * 
    * @param objectID the id of the routing object
    * @param parentDistance the distance from the routing object of this entry to

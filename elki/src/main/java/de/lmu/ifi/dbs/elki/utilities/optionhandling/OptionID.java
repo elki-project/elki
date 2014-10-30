@@ -42,10 +42,7 @@ public final class OptionID {
   private String description;
 
   /**
-   * Provides a new OptionID of the given name and description.
-   * <p/>
-   * All OptionIDs are unique w.r.t. their name. An OptionID provides
-   * additionally a description of the option.
+   * Constructor.
    * 
    * @param name the name of the option
    * @param description the description of the option

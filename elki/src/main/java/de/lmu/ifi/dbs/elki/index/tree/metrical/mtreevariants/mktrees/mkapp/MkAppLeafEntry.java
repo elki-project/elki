@@ -56,7 +56,7 @@ class MkAppLeafEntry extends MTreeLeafEntry implements MkAppEntry {
   }
 
   /**
-   * Provides a new MkAppLeafEntry with the given parameters.
+   * Constructor.
    * 
    * @param objectID the id of the underlying data object
    * @param parentDistance the distance from the underlying data object to its

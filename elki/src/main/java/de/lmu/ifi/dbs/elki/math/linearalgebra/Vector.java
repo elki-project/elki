@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
- * Provides a vector object that encapsulates an m x 1 - matrix object.
+ * A mathematical vector object, along with mathematical operations.
  * 
  * @author Elke Achtert
  * 
@@ -95,7 +95,7 @@ public class Vector implements NumberVector {
   }
 
   /**
-   * Provides an m x 1 vector.
+   * Constructor
    * 
    * @param m the number of rows
    */

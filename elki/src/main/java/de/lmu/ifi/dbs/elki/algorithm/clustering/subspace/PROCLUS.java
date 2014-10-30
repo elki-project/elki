@@ -815,7 +815,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     Vector centroid;
 
     /**
-     * Provides a new cluster with the specified parameters.
+     * Constructor.
      * 
      * @param objectIDs the ids of the objects belonging to this cluster
      * @param dimensions the correlated dimensions of this cluster

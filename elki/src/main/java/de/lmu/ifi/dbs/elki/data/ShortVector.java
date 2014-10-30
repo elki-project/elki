@@ -76,13 +76,12 @@ public class ShortVector extends AbstractNumberVector {
   }
 
   /**
-   * Provides an ShortVector consisting of the given Short values.
+   * Create an ShortVector consisting of the given Short values.
    * 
    * @param values the values to be set as values of the ShortVector
    */
   public ShortVector(short[] values) {
-    this.values = new short[values.length];
-    System.arraycopy(values, 0, this.values, 0, values.length);
+    this.values = values.clone();
   }
 
   @Override

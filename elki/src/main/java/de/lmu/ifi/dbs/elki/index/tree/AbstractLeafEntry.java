@@ -49,7 +49,7 @@ public abstract class AbstractLeafEntry implements LeafEntry {
   }
 
   /**
-   * Provides a new AbstractEntry with the specified id.
+   * Constructor.
    * 
    * @param id the id of the object (node or data object) represented by this
    *        entry.

@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * Provides the rational quadratic kernel, a less computational approximation of
- * the Gaussian RBF kerne ({@link RadialBasisFunctionKernelFunction}).
+ * Rational quadratic kernel, a less computational approximation of the Gaussian
+ * RBF kernel ({@link RadialBasisFunctionKernelFunction}).
  * 
  * @author Erich Schubert
  */

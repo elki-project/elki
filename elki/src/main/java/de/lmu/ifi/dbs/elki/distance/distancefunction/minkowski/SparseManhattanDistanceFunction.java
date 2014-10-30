@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Manhattan distance function. Optimized for sparse vectors.
+ * Manhattan distance, optimized for {@link SparseNumberVector}s.
  * 
  * @author Erich Schubert
  */
@@ -38,7 +38,7 @@ public class SparseManhattanDistanceFunction extends SparseLPNormDistanceFunctio
   public static final SparseManhattanDistanceFunction STATIC = new SparseManhattanDistanceFunction();
 
   /**
-   * Constructor.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance instead.
    */

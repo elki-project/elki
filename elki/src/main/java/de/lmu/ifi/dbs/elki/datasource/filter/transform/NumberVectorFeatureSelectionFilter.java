@@ -99,10 +99,8 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
   }
 
   /**
-   * <p>
    * Provides a BitSet with the bits set to true corresponding to the selected
    * attributes in {@link Parameterizer#SELECTED_ATTRIBUTES_ID}.
-   * </p>
    * 
    * The index in the BitSet is shifted to the left by one, i.e., index 0 in the
    * BitSet relates to the first attribute.

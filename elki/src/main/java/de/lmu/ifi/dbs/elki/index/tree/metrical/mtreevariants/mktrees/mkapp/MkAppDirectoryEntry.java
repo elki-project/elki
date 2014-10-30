@@ -56,7 +56,7 @@ class MkAppDirectoryEntry extends MTreeDirectoryEntry implements MkAppEntry {
   }
 
   /**
-   * Provides a new MkCoPDirectoryEntry with the given parameters.
+   * Constructor.
    * 
    * @param objectID the id of the routing object
    * @param parentDistance the distance from the object to its parent

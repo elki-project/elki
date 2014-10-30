@@ -39,8 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
- * Provides a class for storing the kernel matrix and several extraction methods
- * for convenience.
+ * Kernel matrix representation.
  * 
  * @author Simon Paradies
  * 

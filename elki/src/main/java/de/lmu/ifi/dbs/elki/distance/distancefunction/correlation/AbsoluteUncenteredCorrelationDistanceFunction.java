@@ -42,7 +42,7 @@ public class AbsoluteUncenteredCorrelationDistanceFunction extends AbstractNumbe
   public static final AbsoluteUncenteredCorrelationDistanceFunction STATIC = new AbsoluteUncenteredCorrelationDistanceFunction();
 
   /**
-   * Provides a AbsoluteUncenteredCorrelationDistanceFunction.
+   * Constructor - use {@link #STATIC} instead.
    * 
    * @deprecated Use static instance!
    */

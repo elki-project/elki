@@ -36,8 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  */
 public class MessageFormatter extends Formatter {
   /**
-   * Provides a message formatter to simply retrieve the message of an
-   * LogRecord.
+   * Constructor.
    */
   public MessageFormatter() {
     super();

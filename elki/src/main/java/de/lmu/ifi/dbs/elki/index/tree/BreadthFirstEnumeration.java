@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 
 /**
- * Provides a breadth first enumeration over the nodes of an index structure.
+ * Breadth first enumeration over the nodes of an index structure.
  * 
  * @author Elke Achtert
  * 

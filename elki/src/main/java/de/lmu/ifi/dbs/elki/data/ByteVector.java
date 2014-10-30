@@ -76,7 +76,7 @@ public class ByteVector extends AbstractNumberVector {
   }
 
   /**
-   * Provides an ByteVector consisting of the given Byte values.
+   * Create an ByteVector consisting of the given Byte values.
    * 
    * @param values the values to be set as values of the ByteVector
    */
