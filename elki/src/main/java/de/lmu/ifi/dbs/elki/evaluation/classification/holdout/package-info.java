@@ -1,12 +1,5 @@
 /**
- * ELKI framework "Environment for Developing KDD-Applications Supported by Index-Structures".
- * 
- * <p>{@link de.lmu.ifi.dbs.elki.KDDTask} is the basic work-flow for unsupervised knowledge discovery.
- * It will setup a {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection DatabaseConnection},
- * run an {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm} on it and pass the
- * result to a {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHandler}.</p>
- *
- * @apiviz.exclude ^experimentalcode\.
+ * Holdout and cross-validation strategies for evaluating classifiers.
  */
 /*
  This file is part of ELKI:
@@ -30,4 +23,5 @@
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki;
+package de.lmu.ifi.dbs.elki.evaluation.classification.holdout;
+
