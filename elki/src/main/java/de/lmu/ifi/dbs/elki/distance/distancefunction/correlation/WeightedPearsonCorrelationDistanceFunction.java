@@ -59,7 +59,7 @@ public class WeightedPearsonCorrelationDistanceFunction extends AbstractNumberVe
   private double[] weights;
 
   /**
-   * Constructor - use {@link #STATIC} instead.
+   * Constructor.
    * 
    * @param weights Weights
    */
