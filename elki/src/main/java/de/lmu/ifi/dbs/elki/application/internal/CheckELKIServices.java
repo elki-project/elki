@@ -97,7 +97,7 @@ public class CheckELKIServices {
     TreeSet<String> props = new TreeSet<>();
     Enumeration<URL> us;
     try {
-      us = getClass().getClassLoader().getResources(ELKIServiceLoader.PREFIX);
+      us = getClass().getClassLoader().getResources(ELKIServiceLoader.RESOURCE_PREFIX);
     }
     catch(IOException e) {
       throw new AbortException("Error enumerating service folders.", e);
@@ -111,8 +111,11 @@ public class CheckELKIServices {
             Enumeration<JarEntry> entries = jar.entries();
             while(entries.hasMoreElements()) {
               String prop = entries.nextElement().getName();
-              if(prop.length() > ELKIServiceLoader.PREFIX.length() && prop.startsWith(ELKIServiceLoader.PREFIX)) {
-                props.add(prop.substring(ELKIServiceLoader.PREFIX.length()));
+              if(prop.startsWith(ELKIServiceLoader.RESOURCE_PREFIX)) {
+                props.add(prop.substring(ELKIServiceLoader.RESOURCE_PREFIX.length()));
+              }
+              else if(prop.startsWith(ELKIServiceLoader.FILENAME_PREFIX)) {
+                props.add(prop.substring(ELKIServiceLoader.FILENAME_PREFIX.length()));
               }
             }
           }
@@ -158,7 +161,7 @@ public class CheckELKIServices {
 
     Matcher m = strip.matcher("");
     try {
-      Enumeration<URL> us = getClass().getClassLoader().getResources(ELKIServiceLoader.PREFIX + cls.getName());
+      Enumeration<URL> us = getClass().getClassLoader().getResources(ELKIServiceLoader.RESOURCE_PREFIX + cls.getName());
       while(us.hasMoreElements()) {
         URL u = us.nextElement();
         boolean injar = "jar".equals(u.getProtocol());
@@ -202,8 +205,8 @@ public class CheckELKIServices {
       }
       // Try to automatically update:
       try {
-        Files.createDirectories(Paths.get(update + File.separator + ELKIServiceLoader.PREFIX));
-        String fname = update + File.separator + ELKIServiceLoader.PREFIX + prop;
+        Files.createDirectories(Paths.get(update + File.separator + ELKIServiceLoader.FILENAME_PREFIX));
+        String fname = update + File.separator + ELKIServiceLoader.FILENAME_PREFIX + prop;
         PrintStream pr = new PrintStream(new FileOutputStream(fname, true));
         pr.println(); // In case there was no linefeed at the end.
         pr.println("### Automatically appended entries:");

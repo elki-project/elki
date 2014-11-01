@@ -49,9 +49,16 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
   private static final Logging LOG = Logging.getLogger(ELKIServiceLoader.class);
 
   /**
-   * Prefix for the ELKI functionality discovery.
+   * Resource name prefix for the ELKI functionality discovery.
+   *
+   * Note: resources are always separated with /, even on Windows.
    */
-  public static final String PREFIX = "META-INF" + File.separator + "elki" + File.separator;
+  public static final String RESOURCE_PREFIX = "META-INF/elki/";
+
+  /**
+   * File name prefix for the ELKI functionality discovery.
+   */
+  public static final String FILENAME_PREFIX = "META-INF" + File.separator + "elki" + File.separator;
 
   /**
    * Comment character
@@ -111,7 +118,7 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
    */
   private void getServiceFiles(Class<?> parent) {
     try {
-      String fullName = PREFIX + parent.getName();
+      String fullName = RESOURCE_PREFIX + parent.getName();
       configfiles = cl.getResources(fullName);
     }
     catch(IOException x) {

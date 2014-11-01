@@ -76,7 +76,7 @@ public class CheckParameterizables {
     LoggingConfiguration.setVerbose(Level.VERBOSE);
     knownParameterizables = new ArrayList<>();
     try {
-      Enumeration<URL> us = getClass().getClassLoader().getResources(ELKIServiceLoader.PREFIX);
+      Enumeration<URL> us = getClass().getClassLoader().getResources(ELKIServiceLoader.RESOURCE_PREFIX);
       while(us.hasMoreElements()) {
         URL u = us.nextElement();
         if("file".equals(u.getProtocol())) {
@@ -96,15 +96,21 @@ public class CheckParameterizables {
             Enumeration<JarEntry> entries = jar.entries();
             while(entries.hasMoreElements()) {
               String prop = entries.nextElement().getName();
-              if(prop.length() > ELKIServiceLoader.PREFIX.length() && prop.startsWith(ELKIServiceLoader.PREFIX)) {
-                prop = prop.substring(ELKIServiceLoader.PREFIX.length());
-                try {
-                  knownParameterizables.add(Class.forName(prop));
-                }
-                catch(ClassNotFoundException e) {
-                  LOG.warning("Service file name is not a class name: " + prop);
-                  continue;
-                }
+              if(prop.startsWith(ELKIServiceLoader.RESOURCE_PREFIX)) {
+                prop = prop.substring(ELKIServiceLoader.RESOURCE_PREFIX.length());
+              }
+              else if(prop.startsWith(ELKIServiceLoader.FILENAME_PREFIX)) {
+                prop = prop.substring(ELKIServiceLoader.FILENAME_PREFIX.length());
+              }
+              else {
+                continue;
+              }
+              try {
+                knownParameterizables.add(Class.forName(prop));
+              }
+              catch(ClassNotFoundException e) {
+                LOG.warning("Service file name is not a class name: " + prop);
+                continue;
               }
             }
           }
