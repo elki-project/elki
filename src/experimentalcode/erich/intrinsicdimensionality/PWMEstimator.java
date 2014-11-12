@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
-public class PWMEstimator implements IntrinsicDimensionalityEstimator {
+public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);

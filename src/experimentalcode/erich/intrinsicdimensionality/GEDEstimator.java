@@ -24,14 +24,25 @@ package experimentalcode.erich.intrinsicdimensionality;
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Generalized Expansion Dimension for estimating the intrinsic dimensionality.
  * 
+ * Reference:
+ * <p>
+ * M. E. Houle, H. Kashima, M. Nett<br />
+ * Generalized expansion dimension<br />
+ * In: 12th International Conference on Data Mining Workshops (ICDMW)
+ * </p>
+ * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
-public class GEDEstimator implements IntrinsicDimensionalityEstimator {
+@Reference(authors = "M. E. Houle, H. Kashima, M. Nett", //
+title = "Generalized expansion dimension", //
+booktitle = "12th International Conference on Data Mining Workshops (ICDMW)")
+public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int len = adapter.size(data);
