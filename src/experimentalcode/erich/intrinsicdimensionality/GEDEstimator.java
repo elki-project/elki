@@ -43,9 +43,17 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 title = "Generalized expansion dimension", //
 booktitle = "12th International Conference on Data Mining Workshops (ICDMW)")
 public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
+  /**
+   * Static instance.
+   */
+  public static final GEDEstimator STATIC = new GEDEstimator();
+
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int len = adapter.size(data);
+    if(len < 2) {
+      throw new ArithmeticException("Cannot compute expansion dimensionality for a single observation.");
+    }
     double[] meds = new double[(len << 1) - 1];
     for(int r = 0; r < len; r++) {
       final double d1 = adapter.getDouble(data, r);

@@ -31,6 +31,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @author Erich Schubert
  */
 public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
+  /**
+   * Static instance.
+   */
+  public static final HillEstimator STATIC = new HillEstimator();
+
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);
@@ -47,5 +52,4 @@ public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
     }
     return -1.0 * (n - 1) / sum;
   }
-
 }

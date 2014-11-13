@@ -33,6 +33,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @author Erich Schubert
  */
 public class MLEstimator extends AbstractIntrinsicDimensionalityEstimator {
+  /**
+   * Static instance.
+   */
+  public static final MLEstimator STATIC = new MLEstimator();
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {

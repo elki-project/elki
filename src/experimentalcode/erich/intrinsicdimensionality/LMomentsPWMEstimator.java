@@ -33,6 +33,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * @author Erich Schubert
  */
 public class LMomentsPWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
+  /**
+   * Static instance.
+   */
+  public static final LMomentsPWMEstimator STATIC = new LMomentsPWMEstimator();
+
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);

@@ -31,14 +31,24 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @author Erich Schubert
  */
 public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
+  /**
+   * Static instance.
+   */
+  public static final PWMEstimator STATIC = new PWMEstimator();
+
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);
-    double sum = 0.;
-    for(int i = 0; i < n; i++) {
-      sum += adapter.getDouble(data, i) * ((i + 1) - 0.35) / ((double) n);
+    // Estimate first PWM (k=1), ignoring the last value:
+    double v1 = 0.;
+    final int num = n - 1;
+    for(int i = 0; i < num; i++) {
+      // Note that our i starts at 0, i + 1 - 0.35 = i + 0.65
+      v1 += adapter.getDouble(data, i) * (i + 0.65);
     }
-    final double mean = (sum / n) / adapter.getDouble(data, n - 1);
-    return mean / (1.0 - 2.0 * mean);
+    v1 /= num * num;
+    final double w = adapter.getDouble(data, n - 1);
+    v1 /= w;
+    return v1 / (1 - v1 * 2);
   }
 }
