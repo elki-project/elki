@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
@@ -78,9 +79,25 @@ public final class FilterUtil {
    * @param bundle Bundle
    * @return Column number, or {@code -1}.
    */
-  public static int findLabelColumn(final MultipleObjectsBundle bundle) {
+  public static int findLabelColumn(MultipleObjectsBundle bundle) {
     for(int i = 0; i < bundle.metaLength(); i++) {
       if(TypeUtil.GUESSED_LABEL.isAssignableFromType(bundle.meta(i))) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Find the first "label-like" column (matching {@link TypeUtil#GUESSED_LABEL}
+   * ) in a type information.
+   * 
+   * @param meta Meta data
+   * @return Column number, or {@code -1}.
+   */
+  public static int findLabelColumn(BundleMeta meta) {
+    for(int i = 0; i < meta.size(); i++) {
+      if(TypeUtil.GUESSED_LABEL.isAssignableFromType(meta.get(i))) {
         return i;
       }
     }

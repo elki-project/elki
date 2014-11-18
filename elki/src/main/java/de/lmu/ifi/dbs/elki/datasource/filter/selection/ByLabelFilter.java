@@ -27,9 +27,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -103,12 +103,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
         // Search for the first label column
         if(lblcol < 0) {
           BundleMeta meta = source.getMeta();
-          for(int i = 0; i < meta.size(); i++) {
-            if(TypeUtil.GUESSED_LABEL.isAssignableFromType(meta.get(i))) {
-              lblcol = i;
-              break;
-            }
-          }
+          lblcol = FilterUtil.findLabelColumn(meta);
         }
         return Event.META_CHANGED;
       case NEXT_OBJECT:

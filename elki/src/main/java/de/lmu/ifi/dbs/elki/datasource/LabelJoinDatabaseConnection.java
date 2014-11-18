@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -72,7 +72,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
   @Override
   public MultipleObjectsBundle loadData() {
     List<MultipleObjectsBundle> bundles = new ArrayList<>(sources.size());
-    for (DatabaseConnection dbc : sources) {
+    for(DatabaseConnection dbc : sources) {
       bundles.add(dbc.loadData());
     }
 
@@ -81,108 +81,92 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
     // Process first bundle
     {
       // Identify a label column
-      final int lblcol;
-      {
-        int lblc = -1;
-        for (int i = 0; i < first.metaLength(); i++) {
-          if (TypeUtil.GUESSED_LABEL.isAssignableFromType(first.meta(i))) {
-            lblc = i;
-            break;
-          }
-        }
-        lblcol = lblc; // make static
-      }
-      if (lblcol == -1) {
+      final int lblcol = FilterUtil.findLabelColumn(first);
+      if(lblcol == -1) {
         throw new AbortException("No label column found in first source, cannot join (do you want to use " + ExternalIDJoinDatabaseConnection.class.getSimpleName() + " instead?)");
       }
-      for (int i = 0; i < first.dataLength(); i++) {
+      for(int i = 0; i < first.dataLength(); i++) {
         Object data = first.data(i, lblcol);
-        if (data == null) {
+        if(data == null) {
           LOG.warning("Object without label encountered.");
           continue;
         }
-        if (data instanceof String) {
+        if(data instanceof String) {
           int old = labelmap.put((String) data, i);
-          if (old != -1) {
+          if(old != -1) {
             LOG.warning("Duplicate label encountered: " + data + " in rows " + old + " and " + i);
           }
-        } else if (data instanceof LabelList) {
+        }
+        else if(data instanceof LabelList) {
           final LabelList ll = (LabelList) data;
           for(int j = 0; j < ll.size(); j++) {
             String lbl = ll.get(j);
             int old = labelmap.put(lbl, i);
-            if (old != -1) {
+            if(old != -1) {
               LOG.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
             }
           }
-        } else {
+        }
+        else {
           String lbl = data.toString();
           int old = labelmap.put(lbl, i);
-          if (old != -1) {
+          if(old != -1) {
             LOG.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
           }
         }
       }
     }
     // Process additional columns
-    for (int c = 1; c < sources.size(); c++) {
+    for(int c = 1; c < sources.size(); c++) {
       MultipleObjectsBundle cur = bundles.get(c);
-      final int lblcol;
-      {
-        int lblc = -1;
-        for (int i = 0; i < cur.metaLength(); i++) {
-          if (TypeUtil.GUESSED_LABEL.isAssignableFromType(cur.meta(i))) {
-            lblc = i;
-            break;
-          }
-        }
-        lblcol = lblc; // make static
-      }
-      if (lblcol == -1) {
+      final int lblcol = FilterUtil.findLabelColumn(cur);
+      if(lblcol == -1) {
         throw new AbortException("No label column found in source " + (c + 1) + ", cannot join (do you want to use " + ExternalIDJoinDatabaseConnection.class.getSimpleName() + " instead?)");
       }
       // Destination columns
       List<ArrayList<Object>> dcol = new ArrayList<>(cur.metaLength());
-      for (int i = 0; i < cur.metaLength(); i++) {
+      for(int i = 0; i < cur.metaLength(); i++) {
         // Skip the label columns
-        if (i == lblcol) {
+        if(i == lblcol) {
           dcol.add(null);
           continue;
         }
         ArrayList<Object> newcol = new ArrayList<>(first.dataLength());
         // Pre-fill with nulls.
-        for (int j = 0; j < first.dataLength(); j++) {
+        for(int j = 0; j < first.dataLength(); j++) {
           newcol.add(null);
         }
         first.appendColumn(cur.meta(i), newcol);
         dcol.add(newcol);
       }
-      for (int i = 0; i < cur.dataLength(); i++) {
+      for(int i = 0; i < cur.dataLength(); i++) {
         Object data = cur.data(i, lblcol);
-        if (data == null) {
+        if(data == null) {
           LOG.warning("Object without label encountered.");
           continue;
         }
         int row = -1;
-        if (data instanceof String) {
+        if(data instanceof String) {
           row = labelmap.get(data);
-        } else if (data instanceof LabelList) {
+        }
+        else if(data instanceof LabelList) {
           final LabelList ll = (LabelList) data;
           for(int j = 0; j < ll.size(); j++) {
             row = labelmap.get(ll.get(j));
-            if (row >= 0) {
+            if(row >= 0) {
               break;
             }
           }
-        } else {
+        }
+        else {
           row = labelmap.get(data.toString());
         }
-        if (row < 0) {
+        if(row < 0) {
           LOG.warning("Label not found for join: " + data + " in row " + i);
           continue;
         }
-        for (int d = 0; d < cur.metaLength(); d++) {
-          if (d == lblcol) {
+        for(int d = 0; d < cur.metaLength(); d++) {
+          if(d == lblcol) {
             continue;
           }
           List<Object> col = dcol.get(d);
@@ -191,17 +175,18 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
         }
       }
     }
-    for (int i = 0; i < first.dataLength(); i++) {
-      for (int d = 0; d < first.metaLength(); d++) {
-        if (first.data(i, d) == null) {
+    for(int i = 0; i < first.dataLength(); i++) {
+      for(int d = 0; d < first.metaLength(); d++) {
+        if(first.data(i, d) == null) {
           StringBuilder buf = new StringBuilder();
-          for (int d2 = 0; d2 < first.metaLength(); d2++) {
-            if (buf.length() > 0) {
+          for(int d2 = 0; d2 < first.metaLength(); d2++) {
+            if(buf.length() > 0) {
               buf.append(", ");
             }
-            if (first.data(i, d2) == null) {
+            if(first.data(i, d2) == null) {
               buf.append("null");
-            } else {
+            }
+            else {
               buf.append(first.data(i, d2));
             }
           }
@@ -242,7 +227,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
       super.makeOptions(config);
       super.configFilters(config);
       final ObjectListParameter<DatabaseConnection> sourcesParam = new ObjectListParameter<>(SOURCES_ID, DatabaseConnection.class);
-      if (config.grab(sourcesParam)) {
+      if(config.grab(sourcesParam)) {
         sources = sourcesParam.instantiateClasses(config);
       }
     }
