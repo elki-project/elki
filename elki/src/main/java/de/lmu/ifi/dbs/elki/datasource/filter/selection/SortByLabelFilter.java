@@ -26,13 +26,14 @@ package de.lmu.ifi.dbs.elki.datasource.filter.selection;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * A filter to sort the data set by some label.
@@ -68,16 +69,9 @@ public class SortByLabelFilter implements ObjectFilter {
       offsets[i] = i;
     }
     // Sort by labels - identify a label column
-    final int lblcol;
-    {
-      int lblc = -1;
-      for(int i = 0; i < objects.metaLength(); i++) {
-        if(TypeUtil.GUESSED_LABEL.isAssignableFromType(objects.meta(i))) {
-          lblc = i;
-          break;
-        }
-      }
-      lblcol = lblc; // make static
+    final int lblcol = FilterUtil.findLabelColumn(objects);
+    if (lblcol == -1) {
+      throw new AbortException("No label column found - cannot sort by label.");
     }
     IntegerArrayQuickSort.sort(offsets, new IntegerComparator() {
       @Override

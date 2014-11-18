@@ -27,7 +27,9 @@ import java.lang.reflect.Field;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
@@ -51,21 +53,37 @@ public final class FilterUtil {
    * @return Factory
    */
   @SuppressWarnings("unchecked")
-  public static <V extends NumberVector> NumberVector.Factory<V>  guessFactory(SimpleTypeInformation<V> in) {
-    NumberVector.Factory<V>  factory = null;
+  public static <V extends NumberVector> NumberVector.Factory<V> guessFactory(SimpleTypeInformation<V> in) {
+    NumberVector.Factory<V> factory = null;
     if(in instanceof VectorTypeInformation) {
-      factory = (NumberVector.Factory<V> ) ((VectorTypeInformation<V>) in).getFactory();
+      factory = (NumberVector.Factory<V>) ((VectorTypeInformation<V>) in).getFactory();
     }
     if(factory == null) {
       // FIXME: hack. Add factories to simple type information, too?
       try {
         Field f = in.getRestrictionClass().getField("FACTORY");
-        factory = (NumberVector.Factory<V> ) f.get(null);
+        factory = (NumberVector.Factory<V>) f.get(null);
       }
       catch(Exception e) {
         LoggingUtil.warning("Cannot determine factory for type " + in.getRestrictionClass(), e);
       }
     }
     return factory;
+  }
+
+  /**
+   * Find the first "label-like" column (matching {@link TypeUtil#GUESSED_LABEL}
+   * ) in a bundle.
+   * 
+   * @param bundle Bundle
+   * @return Column number, or {@code -1}.
+   */
+  public static int findLabelColumn(final MultipleObjectsBundle bundle) {
+    for(int i = 0; i < bundle.metaLength(); i++) {
+      if(TypeUtil.GUESSED_LABEL.isAssignableFromType(bundle.meta(i))) {
+        return i;
+      }
+    }
+    return -1;
   }
 }

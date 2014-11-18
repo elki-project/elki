@@ -50,16 +50,6 @@ public class ShuffleObjectsFilter implements ObjectFilter {
   private static final Logging LOG = Logging.getLogger(ShuffleObjectsFilter.class);
 
   /**
-   * Optional parameter to specify a seed for randomly shuffling the rows of the
-   * database. If not set, a random seed will be used. Shuffling takes time
-   * linearly dependent from the size of the database.
-   * <p>
-   * Key: {@code -shuffle.seed}
-   * </p>
-   */
-  public static final OptionID SEED_ID = new OptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, a random seed will be used.");
-
-  /**
    * Random generator.
    */
   final RandomFactory rnd;
@@ -116,6 +106,19 @@ public class ShuffleObjectsFilter implements ObjectFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Optional parameter to specify a seed for randomly shuffling the rows of
+     * the database. If not set, a random seed will be used. Shuffling takes
+     * time linearly dependent from the size of the database.
+     * <p>
+     * Key: {@code -shuffle.seed}
+     * </p>
+     */
+    public static final OptionID SEED_ID = new OptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, a random seed will be used.");
+
+    /**
+     * Random generator
+     */
     RandomFactory rnd;
 
     @Override
