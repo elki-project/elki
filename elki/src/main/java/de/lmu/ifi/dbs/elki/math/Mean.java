@@ -50,7 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "B. P. Welford", title = "Note on a method for calculating corrected sums of squares and products", booktitle = "Technometrics 4(3)")
+@Reference(authors = "B. P. Welford", //
+title = "Note on a method for calculating corrected sums of squares and products", //
+booktitle = "Technometrics 4(3)")
 public class Mean {
   /**
    * Mean of values - first moment.
@@ -122,6 +124,33 @@ public class Mean {
   }
 
   /**
+   * Add values with weight 1.0
+   * 
+   * @param vals Values
+   * @return this
+   */
+  public Mean put(double[] vals) {
+    for(double v : vals) {
+      put(v);
+    }
+    return this;
+  }
+
+  /**
+   * Add values with weight 1.0
+   * 
+   * @param vals Values
+   * @return this
+   */
+  public Mean put(double[] vals, double[] weights) {
+    assert (vals.length == weights.length);
+    for(int i = 0, end = vals.length; i < end; i++) {
+      put(vals[i], weights[i]);
+    }
+    return this;
+  }
+
+  /**
    * Get the number of points the average is based on.
    * 
    * @return number of data points
@@ -147,7 +176,7 @@ public class Mean {
    */
   public static Mean[] newArray(int dimensionality) {
     Mean[] arr = new Mean[dimensionality];
-    for (int i = 0; i < dimensionality; i++) {
+    for(int i = 0; i < dimensionality; i++) {
       arr[i] = new Mean();
     }
     return arr;
@@ -175,7 +204,7 @@ public class Mean {
   public static double of(double[] data) {
     // FIXME: what is numerically best. Kahan summation?
     double sum = 0.;
-    for (double v : data) {
+    for(double v : data) {
       sum += v;
     }
     return sum / data.length;

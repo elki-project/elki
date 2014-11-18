@@ -57,7 +57,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "B. P. Welford", title = "Note on a method for calculating corrected sums of squares and products", booktitle = "Technometrics 4(3)")
+@Reference(authors = "B. P. Welford", //
+title = "Note on a method for calculating corrected sums of squares and products", //
+booktitle = "Technometrics 4(3)")
 public class MeanVariance extends Mean {
   /**
    * nVariance
@@ -106,7 +108,9 @@ public class MeanVariance extends Mean {
    * @param weight weight
    */
   @Override
-  @Reference(authors = "D.H.D. West", title = "Updating Mean and Variance Estimates: An Improved Method", booktitle = "Communications of the ACM, Volume 22 Issue 9")
+  @Reference(authors = "D.H.D. West", //
+  title = "Updating Mean and Variance Estimates: An Improved Method", //
+  booktitle = "Communications of the ACM, Volume 22 Issue 9")
   public void put(double val, double weight) {
     final double nwsum = weight + n;
     final double delta = val - m1;
@@ -124,7 +128,7 @@ public class MeanVariance extends Mean {
    */
   @Override
   public void put(Mean other) {
-    if (other instanceof MeanVariance) {
+    if(other instanceof MeanVariance) {
       final double nwsum = other.n + this.n;
       final double delta = other.m1 - this.m1;
       final double rval = delta * other.n / nwsum;
@@ -134,9 +138,39 @@ public class MeanVariance extends Mean {
       this.m1 = (this.n * this.m1 + other.n * other.m1) / nwsum;
       this.m2 += ((MeanVariance) other).m2 + delta * this.n * rval;
       this.n = nwsum;
-    } else {
+    }
+    else {
       throw new AbortException("I cannot combine Mean and MeanVariance to a MeanVariance.");
     }
+  }
+
+  /**
+   * Add values with weight 1.0
+   * 
+   * @param vals Values
+   * @return this
+   */
+  @Override
+  public MeanVariance put(double[] vals) {
+    for(double v : vals) {
+      put(v);
+    }
+    return this;
+  }
+
+  /**
+   * Add values with weight 1.0
+   * 
+   * @param vals Values
+   * @return this
+   */
+  @Override
+  public MeanVariance put(double[] vals, double[] weights) {
+    assert (vals.length == weights.length);
+    for(int i = 0, end = vals.length; i < end; i++) {
+      put(vals[i], weights[i]);
+    }
+    return this;
   }
 
   /**
@@ -176,7 +210,7 @@ public class MeanVariance extends Mean {
    * @return sample variance
    */
   public double getSampleVariance() {
-    if (!(n > 1.)) {
+    if(!(n > 1.)) {
       throw new ArithmeticException("Cannot compute a reasonable sample variance with weight <= 1.0!");
     }
     return m2 / (n - 1);
@@ -232,7 +266,7 @@ public class MeanVariance extends Mean {
    */
   public static MeanVariance[] newArray(int dimensionality) {
     MeanVariance[] arr = new MeanVariance[dimensionality];
-    for (int i = 0; i < dimensionality; i++) {
+    for(int i = 0; i < dimensionality; i++) {
       arr[i] = new MeanVariance();
     }
     return arr;

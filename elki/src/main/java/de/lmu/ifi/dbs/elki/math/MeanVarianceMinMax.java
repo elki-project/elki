@@ -93,6 +93,35 @@ public class MeanVarianceMinMax extends MeanVariance {
   }
 
   /**
+   * Add values with weight 1.0
+   * 
+   * @param vals Values
+   * @return this
+   */
+  @Override
+  public MeanVarianceMinMax put(double[] vals) {
+    for(double v : vals) {
+      put(v);
+    }
+    return this;
+  }
+
+  /**
+   * Add values with weight 1.0
+   * 
+   * @param vals Values
+   * @return this
+   */
+  @Override
+  public MeanVarianceMinMax put(double[] vals, double[] weights) {
+    assert (vals.length == weights.length);
+    for(int i = 0, end = vals.length; i < end; i++) {
+      put(vals[i], weights[i]);
+    }
+    return this;
+  }
+
+  /**
    * Get the current minimum.
    * 
    * @return current minimum.
