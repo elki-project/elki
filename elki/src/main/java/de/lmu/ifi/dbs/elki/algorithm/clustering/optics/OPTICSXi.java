@@ -55,6 +55,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 /**
  * Class to handle OPTICS Xi extraction.
  * 
+ * Note: this implementation includes an additional filter step that prunes
+ * elements from a steep up area that don't have the predecessor in the cluster.
+ * This removes a popular type of artifacts.
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.composedOf OPTICSTypeAlgorithm oneway - «runs»
@@ -130,175 +134,168 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
 
-    SteepScanPosition scan = new SteepScanPosition(clusterOrder);
-    while(scan.hasNext()) {
-      final int curpos = scan.index;
+    for(SteepScanPosition scan = new SteepScanPosition(clusterOrder); scan.hasNext();) {
       // Update maximum-inbetween
       mib = Math.max(mib, scan.ecurr.getReachability());
       // The last point cannot be the start of a steep area.
-      if(scan.esucc != null) {
-        // Xi-steep down area
-        if(scan.steepDown(ixi)) {
-          // Update mib values with current mib and filter
-          updateFilterSDASet(mib, sdaset, ixi);
-          final double startval = scan.ecurr.getReachability();
-          int startsteep = scan.index;
-          int endsteep = Math.min(scan.index + 1, clusterOrder.size());
-          {
-            while(scan.hasNext()) {
-              scan.next();
-              // not going downward at all - stop here.
-              if(!scan.steepDown(1.0)) {
+      if(scan.esucc == null) {
+        break;
+      }
+      // Xi-steep down area
+      if(scan.steepDown(ixi)) {
+        // Update mib values with current mib and filter
+        updateFilterSDASet(mib, sdaset, ixi);
+        final double startval = scan.ecurr.getReachability();
+        mib = startval;
+        int startsteep = scan.index, endsteep = scan.index;
+        for(scan.next(); scan.hasNext(); scan.next()) {
+          // still steep - continue.
+          if(scan.steepDown(ixi)) {
+            endsteep = scan.index;
+            mib = scan.ecurr.getReachability();
+            continue;
+          }
+          // Not going downward at all - stop here.
+          // Always stop looking after minpts "flat" steps.
+          if(!scan.steepDown(1.0) || scan.index - endsteep > minpts) {
+            break;
+          }
+        }
+        final SteepDownArea sda = new SteepDownArea(startsteep, endsteep, startval, 0);
+        if(LOG.isDebuggingFinest()) {
+          LOG.debugFinest("Xi " + sda.toString());
+        }
+        sdaset.add(sda);
+        if(salist != null) {
+          salist.add(sda);
+        }
+        continue;
+      }
+      // Xi-steep up area
+      if(scan.steepUp(ixi)) {
+        // Update mib values with current mib and filter
+        updateFilterSDASet(mib, sdaset, ixi);
+        final SteepUpArea sua;
+        // Compute steep-up area
+        {
+          int startsteep = scan.index, endsteep = scan.index + 1;
+          mib = scan.ecurr.getReachability();
+          double esuccr = scan.esucc.getReachability();
+          // There is nothing higher than infinity
+          if(!Double.isInfinite(esuccr)) {
+            // find end of steep-up-area, eventually updating mib again
+            for(scan.next(); scan.hasNext(); scan.next()) {
+              // still steep - continue.
+              if(scan.steepUp(ixi)) {
+                endsteep = scan.index;
+                mib = scan.ecurr.getReachability();
+                esuccr = scan.esucc != null ? scan.esucc.getReachability() : Double.POSITIVE_INFINITY;
+                continue;
+              }
+              // Not going upward - stop here.
+              // Stop looking after minpts non-up steps.
+              if(!scan.steepUp(1.0) || scan.index - endsteep > minpts) {
                 break;
               }
-              // still steep - continue.
-              if(scan.steepDown(ixi)) {
-                endsteep = Math.min(scan.index + 1, clusterOrder.size());
-              }
-              else {
-                // Stop looking after minpts "flat" steps.
-                if(scan.index - endsteep > minpts) {
-                  break;
-                }
-              }
             }
           }
-          mib = clusterOrder.get(endsteep).getReachability();
-          final SteepDownArea sda = new SteepDownArea(startsteep, endsteep, startval, 0);
+          else {
+            // To not get stuck
+            scan.next();
+          }
+          sua = new SteepUpArea(startsteep, endsteep, esuccr);
           if(LOG.isDebuggingFinest()) {
-            LOG.debugFinest("Xi " + sda.toString());
+            LOG.debugFinest("Xi " + sua.toString());
           }
-          sdaset.add(sda);
           if(salist != null) {
-            salist.add(sda);
+            salist.add(sua);
           }
-          continue;
         }
-        else
-        // Xi-steep up area
-        if(scan.steepUp(ixi)) {
-          // Update mib values with current mib and filter
-          updateFilterSDASet(mib, sdaset, ixi);
-          final SteepUpArea sua;
-          // Compute steep-up area
+        // Validate and computer clusters
+        // LOG.debug("SDA size:"+sdaset.size()+" "+sdaset);
+        ListIterator<SteepDownArea> sdaiter = sdaset.listIterator(sdaset.size());
+        // Iterate backwards for correct hierarchy generation.
+        while(sdaiter.hasPrevious()) {
+          SteepDownArea sda = sdaiter.previous();
+          // LOG.debug("Comparing: eU="+mib.doubleValue()+" SDA: "+sda.toString());
+          // Condition 3b: end-of-steep-up > maximum-in-between lower
+          if(mib * ixi < sda.getMib()) {
+            continue;
+          }
+          // By default, clusters cover both the steep up and steep down area
+          int cstart = sda.getStartIndex(), cend = sua.getEndIndex();
+          // NOT in original article: never include infinity-reachable points at
+          // the end
+          while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).getReachability())) {
+            --cend;
+          }
+          // However, we sometimes have to adjust this (Condition 4):
           {
-            int startsteep = scan.index;
-            int endsteep = scan.index + 1;
-            mib = scan.ecurr.getReachability();
-            double esuccr = scan.esucc.getReachability();
-            // There is nothing higher than infinity
-            if(!Double.isInfinite(esuccr)) {
-              // find end of steep-up-area, eventually updating mib again
-              while(scan.hasNext()) {
-                scan.next();
-                // not going upward - stop here.
-                if(!scan.steepUp(1.0)) {
-                  break;
-                }
-                // still steep - continue.
-                if(scan.steepUp(ixi)) {
-                  endsteep = Math.min(scan.index + 1, clusterOrder.size() - 1);
-                  mib = scan.ecurr.getReachability();
-                  esuccr = scan.esucc.getReachability();
-                }
-                else {
-                  // Stop looking after minpts non-up steps.
-                  if(scan.index - endsteep > minpts) {
-                    break;
-                  }
-                }
+            // Case b)
+            if(sda.getMaximum() * ixi >= sua.getMaximum()) {
+              while(cstart < cend && //
+              clusterOrder.get(cstart + 1).getReachability() > sua.getMaximum()) {
+                cstart++;
               }
             }
-            sua = new SteepUpArea(startsteep, endsteep, esuccr);
-            if(LOG.isDebuggingFinest()) {
-              LOG.debugFinest("Xi " + sua.toString());
+            // Case c)
+            else if(sua.getMaximum() * ixi >= sda.getMaximum()) {
+              while(cend > cstart && //
+              clusterOrder.get(cend - 1).getReachability() > sda.getMaximum()) {
+                cend--;
+              }
             }
-            if(salist != null) {
-              salist.add(sua);
+            // Case a) is the default
+          }
+          // This NOT in the original article - please credit ELKI:
+          // ensure that the predecessor is in the current cluster. This filter
+          // removes common artifacts from the Xi method
+          simplify: while(cend > cstart) {
+            DBID pred = clusterOrder.get(cend).getPredecessorID();
+            for(int i = cstart; i < cend; i++) {
+              if(DBIDUtil.equal(pred, clusterOrder.get(i).getID())) {
+                break simplify;
+              }
+            }
+            // Not found.
+            --cend;
+          }
+          // Condition 3a: obey minpts
+          if(cend - cstart + 1 < minpts) {
+            continue;
+          }
+          // Build the cluster
+          ModifiableDBIDs dbids = DBIDUtil.newArray();
+          for(int idx = cstart; idx <= cend; idx++) {
+            final DBID dbid = clusterOrder.get(idx).getID();
+            // Collect only unclaimed IDs.
+            if(unclaimedids.remove(dbid)) {
+              dbids.add(dbid);
             }
           }
-          // Validate and computer clusters
-          // logger.debug("SDA size:"+sdaset.size()+" "+sdaset);
-          ListIterator<SteepDownArea> sdaiter = sdaset.listIterator(sdaset.size());
-          // Iterate backwards for correct hierarchy generation.
-          while(sdaiter.hasPrevious()) {
-            SteepDownArea sda = sdaiter.previous();
-            // logger.debug("Comparing: eU="+mib.doubleValue()+" SDA: "+sda.toString());
-            // Condition 3b: end-of-steep-up > maximum-in-between lower
-            if(mib * ixi < sda.getMib()) {
-              continue;
-            }
-            // By default, clusters cover both the steep up and steep down area
-            int cstart = sda.getStartIndex();
-            int cend = sua.getEndIndex();
-            // Hotfix: never include infinity-reachable points at the end
-            while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).getReachability())) {
-              --cend;
-            }
-            // However, we sometimes have to adjust this (Condition 4):
-            {
-              // Case b)
-              if(sda.getMaximum() * ixi >= sua.getMaximum()) {
-                while(cstart < sda.getEndIndex()) {
-                  if(clusterOrder.get(cstart + 1).getReachability() > sua.getMaximum()) {
-                    cstart++;
-                  }
-                  else {
-                    break;
-                  }
-                }
-              }
-              // Case c)
-              else if(sua.getMaximum() * ixi >= sda.getMaximum()) {
-                while(cend > sua.getStartIndex()) {
-                  if(clusterOrder.get(cend - 1).getReachability() > sda.getMaximum()) {
-                    cend--;
-                  }
-                  else {
-                    break;
-                  }
-                }
-              }
-              // Case a) is the default
-            }
-            // Condition 3a: obey minpts
-            if(cend - cstart + 1 < minpts) {
-              continue;
-            }
-            // Build the cluster
-            ModifiableDBIDs dbids = DBIDUtil.newArray();
-            for(int idx = cstart; idx <= cend; idx++) {
-              final DBID dbid = clusterOrder.get(idx).getID();
-              // Collect only unclaimed IDs.
-              if(unclaimedids.remove(dbid)) {
-                dbids.add(dbid);
-              }
-            }
-            if(LOG.isDebuggingFine()) {
-              LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cstart - cend + 1));
-            }
-            OPTICSModel model = new OPTICSModel(cstart, cend);
-            Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model);
-            // Build the hierarchy
-            {
-              Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator();
-              while(iter.hasNext()) {
-                Cluster<OPTICSModel> clus = iter.next();
-                OPTICSModel omodel = clus.getModel();
-                if(model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
-                  clustering.addChildCluster(cluster, clus);
-                  iter.remove();
-                }
-              }
-            }
-            curclusters.add(cluster);
+          if(LOG.isDebuggingFine()) {
+            LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cstart - cend + 1));
           }
+          OPTICSModel model = new OPTICSModel(cstart, cend);
+          Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model);
+          // Build the hierarchy
+          {
+            Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator();
+            while(iter.hasNext()) {
+              Cluster<OPTICSModel> clus = iter.next();
+              OPTICSModel omodel = clus.getModel();
+              if(model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
+                clustering.addChildCluster(cluster, clus);
+                iter.remove();
+              }
+            }
+          }
+          curclusters.add(cluster);
         }
+        continue;
       }
-      // Make sure to advance at least one step
-      if(curpos == scan.index) {
-        scan.next();
-      }
+      // Flat - advance anyway.
+      scan.next();
     }
     if(curclusters.size() > 0 || unclaimedids.size() > 0) {
       if(unclaimedids.size() > 0) {
@@ -374,17 +371,17 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     /**
      * Current position
      */
-    int index = 0;
+    int index;
 
     /**
      * Current entry
      */
-    DoubleDistanceClusterOrderEntry ecurr = null;
+    DoubleDistanceClusterOrderEntry ecurr;
 
     /**
      * Next entry
      */
-    DoubleDistanceClusterOrderEntry esucc = null;
+    DoubleDistanceClusterOrderEntry esucc;
 
     /**
      * Constructor.
@@ -394,6 +391,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     public SteepScanPosition(List<DoubleDistanceClusterOrderEntry> co) {
       super();
       this.co = co;
+      this.index = 0;
       this.ecurr = (co.size() >= 1) ? co.get(0) : null;
       this.esucc = (co.size() >= 2) ? co.get(1) : null;
     }
@@ -404,9 +402,8 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     public void next() {
       index++;
       ecurr = esucc;
-      if(index + 1 < co.size()) {
-        esucc = co.get(index + 1);
-      }
+      final int next = index + 1;
+      esucc = next < co.size() ? co.get(next) : null;
     }
 
     /**

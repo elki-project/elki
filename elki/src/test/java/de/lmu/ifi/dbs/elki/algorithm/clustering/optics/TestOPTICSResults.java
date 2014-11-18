@@ -64,7 +64,7 @@ public class TestOPTICSResults extends AbstractSimpleAlgorithmTest implements JU
     // run OPTICS on database
     Clustering<?> clustering = opticsxi.run(db);
 
-    testFMeasure(db, clustering, 0.874062);
-    testClusterSizes(clustering, new int[] { 109, 121, 210, 270 });
+    testFMeasure(db, clustering, 0.88196647);
+    testClusterSizes(clustering, new int[] { 108, 120, 209, 273 });
   }
 }
