@@ -20,6 +20,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.StudentsTDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GumbelDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedExtremeValueDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedParetoDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.RayleighDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution
