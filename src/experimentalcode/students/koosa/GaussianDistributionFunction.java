@@ -4,8 +4,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,14 +27,32 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public interface UOModel extends Model, SpatialComparable {
-  public final static Random rand = new Random();
+public class GaussianDistributionFunction implements ProbabilityFunction {
+
+  private double mean;
+  private double variance;
   
-  public DoubleVector drawSample();
+  // Constructor
+  public GaussianDistributionFunction(final double mean, final double variance) {
+    this.mean = mean;
+    this.variance = variance;
+  }
   
-  public HyperBoundingBox getMBR();
-  
-  public void setMBR(final HyperBoundingBox box);
-  
-  public int getWeight();
+  @Override
+  public DoubleVector drawValue(HyperBoundingBox mbr, Random rand) {
+    double[] values = new double[mbr.getDimensionality()];
+
+    for(int i = 0; i < mbr.getDimensionality(); i++) {
+      double randomDraw = mean + rand.nextGaussian() * variance;
+      if(randomDraw < mbr.getMin(i) || randomDraw > mbr.getMax(i)) {
+        // repeat the draw until there is a valid value
+        i--;
+      } else {
+        values[i] = randomDraw;
+      }
+    }
+    
+    return new DoubleVector(values);
+  }
+
 }

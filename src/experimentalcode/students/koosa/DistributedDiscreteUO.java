@@ -29,14 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class DistributedDiscreteUO extends DiscreteUncertainObject {
+public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject {
 
   // I read the warning about Integer, Double, ... in Pair-Class
   // but since this is exactly what I want, I can as well use
   // this class as writing a new one that does the same.
   private List<Pair<DoubleVector,Double>> samplePoints;
   private int totalProbability;
-  private HyperBoundingBox mbr;
+  private DoubleVector noObjectChosen;
   
   // Constructor
   public DistributedDiscreteUO (final List<Pair<DoubleVector,Double>> samplePoints) {
@@ -58,8 +58,15 @@ public class DistributedDiscreteUO extends DiscreteUncertainObject {
     this.samplePoints = samplePoints;
     // I normalize the totalProbability with 10000, to allow 
     // up to 2 decimal places for the probability.
-    this.totalProbability = (int) check * 10000;
+    this.totalProbability = (int) Math.ceil(check * 10000);
     this.dimensions = samplePoints.get(0).getFirst().getDimensionality();
+    if(totalProbability - 10000 == 0) {
+      double[] values = new double[dimensions];
+      for(int i = 0; i < dimensions; i++) {
+        values[i] = Double.NEGATIVE_INFINITY;
+      }
+      noObjectChosen = new DoubleVector(values);
+    }
   }
   
   // note that the user has to be certain, he looks upon the
@@ -71,14 +78,20 @@ public class DistributedDiscreteUO extends DiscreteUncertainObject {
 
   @Override
   public DoubleVector drawSample() {
-    final int index = rand.nextInt(totalProbability);
+    // Due to nextInt(n)'s exclusion of n
+    // I die over 10001 to cover every possible
+    // probability.
+    final int index = rand.nextInt(10001);
     int sum = 0;
     int i = -1;
     
-    while(sum < index) {
+    while(sum < index && sum < totalProbability) {
       sum += samplePoints.get(++i).getSecond() * 10000;
     }
     
+    if(sum > totalProbability) {
+      return noObjectChosen;
+    }
     return samplePoints.get(i).getFirst();
   }
 

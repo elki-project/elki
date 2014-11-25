@@ -1,11 +1,7 @@
 package experimentalcode.students.koosa;
 
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,14 +25,11 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public interface UOModel extends Model, SpatialComparable {
-  public final static Random rand = new Random();
+public abstract class AbstractContinuousUncertainObject implements UOModel {
+  // The purpose of this Interface is to distinguish between
+  // the uncertain model-types "discrete" and "continuous" in
+  // advance, to uphold typesafety and such wonderful things.
   
-  public DoubleVector drawSample();
-  
-  public HyperBoundingBox getMBR();
-  
-  public void setMBR(final HyperBoundingBox box);
-  
-  public int getWeight();
+  protected int dimensions;
+  protected HyperBoundingBox mbr;
 }

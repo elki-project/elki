@@ -4,8 +4,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,14 +28,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public interface UOModel extends Model, SpatialComparable {
-  public final static Random rand = new Random();
-  
-  public DoubleVector drawSample();
-  
-  public HyperBoundingBox getMBR();
-  
-  public void setMBR(final HyperBoundingBox box);
-  
-  public int getWeight();
+public interface ProbabilityFunction {
+  public DoubleVector drawValue(final HyperBoundingBox mbr, final Random rand);
 }

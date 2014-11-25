@@ -2,7 +2,6 @@ package experimentalcode.students.koosa;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -30,11 +29,10 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class UniformDiscreteUO extends DiscreteUncertainObject {
+public class UniformDiscreteUO extends AbstractDiscreteUncertainObject {
 
   private List<DoubleVector> samplePoints;
   private double sampleProbability;
-  private HyperBoundingBox mbr;
 
   // Constructor
   public UniformDiscreteUO (final List<DoubleVector> samplePoints) {

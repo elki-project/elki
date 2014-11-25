@@ -1,5 +1,7 @@
 package experimentalcode.students.koosa;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,8 +25,70 @@ package experimentalcode.students.koosa;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public abstract class ContinuousUncertainObject implements UOModel {
-  // The purpose of this Interface is to distinguish between
-  // the uncertain model-types "discrete" and "continuous" in
-  // advance, to uphold typesafety and such wonderful things.
+public class ContinuousUncertainObject<F extends ProbabilityFunction> extends AbstractContinuousUncertainObject {
+
+  private F probabilityFunction;
+  
+  //Constructor
+  public ContinuousUncertainObject() {
+    // Constructs the plain object to be filled
+    // from custom code.
+  }
+  
+  //Constructor - meaningful
+  public ContinuousUncertainObject(final HyperBoundingBox box, final F probabilityFunction) {
+    this.mbr = box;
+    this.dimensions = box.getDimensionality();
+    this.probabilityFunction = probabilityFunction;
+  }
+  
+  //Constructor - worth considering?
+  public ContinuousUncertainObject(final double[] min, final double[] max, final F probabilityFunction) {
+    this.mbr = new HyperBoundingBox(min, max);
+    this.dimensions = min.length;
+    this.probabilityFunction = probabilityFunction;
+  }
+  
+  @Override
+  public DoubleVector drawSample() {
+    return probabilityFunction.drawValue(mbr, rand);
+  }
+
+  @Override
+  public HyperBoundingBox getMBR() {
+    return this.mbr;
+  }
+
+  @Override
+  public void setMBR(HyperBoundingBox box) {
+    this.mbr = box;
+  }
+
+  @Override
+  public int getWeight() {
+    // One can argue, how much sense a
+    // weight of an infinite set does make,
+    // but to uphold the generic design you'll get 
+    // Integer.Max_VALUE.
+    // TODO: Maybe we want to return something like
+    // -1 instead, but in the end this seems to
+    // be nothing but a question of taste.
+    return Integer.MAX_VALUE;
+  }
+
+  @Override
+  public int getDimensionality() {
+    return this.dimensions;
+  }
+
+  @Override
+  public double getMin(int dimension) {
+    return this.mbr.getMin(dimension);
+  }
+
+  @Override
+  public double getMax(int dimension) {
+    return this.mbr.getMax(dimension);
+  }
+
 }
