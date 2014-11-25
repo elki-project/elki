@@ -33,6 +33,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogisticLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogLogisticMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedLogisticAlternateLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMMEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedParetoLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMMEstimator
