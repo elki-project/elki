@@ -32,4 +32,8 @@ public abstract class AbstractContinuousUncertainObject implements UOModel {
   
   protected int dimensions;
   protected HyperBoundingBox mbr;
+  
+  public int getWeight() {
+    return Integer.MAX_VALUE;
+  }
 }

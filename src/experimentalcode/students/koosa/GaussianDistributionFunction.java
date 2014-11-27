@@ -43,13 +43,13 @@ public class GaussianDistributionFunction implements ProbabilityFunction {
     double[] values = new double[mbr.getDimensionality()];
 
     for(int i = 0; i < mbr.getDimensionality(); i++) {
-      double randomDraw = mean + rand.nextGaussian() * variance;
-      if(randomDraw < mbr.getMin(i) || randomDraw > mbr.getMax(i)) {
-        // repeat the draw until there is a valid value
-        i--;
-      } else {
-        values[i] = randomDraw;
+      double randomDraw;
+      // Die until the value is inside the box.
+      do {
+        randomDraw = mean + rand.nextGaussian() * variance;
       }
+      while(randomDraw < mbr.getMin(i) || randomDraw > mbr.getMax(i));
+      values[i] = randomDraw;
     }
     
     return new DoubleVector(values);

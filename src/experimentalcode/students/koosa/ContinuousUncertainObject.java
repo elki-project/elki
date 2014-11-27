@@ -65,18 +65,6 @@ public class ContinuousUncertainObject<F extends ProbabilityFunction> extends Ab
   }
 
   @Override
-  public int getWeight() {
-    // One can argue, how much sense a
-    // weight of an infinite set does make,
-    // but to uphold the generic design you'll get 
-    // Integer.Max_VALUE.
-    // TODO: Maybe we want to return something like
-    // -1 instead, but in the end this seems to
-    // be nothing but a question of taste.
-    return Integer.MAX_VALUE;
-  }
-
-  @Override
   public int getDimensionality() {
     return this.dimensions;
   }

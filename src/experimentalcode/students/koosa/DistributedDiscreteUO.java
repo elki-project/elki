@@ -29,14 +29,15 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject {
+public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<Pair<DoubleVector,Double>>> {
 
-  // I read the warning about Integer, Double, ... in Pair-Class
-  // but since this is exactly what I want, I can as well use
-  // this class as writing a new one that does the same.
-  private List<Pair<DoubleVector,Double>> samplePoints;
   private int totalProbability;
-  private DoubleVector noObjectChosen;
+  private static DoubleVector noObjectChosen;
+  
+  static {
+    double[] values = {Double.NEGATIVE_INFINITY};
+    noObjectChosen = new DoubleVector(values);
+  }
   
   // Constructor
   public DistributedDiscreteUO (final List<Pair<DoubleVector,Double>> samplePoints) {
@@ -60,13 +61,6 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject {
     // up to 2 decimal places for the probability.
     this.totalProbability = (int) Math.ceil(check * 10000);
     this.dimensions = samplePoints.get(0).getFirst().getDimensionality();
-    if(totalProbability - 10000 == 0) {
-      double[] values = new double[dimensions];
-      for(int i = 0; i < dimensions; i++) {
-        values[i] = Double.NEGATIVE_INFINITY;
-      }
-      noObjectChosen = new DoubleVector(values);
-    }
   }
   
   // note that the user has to be certain, he looks upon the
@@ -79,36 +73,25 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject {
   @Override
   public DoubleVector drawSample() {
     // Due to nextInt(n)'s exclusion of n
-    // I die over 10001 to cover every possible
-    // probability.
-    final int index = rand.nextInt(10001);
+    // we have an exact range of 10000 for
+    // our possible draws by starting at
+    // sum == 0.
+    final int index = rand.nextInt(10000);
     int sum = 0;
-    int i = -1;
+    int i = 0;
     
     while(sum < index && sum < totalProbability) {
-      sum += samplePoints.get(++i).getSecond() * 10000;
+      sum += samplePoints.get(i++).getSecond() * 10000;
     }
     
     if(sum > totalProbability) {
       return noObjectChosen;
     }
-    return samplePoints.get(i).getFirst();
+    // Due to incrementation of i in the while-loop
+    // we have to decrement it here for a correct (and in
+    // edge-cases even valid) draw.
+    return samplePoints.get(--i).getFirst();
   }
-
-  @Override
-  public int getDimensionality() {
-    return this.dimensions;
-  }
-
-  @Override
-  public double getMin(int dimension) {
-    return mbr.getMin(dimension);
-  }
-
-  @Override
-  public double getMax(int dimension) {
-    return mbr.getMax(dimension);
-  }  
   
   public void addSamplePoint(final Pair<DoubleVector,Double> samplePoint) {
     this.samplePoints.add(samplePoint);
@@ -132,16 +115,6 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject {
       }
     }
     this.mbr = new HyperBoundingBox(min, max);
-  }
-  
-  @Override
-  public HyperBoundingBox getMBR() {
-    return this.mbr;
-  }
-  
-  @Override
-  public void setMBR(final HyperBoundingBox box) {
-    this.mbr = box;
   }
   
   @Override

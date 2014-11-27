@@ -1,5 +1,7 @@
 package experimentalcode.students.koosa;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 /*
  This file is part of ELKI:
@@ -24,9 +26,38 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public abstract class AbstractDiscreteUncertainObject implements UOModel {
+public abstract class AbstractDiscreteUncertainObject<T extends List<?>> implements UOModel {
   protected int dimensions;
   protected HyperBoundingBox mbr;
+  protected T samplePoints;
 
   public abstract double getSampleProbability(final int position);
+  
+  public void setMBR(final HyperBoundingBox box) {
+    this.mbr = box;
+  }
+  
+  public HyperBoundingBox getMBR() {
+    return this.mbr;
+  }
+  
+  @Override
+  public double getMin(final int dimension) {
+    return this.mbr.getMin(dimension);
+  }
+  
+  @Override
+  public double getMax(final int dimension) {
+    return this.mbr.getMax(dimension);
+  }
+  
+  @Override
+  public int getDimensionality() {
+    return this.dimensions;
+  }
+  
+  @Override
+  public int getWeight() {
+    return this.samplePoints.size();
+  }
 }

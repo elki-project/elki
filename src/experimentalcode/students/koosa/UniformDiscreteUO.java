@@ -29,9 +29,8 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class UniformDiscreteUO extends AbstractDiscreteUncertainObject {
+public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<DoubleVector>> {
 
-  private List<DoubleVector> samplePoints;
   private double sampleProbability;
 
   // Constructor
@@ -54,21 +53,6 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject {
     // Index := random.mod(samplePoints.size())
     return samplePoints.get(rand.nextInt() % samplePoints.size());
   }
-
-  @Override
-  public int getDimensionality() {
-    return this.dimensions;
-  }
-
-  @Override
-  public double getMin(int dimension) {
-    return mbr.getMin(dimension);
-  }
-
-  @Override
-  public double getMax(int dimension) {
-    return mbr.getMax(dimension);
-  }
   
   public void addSamplePoint(final DoubleVector samplePoint) {
     this.samplePoints.add(samplePoint);
@@ -88,20 +72,5 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject {
       }
     }
     this.mbr = new HyperBoundingBox(min, max);
-  }
-  
-  @Override
-  public HyperBoundingBox getMBR() {
-    return this.mbr;
-  }
-  
-  @Override
-  public void setMBR(final HyperBoundingBox box) {
-    this.mbr = box;
-  }
-  
-  @Override
-  public int getWeight() {
-    return this.samplePoints.size();
   }
 }
