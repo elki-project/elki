@@ -57,11 +57,6 @@ public class DistanceResultAdapter implements ScoreIter, DBIDRefIter {
   }
 
   @Override
-  public double score() {
-    return iter.doubleValue();
-  }
-
-  @Override
   public boolean valid() {
     return iter.valid();
   }

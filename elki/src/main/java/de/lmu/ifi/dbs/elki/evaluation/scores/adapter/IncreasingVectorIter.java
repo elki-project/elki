@@ -23,10 +23,9 @@ package de.lmu.ifi.dbs.elki.evaluation.scores.adapter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.ScoreIter;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
 
 /**
  * Class to iterate over a number vector in decreasing order.
@@ -35,70 +34,21 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
  * 
  * @apiviz.composedOf NumberVector
  */
-public class IncreasingVectorIter implements ScoreIter, IntegerComparator, ArrayIter {
-  /**
-   * Order of dimensions.
-   */
-  private int[] sort;
-
-  /**
-   * Data vector.
-   */
-  private NumberVector vec;
-
-  /**
-   * Current position.
-   */
-  int pos = 0;
-
+public class IncreasingVectorIter extends AbstractVectorIter implements IntegerComparator {
   /**
    * Constructor.
    * 
    * @param vec Vector to iterate over.
    */
   public IncreasingVectorIter(NumberVector vec) {
-    this.vec = vec;
-    final int dim = vec.getDimensionality();
-    this.sort = new int[dim];
-    for(int d = 0; d < dim; d++) {
-      sort[d] = d;
-    }
+    super(vec);
+    this.sort = MathUtil.sequence(0, vec.getDimensionality());
     IntegerArrayQuickSort.sort(sort, this);
   }
 
   @Override
   public int compare(int x, int y) {
     return Double.compare(vec.doubleValue(x), vec.doubleValue(y));
-  }
-
-  @Override
-  public double score() {
-    return vec.doubleValue(sort[pos]);
-  }
-
-  public int dim() {
-    return sort[pos];
-  }
-
-  @Override
-  public boolean valid() {
-    return pos < vec.getDimensionality();
-  }
-
-  @Override
-  public IncreasingVectorIter advance() {
-    ++pos;
-    return this;
-  }
-
-  @Override
-  public boolean tiedToPrevious() {
-    return pos > 0 && Double.compare(vec.doubleValue(sort[pos]), vec.doubleValue(sort[pos - 1])) == 0;
-  }
-
-  @Override
-  public int getOffset() {
-    return pos;
   }
 
   @Override

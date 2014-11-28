@@ -56,11 +56,6 @@ public class SimpleAdapter implements ScoreIter, DBIDRefIter {
   }
 
   @Override
-  public double score() {
-    return Double.NaN;
-  }
-
-  @Override
   public boolean valid() {
     return iter.valid();
   }

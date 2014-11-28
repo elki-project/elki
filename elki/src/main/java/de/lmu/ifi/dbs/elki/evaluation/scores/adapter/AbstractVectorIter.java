@@ -23,9 +23,8 @@ package de.lmu.ifi.dbs.elki.evaluation.scores.adapter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.ScoreIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
 
 /**
  * Class to iterate over a number vector in decreasing order.
@@ -34,37 +33,75 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
  * 
  * @apiviz.composedOf NumberVector
  */
-public class DecreasingVectorIter extends AbstractVectorIter implements IntegerComparator {
+public abstract class AbstractVectorIter implements ScoreIter, ArrayIter {
+  /**
+   * Order of dimensions.
+   */
+  protected int[] sort;
+
+  /**
+   * Data vector.
+   */
+  protected NumberVector vec;
+
+  /**
+   * Current position.
+   */
+  int pos = 0;
+
   /**
    * Constructor.
    * 
    * @param vec Vector to iterate over.
    */
-  public DecreasingVectorIter(NumberVector vec) {
-    super(vec);
-    this.sort = MathUtil.sequence(0, vec.getDimensionality());
-    IntegerArrayQuickSort.sort(sort, this);
+  public AbstractVectorIter(NumberVector vec) {
+    this.vec = vec;
+  }
+
+  /**
+   * Get the dimension in the <i>original</i> vector.
+   * 
+   * @return Vector position.
+   */
+  public int dim() {
+    return sort[pos];
   }
 
   @Override
-  public int compare(int x, int y) {
-    return Double.compare(vec.doubleValue(y), vec.doubleValue(x));
+  public boolean valid() {
+    return pos < vec.getDimensionality() && pos >= 0;
   }
 
   @Override
-  public DecreasingVectorIter advance(int count) {
+  public AbstractVectorIter advance() {
+    ++pos;
+    return this;
+  }
+
+  @Override
+  public boolean tiedToPrevious() {
+    return pos > 0 && Double.compare(vec.doubleValue(sort[pos]), vec.doubleValue(sort[pos - 1])) == 0;
+  }
+
+  @Override
+  public int getOffset() {
+    return pos;
+  }
+
+  @Override
+  public AbstractVectorIter advance(int count) {
     pos += count;
     return this;
   }
 
   @Override
-  public DecreasingVectorIter retract() {
+  public AbstractVectorIter retract() {
     pos--;
     return this;
   }
 
   @Override
-  public DecreasingVectorIter seek(int off) {
+  public AbstractVectorIter seek(int off) {
     pos = off;
     return this;
   }

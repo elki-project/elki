@@ -68,11 +68,6 @@ public class OutlierScoreAdapter implements ScoreIter, DBIDRefIter {
   }
 
   @Override
-  public double score() {
-    return scores.doubleValue(iter);
-  }
-
-  @Override
   public boolean valid() {
     return iter.valid();
   }
