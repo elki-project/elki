@@ -71,6 +71,11 @@ public class IncreasingVectorIter implements ScoreIter, IntegerComparator, Array
     return Double.compare(vec.doubleValue(x), vec.doubleValue(y));
   }
 
+  @Override
+  public double score() {
+    return vec.doubleValue(sort[pos]);
+  }
+
   public int dim() {
     return sort[pos];
   }

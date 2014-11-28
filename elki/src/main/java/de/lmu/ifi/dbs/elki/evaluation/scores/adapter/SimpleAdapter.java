@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.scores.adapter;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -52,6 +53,11 @@ public class SimpleAdapter implements ScoreIter, DBIDRefIter {
   public SimpleAdapter(DBIDIter iter) {
     super();
     this.iter = iter;
+  }
+
+  @Override
+  public double score() {
+    return Double.NaN;
   }
 
   @Override

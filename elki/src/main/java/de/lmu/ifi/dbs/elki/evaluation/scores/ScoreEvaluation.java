@@ -86,6 +86,13 @@ public interface ScoreEvaluation {
      * @return Boolean
      */
     boolean tiedToPrevious();
+    
+    /**
+     * Get the current score.
+     * 
+     * @return Current score.
+     */
+    double score();
   }
 
   /**

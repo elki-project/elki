@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.scores.adapter;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,6 +25,7 @@ package de.lmu.ifi.dbs.elki.evaluation.scores.adapter;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.Predicate;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.ScoreIter;
 
 /**
  * Class that uses a NumberVector as reference, and considers all non-zero
@@ -33,7 +35,7 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.Predicate;
  * 
  * @author Erich Schubert
  */
-public class VectorOverThreshold implements Predicate<DecreasingVectorIter> {
+public class VectorOverThreshold implements Predicate<ScoreIter> {
   /**
    * Vector to use as reference
    */
@@ -68,8 +70,8 @@ public class VectorOverThreshold implements Predicate<DecreasingVectorIter> {
   }
 
   @Override
-  public boolean test(DecreasingVectorIter o) {
-    return Math.abs(vec.doubleValue(o.dim())) > threshold;
+  public boolean test(ScoreIter o) {
+    return Math.abs(o.score()) > threshold;
   }
 
   @Override

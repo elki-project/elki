@@ -71,6 +71,11 @@ public class DecreasingVectorIter implements ScoreIter, IntegerComparator, Array
     return Double.compare(vec.doubleValue(y), vec.doubleValue(x));
   }
 
+  @Override
+  public double score() {
+    return vec.doubleValue(sort[pos]);
+  }
+
   public int dim() {
     return sort[pos];
   }
