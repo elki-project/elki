@@ -80,9 +80,9 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     int sum = 0;
     int i = 0;
     
-    while(sum < index && sum < totalProbability) {
+    do {
       sum += samplePoints.get(i++).getSecond() * 10000;
-    }
+    } while(sum < index && sum < totalProbability);
     
     if(sum > totalProbability) {
       return noObjectChosen;
