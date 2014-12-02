@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecomposition;
 /*
  This file is part of ELKI:
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
-public class GaussianDistributionFunction implements ProbabilityFunction {
+public class GaussianDistributionFunction implements ProbabilityDensityFunction {
 
   private List<DoubleVector> means;
   private List<Matrix> variances;
@@ -76,9 +76,9 @@ public class GaussianDistributionFunction implements ProbabilityFunction {
   }
   
   @Override
-  public DoubleVector drawValue(HyperBoundingBox mbr, Random rand) {
+  public DoubleVector drawValue(SpatialComparable bounds, Random rand) {
     int index = 0;
-    double[] values = new double[mbr.getDimensionality()];
+    double[] values = new double[bounds.getDimensionality()];
     if(weights.getDimensionality() > 1 || weightMax != 10000) {
       final int ind = rand.nextInt(10000);
       int sum = 0;

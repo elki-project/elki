@@ -1,7 +1,6 @@
 package experimentalcode.students.koosa;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /*
@@ -27,7 +26,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class UncertainObject<U extends UOModel> implements SpatialComparable {
+public class UncertainObject<U extends UOModel<SpatialComparable>> implements SpatialComparable {
   
   protected U sampleModel;
   protected int id;
@@ -69,12 +68,12 @@ public class UncertainObject<U extends UOModel> implements SpatialComparable {
     return sampleModel.getMax(dimension);
   }
   
-  public HyperBoundingBox getMBR() {
-    return sampleModel.getMBR();
+  public SpatialComparable getBounds() {
+    return sampleModel.getBounds();
   }
   
-  public void setMBR(final HyperBoundingBox box) {
-    this.sampleModel.setMBR(box);
+  public void setBounds(final SpatialComparable bounds) {
+    this.sampleModel.setBounds(bounds);
   }
   
   public int getWeight() {

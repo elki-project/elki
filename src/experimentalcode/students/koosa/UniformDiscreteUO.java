@@ -5,6 +5,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 
 /*
  This file is part of ELKI:
@@ -34,9 +36,15 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   private double sampleProbability;
 
   // Constructor
-  public UniformDiscreteUO (final List<DoubleVector> samplePoints) {
+  public UniformDiscreteUO(final List<DoubleVector> samplePoints) {
+    this(samplePoints, new RandomFactory(null));
+  }
+  
+  // Constructor
+  public UniformDiscreteUO (final List<DoubleVector> samplePoints, final RandomFactory randomFactory) {
     this.samplePoints = samplePoints;
     this.dimensions = samplePoints.get(0).getDimensionality();
+    this.randomFactory = randomFactory;
   }
   
   @Override
@@ -51,16 +59,16 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
     // precisely 1:samplePoints.size(), it should be fair enough
     // to simply draw a sample by returning the point at 
     // Index := random.mod(samplePoints.size())
-    return samplePoints.get(rand.nextInt() % samplePoints.size());
+    return samplePoints.get(randomFactory.getRandom().nextInt() % samplePoints.size());
   }
   
   public void addSamplePoint(final DoubleVector samplePoint) {
     this.samplePoints.add(samplePoint);
     this.sampleProbability = sampleProbability/(samplePoints.size() - 1) * samplePoints.size();
-    setMBR();
+    setBounds();
   }
   
-  protected void setMBR() {
+  protected void setBounds() {
     double min[] = new double[dimensions];
     Arrays.fill(min, Double.MAX_VALUE);
     double max[] = new double[dimensions];
@@ -71,6 +79,10 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
         max[d] = Math.max(max[d], samplePoint.doubleValue(d));
       }
     }
-    this.mbr = new HyperBoundingBox(min, max);
+    this.bounds = new HyperBoundingBox(min, max);
+  }
+  
+  public void setBounds(final SpatialComparable bounds) {
+    this.bounds = bounds;
   }
 }

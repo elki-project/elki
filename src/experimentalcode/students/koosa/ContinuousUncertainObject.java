@@ -2,6 +2,8 @@ package experimentalcode.students.koosa;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,9 +27,9 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class ContinuousUncertainObject<F extends ProbabilityFunction> extends AbstractContinuousUncertainObject {
+public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> extends AbstractContinuousUncertainObject {
 
-  private F probabilityFunction;
+  private F probabilityDensityFunction;
   
   //Constructor
   public ContinuousUncertainObject() {
@@ -35,33 +37,45 @@ public class ContinuousUncertainObject<F extends ProbabilityFunction> extends Ab
     // from custom code.
   }
   
+  // Constructor
+  public ContinuousUncertainObject(final HyperBoundingBox box, final F probabilityDensityFunction) {
+    this(box, probabilityDensityFunction, new RandomFactory(null));
+  }
+  
   //Constructor - meaningful
-  public ContinuousUncertainObject(final HyperBoundingBox box, final F probabilityFunction) {
-    this.mbr = box;
-    this.dimensions = box.getDimensionality();
-    this.probabilityFunction = probabilityFunction;
+  public ContinuousUncertainObject(final SpatialComparable bounds, final F probabilityDensityFunction, final RandomFactory randomFactory) {
+    this.bounds = bounds;
+    this.dimensions = bounds.getDimensionality();
+    this.probabilityDensityFunction = probabilityDensityFunction;
+    this.randomFactory = randomFactory;
+  }
+  
+  // Constructor
+  public ContinuousUncertainObject(final double[] min, final double[] max, final F probabilityDensityFunction) {
+    this(min, max, probabilityDensityFunction, new RandomFactory(null));
   }
   
   //Constructor - worth considering?
-  public ContinuousUncertainObject(final double[] min, final double[] max, final F probabilityFunction) {
-    this.mbr = new HyperBoundingBox(min, max);
+  public ContinuousUncertainObject(final double[] min, final double[] max, final F probabilityDensityFunction, final RandomFactory randomFactory) {
+    this.bounds = new HyperBoundingBox(min, max);
     this.dimensions = min.length;
-    this.probabilityFunction = probabilityFunction;
+    this.probabilityDensityFunction = probabilityDensityFunction;
+    this.randomFactory = randomFactory;
   }
   
   @Override
   public DoubleVector drawSample() {
-    return probabilityFunction.drawValue(mbr, rand);
+    return probabilityDensityFunction.drawValue(bounds, randomFactory.getRandom());
   }
 
   @Override
-  public HyperBoundingBox getMBR() {
-    return this.mbr;
+  public SpatialComparable getBounds() {
+    return this.bounds;
   }
 
   @Override
-  public void setMBR(HyperBoundingBox box) {
-    this.mbr = box;
+  public void setBounds(final SpatialComparable bounds) {
+    this.bounds = bounds;
   }
 
   @Override
@@ -71,12 +85,12 @@ public class ContinuousUncertainObject<F extends ProbabilityFunction> extends Ab
 
   @Override
   public double getMin(int dimension) {
-    return this.mbr.getMin(dimension);
+    return this.bounds.getMin(dimension);
   }
 
   @Override
   public double getMax(int dimension) {
-    return this.mbr.getMax(dimension);
+    return this.bounds.getMax(dimension);
   }
 
 }

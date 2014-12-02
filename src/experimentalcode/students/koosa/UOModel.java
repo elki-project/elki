@@ -1,7 +1,5 @@
 package experimentalcode.students.koosa;
 
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -28,15 +26,17 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 
-public interface UOModel extends Model, SpatialComparable {
-  public final static Random rand = new Random();
+public abstract class UOModel<C extends SpatialComparable> implements Model, SpatialComparable {
+  protected RandomFactory randomFactory;
+  protected C bounds;
   
-  public DoubleVector drawSample();
+  public abstract DoubleVector drawSample();
   
-  public HyperBoundingBox getMBR();
+  public abstract SpatialComparable getBounds();
   
-  public void setMBR(final HyperBoundingBox box);
+  public abstract void setBounds(final SpatialComparable bounds);
   
-  public int getWeight();
+  public abstract int getWeight();
 }

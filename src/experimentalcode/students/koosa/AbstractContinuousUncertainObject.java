@@ -1,6 +1,7 @@
 package experimentalcode.students.koosa;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /*
  This file is part of ELKI:
@@ -25,13 +26,13 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public abstract class AbstractContinuousUncertainObject implements UOModel {
+public abstract class AbstractContinuousUncertainObject extends UOModel<SpatialComparable> {
   // The purpose of this Interface is to distinguish between
   // the uncertain model-types "discrete" and "continuous" in
   // advance, to uphold typesafety and such wonderful things.
   
   protected int dimensions;
-  protected HyperBoundingBox mbr;
+  protected SpatialComparable bounds;
   
   public int getWeight() {
     return Integer.MAX_VALUE;

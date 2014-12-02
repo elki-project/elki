@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 /*
  This file is part of ELKI:
@@ -40,7 +41,12 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
   }
   
   // Constructor
-  public DistributedDiscreteUO (final List<Pair<DoubleVector,Double>> samplePoints) {
+  public DistributedDiscreteUO(final List<Pair<DoubleVector,Double>> samplePoints) {
+    this(samplePoints, new RandomFactory(null));
+  }
+  
+  // Constructor
+  public DistributedDiscreteUO(final List<Pair<DoubleVector,Double>> samplePoints, final RandomFactory randomFactory) {
     double check = 0;
     for(Pair<DoubleVector,Double> pair: samplePoints) {
       if(pair.getSecond() < 0) {
@@ -61,6 +67,7 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     // up to 2 decimal places for the probability.
     this.totalProbability = (int) Math.ceil(check * 10000);
     this.dimensions = samplePoints.get(0).getFirst().getDimensionality();
+    this.randomFactory = randomFactory;
   }
   
   // note that the user has to be certain, he looks upon the
@@ -76,7 +83,7 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     // we have an exact range of 10000 for
     // our possible draws by starting at
     // sum == 0.
-    final int index = rand.nextInt(10000);
+    final int index = randomFactory.getRandom().nextInt(10000);
     int sum = 0;
     int i = 0;
     
@@ -100,10 +107,10 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
       throw new IllegalArgumentException("[W: ]\tThe new sum of probabilities exceeded a total of 1.");
     }
     this.totalProbability = (int) check * 10000;
-    setMBR();
+    setBounds();
   }
   
-  protected void setMBR() {
+  protected void setBounds() {
     double min[] = new double[dimensions];
     Arrays.fill(min, Double.MAX_VALUE);
     double max[] = new double[dimensions];
@@ -114,7 +121,7 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
         max[d] = Math.max(max[d], samplePoint.getFirst().doubleValue(d));
       }
     }
-    this.mbr = new HyperBoundingBox(min, max);
+    this.bounds = new HyperBoundingBox(min, max);
   }
   
   @Override

@@ -4,6 +4,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,15 +28,15 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class UniformDistributionFunction implements ProbabilityFunction {
+public class UniformDistributionFunction implements ProbabilityDensityFunction {
 
   @Override
-  public DoubleVector drawValue(HyperBoundingBox mbr, Random rand) {
-    double[] values = new double[mbr.getDimensionality()];
+  public DoubleVector drawValue(final SpatialComparable bounds, final Random rand) {
+    double[] values = new double[bounds.getDimensionality()];
     
-    for(int i = 0; i < mbr.getDimensionality(); i++) {
-      if(Double.valueOf(mbr.getMax(i) - mbr.getMin(i)).isInfinite()){
-        values[i] = rand.nextDouble() * (mbr.getMax(i) - mbr.getMin(i)) + mbr.getMin(i);
+    for(int i = 0; i < bounds.getDimensionality(); i++) {
+      if(Double.valueOf(bounds.getMax(i) - bounds.getMin(i)).isInfinite()){
+        values[i] = rand.nextDouble() * (bounds.getMax(i) - bounds.getMin(i)) + bounds.getMin(i);
       } else {
         values[i] = rand.nextInt(2) == 0 ? rand.nextDouble() * rand.nextInt(Integer.MAX_VALUE) : -rand.nextInt(Integer.MAX_VALUE);
       }

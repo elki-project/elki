@@ -3,6 +3,7 @@ package experimentalcode.students.koosa;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,29 +27,28 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public abstract class AbstractDiscreteUncertainObject<T extends List<?>> implements UOModel {
+public abstract class AbstractDiscreteUncertainObject<T extends List<?>> extends UOModel<SpatialComparable> {
   protected int dimensions;
-  protected HyperBoundingBox mbr;
   protected T samplePoints;
 
   public abstract double getSampleProbability(final int position);
   
-  public void setMBR(final HyperBoundingBox box) {
-    this.mbr = box;
+  public void setBounds(final SpatialComparable bounds) {
+    this.bounds = bounds;
   }
   
-  public HyperBoundingBox getMBR() {
-    return this.mbr;
+  public SpatialComparable getBounds() {
+    return this.bounds;
   }
   
   @Override
   public double getMin(final int dimension) {
-    return this.mbr.getMin(dimension);
+    return this.bounds.getMin(dimension);
   }
   
   @Override
   public double getMax(final int dimension) {
-    return this.mbr.getMax(dimension);
+    return this.bounds.getMax(dimension);
   }
   
   @Override
