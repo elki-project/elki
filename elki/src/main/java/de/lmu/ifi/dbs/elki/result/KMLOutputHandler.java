@@ -337,7 +337,7 @@ public class KMLOutputHandler implements ResultHandler {
             Vector v = it.get();
             xmlw.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
             if(compat && (v.getDimensionality() == 2)) {
-              xmlw.writeCharacters(",500");
+              xmlw.writeCharacters(",50");
             }
             xmlw.writeCharacters(" ");
             if(!reverse) {
@@ -391,20 +391,20 @@ public class KMLOutputHandler implements ResultHandler {
       buildHullsRecursively(clu, hier, hullmap, coords);
     }
 
-    int numc = clusters.size();
     {
-      final double projarea = 90. * 90.; // 1/8 of earth
+      final double projarea = 360. * 180. * .01;
       // TODO: generate styles from color scheme
       Iterator<Cluster<Model>> it = clusters.iterator();
       for(int i = 0; it.hasNext(); i++) {
         Cluster<Model> clus = it.next();
-        Color col = Color.getHSBColor(i * 51.f / (float) numc, 1.f, .5f);
+        // This is a prime based magic number, to produce a colorful output
+        Color col = Color.getHSBColor(i / 4.294967291f, 1.f, .5f);
         DoubleObjPair<Polygon> pair = hullmap.get(clus);
         // Approximate area (using bounding box)
         double hullarea = SpatialUtil.volume(pair.second);
-        final double relativeArea = 1. - (hullarea / projarea);
+        final double relativeArea = Math.max(1. - (hullarea / projarea), 0.);
         // final double relativeSize = pair.first / coords.size();
-        final double opacity = 1. * Math.sqrt(relativeArea);
+        final double opacity = .65 * Math.sqrt(relativeArea) + .1;
         xmlw.writeStartElement("Style");
         xmlw.writeAttribute("id", "s" + i);
         writeNewlineOnDebug(xmlw);
@@ -421,7 +421,7 @@ public class KMLOutputHandler implements ResultHandler {
           xmlw.writeStartElement("PolyStyle");
           xmlw.writeStartElement("color");
           // KML uses AABBGGRR format!
-          xmlw.writeCharacters(String.format("%02x%02x%02x%02x", (int) (255 * Math.min(1., opacity)), col.getBlue(), col.getGreen(), col.getRed()));
+          xmlw.writeCharacters(String.format("%02x%02x%02x%02x", (int) (255 * Math.min(.75, opacity)), col.getBlue(), col.getGreen(), col.getRed()));
           xmlw.writeEndElement(); // color
           // out.writeStartElement("fill");
           // out.writeCharacters("1"); // Default 1
@@ -482,7 +482,7 @@ public class KMLOutputHandler implements ResultHandler {
             Vector v = itp.get();
             xmlw.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
             if(compat && (v.getDimensionality() == 2)) {
-              xmlw.writeCharacters(",500");
+              xmlw.writeCharacters(",100");
             }
             xmlw.writeCharacters(" ");
             if(!reverse) {
