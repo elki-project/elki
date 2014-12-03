@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.AlternativeTypeInformation;
@@ -32,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -41,7 +44,7 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.AveragePrecisionEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
@@ -52,23 +55,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Evaluate a distance functions performance by computing the mean average
- * precision, when ranking the objects by distance.
+ * precision, ROC, and NN classification performance when ranking the objects by
+ * distance.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has MAPResult
+ * @apiviz.has RetrievalPerformanceResult
  * 
  * @param <O> Object type
  */
-public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlgorithm<O, MeanAveragePrecisionForDistance.MAPResult> {
+public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgorithm<O, EvaluateRetrievalPerformance.RetrievalPerformanceResult> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(MeanAveragePrecisionForDistance.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateRetrievalPerformance.class);
 
   /**
    * Relative number of object to use in sampling.
@@ -86,18 +91,30 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
   private boolean includeSelf;
 
   /**
+   * Prefix for statistics.
+   */
+  private final String PREFIX = this.getClass().getName();
+
+  /**
+   * K nearest neighbors to use for classification evaluation.
+   */
+  private int maxk = 100;
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
    * @param sampling Sampling rate
    * @param random Random sampling generator
    * @param includeSelf Include query object in evaluation
+   * @param maxk Maximum k for kNN evaluation
    */
-  public MeanAveragePrecisionForDistance(DistanceFunction<? super O> distanceFunction, double sampling, RandomFactory random, boolean includeSelf) {
+  public EvaluateRetrievalPerformance(DistanceFunction<? super O> distanceFunction, double sampling, RandomFactory random, boolean includeSelf, int maxk) {
     super(distanceFunction);
     this.sampling = sampling;
     this.random = random;
     this.includeSelf = includeSelf;
+    this.maxk = maxk;
   }
 
   /**
@@ -108,7 +125,7 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
    * @param lrelation Relation for class label comparison
    * @return Vectors containing mean and standard deviation.
    */
-  public MAPResult run(Database database, Relation<O> relation, Relation<?> lrelation) {
+  public RetrievalPerformanceResult run(Database database, Relation<O> relation, Relation<?> lrelation) {
     final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
 
     final DBIDs ids;
@@ -128,8 +145,13 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
     // Distance storage.
     ModifiableDoubleDBIDList nlist = DBIDUtil.newDistanceDBIDList(relation.size());
 
+    // For counting labels seen in kNN
+    TObjectIntHashMap<Object> counters = new TObjectIntHashMap<>();
+
     // Statistics tracking
-    Mean map = new Mean(), mroc = new Mean();
+    double map = 0., mroc = 0.;
+    double[] knnperf = new double[maxk];
+    int samples = 0;
 
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Processing query objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -140,21 +162,32 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
         if(nlist.size() != relation.size() - (includeSelf ? 0 : 1)) {
           LOG.warning("Neighbor list does not have the desired size: " + nlist.size());
         }
-        map.put(new AveragePrecisionEvaluation().evaluate(posn, nlist));
-        // We may as well compute ROC AUC while we're at it.
-        mroc.put(new ROCEvaluation().evaluate(posn, nlist));
+        map += AveragePrecisionEvaluation.STATIC.evaluate(posn, nlist);
+        mroc += ROCEvaluation.STATIC.evaluate(posn, nlist);
+        KNNEvaluator.STATIC.evaluateKNN(knnperf, nlist, lrelation, counters, label);
+        samples += 1;
       }
       LOG.incrementProcessed(objloop);
     }
     LOG.ensureCompleted(objloop);
-    if(map.getCount() < 1) {
+    if(samples < 1) {
       throw new AbortException("No object matched - are labels parsed correctly?");
     }
-    if(!(map.getMean() >= 0) || !(mroc.getMean() >= 0)) {
+    if(!(map >= 0) || !(mroc >= 0)) {
       throw new AbortException("NaN in MAP/ROC.");
     }
 
-    return new MAPResult(map.getMean(), mroc.getMean(), ids.size());
+    map /= samples;
+    mroc /= samples;
+    LOG.statistics(new DoubleStatistic(PREFIX + ".map", map));
+    LOG.statistics(new DoubleStatistic(PREFIX + ".rocauc", mroc));
+    LOG.statistics(new DoubleStatistic(PREFIX + ".samples", samples));
+    for(int k = 0; k < maxk; k++) {
+      knnperf[k] = knnperf[k] / samples;
+      LOG.statistics(new DoubleStatistic(PREFIX + ".knn-" + (k + 1), knnperf[k]));
+    }
+
+    return new RetrievalPerformanceResult(samples, map, mroc, knnperf);
   }
 
   /**
@@ -247,11 +280,102 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
   }
 
   /**
+   * Evaluate kNN retrieval performance.
+   * 
+   * @author Erich Schubert
+   */
+  public static class KNNEvaluator {
+    /**
+     * Static instance.
+     */
+    public static final KNNEvaluator STATIC = new KNNEvaluator();
+  
+    /**
+     * Evaluate by simulating kNN classification for k=1...maxk
+     * 
+     * @param knnperf Output data storage
+     * @param nlist Neighbor list
+     * @param lrelation Label relation
+     * @param counters (Reused) map for counting the class occurrences.
+     * @param label Label(s) of query object
+     */
+    public void evaluateKNN(double[] knnperf, ModifiableDoubleDBIDList nlist, Relation<?> lrelation, TObjectIntHashMap<Object> counters, Object label) {
+      final int maxk = knnperf.length;
+      int k = 1, prevk = 0, max = 0;
+      counters.clear();
+      DoubleDBIDListIter iter = nlist.iter();
+      while(iter.valid() && prevk < maxk) {
+        // Note: we already skipped the query object in {@link
+        // #computeDistances}
+        double prev = iter.doubleValue();
+        Object l = lrelation.get(iter);
+        max = Math.max(max, countkNN(counters, l));
+        iter.advance();
+        ++k;
+        // End of ties.
+        if(!iter.valid() || iter.doubleValue() > prev) {
+          int pties = 0, ties = 0;
+          for(TObjectIntIterator<Object> cit = counters.iterator(); cit.hasNext();) {
+            cit.advance();
+            if(cit.value() < max) {
+              continue;
+            }
+            ties++;
+            if(cit.key() == null) {
+              continue;
+            }
+            if(cit.key().equals(label)) {
+              pties++;
+            }
+            else if(label instanceof LabelList) {
+              LabelList ll = (LabelList) label;
+              for(int i = 0, e = ll.size(); i < e; i++) {
+                if(cit.key().equals(ll.get(i))) {
+                  pties++;
+                  break;
+                }
+              }
+            }
+          }
+          while(prevk < k && prevk < maxk) {
+            knnperf[prevk++] += pties / (double) ties;
+          }
+        }
+      }
+    }
+  
+    /**
+     * Counting helper for kNN classification.
+     * 
+     * @param counters Counter storage
+     * @param l Object labels
+     * @return Maximum count
+     */
+    public int countkNN(TObjectIntHashMap<Object> counters, Object l) {
+      // Count each label, return maximum.
+      if(l instanceof LabelList) {
+        LabelList ll = (LabelList) l;
+        int m = 0;
+        for(int i = 0, e = ll.size(); i < e; i++) {
+          m = Math.max(m, counters.adjustOrPutValue(ll.get(i), 1, 1));
+        }
+        return m;
+      }
+      return counters.adjustOrPutValue(l, 1, 1);
+    }
+  }
+
+  /**
    * Result object for MAP scores.
    * 
    * @author Erich Schubert
    */
-  public static class MAPResult implements Result, TextWriteable {
+  public static class RetrievalPerformanceResult implements Result, TextWriteable {
+    /**
+     * Sample size
+     */
+    private int samplesize;
+
     /**
      * MAP value
      */
@@ -263,22 +387,24 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
     private double rocauc;
 
     /**
-     * Sample size
+     * KNN performance
      */
-    private int samplesize;
+    private double[] knnperf;
 
     /**
      * Constructor.
      * 
+     * @param samplesize Sample size
      * @param map MAP value
      * @param rocauc ROC AUC value
-     * @param samplesize Sample size
+     * @param knnperf
      */
-    public MAPResult(double map, double rocauc, int samplesize) {
+    public RetrievalPerformanceResult(int samplesize, double map, double rocauc, double[] knnperf) {
       super();
       this.map = map;
       this.rocauc = rocauc;
       this.samplesize = samplesize;
+      this.knnperf = knnperf;
     }
 
     /**
@@ -297,12 +423,12 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
 
     @Override
     public String getLongName() {
-      return "MAP score";
+      return "Distance function retrieval evaluation.";
     }
 
     @Override
     public String getShortName() {
-      return "map-score";
+      return "distance-retrieval-evaluation";
     }
 
     @Override
@@ -316,6 +442,11 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
       out.inlinePrintNoQuotes("Samplesize");
       out.inlinePrint(samplesize);
       out.flush();
+      for(int i = 0; i < knnperf.length; i++) {
+        out.inlinePrintNoQuotes("knn-" + (i + 1));
+        out.inlinePrint(knnperf[i]);
+        out.flush();
+      }
     }
   }
 
@@ -345,6 +476,11 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
     public static final OptionID INCLUDESELF_ID = new OptionID("map.includeself", "Include the query object in the evaluation.");
 
     /**
+     * Parameter for maximum value of k.
+     */
+    public static final OptionID MAXK_ID = new OptionID("map.maxk", "Maximum value of k for kNN evaluation.");
+
+    /**
      * Relative amount of data to sample.
      */
     protected double sampling = 1.0;
@@ -358,6 +494,11 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
      * Include query object in evaluation.
      */
     protected boolean includeSelf;
+
+    /**
+     * Maximum k for evaluation.
+     */
+    protected int maxk = 0;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -378,11 +519,16 @@ public class MeanAveragePrecisionForDistance<O> extends AbstractDistanceBasedAlg
       if(config.grab(includeP)) {
         includeSelf = includeP.isTrue();
       }
+      IntParameter maxkP = new IntParameter(MAXK_ID) //
+      .setOptional(true);
+      if(config.grab(maxkP)) {
+        maxk = maxkP.intValue();
+      }
     }
 
     @Override
-    protected MeanAveragePrecisionForDistance<O> makeInstance() {
-      return new MeanAveragePrecisionForDistance<>(distanceFunction, sampling, seed, includeSelf);
+    protected EvaluateRetrievalPerformance<O> makeInstance() {
+      return new EvaluateRetrievalPerformance<>(distanceFunction, sampling, seed, includeSelf, maxk);
     }
   }
 }
