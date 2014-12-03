@@ -101,6 +101,7 @@
 					<archive>
 						<manifestFile>${elki.projdir}/elki/src/main/resources/META-INF/MANIFEST.MF</manifestFile>
 						<manifest>
+							<mainClass>de.lmu.ifi.dbs.elki.application.ELKILauncher</mainClass>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 					</archive>

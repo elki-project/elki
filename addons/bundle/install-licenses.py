@@ -17,7 +17,7 @@ extract=[
 [r"(^|/)libsvm", None, None],
 # Trove doesn't include a license.txt
 [r"(^|/)trove4j", None, None],
-[r"(^|/)xalan", r"^([^/]+)-(LICENSE|NOTICE|README)(\.txt)?$", "\\2-\\1"],
+[r"(^|/)xalan", r"^/?([^/]+)[-\.](LICENSE|NOTICE|README)(\.txt)?$", "\\2-\\1"],
 [r"(^|/)xml-apis", r"license/(LICENSE|NOTICE|README)(\.txt)?$", "\\1-xml-apis"],
 [r"(^|/)xml-apis", r"license/(LICENSE|NOTICE|README)\.([^.]+?)(\.txt)?$", "\\1-\\2"],
 [r"(^|/)xmlgraphics-commons", r"META-INF/(LICENSE|NOTICE|README)(\.txt)?$", "\\1-xmlgraphics-commons"],
