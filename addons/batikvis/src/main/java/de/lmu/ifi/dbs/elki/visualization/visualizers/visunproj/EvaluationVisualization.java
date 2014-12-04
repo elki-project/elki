@@ -86,8 +86,8 @@ public class EvaluationVisualization extends AbstractVisFactory {
     final ArrayList<EvaluationResult> srs = ResultUtil.filterResults(newResult, EvaluationResult.class);
     for(EvaluationResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
-      task.width = .4;
-      task.height = 1.5;
+      task.width = .5;
+      task.height = sr.numLines() * .05;
       task.level = VisualizationTask.LEVEL_STATIC;
       baseResult.getHierarchy().add(sr, task);
     }

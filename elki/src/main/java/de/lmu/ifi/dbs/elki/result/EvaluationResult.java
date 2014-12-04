@@ -106,6 +106,19 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
   }
 
   /**
+   * Number of lines recommended for display.
+   * 
+   * @return Number of lines
+   */
+  public int numLines() {
+    int r = header.size();
+    for(MeasurementGroup m : groups) {
+      r += 1 + m.measurements.size();
+    }
+    return r;
+  }
+
+  /**
    * A group of evaluation measurements.
    * 
    * @author Erich Schubert
