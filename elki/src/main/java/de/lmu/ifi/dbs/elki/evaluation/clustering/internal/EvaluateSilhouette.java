@@ -143,7 +143,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
     for(Cluster<?> cluster : clusters) {
-      if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
+      if(cluster.size() <= 1 || treatAsSingletons(cluster)) {
         // As suggested in Rousseeuw, we use 0 for singletons.
         msil.put(0., cluster.size());
         continue;
@@ -166,7 +166,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
           if(ocluster == /* yes, reference identity */cluster) {
             continue;
           }
-          if(!mergenoise && ocluster.isNoise()) {
+          if(treatAsSingletons(ocluster)) {
             // Treat noise cluster as singletons:
             for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
               double dist = dq.distance(it1, it3);
@@ -199,6 +199,17 @@ public class EvaluateSilhouette<O> implements Evaluator {
     MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
     g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(msil.getSampleStddev()), msil.getMean(), -1., 1., 0., false);
     db.getHierarchy().add(c, ev);
+  }
+
+  /**
+   * Test whether to treat a cluster as noise cluster.
+   * 
+   * @param cluster Cluster to analyze
+   * @return True, when the cluster is considered noise.
+   */
+  private boolean treatAsSingletons(Cluster<?> cluster) {
+    // mergenoise = true => treat noise cluster as cluster
+    return mergenoise && cluster.isNoise();
   }
 
   @Override
