@@ -26,6 +26,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -189,15 +191,37 @@ public class EvaluateSilhouette<O> implements Evaluator {
         msil.put((min - a) / Math.max(min, a));
       }
     }
+    // Include SSQ if available for free:
+    double ssq = 0;
+    MeanVariance ssqvar = new MeanVariance();
+    for(Cluster<?> cluster : clusters) {
+      Model m = cluster.getModel();
+      if(m instanceof KMeansModel) {
+        double v = ((KMeansModel) m).getVarianceContribution();
+        ssq += v;
+        ssqvar.put(v);
+      }
+      else {
+        ssq = Double.NaN;
+      }
+    }
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(key + ".silhouette.noise", mergenoise ? 1L : 0L));
       LOG.statistics(new DoubleStatistic(key + ".silhouette.mean", msil.getMean()));
       LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", msil.getSampleStddev()));
+      if(ssq == ssq) {
+        LOG.statistics(new DoubleStatistic(key + ".ssq", ssq));
+        LOG.statistics(new DoubleStatistic(key + ".ssq.mean", ssqvar.getMean()));
+        LOG.statistics(new DoubleStatistic(key + ".ssq.stddev", ssqvar.getSampleStddev()));
+      }
     }
 
     EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
     g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(msil.getSampleStddev()), msil.getMean(), -1., 1., 0., false);
+    if(ssq == ssq) {
+      g.addMeasure("Sum of Squares", ssq, 0, Double.NaN, true);
+    }
     db.getHierarchy().add(c, ev);
   }
 
