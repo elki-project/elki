@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DoubleDistanceClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult;
-import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -80,7 +79,6 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
       if(steep != null) {
         final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
         task.level = VisualizationTask.LEVEL_DATA + 1;
-        task.initDefaultVisibility(false);
         baseResult.getHierarchy().add(p, task);
         baseResult.getHierarchy().add(steep, task);
       }
@@ -157,19 +155,19 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
       final OPTICSPlot<E> opticsplot = optics.getOPTICSPlot(context);
       final List<E> co = getClusterOrder();
       final OPTICSDistanceAdapter<E> adapter = opticsplot.getDistanceAdapter();
-      final LinearScale scale = opticsplot.getScale();
+      final int oheight = opticsplot.getHeight();
+      final double xscale = plotwidth / (double) co.size();
+      final double yscale = plotheight / (double) oheight;
 
       for(OPTICSXi.SteepArea area : areas) {
         final int st = area.getStartIndex();
         final int en = area.getEndIndex();
         // Note: make sure we are using doubles!
-        final double x1 = (st + .25) / co.size();
-        final double x2 = (en + .75) / co.size();
-        final double d1 = adapter.getDoubleForEntry(co.get(st));
-        final double d2 = adapter.getDoubleForEntry(co.get(en));
-        final double y1 = (!Double.isInfinite(d1) && !Double.isNaN(d1)) ? (1. - scale.getScaled(d1)) : 0.;
-        final double y2 = (!Double.isInfinite(d2) && !Double.isNaN(d2)) ? (1. - scale.getScaled(d2)) : 0.;
-        Element e = svgp.svgLine(plotwidth * x1, plotheight * y1, plotwidth * x2, plotheight * y2);
+        final double x1 = (st + .25);
+        final double x2 = (en + .75);
+        final double y1 = opticsplot.scaleToPixel(adapter.getDoubleForEntry(co.get(st)));
+        final double y2 = opticsplot.scaleToPixel(adapter.getDoubleForEntry(co.get(en)));
+        Element e = svgp.svgLine(x1 * xscale, y1 * yscale, x2 * xscale, y2 * yscale);
         if(area instanceof OPTICSXi.SteepDownArea) {
           SVGUtil.addCSSClass(e, CSS_STEEP_DOWN);
         }
@@ -192,9 +190,9 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
         if(color == null) {
           color = Color.BLACK;
         }
-        color = new Color((int) (color.getRed() * 0.8), (int) (color.getGreen() * 0.8 + 0.2 * 256.), (int) (color.getBlue() * 0.8));
+        color = new Color((int) (color.getRed() * 0.6), (int) (color.getGreen() * 0.6 + 0.4 * 256.), (int) (color.getBlue() * 0.6));
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * .5);
         svgp.addCSSClassOrLogError(cls);
       }
       if(!svgp.getCSSClassManager().contains(CSS_STEEP_UP)) {
@@ -203,9 +201,9 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
         if(color == null) {
           color = Color.BLACK;
         }
-        color = new Color((int) (color.getRed() * 0.8 + 0.2 * 256.), (int) (color.getGreen() * 0.8), (int) (color.getBlue() * 0.8));
+        color = new Color((int) (color.getRed() * 0.6 + 0.4 * 256.), (int) (color.getGreen() * 0.6), (int) (color.getBlue() * 0.6));
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * .5);
         svgp.addCSSClassOrLogError(cls);
       }
     }

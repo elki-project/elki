@@ -84,6 +84,6 @@ public class TestDeLiCluResults extends AbstractSimpleAlgorithmTest implements J
     double score = ct.getPaircount().f1Measure();
     // We cannot test exactly - due to Hashing, DeLiClu sequence is not
     // identical each time, the results will vary slightly.
-    assertEquals(this.getClass().getSimpleName() + ": Score does not match: " + score, score, 0.807415, 1E-5);
+    assertEquals(this.getClass().getSimpleName() + ": Score does not match: " + score, score, 0.8109293, 1E-5);
   }
 }

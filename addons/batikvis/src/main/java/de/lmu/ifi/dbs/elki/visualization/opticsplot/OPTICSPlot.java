@@ -58,6 +58,11 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
   private static final Logging LOG = Logging.getLogger(OPTICSPlot.class);
 
   /**
+   * Minimum and maximum vertical resolution.
+   */
+  private static final int MIN_HEIGHT = 25, MAX_HEIGHT = 300;
+
+  /**
    * Scale to use
    */
   LinearScale scale;
@@ -71,6 +76,11 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
    * Height of plot
    */
   int height;
+
+  /**
+   * Ratio of plot
+   */
+  double ratio;
 
   /**
    * The result to plot
@@ -175,7 +185,9 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
     List<E> order = co.getClusterOrder();
 
     width = order.size();
-    height = Math.min(200, (int) Math.ceil(width / 5));
+    height = (int) Math.ceil(width * .2);
+    ratio = width / (double) height;
+    height = height < MIN_HEIGHT ? MIN_HEIGHT : height > MAX_HEIGHT ? MAX_HEIGHT : height; 
     if(scale == null) {
       scale = computeScale(order);
     }
@@ -185,13 +197,7 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
     int x = 0;
     for(E coe : order) {
       double reach = distanceAdapter.getDoubleForEntry(coe);
-      final int y;
-      if(!Double.isInfinite(reach) && !Double.isNaN(reach)) {
-        y = (height - 1) - (int) Math.floor(scale.getScaled(reach) * (height - 1));
-      }
-      else {
-        y = 0;
-      }
+      final int y = scaleToPixel(reach);
       try {
         int col = colors.getColorForEntry(coe);
         for(int y2 = height - 1; y2 >= y; y2--) {
@@ -205,6 +211,27 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
     }
 
     plot = img;
+  }
+
+  /**
+   * Scale a reachability distance to a pixel value.
+   * 
+   * @param reach Reachability
+   * @return Pixel value.
+   */
+  public int scaleToPixel(double reach) {
+    return (Double.isInfinite(reach) || Double.isNaN(reach)) ? 0 : //
+    (int) Math.round(scale.getScaled(reach, height - .5, .5));
+  }
+
+  /**
+   * Scale a pixel value to a reachability
+   * 
+   * @param y Pixel value
+   * @return Reachability
+   */
+  public double scaleFromPixel(double y) {
+    return scale.getUnscaled((y - .5) / (height - 1.));
   }
 
   /**
@@ -269,7 +296,7 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
     if(plot == null) {
       replot();
     }
-    return ((double) width) / height;
+    return ratio;
   }
 
   /**

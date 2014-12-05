@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -110,6 +111,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
       String ploturi = opticsplot.getSVGPlotURI();
 
       Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_PRESERVE_ASPECT_RATIO_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
       SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, 0);
       SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, 0);
@@ -119,10 +121,13 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
 
       layer.appendChild(itag);
 
+      LinearScale scale = opticsplot.getScale();
+      double y1 = plotheight * opticsplot.scaleToPixel(scale.getMin()) / opticsplot.getHeight();
+      double y2 = plotheight * opticsplot.scaleToPixel(scale.getMax()) / opticsplot.getHeight();
       try {
         final StyleLibrary style = context.getStyleResult().getStyleLibrary();
-        SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), 0, plotheight, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
-        SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), plotwidth, plotheight, plotwidth, 0, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
+        SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, 0, y1, 0, y2, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
+        SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, plotwidth, y1, plotwidth, y2, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
       }
       catch(CSSNamingConflict e) {
         LoggingUtil.exception("CSS naming conflict for axes on OPTICS plot", e);

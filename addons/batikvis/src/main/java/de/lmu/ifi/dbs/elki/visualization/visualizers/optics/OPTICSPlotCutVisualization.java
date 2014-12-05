@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCut;
+import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -162,7 +163,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
       // TODO make the number of digits configurable
       final String label = (epsilon > 0.0) ? FormatUtil.NF4.format(epsilon) : "";
       // compute absolute y-value of bar
-      final double yAct = plotheight - getYFromEpsilon(epsilon);
+      final double yAct = getYFromEpsilon(epsilon);
 
       if(elemText == null) {
         elemText = svgp.svgText(StyleLibrary.SCALE * 1.05, yAct, label);
@@ -212,13 +213,9 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      * @return epsilon
      */
     protected double getEpsilonFromY(double y) {
-      if(y < 0) {
-        y = 0;
-      }
-      if(y > plotheight) {
-        y = plotheight;
-      }
-      return optics.getOPTICSPlot(context).getScale().getUnscaled(y / plotheight);
+      OPTICSPlot<E> opticsplot = optics.getOPTICSPlot(context);
+      y = (y < 0) ? 0 : (y > plotheight) ? 1. : y / plotheight;
+      return optics.getOPTICSPlot(context).scaleFromPixel(y * opticsplot.getHeight());
     }
 
     /**
@@ -228,14 +225,10 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      * @return y-Value
      */
     protected double getYFromEpsilon(double epsilon) {
-      double y = optics.getOPTICSPlot(context).getScale().getScaled(epsilon) * plotheight;
-      if(y < 0) {
-        y = 0;
-      }
-      if(y > plotheight) {
-        y = plotheight;
-      }
-      return y;
+      OPTICSPlot<E> opticsplot = optics.getOPTICSPlot(context);
+      int h = opticsplot.getHeight();
+      double y = opticsplot.getScale().getScaled(epsilon, h - .5, .5) / (double) h * plotheight;
+      return (y < 0.) ? 0. : (y > plotheight) ? plotheight : y;
     }
 
     @Override

@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -51,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Class to handle OPTICS Xi extraction.
@@ -83,15 +85,39 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
   double xi;
 
   /**
+   * Disable the predecessor correction.
+   */
+  boolean nocorrect;
+
+  /**
+   * Keep the steep areas, for visualization.
+   */
+  boolean keepsteep;
+
+  /**
+   * Constructor.
+   * 
+   * @param optics OPTICS algorithm to use
+   * @param xi Xi value
+   * @param nocorrect Disable the predecessor correction
+   * @param keepsteep Keep the steep areas for visualization
+   */
+  public OPTICSXi(OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> optics, double xi, boolean nocorrect, boolean keepsteep) {
+    super();
+    this.optics = optics;
+    this.xi = xi;
+    this.nocorrect = nocorrect;
+    this.keepsteep = keepsteep;
+  }
+
+  /**
    * Constructor.
    * 
    * @param optics OPTICS algorithm to use
    * @param xi Xi value
    */
   public OPTICSXi(OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> optics, double xi) {
-    super();
-    this.optics = optics;
-    this.xi = xi;
+    this(optics, xi, false, false);
   }
 
   public Clustering<OPTICSModel> run(Database database, Relation<?> relation) {
@@ -123,20 +149,21 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    */
   // TODO: resolve handling of the last point in the cluster order
   private Clustering<OPTICSModel> extractClusters(ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrderResult, Relation<?> relation, double ixi, int minpts) {
-    // TODO: add progress?
     List<DoubleDistanceClusterOrderEntry> clusterOrder = clusterOrderResult.getClusterOrder();
     double mib = 0.0;
-    // TODO: make it configurable to keep this list; this is mostly useful for
-    // visualization
-    List<SteepArea> salist = new ArrayList<>();
+    List<SteepArea> salist = keepsteep ? new ArrayList<SteepArea>() : null;
     List<SteepDownArea> sdaset = new ArrayList<>();
     final Clustering<OPTICSModel> clustering = new Clustering<>("OPTICS Xi-Clusters", "optics");
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
 
+    FiniteProgress scanprog = LOG.isVerbose() ? new FiniteProgress("OPTICS Xi cluster extraction", clusterOrder.size(), LOG) : null;
     for(SteepScanPosition scan = new SteepScanPosition(clusterOrder); scan.hasNext();) {
+      if(scanprog != null) {
+        scanprog.setProcessed(scan.index, LOG);
+      }
       // Update maximum-inbetween
-      mib = Math.max(mib, scan.ecurr.getReachability());
+      mib = Math.max(mib, scan.getReachability());
       // The last point cannot be the start of a steep area.
       if(scan.esucc == null) {
         break;
@@ -145,14 +172,13 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       if(scan.steepDown(ixi)) {
         // Update mib values with current mib and filter
         updateFilterSDASet(mib, sdaset, ixi);
-        final double startval = scan.ecurr.getReachability();
-        mib = startval;
-        int startsteep = scan.index, endsteep = scan.index;
+        final double startval = scan.getReachability();
+        mib = 0.;
+        int startsteep = scan.index, endsteep = scan.index + 1;
         for(scan.next(); scan.hasNext(); scan.next()) {
           // still steep - continue.
           if(scan.steepDown(ixi)) {
-            endsteep = scan.index;
-            mib = scan.ecurr.getReachability();
+            endsteep = scan.index + 1;
             continue;
           }
           // Not going downward at all - stop here.
@@ -163,7 +189,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         }
         final SteepDownArea sda = new SteepDownArea(startsteep, endsteep, startval, 0);
         if(LOG.isDebuggingFinest()) {
-          LOG.debugFinest("Xi " + sda.toString());
+          LOG.debugFinest("New steep down area: " + sda.toString());
         }
         sdaset.add(sda);
         if(salist != null) {
@@ -179,17 +205,21 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         // Compute steep-up area
         {
           int startsteep = scan.index, endsteep = scan.index + 1;
-          mib = scan.ecurr.getReachability();
-          double esuccr = scan.esucc.getReachability();
+          mib = scan.getReachability();
+          double esuccr = scan.getNextReachability();
           // There is nothing higher than infinity
           if(!Double.isInfinite(esuccr)) {
             // find end of steep-up-area, eventually updating mib again
             for(scan.next(); scan.hasNext(); scan.next()) {
               // still steep - continue.
               if(scan.steepUp(ixi)) {
-                endsteep = scan.index;
-                mib = scan.ecurr.getReachability();
-                esuccr = scan.esucc != null ? scan.esucc.getReachability() : Double.POSITIVE_INFINITY;
+                endsteep = scan.index + 1;
+                mib = scan.getReachability();
+                esuccr = scan.getNextReachability();
+                if(esuccr == Double.POSITIVE_INFINITY) {
+                  --endsteep;
+                  break;
+                }
                 continue;
               }
               // Not going upward - stop here.
@@ -200,12 +230,13 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
             }
           }
           else {
+            --endsteep;
             // To not get stuck
             scan.next();
           }
           sua = new SteepUpArea(startsteep, endsteep, esuccr);
           if(LOG.isDebuggingFinest()) {
-            LOG.debugFinest("Xi " + sua.toString());
+            LOG.debugFinest("New steep up area: " + sua.toString());
           }
           if(salist != null) {
             salist.add(sua);
@@ -217,17 +248,24 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         // Iterate backwards for correct hierarchy generation.
         while(sdaiter.hasPrevious()) {
           SteepDownArea sda = sdaiter.previous();
-          // LOG.debug("Comparing: eU="+mib.doubleValue()+" SDA: "+sda.toString());
+          if(LOG.isDebuggingFinest()) {
+            LOG.debugFinest("Comparing: eU=" + mib + " SDA: " + sda.toString());
+          }
           // Condition 3b: end-of-steep-up > maximum-in-between lower
           if(mib * ixi < sda.getMib()) {
+            if(LOG.isDebuggingFinest()) {
+              LOG.debugFinest("mib * ixi = " + mib * ixi + " >= sda.getMib() = " + sda.getMib());
+            }
             continue;
           }
           // By default, clusters cover both the steep up and steep down area
           int cstart = sda.getStartIndex(), cend = sua.getEndIndex();
           // NOT in original article: never include infinity-reachable points at
-          // the end
-          while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).getReachability())) {
-            --cend;
+          // the end of the cluster.
+          if(!nocorrect) {
+            while(cend > cstart && Double.isInfinite(clusterOrder.get(cend).getReachability())) {
+              --cend;
+            }
           }
           // However, we sometimes have to adjust this (Condition 4):
           {
@@ -250,18 +288,23 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
           // This NOT in the original article - please credit ELKI:
           // ensure that the predecessor is in the current cluster. This filter
           // removes common artifacts from the Xi method
-          simplify: while(cend > cstart) {
-            DBID pred = clusterOrder.get(cend).getPredecessorID();
-            for(int i = cstart; i < cend; i++) {
-              if(DBIDUtil.equal(pred, clusterOrder.get(i).getID())) {
-                break simplify;
+          if(!nocorrect) {
+            simplify: while(cend > cstart) {
+              DBID pred = clusterOrder.get(cend).getPredecessorID();
+              for(int i = cstart; i < cend; i++) {
+                if(DBIDUtil.equal(pred, clusterOrder.get(i).getID())) {
+                  break simplify;
+                }
               }
+              // Not found.
+              --cend;
             }
-            // Not found.
-            --cend;
           }
           // Condition 3a: obey minpts
           if(cend - cstart + 1 < minpts) {
+            if(LOG.isDebuggingFinest()) {
+              LOG.debugFinest("MinPts not satisfied.");
+            }
             continue;
           }
           // Build the cluster
@@ -274,7 +317,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
             }
           }
           if(LOG.isDebuggingFine()) {
-            LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cstart - cend + 1));
+            LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cend - cstart + 1));
           }
           OPTICSModel model = new OPTICSModel(cstart, cend);
           Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model);
@@ -296,6 +339,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       }
       // Flat - advance anyway.
       scan.next();
+    }
+    if(scanprog != null) {
+      scanprog.setProcessed(clusterOrder.size(), LOG);
     }
     if(curclusters.size() > 0 || unclaimedids.size() > 0) {
       if(unclaimedids.size() > 0) {
@@ -445,6 +491,24 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         return false;
       }
       return ecurr.getReachability() * ixi >= esucc.getReachability();
+    }
+
+    /**
+     * Get current reachability.
+     * 
+     * @return Reachability
+     */
+    public double getReachability() {
+      return ecurr.getReachability();
+    }
+
+    /**
+     * Get current reachability.
+     * 
+     * @return Reachability
+     */
+    public double getNextReachability() {
+      return (esucc != null) ? esucc.getReachability() : Double.POSITIVE_INFINITY;
     }
   }
 
@@ -646,16 +710,28 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
      */
     public static final OptionID XI_ID = new OptionID("opticsxi.xi", "Threshold for the steepness requirement.");
 
+    /**
+     * Parameter to disable the correction function.
+     */
+    public static final OptionID NOCORRECT_ID = new OptionID("opticsxi.nocorrect", "Disable the predecessor correction.");
+
+    /**
+     * Parameter to keep the steep areas
+     */
+    public static final OptionID KEEPSTEEP_ID = new OptionID("opticsxi.keepsteep", "Keep the steep up/down areas of the plot.");
+
     protected OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> optics;
 
     protected double xi = 0.;
 
+    protected boolean nocorrect = false, keepsteep = false;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter xiP = new DoubleParameter(XI_ID);
-      xiP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      xiP.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      DoubleParameter xiP = new DoubleParameter(XI_ID)//
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
+      .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(xiP)) {
         xi = xiP.doubleValue();
       }
@@ -664,11 +740,21 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       if(config.grab(opticsP)) {
         optics = opticsP.instantiateClass(config);
       }
+
+      Flag nocorrectF = new Flag(NOCORRECT_ID);
+      if(config.grab(nocorrectF)) {
+        nocorrect = nocorrectF.isTrue();
+      }
+
+      Flag keepsteepF = new Flag(KEEPSTEEP_ID);
+      if(config.grab(keepsteepF)) {
+        keepsteep = keepsteepF.isTrue();
+      }
     }
 
     @Override
     protected OPTICSXi makeInstance() {
-      return new OPTICSXi(optics, xi);
+      return new OPTICSXi(optics, xi, nocorrect, keepsteep);
     }
   }
 }
