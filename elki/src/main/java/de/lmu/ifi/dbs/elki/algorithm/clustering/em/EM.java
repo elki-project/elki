@@ -181,7 +181,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       if(LOG.isVerbose()) {
         LOG.verbose("iteration " + it + " - expectation value: " + emNew);
       }
-      if(Math.abs(emOld - emNew) <= delta) {
+      if(Math.abs(emOld - emNew) <= delta || emOld > emNew) {
         break;
       }
     }
@@ -392,7 +392,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
         initializer = initialP.instantiateClass(config);
       }
 
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.)//
+      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 1e-5)//
       .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();

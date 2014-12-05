@@ -143,17 +143,20 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   public void finalizeEStep() {
     final int dim = mean.getDimensionality();
     // TODO: improve handling of degenerated cases?
-    if(wsum > 0.) {
+    if(wsum > Double.MIN_NORMAL) {
       covariance.timesEquals(1. / wsum);
     }
     LUDecomposition lu = new LUDecomposition(covariance);
     double det = lu.det();
-    if(det <= 0.) {
+    if(!(det > 0.)) {
       // Add a small value to the diagonal
       covariance.plusDiagonalEquals(Matrix.SINGULARITY_CHEAT);
       lu = new LUDecomposition(covariance); // Should no longer be zero now.
       det = lu.det();
-      assert (det > 0) : "Singularity cheat did not resolve zero determinant.";
+      if(!(det > 0.)) {
+        assert (det > 0) : "Singularity cheat did not resolve zero determinant.";
+        det = 1.;
+      }
     }
     normDistrFactor = 1. / Math.sqrt(norm * det);
     invCovMatr = lu.solve(Matrix.identity(dim, dim));
@@ -166,7 +169,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(Vector vec) {
-    if (invCovMatr != null) {
+    if(invCovMatr != null) {
       return VMath.mahalanobisDistance(invCovMatr.getArrayRef(), vec.getArrayRef(), mref);
     }
     Vector difference = vec.minus(mean);
