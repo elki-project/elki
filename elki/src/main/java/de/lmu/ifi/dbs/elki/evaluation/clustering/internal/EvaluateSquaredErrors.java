@@ -26,21 +26,18 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ModelUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 /*
@@ -68,8 +65,6 @@ import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -77,31 +72,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Compute the silhouette of a data set.
+ * Evaluate a clustering by reporting the squared errors (SSE, SSQ), as used by
+ * k-means. This should be used with {@link SquaredEuclideanDistanceFunction}
+ * only (when used with other distances, it will manually square the values; but
+ * beware that the result is less meaningful with other distance functions).
  * 
- * Reference:
- * <p>
- * P. J. Rousseeuw<br />
- * Silhouettes: A graphical aid to the interpretation and validation of cluster
- * analysis<br />
- * In: Journal of Computational and Applied Mathematics Volume 20, November 1987
- * </p>
+ * For clusterings that provide a cluster prototype object (e.g. k-means), the
+ * prototype will be used. For other algorithms, the centroid will be
+ * recomputed.
  * 
- * TODO: keep all silhouette values, and allow visualization!
+ * TODO: support non-vector based clusterings, too, if the algorithm provided a
+ * prototype object (e.g. PAM).
+ * 
+ * TODO: when combined with k-means, detect if the distance functions agree
+ * (both should be using squared Euclidean), and reuse the SSQ values provided
+ * by k-means.
  * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  */
-@Reference(authors = "P. J. Rousseeuw", //
-title = "Silhouettes: A graphical aid to the interpretation and validation of cluster analysis", //
-booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
-url = "http://dx.doi.org/10.1016%2F0377-0427%2887%2990125-7")
-public class EvaluateSilhouette<O> implements Evaluator {
+public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateSquaredErrors.class);
 
   /**
    * Keep noise "clusters" merged, instead of breaking them into singletons.
@@ -111,12 +106,12 @@ public class EvaluateSilhouette<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private DistanceFunction<? super O> distance;
+  private NumberVectorDistanceFunction<? super O> distance;
 
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateSilhouette.class.getName();
+  private String key = EvaluateSquaredErrors.class.getName();
 
   /**
    * Constructor.
@@ -125,7 +120,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * @param mergenoise Flag to treat noise as clusters, instead of breaking them
    *        into singletons.
    */
-  public EvaluateSilhouette(DistanceFunction<? super O> distance, boolean mergenoise) {
+  public EvaluateSquaredErrors(NumberVectorDistanceFunction<? super O> distance, boolean mergenoise) {
     super();
     this.distance = distance;
     this.mergenoise = mergenoise;
@@ -136,68 +131,40 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * 
    * @param db Database
    * @param rel Data relation
-   * @param dq Distance query
    * @param c Clustering
    */
-  public void evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+  public void evaluateClustering(Database db, Relation<O> rel, Clustering<?> c) {
+    boolean square = !(distance instanceof SquaredEuclideanDistanceFunction);
+
     List<? extends Cluster<?>> clusters = c.getAllClusters();
-    MeanVariance msil = new MeanVariance();
+    double ssq = 0, sum = 0;
     for(Cluster<?> cluster : clusters) {
       if(cluster.size() <= 1 || treatAsSingletons(cluster)) {
-        // As suggested in Rousseeuw, we use 0 for singletons.
-        msil.put(0., cluster.size());
         continue;
       }
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-      double[] as = new double[ids.size()]; // temporary storage.
-      DBIDArrayIter it1 = ids.iter(), it2 = ids.iter();
-      for(it1.seek(0); it1.valid(); it1.advance()) {
-        // a: In-cluster distances
-        double a = as[it1.getOffset()]; // Already computed distances
-        for(it2.seek(it1.getOffset() + 1); it2.valid(); it2.advance()) {
-          final double dist = dq.distance(it1, it2);
-          a += dist;
-          as[it2.getOffset()] += dist;
-        }
-        a /= (ids.size() - 1);
-        // b: other clusters:
-        double min = Double.POSITIVE_INFINITY;
-        for(Cluster<?> ocluster : clusters) {
-          if(ocluster == /* yes, reference identity */cluster) {
-            continue;
-          }
-          if(treatAsSingletons(ocluster)) {
-            // Treat noise cluster as singletons:
-            for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
-              double dist = dq.distance(it1, it3);
-              if(dist < min) {
-                min = dist;
-              }
-            }
-            continue;
-          }
-          final DBIDs oids = ocluster.getIDs();
-          double b = 0.;
-          for(DBIDIter it3 = oids.iter(); it3.valid(); it3.advance()) {
-            b += dq.distance(it1, it3);
-          }
-          b /= oids.size();
-          if(b < min) {
-            min = b;
-          }
-        }
-        msil.put((min - a) / Math.max(min, a));
+      Model m = cluster.getModel();
+      NumberVector center = ModelUtil.getPrototype(m, rel);
+      if(center == null) {
+        center = Centroid.make(rel, cluster.getIDs());
+      }
+
+      for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
+        double d = distance.distance(center, rel.get(it1));
+        sum += d;
+        ssq += square ? d * d : d;
       }
     }
     if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(key + ".silhouette.noise", mergenoise ? 1L : 0L));
-      LOG.statistics(new DoubleStatistic(key + ".silhouette.mean", msil.getMean()));
-      LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", msil.getSampleStddev()));
+      LOG.statistics(new DoubleStatistic(key + ".mean", sum / rel.size()));
+      LOG.statistics(new DoubleStatistic(key + ".ssq", ssq));
+      LOG.statistics(new DoubleStatistic(key + ".rmsd", Math.sqrt(ssq / rel.size())));
     }
 
     EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
-    g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(msil.getSampleStddev()), msil.getMean(), -1., 1., 0., false);
+    g.addMeasure("Mean distance", sum / rel.size(), 0., Double.POSITIVE_INFINITY, true);
+    g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
+    g.addMeasure("RMSD", Math.sqrt(ssq / rel.size()), 0., Double.POSITIVE_INFINITY, true);
     db.getHierarchy().add(c, ev);
   }
 
@@ -220,9 +187,8 @@ public class EvaluateSilhouette<O> implements Evaluator {
     }
     Database db = ResultUtil.findDatabase(baseResult);
     Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, rel, dq, c);
+      evaluateClustering(db, rel, c);
     }
   }
 
@@ -233,21 +199,21 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
     /**
      * Parameter for choosing the distance function.
      */
-    public static final OptionID DISTANCE_ID = new OptionID("silhouette.distance", "Distance function to use for computing the silhouette.");
+    public static final OptionID DISTANCE_ID = new OptionID("ssq.distance", "Distance function to use for computing the SSQ.");
 
     /**
      * Parameter to treat noise as a single cluster.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("silhouette.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID MERGENOISE_ID = new OptionID("ssq.noisecluster", "Treat noise as a cluster, not as singletons.");
 
     /**
      * Distance function to use.
      */
-    private DistanceFunction<? super O> distance;
+    private NumberVectorDistanceFunction<? super O> distance;
 
     /**
      * Keep noise "clusters" merged.
@@ -257,7 +223,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if(config.grab(distP)) {
         distance = distP.instantiateClass(config);
       }
@@ -269,8 +235,8 @@ public class EvaluateSilhouette<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluateSilhouette<O> makeInstance() {
-      return new EvaluateSilhouette<>(distance, mergenoise);
+    protected EvaluateSquaredErrors<O> makeInstance() {
+      return new EvaluateSquaredErrors<>(distance, mergenoise);
     }
   }
 }

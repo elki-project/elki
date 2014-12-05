@@ -2,6 +2,7 @@ de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation
 de.lmu.ifi.dbs.elki.evaluation.NoAutomaticEvaluation
 de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSilhouette
+de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSquaredErrors
 de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.ClusterPairSegmentAnalysis
 de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram
 de.lmu.ifi.dbs.elki.evaluation.index.IndexPurity
