@@ -88,6 +88,11 @@ public class PrecisionAtKEvaluation extends AbstractScoreEvaluation {
     return score / total;
   }
 
+  @Override
+  public double expected(int pos, int all) {
+    return pos / (double) all;
+  }
+
   /**
    * Parameterization class.
    * 

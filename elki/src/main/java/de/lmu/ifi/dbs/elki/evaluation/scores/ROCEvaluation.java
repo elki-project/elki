@@ -96,6 +96,11 @@ public class ROCEvaluation extends AbstractScoreEvaluation {
     return curve;
   }
 
+  @Override
+  public double expected(int pos, int all) {
+    return .5;
+  }
+
   /**
    * Compute the area under the ROC curve given a set of positive IDs and a
    * sorted list of (comparable, ID)s, where the comparable object is used to

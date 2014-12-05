@@ -59,6 +59,11 @@ public class AveragePrecisionEvaluation extends AbstractScoreEvaluation {
     }
     return (poscnt > 0) ? acc / poscnt : 0.;
   }
+  
+  @Override
+  public double expected(int pos, int all) {
+    return pos / (double) all;
+  }
 
   /**
    * Parameterization class.

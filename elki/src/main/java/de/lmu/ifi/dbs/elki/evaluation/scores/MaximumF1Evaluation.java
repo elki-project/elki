@@ -60,6 +60,11 @@ public class MaximumF1Evaluation extends AbstractScoreEvaluation {
     return maxf1;
   }
 
+  @Override
+  public double expected(int pos, int all) {
+    return pos / (double) all;
+  }
+
   /**
    * Parameterization class.
    * 

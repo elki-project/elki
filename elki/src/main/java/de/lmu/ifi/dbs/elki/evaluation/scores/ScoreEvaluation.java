@@ -73,6 +73,15 @@ public interface ScoreEvaluation {
   double evaluate(DBIDs ids, OutlierResult outlier);
 
   /**
+   * Expected score for a random result.
+   * 
+   * @param pos Number of positive elements
+   * @param all Total number of elements
+   * @return Expected score
+   */
+  double expected(int pos, int all);
+
+  /**
    * Iterator for comparing scores.
    * 
    * @author Erich Schubert
