@@ -154,7 +154,8 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       lu = new LUDecomposition(covariance); // Should no longer be zero now.
       det = lu.det();
       if(!(det > 0.)) {
-        assert (det > 0) : "Singularity cheat did not resolve zero determinant.";
+        LOG.warning("Singularity cheat did not resolve zero determinant.");
+        // assert (det > 0) : "Singularity cheat did not resolve zero determinant.";
         det = 1.;
       }
     }
