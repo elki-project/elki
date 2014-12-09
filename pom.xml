@@ -83,7 +83,7 @@
 
 	<profiles>
 		<profile>
-			<id>release</id>
+			<id>javadoc</id>
 			<build>
 				<plugins>
 					<!-- copy additional javadoc resources -->
@@ -183,8 +183,16 @@
 							</groups>
 							<header><![CDATA[<img src="{@docRoot}/figures/elki-logo-200.png" width="200">]]></header>
 							<footer><![CDATA[ELKI Version ${project.version}]]></footer>
+							<bottom><![CDATA[Copyright © 2014 <a href="http://elki.dbs.ifi.lmu.de/">ELKI Development Team</a>, <a href="http://www.dbs.ifi.lmu.de/">Lehr- und Forschungseinheit für Datenbanksysteme</a>, <a href="http://www.lmu.de/">Ludwig-Maximilians-Universität München</a>. <a href="http://elki.dbs.ifi.lmu.de/wiki/License">License information.</a>]]></bottom>
 						</configuration>
 					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
 					<!-- attach sources -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -280,8 +288,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
-	
+
 	<issueManagement>
 		<system>trac</system>
 		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
