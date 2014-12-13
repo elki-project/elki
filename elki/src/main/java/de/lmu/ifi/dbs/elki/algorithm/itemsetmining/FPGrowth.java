@@ -247,18 +247,11 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
 
     public FPNode newNode(FPNode parent, int label) {
       FPNode node = new FPNode(parent, label);
-      // Update header table:
-      FPNode prev = header[label];
-      if(prev == null) {
-        header[label] = node;
-      }
-      else {
-        while(prev.sibling != null) {
-          prev = prev.sibling;
-        }
-        prev.sibling = node;
-      }
-      ++nodes;
+      // Prepend to linked list - there is no benefit in keeping a particular
+      // order, as far as I can tell.
+      node.sibling = header[label];
+      header[label] = node;
+      ++nodes; // Statistics tracking only
       return node;
     }
 
