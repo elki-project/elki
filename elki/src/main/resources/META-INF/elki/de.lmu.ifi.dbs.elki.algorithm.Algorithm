@@ -50,6 +50,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.APRIORI
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.FPGrowth
 de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.ABOD
 de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.FastABOD
 de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.LBABOD
