@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.FPGrowth.FPNode.Translator;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.SparseFeatureVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -39,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
@@ -108,52 +108,36 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     this.minsupp = minsupp;
   }
 
+  /**
+   * Run the FP-Growth algorithm
+   * 
+   * @param db Database to process
+   * @param relation Bit vector relation
+   * @return Frequent patterns found
+   */
   public AprioriResult run(Database db, final Relation<BitVector> relation) {
+    // TODO: implement with resizable array, to not need dim.
     final int dim = RelationUtil.dimensionality(relation);
     final VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
     // Compute absolute minsupport
     final int minsupp = (int) Math.ceil(this.minsupp < 1 ? this.minsupp * relation.size() : this.minsupp);
 
     LOG.verbose("Finding item frequencies for ordering.");
-    // TODO: implement with resizable array, to not need dim.
-    final int[] counts = new int[dim];
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      SparseFeatureVector<?> bv = relation.get(iditer);
-      for(int it = bv.iter(); bv.iterValid(it); it = bv.iterAdvance(it)) {
-        counts[bv.iterDim(it)]++;
-      }
-    }
+    final int[] counts = countItemSupport(relation, dim);
     // Forward and backward indexes
     int[] iidx = new int[dim];
     final int[] idx = buildIndex(counts, iidx, minsupp);
     final int items = idx.length;
 
     LOG.verbose("Building FP-Tree.");
-    // FIXME: no header table yet!
-    FPTree tree = new FPTree(items);
-    {
-      int[] buf = new int[dim];
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        // Convert item to index representation:
-        int l = 0;
-        SparseFeatureVector<?> bv = relation.get(iditer);
-        for(int it = bv.iter(); bv.iterValid(it); it = bv.iterAdvance(it)) {
-          int i = iidx[bv.iterDim(it)];
-          if(i < 0) {
-            continue; // Skip non-frequent items
-          }
-          buf[l++] = i;
-        }
-        Arrays.sort(buf, 0, l); // Sort ascending
-        tree.insert(buf, 0, l, 1);
-      }
-    }
+    FPTree tree = buildFPTree(relation, iidx, items);
     if(LOG.isStatistics()) {
       tree.logStatistics();
     }
 
     if(LOG.isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder();
+      buf.append("FP-tree:\n");
       tree.appendTo(buf, new FPNode.Translator() {
         @Override
         public void appendTo(StringBuilder buf, int i) {
@@ -173,20 +157,72 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         // Always translate the indexes back to the original values via 'idx'!
         if(plen - start == 1) {
           solution.add(new OneItemset(idx[data[start]], support));
+          return;
         }
-        else {
-          int[] indices = new int[plen - start];
-          for(int i = start, j = 0; i < plen; i++) {
-            indices[j++] = idx[data[i]]; // Translate to original items
-          }
-          Arrays.sort(indices);
-          solution.add(new SparseItemset(indices, support));
+        // Copy from buffer to a permanent storage
+        int[] indices = new int[plen - start];
+        for(int i = start, j = 0; i < plen; i++) {
+          indices[j++] = idx[data[i]]; // Translate to original items
         }
+        Arrays.sort(indices);
+        solution.add(new SparseItemset(indices, support));
       }
     });
     Collections.sort(solution);
 
     return new AprioriResult("FP-Growth", "fp-growth", solution, meta);
+  }
+
+  /**
+   * Count the support of each 1-item.
+   * 
+   * @param relation Data
+   * @param dim Maximum dimensionality
+   * @return Item counts
+   */
+  private int[] countItemSupport(final Relation<BitVector> relation, final int dim) {
+    final int[] counts = new int[dim];
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding frequent 1-items.", relation.size(), LOG) : null;
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      SparseFeatureVector<?> bv = relation.get(iditer);
+      for(int it = bv.iter(); bv.iterValid(it); it = bv.iterAdvance(it)) {
+        counts[bv.iterDim(it)]++;
+      }
+      LOG.incrementProcessed(prog);
+    }
+    LOG.ensureCompleted(prog);
+    return counts;
+  }
+
+  /**
+   * Build the actual FP-tree structure.
+   * 
+   * @param relation Data
+   * @param iidx Inverse index (dimension to item rank)
+   * @param items Number of items
+   * @return FP-tree
+   */
+  private FPTree buildFPTree(final Relation<BitVector> relation, int[] iidx, final int items) {
+    FPTree tree = new FPTree(items);
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building FP-tree", relation.size(), LOG) : null;
+    int[] buf = new int[items];
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      // Convert item to index representation:
+      int l = 0;
+      SparseFeatureVector<?> bv = relation.get(iditer);
+      for(int it = bv.iter(); bv.iterValid(it); it = bv.iterAdvance(it)) {
+        int i = iidx[bv.iterDim(it)];
+        if(i < 0) {
+          continue; // Skip non-frequent items
+        }
+        buf[l++] = i;
+      }
+      Arrays.sort(buf, 0, l); // Sort ascending
+      tree.insert(buf, 0, l, 1);
+      LOG.incrementProcessed(prog);
+    }
+    LOG.ensureCompleted(prog);
+    return tree;
   }
 
   /**
@@ -225,26 +261,53 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     return idx;
   }
 
-  public static class FPTree {
-    FPNode root = new FPNode(null, -1);
-
+  /**
+   * FP-Tree data structure
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.composedOf FPNode
+   */
+  public static class FPTree extends FPNode {
+    /**
+     * Header table
+     */
     FPNode[] header;
 
+    /**
+     * Number of nodes in the tree (statistics only).
+     */
     int nodes = 1;
 
+    /**
+     * Constructor.
+     *
+     * @param items Number of items in header table
+     */
     public FPTree(int items) {
-      super();
+      super(null, -1);
       header = new FPNode[items];
     }
 
+    /**
+     * Insert an itemset into the tree.
+     * 
+     * @param buf Buffer
+     * @param i Start position in buffer
+     * @param l End position in buffer
+     * @param weight Weight
+     */
     public void insert(int[] buf, int i, int l, int weight) {
-      root.insert(this, buf, i, l, weight);
+      insert(this, buf, i, l, weight);
     }
 
-    public void appendTo(StringBuilder buf, Translator translator) {
-      root.appendTo(buf, translator);
-    }
-
+    /**
+     * Create a new node of the FP-tree, linking it into the header table.
+     * 
+     * @param parent Parent node
+     * @param label Node label
+     * @return New node
+     */
     public FPNode newNode(FPNode parent, int label) {
       FPNode node = new FPNode(parent, label);
       // Prepend to linked list - there is no benefit in keeping a particular
@@ -293,6 +356,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
       if(support < minsupp) {
         return;
       }
+      // FIXME: check for a single-path tree
       // TODO: other pruning techniques we should have employed here?
       postfix[plen++] = item;
       col.collect(support, postfix, 0, plen);
@@ -303,18 +367,42 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
       }
     }
 
+    /**
+     * Interface for collecting frequent itemsets found.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
     public static interface Collector {
-      public void collect(int support, int[] buf, int start, int plen);
+      /**
+       * Collect a single frequent itemset
+       * 
+       * @param support Support of the itemset
+       * @param buf Buffer
+       * @param start First valid buffer position
+       * @param end End of valid buffer
+       */
+      public void collect(int support, int[] buf, int start, int end);
     }
 
+    /**
+     * Output some statistics to logging.
+     */
     public void logStatistics() {
       LOG.statistics(new LongStatistic(STAT + "items", header.length));
       LOG.statistics(new LongStatistic(STAT + "nodes", nodes));
-      LOG.statistics(new LongStatistic(STAT + "transactions", root.count));
+      LOG.statistics(new LongStatistic(STAT + "transactions", count));
     }
   }
 
-  // FIXME: keep keys sorted? Even use a hashmap?
+  /**
+   * A single node of the FP tree.
+   * 
+   * @author Erich Schubert
+   */
+  // FIXME: keep children sorted, and use binary search for faster construction?
+  // Or even use a hashset?
   public static class FPNode {
     /**
      * Parent node and next in sequence.
@@ -434,6 +522,8 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * Translator class for tree printing.
      * 
      * @author Erich Schubert
+     * 
+     * @apiviz.exclude
      */
     public static interface Translator {
       /**
