@@ -1,6 +1,5 @@
 package experimentalcode.students.koosa;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /*

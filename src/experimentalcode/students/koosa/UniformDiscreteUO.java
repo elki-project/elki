@@ -44,7 +44,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   public UniformDiscreteUO (final List<DoubleVector> samplePoints, final RandomFactory randomFactory) {
     this.samplePoints = samplePoints;
     this.dimensions = samplePoints.get(0).getDimensionality();
-    this.randomFactory = randomFactory;
+    this.rand = randomFactory.getRandom();
   }
   
   @Override
@@ -59,7 +59,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
     // precisely 1:samplePoints.size(), it should be fair enough
     // to simply draw a sample by returning the point at 
     // Index := random.mod(samplePoints.size())
-    return samplePoints.get(randomFactory.getRandom().nextInt() % samplePoints.size());
+    return samplePoints.get(rand.nextInt() % samplePoints.size());
   }
   
   public void addSamplePoint(final DoubleVector samplePoint) {

@@ -2,7 +2,6 @@ package experimentalcode.students.koosa;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 /*
  This file is part of ELKI:

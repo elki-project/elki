@@ -47,7 +47,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
     this.bounds = bounds;
     this.dimensions = bounds.getDimensionality();
     this.probabilityDensityFunction = probabilityDensityFunction;
-    this.randomFactory = randomFactory;
+    this.rand = randomFactory.getRandom();
   }
   
   // Constructor
@@ -60,12 +60,12 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
     this.bounds = new HyperBoundingBox(min, max);
     this.dimensions = min.length;
     this.probabilityDensityFunction = probabilityDensityFunction;
-    this.randomFactory = randomFactory;
+    this.rand = randomFactory.getRandom();
   }
   
   @Override
   public DoubleVector drawSample() {
-    return probabilityDensityFunction.drawValue(bounds, randomFactory.getRandom());
+    return probabilityDensityFunction.drawValue(bounds, rand);
   }
 
   @Override

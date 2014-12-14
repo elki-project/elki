@@ -31,49 +31,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
-public class GaussianDistributionFunction implements ProbabilityDensityFunction {
+public abstract class AbstractGaussianDistributionFunction implements ProbabilityDensityFunction {
 
-  private List<DoubleVector> means;
-  private List<Matrix> variances;
-  private DoubleVector weights;
-  private int weightMax = 10000; // reset by constructor
-  
-  // Constructor for the cases:
-  //  -> Simple GaussianDistribution
-  //  -> Multivariate GaussianDistribution
-  //  -> Mixture of GaussianDistribution with uniformly distributed weights
-  public GaussianDistributionFunction(final List<DoubleVector> means, final List<Matrix> variances) {
-    this(means, variances, null);
-  }
-  
-  // Constructor for the cases:
-  //  -> GaussianDistribution with probability of drawing  no Point at all
-  //  -> Mixture of GaussianDistribution with customized weights 
-  public GaussianDistributionFunction(final List<DoubleVector> means, final List<Matrix> variances, final DoubleVector weights) {
-    if(means.size() != variances.size() || (weights != null && variances.size() != weights.getDimensionality())) {
-      throw new IllegalArgumentException("[W: ]\tSize of 'means' and 'variances' has to be the same, also Dimensionality of weights.");
-    }
-    if(weights == null) {
-       if(means.size() == 1) {
-        final double[] values = {1.0};
-        this.weights = new DoubleVector(values);
-      } else {
-        final int ref = means.size();
-        final double[] values = new double[means.size()];
-        for(int i = 0; i < means.size(); i++) {
-          values[i] = 1.0/ref;
-        }
-      }
-    } else {
-      this.weights = weights;
-      weightMax = 0;
-      for(int i = 0; i < weights.getDimensionality(); i++) {
-        weightMax += (int) Math.ceil(weights.doubleValue(i) * 10000);
-      }
-    }
-    this.means = means;
-    this.variances = variances;
-  }
+  protected List<DoubleVector> means;
+  protected List<Matrix> variances;
+  protected DoubleVector weights;
+  protected int weightMax = 10000; // reset by constructor
   
   @Override
   public DoubleVector drawValue(SpatialComparable bounds, Random rand) {
@@ -95,15 +58,10 @@ public class GaussianDistributionFunction implements ProbabilityDensityFunction 
     return new DoubleVector(((Vector) means).plus((new CholeskyDecomposition(variances.get(index))).getL().times(new Vector(values))).getArrayCopy());
   }
   
-  public void setVariances(final List<Matrix> variances) {
-    this.variances = variances;
-  }
-  
   public Matrix getVarianceRef(final int position) {
     return this.variances.get(position);
   }
   
-  // I find this to be the more sane of the two given options
   public Matrix getVarianceCopy(final int position) {
     return this.variances.get(position).copy();
   }
@@ -116,8 +74,16 @@ public class GaussianDistributionFunction implements ProbabilityDensityFunction 
     return this.means.get(position);
   }
   
+  public void setMean(final int position, final DoubleVector mean) {
+    this.means.set(position, mean);
+  }
+  
   public void setWeights(final DoubleVector weights) {
     this.weights = weights;
+  }
+  
+  public DoubleVector getWeights() {
+    return this.weights;
   }
   
   public double getWeight(final int position) {

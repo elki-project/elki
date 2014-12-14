@@ -67,7 +67,7 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     // up to 2 decimal places for the probability.
     this.totalProbability = (int) Math.ceil(check * 10000);
     this.dimensions = samplePoints.get(0).getFirst().getDimensionality();
-    this.randomFactory = randomFactory;
+    this.rand = randomFactory.getRandom();
   }
   
   // note that the user has to be certain, he looks upon the
@@ -83,7 +83,7 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     // we have an exact range of 10000 for
     // our possible draws by starting at
     // sum == 0.
-    final int index = randomFactory.getRandom().nextInt(10000);
+    final int index = rand.nextInt(10000);
     int sum = 0;
     int i = 0;
     
