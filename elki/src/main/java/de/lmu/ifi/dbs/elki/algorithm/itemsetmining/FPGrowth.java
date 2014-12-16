@@ -331,10 +331,10 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * @param col Itemset collector
      */
     public void extract(int minsupp, Collector col) {
-      int[] buf = new int[header.length], buf2 = new int[header.length];
+      int[] buf = new int[header.length], buf2 = new int[header.length], buf3 = new int[header.length];
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Extracting itemsets", header.length, LOG) : null;
       for(int j = header.length - 1; j >= 0; --j) {
-        extract(minsupp, j, buf, 0, buf2, col);
+        extract(minsupp, j, buf, 0, buf2, buf3, col);
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
@@ -348,9 +348,10 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * @param postfix Items to append
      * @param plen Postfix length
      * @param buf2 Scratch buffer
+     * @param buf3 Scratch buffer
      * @param col Itemset collector
      */
-    private void extract(int minsupp, int item, int[] postfix, int plen, int[] buf2, Collector col) {
+    private void extract(int minsupp, int item, int[] postfix, int plen, int[] buf2, int[] buf3, Collector col) {
       // Skip items that have disappeared from the tree
       if(header[item] == null) {
         return;
@@ -371,13 +372,22 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
       if(support < minsupp) {
         return;
       }
+      // Check which parent items to keep in the projection.
+      Arrays.fill(buf3, 0);
+      for(FPNode cur = header[item]; cur != null; cur = cur.sibling) {
+        for(FPNode parent = cur.parent; parent.key >= 0; parent = parent.parent) {
+          buf3[parent.key] += cur.count;
+        }
+      }
       // Build projected tree:
       final int last = item - 1;
       FPTree proj = new FPTree(item);
       for(FPNode cur = header[item]; cur != null; cur = cur.sibling) {
         int j = buf2.length;
         for(FPNode parent = cur.parent; parent.key >= 0; parent = parent.parent) {
-          buf2[--j] = parent.key;
+          if(buf3[parent.key] >= minsupp) {
+            buf2[--j] = parent.key;
+          }
         }
         proj.insert(buf2, j, buf2.length, cur.count);
       }
@@ -385,9 +395,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
       postfix[plen++] = item;
       col.collect(support, postfix, 0, plen);
       for(int j = last; j >= 0; j--) {
-        // TODO: use a total count in the header table to skip now-non-frequent
-        // items at this point?
-        proj.extract(minsupp, j, postfix, plen, buf2, col);
+        proj.extract(minsupp, j, postfix, plen, buf2, buf3, col);
       }
     }
 
