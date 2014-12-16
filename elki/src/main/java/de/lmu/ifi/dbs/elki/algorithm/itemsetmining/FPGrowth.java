@@ -167,7 +167,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         // Always translate the indexes back to the original values via 'idx'!
         if(plen - start == 1) {
           solution.add(new OneItemset(idx[data[start]], support));
-          itemp.incrementProcessed(LOG);
+          LOG.incrementProcessed(itemp);
           return;
         }
         // Copy from buffer to a permanent storage
@@ -177,7 +177,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         }
         Arrays.sort(indices);
         solution.add(new SparseItemset(indices, support));
-        itemp.incrementProcessed(LOG);
+        LOG.incrementProcessed(itemp);
       }
     });
     Collections.sort(solution);
