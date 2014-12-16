@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
@@ -149,6 +150,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     }
 
     LOG.verbose("Extracting frequent patterns.");
+    final IndefiniteProgress itemp = LOG.isVerbose() ? new IndefiniteProgress("Frequent itemsets", LOG) : null;
     final List<Itemset> solution = new ArrayList<>();
     // Start extraction with the least frequent items
     tree.extract(minsupp, new FPTree.Collector() {
@@ -157,6 +159,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         // Always translate the indexes back to the original values via 'idx'!
         if(plen - start == 1) {
           solution.add(new OneItemset(idx[data[start]], support));
+          itemp.incrementProcessed(LOG);
           return;
         }
         // Copy from buffer to a permanent storage
@@ -166,9 +169,12 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         }
         Arrays.sort(indices);
         solution.add(new SparseItemset(indices, support));
+        itemp.incrementProcessed(LOG);
       }
     });
     Collections.sort(solution);
+    LOG.setCompleted(itemp);
+    LOG.statistics(new LongStatistic(STAT + "frequent-itemsets", solution.size()));
 
     return new AprioriResult("FP-Growth", "fp-growth", solution, meta);
   }
@@ -326,9 +332,12 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      */
     public void extract(int minsupp, Collector col) {
       int[] buf = new int[header.length], buf2 = new int[header.length];
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Extracting itemsets", header.length, LOG) : null;
       for(int j = header.length - 1; j >= 0; --j) {
         extract(minsupp, j, buf, 0, buf2, col);
+        LOG.incrementProcessed(prog);
       }
+      LOG.ensureCompleted(prog);
     }
 
     /**
@@ -342,21 +351,36 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * @param col Itemset collector
      */
     private void extract(int minsupp, int item, int[] postfix, int plen, int[] buf2, Collector col) {
-      final int last = item - 1;
-      FPTree proj = new FPTree(item);
+      // Skip items that have disappeared from the tree
+      if(header[item] == null) {
+        return;
+      }
+      // No siblings: single path only.
+      if(header[item].sibling == null) {
+        if(header[item].count < minsupp) {
+          return;
+        }
+        extractLinear(header[item].count, minsupp, item, postfix, plen, buf2, col);
+        return;
+      }
+      // Count total support.
       int support = 0;
       for(FPNode cur = header[item]; cur != null; cur = cur.sibling) {
-        int j = buf2.length;
         support += cur.count;
+      }
+      if(support < minsupp) {
+        return;
+      }
+      // Build projected tree:
+      final int last = item - 1;
+      FPTree proj = new FPTree(item);
+      for(FPNode cur = header[item]; cur != null; cur = cur.sibling) {
+        int j = buf2.length;
         for(FPNode parent = cur.parent; parent.key >= 0; parent = parent.parent) {
           buf2[--j] = parent.key;
         }
         proj.insert(buf2, j, buf2.length, cur.count);
       }
-      if(support < minsupp) {
-        return;
-      }
-      // FIXME: check for a single-path tree
       // TODO: other pruning techniques we should have employed here?
       postfix[plen++] = item;
       col.collect(support, postfix, 0, plen);
@@ -364,6 +388,38 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         // TODO: use a total count in the header table to skip now-non-frequent
         // items at this point?
         proj.extract(minsupp, j, postfix, plen, buf2, col);
+      }
+    }
+
+    /**
+     * Extract itemsets from a linear tree.
+     * 
+     * @param supp Current support
+     * @param minsupp Minimum support
+     * @param item Current item
+     * @param postfix Postfix for extracted itemsets
+     * @param plen Postfix length
+     * @param buf2 Scratch buffer
+     * @param col Output collector
+     */
+    private void extractLinear(int supp, int minsupp, int item, int[] postfix, int plen, int[] buf2, Collector col) {
+      // Without current item:
+      if(item > 0) {
+        extractLinear(supp, minsupp, item - 1, postfix, plen, buf2, col);
+      }
+      // With current item:
+      if(header[item] == null) {
+        return;
+      }
+      int csupp = header[item].count;
+      if(csupp < minsupp) {
+        return;
+      }
+      postfix[plen++] = item;
+      int support = csupp < supp ? csupp : supp;
+      col.collect(support, postfix, 0, plen);
+      if(item > 0) {
+        extractLinear(support, minsupp, item - 1, postfix, plen, buf2, col);
       }
     }
 
