@@ -31,7 +31,7 @@ package de.lmu.ifi.dbs.elki.data;
  */
 public interface SparseFeatureVector<D> extends FeatureVector<D> {
   /**
-   * Iterator over non-zero features only, <em>ascendingly</em>.
+   * Iterator over non-zero features only, <em>ascending</em>.
    * 
    * Note: depending on the underlying implementation, this may or may not be
    * the dimension. Use {@link #iterDim} to get the actual dimension. In fact,
