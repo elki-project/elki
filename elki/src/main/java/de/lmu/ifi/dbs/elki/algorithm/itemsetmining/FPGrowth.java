@@ -143,6 +143,8 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     if(LOG.isStatistics()) {
       tree.logStatistics();
     }
+    // Reduce memory usage:
+    tree.reduceMemory();
 
     if(LOG.isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder();
@@ -418,9 +420,11 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
           }
         }
         if(buf2.length - j >= mminlength) {
-          proj.insert(buf2, j, buf2.length, cur.count);
+          proj.insert(proj, buf2, j, buf2.length, cur.count);
         }
       }
+      // Release memory:
+      proj.reduceMemory();
       // TODO: other pruning techniques we should have employed here?
       postfix[plen++] = item;
       if(plen >= minlength) {
@@ -617,6 +621,21 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         }
         children[i].appendTo(buf, t, depth + 1);
       }
+    }
+
+    /**
+     * Release the memory occupied for the parent-to-child navigation, which is
+     * no longer needed after building the tree (only child-to-parent is needed
+     * in extracting itemsets).
+     */
+    public void reduceMemory() {
+      if(children == null) {
+        return;
+      }
+      for(int i = 0; i < numchildren; ++i) {
+        children[i].reduceMemory();
+      }
+      children = null;
     }
 
     /**
