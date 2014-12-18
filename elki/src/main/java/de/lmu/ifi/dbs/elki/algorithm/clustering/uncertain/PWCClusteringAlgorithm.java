@@ -1,48 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
-import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
-import de.lmu.ifi.dbs.elki.database.AdaptedHashmapDatabase;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.SimpleDBIDFactory;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.datasource.ClusteringAdapterDatabaseConnection;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
-import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -65,6 +22,47 @@ import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
+import de.lmu.ifi.dbs.elki.database.AdaptedHashmapDatabase;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.SimpleDBIDFactory;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.datasource.ClusteringAdapterDatabaseConnection;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
+
 /**
  *
  * This classes purpose is to wrap and use a "normal" clustering algorithm in a
@@ -181,16 +179,6 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
   private final long depth;
 
   /**
-   * Field to store arguments for invocation.
-   */
-  private Object[] arguments;
-
-  /**
-   * Field to store the run method for invocation.
-   */
-  private Method runAlgorithm;
-
-  /**
    *
    * Constructor, quite trivial.
    *
@@ -211,82 +199,6 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
   @Override
   protected Logging getLogger() {
     return PWCClusteringAlgorithm.LOG;
-  }
-
-  /**
-   *
-   * This Method tries if there is a run method capable for some of the asked
-   * for signatures and returns it if some exists, throws an Exception
-   * otherwise.
-   *
-   * @param a
-   * @param signatures
-   * @param relations
-   * @return
-   * @throws NoSuchMethodException
-   * @throws InvocationTargetException
-   * @throws IllegalAccessException
-   */
-  private Method getRunMethod(final Algorithm a, final Class<?>[][] signatures, final Object[]... relations) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    Method m = null;
-    for(int i = 0; i < signatures.length; i++) {
-      try {
-        m = a.getClass().getMethod("run", signatures[i]);
-        this.arguments = relations[i];
-      }
-      catch(final NoSuchMethodException e) {
-        if(i == signatures.length - 1) {
-          throw e;
-        }
-        continue;
-      }
-      return m;
-    }
-    // to satisfy signature constraints
-    return null;
-  }
-
-  /**
-   *
-   * This Method is used to prepare and hand over the signatures and arguments
-   * for an unknown run method.
-   */
-  @SuppressWarnings("rawtypes")
-  private Method prepareAlgorithm(final Database database, final Relation relation, final Algorithm algorithm) {
-    final Class<?>[] signature1 = new Class<?>[2];
-    final Object[] relations1 = new Object[2];
-    final Class<?>[] signature2 = new Class<?>[1];
-    final Object[] relations2 = new Object[1];
-    for(int j = 0; j < 2; j++) {
-      if(j == 0) {
-        signature1[j] = Database.class;
-        relations1[j] = database;
-        continue;
-      }
-      signature1[j] = signature2[j - 1] = Relation.class;
-      relations1[j] = relations2[j - 1] = relation;
-    }
-    Method runAlgorithm;
-    try {
-      runAlgorithm = this.getRunMethod(algorithm, new Class<?>[][] { signature1, signature2 }, relations1, relations2);
-      return runAlgorithm;
-    }
-    catch(final NoSuchMethodException e) {
-      throw new APIViolationException("No appropriate 'run' method found.");
-    }
-    catch(IllegalArgumentException | IllegalAccessException | SecurityException e) {
-      throw new APIViolationException("Invoking the real 'run' method failed.", e);
-    }
-    catch(final InvocationTargetException e) {
-      final Throwable cause = e.getTargetException();
-      if(cause instanceof RuntimeException) {
-        throw (RuntimeException) cause;
-      }
-      if(cause instanceof Error) {
-        throw (Error) cause;
-      }
-      throw new APIViolationException("Invoking the real 'run' method failed: " + cause.toString(), cause);
-    }
   }
 
   /**
@@ -343,20 +255,8 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     }
 
     for(final Relation<NumberVector> r : rlist) {
-      if(this.arguments == null) {
-        this.runAlgorithm = this.prepareAlgorithm(database, r, this.algorithm);
-      }
-      else {
-        this.arguments[this.arguments.length - 1] = r;
-      }
-
-      Clustering<Model> clusterResult;
-      try {
-        clusterResult = (Clustering<Model>) this.runAlgorithm.invoke(this.algorithm, this.arguments);
-      }
-      catch(final Exception e) {
-        throw new APIViolationException("Invoking the run method failed at sample clustering.", e);
-      }
+      ProxyDatabase d = new ProxyDatabase(r.getDBIDs(), r);
+      Clustering<Model> clusterResult = (Clustering<Model>) this.algorithm.run(d);
 
       database.getHierarchy().add(database, r);
       database.getHierarchy().add(r, clusterResult);
@@ -397,21 +297,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
 
     final Relation<Clustering<Model>> simRelation = new MaterializedRelation<Clustering<Model>>(database, t, sids, "Clusterings", datastore);
 
-    this.runAlgorithm = null;
-    this.arguments = null;
-
-    this.runAlgorithm = this.prepareAlgorithm(database, simRelation, this.metaAlgorithm);
-
-    Clustering<Model> metaClustering;
-
-    try {
-      metaClustering = (Clustering<Model>) this.runAlgorithm.invoke(this.metaAlgorithm, this.arguments);
-    }
-    catch(final Exception e) {
-      throw new APIViolationException("Invoking the run method failed during meta clustering.", e);
-    }
-
-    return metaClustering;
+    ProxyDatabase d = new ProxyDatabase(simRelation.getDBIDs(), simRelation);
+    return (Clustering<Model>) this.metaAlgorithm.run(d);
   }
-
 }

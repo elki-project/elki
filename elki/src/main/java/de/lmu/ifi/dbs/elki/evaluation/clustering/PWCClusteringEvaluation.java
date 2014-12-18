@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -51,8 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  *
- * Class to wrap evaluation for
- * a clustering of clusterings.
+ * Class to wrap evaluation for a clustering of clusterings.
  *
  * @author Alexander Koos
  *
@@ -66,9 +66,9 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
 
     private double alpha;
 
-    public static final OptionID SIMILARITY_FUNCTION_ID = new OptionID("mce.similarityFunction","Used for detection of the representatives. Recommended to use the same as for metaclustering.");
+    public static final OptionID SIMILARITY_FUNCTION_ID = new OptionID("mce.similarityFunction", "Used for detection of the representatives. Recommended to use the same as for metaclustering.");
 
-    public static final OptionID ALPHA_ID = new OptionID("mce.alpha","Used to compute the confidence probability.");
+    public static final OptionID ALPHA_ID = new OptionID("mce.alpha", "Used to compute the confidence probability.");
 
     @Override
     protected PWCClusteringEvaluation<PWCPrimitiveSimilarityFunction> makeInstance() {
@@ -99,7 +99,7 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
 
       final double eprob = this.probabilityEstimator(c, tau, crs, f);
       final double z = this.getAlphaQuantil(alpha);
-      final double cprob = Math.abs(eprob - z * Math.sqrt(( eprob * (1 - eprob) ) / crs.size()));
+      final double cprob = Math.abs(eprob - z * Math.sqrt((eprob * (1 - eprob)) / crs.size()));
 
       final MeasurementGroup g = this.newGroup("PWC Measures");
       g.addMeasure("Tau-All-Reference-Measure", tauAll, 0, 1, true);
@@ -114,18 +114,24 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
     private double probabilityEstimator(final Clustering<Model> c, final double tau, final List<Clustering<Model>> crs, final PWCPrimitiveSimilarityFunction f) {
       double x = 0;
       for(final Clustering<Model> c1 : crs) {
-        x += ( 1 - f.getMetricScale( (new ClusterContingencyTable(true, true) {{ this.process(c1, c); };}).getPaircount() ) ) <= tau ? 1 : 0;
+        x += (1 - f.getMetricScale((new ClusterContingencyTable(true, true) {
+          {
+            this.process(c1, c);
+          };
+        }).getPaircount())) <= tau ? 1 : 0;
       }
       return x / crs.size();
     }
 
   }
 
-  public final static HashMap<String, Double> alphaMap = new HashMap<String, Double>(){{
-    this.put("0.05", 1.65);
-    this.put("0.01", 2.33);
-    this.put("0.005", 2.58);
-  }};;
+  public final static HashMap<String, Double> alphaMap = new HashMap<String, Double>() {
+    {
+      this.put("0.05", 1.65);
+      this.put("0.01", 2.33);
+      this.put("0.005", 2.58);
+    }
+  };;
 
   private final F simFunc;
 
@@ -145,14 +151,22 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
 
   @SuppressWarnings("unchecked")
   private void evaluateMetaClustering(final Result newResult) {
-    final Database db  = ResultUtil.findDatabase(newResult);
+    final Database db = ResultUtil.findDatabase(newResult);
     final List<Clustering<Model>> clusterings0 = ResultUtil.filterResults(newResult, Clustering.class);
     final List<Clustering<Model>> clusterings1 = new ArrayList<Clustering<Model>>();
     final List<Clustering<Model>> refClusterings = new ArrayList<Clustering<Model>>();
-    final List<Pair<Clustering<Model>, Pair<Double,Double>>> bestClusterings = new ArrayList<Pair<Clustering<Model>,Pair<Double,Double>>>();
+    final List<Pair<Clustering<Model>, Pair<Double, Double>>> bestClusterings = new ArrayList<Pair<Clustering<Model>, Pair<Double, Double>>>();
     final List<Clustering<Model>> clusteringsAll = new ArrayList<Clustering<Model>>();
-    for(final Clustering<Model> c : clusterings0) {
-      final SingleObjectBundle bundle = db.getBundle(c.getAllClusters().get(0).getIDs().size() > 0 ? c.getAllClusters().get(0).getIDs().iter() : c.getAllClusters().get(1).getIDs().iter());
+    clusterings: for(final Clustering<Model> c : clusterings0) {
+      Iterator<Cluster<Model>> clusters = c.getAllClusters().iterator();
+      Cluster<Model> cluster = null;
+      while(cluster == null || cluster.size() == 0) {
+        if(!clusters.hasNext()) {
+          continue clusterings;
+        }
+        cluster = clusters.next();
+      }
+      final SingleObjectBundle bundle = db.getBundle(cluster.getIDs().iter());
       for(int i = 0; i < bundle.metaLength(); i++) {
         if(bundle.data(i) != null && bundle.data(i).getClass().equals(Clustering.class)) {
           clusterings1.add(c);
@@ -200,7 +214,7 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
               i++;
               continue;
             }
-            //TODO: this should be optimized in some way
+            // TODO: this should be optimized in some way
             {
 
             }
@@ -222,8 +236,9 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
         }
         int bestIndex = -1;
         double maxValue = 0;
-        //        final Clustering<Model> bestCombinationClustering = new  Clustering<Model>("","");
-        //        final HashSetModifiableDBIDs noiseIDs = DBIDUtil.newHashSet();
+        // final Clustering<Model> bestCombinationClustering = new
+        // Clustering<Model>("","");
+        // final HashSetModifiableDBIDs noiseIDs = DBIDUtil.newHashSet();
         for(int i = 0; i < similaritySum.length; i++) {
           // In special cases similaritySum can become 0 and there
           // is only one Clustering, therefore I want to
@@ -245,11 +260,10 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
             tauAll = res;
           }
         }
-        bestClusterings.add(new Pair<Clustering<Model>, Pair<Double, Double>>(clusterings.get(bestIndex),
-            new Pair<Double,Double>(tauAll, tau[bestIndex])));
+        bestClusterings.add(new Pair<Clustering<Model>, Pair<Double, Double>>(clusterings.get(bestIndex), new Pair<Double, Double>(tauAll, tau[bestIndex])));
       }
     }
-    for(final Pair<Clustering<Model>, Pair<Double,Double>> c : bestClusterings) {
+    for(final Pair<Clustering<Model>, Pair<Double, Double>> c : bestClusterings) {
       final PWCScoreResult psr = new PWCScoreResult(this.alpha, refClusterings, c.getFirst(), c.getSecond().getFirst(), c.getSecond().getSecond(), this.simFunc);
       db.getHierarchy().add(c.getFirst(), psr);
     }
