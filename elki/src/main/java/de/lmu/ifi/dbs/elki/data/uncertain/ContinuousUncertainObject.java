@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.PWCClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;

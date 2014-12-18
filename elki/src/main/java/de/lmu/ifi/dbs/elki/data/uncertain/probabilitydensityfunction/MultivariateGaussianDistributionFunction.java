@@ -26,7 +26,7 @@ import java.util.List;
  */
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.PWCClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
