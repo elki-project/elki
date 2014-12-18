@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.SparseFeatureVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -43,16 +42,10 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * FP-Growth is an algorithm for mining the frequent itemsets by using a
@@ -87,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 title = "Mining frequent patterns without candidate generation", //
 booktitle = "Proceedings of the 2000 ACM SIGMOD international conference on Management of data ", //
 url = "http://dx.doi.org/10.1145/342009.335372")
-public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
+public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
   /**
    * Class logger.
    */
@@ -99,24 +92,14 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
   private static final String STAT = FPGrowth.class.getName() + ".";
 
   /**
-   * Minimum support.
-   */
-  private double minsupp;
-
-  /**
-   * Parameter for minimum length.
-   */
-  protected int minlength;
-
-  /**
    * Constructor.
    *
    * @param minsupp Minimum support (relative or absolute)
-   * @param minlength Minimum length of itemsets
+   * @param minlength Minimum length
+   * @param maxlength Maximum length
    */
-  public FPGrowth(double minsupp, int minlength) {
-    this.minsupp = minsupp;
-    this.minlength = minlength;
+  public FPGrowth(double minsupp, int minlength, int maxlength) {
+    super(minsupp, minlength, maxlength);
   }
 
   /**
@@ -126,12 +109,12 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
    * @param relation Bit vector relation
    * @return Frequent patterns found
    */
-  public AprioriResult run(Database db, final Relation<BitVector> relation) {
+  public FrequentItemsetsResult run(Database db, final Relation<BitVector> relation) {
     // TODO: implement with resizable array, to not need dim.
     final int dim = RelationUtil.dimensionality(relation);
     final VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
     // Compute absolute minsupport
-    final int minsupp = (int) Math.ceil(this.minsupp < 1 ? this.minsupp * relation.size() : this.minsupp);
+    final int minsupp = getMinimumSupport(relation.size());
 
     LOG.verbose("Finding item frequencies for ordering.");
     final int[] counts = countItemSupport(relation, dim);
@@ -146,7 +129,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     LOG.statistics(new LongStatistic(STAT + "minsupp-absolute", minsupp));
 
     LOG.verbose("Building FP-Tree.");
-    Duration ctime = LOG.newDuration(STAT + "fp-tree.construction").begin();
+    Duration ctime = LOG.newDuration(STAT + "fp-tree.construction.time").begin();
     FPTree tree = buildFPTree(relation, iidx, items);
     if(LOG.isStatistics()) {
       tree.logStatistics();
@@ -169,11 +152,11 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     }
 
     LOG.verbose("Extracting frequent patterns.");
-    Duration etime = LOG.newDuration(STAT + "fp-growth.extraction").begin();
+    Duration etime = LOG.newDuration(STAT + "fp-growth.extraction.time").begin();
     final IndefiniteProgress itemp = LOG.isVerbose() ? new IndefiniteProgress("Frequent itemsets", LOG) : null;
     final List<Itemset> solution = new ArrayList<>();
     // Start extraction with the least frequent items
-    tree.extract(minsupp, minlength, true, new FPTree.Collector() {
+    tree.extract(minsupp, minlength, maxlength, true, new FPTree.Collector() {
       @Override
       public void collect(int support, int[] data, int start, int plen) {
         // Always translate the indexes back to the original values via 'idx'!
@@ -197,7 +180,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     LOG.statistics(etime.end());
     LOG.statistics(new LongStatistic(STAT + "frequent-itemsets", solution.size()));
 
-    return new AprioriResult("FP-Growth", "fp-growth", solution, meta);
+    return new FrequentItemsetsResult("FP-Growth", "fp-growth", solution, meta);
   }
 
   /**
@@ -354,15 +337,16 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * 
      * @param minsupp Minimum support
      * @param minlength Minimum length
+     * @param maxlength Maximum length
      * @param destruct Remove nodes
      * @param col Itemset collector
      */
-    public void extract(int minsupp, int minlength, boolean destruct, Collector col) {
+    public void extract(int minsupp, int minlength, int maxlength, boolean destruct, Collector col) {
       int[] buf = new int[header.length], buf2 = new int[header.length], buf3 = new int[header.length];
       int stop = (minlength > 1) ? minlength - 1 : 0;
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Extracting itemsets", header.length - stop, LOG) : null;
       for(int j = header.length - 1; j >= stop; --j) {
-        extract(minsupp, minlength, j, buf, 0, buf2, buf3, destruct, col);
+        extract(minsupp, minlength, maxlength, j, buf, 0, buf2, buf3, destruct, col);
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
@@ -373,6 +357,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * 
      * @param minsupp Minimum support
      * @param minlength Minimum length
+     * @param maxlength Maximum length
      * @param item Current item
      * @param postfix Items to append
      * @param plen Postfix length
@@ -381,7 +366,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * @param destruct Remove nodes
      * @param col Itemset collector
      */
-    private void extract(int minsupp, int minlength, int item, int[] postfix, int plen, int[] buf2, int[] buf3, boolean destruct, Collector col) {
+    private void extract(int minsupp, int minlength, int maxlength, int item, int[] postfix, int plen, int[] buf2, int[] buf3, boolean destruct, Collector col) {
       // Skip items that have disappeared from the tree
       if(header[item] == null) {
         return;
@@ -391,7 +376,7 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         if(header[item].count < minsupp) {
           return;
         }
-        extractLinear(header[item].count, minsupp, minlength, item, postfix, plen, buf2, col);
+        extractLinear(header[item].count, minsupp, minlength, maxlength, item, postfix, plen, buf2, col);
         if(destruct) {
           Arrays.fill(header, null);
         }
@@ -443,11 +428,11 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
       proj.reduceMemory();
       // TODO: other pruning techniques we should have employed here?
       postfix[plen++] = item;
-      if(plen >= minlength) {
+      if(plen >= minlength && plen <= maxlength) {
         col.collect(support, postfix, 0, plen);
       }
       for(int j = last; j >= 0; j--) {
-        proj.extract(minsupp, minlength, j, postfix, plen, buf2, buf3, destruct, col);
+        proj.extract(minsupp, minlength, maxlength, j, postfix, plen, buf2, buf3, destruct, col);
       }
       if(destruct) {
         header[item] = null;
@@ -460,18 +445,19 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * @param supp Current support
      * @param minsupp Minimum support
      * @param minlength Minimum length
+     * @param maxlength Maximum length
      * @param item Current item
      * @param postfix Postfix for extracted itemsets
      * @param plen Postfix length
      * @param buf2 Scratch buffer
      * @param col Output collector
      */
-    private void extractLinear(int supp, int minsupp, int minlength, int item, int[] postfix, int plen, int[] buf2, Collector col) {
+    private void extractLinear(int supp, int minsupp, int minlength, int maxlength, int item, int[] postfix, int plen, int[] buf2, Collector col) {
       // For testing minimum length:
       final int mminlength = minlength - plen;
       // Without current item:
-      if(item > 0 && item >= mminlength) {
-        extractLinear(supp, minsupp, minlength, item - 1, postfix, plen, buf2, col);
+      if(item > 0 && item >= mminlength && plen < maxlength) {
+        extractLinear(supp, minsupp, minlength, maxlength, item - 1, postfix, plen, buf2, col);
       }
       // With current item:
       if(header[item] == null || item + 1 < mminlength) {
@@ -483,11 +469,11 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
       }
       postfix[plen++] = item;
       int support = csupp < supp ? csupp : supp;
-      if(plen >= minlength) {
+      if(plen >= minlength && plen <= maxlength) {
         col.collect(support, postfix, 0, plen);
       }
-      if(item > 0) {
-        extractLinear(support, minsupp, minlength, item - 1, postfix, plen, buf2, col);
+      if(item > 0 && plen < maxlength) {
+        extractLinear(support, minsupp, minlength, maxlength, item - 1, postfix, plen, buf2, col);
       }
     }
 
@@ -692,49 +678,10 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParameterizer {
-    /**
-     * Parameter to specify the minimum support, in absolute or relative terms.
-     */
-    public static final OptionID MINSUPP_ID = new OptionID("fpgrowth.minsupp", //
-    "Threshold for minimum support as minimally required number of transactions (if > 1) " //
-        + "or the minimum frequency (if <= 1).");
-
-    /**
-     * Parameter to specify the minimum itemset length.
-     */
-    public static final OptionID MINLENGTH_ID = new OptionID("fpgrowth.minlength", //
-    "Minimum length of frequent itemsets to report. This can help to reduce the output size to only the most interesting patterns.");
-
-    /**
-     * Parameter for minimum support.
-     */
-    protected double minsupp;
-
-    /**
-     * Parameter for minimum length.
-     */
-    protected int minlength;
-
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      DoubleParameter minsuppP = new DoubleParameter(MINSUPP_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(minsuppP)) {
-        minsupp = minsuppP.getValue();
-      }
-      IntParameter minlengthP = new IntParameter(MINLENGTH_ID) //
-      .setOptional(true) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(minlengthP)) {
-        minlength = minlengthP.getValue();
-      }
-    }
-
+  public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
     @Override
     protected FPGrowth makeInstance() {
-      return new FPGrowth(minsupp, minlength);
+      return new FPGrowth(minsupp, minlength, maxlength);
     }
   }
 }

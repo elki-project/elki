@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @author Erich Schubert
  */
-public class AprioriResult extends BasicResult implements TextWriteable {
+public class FrequentItemsetsResult extends BasicResult implements TextWriteable {
   /**
    * The supports of all frequent itemsets.
    */
@@ -55,7 +55,7 @@ public class AprioriResult extends BasicResult implements TextWriteable {
    * @param itemsets Frequent itemsets
    * @param meta Metadata
    */
-  public AprioriResult(String name, String shortname, List<Itemset> itemsets, VectorFieldTypeInformation<BitVector> meta) {
+  public FrequentItemsetsResult(String name, String shortname, List<Itemset> itemsets, VectorFieldTypeInformation<BitVector> meta) {
     super(name, shortname);
     this.itemsets = itemsets;
     this.meta = meta;

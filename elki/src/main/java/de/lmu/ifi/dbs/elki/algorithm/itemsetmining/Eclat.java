@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.SparseFeatureVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -43,14 +42,10 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Eclat is a depth-first discovery algorithm for mining frequent itemsets.
@@ -84,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 authors = "M.J. Zaki, S. Parthasarathy, M. Ogihara, and W. Li", //
 booktitle = "Proc. 3rd ACM SIGKDD '97 Int. Conf. on Knowledge Discovery and Data Mining", //
 url = "http://www.aaai.org/Library/KDD/1997/kdd97-060.php")
-public class Eclat extends AbstractAlgorithm<AprioriResult> {
+public class Eclat extends AbstractFrequentItemsetAlgorithm {
   /**
    * Class logger.
    */
@@ -96,18 +91,14 @@ public class Eclat extends AbstractAlgorithm<AprioriResult> {
   private static final String STAT = Eclat.class.getName() + ".";
 
   /**
-   * Minimum support.
-   */
-  private double minsupp;
-
-  /**
    * Constructor.
    *
    * @param minsupp Minimum support
+   * @param minlength Minimum length
+   * @param maxlength Maximum length
    */
-  public Eclat(double minsupp) {
-    super();
-    this.minsupp = minsupp;
+  public Eclat(double minsupp, int minlength, int maxlength) {
+    super(minsupp, minlength, maxlength);
   }
 
   /**
@@ -117,17 +108,20 @@ public class Eclat extends AbstractAlgorithm<AprioriResult> {
    * @param relation Bit vector relation
    * @return Frequent patterns found
    */
-  public AprioriResult run(Database db, final Relation<BitVector> relation) {
+  public FrequentItemsetsResult run(Database db, final Relation<BitVector> relation) {
     // TODO: implement with resizable arrays, to not need dim.
     final int dim = RelationUtil.dimensionality(relation);
     final VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
     // Compute absolute minsupport
-    final int minsupp = (int) Math.ceil(this.minsupp < 1 ? this.minsupp * relation.size() : this.minsupp);
+    final int minsupp = getMinimumSupport(relation.size());
 
     LOG.verbose("Build 1-dimensional transaction lists.");
+    Duration ctime = LOG.newDuration(STAT + "eclat.transposition.time").begin();
     DBIDs[] idx = buildIndex(relation, dim, minsupp);
+    LOG.statistics(ctime.end());
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building frequent itemsets", idx.length, LOG) : null;
+    Duration etime = LOG.newDuration(STAT + "eclat.extraction.time").begin();
     final List<Itemset> solution = new ArrayList<>();
     for(int i = 0; i < idx.length; i++) {
       LOG.incrementProcessed(prog);
@@ -135,9 +129,10 @@ public class Eclat extends AbstractAlgorithm<AprioriResult> {
     }
     LOG.ensureCompleted(prog);
     Collections.sort(solution);
+    LOG.statistics(etime.end());
 
     LOG.statistics(new LongStatistic(STAT + "frequent-itemsets", solution.size()));
-    return new AprioriResult("FP-Growth", "fp-growth", solution, meta);
+    return new FrequentItemsetsResult("Eclat", "eclat", solution, meta);
   }
 
   // TODO: implement diffsets.
@@ -147,9 +142,13 @@ public class Eclat extends AbstractAlgorithm<AprioriResult> {
     if(iset == null || iset.size() < minsupp) {
       return;
     }
-    solution.add(new OneItemset(start, iset.size()));
-    buf[0] = start;
-    extractItemsets(iset, idx, buf, 1, start + 1, minsupp, solution);
+    if(minlength <= 1) {
+      solution.add(new OneItemset(start, iset.size()));
+    }
+    if(maxlength > 1) {
+      buf[0] = start;
+      extractItemsets(iset, idx, buf, 1, start + 1, minsupp, solution);
+    }
   }
 
   private void extractItemsets(DBIDs iset, DBIDs[] idx, int[] buf, int depth, int start, int minsupp, List<Itemset> solution) {
@@ -164,8 +163,12 @@ public class Eclat extends AbstractAlgorithm<AprioriResult> {
       }
       buf[depth] = i;
       int[] items = Arrays.copyOf(buf, depth + 1);
-      solution.add(new SparseItemset(items, ids.size()));
-      extractItemsets(ids, idx, buf, depth + 1, i + 1, minsupp, solution);
+      if(depth >= minlength) {
+        solution.add(new SparseItemset(items, ids.size()));
+      }
+      if(depth < maxlength) {
+        extractItemsets(ids, idx, buf, depth + 1, i + 1, minsupp, solution);
+      }
     }
   }
 
@@ -233,32 +236,10 @@ public class Eclat extends AbstractAlgorithm<AprioriResult> {
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParameterizer {
-    /**
-     * Parameter to specify the minimum support, in absolute or relative terms.
-     */
-    public static final OptionID MINSUPP_ID = new OptionID("eclat.minsupp", //
-    "Threshold for minimum support as minimally required number of transactions (if > 1) " //
-        + "or the minimum frequency (if <= 1).");
-
-    /**
-     * Parameter for minimum support.
-     */
-    protected double minsupp;
-
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      DoubleParameter minsuppP = new DoubleParameter(MINSUPP_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(minsuppP)) {
-        minsupp = minsuppP.getValue();
-      }
-    }
-
+  public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
     @Override
     protected Eclat makeInstance() {
-      return new Eclat(minsupp);
+      return new Eclat(minsupp, minlength, maxlength);
     }
   }
 }

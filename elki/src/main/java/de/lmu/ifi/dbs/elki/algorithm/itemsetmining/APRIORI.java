@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.SparseFeatureVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -46,17 +45,12 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * The APRIORI algorithm for Mining Association Rules.
@@ -88,7 +82,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 title = "Fast Algorithms for Mining Association Rules", //
 booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", //
 url = "http://www.vldb.org/conf/1994/P487.PDF")
-public class APRIORI extends AbstractAlgorithm<AprioriResult> {
+public class APRIORI extends AbstractFrequentItemsetAlgorithm {
   /**
    * The logger for this class.
    */
@@ -100,19 +94,14 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   private final String STAT = this.getClass().getName() + ".";
 
   /**
-   * Minimum support. If less than 1, considered to be a relative frequency,
-   * otherwise an absolute count.
-   */
-  private double minfreq;
-
-  /**
    * Constructor with minimum frequency.
    * 
    * @param minfreq Minimum frequency
+   * @param minlength Minimum length
+   * @param maxlength Maximum length
    */
-  public APRIORI(double minfreq) {
-    super();
-    this.minfreq = minfreq;
+  public APRIORI(double minfreq, int minlength, int maxlength) {
+    super(minfreq, minlength, maxlength);
   }
 
   /**
@@ -121,11 +110,11 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @param relation the Relation to process
    * @return the AprioriResult learned by this APRIORI
    */
-  public AprioriResult run(Relation<BitVector> relation) {
+  public FrequentItemsetsResult run(Relation<BitVector> relation) {
     DBIDs ids = relation.getDBIDs();
     List<Itemset> solution = new ArrayList<>();
     final int size = ids.size();
-    final int needed = (int) ((minfreq < 1.) ? Math.ceil(minfreq * size) : minfreq);
+    final int needed = getMinimumSupport(size);
 
     // TODO: we don't strictly require a vector field.
     // We could work with knowing just the maximum dimensionality beforehand.
@@ -142,8 +131,10 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       if(LOG.isDebuggingFine()) {
         LOG.debugFine(debugDumpCandidates(new StringBuilder(), oneitems, meta));
       }
-      solution.addAll(oneitems);
-      if(oneitems.size() >= 2) {
+      if(minlength <= 1) {
+        solution.addAll(oneitems);
+      }
+      if(oneitems.size() >= 2 && maxlength >= 2) {
         Duration timetwo = LOG.newDuration(STAT + "2-items.time").begin();
         ArrayModifiableDBIDs survivors = DBIDUtil.newArray(ids.size());
         List<? extends Itemset> candidates = buildFrequentTwoItemsets(oneitems, relation, dim, needed, ids, survivors);
@@ -156,8 +147,10 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         if(LOG.isDebuggingFine()) {
           LOG.debugFine(debugDumpCandidates(new StringBuilder(), candidates, meta));
         }
-        solution.addAll(candidates);
-        for(int length = 3; candidates.size() >= length; length++) {
+        if(minlength <= 2) {
+          solution.addAll(candidates);
+        }
+        for(int length = 3; length <= maxlength && candidates.size() >= length; length++) {
           Duration timel = LOG.newDuration(STAT + length + "-items.time").begin();
           // Join to get the new candidates
           candidates = aprioriGenerate(candidates, length, dim);
@@ -179,7 +172,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         }
       }
     }
-    return new AprioriResult("APRIORI", "apriori", solution, meta);
+    return new FrequentItemsetsResult("APRIORI", "apriori", solution, meta);
   }
 
   /**
@@ -588,32 +581,10 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParameterizer {
-    /**
-     * Parameter to specify the minimum support, in absolute or relative terms.
-     */
-    public static final OptionID MINSUPP_ID = new OptionID("apriori.minsupp", //
-    "Threshold for minimum support as minimally required number of transactions (if > 1) " //
-        + "or the minimum frequency (if <= 1).");
-
-    /**
-     * Parameter for minimum support.
-     */
-    protected double minsupp;
-
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      DoubleParameter minsuppP = new DoubleParameter(MINSUPP_ID);
-      minsuppP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(minsuppP)) {
-        minsupp = minsuppP.getValue();
-      }
-    }
-
+  public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
     @Override
     protected APRIORI makeInstance() {
-      return new APRIORI(minsupp);
+      return new APRIORI(minsupp, minlength, maxlength);
     }
   }
 }

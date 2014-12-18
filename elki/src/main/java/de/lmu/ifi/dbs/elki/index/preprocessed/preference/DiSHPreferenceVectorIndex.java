@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -250,7 +250,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       }
     }
     APRIORI apriori = new APRIORI(minpts);
-    AprioriResult aprioriResult = apriori.run(apriori_db);
+    FrequentItemsetsResult aprioriResult = apriori.run(apriori_db);
 
     // result of apriori
     List<Itemset> frequentItemsets = aprioriResult.getItemsets();
