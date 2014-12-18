@@ -156,7 +156,7 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
       for(int i = 0; i < values.length; i++) {
         values[i] = rand.nextGaussian();
       }
-      final double[] result = this.variances.get(index).getColumnDimensionality() > 1 ? (this.means.get(index).getColumnVector()).plus((new CholeskyDecomposition(this.variances.get(index))).getL().times(new Vector(values))).getArrayCopy() : this.getGaussianDrawnVector(this.means.get(index).getColumnVector(), this.variances.get(index).get(0,0), new Vector(values));
+      final double[] result = this.variances.get(index).getColumnDimensionality() > 1 ? (this.means.get(index).getColumnVector()).plus((new CholeskyDecomposition(this.variances.get(index))).getL().times(new Vector(values))).getArrayCopy() : this.getGaussianDrawnVector(this.means.get(index).getColumnVector(), Math.sqrt(this.variances.get(index).get(0,0)), new Vector(values));
       for(int i = 0; i < result.length; i++) {
         inBounds &= result[i] <= bounds.getMax(i) && result[i] >= bounds.getMin(i);
       }
@@ -219,7 +219,7 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
             imeans[j] = vec.getMax(j) + ( blur ? ( this.urand.nextInt(2) == 1 ? this.urand.nextGaussian() * minBound :
               this.urand.nextGaussian() * maxBound ) : 0 );
           }
-          final double[] result = ivariances.getColumnDimensionality() > 1 ? (vec.getColumnVector()).plus((new CholeskyDecomposition(ivariances).getL()).times(new Vector(imeans))).getArrayCopy() : this.getGaussianDrawnVector(vec.getColumnVector(), ivariances.get(0, 0), new Vector(imeans));
+          final double[] result = ivariances.getColumnDimensionality() > 1 ? (vec.getColumnVector()).plus((new CholeskyDecomposition(ivariances).getL()).times(new Vector(imeans))).getArrayCopy() : this.getGaussianDrawnVector(vec.getColumnVector(), Math.sqrt(ivariances.get(0, 0)), new Vector(imeans));
           boolean valid = true;
           for(int j = 0; j < vec.getDimensionality(); j++) {
             valid &= ( result[j] >= vec.doubleValue(j) - minBound )

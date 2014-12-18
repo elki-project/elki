@@ -94,14 +94,15 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
 
     private static final String DEFAULT_ALPHA = "0.05";
 
-    public PWCScoreResult(final double alpha, final List<Clustering<Model>> crs, final Clustering<Model> c, final double tau, final PWCPrimitiveSimilarityFunction f) {
+    public PWCScoreResult(final double alpha, final List<Clustering<Model>> crs, final Clustering<Model> c, final double tauAll, final double tau, final PWCPrimitiveSimilarityFunction f) {
       super("Possible-Worlds-Clustering Score", "PWC Score");
 
       final double eprob = this.probabilityEstimator(c, tau, crs, f);
       final double z = this.getAlphaQuantil(alpha);
-      final double cprob = eprob - z * Math.sqrt(( eprob * (1 - eprob) ) / crs.size());
+      final double cprob = Math.abs(eprob - z * Math.sqrt(( eprob * (1 - eprob) ) / crs.size()));
 
       final MeasurementGroup g = this.newGroup("PWC Measures");
+      g.addMeasure("Tau-All-Reference-Measure", tauAll, 0, 1, true);
       g.addMeasure("Tau-Measure", tau, 0, 1, true);
       g.addMeasure("Confidence-Probability", cprob, 0, 1, false);
     }
@@ -148,12 +149,26 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
     final List<Clustering<Model>> clusterings0 = ResultUtil.filterResults(newResult, Clustering.class);
     final List<Clustering<Model>> clusterings1 = new ArrayList<Clustering<Model>>();
     final List<Clustering<Model>> refClusterings = new ArrayList<Clustering<Model>>();
-    final List<Pair<Clustering<Model>,Double>> bestClusterings = new ArrayList<Pair<Clustering<Model>,Double>>();
+    final List<Pair<Clustering<Model>, Pair<Double,Double>>> bestClusterings = new ArrayList<Pair<Clustering<Model>,Pair<Double,Double>>>();
+    final List<Clustering<Model>> clusteringsAll = new ArrayList<Clustering<Model>>();
     for(final Clustering<Model> c : clusterings0) {
       final SingleObjectBundle bundle = db.getBundle(c.getAllClusters().get(0).getIDs().size() > 0 ? c.getAllClusters().get(0).getIDs().iter() : c.getAllClusters().get(1).getIDs().iter());
       for(int i = 0; i < bundle.metaLength(); i++) {
         if(bundle.data(i) != null && bundle.data(i).getClass().equals(Clustering.class)) {
           clusterings1.add(c);
+        }
+      }
+    }
+    for(final Clustering<Model> cs : clusterings1) {
+      for(final Cluster<Model> cs2 : cs.getAllClusters()) {
+        final DBIDs ids = cs2.getIDs();
+        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          for(int i = 0; i < db.getBundle(iter).metaLength(); i++) {
+            final Object b = db.getBundle(iter).data(i);
+            if(b != null && b.getClass().equals(Clustering.class)) {
+              clusteringsAll.add((Clustering<Model>) b);
+            }
+          }
         }
       }
     }
@@ -185,7 +200,10 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
               i++;
               continue;
             }
+            //TODO: this should be optimized in some way
+            {
 
+            }
             double currentSumOfDists = 0;
             for(int j = 0; j < i; j++) {
               double res = this.clusteringDistance(c, clusterings.get(j));
@@ -220,11 +238,19 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
             maxValue = similaritySum[i];
           }
         }
-        bestClusterings.add(new Pair<Clustering<Model>, Double>(clusterings.get(bestIndex), tau[bestIndex]));
+        double tauAll = -1;
+        for(final Clustering<Model> c : clusteringsAll) {
+          final double res = 1 - this.clusteringDistance(c, clusterings.get(bestIndex));
+          if(tauAll < res) {
+            tauAll = res;
+          }
+        }
+        bestClusterings.add(new Pair<Clustering<Model>, Pair<Double, Double>>(clusterings.get(bestIndex),
+            new Pair<Double,Double>(tauAll, tau[bestIndex])));
       }
     }
-    for(final Pair<Clustering<Model>, Double> c : bestClusterings) {
-      final PWCScoreResult psr = new PWCScoreResult(this.alpha, refClusterings, c.getFirst(), c.getSecond(), this.simFunc);
+    for(final Pair<Clustering<Model>, Pair<Double,Double>> c : bestClusterings) {
+      final PWCScoreResult psr = new PWCScoreResult(this.alpha, refClusterings, c.getFirst(), c.getSecond().getFirst(), c.getSecond().getSecond(), this.simFunc);
       db.getHierarchy().add(c.getFirst(), psr);
     }
   }
