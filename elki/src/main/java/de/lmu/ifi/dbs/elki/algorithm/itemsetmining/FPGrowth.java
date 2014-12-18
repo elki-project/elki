@@ -40,6 +40,8 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
@@ -138,13 +140,20 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     final int[] idx = buildIndex(counts, iidx, minsupp);
     final int items = idx.length;
 
+    LOG.statistics(new LongStatistic(STAT + "raw-items", dim));
+    LOG.statistics(new LongStatistic(STAT + "raw-transactions", relation.size()));
+    LOG.statistics(new DoubleStatistic(STAT + "minsupp-relative", minsupp / (double) relation.size()));
+    LOG.statistics(new LongStatistic(STAT + "minsupp-absolute", minsupp));
+
     LOG.verbose("Building FP-Tree.");
+    Duration ctime = LOG.newDuration(STAT + "fp-tree.construction").begin();
     FPTree tree = buildFPTree(relation, iidx, items);
     if(LOG.isStatistics()) {
       tree.logStatistics();
     }
     // Reduce memory usage:
     tree.reduceMemory();
+    LOG.statistics(ctime.end());
 
     if(LOG.isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder();
@@ -160,10 +169,11 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
     }
 
     LOG.verbose("Extracting frequent patterns.");
+    Duration etime = LOG.newDuration(STAT + "fp-growth.extraction").begin();
     final IndefiniteProgress itemp = LOG.isVerbose() ? new IndefiniteProgress("Frequent itemsets", LOG) : null;
     final List<Itemset> solution = new ArrayList<>();
     // Start extraction with the least frequent items
-    tree.extract(minsupp, minlength, new FPTree.Collector() {
+    tree.extract(minsupp, minlength, true, new FPTree.Collector() {
       @Override
       public void collect(int support, int[] data, int start, int plen) {
         // Always translate the indexes back to the original values via 'idx'!
@@ -182,8 +192,9 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         LOG.incrementProcessed(itemp);
       }
     });
-    Collections.sort(solution);
     LOG.setCompleted(itemp);
+    Collections.sort(solution);
+    LOG.statistics(etime.end());
     LOG.statistics(new LongStatistic(STAT + "frequent-itemsets", solution.size()));
 
     return new AprioriResult("FP-Growth", "fp-growth", solution, meta);
@@ -343,14 +354,15 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * 
      * @param minsupp Minimum support
      * @param minlength Minimum length
+     * @param destruct Remove nodes
      * @param col Itemset collector
      */
-    public void extract(int minsupp, int minlength, Collector col) {
+    public void extract(int minsupp, int minlength, boolean destruct, Collector col) {
       int[] buf = new int[header.length], buf2 = new int[header.length], buf3 = new int[header.length];
       int stop = (minlength > 1) ? minlength - 1 : 0;
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Extracting itemsets", header.length - stop, LOG) : null;
       for(int j = header.length - 1; j >= stop; --j) {
-        extract(minsupp, minlength, j, buf, 0, buf2, buf3, col);
+        extract(minsupp, minlength, j, buf, 0, buf2, buf3, destruct, col);
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
@@ -366,9 +378,10 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
      * @param plen Postfix length
      * @param buf2 Scratch buffer
      * @param buf3 Scratch buffer
+     * @param destruct Remove nodes
      * @param col Itemset collector
      */
-    private void extract(int minsupp, int minlength, int item, int[] postfix, int plen, int[] buf2, int[] buf3, Collector col) {
+    private void extract(int minsupp, int minlength, int item, int[] postfix, int plen, int[] buf2, int[] buf3, boolean destruct, Collector col) {
       // Skip items that have disappeared from the tree
       if(header[item] == null) {
         return;
@@ -379,6 +392,9 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
           return;
         }
         extractLinear(header[item].count, minsupp, minlength, item, postfix, plen, buf2, col);
+        if(destruct) {
+          Arrays.fill(header, null);
+        }
         return;
       }
       // Count total support.
@@ -431,7 +447,10 @@ public class FPGrowth extends AbstractAlgorithm<AprioriResult> {
         col.collect(support, postfix, 0, plen);
       }
       for(int j = last; j >= 0; j--) {
-        proj.extract(minsupp, minlength, j, postfix, plen, buf2, buf3, col);
+        proj.extract(minsupp, minlength, j, postfix, plen, buf2, buf3, destruct, col);
+      }
+      if(destruct) {
+        header[item] = null;
       }
     }
 
