@@ -62,6 +62,15 @@ public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm
   }
 
   /**
+   * Constructor.
+   *
+   * @param minsupp Minimum support
+   */
+  public AbstractFrequentItemsetAlgorithm(double minsupp) {
+    this(minsupp, 0, Integer.MAX_VALUE);
+  }
+
+  /**
    * Get the minimum support for a given data set size.
    * 
    * Converts relative minimum support to absolute minimum support.

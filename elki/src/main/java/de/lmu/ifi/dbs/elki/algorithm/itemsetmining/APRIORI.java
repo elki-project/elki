@@ -105,6 +105,15 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
   }
 
   /**
+   * Constructor with minimum frequency.
+   * 
+   * @param minfreq Minimum frequency
+   */
+  public APRIORI(double minfreq) {
+    super(minfreq);
+  }
+
+  /**
    * Performs the APRIORI algorithm on the given database.
    * 
    * @param relation the Relation to process
