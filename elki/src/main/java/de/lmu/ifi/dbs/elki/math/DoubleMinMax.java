@@ -25,16 +25,17 @@ package de.lmu.ifi.dbs.elki.math;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
-
 /**
  * Class to find the minimum and maximum double values in data.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.exclude DoubleMinMaxProcessor
  */
-public class DoubleMinMax extends DoubleDoublePair {
+public class DoubleMinMax {
+  /**
+   * Minimum and maximum.
+   */
+  private double min, max;
+
   /**
    * Constructor without starting values.
    * 
@@ -45,7 +46,9 @@ public class DoubleMinMax extends DoubleDoublePair {
    * So that the first data added will replace both.
    */
   public DoubleMinMax() {
-    super(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
+    super();
+    this.min = Double.POSITIVE_INFINITY;
+    this.max = Double.NEGATIVE_INFINITY;
   }
 
   /**
@@ -55,7 +58,9 @@ public class DoubleMinMax extends DoubleDoublePair {
    * @param max Maximum value
    */
   public DoubleMinMax(double min, double max) {
-    super(min, max);
+    super();
+    this.min = min;
+    this.max = max;
   }
 
   /**
@@ -67,15 +72,11 @@ public class DoubleMinMax extends DoubleDoublePair {
    * If the new value is larger than the current maximum, it will become the new
    * maximum.
    * 
-   * @param data New value
+   * @param val New value
    */
-  public void put(double data) {
-    if (data < first) {
-      first = data;
-    }
-    if (data > second) {
-      second = data;
-    }
+  public void put(double val) {
+    min = val < min ? val : min;
+    max = val > max ? val : max;
   }
 
   /**
@@ -90,8 +91,12 @@ public class DoubleMinMax extends DoubleDoublePair {
    * @param data Data to process
    */
   public void put(double[] data) {
-    for(double value : data) {
-      this.put(value);
+    final int l = data.length;
+    int i = 0;
+    while(i < l) {
+      final double val = data[l];
+      min = val < min ? val : min;
+      max = val > max ? val : max;
     }
   }
 
@@ -118,7 +123,7 @@ public class DoubleMinMax extends DoubleDoublePair {
    * @return current minimum.
    */
   public double getMin() {
-    return this.first;
+    return this.min;
   }
 
   /**
@@ -127,7 +132,7 @@ public class DoubleMinMax extends DoubleDoublePair {
    * @return current maximum.
    */
   public double getMax() {
-    return this.second;
+    return this.max;
   }
 
   /**
@@ -136,7 +141,7 @@ public class DoubleMinMax extends DoubleDoublePair {
    * @return Difference of current Minimum and Maximum.
    */
   public double getDiff() {
-    return this.getMax() - this.getMin();
+    return this.max - this.min;
   }
 
   /**
@@ -145,7 +150,7 @@ public class DoubleMinMax extends DoubleDoublePair {
    * @return true when at least one value has been added
    */
   public boolean isValid() {
-    return (first <= second);
+    return (min <= max);
   }
 
   /**
@@ -154,7 +159,7 @@ public class DoubleMinMax extends DoubleDoublePair {
    * @return Minimum, Maximum
    */
   public double[] asDoubleArray() {
-    return new double[] { this.getMin(), this.getMax() };
+    return new double[] { this.min, this.max };
   }
 
   /**
@@ -176,7 +181,7 @@ public class DoubleMinMax extends DoubleDoublePair {
    * Reset statistics.
    */
   public void reset() {
-    first = Double.POSITIVE_INFINITY;
-    second = Double.NEGATIVE_INFINITY;
+    min = Double.POSITIVE_INFINITY;
+    max = Double.NEGATIVE_INFINITY;
   }
 }

@@ -152,22 +152,46 @@ public class MeanVariance extends Mean {
    */
   @Override
   public MeanVariance put(double[] vals) {
-    for(double v : vals) {
-      put(v);
+    if(vals.length <= 2) {
+      final int l = vals.length;
+      int i = 0;
+      while(i < l) {
+        put(vals[l]);
+      }
+      return this;
     }
+    // First pass:
+    double sum = 0.;
+    final int l = vals.length;
+    int i = 0;
+    while(i < l) {
+      sum += vals[l];
+    }
+    double om1 = sum / vals.length;
+    // Second pass:
+    double om2 = 0.;
+    i = 0;
+    while(i < l) {
+      final double v = vals[l] - om1;
+      om2 += v * v;
+    }
+    final double nwsum = vals.length + this.n;
+    final double delta = om1 - this.m1;
+    final double rval = delta * vals.length / nwsum;
+
+    // this.mean += rval;
+    // This supposedly is more numerically stable:
+    this.m1 = (this.n * this.m1 + sum) / nwsum;
+    this.m2 += om2 + delta * this.n * rval;
+    this.n = nwsum;
     return this;
   }
 
-  /**
-   * Add values with weight 1.0
-   * 
-   * @param vals Values
-   * @return this
-   */
   @Override
   public MeanVariance put(double[] vals, double[] weights) {
     assert (vals.length == weights.length);
     for(int i = 0, end = vals.length; i < end; i++) {
+      // TODO: use a two-pass update as in the other put
       put(vals[i], weights[i]);
     }
     return this;

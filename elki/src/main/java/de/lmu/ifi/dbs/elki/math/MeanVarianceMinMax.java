@@ -62,32 +62,25 @@ public class MeanVarianceMinMax extends MeanVariance {
   @Override
   public void put(double val) {
     super.put(val);
-    if (val < min) {
-      min = val;
-    }
-    if (val > max) {
-      max = val;
-    }
+    min = val < min ? val : min;
+    max = val > max ? val : max;
   }
 
   @Override
   public void put(double val, double weight) {
     super.put(val, weight);
-    if (val < min) {
-      min = val;
-    }
-    if (val > max) {
-      max = val;
-    }
+    min = val < min ? val : min;
+    max = val > max ? val : max;
   }
 
   @Override
   public void put(Mean other) {
-    if (other instanceof MeanVarianceMinMax) {
+    if(other instanceof MeanVarianceMinMax) {
       super.put(other);
       min = Math.min(min, ((MeanVarianceMinMax) other).min);
       max = Math.max(max, ((MeanVarianceMinMax) other).max);
-    } else {
+    }
+    else {
       throw new AbortException("Cannot aggregate into a minmax statistic: " + other.getClass());
     }
   }
@@ -100,22 +93,49 @@ public class MeanVarianceMinMax extends MeanVariance {
    */
   @Override
   public MeanVarianceMinMax put(double[] vals) {
-    for(double v : vals) {
-      put(v);
+    if(vals.length <= 2) {
+      final int l = vals.length;
+      int i = 0;
+      while(i < l) {
+        put(vals[l]);
+      }
+      return this;
     }
+    // First pass:
+    double sum = 0.;
+    final int l = vals.length;
+    int i = 0;
+    while(i < l) {
+      final double v = vals[l];
+      sum += v;
+      min = v < min ? v : min;
+      max = v > max ? v : max;
+    }
+    double om1 = sum / vals.length;
+    // Second pass:
+    double om2 = 0.;
+    i = 0;
+    while(i < l) {
+      final double v = vals[l] - om1;
+      om2 += v * v;
+    }
+    final double nwsum = vals.length + this.n;
+    final double delta = om1 - this.m1;
+    final double rval = delta * vals.length / nwsum;
+
+    // this.mean += rval;
+    // This supposedly is more numerically stable:
+    this.m1 = (this.n * this.m1 + sum) / nwsum;
+    this.m2 += om2 + delta * this.n * rval;
+    this.n = nwsum;
     return this;
   }
 
-  /**
-   * Add values with weight 1.0
-   * 
-   * @param vals Values
-   * @return this
-   */
   @Override
   public MeanVarianceMinMax put(double[] vals, double[] weights) {
     assert (vals.length == weights.length);
     for(int i = 0, end = vals.length; i < end; i++) {
+      // TODO: use two-pass update as above.
       put(vals[i], weights[i]);
     }
     return this;
@@ -165,7 +185,7 @@ public class MeanVarianceMinMax extends MeanVariance {
    */
   public static MeanVarianceMinMax[] newArray(int dimensionality) {
     MeanVarianceMinMax[] arr = new MeanVarianceMinMax[dimensionality];
-    for (int i = 0; i < dimensionality; i++) {
+    for(int i = 0; i < dimensionality; i++) {
       arr[i] = new MeanVarianceMinMax();
     }
     return arr;
