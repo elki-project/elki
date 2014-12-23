@@ -1042,17 +1042,21 @@ public final class MathUtil {
    * @return {@code Math.pow(x, p)}
    */
   public static double powi(double x, int p) {
-    if(p < 0) { // Fallback for negative integers.
+    if(p <= 2) {
       return Math.pow(x, p);
     }
-    double ret = 1.;
-    for(; p > 0; p >>= 1) {
-      if((p & 1) == 1) {
-        ret *= x;
+    double tmp = x, ret = (p & 1) == 1 ? x : 1.;
+    p >>= 1;
+    while(true) {
+      if(p == 1) {
+        return ret * tmp;
       }
-      x *= x;
+      if((p & 1) != 0) {
+        ret *= tmp;
+      }
+      tmp *= tmp;
+      p >>= 1;
     }
-    return ret;
   }
 
   /**
@@ -1064,17 +1068,21 @@ public final class MathUtil {
    * @return {@code Math.pow(x, p)}
    */
   public static int ipowi(int x, int p) {
-    if(p < 0) { // Fallback for negative integers.
+    if(p <= 2) {
       return (int) Math.pow(x, p);
     }
-    int ret = 1;
-    for(; p > 0; p >>= 1) {
-      if((p & 1) == 1) {
-        ret *= x;
+    int tmp = x, ret = (p & 1) == 1 ? x : 1;
+    p >>= 1;
+    while(true) {
+      if(p == 1) {
+        return ret * tmp;
       }
-      x *= x;
+      if((p & 1) != 0) {
+        ret *= tmp;
+      }
+      tmp *= tmp;
+      p >>= 1;
     }
-    return ret;
   }
 
   /**
