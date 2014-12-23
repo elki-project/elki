@@ -289,11 +289,11 @@ public class CovarianceMatrix {
    * @return New matrix
    */
   public Matrix makeSampleMatrix() {
-    if(wsum <= 1.0) {
+    if(wsum <= 1.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
     Matrix mat = new Matrix(elements);
-    return mat.times(1.0 / (wsum - 1));
+    return mat.times(1. / (wsum - 1.));
   }
 
   /**
@@ -394,10 +394,47 @@ public class CovarianceMatrix {
    * @return Covariance matrix
    */
   public static CovarianceMatrix make(Relation<? extends NumberVector> relation) {
-    CovarianceMatrix c = new CovarianceMatrix(RelationUtil.dimensionality(relation));
+    int dim = RelationUtil.dimensionality(relation);
+    CovarianceMatrix c = new CovarianceMatrix(dim);
+    double[] mean = c.mean;
+    int count = 0;
+    // Compute mean first:
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      c.put(relation.get(iditer));
+      NumberVector vec = relation.get(iditer);
+      for(int i = 0; i < dim; i++) {
+        mean[i] += vec.doubleValue(i);
+      }
+      count++;
     }
+    if(count == 0) {
+      return c;
+    }
+    // Normalize mean
+    for(int i = 0; i < dim; i++) {
+      mean[i] /= count;
+    }
+    // Compute covariances second
+    // Two-pass approach is numerically okay and fast, when possible.
+    double[] tmp = c.nmea; // Scratch space
+    double[][] elems = c.elements;
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      NumberVector vec = relation.get(iditer);
+      for(int i = 0; i < dim; i++) {
+        tmp[i] = vec.doubleValue(i) - mean[i];
+      }
+      for(int i = 0; i < dim; i++) {
+        for(int j = i; j < dim; j++) {
+          elems[i][j] += tmp[i] * tmp[j];
+        }
+      }
+    }
+    // Restore symmetry.
+    for(int i = 0; i < dim; i++) {
+      for(int j = i + 1; j < dim; j++) {
+        elems[j][i] = elems[i][j];
+      }
+    }
+    c.wsum = count;
     return c;
   }
 
@@ -409,10 +446,47 @@ public class CovarianceMatrix {
    * @return Covariance matrix
    */
   public static CovarianceMatrix make(Relation<? extends NumberVector> relation, DBIDs ids) {
-    CovarianceMatrix c = new CovarianceMatrix(RelationUtil.dimensionality(relation));
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      c.put(relation.get(iter));
+    int dim = RelationUtil.dimensionality(relation);
+    CovarianceMatrix c = new CovarianceMatrix(dim);
+    double[] mean = c.mean;
+    int count = 0;
+    // Compute mean first:
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+      NumberVector vec = relation.get(iditer);
+      for(int i = 0; i < dim; i++) {
+        mean[i] += vec.doubleValue(i);
+      }
+      count++;
     }
+    if(count == 0) {
+      return c;
+    }
+    // Normalize mean
+    for(int i = 0; i < dim; i++) {
+      mean[i] /= count;
+    }
+    // Compute covariances second
+    // Two-pass approach is numerically okay and fast, when possible.
+    double[] tmp = c.nmea; // Scratch space
+    double[][] elems = c.elements;
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+      NumberVector vec = relation.get(iditer);
+      for(int i = 0; i < dim; i++) {
+        tmp[i] = vec.doubleValue(i) - mean[i];
+      }
+      for(int i = 0; i < dim; i++) {
+        for(int j = i; j < dim; j++) {
+          elems[i][j] += tmp[i] * tmp[j];
+        }
+      }
+    }
+    // Restore symmetry.
+    for(int i = 0; i < dim; i++) {
+      for(int j = i + 1; j < dim; j++) {
+        elems[j][i] = elems[i][j];
+      }
+    }
+    c.wsum = count;
     return c;
   }
 }
