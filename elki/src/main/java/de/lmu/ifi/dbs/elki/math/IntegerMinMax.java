@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math;
  */
 
 import java.util.Collection;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * Class to find the minimum and maximum int values in data.
@@ -32,7 +31,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * @author Erich Schubert
  * @author Arthur Zimek
  */
-public class IntegerMinMax extends IntIntPair {
+public class IntegerMinMax {
+  /**
+   * Minimum and maximum.
+   */
+  private int min, max;
+
   /**
    * Constructor without starting values.
    * 
@@ -43,7 +47,9 @@ public class IntegerMinMax extends IntIntPair {
    * So that the first data added will replace both.
    */
   public IntegerMinMax() {
-    super(Integer.MAX_VALUE, Integer.MIN_VALUE);
+    super();
+    min = Integer.MAX_VALUE;
+    max = Integer.MIN_VALUE;
   }
 
   /**
@@ -53,7 +59,9 @@ public class IntegerMinMax extends IntIntPair {
    * @param max Maximum value
    */
   public IntegerMinMax(int min, int max) {
-    super(min, max);
+    super();
+    this.min = min;
+    this.max = max;
   }
 
   /**
@@ -65,11 +73,11 @@ public class IntegerMinMax extends IntIntPair {
    * If the new value is larger than the current maximum, it will become the new
    * maximum.
    * 
-   * @param data New value
+   * @param val New value
    */
-  public void put(int data) {
-    this.first = Math.min(this.first, data);
-    this.second = Math.max(this.second, data);
+  public void put(int val) {
+    min = val < min ? val : min;
+    max = val > max ? val : max;
   }
 
   /**
@@ -84,8 +92,12 @@ public class IntegerMinMax extends IntIntPair {
    * @param data Data to process
    */
   public void put(int[] data) {
-    for(int value : data) {
-      this.put(value);
+    final int l = data.length;
+    int i = 0;
+    while(i < l) {
+      final int val = data[l];
+      min = val < min ? val : min;
+      max = val > max ? val : max;
     }
   }
 
@@ -99,11 +111,25 @@ public class IntegerMinMax extends IntIntPair {
    * new maximum.
    * 
    * @param data Data to process
+   * @deprecated {@code Collection<Integer>} is expensive. Avoid.
    */
+  @Deprecated
   public void put(Collection<Integer> data) {
     for(Integer value : data) {
-      this.put(value.intValue());
+      final int val = value.intValue();
+      min = val < min ? val : min;
+      max = val > max ? val : max;
     }
+  }
+
+  /**
+   * Process a MinMax pair.
+   * 
+   * @param val New value
+   */
+  public void put(IntegerMinMax val) {
+    min = val.min < min ? val.min : min;
+    max = val.max > max ? val.max : max;
   }
 
   /**
@@ -112,7 +138,7 @@ public class IntegerMinMax extends IntIntPair {
    * @return current minimum.
    */
   public int getMin() {
-    return this.first;
+    return this.min;
   }
 
   /**
@@ -121,7 +147,7 @@ public class IntegerMinMax extends IntIntPair {
    * @return current maximum.
    */
   public int getMax() {
-    return this.second;
+    return this.max;
   }
 
   /**
@@ -130,7 +156,7 @@ public class IntegerMinMax extends IntIntPair {
    * @return Difference of current Minimum and Maximum.
    */
   public int getDiff() {
-    return this.getMax() - this.getMin();
+    return this.max - this.min;
   }
 
   /**
@@ -139,7 +165,7 @@ public class IntegerMinMax extends IntIntPair {
    * @return true when at least one value has been added
    */
   public boolean isValid() {
-    return (first <= second);
+    return (min <= max);
   }
 
   /**
@@ -148,7 +174,7 @@ public class IntegerMinMax extends IntIntPair {
    * @return Minimum, Maximum
    */
   public int[] asIntArray() {
-    return new int[] { this.getMin(), this.getMax() };
+    return new int[] { this.min, this.max };
   }
 
   /**
@@ -170,7 +196,7 @@ public class IntegerMinMax extends IntIntPair {
    * Reset statistics.
    */
   public void reset() {
-    first = Integer.MAX_VALUE;
-    second = Integer.MIN_VALUE;
+    min = Integer.MAX_VALUE;
+    max = Integer.MIN_VALUE;
   }
 }

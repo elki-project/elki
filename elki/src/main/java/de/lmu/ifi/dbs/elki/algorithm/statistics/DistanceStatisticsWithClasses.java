@@ -259,8 +259,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     }
     LOG.ensureCompleted(progress);
     // Update values (only needed for sampling case).
-    gminmax.setFirst(Math.min(giminmax.getMin(), gominmax.getMin()));
-    gminmax.setSecond(Math.max(giminmax.getMax(), gominmax.getMax()));
+    gminmax.put(gominmax);
 
     LOG.setCompleted(stepprog);
 

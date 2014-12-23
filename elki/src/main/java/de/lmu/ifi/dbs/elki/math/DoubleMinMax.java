@@ -110,11 +110,23 @@ public class DoubleMinMax {
    * new maximum.
    * 
    * @param data Data to process
+   * @deprecated {@code Collection<Double>} is expensive. Avoid.
    */
+  @Deprecated
   public void put(Collection<Double> data) {
     for(Double value : data) {
       this.put(value.doubleValue());
     }
+  }
+
+  /**
+   * Process a MinMax pair.
+   * 
+   * @param val New value
+   */
+  public void put(DoubleMinMax val) {
+    min = val.min < min ? val.min : min;
+    max = val.max > max ? val.max : max;
   }
 
   /**
