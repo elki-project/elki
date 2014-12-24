@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -38,24 +39,19 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
-import de.lmu.ifi.dbs.elki.database.AdaptedHashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.SimpleDBIDFactory;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.datasource.ClusteringAdapterDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -213,7 +209,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * @param relation
    * @return
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({ "unchecked" })
   public Clustering<Model> run(final Database database, final Relation<UncertainObject<UOModel<SpatialComparable>>> relation) {
     final ArrayList<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
     final ArrayList<Clustering<Model>> rclusterings = new ArrayList<Clustering<Model>>();
@@ -268,36 +264,20 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
         rclusterings.add(clusterResult);
       }
     }
-
     rclusterings.addAll(clusterings);
 
-    final ClusteringAdapterDatabaseConnection dbc = new ClusteringAdapterDatabaseConnection(rclusterings);
-    final HashSetModifiableDBIDs iids = DBIDUtil.newHashSet();
-    ((AdaptedHashmapDatabase) database).insert(dbc.loadData(), iids, "Sample-Clusterings");
-
-    final SimpleTypeInformation<Clustering<Model>> t = new SimpleTypeInformation<>(Clustering.class);
-    final WritableDataStore<Clustering<Model>> datastore = DataStoreUtil.makeStorage(database.getRelation(t).getDBIDs(), DataStoreFactory.HINT_DB, Clustering.class);
-    for(final DBIDIter iter = database.getRelation(t).getDBIDs().iter(); iter.valid(); iter.advance()) {
-      datastore.put(iter, (Clustering<Model>) database.getRelation(t).get(iter));
+    SimpleTypeInformation<Clustering<Model>> TYPE = new SimpleTypeInformation<>(Clustering.class);
+    DBIDRange rids = DBIDFactory.FACTORY.generateStaticDBIDRange(rclusterings.size());
+    final WritableDataStore<Clustering<Model>> datastore = DataStoreUtil.makeStorage(rids, DataStoreFactory.HINT_DB, Clustering.class);
+    Iterator<Clustering<Model>> it2 = rclusterings.iterator();
+    for(final DBIDIter iter = rids.iter(); iter.valid(); iter.advance()) {
+      datastore.put(iter, it2.next());
     }
+    assert(rids.size() == rclusterings.size());
 
-    final ModifiableDBIDs sids = (new SimpleDBIDFactory()).newArray();
-    for(final DBIDIter iter = database.getRelation(t).getDBIDs().iter(); iter.valid(); iter.advance()) {
-      for(int i = 0; i < database.getBundle(iter).metaLength(); i++) {
-        final Object b = database.getBundle(iter).data(i);
-        if(b != null) {
-          if(b.getClass().equals(Clustering.class)) {
-            if(((Relation) database.getHierarchy().iterParents((Result) b).get()).getLongName().startsWith("Sample")) {
-              sids.add(iter);
-            }
-          }
-        }
-      }
-    }
+    final Relation<Clustering<Model>> simRelation = new MaterializedRelation<Clustering<Model>>(database, TYPE, rids, "Clusterings", datastore);
+    ProxyDatabase d = new ProxyDatabase(rids, simRelation);
 
-    final Relation<Clustering<Model>> simRelation = new MaterializedRelation<Clustering<Model>>(database, t, sids, "Clusterings", datastore);
-
-    ProxyDatabase d = new ProxyDatabase(simRelation.getDBIDs(), simRelation);
     return (Clustering<Model>) this.metaAlgorithm.run(d);
   }
 }

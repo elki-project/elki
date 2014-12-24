@@ -276,21 +276,19 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
       return;
     }
     final Database db = ResultUtil.findDatabase(baseResult);
-    Relation<Clustering<Model>> rel = null;
     for(final Relation<?> r : db.getRelations()) {
       if(r.getDataTypeInformation().isAssignableFromType(new SimpleTypeInformation<>(Clustering.class))) {
-        rel = (Relation<Clustering<Model>>) r;
-        break;
+        final Relation<Clustering<Model>> rel = (Relation<Clustering<Model>>) r;
+        final List<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
+        for(final DBIDIter iter = rel.iterDBIDs(); iter.valid(); iter.advance()) {
+          clusterings.add(rel.get(iter));
+        }
+        for(final Clustering<Model> c : clusterings) {
+          this.autoEvaluateClusterings(baseResult, c);
+        }
+
+        this.evaluateMetaClustering(newResult);
       }
     }
-    final List<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
-    for(final DBIDIter iter = rel.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      clusterings.add(rel.get(iter));
-    }
-    for(final Clustering<Model> c : clusterings) {
-      this.autoEvaluateClusterings(baseResult, c);
-    }
-
-    this.evaluateMetaClustering(newResult);
   }
 }
