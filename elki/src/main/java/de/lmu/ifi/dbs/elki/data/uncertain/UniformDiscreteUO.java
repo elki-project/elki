@@ -93,6 +93,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
     this.samplePoints = samplePoints;
     this.dimensions = samplePoints.get(0).getDimensionality();
     this.rand = randomFactory.getRandom();
+    this.setBounds();
   }
 
   @Override

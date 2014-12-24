@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
@@ -28,17 +29,17 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /**
  * This abstract class is derived from {@link UOModel} to
- * model Uncertain-Data-Objects with discrete distributions, 
+ * model Uncertain-Data-Objects with discrete distributions,
  * i.e. Uncertain-Data-Objects where the possible values are
  * explicitly given.
- * 
+ *
  * The parameter is a List of some kind, which holds the
  * possible values of the particular Uncertain-Data-Object.
- * 
+ *
  * The way those values are displayed shall be of concern
  * for the particular author, but still we assume some kind
  * of vector to be the most convenient choice.
- *  
+ *
  * @author Alexander Koos
  *
  * @param <T>
@@ -47,16 +48,27 @@ public abstract class AbstractDiscreteUncertainObject<T extends List<?>> extends
   protected T samplePoints;
 
   public abstract double getSampleProbability(final int position);
-  
+
   /**
    * Returns the weight, i.e. the number of
    * different possible values, of the
    * particular Uncertain-Data-Object.
-   * 
+   *
    * @return int
    */
   @Override
   public int getWeight() {
     return this.samplePoints.size();
+  }
+
+  public T getObservationsReference() {
+    return this.samplePoints;
+  }
+
+  @SuppressWarnings({ "unchecked", "serial" })
+  public T getObservationsCopy() {
+    return (T) (new ArrayList<Object>() {{
+      this.addAll(AbstractDiscreteUncertainObject.this.samplePoints);
+    }});
   }
 }

@@ -106,6 +106,7 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     this.totalProbability = check;
     this.dimensions = samplePoints.get(0).getFirst().getDimensionality();
     this.rand = randomFactory.getRandom();
+    this.setBounds();
   }
 
   // note that the user has to be certain, he looks upon the
