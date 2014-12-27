@@ -73,8 +73,9 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
   }
 
   @Override
-  public void assignVar(DBIDRef id, DBIDVar var) {
+  public DBIDVar assignVar(DBIDRef id, DBIDVar var) {
     data.assignVar(idmap.mapDBIDToOffset(id), var);
+    return var;
   }
 
   @Override

@@ -97,8 +97,9 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
   }
 
   @Override
-  public void assignVar(DBIDRef id, DBIDVar var) {
+  public DBIDVar assignVar(DBIDRef id, DBIDVar var) {
     final int val = map.get(DBIDUtil.asInteger(id));
     DBIDFactory.FACTORY.assignVar(var, val);
+    return var;
   }
 }

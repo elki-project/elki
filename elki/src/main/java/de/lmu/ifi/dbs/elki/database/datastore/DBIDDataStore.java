@@ -47,6 +47,7 @@ public interface DBIDDataStore extends DataStore<DBID> {
    * 
    * @param id Database ID.
    * @param var Variable to update.
+   * @return {@code var}
    */
-  public void assignVar(DBIDRef id, DBIDVar var);
+  public DBIDVar assignVar(DBIDRef id, DBIDVar var);
 }
