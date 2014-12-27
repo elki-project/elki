@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Linear memory implementation of HDBSCAN* clustering based on SLINK.
+ * Linear memory implementation of HDBSCAN clustering based on SLINK.
  * 
  * By not building a distance matrix, we can reduce memory usage to linear
  * memory only; but at the cost of roughly double the runtime (unless using
@@ -35,7 +35,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * recompute distances when building the spanning tree.
  * 
  * This version uses the SLINK algorithm to directly produce the pointer
- * representation expected by the extraction methods.
+ * representation expected by the extraction methods. The SLINK algorithm is
+ * closely related to Prim's minimum spanning tree, but produces the more
+ * compact pointer representation instead of an edges list.
+ * 
+ * This implementation does <em>not</em> include the cluster extraction
+ * discussed as Step 4. This functionality should however already be provided by
+ * {@link ExtractFlatClusteringFromHierarchy}.
  * 
  * @author Erich Schubert
  */

@@ -23,12 +23,23 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Linear memory implementation of HDBSCAN* clustering.
+ * Linear memory implementation of HDBSCAN clustering.
  * 
  * By not building a distance matrix, we can reduce memory usage to linear
  * memory only; but at the cost of roughly double the runtime (unless using
  * indexes) as we first need to compute all kNN distances (for core sizes), then
  * recompute distances when building the spanning tree.
+ * 
+ * This implementation follows the HDBSCAN publication more closely than
+ * {@link SLINKHDBSCANLinearMemory}, by computing the minimum spanning tree
+ * using Prim's algorithm (instead of SLINK; although the two are remarkably
+ * similar). In order to produce the preferred internal format of hierarchical
+ * clusterings (the compact pointer representation introduced in {@link #SLINK})
+ * we have to perform a postprocessing conversion.
+ * 
+ * This implementation does <em>not</em> include the cluster extraction
+ * discussed as Step 4. This functionality should however already be provided by
+ * {@link ExtractFlatClusteringFromHierarchy}.
  * 
  * @author Erich Schubert
  */
