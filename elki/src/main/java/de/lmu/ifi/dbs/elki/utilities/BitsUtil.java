@@ -890,7 +890,8 @@ public final class BitsUtil {
     if(v == null) {
       return "null";
     }
-    final int mag = Math.max(magnitude(v), minw);
+    int mag = magnitude(v);
+    mag = mag >= minw ? mag : minw;
     if(mag == 0) {
       return "0";
     }
@@ -979,7 +980,8 @@ public final class BitsUtil {
     if(v == null) {
       return "null";
     }
-    final int mag = Math.max(magnitude(v), minw);
+    int mag = magnitude(v);
+    mag = mag >= minw ? mag : minw;
     if(mag == 0) {
       return "0";
     }
