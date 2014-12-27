@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
@@ -276,7 +277,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
         }
 
         double distance = distFunction.minDist(entry1, entry2);
-        double reach = Math.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
+        double reach = MathUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
         SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
         heap.add(dataPair);
       }
@@ -307,7 +308,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
           continue;
         }
         double distance = distFunction.minDist(entry1, entry2);
-        double reach = Math.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
+        double reach = MathUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
         SpatialObjectPair dataPair = new SpatialObjectPair(reach, entry1, entry2, false);
         heap.add(dataPair);
       }

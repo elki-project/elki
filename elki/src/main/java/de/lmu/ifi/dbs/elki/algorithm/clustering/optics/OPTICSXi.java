@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -163,7 +164,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         scanprog.setProcessed(scan.index, LOG);
       }
       // Update maximum-inbetween
-      mib = Math.max(mib, scan.getReachability());
+      mib = MathUtil.max(mib, scan.getReachability());
       // The last point cannot be the start of a steep area.
       if(scan.esucc == null) {
         break;
@@ -386,7 +387,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
       }
       else {
         // Update
-        sda.setMib(Math.max(sda.getMib(), mib));
+        if(mib > sda.getMib()) {
+          sda.setMib(mib);
+        }
       }
     }
   }
