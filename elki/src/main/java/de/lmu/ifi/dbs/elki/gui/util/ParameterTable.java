@@ -359,9 +359,7 @@ public class ParameterTable extends JTable {
           EnumParameter<?> ep = (EnumParameter<?>) option;
           for(String s : ep.getPossibleValues()) {
             if(ep.hasDefaultValue() && ep.getDefaultValueAsString().equals(s)) {
-              if(!(DynamicParameters.STRING_USE_DEFAULT + ep.getDefaultValueAsString()).equals(val)) {
-                comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + s);
-              }
+              comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + s);
             }
             else if(!s.equals(val)) {
               comboBox.addItem(s);
