@@ -296,8 +296,8 @@ public final class VectorUtil {
       final double min2 = v2.getMin(k), max2 = v2.getMax(k);
       final double p1 = min1 * min2, p2 = min1 * max2;
       final double p3 = max1 * min2, p4 = max1 * max2;
-      s1 += Math.max(p1 > p2 ? p1 : p2, p3 > p4 ? p3 : p4);
-      s2 += Math.min(p1 < p2 ? p1 : p2, p3 < p4 ? p3 : p4);
+      s1 += MathUtil.max(p1, p2, p3, p4);
+      s2 += MathUtil.min(p1, p2, p3, p4);
       if(max1 < 0) {
         l1 += max1 * max1;
       }
@@ -329,7 +329,7 @@ public final class VectorUtil {
         l2 += min2 * min2;
       } // else: 0
     }
-    final double cross = Math.max(s1, Math.abs(s2));
+    final double cross = MathUtil.max(s1, Math.abs(s2));
     if(cross == 0.) {
       return 0.;
     }

@@ -622,7 +622,7 @@ public final class MathUtil {
    * @return n! / (k! * (n-k)!)
    */
   public static double approximateBinomialCoefficient(int n, int k) {
-    final int m = Math.max(k, n - k);
+    final int m = max(k, n - k);
     long temp = 1;
     for(int i = n, j = 1; i > m; i--, j++) {
       temp = temp * i / j;
@@ -1106,5 +1106,201 @@ public final class MathUtil {
       ret[j] = start;
     }
     return ret;
+  }
+
+  /**
+   * Binary max, <i>without</i> handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#max}. But usually, it should be written inline as
+   * {@code (a >= b) ? a : b}
+   * 
+   * The result is asymmetric in case of {@code Double.NaN}:<br />
+   * {@code MathUtil.max(Double.NaN, 1.)} is 1, but <br />
+   * {@code MathUtil.max(1., Double.NaN)} is {@code Double.NaN}.
+   *
+   * @param a First value
+   * @param b Second value
+   * @return Maximum
+   */
+  public static double max(double a, double b) {
+    return a >= b ? a : b;
+  }
+
+  /**
+   * Ternary max, <i>without</i> handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#max}. But usually, it should be written inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @param c Third value
+   * @return Maximum
+   */
+  public static double max(double a, double b, double c) {
+    return a >= b ? (a >= c ? a : c) : (b >= c ? b : c);
+  }
+
+  /**
+   * Quadrary max, <i>without</i> handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#max}. But usually, it should be written inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @param c Third value
+   * @param d Fourth value
+   * @return Maximum
+   */
+  public static double max(double a, double b, double c, double d) {
+    return a >= b ? //
+    a >= c ? (a >= d ? a : d) : (c >= d ? c : d) //
+    : //
+    b >= c ? (b >= d ? b : d) : (c >= d ? c : d);
+  }
+
+  /**
+   * Binary max. If possible, inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @return Maximum
+   */
+  public static int max(int a, int b) {
+    return a >= b ? a : b;
+  }
+
+  /**
+   * Ternary max. If possible, inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @param c Third value
+   * @return Maximum
+   */
+  public static int max(int a, int b, int c) {
+    return a >= b ? (a >= c ? a : c) : (b >= c ? b : c);
+  }
+
+  /**
+   * Quadrary max, <i>without</i> handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#max}. But usually, it should be written inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @param c Third value
+   * @param d Fourth value
+   * @return Maximum
+   */
+  public static int max(int a, int b, int c, int d) {
+    return a >= b ? //
+    a >= c ? (a >= d ? a : d) : (c >= d ? c : d) //
+    : //
+    b >= c ? (b >= d ? b : d) : (c >= d ? c : d);
+  }
+
+  /**
+   * Binary min, <i>without</i< handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#min}. But usually, it should be written inline as
+   * {@code (a <= b) ? a : b}
+   * 
+   * The result is asymmetric in case of {@code Double.NaN}:<br />
+   * {@code MathUtil.min(Double.NaN, 1.)} is 1, but <br />
+   * {@code MathUtil.min(1., Double.NaN)} is {@code Double.NaN}.
+   *
+   * @param a First value
+   * @param b Second value
+   * @return minimum
+   */
+  public static double min(double a, double b) {
+    return a <= b ? a : b;
+  }
+
+  /**
+   * Ternary min, <i>without</i< handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#min}. But usually, it should be written inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @param c Third value
+   * @return minimum
+   */
+  public static double min(double a, double b, double c) {
+    return a <= b ? (a <= c ? a : c) : (b <= c ? b : c);
+  }
+
+  /**
+   * Quadrary min, <i>without</i< handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#min}. But usually, it should be written inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @param c Third value
+   * @param d Fourth value
+   * @return minimum
+   */
+  public static double min(double a, double b, double c, double d) {
+    return a <= b ? //
+    a <= c ? (a <= d ? a : d) : (c <= d ? c : d) //
+    : //
+    b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
+  }
+
+  /**
+   * Binary min, <i>without</i< handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#min}. But usually, it should be written inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @return minimum
+   */
+  public static int min(int a, int b) {
+    return a <= b ? a : b;
+  }
+
+  /**
+   * Ternary min, <i>without</i< handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#min}. But usually, it should be written inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @param c Third value
+   * @return minimum
+   */
+  public static int min(int a, int b, int c) {
+    return a <= b ? (a <= c ? a : c) : (b <= c ? b : c);
+  }
+
+  /**
+   * Quadrary min, <i>without</i< handling of special values.
+   * 
+   * Because of the lack of special case handling, this is faster than
+   * {@link Math#min}. But usually, it should be written inline.
+   *
+   * @param a First value
+   * @param b Second value
+   * @param c Third value
+   * @param d Fourth value
+   * @return minimum
+   */
+  public static int min(int a, int b, int c, int d) {
+    return a <= b ? //
+    a <= c ? (a <= d ? a : d) : (c <= d ? c : d) //
+    : //
+    b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
   }
 }
