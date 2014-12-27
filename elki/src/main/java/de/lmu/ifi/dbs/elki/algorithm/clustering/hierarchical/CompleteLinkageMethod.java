@@ -49,7 +49,7 @@ public class CompleteLinkageMethod implements LinkageMethod {
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return Math.max(dx, dy);
+    return dx > dy ? dx : dy;
   }
 
   /**

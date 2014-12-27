@@ -39,7 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S. Zubrzycki", title = "Sur la liaison et la division des points d'un ensemble fini", booktitle = "Colloquium Mathematicae (Vol. 2, No. 3-4)")
+@Reference(authors = "K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S. Zubrzycki", //
+title = "Sur la liaison et la division des points d'un ensemble fini",//
+booktitle = "Colloquium Mathematicae (Vol. 2, No. 3-4)")
 @Alias({ "single-link", "single", "slink", "nearest", "nearest-neighbor" })
 public class SingleLinkageMethod implements LinkageMethod {
   /**
@@ -59,7 +61,7 @@ public class SingleLinkageMethod implements LinkageMethod {
 
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return Math.min(dx, dy);
+    return dx < dy ? dx : dy;
   }
 
   /**

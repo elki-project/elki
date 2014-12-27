@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -198,41 +199,14 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     order.sort(new DataStoreUtil.AscendingByDoubleDataStore(lambda));
     DBIDArrayIter it = order.iter(); // Used multiple times!
 
-    int split;
-    if(minclusters > 0) {
-      split = Math.max(ids.size() - minclusters, 0);
-      // Stop distance:
-      final double stopdist = lambda.doubleValue(order.get(split));
-
-      // Tie handling: decrement split.
-      while(split > 0) {
-        it.seek(split - 1);
-        if(stopdist <= lambda.doubleValue(it)) {
-          split--;
-        }
-        else {
-          break;
-        }
-      }
-    }
-    else if(!Double.isNaN(threshold)) {
-      split = ids.size();
-      it.seek(split - 1);
-      while(threshold <= lambda.doubleValue(it) && it.valid()) {
-        split--;
-        it.retract();
-      }
-    }
-    else { // full hierarchy
-      split = 0;
-    }
+    final int split = findSplit(order, it, lambda);
 
     // Extract the child clusters
-    int expcnum = ids.size() - split;
+    final int expcnum = ids.size() - split;
     WritableIntegerDataStore cluster_map = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
-    ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<>(expcnum);
-    TDoubleArrayList cluster_dist = new TDoubleArrayList(expcnum);
-    ArrayModifiableDBIDs cluster_leads = DBIDUtil.newArray(expcnum);
+    ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<>(expcnum + 10);
+    TDoubleArrayList cluster_dist = new TDoubleArrayList(expcnum + 10);
+    ArrayModifiableDBIDs cluster_leads = DBIDUtil.newArray(expcnum + 10);
 
     DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
     // Go backwards on the lower part.
@@ -398,10 +372,45 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     default:
       throw new AbortException("Unsupported output mode.");
     }
-
     LOG.ensureCompleted(progress);
 
     return dendrogram;
+  }
+
+  /**
+   * Find the splitting point in the ordered DBIDs list.
+   * 
+   * @param order Ordered list
+   * @param it Iterator on this list (reused)
+   * @param lambda Join distances.
+   * @return Splitting point
+   */
+  private int findSplit(ArrayDBIDs order, DBIDArrayIter it, DoubleDataStore lambda) {
+    int split;
+    if(minclusters > 0) {
+      split = order.size() > minclusters ? order.size() - minclusters : 0;
+      // Stop distance:
+      final double stopdist = lambda.doubleValue(order.get(split));
+
+      // Tie handling: decrement split.
+      it.seek(split - 1);
+      while(it.valid() && stopdist <= lambda.doubleValue(it)) {
+        split--;
+        it.retract();
+      }
+    }
+    else if(!Double.isNaN(threshold)) {
+      split = order.size();
+      it.seek(split - 1);
+      while(it.valid() && threshold <= lambda.doubleValue(it)) {
+        split--;
+        it.retract();
+      }
+    }
+    else { // full hierarchy
+      split = 0;
+    }
+    return split;
   }
 
   /**
@@ -513,8 +522,8 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       }
 
       if(thresholdmode == null || ThresholdMode.BY_MINCLUSTERS.equals(thresholdmode)) {
-        IntParameter minclustersP = new IntParameter(MINCLUSTERS_ID);
-        minclustersP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        IntParameter minclustersP = new IntParameter(MINCLUSTERS_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(minclustersP)) {
           minclusters = minclustersP.intValue();
         }

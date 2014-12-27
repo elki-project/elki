@@ -67,8 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * See also:
  * <p>
- * A Review of Classification<br />
  * R. M. Cormack<br />
+ * A Review of Classification<br />
  * Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3
  * </p>
  * 
@@ -142,12 +142,10 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
 
     // Initialize space for result:
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableIntegerDataStore csize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+    WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
+    WritableIntegerDataStore csize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 1);
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       pi.put(it, it);
-      lambda.put(it, Double.POSITIVE_INFINITY);
-      csize.put(it, 1);
     }
 
     // Repeat until everything merged into 1 cluster

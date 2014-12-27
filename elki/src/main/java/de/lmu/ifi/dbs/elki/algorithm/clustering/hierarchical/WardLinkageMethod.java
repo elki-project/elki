@@ -42,7 +42,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "J. H. Ward Jr", title = "Hierarchical grouping to optimize an objective function", booktitle = "Journal of the American statistical association 58.301", url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
+@Reference(authors = "J. H. Ward Jr", //
+title = "Hierarchical grouping to optimize an objective function", //
+booktitle = "Journal of the American statistical association 58.301", //
+url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
 @Alias({ "ward", "variance" })
 public class WardLinkageMethod implements LinkageMethod {
   /**

@@ -40,7 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA" })
-@Reference(authors = "A. K. Jain and R. C. Dubes", title = "Algorithms for Clustering Data", booktitle = "Algorithms for Clustering Data, Prentice-Hall")
+@Reference(authors = "A. K. Jain and R. C. Dubes", //
+title = "Algorithms for Clustering Data", //
+booktitle = "Algorithms for Clustering Data, Prentice-Hall")
 public class GroupAverageLinkageMethod implements LinkageMethod {
   /**
    * Static instance of class.

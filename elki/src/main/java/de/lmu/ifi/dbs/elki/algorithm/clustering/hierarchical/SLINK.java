@@ -51,10 +51,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * Implementation of the efficient Single-Link Algorithm SLINK of R. Sibson.
  * 
+ * Reference:
  * <p>
- * Reference:<br />
- * R. Sibson: SLINK: An optimally efficient algorithm for the single-link
- * cluster method. <br/>
+ * R. Sibson:<br />
+ * SLINK: An optimally efficient algorithm for the single-link cluster method.<br/>
  * In: The Computer Journal 16 (1973), No. 1, p. 30-34.
  * </p>
  * 
@@ -67,7 +67,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("SLINK: Single Link Clustering")
 @Description("Hierarchical clustering algorithm based on single-link connectivity.")
-@Reference(authors = "R. Sibson", title = "SLINK: An optimally efficient algorithm for the single-link cluster method", booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
+@Reference(authors = "R. Sibson", //
+title = "SLINK: An optimally efficient algorithm for the single-link cluster method", //
+booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", //
+url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
 @Alias(value = { "de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK", "clustering.SLINK", "SLINK", "single-link", "single-linkage" })
 public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
@@ -93,7 +96,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   public PointerHierarchyRepresentationResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
     // Temporary storage for m.
     WritableDoubleDataStore m = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
 
@@ -148,7 +151,8 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     // P(n+1) = n+1:
     pi.put(id, id);
     // L(n+1) = infinity
-    lambda.putDouble(id, Double.POSITIVE_INFINITY);
+    // Initialized already.
+    // lambda.putDouble(id, Double.POSITIVE_INFINITY);
   }
 
   /**
@@ -158,7 +162,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param id the id of the object to be inserted into the pointer
    *        representation
    * @param processedIDs the already processed ids
-   * @param distQuery Distnace query
+   * @param distQuery Distance query
    * @param m Data store
    */
   private void step2(DBIDRef id, DBIDs processedIDs, DistanceQuery<? super O> distQuery, WritableDoubleDataStore m) {
@@ -209,7 +213,9 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       // if L(i) >= M(i)
       if(l_i >= m_i) {
         // M(P(i)) = min { M(P(i)), L(i) }
-        m.putDouble(p_i, Math.min(mp_i, l_i));
+        if(l_i < mp_i) {
+          m.putDouble(p_i, l_i);
+        }
 
         // L(i) = M(i)
         lambda.putDouble(it, m_i);
@@ -219,7 +225,9 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       }
       else {
         // M(P(i)) = min { M(P(i)), M(i) }
-        m.putDouble(p_i, Math.min(mp_i, m_i));
+        if(m_i < mp_i) {
+          m.putDouble(p_i, m_i);
+        }
       }
     }
   }
