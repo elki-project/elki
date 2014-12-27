@@ -24,9 +24,9 @@ package de.lmu.ifi.dbs.elki.math.geometry;
  */
 
 import java.util.Arrays;
-import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf Adapter
+ * @apiviz.composedOf Collector
  */
 @Reference(authors = "R. C. Prim", //
 title = "Shortest connection networks and some generalizations", //
@@ -92,12 +93,12 @@ public class PrimsMinimumSpanningTree {
     // Best previous node
     int[] src = new int[n];
     // Nodes already handled
-    BitSet in = new BitSet(n);
+    long[] in = BitsUtil.zero(n);
 
     // We always start at "random" node 0
     // Note: we use this below in the "j" loop!
     int current = 0;
-    in.set(current);
+    BitsUtil.setI(in, current);
     best[current] = 0;
 
     // Search
@@ -106,7 +107,7 @@ public class PrimsMinimumSpanningTree {
       int newbesti = -1;
       double newbestd = Double.POSITIVE_INFINITY;
       // Note: we assume we started with 0, and can thus skip it
-      for(int j = in.nextClearBit(1); j < n && j > 0; j = in.nextClearBit(j + 1)) {
+      for(int j = BitsUtil.nextClearBit(in, 1); j < n && j > 0; j = BitsUtil.nextClearBit(in, j + 1)) {
         final double dist = adapter.distance(data, current, j);
         if(dist < best[j]) {
           best[j] = dist;
@@ -119,7 +120,7 @@ public class PrimsMinimumSpanningTree {
       }
       assert (newbesti >= 0);
       // Flag
-      in.set(newbesti);
+      BitsUtil.setI(in, newbesti);
       // Store edge
       mst[i << 1] = newbesti;
       mst[(i << 1) + 1] = src[newbesti];
@@ -127,6 +128,57 @@ public class PrimsMinimumSpanningTree {
       current = newbesti;
     }
     return mst;
+  }
+
+  /**
+   * Run Prim's algorithm on a dense graph.
+   * 
+   * @param data Data set
+   * @param adapter Adapter instance
+   * @param collector Edge collector
+   */
+  public static <T> void processDense(T data, Adapter<T> adapter, Collector collector) {
+    // Number of nodes
+    final int n = adapter.size(data);
+    // Best distance for each node
+    double[] best = new double[n];
+    Arrays.fill(best, Double.POSITIVE_INFINITY);
+    // Best previous node
+    int[] src = new int[n];
+    // Nodes already handled
+    long[] in = BitsUtil.ones(n);
+
+    // We always start at "random" node 0
+    // Note: we use this below in the "j" loop!
+    int current = 0;
+    BitsUtil.clearI(in, current);
+    best[current] = 0;
+
+    // Search
+    for(int i = n - 2; i >= 0; i--) {
+      // Update best and src from current:
+      int newbesti = -1;
+      double newbestd = Double.POSITIVE_INFINITY;
+      // Note: we assume we started with 0, and can thus skip it
+      for(int j = BitsUtil.nextSetBit(in, 1); j > 0; j = BitsUtil.nextSetBit(in, j + 1)) {
+        final double dist = adapter.distance(data, current, j);
+        if(dist < best[j]) {
+          best[j] = dist;
+          src[j] = current;
+        }
+        if(best[j] < newbestd) {
+          newbestd = best[j];
+          newbesti = j;
+        }
+      }
+      assert (newbesti >= 0);
+      // Flag
+      BitsUtil.clearI(in, newbesti);
+      // Store edge
+      collector.addEdge(newbestd, src[newbesti], newbesti);
+      // Continue
+      current = newbesti;
+    }
   }
 
   /**
@@ -189,6 +241,22 @@ public class PrimsMinimumSpanningTree {
      * @return Size
      */
     public int size(T data);
+  }
+
+  /**
+   * Interface for collecting edges.
+   * 
+   * @author Erich Schubert
+   */
+  public static interface Collector {
+    /**
+     * Add a new edge to the output.
+     * 
+     * @param length Length of edge
+     * @param i Source node
+     * @param j Destination node
+     */
+    public void addEdge(double length, int i, int j);
   }
 
   /**
