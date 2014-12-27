@@ -57,16 +57,16 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
   @Override
   public void add(Result parent, Result child) {
     super.add(parent, child);
-    if (child instanceof HierarchicalResult) {
+    if(child instanceof HierarchicalResult) {
       HierarchicalResult hr = (HierarchicalResult) child;
       ModifiableHierarchy<Result> h = hr.getHierarchy();
       // Merge hierarchy
       hr.setHierarchy(this);
       // Add children of child
-      for (Hierarchy.Iter<Result> iter = h.iterChildren(hr); iter.valid(); iter.advance()) {
+      for(Hierarchy.Iter<Result> iter = h.iterChildren(hr); iter.valid(); iter.advance()) {
         Result desc = iter.get();
         this.add(hr, desc);
-        if (desc instanceof HierarchicalResult) {
+        if(desc instanceof HierarchicalResult) {
           ((HierarchicalResult) desc).setHierarchy(this);
         }
       }
@@ -114,10 +114,10 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
    * @param parent Parent result that was added to
    */
   private void fireResultAdded(Result child, Result parent) {
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debug("Result added: " + child + " <- " + parent);
     }
-    for (ResultListener l : listenerList.getListeners(ResultListener.class)) {
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultAdded(child, parent);
     }
   }
@@ -128,10 +128,10 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
    * @param current Result that has changed
    */
   private void fireResultChanged(Result current) {
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debug("Result changed: " + current);
     }
-    for (ResultListener l : listenerList.getListeners(ResultListener.class)) {
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultChanged(current);
     }
   }
@@ -144,10 +144,10 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
    * @param parent Parent result that has been removed
    */
   private void fireResultRemoved(Result child, Result parent) {
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       LOG.debug("Result removed: " + child + " <- " + parent);
     }
-    for (ResultListener l : listenerList.getListeners(ResultListener.class)) {
+    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
       l.resultRemoved(child, parent);
     }
   }

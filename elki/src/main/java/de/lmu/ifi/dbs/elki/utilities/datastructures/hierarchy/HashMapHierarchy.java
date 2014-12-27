@@ -58,7 +58,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     // Add child to parent.
     {
       Rec<O> rec = graph.get(parent);
-      if (rec == null) {
+      if(rec == null) {
         rec = new Rec<>();
         graph.put(parent, rec);
       }
@@ -67,7 +67,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     // Add child to parent
     {
       Rec<O> rec = graph.get(child);
-      if (rec == null) {
+      if(rec == null) {
         rec = new Rec<>();
         graph.put(child, rec);
       }
@@ -78,7 +78,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   @Override
   public void add(O entry) {
     Rec<O> rec = graph.get(entry);
-    if (rec == null) {
+    if(rec == null) {
       rec = new Rec<>();
       graph.put(entry, rec);
     }
@@ -89,14 +89,14 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     // Remove child from parent.
     {
       Rec<O> rec = graph.get(parent);
-      if (rec != null) {
+      if(rec != null) {
         rec.removeChild(child);
       }
     }
     // Remove parent from child
     {
       Rec<O> rec = graph.get(child);
-      if (rec != null) {
+      if(rec != null) {
         rec.removeParent(parent);
       }
     }
@@ -105,14 +105,14 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   @Override
   public void remove(O entry) {
     Rec<O> rec = graph.get(entry);
-    if (rec == null) {
+    if(rec == null) {
       return;
     }
-    for (int i = 0; i < rec.nump; i++) {
+    for(int i = 0; i < rec.nump; i++) {
       graph.get(rec.parents[i]).removeChild(entry);
       rec.parents[i] = null;
     }
-    for (int i = 0; i < rec.numc; i++) {
+    for(int i = 0; i < rec.numc; i++) {
       graph.get(rec.children[i]).removeParent(entry);
       rec.children[i] = null;
     }
@@ -123,17 +123,17 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   @Override
   public void removeSubtree(O entry) {
     Rec<O> rec = graph.get(entry);
-    if (rec == null) {
+    if(rec == null) {
       return;
     }
-    for (int i = 0; i < rec.nump; i++) {
+    for(int i = 0; i < rec.nump; i++) {
       graph.get(rec.parents[i]).removeChild(entry);
       rec.parents[i] = null;
     }
-    for (int i = 0; i < rec.numc; i++) {
+    for(int i = 0; i < rec.numc; i++) {
       final Rec<O> crec = graph.get(rec.children[i]);
       crec.removeParent(entry);
-      if (crec.nump == 0) {
+      if(crec.nump == 0) {
         removeSubtree((O) rec.children[i]);
       }
       rec.children[i] = null;
@@ -143,7 +143,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   @Override
   public int numChildren(O obj) {
     Rec<O> rec = graph.get(obj);
-    if (rec == null) {
+    if(rec == null) {
       return 0;
     }
     return rec.numc;
@@ -153,7 +153,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   @Override
   public Iter<O> iterChildren(O obj) {
     Rec<O> rec = graph.get(obj);
-    if (rec == null) {
+    if(rec == null) {
       return (Iter<O>) EMPTY_ITERATOR;
     }
     return rec.iterChildren();
@@ -167,7 +167,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   @Override
   public int numParents(O obj) {
     Rec<O> rec = graph.get(obj);
-    if (rec == null) {
+    if(rec == null) {
       return 0;
     }
     return rec.nump;
@@ -177,7 +177,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   @Override
   public Iter<O> iterParents(O obj) {
     Rec<O> rec = graph.get(obj);
-    if (rec == null) {
+    if(rec == null) {
       return (Iter<O>) EMPTY_ITERATOR;
     }
     return rec.iterParents();
@@ -211,12 +211,17 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     /**
      * Parents.
      */
-    Object[] parents = null;
+    Object[] parents = EMPTY;
 
     /**
      * Children.
      */
-    Object[] children = null;
+    Object[] children = EMPTY;
+
+    /**
+     * Empty list.
+     */
+    private static final Object[] EMPTY = new Object[0];
 
     /**
      * Add a parent.
@@ -224,23 +229,22 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @param parent Parent to add.
      */
     void addParent(O parent) {
-      if (parents == null) {
+      if(parents == EMPTY) {
         parents = new Object[1];
         parents[0] = parent;
         nump = 1;
-      } else {
-        for (int i = 0; i < nump; i++) {
-          if (parent.equals(parents[i])) {
-            return;
-          }
-        }
-        if (parents.length == nump) {
-          final int newsize = Math.min(5, (parents.length << 1) + 1);
-          parents = Arrays.copyOf(parents, newsize);
-        }
-        parents[nump] = parent;
-        nump++;
+        return;
       }
+      for(int i = 0; i < nump; i++) {
+        if(parent.equals(parents[i])) {
+          return; // Exists already.
+        }
+      }
+      if(parents.length == nump) {
+        final int newsize = Math.max(5, (parents.length << 1) + 1);
+        parents = Arrays.copyOf(parents, newsize);
+      }
+      parents[nump++] = parent;
     }
 
     /**
@@ -249,22 +253,21 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @param child Child to add
      */
     void addChild(O child) {
-      if (children == null) {
+      if(children == EMPTY) {
         children = new Object[5];
         children[0] = child;
         numc = 1;
-      } else {
-        for (int i = 0; i < numc; i++) {
-          if (child.equals(children[i])) {
-            return;
-          }
-        }
-        if (children.length == numc) {
-          children = Arrays.copyOf(children, (children.length << 1) + 1);
-        }
-        children[numc] = child;
-        numc++;
+        return;
       }
+      for(int i = 0; i < numc; i++) {
+        if(child.equals(children[i])) {
+          return; // Exists already
+        }
+      }
+      if(children.length == numc) {
+        children = Arrays.copyOf(children, (children.length << 1) + 1);
+      }
+      children[numc++] = child;
     }
 
     /**
@@ -273,19 +276,18 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @param parent Parent to remove.
      */
     void removeParent(O parent) {
-      if (parents == null) {
+      if(parents == EMPTY) {
         return;
       }
-      for (int i = 0; i < nump; i++) {
-        if (parent.equals(parents[i])) {
+      for(int i = 0; i < nump; i++) {
+        if(parent.equals(parents[i])) {
           System.arraycopy(parents, i + 1, parents, i, nump - 1 - i);
-          parents[nump] = null;
-          nump--;
+          parents[nump--] = null;
           break;
         }
       }
-      if (nump == 0) {
-        parents = null;
+      if(nump == 0) {
+        parents = EMPTY;
       }
     }
 
@@ -295,19 +297,18 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @param child Child to remove.
      */
     void removeChild(O child) {
-      if (children == null) {
+      if(children == EMPTY) {
         return;
       }
-      for (int i = 0; i < numc; i++) {
-        if (child.equals(children[i])) {
+      for(int i = 0; i < numc; i++) {
+        if(child.equals(children[i])) {
           System.arraycopy(children, i + 1, children, i, numc - 1 - i);
-          children[numc] = null;
-          numc--;
+          children[numc--] = null;
           break;
         }
       }
-      if (numc == 0) {
-        children = null;
+      if(numc == 0) {
+        children = EMPTY;
       }
     }
 
@@ -318,7 +319,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      */
     @SuppressWarnings("unchecked")
     public Iter<O> iterParents() {
-      if (nump == 0) {
+      if(nump == 0) {
         return (Iter<O>) EMPTY_ITERATOR;
       }
       return new ItrParents();
@@ -331,7 +332,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      */
     @SuppressWarnings("unchecked")
     public Iter<O> iterChildren() {
-      if (numc == 0) {
+      if(numc == 0) {
         return (Iter<O>) EMPTY_ITERATOR;
       }
       return new ItrChildren();
@@ -428,13 +429,14 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     @Override
     public Iter<O> advance() {
-      if (subiter == null) { // Not yet descended
+      if(subiter == null) { // Not yet descended
         assert (childiter.valid());
         subiter = iterDescendants(childiter.get());
-      } else { // Continue with subtree
+      }
+      else { // Continue with subtree
         subiter.advance();
       }
-      if (subiter.valid()) {
+      if(subiter.valid()) {
         return this;
       }
       // Proceed to next child.
@@ -445,10 +447,11 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     @Override
     public O get() {
-      if (subiter != null) {
+      if(subiter != null) {
         assert (subiter.valid());
         return subiter.get();
-      } else {
+      }
+      else {
         assert (childiter.valid());
         return childiter.get();
       }
@@ -489,13 +492,14 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     @Override
     public Iter<O> advance() {
-      if (subiter == null) { // Not yet descended
+      if(subiter == null) { // Not yet descended
         assert (parentiter.valid());
         subiter = iterAncestors(parentiter.get());
-      } else { // Continue with subtree
+      }
+      else { // Continue with subtree
         subiter.advance();
       }
-      if (subiter.valid()) {
+      if(subiter.valid()) {
         return this;
       }
       // Proceed to next child.
@@ -506,10 +510,11 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     @Override
     public O get() {
-      if (subiter != null) {
+      if(subiter != null) {
         assert (subiter.valid());
         return subiter.get();
-      } else {
+      }
+      else {
         assert (parentiter.valid());
         return parentiter.get();
       }
@@ -549,9 +554,10 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     @Override
     public Iter<O> advance() {
-      if (iter.hasNext()) {
+      if(iter.hasNext()) {
         cur = iter.next();
-      } else {
+      }
+      else {
         cur = null;
       }
       return this;

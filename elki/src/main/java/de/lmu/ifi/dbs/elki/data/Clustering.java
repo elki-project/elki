@@ -75,7 +75,7 @@ public class Clustering<M extends Model> extends BasicResult {
     super(name, shortname);
     this.toplevelclusters = toplevelclusters;
     this.hierarchy = new HashMapHierarchy<>();
-    for (Cluster<M> clus : toplevelclusters) {
+    for(Cluster<M> clus : toplevelclusters) {
       hierarchy.add(clus);
     }
   }
@@ -135,7 +135,7 @@ public class Clustering<M extends Model> extends BasicResult {
    */
   public List<Cluster<M>> getAllClusters() {
     ArrayList<Cluster<M>> res = new ArrayList<>(hierarchy.size());
-    for (Hierarchy.Iter<Cluster<M>> iter = hierarchy.iterAll(); iter.valid(); iter.advance()) {
+    for(Hierarchy.Iter<Cluster<M>> iter = hierarchy.iterAll(); iter.valid(); iter.advance()) {
       res.add(iter.get());
     }
     Collections.sort(res, Cluster.BY_NAME_SORTER);
@@ -165,9 +165,10 @@ public class Clustering<M extends Model> extends BasicResult {
 
       @Override
       public Iter<Cluster<M>> advance() {
-        if (iter.hasNext()) {
+        if(iter.hasNext()) {
           cur = iter.next();
-        } else {
+        }
+        else {
           cur = null;
         }
         return this;
