@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.parallel.Executor;
 import de.lmu.ifi.dbs.elki.parallel.processor.AbstractDoubleProcessor;
 import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
@@ -93,7 +94,7 @@ public class LRDProcessor extends AbstractDoubleProcessor {
         if(DBIDUtil.equal(n, id)) {
           continue;
         }
-        lrd += Math.max(kdists.doubleValue(n), n.doubleValue());
+        lrd += MathUtil.max(kdists.doubleValue(n), n.doubleValue());
         size += 1;
       }
       // Avoid division by 0:

@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -144,7 +145,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
       for(DoubleDBIDListIter neighbor = nMinPts.get(iditer).iter(); neighbor.valid(); neighbor.advance()) {
         double coreDist = coreDistance.doubleValue(neighbor);
         double dist = distQuery.distance(iditer, neighbor);
-        double rd = Math.max(coreDist, dist);
+        double rd = MathUtil.max(coreDist, dist);
         lrd = rd + lrd;
         core.add(rd);
       }

@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -149,7 +150,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
       max = hbbs[1];
       double maxd = 0;
       for(int i = 0; i < dim; i++) {
-        maxd = Math.max(maxd, max[i] - min[i]);
+        maxd = MathUtil.max(maxd, max[i] - min[i]);
       }
       // Enlarge bounding box to have equal lengths.
       for(int i = 0; i < dim; i++) {
@@ -204,7 +205,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
             ci = ci2;
           }
         }
-        // logger.debug("level:" + (ci != null ? ci.getLevel() : -1) +" l:"+l);
+        // LOG.debug("level:" + (ci != null ? ci.getLevel() : -1) +" l:"+l);
         if(ci == null) {
           break; // no matching tree for this level.
         }
@@ -222,14 +223,14 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
             cj = cj2;
           }
         }
-        // logger.debug("level:" + (cj != null ? cj.getLevel() : -1) +" l:"+l);
+        // LOG.debug("level:" + (cj != null ? cj.getLevel() : -1) +" l:"+l);
         if(cj == null) {
           continue; // no matching tree for this level.
         }
         double mdefnorm = calculate_MDEF_norm(cj, ci);
-        // logger.warning("level:" + ci.getLevel() + "/" + cj.getLevel() +
+        // LOG.warning("level:" + ci.getLevel() + "/" + cj.getLevel() +
         // " mdef: " + mdefnorm);
-        maxmdefnorm = Math.max(maxmdefnorm, mdefnorm);
+        maxmdefnorm = MathUtil.max(maxmdefnorm, mdefnorm);
       }
       // Store results
       mdef_norm.putDouble(iditer, maxmdefnorm);

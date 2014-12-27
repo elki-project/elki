@@ -286,7 +286,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         sum += pdists.doubleValue(neighbor);
         ks++;
       }
-      double plof = Math.max(pdists.doubleValue(iditer) * ks / sum, 1.0);
+      double plof = MathUtil.max(pdists.doubleValue(iditer) * ks / sum, 1.0);
       if(Double.isNaN(plof) || Double.isInfinite(plof)) {
         plof = 1.0;
       }

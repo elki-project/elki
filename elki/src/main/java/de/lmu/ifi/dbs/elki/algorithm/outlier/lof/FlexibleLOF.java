@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -273,7 +274,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
           continue;
         }
         KNNList neighborsNeighbors = knnq.getKNNForDBID(neighbor, kreach);
-        sum += Math.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
+        sum += MathUtil.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
         count++;
       }
       // Avoid division by 0

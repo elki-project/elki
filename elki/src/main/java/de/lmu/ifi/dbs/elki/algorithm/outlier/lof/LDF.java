@@ -163,7 +163,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
           count++;
           break;
         }
-        final double v = Math.max(nkdist, neighbor.doubleValue()) / (h * nkdist);
+        final double v = MathUtil.max(nkdist, neighbor.doubleValue()) / (h * nkdist);
         sum += kernel.density(v) / MathUtil.powi(h * nkdist, dim);
         count++;
       }
