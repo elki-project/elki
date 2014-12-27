@@ -66,11 +66,12 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * 
  * FIXME: re-check tie handling!
  * 
+ * TODO: add an hierarchy simplification step.
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult
- * @apiviz.has Clustering
  */
 public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**

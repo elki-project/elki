@@ -1,5 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2014
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -39,7 +61,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * This implementation does <em>not</em> include the cluster extraction
  * discussed as Step 4. This functionality should however already be provided by
- * {@link ExtractFlatClusteringFromHierarchy}.
+ * {@link ExtractFlatClusteringFromHierarchy}. For this reason, we also do
+ * <em>not include self-edges</em>.
+ * 
+ * Reference:
+ * <p>
+ * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
+ * Density-Based Clustering Based on Hierarchical Density Estimates<br />
+ * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
+ * PAKDD
+ * </p>
  * 
  * @author Erich Schubert
  */
@@ -49,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
 booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
 url = "http://dx.doi.org/10.1007/978-3-642-37456-2_14")
-public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
    */
@@ -72,7 +103,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerHierarchyR
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
+  public PointerDensityHierarchyRepresentationResult run(Database db, Relation<O> relation) {
     final DistanceQuery<O> distQ = db.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<O> knnQ = db.getKNNQuery(distQ, minPts + 1);
     // We need array addressing later.
@@ -95,7 +126,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerHierarchyR
     WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
     convertToPointerRepresentation(ids, heap, pi, lambda);
 
-    return new PointerHierarchyRepresentationResult(ids, pi, lambda);
+    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, coredists);
   }
 
   @Override
