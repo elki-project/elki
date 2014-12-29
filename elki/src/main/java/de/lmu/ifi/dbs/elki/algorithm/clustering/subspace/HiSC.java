@@ -186,8 +186,6 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       final V v1 = relation.get(id);
       final int dim = v1.getDimensionality();
 
-      long[] inverseCommonPreferenceVector = BitsUtil.ones(dim);
-      
       for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         // We can aggressively ignore processed objects, because we do not
         // have a minPts parameter in HiSC:
@@ -222,11 +220,8 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
           continue;
         }
 
-        // flip commonPreferenceVector for distance computation in common
-        // subspace
-        BitsUtil.onesI(inverseCommonPreferenceVector, dim);
-        BitsUtil.xorI(inverseCommonPreferenceVector, commonPreferenceVector);
-        final double orthogonalDistance = weightedDistance(v1, v2, inverseCommonPreferenceVector);
+        // Note: used to be: in orthogonal subspace?
+        double orthogonalDistance = weightedDistance(v1, v2, commonPreferenceVector);
 
         if(prevdim == subspaceDim) {
           double prevdist = reachability.doubleValue(iter);
