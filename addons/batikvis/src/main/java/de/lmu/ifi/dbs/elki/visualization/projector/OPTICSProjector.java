@@ -27,8 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -41,26 +40,24 @@ import de.lmu.ifi.dbs.elki.visualization.projections.OPTICSProjection;
  * Projection for OPTICS plots.
  * 
  * @author Erich Schubert
- * 
- * @param <E> Cluster order entry type
  */
-public class OPTICSProjector<E extends ClusterOrderEntry<?>> extends AbstractHierarchicalResult implements Projector {
+public class OPTICSProjector extends AbstractHierarchicalResult implements Projector {
   /**
    * Cluster order result
    */
-  private ClusterOrderResult<E> clusterOrder;
+  private ClusterOrder clusterOrder;
 
   /**
    * OPTICS plot image
    */
-  private OPTICSPlot<E> plot = null;
+  private OPTICSPlot plot = null;
 
   /**
    * Constructor.
    * 
    * @param co Cluster order
    */
-  public OPTICSProjector(ClusterOrderResult<E> co) {
+  public OPTICSProjector(ClusterOrder co) {
     super();
     this.clusterOrder = co;
   }
@@ -80,7 +77,7 @@ public class OPTICSProjector<E extends ClusterOrderEntry<?>> extends AbstractHie
     List<PlotItem> col = new ArrayList<>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if(tasks.size() > 0) {
-      final PlotItem it = new PlotItem(4., 1., new OPTICSProjection<>(this));
+      final PlotItem it = new PlotItem(4., 1., new OPTICSProjection(this));
       it.tasks = tasks;
       col.add(it);
     }
@@ -92,7 +89,7 @@ public class OPTICSProjector<E extends ClusterOrderEntry<?>> extends AbstractHie
    * 
    * @return the cluster order
    */
-  public ClusterOrderResult<E> getResult() {
+  public ClusterOrder getResult() {
     return clusterOrder;
   }
 
@@ -102,7 +99,7 @@ public class OPTICSProjector<E extends ClusterOrderEntry<?>> extends AbstractHie
    * @param context Context to use
    * @return Plot
    */
-  public OPTICSPlot<E> getOPTICSPlot(VisualizerContext context) {
+  public OPTICSPlot getOPTICSPlot(VisualizerContext context) {
     if(plot == null) {
       plot = OPTICSPlot.plotForClusterOrder(clusterOrder, context);
     }

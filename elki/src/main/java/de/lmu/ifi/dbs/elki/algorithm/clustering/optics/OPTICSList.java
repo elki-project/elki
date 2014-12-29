@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -104,7 +103,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
    * @param relation Relation
    * @return Result
    */
-  public ClusterOrderResult<DoubleDistanceClusterOrderEntry> run(Database db, Relation<O> relation) {
+  public ClusterOrder run(Database db, Relation<O> relation) {
     return new Instance(db, relation).run();
   }
 
@@ -117,12 +116,12 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
     /**
      * Holds a set of processed ids.
      */
-    private ModifiableDBIDs processedIDs;
+    ModifiableDBIDs processedIDs;
 
     /**
      * Current list of candidates.
      */
-    private ArrayModifiableDBIDs candidates;
+    ArrayModifiableDBIDs candidates;
 
     /**
      * Predecessor storage.
@@ -137,12 +136,12 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
     /**
      * Output cluster order.
      */
-    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder;
+    ClusterOrder clusterOrder;
 
     /**
      * IDs to process.
      */
-    private DBIDs ids;
+    DBIDs ids;
 
     /**
      * Progress for logging.
@@ -166,7 +165,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       candidates = DBIDUtil.newArray();
       predecessor = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT);
       reachability = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
-      clusterOrder = new ClusterOrderResult<>(db, ids, "OPTICS Clusterorder", "optics-clusterorder");
+      clusterOrder = new ClusterOrder(ids, "OPTICS Clusterorder", "optics-clusterorder");
       progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", ids.size(), LOG) : null;
       DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
       rangeQuery = db.getRangeQuery(dq, epsilon);
@@ -182,7 +181,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
      * 
      * @return Cluster order result.
      */
-    public ClusterOrderResult<DoubleDistanceClusterOrderEntry> run() {
+    public ClusterOrder run() {
       for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
         if(processedIDs.contains(iditer)) {
           continue;
@@ -211,10 +210,9 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
         candidates.remove(last);
         processedIDs.add(cur);
         { // Build cluster order entry
-          DBID currentID = DBIDUtil.deref(cur);
-          DBID prevID = DBIDUtil.deref(predecessor.assignVar(cur, prev));
+          predecessor.assignVar(cur, prev);
           double dist = reachability.doubleValue(cur);
-          clusterOrder.add(new DoubleDistanceClusterOrderEntry(currentID, prevID, dist));
+          clusterOrder.add(cur, dist, prev);
           LOG.incrementProcessed(progress);
         }
 

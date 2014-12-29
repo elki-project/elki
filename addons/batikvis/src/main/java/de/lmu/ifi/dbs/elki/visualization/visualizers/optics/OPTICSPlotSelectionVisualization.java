@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  */
 
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
@@ -32,8 +31,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -89,8 +89,8 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector<?> p : ops) {
+    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector p : ops) {
       final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       baseResult.getHierarchy().add(p, task);
@@ -116,7 +116,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
    * 
    * @apiviz.uses DBIDSelection oneway - 1 visualizes
    */
-  public class Instance extends AbstractOPTICSVisualization<ClusterOrderEntry<?>> implements DragableArea.DragListener {
+  public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
     /**
      * CSS class for markers
      */
@@ -167,17 +167,16 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * Add marker for the selected IDs to mtag
      */
     public void addMarker() {
-      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
+      ClusterOrder order = getClusterOrder();
       // TODO: replace mtag!
       DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
         DBIDs selection = DBIDUtil.ensureSet(selContext.getSelectedIds());
 
         final double width = plotwidth / order.size();
-        int begin = -1;
-        for(int j = 0; j < order.size(); j++) {
-          DBID id = order.get(j).getID();
-          if(selection.contains(id)) {
+        int begin = -1, j = 0;
+        for(DBIDIter it = order.iter(); it.valid(); it.advance(), j++) {
+          if(selection.contains(it)) {
             if(begin == -1) {
               begin = j;
             }
@@ -213,7 +212,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     @Override
     public boolean startDrag(SVGPoint startPoint, Event evt) {
-      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
+      ClusterOrder order = getClusterOrder();
       int mouseActIndex = getSelectedIndex(order, startPoint);
       if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
         double width = plotwidth / order.size();
@@ -228,7 +227,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     @Override
     public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
+      ClusterOrder order = getClusterOrder();
       int mouseDownIndex = getSelectedIndex(order, startPoint);
       int mouseActIndex = getSelectedIndex(order, dragPoint);
       final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
@@ -245,7 +244,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     @Override
     public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
+      ClusterOrder order = getClusterOrder();
       int mouseDownIndex = getSelectedIndex(order, startPoint);
       int mouseActIndex = getSelectedIndex(order, dragPoint);
       Mode mode = getInputMode(evt);
@@ -286,7 +285,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * @param cPt clicked point
      * @return Index of the object
      */
-    private int getSelectedIndex(List<? extends ClusterOrderEntry<?>> order, SVGPoint cPt) {
+    private int getSelectedIndex(ClusterOrder order, SVGPoint cPt) {
       int mouseActIndex = (int) ((cPt.getX() / plotwidth) * order.size());
       return mouseActIndex;
     }
@@ -299,7 +298,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * @param end last index to select
      */
     protected void updateSelection(Mode mode, int begin, int end) {
-      List<? extends ClusterOrderEntry<?>> order = getClusterOrder();
+      ClusterOrder order = getClusterOrder();
       if(begin < 0 || begin > end || end >= order.size()) {
         LOG.warning("Invalid range in updateSelection: " + begin + " .. " + end);
         return;
@@ -314,21 +313,20 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
         selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
       }
 
-      for(int i = begin; i <= end; i++) {
-        DBID id = order.get(i).getID();
+      for(DBIDArrayIter it = order.iter().seek(begin); it.getOffset() <= end; it.advance()) {
         if(mode == Mode.INVERT) {
-          if(!selection.contains(id)) {
-            selection.add(id);
+          if(!selection.contains(it)) {
+            selection.add(it);
           }
           else {
-            selection.remove(id);
+            selection.remove(it);
           }
         }
         else {
           // In REPLACE and ADD, add objects.
           // The difference was done before by not re-using the selection.
           // Since we are using a set, we can just add in any case.
-          selection.add(id);
+          selection.add(it);
         }
       }
       context.setSelection(new DBIDSelection(selection));

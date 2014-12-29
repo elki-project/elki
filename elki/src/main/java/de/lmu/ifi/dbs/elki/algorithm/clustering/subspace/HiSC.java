@@ -23,19 +23,22 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrder;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.GeneralizedOPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -59,7 +62,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * of subspace clusters.
  * <p>
  * Reference: E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman,
- * A. Zimek: Finding Hierarchies of Subspace Clusters. <br>
+ * A. Zimek<br />
+ * Finding Hierarchies of Subspace Clusters. <br />
  * In: Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery
  * in Databases (PKDD'06), Berlin, Germany, 2006.
  * </p>
@@ -72,8 +76,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Finding Hierarchies of Subspace Clusters")
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Finding Hierarchies of Subspace Clusters", booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
-public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, HiSC.HiSCClusterOrderEntry> {
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek",//
+title = "Finding Hierarchies of Subspace Clusters", //
+booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", //
+url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
+public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, CorrelationClusterOrder> {
   /**
    * The logger for this class.
    */
@@ -83,16 +90,6 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, HiSC.HiSC
    * Factory to produce
    */
   private IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>> indexfactory;
-
-  /**
-   * Instantiated index.
-   */
-  private HiSCPreferenceVectorIndex<NumberVector> index;
-
-  /**
-   * Relation we are currently processing.
-   */
-  private Relation<V> relation;
 
   /**
    * Holds the maximum diversion allowed.
@@ -105,68 +102,159 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, HiSC.HiSC
    * @param indexfactory HiSC index factory
    */
   public HiSC(IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>> indexfactory, double epsilon) {
-    super(2);
+    super();
     this.indexfactory = indexfactory;
     this.alpha = epsilon;
   }
 
   @Override
-  public ClusterOrderResult<HiSCClusterOrderEntry> run(Relation<V> relation) {
-    assert (this.index == null && this.relation == null) : "Running algorithm instance multiple times in parallel is not supported.";
-    this.index = indexfactory.instantiate(relation);
-    this.relation = relation;
-    ClusterOrderResult<HiSCClusterOrderEntry> result = super.run(relation);
-    this.index = null;
-    this.relation = null;
-    return result;
+  public ClusterOrder run(Database db, Relation<V> relation) {
+    return new Instance(db, relation).run();
   }
 
-  @Override
-  protected HiSCClusterOrderEntry makeSeedEntry(Relation<V> relation, DBID objectID) {
-    return new HiSCClusterOrderEntry(objectID, null, Integer.MAX_VALUE, Double.POSITIVE_INFINITY, new long[0]);
-  }
+  /**
+   * Algorithm instance for a single data set.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
+    /**
+     * Instantiated index.
+     */
+    private HiSCPreferenceVectorIndex<NumberVector> index;
 
-  @Override
-  protected Collection<HiSCClusterOrderEntry> getNeighborsForDBID(Relation<V> relation, DBID id) {
-    DBID id1 = DBIDUtil.deref(id);
-    long[] pv1 = index.getPreferenceVector(id1);
-    V v1 = relation.get(id1);
-    final int dim = v1.getDimensionality();
+    /**
+     * Cluster order.
+     */
+    private ArrayModifiableDBIDs clusterOrder;
 
-    ArrayList<HiSCClusterOrderEntry> result = new ArrayList<>();
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      long[] pv2 = index.getPreferenceVector(iter);
-      V v2 = relation.get(iter);
-      final long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
+    /**
+     * Data relation.
+     */
+    private Relation<V> relation;
 
-      // number of zero values in commonPreferenceVector
-      int subspaceDim = dim - BitsUtil.cardinality(commonPreferenceVector);
+    /**
+     * Correlation dimensionality.
+     */
+    private WritableIntegerDataStore correlationValue;
 
-      // special case: v1 and v2 are in parallel subspaces
-      double dist1 = weightedDistance(v1, v2, pv1);
-      double dist2 = weightedDistance(v1, v2, pv2);
+    /**
+     * Shared preference vectors.
+     */
+    private WritableDataStore<long[]> commonPreferenceVectors;
 
-      if(Math.max(dist1, dist2) > alpha) {
-        subspaceDim++;
-        if(LOG.isDebugging()) {
-          StringBuilder msg = new StringBuilder();
-          msg.append("\ndist1 ").append(dist1);
-          msg.append("\ndist2 ").append(dist2);
-          msg.append("\nsubspaceDim ").append(subspaceDim);
-          msg.append("\ncommon pv ").append(BitsUtil.toStringLow(commonPreferenceVector, dim));
-          LOG.debugFine(msg.toString());
+    /**
+     * Constructor.
+     *
+     * @param db Database
+     * @param relation Relation
+     */
+    public Instance(Database db, Relation<V> relation) {
+      super(db, relation);
+      DBIDs ids = relation.getDBIDs();
+      this.clusterOrder = DBIDUtil.newArray(ids.size());
+      this.relation = relation;
+      this.correlationValue = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_DB, Integer.MAX_VALUE);
+      this.commonPreferenceVectors = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, long[].class);
+    }
+
+    @Override
+    public CorrelationClusterOrder run() {
+      this.index = indexfactory.instantiate(relation);
+      return super.run();
+    }
+
+    @Override
+    protected CorrelationClusterOrder buildResult() {
+      return new CorrelationClusterOrder("HiCO Cluster Order", "hico-cluster-order", //
+      clusterOrder, reachability, predecessor, correlationValue);
+    }
+
+    @Override
+    protected void initialDBID(DBIDRef id) {
+      correlationValue.put(id, Integer.MAX_VALUE);
+      commonPreferenceVectors.put(id, new long[0]);
+    }
+
+    @Override
+    protected void expandDBID(DBIDRef id) {
+      clusterOrder.add(id);
+
+      final long[] pv1 = index.getPreferenceVector(id);
+      final V v1 = relation.get(id);
+      final int dim = v1.getDimensionality();
+
+      long[] inverseCommonPreferenceVector = BitsUtil.ones(dim);
+      
+      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+        // We can aggressively ignore processed objects, because we do not
+        // have a minPts parameter in HiSC:
+        if(processedIDs.contains(iter)) {
+          continue;
+        }
+        long[] pv2 = index.getPreferenceVector(iter);
+        V v2 = relation.get(iter);
+        final long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
+
+        // number of zero values in commonPreferenceVector
+        int subspaceDim = dim - BitsUtil.cardinality(commonPreferenceVector);
+
+        // special case: v1 and v2 are in parallel subspaces
+        double dist1 = weightedDistance(v1, v2, pv1);
+        double dist2 = weightedDistance(v1, v2, pv2);
+
+        if(dist1 > alpha || dist2 > alpha) {
+          subspaceDim++;
+          if(LOG.isDebugging()) {
+            StringBuilder msg = new StringBuilder();
+            msg.append("dist1 ").append(dist1);
+            msg.append("\ndist2 ").append(dist2);
+            msg.append("\nsubspaceDim ").append(subspaceDim);
+            msg.append("\ncommon pv ").append(BitsUtil.toStringLow(commonPreferenceVector, dim));
+            LOG.debugFine(msg.toString());
+          }
+        }
+        int prevdim = correlationValue.intValue(iter);
+        // Cannot be better:
+        if(prevdim < subspaceDim) {
+          continue;
+        }
+
+        // flip commonPreferenceVector for distance computation in common
+        // subspace
+        BitsUtil.onesI(inverseCommonPreferenceVector, dim);
+        BitsUtil.xorI(inverseCommonPreferenceVector, commonPreferenceVector);
+        final double orthogonalDistance = weightedDistance(v1, v2, inverseCommonPreferenceVector);
+
+        if(prevdim == subspaceDim) {
+          double prevdist = reachability.doubleValue(iter);
+          if(prevdist <= orthogonalDistance) {
+            continue; // Not better.
+          }
+        }
+        correlationValue.putInt(iter, subspaceDim);
+        reachability.putDouble(iter, orthogonalDistance);
+        predecessor.putDBID(iter, id);
+        commonPreferenceVectors.put(iter, commonPreferenceVector);
+        if(prevdim == Integer.MAX_VALUE) {
+          candidates.add(iter);
         }
       }
-
-      // flip commonPreferenceVector for distance computation in common subspace
-      long[] inverseCommonPreferenceVector = BitsUtil.ones(dim);
-      BitsUtil.xorI(inverseCommonPreferenceVector, commonPreferenceVector);
-
-      final double orthogonalDistance = weightedDistance(v1, v2, inverseCommonPreferenceVector);
-      result.add(new HiSCClusterOrderEntry(DBIDUtil.deref(iter), id1, subspaceDim, orthogonalDistance, commonPreferenceVector));
     }
-    Collections.sort(result);
-    return result;
+
+    @Override
+    public int compare(DBIDRef o1, DBIDRef o2) {
+      int c1 = correlationValue.intValue(o1), c2 = correlationValue.intValue(o2);
+      return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
+      super.compare(o1, o2);
+    }
+
+    @Override
+    protected Logging getLogger() {
+      return LOG;
+    }
   }
 
   /**
@@ -189,8 +277,8 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, HiSC.HiSC
   }
 
   @Override
-  public Class<? super HiSCClusterOrderEntry> getEntryType() {
-    return HiSCClusterOrderEntry.class;
+  public int getMinPts() {
+    return 2;
   }
 
   @Override
@@ -201,63 +289,6 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, HiSC.HiSC
   @Override
   protected Logging getLogger() {
     return LOG;
-  }
-
-  /**
-   * Cluster order entry for HiSC.
-   * 
-   * @author Elke Achtert
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class HiSCClusterOrderEntry extends CorrelationClusterOrderEntry<HiSCClusterOrderEntry> {
-    /**
-     * The common preference vector of the two objects defining this distance.
-     */
-    private long[] commonPreferenceVector;
-
-    /**
-     * Constructs a new CorrelationDistance object.
-     * 
-     * @param correlationValue the correlation dimension to be represented by
-     *        the CorrelationDistance
-     * @param euclideanValue the Euclidean distance to be represented by the
-     *        CorrelationDistance
-     * @param commonPreferenceVector the common preference vector of the two
-     *        objects defining this distance
-     */
-    public HiSCClusterOrderEntry(DBID objectID, DBID predecessorID, int correlationValue, double euclideanValue, long[] commonPreferenceVector) {
-      super(objectID, predecessorID, correlationValue, euclideanValue);
-      this.commonPreferenceVector = commonPreferenceVector;
-    }
-
-    /**
-     * Returns the common preference vector of the two objects defining this
-     * distance.
-     * 
-     * @return the common preference vector
-     */
-    public long[] getCommonPreferenceVector() {
-      return commonPreferenceVector;
-    }
-
-    /**
-     * Returns a string representation of this
-     * PreferenceVectorBasedCorrelationDistance.
-     * 
-     * @return the correlation value, the Euclidean value and the common
-     *         preference vector separated by blanks
-     */
-    @Override
-    public String toString() {
-      return super.toString() + SEPARATOR + commonPreferenceVector.toString();
-    }
-
-    @Override
-    public int compareTo(HiSCClusterOrderEntry other) {
-      return super.compareTo(other);
-    }
   }
 
   /**

@@ -25,12 +25,9 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DoubleDistanceClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
@@ -45,13 +42,9 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf LinearScale
- * @apiviz.composedOf OPTICSColorAdapter
- * @apiviz.composedOf OPTICSDistanceAdapter
  * @apiviz.has ClusterOrderResult oneway - - renders
- * 
- * @param <E> Cluster order entry type
  */
-public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
+public class OPTICSPlot implements Result {
   /**
    * Logger
    */
@@ -83,19 +76,14 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
   double ratio;
 
   /**
-   * The result to plot
+   * The result to plot.
    */
-  final ClusterOrderResult<E> co;
+  final ClusterOrder co;
 
   /**
    * Color adapter to use
    */
-  final OPTICSColorAdapter colors;
-
-  /**
-   * The mapping from cluster order entry to value
-   */
-  final OPTICSDistanceAdapter<E> distanceAdapter;
+  final StylingPolicy colors;
 
   /**
    * The Optics plot.
@@ -108,98 +96,37 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
   protected int plotnum = -1;
 
   /**
-   * Constructor.
-   * 
-   * @param co Cluster order to plot.
-   * @param colors Coloring strategy
-   * @param distanceAdapter Distance adapter
-   */
-  public OPTICSPlot(ClusterOrderResult<E> co, OPTICSColorAdapter colors, OPTICSDistanceAdapter<E> distanceAdapter) {
-    super();
-    this.co = co;
-    this.colors = colors;
-    this.distanceAdapter = distanceAdapter;
-  }
-
-  /**
    * Constructor, with automatic distance adapter detection.
    * 
    * @param co Cluster order to plot.
    * @param colors Coloring strategy
    */
-  public OPTICSPlot(ClusterOrderResult<E> co, OPTICSColorAdapter colors) {
+  public OPTICSPlot(ClusterOrder co, StylingPolicy colors) {
     super();
     this.co = co;
     this.colors = colors;
-    this.distanceAdapter = getAdapterForDistance(co);
-  }
-
-  /**
-   * Try to find a distance adapter.
-   * 
-   * @param <E> cluster order entry type
-   * @param co ClusterOrderResult
-   * @return distance adapter
-   */
-  @SuppressWarnings({ "unchecked" })
-  private static <E extends ClusterOrderEntry<?>> OPTICSDistanceAdapter<E> getAdapterForDistance(ClusterOrderResult<E> co) {
-    Class<?> dcls = co.getEntryType();
-    if(dcls != null && DoubleDistanceClusterOrderEntry.class.isAssignableFrom(dcls)) {
-      return (OPTICSDistanceAdapter<E>) new OPTICSNumberDistanceAdapter();
-    }
-    else if(dcls != null && CorrelationClusterOrderEntry.class.isAssignableFrom(dcls)) {
-      return (OPTICSDistanceAdapter<E>) new OPTICSCorrelationDimensionalityDistanceAdapter();
-    }
-    else if(dcls == null) {
-      throw new UnsupportedOperationException("No distance in cluster order?!?");
-    }
-    else {
-      throw new UnsupportedOperationException("No distance adapter found for distance class: " + dcls);
-    }
-  }
-
-  /**
-   * Test whether this class can produce an OPTICS plot for the given cluster
-   * order.
-   * 
-   * @param <E> Cluster order entry type
-   * @param co Cluster order result
-   * @return test result
-   */
-  public static <E extends ClusterOrderEntry<?>> boolean canPlot(ClusterOrderResult<E> co) {
-    try {
-      if(getAdapterForDistance(co) != null) {
-        return true;
-      }
-      return false;
-    }
-    catch(UnsupportedOperationException e) {
-      return false;
-    }
   }
 
   /**
    * Trigger a redraw of the OPTICS plot
    */
   public void replot() {
-    List<E> order = co.getClusterOrder();
-
-    width = order.size();
+    width = co.size();
     height = (int) Math.ceil(width * .2);
     ratio = width / (double) height;
-    height = height < MIN_HEIGHT ? MIN_HEIGHT : height > MAX_HEIGHT ? MAX_HEIGHT : height; 
+    height = height < MIN_HEIGHT ? MIN_HEIGHT : height > MAX_HEIGHT ? MAX_HEIGHT : height;
     if(scale == null) {
-      scale = computeScale(order);
+      scale = computeScale(co);
     }
 
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
     int x = 0;
-    for(E coe : order) {
-      double reach = distanceAdapter.getDoubleForEntry(coe);
+    for(DBIDIter it = co.iter(); it.valid(); it.advance()) {
+      double reach = co.getReachability(it);
       final int y = scaleToPixel(reach);
       try {
-        int col = colors.getColorForEntry(coe);
+        int col = colors.getColorForDBID(it);
         for(int y2 = height - 1; y2 >= y; y2--) {
           img.setRGB(x, y2, col);
         }
@@ -240,12 +167,12 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
    * @param order Cluster order to process
    * @return Scale for value range of cluster order
    */
-  protected LinearScale computeScale(List<E> order) {
+  protected LinearScale computeScale(ClusterOrder order) {
     DoubleMinMax range = new DoubleMinMax();
     // calculate range
-    for(E coe : order) {
-      double reach = distanceAdapter.getDoubleForEntry(coe);
-      if(!distanceAdapter.isInfinite(coe) && !Double.isNaN(reach)) {
+    for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
+      final double reach = co.getReachability(it);
+      if(reach < Double.POSITIVE_INFINITY) {
         range.put(reach);
       }
     }
@@ -312,15 +239,6 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
   }
 
   /**
-   * Get the distance adapter-
-   * 
-   * @return the distanceAdapter
-   */
-  public OPTICSDistanceAdapter<E> getDistanceAdapter() {
-    return distanceAdapter;
-  }
-
-  /**
    * Free memory used by rendered image.
    */
   public void forgetRenderedImage() {
@@ -354,27 +272,21 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
    * Static method to find an optics plot for a result, or to create a new one
    * using the given context.
    * 
-   * @param <E> Cluster order entry type
+   * @param Cluster order entry type
    * @param co Cluster order
    * @param context Context (for colors and reference clustering)
    * 
    * @return New or existing optics plot
    */
-  public static <E extends ClusterOrderEntry<?>> OPTICSPlot<E> plotForClusterOrder(ClusterOrderResult<E> co, VisualizerContext context) {
+  public static <E extends ClusterOrder> OPTICSPlot plotForClusterOrder(E co, VisualizerContext context) {
     // Check for an existing plot
     // ArrayList<OPTICSPlot<D>> plots = ResultUtil.filterResults(co,
     // OPTICSPlot.class);
     // if (plots.size() > 0) {
     // return plots.get(0);
     // }
-    // Supported by this class?
-    if(!OPTICSPlot.canPlot(co)) {
-      return null;
-    }
     final StylingPolicy policy = context.getStyleResult().getStylingPolicy();
-    final OPTICSColorAdapter opcolor = new OPTICSColorFromStylingPolicy(policy);
-
-    OPTICSPlot<E> opticsplot = new OPTICSPlot<>(co, opcolor);
+    OPTICSPlot opticsplot = new OPTICSPlot(co, policy);
     // co.addChildResult(opticsplot);
     return opticsplot;
   }
@@ -384,7 +296,7 @@ public class OPTICSPlot<E extends ClusterOrderEntry<?>> implements Result {
    * 
    * @return Cluster order
    */
-  public ClusterOrderResult<E> getClusterOrder() {
+  public ClusterOrder getClusterOrder() {
     return co;
   }
 }

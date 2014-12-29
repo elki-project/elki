@@ -25,13 +25,10 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DoubleDistanceClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 
 /**
  * Produce OPTICS plot projections
@@ -50,13 +47,9 @@ public class OPTICSProjectorFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Collection<ClusterOrderResult<? extends ClusterOrderEntry<?>>> cos = ResultUtil.filterResults(newResult, ClusterOrderResult.class);
-    for(ClusterOrderResult<? extends ClusterOrderEntry<?>> co : cos) {
-      if(OPTICSPlot.canPlot(co)) {
-        @SuppressWarnings("unchecked")
-        OPTICSProjector<?> proj = new OPTICSProjector<>((ClusterOrderResult<DoubleDistanceClusterOrderEntry>) co);
-        baseResult.getHierarchy().add(co, proj);
-      }
+    Collection<ClusterOrder> cos = ResultUtil.filterResults(newResult, ClusterOrder.class);
+    for(ClusterOrder co : cos) {
+      baseResult.getHierarchy().add(co, new OPTICSProjector(co));
     }
   }
 }

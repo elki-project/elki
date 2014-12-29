@@ -30,7 +30,6 @@ import java.util.Map;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
@@ -77,8 +76,8 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector<?> p : ops) {
+    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector p : ops) {
       final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
       if(ocl != null) {
         final VisualizationTask task = new VisualizationTask(NAME, ocl, null, this);
@@ -135,7 +134,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
    * 
    * @apiviz.uses Clustering oneway - - «visualizes»
    */
-  public class Instance extends AbstractOPTICSVisualization<ClusterOrderEntry<?>> {
+  public class Instance extends AbstractOPTICSVisualization {
     /**
      * CSS class for markers
      */
@@ -187,8 +186,8 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
         Cluster<OPTICSModel> cluster = clusters.get();
         try {
           OPTICSModel model = cluster.getModel();
-          final double x1 = plotwidth * ((model.getStartIndex() + .25) / this.optics.getResult().getClusterOrder().size());
-          final double x2 = plotwidth * ((model.getEndIndex() + .75) / this.optics.getResult().getClusterOrder().size());
+          final double x1 = plotwidth * ((model.getStartIndex() + .25) / this.optics.getResult().size());
+          final double x2 = plotwidth * ((model.getEndIndex() + .75) / this.optics.getResult().size());
           final double y = plotheight + depth * scale * 0.01;
           Element e = svgp.svgLine(x1, y, x2, y);
           SVGUtil.addCSSClass(e, CSS_BRACKET);

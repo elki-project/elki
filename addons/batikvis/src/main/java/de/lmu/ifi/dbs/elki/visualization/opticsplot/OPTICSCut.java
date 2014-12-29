@@ -23,15 +23,14 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
 /**
@@ -48,14 +47,12 @@ public class OPTICSCut {
   /**
    * Compute an OPTICS cut clustering
    * 
-   * @param <E> Cluster order entry type
    * @param co Cluster order result
    * @param adapter Distance adapter
    * @param epsilon Epsilon value for cut
    * @return New partitioning clustering
    */
-  public static <E extends ClusterOrderEntry<?>> Clustering<Model> makeOPTICSCut(ClusterOrderResult<E> co, OPTICSDistanceAdapter<E> adapter, double epsilon) {
-    List<E> order = co.getClusterOrder();
+  public static <E extends ClusterOrder> Clustering<Model> makeOPTICSCut(E co, double epsilon) {
     // Clustering model we are building
     Clustering<Model> clustering = new Clustering<>("OPTICS Cut Clustering", "optics-cut");
     // Collects noise elements
@@ -68,19 +65,20 @@ public class OPTICSCut {
     ModifiableDBIDs current = DBIDUtil.newHashSet();
 
     // TODO: can we implement this more nicely with a 1-lookahead?
-    for(int j = 0; j < order.size(); j++) {
+    DBIDVar prev = DBIDUtil.newVar();
+    for(DBIDIter it = co.iter(); it.valid(); it.advance(), prev.set(it)) {
       lastDist = actDist;
-      actDist = adapter.getDoubleForEntry(order.get(j));
+      actDist = co.getReachability(it);
 
       if(actDist <= epsilon) {
         // the last element before the plot drops belongs to the cluster
-        if(lastDist > epsilon && j > 0) {
+        if(lastDist > epsilon && prev.isSet()) {
           // So un-noise it
-          noise.remove(order.get(j - 1).getID());
+          noise.remove(prev);
           // Add it to the cluster
-          current.add(order.get(j - 1).getID());
+          current.add(prev);
         }
-        current.add(order.get(j).getID());
+        current.add(it);
       }
       else {
         // 'Finish' the previous cluster
@@ -91,7 +89,7 @@ public class OPTICSCut {
           current = DBIDUtil.newHashSet();
         }
         // Add to noise
-        noise.add(order.get(j).getID());
+        noise.add(it);
       }
     }
     // Any unfinished cluster will also be added

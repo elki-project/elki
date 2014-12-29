@@ -93,7 +93,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
    * @param relation Relation
    * @return Result
    */
-  public ClusterOrderResult<DoubleDistanceClusterOrderEntry> run(Database db, Relation<O> relation) {
+  public ClusterOrder run(Database db, Relation<O> relation) {
     return new Instance(db, relation).run();
   }
 
@@ -111,12 +111,12 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
     /**
      * Heap of candidates.
      */
-    UpdatableHeap<DoubleDistanceClusterOrderEntry> heap = new UpdatableHeap<>();
+    UpdatableHeap<OPTICSHeapEntry> heap = new UpdatableHeap<>();
 
     /**
      * Output cluster order.
      */
-    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder;
+    ClusterOrder clusterOrder;
 
     /**
      * IDs to process.
@@ -142,7 +142,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
     public Instance(Database db, Relation<O> relation) {
       ids = relation.getDBIDs();
       processedIDs = DBIDUtil.newHashSet(ids.size());
-      clusterOrder = new ClusterOrderResult<>(db, ids, "OPTICS Clusterorder", "optics-clusterorder");
+      clusterOrder = new ClusterOrder(ids, "OPTICS Clusterorder", "optics-clusterorder");
       progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", ids.size(), LOG) : null;
       DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
       rangeQuery = db.getRangeQuery(dq, epsilon);
@@ -153,7 +153,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
      * 
      * @return Cluster order result.
      */
-    public ClusterOrderResult<DoubleDistanceClusterOrderEntry> run() {
+    public ClusterOrder run() {
       for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
         if(!processedIDs.contains(iditer)) {
           assert (heap.isEmpty());
@@ -170,11 +170,11 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
      * @param objectID the currently processed object
      */
     protected void expandClusterOrder(DBIDRef objectID) {
-      heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(objectID), null, Double.POSITIVE_INFINITY));
+      heap.add(new OPTICSHeapEntry(DBIDUtil.deref(objectID), null, Double.POSITIVE_INFINITY));
 
       while(!heap.isEmpty()) {
-        final DoubleDistanceClusterOrderEntry current = heap.poll();
-        clusterOrder.add(current);
+        final OPTICSHeapEntry current = heap.poll();
+        clusterOrder.add(current.objectID, current.reachability, current.predecessorID);
         processedIDs.add(current.getID());
 
         DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
@@ -187,7 +187,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
               continue;
             }
             double reachability = MathUtil.max(neighbor.doubleValue(), coreDistance);
-            heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
+            heap.add(new OPTICSHeapEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
           }
         }
         if(progress != null) {

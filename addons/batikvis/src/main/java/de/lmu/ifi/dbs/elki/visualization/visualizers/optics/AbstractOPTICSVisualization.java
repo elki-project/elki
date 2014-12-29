@@ -23,11 +23,9 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import org.apache.batik.util.SVGConstants;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.OPTICSProjection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -40,14 +38,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * @author Erich Schubert
  * 
  * @apiviz.uses OPTICSProjection
- * 
- * @param <E> Cluster order entry type
  */
-public abstract class AbstractOPTICSVisualization<E extends ClusterOrderEntry<?>> extends AbstractVisualization {
+public abstract class AbstractOPTICSVisualization extends AbstractVisualization {
   /**
    * The plot
    */
-  final protected OPTICSProjection<E> optics;
+  final protected OPTICSProjection optics;
 
   /**
    * Width of plot (in display units)
@@ -86,7 +82,7 @@ public abstract class AbstractOPTICSVisualization<E extends ClusterOrderEntry<?>
    * 
    * @return Cluster order
    */
-  protected List<E> getClusterOrder() {
-    return optics.getResult().getClusterOrder();
+  protected ClusterOrder getClusterOrder() {
+    return optics.getResult();
   }
 }

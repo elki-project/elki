@@ -23,25 +23,30 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.CorrelationClusterOrder;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.GeneralizedOPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -50,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -63,22 +69,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Implementation of the HiCO algorithm, an algorithm for detecting hierarchies
  * of correlation clusters.
  * <p>
- * Reference: E. Achtert, C. Böhm, P. Kröger, A. Zimek: Mining Hierarchies of
- * Correlation Clusters. <br>
+ * Reference: E. Achtert, C. Böhm, P. Kröger, A. Zimek:<br />
+ * Mining Hierarchies of Correlation Clusters. <br>
  * In: Proc. Int. Conf. on Scientific and Statistical Database Management
  * (SSDBM'06), Vienna, Austria, 2006.
  * </p>
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses FilteredLocalPCAIndex
+ * @apiviz.composedOf HiCO.Instance
  * 
  * @param <V> the type of NumberVector handled by the algorithm
  */
 @Title("Mining Hierarchies of Correlation Clusters")
 @Description("Algorithm for detecting hierarchies of correlation clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger, A. Zimek", title = "Mining Hierarchies of Correlation Clusters", booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06), Vienna, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.35")
-public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, HiCO.HiCOClusterOrderEntry> {
+public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, CorrelationClusterOrder> {
   /**
    * The logger for this class.
    */
@@ -100,14 +106,14 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, HiCO.HiCO
   private IndexFactory<V, FilteredLocalPCAIndex<NumberVector>> indexfactory;
 
   /**
-   * Instantiated index.
-   */
-  private FilteredLocalPCAIndex<NumberVector> index;
-
-  /**
    * Delta parameter
    */
   double delta;
+
+  /**
+   * Mu parameter.
+   */
+  int mu;
 
   /**
    * Constructor.
@@ -116,51 +122,177 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, HiCO.HiCO
    * @param mu Mu parameter
    */
   public HiCO(IndexFactory<V, FilteredLocalPCAIndex<NumberVector>> indexfactory, int mu, double delta) {
-    super(mu);
+    super();
+    this.mu = mu;
     this.indexfactory = indexfactory;
     this.delta = delta;
   }
 
   @Override
-  public ClusterOrderResult<HiCOClusterOrderEntry> run(Relation<V> relation) {
-    assert (this.index == null) : "Running algorithm instance multiple times in parallel is not supported.";
-    this.index = indexfactory.instantiate(relation);
-    ClusterOrderResult<HiCOClusterOrderEntry> result = super.run(relation);
-    this.index = null;
-    return result;
-  }
-
-  @Override
-  protected HiCOClusterOrderEntry makeSeedEntry(Relation<V> relation, DBID objectID) {
-    return new HiCOClusterOrderEntry(objectID, null, Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
-  }
-
-  @Override
-  protected Collection<HiCOClusterOrderEntry> getNeighborsForDBID(Relation<V> relation, DBID id) {
-    DBID id1 = DBIDUtil.deref(id);
-    PCAFilteredResult pca1 = index.getLocalProjection(id1);
-    V dv1 = relation.get(id1);
-    final int dim = dv1.getDimensionality();
-
-    ArrayList<HiCOClusterOrderEntry> result = new ArrayList<>();
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      PCAFilteredResult pca2 = index.getLocalProjection(iter);
-      V dv2 = relation.get(iter);
-
-      int correlationDistance = correlationDistance(pca1, pca2, dim);
-      double euclideanDistance = EuclideanDistanceFunction.STATIC.distance(dv1, dv2);
-
-      result.add(new HiCOClusterOrderEntry(DBIDUtil.deref(iter), id1, correlationDistance, euclideanDistance));
+  public CorrelationClusterOrder run(Database db, Relation<V> relation) {
+    if(mu >= relation.size()) {
+      throw new AbortException("Parameter mu is chosen unreasonably large. This won't yield meaningful results.");
     }
-    Collections.sort(result);
-    // This is a hack, but needed to enforce core-distance of OPTICS:
-    if(result.size() >= getMinPts()) {
-      HiCOClusterOrderEntry coredist = result.get(getMinPts() - 1);
-      for(int i = 0; i < getMinPts() - 1; i++) {
-        result.set(i, new HiCOClusterOrderEntry(result.get(i).getID(), id1, coredist.getCorrelationValue(), coredist.getEuclideanValue()));
+    return new Instance(db, relation).run();
+  }
+
+  /**
+   * Instance of the OPTICS algorithm.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.uses FilteredLocalPCAIndex
+   */
+  private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
+    /**
+     * Instantiated index.
+     */
+    private FilteredLocalPCAIndex<NumberVector> index;
+
+    /**
+     * Data relation.
+     */
+    private Relation<V> relation;
+
+    /**
+     * Cluster order.
+     */
+    private ArrayModifiableDBIDs clusterOrder;
+
+    /**
+     * Correlation value.
+     */
+    private WritableIntegerDataStore correlationValue;
+
+    /**
+     * Temporary storage of correlation values.
+     */
+    private WritableIntegerDataStore tmpCorrelation;
+
+    /**
+     * Temporary storage of distances.
+     */
+    private WritableDoubleDataStore tmpDistance;
+
+    /**
+     * Temporary ids.
+     */
+    private ArrayModifiableDBIDs tmpIds;
+
+    /**
+     * Sort object by the temporary fields.
+     */
+    Comparator<DBIDRef> tmpcomp = new Sorter();
+
+    /**
+     * Constructor.
+     *
+     * @param db Database
+     * @param relation Relation
+     */
+    public Instance(Database db, Relation<V> relation) {
+      super(db, relation);
+      DBIDs ids = relation.getDBIDs();
+      this.clusterOrder = DBIDUtil.newArray(ids.size());
+      this.relation = relation;
+      this.correlationValue = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_DB, Integer.MAX_VALUE);
+      this.tmpIds = DBIDUtil.newArray(ids);
+      this.tmpCorrelation = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
+      this.tmpDistance = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
+    }
+
+    @Override
+    public CorrelationClusterOrder run() {
+      this.index = indexfactory.instantiate(relation);
+      return super.run();
+    }
+
+    @Override
+    protected CorrelationClusterOrder buildResult() {
+      return new CorrelationClusterOrder("HiCO Cluster Order", "hico-cluster-order", //
+      clusterOrder, reachability, predecessor, correlationValue);
+    }
+
+    @Override
+    protected void initialDBID(DBIDRef id) {
+      correlationValue.put(id, Integer.MAX_VALUE);
+    }
+
+    @Override
+    protected void expandDBID(DBIDRef id) {
+      clusterOrder.add(id);
+
+      PCAFilteredResult pca1 = index.getLocalProjection(id);
+      V dv1 = relation.get(id);
+      final int dim = dv1.getDimensionality();
+
+      DBIDArrayIter iter = tmpIds.iter();
+      for(; iter.valid(); iter.advance()) {
+        PCAFilteredResult pca2 = index.getLocalProjection(iter);
+        V dv2 = relation.get(iter);
+
+        tmpCorrelation.putInt(iter, correlationDistance(pca1, pca2, dim));
+        tmpDistance.putDouble(iter, EuclideanDistanceFunction.STATIC.distance(dv1, dv2));
+      }
+      tmpIds.sort(tmpcomp);
+
+      // Core-distance of OPTICS:
+      // FIXME: what if there are less than mu points of smallest
+      // dimensionality? Then this distance will not be meaningful.
+      double coredist = tmpDistance.doubleValue(iter.seek(mu - 1));
+      for(iter.seek(0); iter.valid(); iter.advance()) {
+        if(processedIDs.contains(iter)) {
+          continue;
+        }
+        int prevcorr = correlationValue.intValue(iter);
+        int curcorr = tmpCorrelation.intValue(iter);
+        if(prevcorr <= curcorr) {
+          continue; // No improvement.
+        }
+        double currdist = MathUtil.max(tmpDistance.doubleValue(iter), coredist);
+        if(prevcorr == curcorr) {
+          double prevdist = reachability.doubleValue(iter);
+          if(prevdist <= currdist) {
+            continue; // No improvement.
+          }
+        }
+        correlationValue.putInt(iter, curcorr);
+        reachability.putDouble(iter, currdist);
+        predecessor.putDBID(iter, id);
+        // Add to candidates if not yet seen:
+        if(prevcorr == Integer.MAX_VALUE) {
+          candidates.add(iter);
+        }
       }
     }
-    return result;
+
+    @Override
+    public int compare(DBIDRef o1, DBIDRef o2) {
+      int c1 = correlationValue.intValue(o1), c2 = correlationValue.intValue(o2);
+      return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
+      super.compare(o1, o2);
+    }
+
+    /**
+     * Sort new candidates by their distance, for determining the core size.
+     * 
+     * @author Erich Schubert
+     *
+     * @apiviz.exclude
+     */
+    private final class Sorter implements Comparator<DBIDRef> {
+      @Override
+      public int compare(DBIDRef o1, DBIDRef o2) {
+        int c1 = tmpCorrelation.intValue(o1), c2 = tmpCorrelation.intValue(o2);
+        return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
+        Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
+      }
+    }
+
+    @Override
+    protected Logging getLogger() {
+      return LOG;
+    }
   }
 
   /**
@@ -263,40 +395,18 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, HiCO.HiCO
   }
 
   @Override
+  public int getMinPts() {
+    return mu;
+  }
+
+  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(indexfactory.getInputTypeRestriction());
   }
 
   @Override
-  public Class<? super HiCOClusterOrderEntry> getEntryType() {
-    return HiCOClusterOrderEntry.class;
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
-  }
-
-  /**
-   * Cluster order entry for HiCO.
-   * 
-   * @author Elke Achtert
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class HiCOClusterOrderEntry extends CorrelationClusterOrderEntry<HiCOClusterOrderEntry> {
-    /**
-     * Constructs a new CorrelationDistance object.
-     * 
-     * @param correlationValue the correlation dimension to be represented by
-     *        the CorrelationDistance
-     * @param euclideanValue the Euclidean distance to be represented by the
-     *        CorrelationDistance
-     */
-    public HiCOClusterOrderEntry(DBID objectID, DBID predecessorID, int correlationValue, double euclideanValue) {
-      super(objectID, predecessorID, correlationValue, euclideanValue);
-    }
   }
 
   /**

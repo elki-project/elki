@@ -31,9 +31,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DoubleDistanceClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -76,8 +74,8 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector<?> p : ops) {
+    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector p : ops) {
       final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       baseResult.getHierarchy().add(p, task);
@@ -86,7 +84,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleDistanceClusterOrderEntry>(task);
+    return new Instance(task);
   }
 
   @Override
@@ -103,7 +101,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
    * 
    * @param <E> cluster order entry type
    */
-  public class Instance<E extends ClusterOrderEntry<?>> extends AbstractOPTICSVisualization<E> implements DragableArea.DragListener {
+  public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
     /**
      * CSS-Styles
      */
@@ -213,7 +211,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      * @return epsilon
      */
     protected double getEpsilonFromY(double y) {
-      OPTICSPlot<E> opticsplot = optics.getOPTICSPlot(context);
+      OPTICSPlot opticsplot = optics.getOPTICSPlot(context);
       y = (y < 0) ? 0 : (y > plotheight) ? 1. : y / plotheight;
       return optics.getOPTICSPlot(context).scaleFromPixel(y * opticsplot.getHeight());
     }
@@ -225,7 +223,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      * @return y-Value
      */
     protected double getYFromEpsilon(double epsilon) {
-      OPTICSPlot<E> opticsplot = optics.getOPTICSPlot(context);
+      OPTICSPlot opticsplot = optics.getOPTICSPlot(context);
       int h = opticsplot.getHeight();
       double y = opticsplot.getScale().getScaled(epsilon, h - .5, .5) / (double) h * plotheight;
       return (y < 0.) ? 0. : (y > plotheight) ? plotheight : y;
@@ -256,8 +254,8 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
         // opvis.unsetEpsilonExcept(this);
 
         // FIXME: replace an existing optics cut result!
-        final ClusterOrderResult<E> order = optics.getResult();
-        Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, optics.getOPTICSPlot(context).getDistanceAdapter(), epsilon);
+        final ClusterOrder order = optics.getResult();
+        Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, epsilon);
         order.addChildResult(cl);
       }
       synchronizedRedraw();

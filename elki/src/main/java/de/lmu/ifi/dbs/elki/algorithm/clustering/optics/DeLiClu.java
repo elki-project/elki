@@ -87,7 +87,7 @@ title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency o
 booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", //
 url = "http://dx.doi.org/10.1007/11731139_16")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu" })
-public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgorithm<NV, ClusterOrderResult<DoubleDistanceClusterOrderEntry>> implements OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> {
+public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgorithm<NV, ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * The logger for this class.
    */
@@ -120,7 +120,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
     this.minpts = minpts;
   }
 
-  public ClusterOrderResult<DoubleDistanceClusterOrderEntry> run(Database database, Relation<NV> relation) {
+  public ClusterOrder run(Database database, Relation<NV> relation) {
     Collection<DeLiCluTreeIndex<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTreeIndex.class);
     if(indexes.size() != 1) {
       throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes. DeLiClu needs a special index to operate, therefore you need to add this index to your database.");
@@ -144,12 +144,12 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("DeLiClu", size, LOG) : null;
 
-    ClusterOrderResult<DoubleDistanceClusterOrderEntry> clusterOrder = new ClusterOrderResult<>(database, ids, "DeLiClu Clustering", "deliclu-clustering");
+    ClusterOrder clusterOrder = new ClusterOrder(ids, "DeLiClu Clustering", "deliclu-clustering");
     heap = new UpdatableHeap<>();
 
     // add start object to cluster order and (root, root) to priority queue
     DBID startID = DBIDUtil.deref(ids.iter());
-    clusterOrder.add(new DoubleDistanceClusterOrderEntry(startID, null, Double.POSITIVE_INFINITY));
+    clusterOrder.add(startID, Double.POSITIVE_INFINITY, null);
     int numHandled = 1;
     index.setHandled(startID, relation.get(startID));
     SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry) index.getRootEntry();
@@ -177,7 +177,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
           throw new RuntimeException("snh: parent(" + e1id + ") = null!!!");
         }
         // add to cluster order
-        clusterOrder.add(new DoubleDistanceClusterOrderEntry(e1id, e2.getDBID(), dataPair.distance));
+        clusterOrder.add(e1id, dataPair.distance, e2.getDBID());
         numHandled++;
         // reinsert expanded leafs
         reinsertExpanded(distFunction, index, path, knns);
@@ -336,11 +336,6 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
   @Override
   public int getMinPts() {
     return minpts;
-  }
-
-  @Override
-  public Class<? super DoubleDistanceClusterOrderEntry> getEntryType() {
-    return DoubleDistanceClusterOrderEntry.class;
   }
 
   @Override

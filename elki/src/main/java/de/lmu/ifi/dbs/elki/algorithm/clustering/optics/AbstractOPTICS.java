@@ -63,7 +63,7 @@ title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
 booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
 url = "http://dx.doi.org/10.1145/304181.304187")
 @Alias({ "OPTICS", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS" })
-public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrderResult<DoubleDistanceClusterOrderEntry>> implements OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry> {
+public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O, ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * Holds the maximum distance to search for objects (performance parameter)
    */
@@ -94,16 +94,11 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O
    * @param relation Relation
    * @return Result
    */
-  public abstract ClusterOrderResult<DoubleDistanceClusterOrderEntry> run(Database db, Relation<O> relation);
+  public abstract ClusterOrder run(Database db, Relation<O> relation);
 
   @Override
   public int getMinPts() {
     return minpts;
-  }
-
-  @Override
-  public Class<? super DoubleDistanceClusterOrderEntry> getEntryType() {
-    return DoubleDistanceClusterOrderEntry.class;
   }
 
   @Override
@@ -117,6 +112,8 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<O
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
   public static abstract class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**

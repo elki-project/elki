@@ -25,16 +25,14 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
 
 import java.awt.Color;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DoubleDistanceClusterOrderEntry;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -42,7 +40,6 @@ import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSDistanceAdapter;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -73,8 +70,8 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector<?> p : ops) {
+    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector p : ops) {
       final SteepAreaResult steep = findSteepAreaResult(p.getResult());
       if(steep != null) {
         final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
@@ -87,7 +84,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleDistanceClusterOrderEntry>(task);
+    return new Instance(task);
   }
 
   @Override
@@ -102,7 +99,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
    * @param co Cluster order
    * @return OPTICS clustering
    */
-  protected static OPTICSXi.SteepAreaResult findSteepAreaResult(ClusterOrderResult<?> co) {
+  protected static OPTICSXi.SteepAreaResult findSteepAreaResult(ClusterOrder co) {
     for(Hierarchy.Iter<Result> r = co.getHierarchy().iterChildren(co); r.valid(); r.advance()) {
       if(OPTICSXi.SteepAreaResult.class.isInstance(r.get())) {
         return (OPTICSXi.SteepAreaResult) r.get();
@@ -119,7 +116,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
    * @apiviz.uses 
    *              de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult
    */
-  public class Instance<E extends ClusterOrderEntry<?>> extends AbstractOPTICSVisualization<E> {
+  public class Instance extends AbstractOPTICSVisualization {
     /**
      * CSS class for markers
      */
@@ -152,12 +149,13 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
       makeLayerElement();
       addCSSClasses();
 
-      final OPTICSPlot<E> opticsplot = optics.getOPTICSPlot(context);
-      final List<E> co = getClusterOrder();
-      final OPTICSDistanceAdapter<E> adapter = opticsplot.getDistanceAdapter();
+      final OPTICSPlot opticsplot = optics.getOPTICSPlot(context);
+      final ClusterOrder co = getClusterOrder();
       final int oheight = opticsplot.getHeight();
       final double xscale = plotwidth / (double) co.size();
       final double yscale = plotheight / (double) oheight;
+
+      DBIDArrayIter tmp = co.iter();
 
       for(OPTICSXi.SteepArea area : areas) {
         final int st = area.getStartIndex();
@@ -165,8 +163,8 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
         // Note: make sure we are using doubles!
         final double x1 = (st + .25);
         final double x2 = (en + .75);
-        final double y1 = opticsplot.scaleToPixel(adapter.getDoubleForEntry(co.get(st)));
-        final double y2 = opticsplot.scaleToPixel(adapter.getDoubleForEntry(co.get(en)));
+        final double y1 = opticsplot.scaleToPixel(co.getReachability(tmp.seek(st)));
+        final double y2 = opticsplot.scaleToPixel(co.getReachability(tmp.seek(en)));
         Element e = svgp.svgLine(x1 * xscale, y1 * yscale, x2 * xscale, y2 * yscale);
         if(area instanceof OPTICSXi.SteepDownArea) {
           SVGUtil.addCSSClass(e, CSS_STEEP_DOWN);

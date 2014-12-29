@@ -27,10 +27,11 @@ import java.util.Collection;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderEntry;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -72,8 +73,8 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ClusterOrderResult<?>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
-    for(ClusterOrderResult<?> co : cos) {
+    Collection<ClusterOrder> cos = ResultUtil.filterResults(result, ClusterOrder.class);
+    for(ClusterOrder co : cos) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, co, p.getRelation(), this);
@@ -102,7 +103,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
     /**
      * The result we visualize
      */
-    protected ClusterOrderResult<? extends ClusterOrderEntry<?>> result;
+    protected ClusterOrder result;
 
     public Instance(VisualizationTask task) {
       super(task);
@@ -125,14 +126,11 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
 
       svgp.addCSSClassOrLogError(cls);
 
-      for(ClusterOrderEntry<?> ce : result) {
-        DBID thisId = ce.getID();
-        DBID prevId = ce.getPredecessorID();
-        if(thisId == null || prevId == null) {
-          continue;
-        }
-        double[] thisVec = proj.fastProjectDataToRenderSpace(rel.get(thisId));
-        double[] prevVec = proj.fastProjectDataToRenderSpace(rel.get(prevId));
+      DBIDIter it = result.iter();
+      DBIDVar prev = DBIDUtil.newVar(it);
+      for(it.advance() /* skip first! */; it.valid(); it.advance(), prev.set(it)) {
+        double[] thisVec = proj.fastProjectDataToRenderSpace(rel.get(it));
+        double[] prevVec = proj.fastProjectDataToRenderSpace(rel.get(prev));
 
         if(thisVec[0] != thisVec[0] || thisVec[1] != thisVec[1]) {
           continue; // NaN!

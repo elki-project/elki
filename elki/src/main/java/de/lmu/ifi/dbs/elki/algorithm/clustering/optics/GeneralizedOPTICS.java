@@ -23,18 +23,25 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
+import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
  * A trivial generalization of OPTICS that is not restricted to numerical
@@ -42,113 +49,143 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @author Erich Schubert
  * 
- * @param <O> the type of DatabaseObjects handled by the algorithm
- * @param <E> the type of entries in the cluster order
+ * @param <O> the type of objects handled by the algorithm
+ * @param <R> the type of results in the cluster order
  */
-public abstract class GeneralizedOPTICS<O, E extends ClusterOrderEntry<E>> extends AbstractAlgorithm<ClusterOrderResult<E>> implements OPTICSTypeAlgorithm<E> {
-  /**
-   * Parameter to specify the threshold for minimum number of points in the
-   * epsilon-neighborhood of a point, must be an integer greater than 0.
-   */
-  public static final OptionID MINPTS_ID = new OptionID("optics.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
-
-  /**
-   * Density threshold in number of points.
-   */
-  private int minpts;
-
-  /**
-   * Holds a set of processed ids.
-   */
-  private ModifiableDBIDs processedIDs;
-
+public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends AbstractAlgorithm<R> implements OPTICSTypeAlgorithm {
   /**
    * Constructor.
-   * 
-   * @param minpts Minpts value
    */
-  public GeneralizedOPTICS(int minpts) {
+  public GeneralizedOPTICS() {
     super();
-    this.minpts = minpts;
   }
 
   /**
    * Run OPTICS on the database.
    * 
+   * @param db Database
    * @param relation Relation
    * @return Result
    */
-  public ClusterOrderResult<E> run(Relation<O> relation) {
-    final DBIDs ids = relation.getDBIDs();
-    final int size = ids.size();
-    final FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Generalized OPTICS", size, getLogger()) : null;
+  public abstract ClusterOrder run(Database db, Relation<O> relation);
 
-    processedIDs = DBIDUtil.newHashSet(size);
-    ClusterOrderResult<E> clusterOrder = new ClusterOrderResult<>(relation.getDatabase(), ids, "OPTICS Clusterorder", "optics-clusterorder");
-
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      if(!processedIDs.contains(iditer)) {
-        expandClusterOrder(clusterOrder, relation, DBIDUtil.deref(iditer), progress);
-      }
-    }
-    getLogger().ensureCompleted(progress);
-
-    return clusterOrder;
-  }
+  // Usually: return new Instance(db, relation).run();
 
   /**
-   * OPTICS-function expandClusterOrder.
-   * 
-   * @param clusterOrder Cluster order result to expand
-   * @param relation the data relation to run on
-   * @param objectID the currently processed object
-   * @param progress the progress object to actualize the current progress if
-   *        the algorithm
+   * Instance for processing a single data set.
+   *
+   * @author Erich Schubert
    */
-  protected void expandClusterOrder(ClusterOrderResult<E> clusterOrder, Relation<O> relation, DBID objectID, FiniteProgress progress) {
-    UpdatableHeap<E> heap = new UpdatableHeap<>();
-    heap.add(makeSeedEntry(relation, objectID));
+  public abstract static class Instance<O, R> implements Comparator<DBIDRef> {
+    /**
+     * Holds a set of processed ids.
+     */
+    protected ModifiableDBIDs processedIDs;
 
-    while(!heap.isEmpty()) {
-      final E current = heap.poll();
-      clusterOrder.add(current);
-      processedIDs.add(current.getID());
+    /**
+     * Current list of candidates.
+     */
+    protected ArrayModifiableDBIDs candidates;
 
-      Collection<E> neighbors = getNeighborsForDBID(relation, current.getID());
-      if(neighbors != null && neighbors.size() >= minpts) {
-        for(E entry : neighbors) {
-          if(processedIDs.contains(entry.getID())) {
-            continue;
-          }
-          heap.add(entry);
+    /**
+     * Predecessor storage.
+     */
+    protected WritableDBIDDataStore predecessor;
+
+    /**
+     * Reachability storage.
+     */
+    protected WritableDoubleDataStore reachability;
+
+    /**
+     * IDs to process.
+     */
+    DBIDs ids;
+
+    /**
+     * Progress for logging.
+     */
+    FiniteProgress progress;
+
+    /**
+     * Constructor for a single data set.
+     *
+     * @param db Database
+     * @param relation Data relation
+     */
+    public Instance(Database db, Relation<O> relation) {
+      ids = relation.getDBIDs();
+      processedIDs = DBIDUtil.newHashSet(ids.size());
+      candidates = DBIDUtil.newArray();
+      predecessor = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT);
+      reachability = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
+      progress = getLogger().isVerbose() ? new FiniteProgress("OPTICS", ids.size(), getLogger()) : null;
+    }
+
+    @Override
+    public int compare(DBIDRef o1, DBIDRef o2) {
+      return Double.compare(reachability.doubleValue(o2), reachability.doubleValue(o1));
+    }
+
+    /**
+     * Process the data set.
+     * 
+     * @return Cluster order result.
+     */
+    public R run() {
+      final Logging LOG = getLogger();
+      DBIDVar cur = DBIDUtil.newVar();
+      for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+        if(processedIDs.contains(iditer)) {
+          continue;
+        }
+        initialDBID(iditer);
+        processedIDs.add(iditer);
+        expandDBID(iditer);
+        LOG.incrementProcessed(progress);
+
+        while(!candidates.isEmpty()) {
+          int last = candidates.size() - 1;
+          QuickSelect.quickSelect(candidates, this, last);
+          candidates.assignVar(last, cur);
+          candidates.remove(last);
+          processedIDs.add(cur);
+
+          expandDBID(cur);
+          LOG.incrementProcessed(progress);
         }
       }
-      if(progress != null) {
-        progress.setProcessed(processedIDs.size(), getLogger());
-      }
+      LOG.ensureCompleted(progress);
+      return buildResult();
     }
-  }
 
-  /**
-   * Create the initial element to seed the algorithm.
-   * 
-   * @param relation Data relation
-   * @param objectID Object ID
-   * @return Seed element.
-   */
-  abstract protected E makeSeedEntry(Relation<O> relation, DBID objectID);
+    /**
+     * Initialize for a new DBID.
+     * 
+     * @param id Current object ID
+     */
+    abstract protected void initialDBID(DBIDRef id);
 
-  /**
-   * Compute the neighbors for the given DBID.
-   * 
-   * @param relation Data relation
-   * @param id Current object ID
-   * @return Neighbors
-   */
-  abstract protected Collection<E> getNeighborsForDBID(Relation<O> relation, DBID id);
+    /**
+     * Add the current DBID to the cluster order, and expand its neighbors if
+     * minPts and similar conditions are satisfied.
+     * 
+     * @param id Current object ID
+     */
+    abstract protected void expandDBID(DBIDRef id);
 
-  @Override
-  public int getMinPts() {
-    return minpts;
+    /**
+     * Build the final result.
+     * 
+     * @return Result
+     */
+    abstract protected R buildResult();
+
+    /**
+     * Get the class logger.
+     * 
+     * @return Class logger
+     */
+    abstract protected Logging getLogger();
   }
 }

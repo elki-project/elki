@@ -32,24 +32,15 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * @author Erich Schubert
  * 
  * @apiviz.has ClusterOrderResult
- * 
- * @param <E> Cluster order entry type
  */
-public interface OPTICSTypeAlgorithm<E extends ClusterOrderEntry<E>> extends Algorithm {
+public interface OPTICSTypeAlgorithm extends Algorithm {
   @Override
-  ClusterOrderResult<E> run(Database database);
+  ClusterOrder run(Database database);
 
   /**
-   * Get the minpts value used. Needed for OPTICS Xi etc.
+   * Get the minpts value used. Needed for OPTICS Xi.
    * 
    * @return minpts value
    */
   public int getMinPts();
-
-  /**
-   * Get the entry type. Needed for type checking (i.e. is number distance)
-   * 
-   * @return entry type
-   */
-  public Class<? super E> getEntryType();
 }

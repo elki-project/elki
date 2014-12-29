@@ -24,31 +24,30 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
- * Entry in a {@link ClusterOrderResult}.
+ * Entry in the priority heap.
  * 
  * @author Elke Achtert
+ * 
+ * @apiviz.exclude
  */
-public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<DoubleDistanceClusterOrderEntry>, TextWriteable {
+public class OPTICSHeapEntry implements Comparable<OPTICSHeapEntry> {
   /**
    * The id of the entry.
    */
-  private DBID objectID;
+  DBID objectID;
 
   /**
    * The id of the entry's predecessor.
    */
-  private DBID predecessorID;
+  DBID predecessorID;
 
   /**
    * The reachability of the entry.
    */
-  private double reachability;
+  double reachability;
 
   /**
    * Creates a new entry in a cluster order with the specified parameters.
@@ -57,7 +56,7 @@ public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<Double
    * @param predecessorID the id of the entry's predecessor
    * @param reachability the reachability of the entry
    */
-  public DoubleDistanceClusterOrderEntry(DBID objectID, DBID predecessorID, double reachability) {
+  public OPTICSHeapEntry(DBID objectID, DBID predecessorID, double reachability) {
     this.objectID = objectID;
     this.predecessorID = predecessorID;
     this.reachability = reachability;
@@ -77,11 +76,11 @@ public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<Double
     if(this == o) {
       return true;
     }
-    if(!(o instanceof ClusterOrderEntry)) {
+    if(!(o instanceof OPTICSHeapEntry)) {
       return false;
     }
 
-    final ClusterOrderEntry<?> that = (ClusterOrderEntry<?>) o;
+    final OPTICSHeapEntry that = (OPTICSHeapEntry) o;
     // Compare by ID only, for UpdatableHeap!
     return DBIDUtil.equal(objectID, that.getID());
   }
@@ -111,7 +110,6 @@ public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<Double
    * 
    * @return the object id of this entry
    */
-  @Override
   public DBID getID() {
     return objectID;
   }
@@ -122,7 +120,6 @@ public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<Double
    * 
    * @return the id of the predecessor of this entry
    */
-  @Override
   public DBID getPredecessorID() {
     return predecessorID;
   }
@@ -137,19 +134,13 @@ public class DoubleDistanceClusterOrderEntry implements ClusterOrderEntry<Double
   }
 
   @Override
-  public int compareTo(DoubleDistanceClusterOrderEntry o) {
+  public int compareTo(OPTICSHeapEntry o) {
     if(this.reachability < o.reachability) {
       return -1;
     }
     if(this.reachability > o.reachability) {
       return +1;
     }
-    return -getID().compareTo(o.getID());
-  }
-
-  @Override
-  public void writeToText(TextWriterStream out, String label) {
-    out.inlinePrint("predecessor=" + DBIDUtil.toString((DBIDRef) predecessorID));
-    out.inlinePrint("reachability=" + reachability);
+    return -DBIDUtil.compare(objectID, o.objectID);
   }
 }
