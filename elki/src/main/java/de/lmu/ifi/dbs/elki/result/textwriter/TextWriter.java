@@ -347,7 +347,7 @@ public class TextWriter {
     PrintStream outStream = streamOpener.openStream(getFilename(or, or.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
 
-    for(DBIDIter i = or.iter(or.getDBIDs()).iter(); i.valid(); i.advance()) {
+    for(DBIDIter i = or.order(or.getDBIDs()).iter(); i.valid(); i.advance()) {
       printObject(out, db, i, ra);
     }
     out.flush();

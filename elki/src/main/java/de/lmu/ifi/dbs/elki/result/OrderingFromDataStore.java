@@ -116,7 +116,7 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
   }
 
   @Override
-  public ArrayModifiableDBIDs iter(DBIDs ids) {
+  public ArrayModifiableDBIDs order(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
     if(comparator != null) {
       sorted.sort(new DerivedComparator());

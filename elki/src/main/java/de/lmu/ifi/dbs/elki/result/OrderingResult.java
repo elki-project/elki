@@ -45,5 +45,5 @@ public interface OrderingResult extends Result {
    * @param ids Collection of ids.
    * @return iterator for sorted array of ids
    */
-  public ArrayModifiableDBIDs iter(DBIDs ids);
+  public ArrayModifiableDBIDs order(DBIDs ids);
 }

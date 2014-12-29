@@ -75,7 +75,7 @@ public class OrderingFromRelation implements OrderingResult {
   }
 
   @Override
-  public ArrayModifiableDBIDs iter(DBIDs ids) {
+  public ArrayModifiableDBIDs order(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
     sorted.sort(ascending ? //
     new RelationUtil.AscendingByDoubleRelation(scores) //

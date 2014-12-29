@@ -201,7 +201,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     for(OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
       Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
-      db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, or.iter(relation.getDBIDs()).iter()));
+      db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, or.order(relation.getDBIDs()).iter()));
       // Process them only once.
       orderings.remove(or);
       nonefound = false;
@@ -211,7 +211,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
-      DBIDIter iter = or.iter(relation.getDBIDs()).iter();
+      DBIDIter iter = or.order(relation.getDBIDs()).iter();
       db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, iter));
       nonefound = false;
     }

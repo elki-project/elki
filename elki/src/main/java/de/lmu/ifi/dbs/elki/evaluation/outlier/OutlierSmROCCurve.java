@@ -119,7 +119,7 @@ public class OutlierSmROCCurve implements Evaluator {
     int poscnt = 0, negcnt = 0;
     double prevscore = Double.NaN;
     double x = 0, y = 0;
-    for(DBIDIter nei = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter(); nei.valid(); nei.advance()) {
+    for(DBIDIter nei = or.getOrdering().order(or.getOrdering().getDBIDs()).iter(); nei.valid(); nei.advance()) {
       // Analyze next point
       final double curscore = scores.doubleValue(nei);
       // defer calculation for ties

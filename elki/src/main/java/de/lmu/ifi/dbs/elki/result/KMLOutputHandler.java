@@ -280,7 +280,7 @@ public class KMLOutputHandler implements ResultHandler {
 
     scaling.prepare(outlierResult);
 
-    for(DBIDIter iter = outlierResult.getOrdering().iter(ids).iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = outlierResult.getOrdering().order(ids).iter(); iter.valid(); iter.advance()) {
       double score = scores.doubleValue(iter);
       PolygonsObject poly = polys.get(iter);
       String label = labels.get(iter);

@@ -100,7 +100,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for (OutlierResult o : oresults) {
-      DBIDs sorted = o.getOrdering().iter(o.getOrdering().getDBIDs());
+      DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
       XYCurve curve = computePrecisionResult(o.getScores().size(), positiveids, sorted.iter(), o.getScores());
       db.getHierarchy().add(o, curve);
       // Process them only once.
@@ -110,7 +110,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for (OrderingResult or : orderings) {
-      DBIDs sorted = or.iter(or.getDBIDs());
+      DBIDs sorted = or.order(or.getDBIDs());
       XYCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, sorted.iter(), null);
       db.getHierarchy().add(or, curve);
     }

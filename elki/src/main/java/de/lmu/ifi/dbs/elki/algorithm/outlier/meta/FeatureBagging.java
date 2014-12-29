@@ -164,7 +164,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       {
         int i = 0;
         for(OutlierResult r : results) {
-          IDVectorOntoScoreVector[i] = new Pair<DBIDIter, DoubleRelation>(r.getOrdering().iter(relation.getDBIDs()).iter(), r.getScores());
+          IDVectorOntoScoreVector[i] = new Pair<DBIDIter, DoubleRelation>(r.getOrdering().order(relation.getDBIDs()).iter(), r.getScores());
           i++;
         }
       }

@@ -100,7 +100,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
     if(k <= 0) {
       LoggingUtil.warning("No k configured for Top-k outlier scaling!");
     }
-    DBIDIter order = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter();
+    DBIDIter order = or.getOrdering().order(or.getOrdering().getDBIDs()).iter();
     for(int i = 0; i < k && order.valid(); i++, order.advance()) {
       cutoff = or.getScores().doubleValue(order);
     }

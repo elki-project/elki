@@ -116,7 +116,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      DBIDs sorted = o.getOrdering().iter(o.getOrdering().getDBIDs());
+      DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
       db.getHierarchy().add(o, computePrecisionResult(o.getScores().size(), positiveids, sorted));
       // Process them only once.
       orderings.remove(o.getOrdering());
@@ -125,7 +125,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      DBIDs sorted = or.iter(or.getDBIDs());
+      DBIDs sorted = or.order(or.getDBIDs());
       db.getHierarchy().add(or, computePrecisionResult(or.getDBIDs().size(), positiveids, sorted));
     }
   }

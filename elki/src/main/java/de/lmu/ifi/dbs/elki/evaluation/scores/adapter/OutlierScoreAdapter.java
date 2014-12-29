@@ -63,7 +63,7 @@ public class OutlierScoreAdapter implements ScoreIter, DBIDRefIter {
    */
   public OutlierScoreAdapter(OutlierResult o) {
     super();
-    this.iter = o.getOrdering().iter(o.getScores().getDBIDs()).iter();
+    this.iter = o.getOrdering().order(o.getScores().getDBIDs()).iter();
     this.scores = o.getScores();
   }
 

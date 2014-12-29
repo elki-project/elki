@@ -314,7 +314,7 @@ public class JSONWebServer implements HttpHandler {
 
           re.appendKeyArray("scores");
           DoubleRelation scores = or.getScores();
-          DBIDIter iter = or.getOrdering().iter(scores.getDBIDs()).iter();
+          DBIDIter iter = or.getOrdering().order(scores.getDBIDs()).iter();
           for (int i = 0; i < offset && iter.valid(); i++) {
             iter.advance();
           }

@@ -153,7 +153,7 @@ public class OutlierROCCurve implements Evaluator {
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      DBIDs sorted = or.iter(or.getDBIDs());
+      DBIDs sorted = or.order(or.getDBIDs());
       db.getHierarchy().add(or, computeROCResult(or.getDBIDs().size(), positiveids, sorted));
       nonefound = false;
     }
