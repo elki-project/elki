@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Katharina Rausch
  * @author Erich Schubert
  */
-public class TestOPTICSResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestOPTICSListResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run OPTICS with fixed parameters and compare the result to a golden
    * standard.
@@ -55,16 +55,18 @@ public class TestOPTICSResults extends AbstractSimpleAlgorithmTest implements JU
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(OPTICS.Parameterizer.MINPTS_ID, 18);
+    params.addParameter(OPTICSList.Parameterizer.MINPTS_ID, 18);
     params.addParameter(OPTICSXi.Parameterizer.XI_ID, 0.038);
-    params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, OPTICS.class);
+    params.addParameter(OPTICSXi.Parameterizer.XIALG_ID, OPTICSList.class);
     OPTICSXi opticsxi = ClassGenericsUtil.parameterizeOrAbort(OPTICSXi.class, params);
     testParameterizationOk(params);
 
     // run OPTICS on database
     Clustering<?> clustering = opticsxi.run(db);
 
-    testFMeasure(db, clustering, 0.877117490049);
-    testClusterSizes(clustering, new int[] { 109, 121, 209, 271 });
+    // This is about 1 object better than the heap based OPTICS, but this is
+    // solvely by chance due to different processing order.
+    testFMeasure(db, clustering, 0.879586493);
+    testClusterSizes(clustering, new int[] { 108, 121, 209, 272 });
   }
 }

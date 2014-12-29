@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.AbstractOPTICS;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Optics-OF outlier detection algorithm, an algorithm to find Local Outliers in
- * a database based on ideas from {@link OPTICS} clustering.
+ * a database based on ideas from {@link OPTICSHeap} clustering.
  * <p>
  * Reference:<br>
  * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander:<br />
@@ -198,7 +198,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(OPTICS.Parameterizer.MINPTS_ID);
+      final IntParameter param = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID);
       param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(param)) {
         minpts = param.getValue();

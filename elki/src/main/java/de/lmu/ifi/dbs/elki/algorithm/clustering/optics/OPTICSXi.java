@@ -739,7 +739,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         xi = xiP.doubleValue();
       }
 
-      ClassParameter<OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry>> opticsP = new ClassParameter<>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICS.class);
+      ClassParameter<OPTICSTypeAlgorithm<DoubleDistanceClusterOrderEntry>> opticsP = new ClassParameter<>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICSHeap.class);
       if(config.grab(opticsP)) {
         optics = opticsP.instantiateClass(config);
       }

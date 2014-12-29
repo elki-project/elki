@@ -19,7 +19,8 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBatchedLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.XMeans
-de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS
+de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSHeap
+de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSList
 de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DeLiClu
 de.lmu.ifi.dbs.elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.COP

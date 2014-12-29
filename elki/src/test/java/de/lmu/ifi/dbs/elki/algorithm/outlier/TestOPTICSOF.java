@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.AbstractOPTICS;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -46,7 +46,7 @@ public class TestOPTICSOF extends AbstractSimpleAlgorithmTest implements JUnit4T
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(OPTICS.Parameterizer.MINPTS_ID, 22);
+    params.addParameter(AbstractOPTICS.Parameterizer.MINPTS_ID, 22);
 
     // setup Algorithm
     OPTICSOF<DoubleVector> opticsof = ClassGenericsUtil.parameterizeOrAbort(OPTICSOF.class, params);

@@ -86,6 +86,7 @@ public class ClusterOrderResult<E extends ClusterOrderEntry<?>> extends BasicRes
    */
   public ClusterOrderResult(Database database, DBIDs ids, String name, String shortname) {
     super(name, shortname);
+    this.database = database;
     this.ids = ids;
     this.clusterOrder = new ArrayList<>(ids.size());
     this.map = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ClusterOrderEntry.class);
