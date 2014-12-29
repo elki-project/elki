@@ -407,6 +407,20 @@ public final class BitsUtil {
   }
 
   /**
+   * Fill a vector initialized with "bits" ones.
+   * 
+   * @param v Vector to fill.
+   * @param bits Size
+   */
+  public static void onesI(long[] v, int bits) {
+    final int fillWords = bits >>> LONG_LOG2_SIZE;
+    final int fillBits = bits & LONG_LOG2_MASK;
+    Arrays.fill(v, 0, fillWords, LONG_ALL_BITS);
+    v[fillWords] = (1L << fillBits) - 1;
+    Arrays.fill(v, fillWords + 1, v.length, 0L);
+  }
+
+  /**
    * Zero the given set
    * 
    * Low-endian layout for the array.
