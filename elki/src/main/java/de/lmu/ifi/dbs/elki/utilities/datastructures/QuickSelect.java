@@ -27,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
@@ -1200,11 +1199,9 @@ public class QuickSelect {
    * @param data Data to process
    * @param comparator Comparator to use
    * @param rank Rank position that we are interested in (integer!)
-   * @return Value at the given rank
    */
-  public static DBID quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int rank) {
+  public static void quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int rank) {
     quickSelect(data, comparator, 0, data.size(), rank);
-    return data.get(rank);
   }
 
   /**
@@ -1214,9 +1211,9 @@ public class QuickSelect {
    * 
    * @param data Data to process
    * @param comparator Comparator to use
-   * @return Median value
+   * @return Median position
    */
-  public static DBID median(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator) {
+  public static int median(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator) {
     return median(data, comparator, 0, data.size());
   }
 
@@ -1231,15 +1228,15 @@ public class QuickSelect {
    * @param comparator Comparator to use
    * @param begin Begin of valid values
    * @param end End of valid values (exclusive!)
-   * @return Median value
+   * @return Median position
    */
-  public static DBID median(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int begin, int end) {
+  public static int median(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int begin, int end) {
     final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
     final int left = begin + ((length - 1) >> 1);
     quickSelect(data, comparator, begin, end, left);
-    return data.get(left);
+    return left;
   }
 
   /**
@@ -1250,9 +1247,9 @@ public class QuickSelect {
    * @param data Data to process
    * @param comparator Comparator to use
    * @param quant Quantile to compute
-   * @return Value at quantile
+   * @return Quantile position
    */
-  public static DBID quantile(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, double quant) {
+  public static int quantile(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, double quant) {
     return quantile(data, comparator, 0, data.size(), quant);
   }
 
@@ -1268,9 +1265,9 @@ public class QuickSelect {
    * @param begin Begin of valid values
    * @param end End of valid values (exclusive)
    * @param quant Quantile to compute
-   * @return Value at quantile
+   * @return Quantile position
    */
-  public static DBID quantile(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int begin, int end, double quant) {
+  public static int quantile(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int begin, int end, double quant) {
     final int length = end - begin;
     assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
@@ -1278,7 +1275,7 @@ public class QuickSelect {
     final int ileft = (int) Math.floor(dleft);
 
     quickSelect(data, comparator, begin, end, ileft);
-    return data.get(ileft);
+    return ileft;
   }
 
   /**
@@ -1392,9 +1389,7 @@ public class QuickSelect {
    * @return Comparison result
    */
   private static int compare(DBIDArrayIter i1, int p1, DBIDArrayIter i2, int p2, Comparator<? super DBIDRef> comp) {
-    i1.seek(p1);
-    i2.seek(p2);
-    return comp.compare(i1, i2);
+    return comp.compare(i1.seek(p1), i2.seek(p2));
   }
 
   /**

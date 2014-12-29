@@ -49,6 +49,7 @@ public class ArrayDBIDsAdapter implements ArrayAdapter<DBID, ArrayDBIDs> {
   }
 
   @Override
+  @Deprecated
   public DBID get(ArrayDBIDs array, int off) throws IndexOutOfBoundsException {
     return array.get(off);
   }

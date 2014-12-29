@@ -43,8 +43,9 @@ import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -220,10 +221,11 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     UpdatableDatabase upd = (UpdatableDatabase) database;
     ModifiableDBIDs todel = DBIDUtil.newHashSet();
     ModifiableDBIDs remain = DBIDUtil.newHashSet(dbids);
+    DBIDArrayIter it = dbids.iter();
     for(int row : table.getSelectedRows()) {
-      final DBID id = dbids.get(row);
-      todel.add(id);
-      remain.remove(id);
+      it.seek(row);
+      todel.add(it);
+      remain.remove(it);
     }
     // Unselect first ...
     context.setSelection(new DBIDSelection(remain));
@@ -258,9 +260,9 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-      DBID id = dbids.get(rowIndex);
+      DBIDRef id = dbids.iter().seek(rowIndex);
       if(columnIndex == 0) {
-        return id.toString();
+        return DBIDUtil.toString(id);
       }
       if(columnIndex == 1) {
         return orep.get(id);
@@ -304,7 +306,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
         LOG.warning("Tried to edit DBID, this is not allowed.");
         return;
       }
-      final DBID id = dbids.get(rowIndex);
+      final DBIDRef id = dbids.iter().seek(rowIndex);
       if(columnIndex == 1 && aValue instanceof String) {
         orep.set(id, (String) aValue);
       }
