@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.math.geometry;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -93,12 +92,13 @@ public class PrimsMinimumSpanningTree {
     // Best previous node
     int[] src = new int[n];
     // Nodes already handled
-    long[] in = BitsUtil.zero(n);
+    // byte[] uses more memory, but it will be faster.
+    byte[] connected = new byte[n];
 
     // We always start at "random" node 0
     // Note: we use this below in the "j" loop!
     int current = 0;
-    BitsUtil.setI(in, current);
+    connected[0] = 1;
     best[current] = 0;
 
     // Search
@@ -107,7 +107,10 @@ public class PrimsMinimumSpanningTree {
       int newbesti = -1;
       double newbestd = Double.POSITIVE_INFINITY;
       // Note: we assume we started with 0, and can thus skip it
-      for(int j = BitsUtil.nextClearBit(in, 1); j < n && j > 0; j = BitsUtil.nextClearBit(in, j + 1)) {
+      for(int j = 0; j < n; ++j) {
+        if(connected[j] == 1) {
+          continue;
+        }
         final double dist = adapter.distance(data, current, j);
         if(dist < best[j]) {
           best[j] = dist;
@@ -120,7 +123,7 @@ public class PrimsMinimumSpanningTree {
       }
       assert (newbesti >= 0);
       // Flag
-      BitsUtil.setI(in, newbesti);
+      connected[newbesti] = 1;
       // Store edge
       mst[i << 1] = newbesti;
       mst[(i << 1) + 1] = src[newbesti];
@@ -146,12 +149,13 @@ public class PrimsMinimumSpanningTree {
     // Best previous node
     int[] src = new int[n];
     // Nodes already handled
-    long[] in = BitsUtil.ones(n);
+    // byte[] uses more memory, but it will be faster.
+    byte[] connected = new byte[n];
 
     // We always start at "random" node 0
     // Note: we use this below in the "j" loop!
     int current = 0;
-    BitsUtil.clearI(in, current);
+    connected[current] = 1;
     best[current] = 0;
 
     // Search
@@ -160,7 +164,10 @@ public class PrimsMinimumSpanningTree {
       int newbesti = -1;
       double newbestd = Double.POSITIVE_INFINITY;
       // Note: we assume we started with 0, and can thus skip it
-      for(int j = BitsUtil.nextSetBit(in, 1); j > 0; j = BitsUtil.nextSetBit(in, j + 1)) {
+      for(int j = 1; j < n; ++j) {
+        if(connected[j] == 1) {
+          continue;
+        }
         final double dist = adapter.distance(data, current, j);
         if(dist < best[j]) {
           best[j] = dist;
@@ -173,7 +180,7 @@ public class PrimsMinimumSpanningTree {
       }
       assert (newbesti >= 0);
       // Flag
-      BitsUtil.clearI(in, newbesti);
+      connected[newbesti] = 1;
       // Store edge
       collector.addEdge(newbestd, src[newbesti], newbesti);
       // Continue
