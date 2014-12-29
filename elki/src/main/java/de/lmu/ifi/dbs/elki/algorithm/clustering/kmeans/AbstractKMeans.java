@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -199,16 +199,18 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
     List<Vector> newMedians = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
-      ArrayModifiableDBIDs list = DBIDUtil.newArray(clusters.get(i));
-      if(list.size() <= 0) {
+      ModifiableDBIDs clu = clusters.get(i);
+      if(clu.size() <= 0) {
         newMedians.add(medians.get(i));
         continue;
       }
+      ArrayModifiableDBIDs list = DBIDUtil.newArray(clu);
+      DBIDArrayIter it = list.iter();
       Vector mean = new Vector(dim);
       for(int d = 0; d < dim; d++) {
         sorter.setDimension(d);
-        DBID id = QuickSelect.median(list, sorter);
-        mean.set(d, database.get(id).doubleValue(d));
+        it.seek(QuickSelect.median(list, sorter));
+        mean.set(d, database.get(it).doubleValue(d));
       }
       newMedians.add(mean);
     }

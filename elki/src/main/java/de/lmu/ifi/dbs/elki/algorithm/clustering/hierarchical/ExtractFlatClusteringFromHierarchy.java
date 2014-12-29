@@ -390,14 +390,13 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     int split;
     if(minclusters > 0) {
       split = order.size() > minclusters ? order.size() - minclusters : 0;
+      it.seek(split);
       // Stop distance:
-      final double stopdist = lambda.doubleValue(order.get(split));
+      final double stopdist = lambda.doubleValue(it);
 
       // Tie handling: decrement split.
-      it.seek(split - 1);
-      while(it.valid() && stopdist <= lambda.doubleValue(it)) {
+      for(it.retract(); it.valid() && stopdist <= lambda.doubleValue(it); it.retract()) {
         split--;
-        it.retract();
       }
     }
     else if(!Double.isNaN(threshold)) {

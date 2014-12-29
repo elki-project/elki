@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -172,9 +173,9 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
-      MedoidModel model = new MedoidModel(medoids.get(i));
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
+    for(DBIDArrayIter it = medoids.iter(); it.valid(); it.advance()) {
+      MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
+      result.addToplevelCluster(new Cluster<>(clusters.get(it.getOffset()), model));
     }
     return result;
   }

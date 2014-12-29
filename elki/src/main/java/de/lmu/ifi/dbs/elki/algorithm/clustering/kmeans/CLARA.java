@@ -135,9 +135,9 @@ public class CLARA<V> extends KMedoidsPAM<V> {
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("CLARA Clustering", "clara-clustering");
-    for(int i = 0; i < bestclusters.size(); i++) {
-      MedoidModel model = new MedoidModel(bestmedoids.get(i));
-      result.addToplevelCluster(new Cluster<>(bestclusters.get(i), model));
+    for(DBIDArrayIter it = bestmedoids.iter(); it.valid(); it.advance()) {
+      MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
+      result.addToplevelCluster(new Cluster<>(bestclusters.get(it.getOffset()), model));
     }
     return result;
   }
