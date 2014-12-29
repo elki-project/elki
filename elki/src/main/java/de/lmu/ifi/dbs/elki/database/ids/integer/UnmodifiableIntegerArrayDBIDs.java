@@ -83,6 +83,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
   }
 
   @Override
+  @Deprecated
   public DBID get(int i) {
     return inner.get(i);
   }

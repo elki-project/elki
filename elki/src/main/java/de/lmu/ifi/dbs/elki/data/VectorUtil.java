@@ -31,6 +31,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -370,9 +371,11 @@ public final class VectorUtil {
     ArrayModifiableDBIDs mids = DBIDUtil.newArray(sample);
     SortDBIDsBySingleDimension s = new SortDBIDsBySingleDimension(relation);
     Vector medoid = new Vector(dim);
+    DBIDArrayIter it = mids.iter();
     for(int d = 0; d < dim; d++) {
       s.setDimension(d);
-      medoid.set(d, relation.get(QuickSelect.median(mids, s)).doubleValue(d));
+      it.seek(QuickSelect.median(mids, s));
+      medoid.set(d, relation.get(it).doubleValue(d));
     }
     return medoid;
   }

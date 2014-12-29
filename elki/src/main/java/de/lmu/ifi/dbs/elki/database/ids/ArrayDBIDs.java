@@ -34,11 +34,16 @@ public interface ArrayDBIDs extends DBIDs {
   /**
    * Get the i'th entry (starting at 0)
    * 
-   * If possible, use an {@link DBIDArrayIter} via {@link #iter()} instead!
+   * If possible, use an {@link DBIDArrayIter} via {@link #iter()} instead, or
+   * an {@link DBIDVar} via {@link #assignVar}
    * 
    * @param i Index
    * @return DBID of i'th entry.
+   * 
+   * @deprecated Preferably use a {@link DBIDArrayIter} or a {@link DBIDVar}
+   *             instead of materializing expensive {@link DBID} objects.
    */
+  @Deprecated
   public DBID get(int i);
 
   /**
