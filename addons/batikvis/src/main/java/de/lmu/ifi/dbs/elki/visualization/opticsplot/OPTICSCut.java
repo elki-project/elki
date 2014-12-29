@@ -66,7 +66,7 @@ public class OPTICSCut {
 
     // TODO: can we implement this more nicely with a 1-lookahead?
     DBIDVar prev = DBIDUtil.newVar();
-    for(DBIDIter it = co.iter(); it.valid(); it.advance(), prev.set(it)) {
+    for(DBIDIter it = co.iter(); it.valid(); prev.set(it), it.advance()) {
       lastDist = actDist;
       actDist = co.getReachability(it);
 
