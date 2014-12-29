@@ -74,7 +74,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @apiviz.has KNNQuery
  * @apiviz.has RangeQuery
- * @apiviz.has OPTICS
  * 
  * @param <O> DatabaseObject
  */
@@ -198,8 +197,8 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID);
-      param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter param = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(param)) {
         minpts = param.getValue();
       }
