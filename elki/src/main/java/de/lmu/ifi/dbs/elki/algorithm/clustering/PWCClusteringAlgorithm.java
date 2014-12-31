@@ -113,12 +113,6 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     protected Algorithm metaAlgorithm;
 
     /**
-     * Parameter to hand an algorithm to be wrapped and run
-     * to our instance of {@link PWCClusteringAlgorithm}.
-     */
-    public final static OptionID ALGORITHM_ID = new OptionID("algorithm.clustering","Used Clustering Algorithm.");
-
-    /**
      * Parameter to hand an algorithm for creating the meta-clustering
      * to our instance of {@link PWCClusteringAlgorithm}.
      *
@@ -126,6 +120,12 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
      * sample-clusterings.
      */
     public final static OptionID META_ALGORITHM_ID = new OptionID("algorithm.metaclustering","Used Algorithm for Meta-Clustering.");
+
+    /**
+     * Parameter to hand an algorithm to be wrapped and run
+     * to our instance of {@link PWCClusteringAlgorithm}.
+     */
+    public final static OptionID ALGORITHM_ID = new OptionID("algorithm.clustering","Used Clustering Algorithm.");
 
     /**
      * Parameter to specify the amount of clusterings that
@@ -144,6 +144,10 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     @Override
     protected void makeOptions(final Parameterization config) {
       super.makeOptions(config);
+      final ClassParameter malgorithm = new ClassParameter(Parameterizer.META_ALGORITHM_ID, Algorithm.class);
+      if(config.grab(malgorithm)) {
+        this.metaAlgorithm = (Algorithm) malgorithm.instantiateClass(config);
+      }
       final ClassParameter palgorithm = new ClassParameter(Parameterizer.ALGORITHM_ID, Algorithm.class);
       if(config.grab(palgorithm)) {
         this.algorithm = (Algorithm) palgorithm.instantiateClass(config);
@@ -152,12 +156,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
       if(config.grab(pdepth)) {
         this.tryDepth = pdepth.getValue();
       }
-      final ClassParameter malgorithm = new ClassParameter(Parameterizer.META_ALGORITHM_ID, Algorithm.class);
-      if(config.grab(malgorithm)) {
-        this.metaAlgorithm = (Algorithm) malgorithm.instantiateClass(config);
-      }
     }
-
   }
 
   /**
