@@ -340,7 +340,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
           k++;
         }
         final Relation<NumberVector> ground = new MaterializedRelation<>(database, t, database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), "Groundtruth", store0);
-        final Relation<NumberVector> obs = new MaterializedRelation<>(database, t, database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), "Observations", store1);
+        final Relation<NumberVector> obs = new MaterializedRelation<>(database, t, database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), "Centers of Mass", store1);
         rlist.add(ground);
         rlist.add(obs);
       }

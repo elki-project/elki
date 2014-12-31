@@ -144,11 +144,12 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
           sampleList.add(new DoubleVector(vec.getColumnVector()));
           continue;
         }
-        sampleList.add(new DoubleVector(new double[vec.getDimensionality()]));
+        final double[] svec = new double[vec.getDimensionality()];
         for(int j = 0; j < vec.getDimensionality(); j++) {
           final double gtv = vec.doubleValue(j);
-          (sampleList.get(i).getValues())[j] = gtv + this.drand.nextDouble() * difMax - this.drand.nextDouble() * difMin + randDev;
+          svec[j] = gtv + this.drand.nextDouble() * difMax - this.drand.nextDouble() * difMin + randDev;
         }
+        sampleList.add(new DoubleVector(svec));
       }
     } else {
       final double[] val = new double[dims];

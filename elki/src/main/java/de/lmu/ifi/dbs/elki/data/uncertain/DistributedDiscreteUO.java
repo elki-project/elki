@@ -172,11 +172,12 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
           sampleList.add(new Pair<DoubleVector,Integer>(new DoubleVector(vec.getColumnVector()), iweights.get(i)));
           continue;
         }
-        sampleList.add(new Pair<DoubleVector,Integer>(new DoubleVector(new double[vec.getDimensionality()]), iweights.get(i)));
+        final double[] spair = new double[vec.getDimensionality()];
         for(int j = 0; j < vec.getDimensionality(); j++) {
           final double gtv = vec.doubleValue(j);
-          (sampleList.get(i).getFirst().getValues())[j] = gtv + this.rand.nextDouble() * difMax - this.rand.nextDouble() * difMin + randDev;
+          spair[j] = gtv + this.rand.nextDouble() * difMax - this.rand.nextDouble() * difMin + randDev;
         }
+        sampleList.add(new Pair<DoubleVector,Integer>(new DoubleVector(spair), iweights.get(i)));
       }
     } else {
       final double[] val = new double[dims];
