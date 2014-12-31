@@ -150,7 +150,7 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
     final List<Clustering<Model>> refClusterings = new ArrayList<Clustering<Model>>();
     final List<Pair<Clustering<Model>,Double>> bestClusterings = new ArrayList<Pair<Clustering<Model>,Double>>();
     for(final Clustering<Model> c : clusterings0) {
-      final SingleObjectBundle bundle = db.getBundle(c.getAllClusters().get(0).getIDs().iter());
+      final SingleObjectBundle bundle = db.getBundle(c.getAllClusters().get(0).getIDs().size() > 0 ? c.getAllClusters().get(0).getIDs().iter() : c.getAllClusters().get(1).getIDs().iter());
       for(int i = 0; i < bundle.metaLength(); i++) {
         if(bundle.data(i) != null && bundle.data(i).getClass().equals(Clustering.class)) {
           clusterings1.add(c);
