@@ -20,15 +20,18 @@ import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.AdaptedHashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.memory.MemoryDataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.SimpleDBIDFactory;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.ClusteringAdapterDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -64,29 +67,27 @@ import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
  */
 /**
  *
- * This classes purpose is to wrap and use a "normal" clustering
- * algorithm in a way for dealing with uncertain data of some kind.
+ * This classes purpose is to wrap and use a "normal" clustering algorithm in a
+ * way for dealing with uncertain data of some kind.
  *
- * The approach is to construct a data set of samples drawn from
- * the uncertain objects.
- * That means that one or maybe no sample, but definitely not more
- * than one, is drawn from each uncertain object.
+ * The approach is to construct a data set of samples drawn from the uncertain
+ * objects. That means that one or maybe no sample, but definitely not more than
+ * one, is drawn from each uncertain object.
  *
- * Afterwards the chosen clustering algorithm is run on this
- * data set consisting of discrete objects and the result is
- * stored.
+ * Afterwards the chosen clustering algorithm is run on this data set consisting
+ * of discrete objects and the result is stored.
  *
- * The user has to specify how often this has to be repeated
- * (for each round a new sample data set is randomly drawn).
+ * The user has to specify how often this has to be repeated (for each round a
+ * new sample data set is randomly drawn).
  *
- * In the end the stored clustering result are compared to
- * each other by some metric (TODO: refer elegantly to the paper)
- * and the best one is forwarded to the {@link EvaluationStep}.
+ * In the end the stored clustering result are compared to each other by some
+ * metric (TODO: refer elegantly to the paper) and the best one is forwarded to
+ * the {@link EvaluationStep}.
  *
  * @author Alexander Koos
  *
  */
-public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>{
+public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>> {
 
   /**
    *
@@ -113,27 +114,27 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     protected Algorithm metaAlgorithm;
 
     /**
-     * Parameter to hand an algorithm for creating the meta-clustering
-     * to our instance of {@link PWCClusteringAlgorithm}.
+     * Parameter to hand an algorithm for creating the meta-clustering to our
+     * instance of {@link PWCClusteringAlgorithm}.
      *
      * It has to use a metric distancefunction to work on the
      * sample-clusterings.
      */
-    public final static OptionID META_ALGORITHM_ID = new OptionID("algorithm.metaclustering","Used Algorithm for Meta-Clustering.");
+    public final static OptionID META_ALGORITHM_ID = new OptionID("algorithm.metaclustering", "Used Algorithm for Meta-Clustering.");
 
     /**
-     * Parameter to hand an algorithm to be wrapped and run
-     * to our instance of {@link PWCClusteringAlgorithm}.
+     * Parameter to hand an algorithm to be wrapped and run to our instance of
+     * {@link PWCClusteringAlgorithm}.
      */
-    public final static OptionID ALGORITHM_ID = new OptionID("algorithm.clustering","Used Clustering Algorithm.");
+    public final static OptionID ALGORITHM_ID = new OptionID("algorithm.clustering", "Used Clustering Algorithm.");
 
     /**
-     * Parameter to specify the amount of clusterings that
-     * shall be created and compared.
+     * Parameter to specify the amount of clusterings that shall be created and
+     * compared.
      *
      * Has a default value.
      */
-    public final static OptionID DEPTH_ID = new OptionID("uncert.depth","Amount of sample-clusterings to be made.");
+    public final static OptionID DEPTH_ID = new OptionID("uncert.depth", "Amount of sample-clusterings to be made.");
 
     @Override
     protected Object makeInstance() {
@@ -175,8 +176,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
   private static final Logging LOG = Logging.getLogger(PWCClusteringAlgorithm.class);
 
   /**
-   * How many clusterings shall be made for
-   * comparison.
+   * How many clusterings shall be made for comparison.
    */
   private final long depth;
 
@@ -208,7 +208,6 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     return TypeUtil.array(new SimpleTypeInformation<>(UncertainObject.class));
   }
 
-
   @Override
   protected Logging getLogger() {
     return PWCClusteringAlgorithm.LOG;
@@ -216,9 +215,8 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
 
   /**
    *
-   * This Method tries if there is a run method
-   * capable for some of the asked for signatures
-   * and returns it if some exists, throws an Exception
+   * This Method tries if there is a run method capable for some of the asked
+   * for signatures and returns it if some exists, throws an Exception
    * otherwise.
    *
    * @param a
@@ -235,9 +233,9 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
       try {
         m = a.getClass().getMethod("run", signatures[i]);
         this.arguments = relations[i];
-      } catch(final NoSuchMethodException e) {
-        if(i == signatures.length - 1)
-        {
+      }
+      catch(final NoSuchMethodException e) {
+        if(i == signatures.length - 1) {
           throw e;
         }
         continue;
@@ -270,11 +268,13 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     }
     Method runAlgorithm;
     try {
-      runAlgorithm = this.getRunMethod(algorithm, new Class<?>[][] {signature1, signature2}, relations1, relations2);
+      runAlgorithm = this.getRunMethod(algorithm, new Class<?>[][] { signature1, signature2 }, relations1, relations2);
       return runAlgorithm;
-    } catch(final NoSuchMethodException e) {
+    }
+    catch(final NoSuchMethodException e) {
       throw new APIViolationException("No appropriate 'run' method found.");
-    }catch(IllegalArgumentException | IllegalAccessException | SecurityException e) {
+    }
+    catch(IllegalArgumentException | IllegalAccessException | SecurityException e) {
       throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
     catch(final InvocationTargetException e) {
@@ -293,9 +293,9 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    *
    * This run method will do the wrapping.
    *
-   * Its called from {@link AbstractAlgorithm#run(Database)} and
-   * performs the call to the algorithms particular run method
-   * as well as the storing and comparison of the resulting Clusterings.
+   * Its called from {@link AbstractAlgorithm#run(Database)} and performs the
+   * call to the algorithms particular run method as well as the storing and
+   * comparison of the resulting Clusterings.
    *
    * @param database
    * @param relation
@@ -303,78 +303,68 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public Clustering<Model> run(final Database database, final Relation<UncertainObject<UOModel<SpatialComparable>>> relation) {
-    final MemoryDataStoreFactory factory = new MemoryDataStoreFactory();
     final ArrayList<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
     final ArrayList<Clustering<Model>> rclusterings = new ArrayList<Clustering<Model>>();
-    Relation<?> labelRel = null;
-    for(final Relation<?> r : database.getRelations()) {
-      if(r.getDataTypeInformation().equals(TypeUtil.CLASSLABEL)) {
-        labelRel = r;
-      }
-    }
     final List<Relation<NumberVector>> rlist = new ArrayList<Relation<NumberVector>>();
-    for(int i = 0; i < this.depth; i++) {
-      final double[][] sampleVecs = new double[relation.getDBIDs().size()][relation.get(relation.getDBIDs().iter()).getDimensionality()];
-      final double[][] groundVecs = new double[relation.getDBIDs().size()][relation.get(relation.getDBIDs().iter()).getDimensionality()];
-      final double[][] obsVecs = new double[relation.getDBIDs().size()][relation.get(relation.getDBIDs().iter()).getDimensionality()];
-      int j = 0;
-      final String[] labels = new String[relation.getDBIDs().size()];
-      for(final DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-        final DoubleVector vec = relation.get(iter).drawSample();
-        if(i == 0) {
-          groundVecs[j] = relation.get(iter).getValues();
-          obsVecs[j] = relation.get(iter).getObservation();
+    {
+      final int dim = RelationUtil.dimensionality(relation);
+      final DBIDs ids = relation.getDBIDs();
+      // Add the raw input data:
+      {
+        final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
+        final WritableDataStore<NumberVector> store0 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          UncertainObject<UOModel<SpatialComparable>> v = relation.get(iter);
+          store0.put(iter, new DoubleVector(v.getValues()));
         }
-        sampleVecs[j] = vec.getValues();
-        labels[j] = labelRel.get(iter).toString();
-        j++;
-      }
-      if(i == 0) {
-        final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class,relation.get(relation.getDBIDs().iter()).getDimensionality(),relation.get(relation.getDBIDs().iter()).getDimensionality());
-        final WritableDataStore<NumberVector> store0 = factory.makeStorage(database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), 0, NumberVector.class);
-        final WritableDataStore<NumberVector> store1 = factory.makeStorage(database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), 0, NumberVector.class);
-        int k = 0;
-        for(final DBIDIter iter = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs().iter(); iter.valid(); iter.advance()) {
-          store0.put(iter, new DoubleVector(groundVecs[k]));
-          store1.put(iter, new DoubleVector(obsVecs[k]));
-          k++;
-        }
-        final Relation<NumberVector> ground = new MaterializedRelation<>(database, t, database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), "Groundtruth", store0);
-        final Relation<NumberVector> obs = new MaterializedRelation<>(database, t, database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), "Centers of Mass", store1);
+        final Relation<NumberVector> ground = new MaterializedRelation<>(database, t, ids, "Raw input data", store0);
         rlist.add(ground);
+      }
+      // Add the uncertain model:
+      {
+        final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
+        final WritableDataStore<NumberVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          store1.put(iter, new DoubleVector(relation.get(iter).getValues()));
+        }
+        final Relation<NumberVector> obs = new MaterializedRelation<>(database, t, ids, "Uncertain Model: Center of Mass", store1);
         rlist.add(obs);
       }
-      j = 0;
-      final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class,relation.get(relation.getDBIDs().iter()).getDimensionality(),relation.get(relation.getDBIDs().iter()).getDimensionality());
-      final WritableDataStore<NumberVector> store = factory.makeStorage(database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), 0, NumberVector.class);
-      for(final DBIDIter iter = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs().iter(); iter.valid(); iter.advance()) {
-        store.put(iter, new DoubleVector(sampleVecs[j]));
-        j++;
+      // Add samples:
+      for(int i = 0; i < this.depth; i++) {
+        final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
+        final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          store.put(iter, new DoubleVector(relation.get(iter).drawSample().getValues()));
+        }
+        final Relation<NumberVector> sample = new MaterializedRelation<>(database, t, ids, "Sample " + i, store);
+        rlist.add(sample);
       }
-      final Relation<NumberVector> sample = new MaterializedRelation<>(database, t, database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD).getDBIDs(), "Sample" + i, store);
-      rlist.add(sample);
     }
 
     for(final Relation<NumberVector> r : rlist) {
       if(this.arguments == null) {
         this.runAlgorithm = this.prepareAlgorithm(database, r, this.algorithm);
-      } else {
-        this.arguments[this.arguments.length - 1] =  r;
+      }
+      else {
+        this.arguments[this.arguments.length - 1] = r;
       }
 
       Clustering<Model> clusterResult;
       try {
         clusterResult = (Clustering<Model>) this.runAlgorithm.invoke(this.algorithm, this.arguments);
-      } catch(final Exception e) {
+      }
+      catch(final Exception e) {
         throw new APIViolationException("Invoking the run method failed at sample clustering.", e);
       }
 
       database.getHierarchy().add(database, r);
       database.getHierarchy().add(r, clusterResult);
 
-      if(r.getLongName().substring(0,5).equals("Sample")) {
+      if(r.getLongName().startsWith("Sample")) {
         clusterings.add(clusterResult);
-      } else {
+      }
+      else {
         rclusterings.add(clusterResult);
       }
     }
@@ -386,26 +376,26 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     ((AdaptedHashmapDatabase) database).insert(dbc.loadData(), iids, "Sample-Clusterings");
 
     final SimpleTypeInformation<Clustering<Model>> t = new SimpleTypeInformation<>(Clustering.class);
-    final WritableDataStore<Clustering<Model>> datastore = factory.makeStorage(database.getRelation(t).getDBIDs(), 0, Clustering.class);
+    final WritableDataStore<Clustering<Model>> datastore = DataStoreUtil.makeStorage(database.getRelation(t).getDBIDs(), DataStoreFactory.HINT_DB, Clustering.class);
     for(final DBIDIter iter = database.getRelation(t).getDBIDs().iter(); iter.valid(); iter.advance()) {
       datastore.put(iter, (Clustering<Model>) database.getRelation(t).get(iter));
     }
 
-    final ModifiableDBIDs ids = (new SimpleDBIDFactory()).newArray();
+    final ModifiableDBIDs sids = (new SimpleDBIDFactory()).newArray();
     for(final DBIDIter iter = database.getRelation(t).getDBIDs().iter(); iter.valid(); iter.advance()) {
       for(int i = 0; i < database.getBundle(iter).metaLength(); i++) {
         final Object b = database.getBundle(iter).data(i);
         if(b != null) {
           if(b.getClass().equals(Clustering.class)) {
-            if(((Relation)database.getHierarchy().iterParents((Result)b).get()).getLongName().substring(0,6).equals("Sample")) {
-              ids.add(iter);
+            if(((Relation) database.getHierarchy().iterParents((Result) b).get()).getLongName().startsWith("Sample")) {
+              sids.add(iter);
             }
           }
         }
       }
     }
 
-    final Relation<Clustering<Model>> simRelation = new MaterializedRelation<Clustering<Model>>(database, t, ids, "Clusterings", datastore);
+    final Relation<Clustering<Model>> simRelation = new MaterializedRelation<Clustering<Model>>(database, t, sids, "Clusterings", datastore);
 
     this.runAlgorithm = null;
     this.arguments = null;
@@ -416,7 +406,8 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
 
     try {
       metaClustering = (Clustering<Model>) this.runAlgorithm.invoke(this.metaAlgorithm, this.arguments);
-    } catch(final Exception e) {
+    }
+    catch(final Exception e) {
       throw new APIViolationException("Invoking the run method failed during meta clustering.", e);
     }
 
