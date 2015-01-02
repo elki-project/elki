@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -82,14 +83,14 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     // Number of neighbors to fetch
     int kk = (int) ((krate > 1.) ? krate : Math.ceil(krate * allids.size()));
 
-    DBIDs samples = DBIDUtil.randomSample(allids, ssize, 0L);
+    DBIDs sampleids = DBIDUtil.randomSample(allids, ssize, 0L);
 
     DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnq = database.getKNNQuery(dq, kk + 1);
 
-    double[] idim = new double[ssize];
-    int idims = 0;
-    for(DBIDIter iter = samples.iter(); iter.valid(); iter.advance()) {
+    double[] idim = new double[ssize], kdists = new double[ssize];
+    int samples = 0;
+    for(DBIDIter iter = sampleids.iter(); iter.valid(); iter.advance()) {
       KNNList knns = knnq.getKNNForDBID(iter, kk);
       DoubleDBIDListIter it = knns.iter();
       // Skip zeros.
@@ -103,10 +104,14 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
       for(int i = 0; it.valid(); it.advance(), ++i) {
         vals[i] = it.doubleValue();
       }
-      idim[idims++] = estimator.estimate(vals);
+      kdists[samples] = vals[vals.length - 1];
+      idim[samples] = estimator.estimate(vals);
+      ++samples;
     }
-    double id = QuickSelect.median(idim, 0, idims);
-    LOG.warning("Estimated intrinsic dimensionality is: " + id);
+    double id = (samples > 1) ? QuickSelect.median(idim, 0, samples) : -1;
+    double kdist = (samples > 1) ? QuickSelect.median(kdists, 0, samples) : 0.;
+    LOG.statistics(new DoubleStatistic(EstimateIntrinsicDimensionality.class.getName() + ".k-distance", kdist));
+    LOG.statistics(new DoubleStatistic(EstimateIntrinsicDimensionality.class.getName() + ".intrinsic-dimensionality", id));
     return null;
   }
 
@@ -123,7 +128,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     private static final OptionID KRATE_ID = new OptionID("idist.k", "Number of kNN (absolute or relative)");
 
-    private static final OptionID SAMPLES_ID = new OptionID("idist.sample", "Sample size (absolute or relative)");
+    private static final OptionID SAMPLES_ID = new OptionID("idist.sampling", "Sample size (absolute or relative)");
 
     /**
      * Number of neighbors to use.
