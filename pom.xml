@@ -148,9 +148,9 @@
 							<overview>${elki.projdir}/elki/src/main/javadoc/overview.html</overview>
 							<doctitle>ELKI</doctitle>
 							<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
-							<docletPath>${elki.projdir}/lib/apiviz-1.3.1.GA+erich2.jar</docletPath>
+							<!-- <docletPath>${elki.projdir}/lib/apiviz-1.3.1.GA+erich2.jar</docletPath>
 							<doclet>org.jboss.apiviz.APIviz</doclet>
-							<additionalparam>-nopackagediagram</additionalparam>
+							<additionalparam>-nopackagediagram</additionalparam> -->
 							<groups>
 								<group>
 									<title>Algorithms</title>
@@ -293,23 +293,4 @@
 		<system>trac</system>
 		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
 	</issueManagement>
-	<!-- temporary, until migration is complete. -->
-	<dependencies>
-		<dependency>
-			<groupId>net.sf.trove4j</groupId>
-			<artifactId>trove4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-swing</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-rasterizer</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-	</dependencies>
 </project>
