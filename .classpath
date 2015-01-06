@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="true" kind="src" path="/elki"/>
-	<classpathentry combineaccessrules="true" kind="src" path="/elki-batik-visualization"/>
+	<classpathentry kind="src" path="/elki"/>
+	<classpathentry kind="src" path="/elki-batik-visualization"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
