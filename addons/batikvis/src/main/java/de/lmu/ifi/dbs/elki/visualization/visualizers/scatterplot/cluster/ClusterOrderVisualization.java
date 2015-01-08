@@ -126,9 +126,12 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
 
       svgp.addCSSClassOrLogError(cls);
 
-      DBIDIter it = result.iter();
-      DBIDVar prev = DBIDUtil.newVar(it);
-      for(it.advance() /* skip first! */; it.valid(); it.advance(), prev.set(it)) {
+      DBIDVar prev = DBIDUtil.newVar();
+      for(DBIDIter it = result.iter(); it.valid(); it.advance()) {
+        result.getPredecessor(it, prev);
+        if(prev.isEmpty()) {
+          continue;
+        }
         double[] thisVec = proj.fastProjectDataToRenderSpace(rel.get(it));
         double[] prevVec = proj.fastProjectDataToRenderSpace(rel.get(prev));
 
