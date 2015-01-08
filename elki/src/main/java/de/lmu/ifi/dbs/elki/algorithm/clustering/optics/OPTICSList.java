@@ -23,14 +23,14 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Comparator;
-
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -46,8 +46,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -55,8 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * The OPTICS algorithm for density-based hierarchical clustering.
  * 
- * This version is implemented using a list and quickselect, instead of using a
- * heap.
+ * This version is implemented using a list, always scanning the list for the
+ * maximum. While this could be cheaper than the complex heap updates,
+ * benchmarks indicate the heap version is usually still preferable.
  * 
  * Reference:
  * <p>
@@ -78,7 +77,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
 booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
 url = "http://dx.doi.org/10.1145/304181.304187")
-@Alias({ "OPTICS", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS" })
 public class OPTICSList<O> extends AbstractOPTICS<O> {
   /**
    * The logger for this class.
@@ -96,13 +94,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
     super(distanceFunction, epsilon, minpts);
   }
 
-  /**
-   * Run OPTICS on the database.
-   * 
-   * @param db Database
-   * @param relation Relation
-   * @return Result
-   */
+  @Override
   public ClusterOrder run(Database db, Relation<O> relation) {
     return new Instance(db, relation).run();
   }
@@ -112,7 +104,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
    *
    * @author Erich Schubert
    */
-  private class Instance implements Comparator<DBIDRef> {
+  private class Instance {
     /**
      * Holds a set of processed ids.
      */
@@ -171,11 +163,6 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       rangeQuery = db.getRangeQuery(dq, epsilon);
     }
 
-    @Override
-    public int compare(DBIDRef o1, DBIDRef o2) {
-      return Double.compare(reachability.doubleValue(o2), reachability.doubleValue(o1));
-    }
-
     /**
      * Process the data set.
      * 
@@ -202,12 +189,12 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       predecessor.putDBID(objectID, objectID);
       reachability.put(objectID, Double.POSITIVE_INFINITY);
 
+      DBIDArrayMIter it = candidates.iter();
       DBIDVar cur = DBIDUtil.newVar(), prev = DBIDUtil.newVar();
       while(!candidates.isEmpty()) {
-        int last = candidates.size() - 1;
-        QuickSelect.quickSelect(candidates, this, last);
-        candidates.assignVar(last, cur);
-        candidates.remove(last);
+        final int best = findMin(it);
+        candidates.assignVar(best, cur);
+        candidates.remove(best);
         processedIDs.add(cur);
         { // Build cluster order entry
           predecessor.assignVar(cur, prev);
@@ -237,6 +224,25 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
           }
         }
       }
+    }
+
+    /**
+     * Find the minimum in the candidates array.
+     * 
+     * @param it Array iterator
+     * @return Position of minimum.
+     */
+    public int findMin(DBIDArrayIter it) {
+      int best = 0, i = 1;
+      double min = reachability.doubleValue(it.seek(0));
+      for(it.advance(); it.valid(); it.advance(), ++i) {
+        final double reach = reachability.doubleValue(it);
+        if(reach < min) { // Prefer last on ties: cheaper
+          min = reach;
+          best = i;
+        }
+      }
+      return best;
     }
   }
 

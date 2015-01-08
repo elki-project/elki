@@ -82,7 +82,7 @@ public class OPTICSHeapEntry implements Comparable<OPTICSHeapEntry> {
 
     final OPTICSHeapEntry that = (OPTICSHeapEntry) o;
     // Compare by ID only, for UpdatableHeap!
-    return DBIDUtil.equal(objectID, that.getID());
+    return DBIDUtil.equal(objectID, that.objectID);
   }
 
   /**
@@ -103,34 +103,6 @@ public class OPTICSHeapEntry implements Comparable<OPTICSHeapEntry> {
   @Override
   public String toString() {
     return objectID + "(" + predecessorID + "," + reachability + ")";
-  }
-
-  /**
-   * Returns the object id of this entry.
-   * 
-   * @return the object id of this entry
-   */
-  public DBID getID() {
-    return objectID;
-  }
-
-  /**
-   * Returns the id of the predecessor of this entry if this entry has a
-   * predecessor, null otherwise.
-   * 
-   * @return the id of the predecessor of this entry
-   */
-  public DBID getPredecessorID() {
-    return predecessorID;
-  }
-
-  /**
-   * Returns the reachability distance of this entry
-   * 
-   * @return the reachability distance of this entry
-   */
-  public double getReachability() {
-    return reachability;
   }
 
   @Override

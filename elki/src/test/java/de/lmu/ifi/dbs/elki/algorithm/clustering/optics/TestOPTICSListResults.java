@@ -64,9 +64,9 @@ public class TestOPTICSListResults extends AbstractSimpleAlgorithmTest implement
     // run OPTICS on database
     Clustering<?> clustering = opticsxi.run(db);
 
-    // This is about 1 object better than the heap based OPTICS, but this is
-    // solvely by chance due to different processing order.
-    testFMeasure(db, clustering, 0.879586493);
-    testClusterSizes(clustering, new int[] { 108, 121, 209, 272 });
+    // This is about 3 object better than the heap based OPTICS, but this is
+    // solely by chance due to different processing order.
+    testFMeasure(db, clustering, 0.881882915);
+    testClusterSizes(clustering, new int[] { 109, 119, 209, 273 });
   }
 }

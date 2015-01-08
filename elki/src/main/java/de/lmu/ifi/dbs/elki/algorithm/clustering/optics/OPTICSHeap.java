@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -68,7 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 title = "OPTICS: Ordering Points to Identify the Clustering Structure", //
 booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", //
 url = "http://dx.doi.org/10.1145/304181.304187")
-@Alias({ "OPTICS", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS" })
+@Alias({ "OPTICS", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS", //
+"de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICS" })
 public class OPTICSHeap<O> extends AbstractOPTICS<O> {
   /**
    * The logger for this class.
@@ -86,13 +86,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
     super(distanceFunction, epsilon, minpts);
   }
 
-  /**
-   * Run OPTICS on the database.
-   * 
-   * @param db Database
-   * @param relation Relation
-   * @return Result
-   */
+  @Override
   public ClusterOrder run(Database db, Relation<O> relation) {
     return new Instance(db, relation).run();
   }
@@ -111,7 +105,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
     /**
      * Heap of candidates.
      */
-    UpdatableHeap<OPTICSHeapEntry> heap = new UpdatableHeap<>();
+    UpdatableHeap<OPTICSHeapEntry> heap;
 
     /**
      * Output cluster order.
@@ -146,6 +140,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
       progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", ids.size(), LOG) : null;
       DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
       rangeQuery = db.getRangeQuery(dq, epsilon);
+      heap = new UpdatableHeap<>();
     }
 
     /**
@@ -175,24 +170,22 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
       while(!heap.isEmpty()) {
         final OPTICSHeapEntry current = heap.poll();
         clusterOrder.add(current.objectID, current.reachability, current.predecessorID);
-        processedIDs.add(current.getID());
+        processedIDs.add(current.objectID);
 
-        DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
+        DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(current.objectID, epsilon);
         if(neighbors.size() >= minpts) {
-          final DoubleDBIDPair last = neighbors.get(minpts - 1);
-          double coreDistance = last.doubleValue();
+          DoubleDBIDListIter neighbor = neighbors.iter();
+          final double coreDistance = neighbor.seek(minpts - 1).doubleValue();
 
-          for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          for(neighbor.seek(0); neighbor.valid(); neighbor.advance()) {
             if(processedIDs.contains(neighbor)) {
               continue;
             }
             double reachability = MathUtil.max(neighbor.doubleValue(), coreDistance);
-            heap.add(new OPTICSHeapEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
+            heap.add(new OPTICSHeapEntry(DBIDUtil.deref(neighbor), current.objectID, reachability));
           }
         }
-        if(progress != null) {
-          progress.setProcessed(processedIDs.size(), LOG);
-        }
+        LOG.incrementProcessed(progress);
       }
     }
   }
