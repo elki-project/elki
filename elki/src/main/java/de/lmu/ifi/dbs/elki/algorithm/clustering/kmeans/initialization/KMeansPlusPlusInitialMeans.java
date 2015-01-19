@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -43,6 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * K-Means++ initialization for k-means.
@@ -80,8 +80,12 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
     // Chose first mean
     List<V> means = new ArrayList<>(k);
 
+    if(ids.size() <= k) {
+      throw new AbortException("Don't use k-means with k >= data set size.");
+    }
+
     Random random = rnd.getSingleThreadedRandom();
-    DBID first = DBIDUtil.deref(DBIDUtil.randomSample(ids, 1, random).iter());
+    DBIDRef first = DBIDUtil.randomSample(ids, 1, random).iter();
     means.add(factory.newNumberVector(relation.get(first)));
 
     // Initialize weights
@@ -93,14 +97,18 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
       if(weightsum < Double.MIN_NORMAL) {
         LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few data points?");
       }
-      double r = random.nextDouble() * weightsum;
+      double r = random.nextDouble() * weightsum, s = 0.;
       DBIDIter it = ids.iter();
-      for(; r > 0. && it.valid(); it.advance()) {
+      for(; s < r && it.valid(); it.advance()) {
         double w = weights.doubleValue(it);
         if(w != w) {
-          continue; // NaN: alrady chosen.
+          continue; // NaN: already chosen.
         }
-        r -= w;
+        s += w;
+      }
+      if(!it.valid()) { // Rare case, but happens due to floating math
+        weightsum -= (r - s); // Decrease
+        continue; // Retry
       }
       // Add new mean:
       final T newmean = relation.get(it);
