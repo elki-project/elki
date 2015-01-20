@@ -59,7 +59,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -245,7 +244,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       gen.setTestAgainstModel(testAgainstModel.booleanValue());
     }
     try {
-      return gen.generate();
+      return super.invokeBundleFilters(gen.generate());
     }
     catch(UnableToComplyException e) {
       throw new AbortException("Data generation failed. ", e);
