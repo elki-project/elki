@@ -67,7 +67,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   public ArrayIntegerStore(int size, DataStoreIDMap idmap, int def) {
     super();
     this.data = new int[size];
-    if (def != 0) {
+    if(def != 0) {
       Arrays.fill(this.data, def);
     }
     this.idmap = idmap;
@@ -107,6 +107,12 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
     final int ret = data[off];
     data[off] = value;
     return ret;
+  }
+
+  @Override
+  public void increment(DBIDRef id, int adjust) {
+    final int off = idmap.mapDBIDToOffset(id);
+    data[off] += adjust;
   }
 
   @Override

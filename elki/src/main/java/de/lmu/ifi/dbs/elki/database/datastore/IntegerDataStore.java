@@ -41,7 +41,7 @@ public interface IntegerDataStore extends DataStore<Integer> {
   public Integer get(DBIDRef id);
 
   /**
-   * Retrieves an object from the storage.
+   * Retrieves a value from the storage.
    * 
    * @param id Database ID.
    * @return Double value

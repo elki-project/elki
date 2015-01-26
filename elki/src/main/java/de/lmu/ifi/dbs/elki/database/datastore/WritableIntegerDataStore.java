@@ -61,4 +61,12 @@ public interface WritableIntegerDataStore extends IntegerDataStore, WritableData
    * @return previous value
    */
   public int put(DBIDRef id, int value);
+
+  /**
+   * Increment a value.
+   * 
+   * @param id Database ID.
+   * @param adjust Value to add to the previous value.
+   */
+  public void increment(DBIDRef id, int adjust);
 }
