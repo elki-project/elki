@@ -75,7 +75,7 @@ public class LinearScaling implements StaticScalingFunction {
    */
   public LinearScaling(DoubleMinMax minmax) {
     this.factor = 1.0 / (minmax.getMax() - minmax.getMin());
-    this.shift = -minmax.getMin() / this.factor;
+    this.shift = -minmax.getMin() * this.factor;
   }
 
   @Override
@@ -103,6 +103,6 @@ public class LinearScaling implements StaticScalingFunction {
    */
   public static LinearScaling fromMinMax(double min, double max) {
     double zoom = 1.0 / (max - min);
-    return new LinearScaling(zoom, -min / zoom);
+    return new LinearScaling(zoom, -min * zoom);
   }
 }
