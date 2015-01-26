@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  */
 class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayDBIDs {
   /**
-   * The actual Trove array list.
+   * The backing array list.
    */
   private int[] store;
 
@@ -81,13 +81,14 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
    */
   protected ArrayModifiableIntegerDBIDs(DBIDs existing) {
     this(existing.size());
-    if (existing instanceof IntegerDBIDRange) {
+    if(existing instanceof IntegerDBIDRange) {
       IntegerDBIDRange range = (IntegerDBIDRange) existing;
-      for (int i = 0; i < range.len; i++) {
+      for(int i = 0; i < range.len; i++) {
         store[i] = range.start + i;
       }
       size = range.len;
-    } else {
+    }
+    else {
       this.addDBIDs(existing);
     }
   }
@@ -109,9 +110,10 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
   @Override
   public void assignVar(int index, DBIDVar var) {
-    if (var instanceof IntegerDBIDVar) {
+    if(var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) var).internalSetIndex(store[index]);
-    } else {
+    }
+    else {
       // less efficient, involves object creation.
       var.set(get(index));
     }
@@ -123,11 +125,11 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
    * @param minsize Desired size
    */
   private void ensureSize(int minsize) {
-    if (minsize <= store.length) {
+    if(minsize <= store.length) {
       return;
     }
     int asize = store.length;
-    while (asize < minsize) {
+    while(asize < minsize) {
       asize = (asize >>> 1) + asize;
     }
     final int[] prev = store;
@@ -148,7 +150,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   @Override
   public boolean addDBIDs(DBIDs ids) {
     ensureSize(size + ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       store[size] = iter.internalGetIndex();
       ++size;
     }
@@ -158,11 +160,11 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
-    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       int rm = id.internalGetIndex();
       // TODO: when sorted, use binary search!
-      for (int i = 0; i < size; i++) {
-        if (store[i] == rm) {
+      for(int i = 0; i < size; i++) {
+        if(store[i] == rm) {
           --size;
           store[i] = store[size];
           success = true;
@@ -175,7 +177,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
   @Override
   public boolean add(DBIDRef e) {
-    if (size == store.length) {
+    if(size == store.length) {
       grow();
     }
     store[size] = e.internalGetIndex();
@@ -187,8 +189,8 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   public boolean remove(DBIDRef o) {
     int rm = o.internalGetIndex();
     // TODO: when sorted, use binary search!
-    for (int i = 0; i < size; i++) {
-      if (store[i] == rm) {
+    for(int i = 0; i < size; i++) {
+      if(store[i] == rm) {
         --size;
         store[i] = store[size];
         return true;
@@ -205,10 +207,20 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   }
 
   @Override
+  public void insert(int i, DBIDRef newval) {
+    if(size == store.length) {
+      grow();
+    }
+    System.arraycopy(store, i, store, i + 1, size - i);
+    store[i] = newval.internalGetIndex();
+    ++size;
+  }
+
+  @Override
   public DBID remove(int index) {
     DBID ret = new IntegerDBID(store[index]);
     --size;
-    if (size > 0) {
+    if(size > 0) {
       store[index] = store[size];
     }
     return ret;
@@ -228,8 +240,8 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   public boolean contains(DBIDRef o) {
     // TODO: recognize sorted arrays, then use binary search?
     int oid = o.internalGetIndex();
-    for (int i = 0; i < size; i++) {
-      if (store[i] == oid) {
+    for(int i = 0; i < size; i++) {
+      if(store[i] == oid) {
         return true;
       }
     }
@@ -365,8 +377,8 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
     public boolean contains(DBIDRef o) {
       // TODO: recognize sorted arrays, then use binary search?
       int oid = o.internalGetIndex();
-      for (int i = begin; i < end; i++) {
-        if (store[i] == oid) {
+      for(int i = begin; i < end; i++) {
+        if(store[i] == oid) {
           return true;
         }
       }

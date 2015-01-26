@@ -72,6 +72,16 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
   public DBID set(int i, DBIDRef newval);
 
   /**
+   * Insert at position i (starting at 0, moving the remainder by one position).
+   * 
+   * Note: this operation has linear time complexity on average: O(n/2)
+   * 
+   * @param i Index
+   * @param newval New value
+   */
+  public void insert(int i, DBIDRef newval);
+
+  /**
    * Swap DBIDs add positions a and b.
    * 
    * @param a First position
