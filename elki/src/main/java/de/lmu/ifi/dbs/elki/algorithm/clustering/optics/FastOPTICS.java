@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -66,7 +67,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
   /**
    * undefined value for (reachability/average) distance
    */
-  public static final double undefinedDist = -0.1f;
+  public static final double UNDEFINED_DISTANCE = -0.1f;
 
   /**
    * Result: output order of points
@@ -100,13 +101,20 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
   int minPts;
 
   /**
+   * Index.
+   */
+  RandProNeighsAndDensities<V> index;
+
+  /**
    * Constructor.
    *
    * @param minpts Minimum number of neighbors.
+   * @param algo Index
    */
-  public FastOPTICS(int minpts) {
+  public FastOPTICS(int minpts, RandProNeighsAndDensities<V> algo) {
     super();
     this.minPts = minpts;
+    this.index = algo;
   }
 
   /**
@@ -120,13 +128,12 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     DistanceQuery<V> dq = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
 
     // initialize points used and reachability distance
-    reachDist = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, undefinedDist);
+    reachDist = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, UNDEFINED_DISTANCE);
 
     // compute projections, density estimates and neighborhoods
-    RandProNeighsAndDensities<V> algo = new RandProNeighsAndDensities<>(rel, minPts);
-    algo.computeSetsBounds(ids); // project points
-    inverseDensities = algo.computeAverageDistInSet(); // compute densities
-    neighs = algo.getNeighs(); // get neighbors of points
+    index.computeSetsBounds(rel, minPts, ids); // project points
+    inverseDensities = index.computeAverageDistInSet(); // compute densities
+    neighs = index.getNeighs(); // get neighbors of points
 
     // compute ordering as for OPTICS
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("OPTICS clustering.", ids.size(), LOG) : null;
@@ -168,7 +175,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
         if(coredist > nrdist) {
           nrdist = coredist;
         }
-        if(reachDist.doubleValue(it) == undefinedDist) {
+        if(reachDist.doubleValue(it) == UNDEFINED_DISTANCE) {
           reachDist.put(it, nrdist);
         }
         else if(nrdist < reachDist.doubleValue(it)) {
@@ -211,6 +218,11 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
      */
     int minpts;
 
+    /**
+     * Random projection index.
+     */
+    RandProNeighsAndDensities<V> index;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -219,11 +231,13 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
       if(config.grab(minptsP)) {
         minpts = minptsP.intValue();
       }
+      Class<RandProNeighsAndDensities<V>> clz = ClassGenericsUtil.uglyCastIntoSubclass(RandProNeighsAndDensities.class);
+      index = config.tryInstantiate(clz);
     }
 
     @Override
     protected FastOPTICS<V> makeInstance() {
-      return new FastOPTICS<V>(minpts);
+      return new FastOPTICS<V>(minpts, index);
     }
   }
 }
