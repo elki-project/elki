@@ -223,8 +223,7 @@ public class RandProNeighsAndDensities<V extends NumberVector> {
     if(nele > minSplitSize * (1 - sizeTolerance) && nele < minSplitSize * (1 + sizeTolerance)) {
       // sort set, since need median element later
       ind.sort(begin, end, new DataStoreUtil.AscendingByDoubleDataStore(tpro));
-      splitsets.add(ind);
-      return;
+      splitsets.add(DBIDUtil.newArray(ind.slice(begin, end)));
     }
 
     // compute splitting element
