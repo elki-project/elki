@@ -27,6 +27,8 @@ de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.LengthNormaliza
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.HellingerHistogramNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceMeanVarianceNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceMinMaxNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceRankNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceLogRankNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.Log1PlusNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.transform.GlobalPrincipalComponentAnalysisTransform
 de.lmu.ifi.dbs.elki.datasource.filter.transform.FastMultidimensionalScalingTransform
