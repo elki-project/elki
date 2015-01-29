@@ -23,9 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -125,8 +124,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
   protected static double calcPosterior(double f, double alpha, double mu, double sigma, double lambda) {
     final double pi = calcP_i(f, mu, sigma);
     final double qi = calcQ_i(f, lambda);
-    final double val = (alpha * pi) / (alpha * pi + (1.0 - alpha) * qi);
-    return val;
+    return (alpha * pi) / (alpha * pi + (1.0 - alpha) * qi);
   }
 
   @Override
@@ -148,60 +146,50 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
     double curLambda = Math.min(1.0 / curMu, Double.MAX_VALUE);
     double curAlpha = 0.05;
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(or.getScores().getDBIDs());
+    DBIDs ids = scores.getDBIDs();
     // TODO: stop condition!
     int iter = 0;
-    // logger.debugFine("iter #-1 mu = " + curMu + " sigma = " + curSigma +
+    // LOG.debugFine("iter #-1 mu = " + curMu + " sigma = " + curSigma +
     // " lambda = " + curLambda + " alpha = " + curAlpha);
     while(true) {
       // E and M-Steps
-      // Sum of weights
-      double tisum = 0.0;
-      // Weighted sum
-      double wsum = 0.0;
-      // Weighted deviation from previous mean
-      double sqsum = 0.0;
+      // Sum of weights for both distributions
+      double otisum = 0.0, itisum = 0.0;
+      // Weighted sum for both distributions
+      double owsum = 0.0, iwsum = 0.0;
+      // Weighted deviation from previous mean (Gaussian only)
+      double osqsum = 0.0;
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        double val = or.getScores().doubleValue(it);
-        // E-Step
+        double val = scores.doubleValue(it);
+        // E-Step: estimate outlier probability
         double ti = calcPosterior(val, curAlpha, curMu, curSigma, curLambda);
         // M-Step
-        tisum += ti;
-        wsum += ti * val;
-        sqsum += ti * val * val; // (val - curMu) * (val - curMu);
+        otisum += ti;
+        itisum += 1 - ti;
+        owsum += ti * val;
+        iwsum += (1 - ti) * val;
+        osqsum += ti * val * val; // (val - curMu) * (val - curMu);
       }
-      if(tisum <= 0.0 || wsum <= 0.0) {
+      if(otisum <= 0.0 || owsum <= 0.0) {
         LOG.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
-      double newMu = wsum / tisum;
-      double newSigma = Math.max(Math.sqrt(sqsum / tisum - newMu * newMu), Double.MIN_NORMAL);
-      double newLambda = Math.min(tisum / wsum, Double.MAX_VALUE);
-      double newAlpha = tisum / ids.size();
+      double newMu = owsum / otisum;
+      double newSigma = Math.max(Math.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
+      double newLambda = Math.min(itisum / iwsum, Double.MAX_VALUE);
+      double newAlpha = otisum / ids.size();
       // converged?
-      {
-        boolean changed = false;
-        if(Math.abs(newMu - curMu) > DELTA) {
-          changed = true;
-        }
-        if(Math.abs(newSigma - curSigma) > DELTA) {
-          changed = true;
-        }
-        if(Math.abs(newLambda - curLambda) > DELTA) {
-          changed = true;
-        }
-        if(Math.abs(newAlpha - curAlpha) > DELTA) {
-          changed = true;
-        }
-        if(!changed) {
-          break;
-        }
+      if(Math.abs(newMu - curMu) < DELTA //
+          && Math.abs(newSigma - curSigma) < DELTA //
+          && Math.abs(newLambda - curLambda) < DELTA //
+          && Math.abs(newAlpha - curAlpha) < DELTA) {
+        break;
       }
       if(newSigma <= 0.0 || newAlpha <= 0.0) {
         LOG.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
-      // logger.debugFine("iter #"+iter+" mu = " + newMu + " sigma = " +
+      // LOG.debugFine("iter #"+iter+" mu = " + newMu + " sigma = " +
       // newSigma + " lambda = " + newLambda + " alpha = " + newAlpha);
       curMu = newMu;
       curSigma = newSigma;
@@ -218,7 +206,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
     sigma = curSigma;
     lambda = curLambda;
     alpha = curAlpha;
-    // logger.debugFine("mu = " + mu + " sigma = " + sigma + " lambda = " +
+    // LOG.debugFine("mu = " + mu + " sigma = " + sigma + " lambda = " +
     // lambda + " alpha = " + alpha);
   }
 
@@ -243,57 +231,47 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
 
     // TODO: stop condition!
     int iter = 0;
-    // logger.debugFine("iter #-1 mu = " + curMu + " sigma = " + curSigma +
+    // LOG.debugFine("iter #-1 mu = " + curMu + " sigma = " + curSigma +
     // " lambda = " + curLambda + " alpha = " + curAlpha);
     while(true) {
       // E and M-Steps
-      // Sum of weights
-      double tisum = 0.0;
-      // Weighted sum
-      double wsum = 0.0;
-      // Weighted deviation from previous mean
-      double sqsum = 0.0;
+      // Sum of weights for both distributions
+      double otisum = 0.0, itisum = 0.0;
+      // Weighted sum for both distributions
+      double owsum = 0.0, iwsum = 0.0;
+      // Weighted deviation from previous mean (Gaussian only)
+      double osqsum = 0.0;
       for(int i = 0; i < size; i++) {
         double val = adapter.getDouble(array, i);
         // E-Step
         double ti = calcPosterior(val, curAlpha, curMu, curSigma, curLambda);
         // M-Step
-        tisum += ti;
-        wsum += ti * val;
-        sqsum += ti * val * val; // (val - curMu) * (val - curMu);
+        otisum += ti;
+        itisum += 1 - ti;
+        owsum += ti * val;
+        iwsum += (1 - ti) * val;
+        osqsum += ti * val * val; // (val - curMu) * (val - curMu);
       }
-      if(tisum <= 0.0 || wsum <= 0.0) {
+      if(otisum <= 0.0 || owsum <= 0.0) {
         LOG.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
-      double newMu = wsum / tisum;
-      double newSigma = Math.max(Math.sqrt(sqsum / tisum - newMu * newMu), Double.MIN_NORMAL);
-      double newLambda = Math.min(tisum / wsum, Double.MAX_VALUE);
-      double newAlpha = tisum / size;
+      double newMu = owsum / otisum;
+      double newSigma = Math.max(Math.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
+      double newLambda = Math.min(itisum / iwsum, Double.MAX_VALUE);
+      double newAlpha = otisum / size;
       // converged?
-      {
-        boolean changed = false;
-        if(Math.abs(newMu - curMu) > DELTA) {
-          changed = true;
-        }
-        if(Math.abs(newSigma - curSigma) > DELTA) {
-          changed = true;
-        }
-        if(Math.abs(newLambda - curLambda) > DELTA) {
-          changed = true;
-        }
-        if(Math.abs(newAlpha - curAlpha) > DELTA) {
-          changed = true;
-        }
-        if(!changed) {
-          break;
-        }
+      if(Math.abs(newMu - curMu) < DELTA //
+          && Math.abs(newSigma - curSigma) < DELTA //
+          && Math.abs(newLambda - curLambda) < DELTA //
+          && Math.abs(newAlpha - curAlpha) < DELTA) {
+        break;
       }
       if(newSigma <= 0.0 || newAlpha <= 0.0) {
         LOG.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
-      // logger.debugFine("iter #"+iter+" mu = " + newMu + " sigma = " +
+      // LOG.debugFine("iter #"+iter+" mu = " + newMu + " sigma = " +
       // newSigma + " lambda = " + newLambda + " alpha = " + newAlpha);
       curMu = newMu;
       curSigma = newSigma;
@@ -310,7 +288,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
     sigma = curSigma;
     lambda = curLambda;
     alpha = curAlpha;
-    // logger.debugFine("mu = " + mu + " sigma = " + sigma + " lambda = " +
+    // LOG.debugFine("mu = " + mu + " sigma = " + sigma + " lambda = " +
     // lambda + " alpha = " + alpha);
   }
 
@@ -326,7 +304,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
 
   @Override
   public double getScaled(double value) {
-    final double val = 1.0 - calcPosterior(value, alpha, mu, sigma, lambda);
+    final double val = calcPosterior(value, alpha, mu, sigma, lambda);
     // Work around issues with unstable convergence.
     if(Double.isNaN(val)) {
       return 0.0;
