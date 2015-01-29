@@ -40,9 +40,20 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Tries to fit a sigmoid to the outlier scores and use it to convert the values
  * to probability estimates in the range of 0.0 to 1.0
  * 
+ * Reference:
+ * <p>
+ * J. Gao, P.-N. Tan<br />
+ * Converting Output Scores from Outlier Detection Algorithms into Probability
+ * Estimates<br />
+ * Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.
+ * </p>
+ * 
  * @author Erich Schubert
  */
-@Reference(authors = "J. Gao, P.-N. Tan", title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", url = "http://dx.doi.org/10.1109/ICDM.2006.43")
+@Reference(authors = "J. Gao, P.-N. Tan", //
+title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
+booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
+url = "http://dx.doi.org/10.1109/ICDM.2006.43")
 public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
   /**
    * The logger for this class.

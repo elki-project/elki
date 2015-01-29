@@ -37,6 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Tries to fit a mixture model (exponential for inliers and gaussian for
  * outliers) to the outlier score distribution.
  * 
+ * Note: we found this method to often fail, and fit the normal distribution to
+ * the inliers instead of the outliers, yielding reversed results.
+ * 
  * Reference:
  * <p>
  * J. Gao, P.-N. Tan<br />

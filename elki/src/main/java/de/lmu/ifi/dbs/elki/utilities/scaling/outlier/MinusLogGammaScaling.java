@@ -36,9 +36,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Scaling that can map arbitrary values to a probability in the range of [0:1],
  * by assuming a Gamma distribution on the data and evaluating the Gamma CDF.
  * 
+ * Reference:
+ * <p>
+ * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek<br />
+ * Interpreting and Unifying Outlier Scores<br />
+ * Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011
+ * </p>
+ * 
  * @author Erich Schubert
  */
-@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Interpreting and Unifying Outlier Scores", booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", url = "http://siam.omnibooksonline.com/2011datamining/data/papers/018.pdf")
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
+title = "Interpreting and Unifying Outlier Scores", //
+booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+url = "http://dx.doi.org/10.1137/1.9781611972818.2")
 public class MinusLogGammaScaling extends OutlierGammaScaling {
   /**
    * Maximum value seen
