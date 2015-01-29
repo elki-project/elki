@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -60,6 +61,7 @@ import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleDoublePair;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterIgnore;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectArray;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
@@ -102,6 +104,7 @@ public class TextWriter {
    */
   static {
     TextWriterObjectInline trivialwriter = new TextWriterObjectInline();
+    TextWriterWriterInterface<Object> ignorewriter = new TextWriterIgnore();
     writers.insertHandler(Pair.class, new TextWriterPair());
     writers.insertHandler(DoubleDoublePair.class, new TextWriterDoubleDoublePair());
     writers.insertHandler(FeatureVector.class, trivialwriter);
@@ -118,6 +121,7 @@ public class TextWriter {
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
     writers.insertHandler(LabelList.class, trivialwriter);
     writers.insertHandler(DBID.class, trivialwriter);
+    writers.insertHandler(GeneratorSingleCluster.class, ignorewriter);
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
   }
