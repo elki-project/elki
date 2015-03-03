@@ -105,15 +105,23 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     // Hamerly bounds
     WritableDoubleDataStore upper = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
     WritableDoubleDataStore lower = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
-
+    // Storage for updated means:
+    final int dim = means.get(0).getDimensionality();
+    List<Vector> sums = new ArrayList<>(k);
+    for(int i = 0; i < k; i++) {
+      sums.add(new Vector(dim));
+    }
+    // Separation of means / distance moved.
     double[] sep = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     LongStatistic varstat = LOG.isStatistics() ? new LongStatistic(this.getClass().getName() + ".reassignments") : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      recomputeSeperation(means, sep);
-      int changed = assignToNearestCluster(relation, means, clusters, assignment, sep, upper, lower);
+      if(iteration > 0) {
+        recomputeSeperation(means, sep);
+      }
+      int changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, upper, lower);
       if(varstat != null) {
         varstat.setLong(changed);
         LOG.statistics(varstat);
@@ -123,10 +131,18 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         break;
       }
       // Recompute means.
-      List<Vector> newmeans = means(clusters, means, relation);
-      double delta = maxMoved(means, newmeans, sep);
-      means = newmeans;
+      for(int i = 0; i < k; i++) {
+        final int s = clusters.get(i).size();
+        sums.get(i).timesEquals(s > 0 ? 1. / s : 1.);
+      }
+      double delta = maxMoved(means, sums, sep);
       updateBounds(relation, assignment, upper, lower, sep, delta);
+      for(int i = 0; i < k; i++) {
+        final int s = clusters.get(i).size();
+        means.get(i).set(sums.get(i));
+        // Restore to sum for next iteration
+        sums.get(i).timesEquals(s > 0 ? s : 1.);
+      }
     }
     LOG.setCompleted(prog);
 
@@ -180,6 +196,8 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    * 
    * @param relation Data
    * @param means Current means
+   * @param newmean New means (must have the same coordinates as the current
+   *        means)
    * @param clusters Current clusters
    * @param assignment Cluster assignment
    * @param sep Separation of means
@@ -187,7 +205,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param lower Lower bounds
    * @return true when the object was reassigned
    */
-  private int assignToNearestCluster(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
+  private int assignToNearestCluster(Relation<V> relation, List<Vector> means, List<Vector> sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
     assert (k == means.size());
     int changed = 0;
     final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
@@ -232,10 +250,21 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         min2 = Math.sqrt(min2);
       }
       if(minIndex != cur) {
-        clusters.get(minIndex).add(it);
+        ModifiableDBIDs newc = clusters.get(minIndex);
+        newc.add(it);
         assignment.putInt(it, minIndex);
+        double[] newmean = sums.get(minIndex).getArrayRef(), oldmean = null;
         if(cur >= 0) {
-          clusters.get(cur).remove(it);
+          ModifiableDBIDs oldc = clusters.get(cur);
+          oldc.remove(it);
+          oldmean = sums.get(cur).getArrayRef();
+        }
+        for(int d = 0; d < fv.getDimensionality(); d++) {
+          final double v = fv.doubleValue(d);
+          newmean[d] += v;
+          if(oldmean != null) {
+            oldmean[d] -= v;
+          }
         }
         ++changed;
         upper.putDouble(it, min1);
