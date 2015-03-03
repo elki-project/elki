@@ -110,6 +110,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @return true when the object was reassigned
    */
   protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
+    assert(k == means.size());
     boolean changed = false;
     Arrays.fill(varsum, 0.);
     final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
