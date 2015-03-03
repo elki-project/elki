@@ -6,6 +6,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarch
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
