@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Hamerly's fast k-means by exploiting the triangle inequality.
@@ -92,12 +93,6 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    }
-    // Emit a warning for non-metric distances, except squared Euclidean
-    // (which we know how to properly handle).
-    if(!(distanceFunction instanceof SquaredEuclideanDistanceFunction) //
-        && !(distanceFunction.isMetric())) {
-      LOG.warning("Hamerly k-means requires a metric distance, and k-means should only be used with squared Euclidean distance!");
     }
     // Choose initial means
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
@@ -173,15 +168,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
     }
     // We need half the Euclidean distance
-    if(issquared) {
-      for(int i = 0; i < k; i++) {
-        sep[i] = Math.sqrt(sep[i]) * .5;
-      }
-    }
-    else {
-      for(int i = 0; i < k; i++) {
-        sep[i] *= .5;
-      }
+    for(int i = 0; i < k; i++) {
+      sep[i] = issquared ? Math.sqrt(sep[i]) : sep[i];
+      sep[i] *= .5;
     }
   }
 
@@ -313,6 +302,17 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     @Override
     protected Logging getLogger() {
       return LOG;
+    }
+
+    @Override
+    protected void getParameterDistanceFunction(Parameterization config) {
+      super.getParameterDistanceFunction(config);
+      if(distanceFunction instanceof SquaredEuclideanDistanceFunction) {
+        return; // Proper choice.
+      }
+      if(!distanceFunction.isMetric()) {
+        LOG.warning("Hamerly k-means requires a metric distance, and k-means should only be used with squared Euclidean distance!");
+      }
     }
 
     @Override
