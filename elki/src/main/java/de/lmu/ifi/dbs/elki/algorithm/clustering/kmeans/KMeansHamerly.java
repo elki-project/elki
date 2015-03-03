@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Hamerly's fast k-means by exploiting the triangle inequality.
@@ -80,18 +79,25 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   /**
    * Constructor.
    * 
+   * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansHamerly(int k, int maxiter, KMeansInitialization<? super V> initializer) {
-    super(SquaredEuclideanDistanceFunction.STATIC, k, maxiter, initializer);
+  public KMeansHamerly(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+    super(distanceFunction, k, maxiter, initializer);
   }
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
+    }
+    // Emit a warning for non-metric distances, except squared Euclidean
+    // (which we know how to properly handle).
+    if(!(distanceFunction instanceof SquaredEuclideanDistanceFunction) //
+        && !(distanceFunction.isMetric())) {
+      LOG.warning("Hamerly k-means requires a metric distance, and k-means should only be used with squared Euclidean distance!");
     }
     // Choose initial means
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
@@ -156,7 +162,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   private void recomputeSeperation(List<Vector> means, double[] sep) {
     final int k = means.size();
     assert (sep.length == k);
-    assert (distanceFunction instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
     Arrays.fill(sep, Double.POSITIVE_INFINITY);
     for(int i = 1; i < k; i++) {
       Vector m1 = means.get(i);
@@ -167,8 +173,15 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
     }
     // We need half the Euclidean distance
-    for(int i = 0; i < k; i++) {
-      sep[i] = Math.sqrt(sep[i]) * .5;
+    if(issquared) {
+      for(int i = 0; i < k; i++) {
+        sep[i] = Math.sqrt(sep[i]) * .5;
+      }
+    }
+    else {
+      for(int i = 0; i < k; i++) {
+        sep[i] *= .5;
+      }
     }
   }
 
@@ -189,7 +202,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     assert (k == means.size());
     int changed = 0;
     final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
-    assert (df instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int cur = assignment.intValue(it);
       // Compute the current bound:
@@ -203,7 +216,8 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       // Update the upper bound
       V fv = relation.get(it);
       if(cur >= 0) {
-        u = Math.sqrt(df.distance(fv, means.get(cur)));
+        u = df.distance(fv, means.get(cur));
+        u = issquared ? Math.sqrt(u) : u;
         upper.putDouble(it, u);
         if(u <= z) {
           continue;
@@ -223,6 +237,11 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
           min2 = dist;
         }
       }
+      // make squared Euclidean a metric:
+      if(issquared) {
+        min1 = Math.sqrt(min1);
+        min2 = Math.sqrt(min2);
+      }
       if(minIndex != cur) {
         clusters.get(minIndex).add(it);
         assignment.putInt(it, minIndex);
@@ -230,9 +249,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
           clusters.get(cur).remove(it);
         }
         ++changed;
-        upper.putDouble(it, Math.sqrt(min1));
+        upper.putDouble(it, min1);
       }
-      lower.putDouble(it, Math.sqrt(min2));
+      lower.putDouble(it, min2);
     }
     return changed;
   }
@@ -249,10 +268,12 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     assert (means.size() == k);
     assert (newmeans.size() == k);
     assert (dists.length == k);
-    assert (distanceFunction instanceof SquaredEuclideanDistanceFunction);
+    boolean issquared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
     double max = 0.;
     for(int i = 0; i < k; i++) {
-      double d = dists[i] = Math.sqrt(distanceFunction.distance(means.get(i), newmeans.get(i)));
+      double d = distanceFunction.distance(means.get(i), newmeans.get(i));
+      d = issquared ? Math.sqrt(d) : d;
+      dists[i] = d;
       max = (d > max) ? d : max;
     }
     return max;
@@ -295,16 +316,8 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      // Would make distance parameterizable: super.makeOptions(config);
-      getParameterK(config);
-      getParameterInitialization(config);
-      getParameterMaxIter(config);
-    }
-
-    @Override
     protected KMeansHamerly<V> makeInstance() {
-      return new KMeansHamerly<>(k, maxiter, initializer);
+      return new KMeansHamerly<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }
