@@ -203,6 +203,20 @@ public class Vector implements NumberVector {
   }
 
   /**
+   * Copy the values of another vector into the current vector.
+   * 
+   * @param other Other vector
+   * @return This vector
+   */
+  public final Vector set(final Vector v) {
+    assert (this.elements.length == v.elements.length) : ERR_VEC_DIMENSIONS;
+    for(int i = 0; i < this.elements.length; i++) {
+      this.elements[i] = v.elements[i];
+    }
+    return this;
+  }
+
+  /**
    * Returns a new vector which is the result of this vector plus the specified
    * vector.
    * 
