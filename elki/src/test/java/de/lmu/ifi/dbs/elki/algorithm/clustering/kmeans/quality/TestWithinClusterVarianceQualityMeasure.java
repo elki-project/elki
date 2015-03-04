@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
 
 /*
  This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
@@ -28,10 +28,10 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FirstKInitialMeans;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.KMeansQualityMeasure;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.WithinClusterMeanDistanceQualityMeasure;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.WithinClusterVarianceQualityMeasure;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * 
  * @author Stephan Baier
  */
-public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestWithinClusterVarianceQualityMeasure extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Test cluster variance.
    */
@@ -75,34 +75,5 @@ public class TestKMeansQualityMeasure extends AbstractSimpleAlgorithmTest implem
 
     final double quality = variance.quality(result2, dist, rel);
     assertEquals("Within cluster variance incorrect", 3.16666666666, quality, 1e-10);
-  }
-
-  /**
-   * Test cluster average overall distance.
-   */
-  @Test
-  public void testOverallDistance() {
-
-    Database db = makeSimpleDatabase(UNITTEST + "quality-measure-test.csv", 7);
-    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params = new ListParameterization();
-    params.addParameter(KMeans.K_ID, 2);
-    params.addParameter(KMeans.INIT_ID, FirstKInitialMeans.class);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
-    testParameterizationOk(params);
-
-    // run KMeans on database
-    @SuppressWarnings("unchecked")
-    Clustering<MeanModel> result = (Clustering<MeanModel>) kmeans.run(db);
-    final PrimitiveDistanceFunction<? super NumberVector> dist = kmeans.getDistanceFunction();
-
-    // Test Cluster Average Overall Distance
-    KMeansQualityMeasure<? super DoubleVector> overall = new WithinClusterMeanDistanceQualityMeasure();
-    final double quality = overall.quality(result, dist, rel);
-
-    assertEquals("Avarage overall distance not as expected.", 0.8888888888888888, quality, 1e-10);
   }
 }
