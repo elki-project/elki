@@ -118,10 +118,14 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     LongStatistic varstat = LOG.isStatistics() ? new LongStatistic(this.getClass().getName() + ".reassignments") : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      if(iteration > 0) {
-        recomputeSeperation(means, sep);
+      int changed;
+      if(iteration == 0) {
+        changed = initialAssignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower);
       }
-      int changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, upper, lower);
+      else {
+        recomputeSeperation(means, sep);
+        changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, upper, lower);
+      }
       if(varstat != null) {
         varstat.setLong(changed);
         LOG.statistics(varstat);
@@ -145,6 +149,8 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
     }
     LOG.setCompleted(prog);
+    upper.destroy();
+    lower.destroy();
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
@@ -200,6 +206,58 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    *        means)
    * @param clusters Current clusters
    * @param assignment Cluster assignment
+   * @param upper Upper bounds
+   * @param lower Lower bounds
+   * @return true when the object was reassigned
+   */
+  private int initialAssignToNearestCluster(Relation<V> relation, List<Vector> means, List<Vector> sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
+    assert (k == means.size());
+    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
+    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      V fv = relation.get(it);
+      // Find closest center, and distance to two closest centers
+      double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
+      int minIndex = -1;
+      for(int i = 0; i < k; i++) {
+        double dist = df.distance(fv, means.get(i));
+        if(dist < min1) {
+          minIndex = i;
+          min2 = min1;
+          min1 = dist;
+        }
+        else if(dist < min2) {
+          min2 = dist;
+        }
+      }
+      // make squared Euclidean a metric:
+      if(issquared) {
+        min1 = Math.sqrt(min1);
+        min2 = Math.sqrt(min2);
+      }
+      ModifiableDBIDs newc = clusters.get(minIndex);
+      newc.add(it);
+      assignment.putInt(it, minIndex);
+      double[] newmean = sums.get(minIndex).getArrayRef();
+      for(int d = 0; d < fv.getDimensionality(); d++) {
+        newmean[d] += fv.doubleValue(d);
+      }
+      upper.putDouble(it, min1);
+      lower.putDouble(it, min2);
+    }
+    return relation.size();
+  }
+
+  /**
+   * Reassign objects, but only if their bounds indicate it is necessary to do
+   * so.
+   * 
+   * @param relation Data
+   * @param means Current means
+   * @param newmean New means (must have the same coordinates as the current
+   *        means)
+   * @param clusters Current clusters
+   * @param assignment Cluster assignment
    * @param sep Separation of means
    * @param upper Upper bounds
    * @param lower Lower bounds
@@ -213,22 +271,19 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int cur = assignment.intValue(it);
       // Compute the current bound:
-      double z = lower.doubleValue(it);
-      double sa = (cur >= 0) ? sep[cur] : 0.;
-      z = (sa > z) ? sa : z;
+      final double z = lower.doubleValue(it);
+      final double sa = sep[cur];
       double u = upper.doubleValue(it);
-      if(u <= z) {
+      if(u <= z || u <= sa) {
         continue;
       }
       // Update the upper bound
       V fv = relation.get(it);
-      if(cur >= 0) {
-        u = df.distance(fv, means.get(cur));
-        u = issquared ? Math.sqrt(u) : u;
-        upper.putDouble(it, u);
-        if(u <= z) {
-          continue;
-        }
+      u = df.distance(fv, means.get(cur));
+      u = issquared ? Math.sqrt(u) : u;
+      upper.putDouble(it, u);
+      if(u <= z || u <= sa) {
+        continue;
       }
       // Find closest center, and distance to two closest centers
       double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
@@ -250,21 +305,15 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         min2 = Math.sqrt(min2);
       }
       if(minIndex != cur) {
-        ModifiableDBIDs newc = clusters.get(minIndex);
-        newc.add(it);
         assignment.putInt(it, minIndex);
-        double[] newmean = sums.get(minIndex).getArrayRef(), oldmean = null;
-        if(cur >= 0) {
-          ModifiableDBIDs oldc = clusters.get(cur);
-          oldc.remove(it);
-          oldmean = sums.get(cur).getArrayRef();
-        }
+        clusters.get(minIndex).add(it);
+        clusters.get(cur).remove(it);
+        double[] newmean = sums.get(minIndex).getArrayRef();
+        double[] oldmean = sums.get(cur).getArrayRef();
         for(int d = 0; d < fv.getDimensionality(); d++) {
           final double v = fv.doubleValue(d);
           newmean[d] += v;
-          if(oldmean != null) {
-            oldmean[d] -= v;
-          }
+          oldmean[d] -= v;
         }
         ++changed;
         upper.putDouble(it, min1);

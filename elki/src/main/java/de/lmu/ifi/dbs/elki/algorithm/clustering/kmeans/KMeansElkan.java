@@ -130,10 +130,14 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     LongStatistic varstat = LOG.isStatistics() ? new LongStatistic(this.getClass().getName() + ".reassignments") : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      if(iteration > 0) {
-        recomputeSeperation(means, sep, cdist);
+      int changed;
+      if(iteration == 0) {
+        changed = initialAssignToNearestCluster(relation, means, sums, clusters, assignment, upper, lower);
       }
-      int changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, cdist, upper, lower);
+      else {
+        recomputeSeperation(means, sep, cdist); // #1
+        changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, cdist, upper, lower);
+      }
       if(varstat != null) {
         varstat.setLong(changed);
         LOG.statistics(varstat);
@@ -157,6 +161,8 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       }
     }
     LOG.setCompleted(prog);
+    upper.destroy();
+    lower.destroy();
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
@@ -211,6 +217,51 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    * @param sums New means
    * @param clusters Current clusters
    * @param assignment Cluster assignment
+   * @param upper Upper bounds
+   * @param lower Lower bounds
+   * @return Number of changes (i.e. relation size)
+   */
+  private int initialAssignToNearestCluster(Relation<V> relation, List<Vector> means, List<Vector> sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
+    assert (k == means.size());
+    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
+    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      V fv = relation.get(it);
+      double[] l = lower.get(it);
+      // Check all (other) means:
+      double best = Double.POSITIVE_INFINITY;
+      int cur = -1;
+      for(int j = 0; j < k; j++) {
+        double dist = df.distance(fv, means.get(j));
+        dist = issquared ? Math.sqrt(dist) : dist;
+        l[j] = dist;
+        if(dist < best) {
+          cur = j;
+          best = dist;
+        }
+      }
+      // Assign to nearest cluster.
+      ModifiableDBIDs newc = clusters.get(cur);
+      newc.add(it);
+      assignment.putInt(it, cur);
+      upper.putDouble(it, best);
+      double[] newmean = sums.get(cur).getArrayRef();
+      for(int d = 0; d < fv.getDimensionality(); d++) {
+        newmean[d] += fv.doubleValue(d);
+      }
+    }
+    return relation.size();
+  }
+
+  /**
+   * Reassign objects, but only if their bounds indicate it is necessary to do
+   * so.
+   * 
+   * @param relation Data
+   * @param means Current means
+   * @param sums New means
+   * @param clusters Current clusters
+   * @param assignment Cluster assignment
    * @param sep Separation of means
    * @param cdist Center-to-center distances
    * @param upper Upper bounds
@@ -225,29 +276,25 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int orig = assignment.intValue(it);
       double u = upper.doubleValue(it);
-      // Upper bound check:
-      if(orig >= 0 && u <= sep[orig]) {
+      // Upper bound check (#2):
+      if(u <= sep[orig]) {
         continue;
       }
-      boolean recompute_u = (orig >= 0); // No assignment, no update
+      boolean recompute_u = true; // Elkan's r(x)
       V fv = relation.get(it);
       double[] l = lower.get(it);
       // Check all (other) means:
       int cur = orig;
       for(int j = 0; j < k; j++) {
-        if(cur == j) {
-          continue;
+        if(orig == j || u <= l[j] || u <= cdist[cur][j]) {
+          continue; // Condition #3 i-iii not satisfied
         }
-        double z = cur >= 0 ? Math.max(l[j], cdist[cur][j]) : l[j];
-        if(u < z) {
-          continue;
-        }
-        if(recompute_u) { // Need to update bound?
+        if(recompute_u) { // Need to update bound? #3a
           u = df.distance(fv, means.get(cur));
           u = issquared ? Math.sqrt(u) : u;
           upper.putDouble(it, u);
           recompute_u = false; // Once only
-          if(u < z) {
+          if(u <= l[j] || u <= cdist[cur][j]) { // #3b
             continue;
           }
         }
@@ -259,22 +306,20 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
           u = dist;
         }
       }
+      // Object is to be reassigned.
       if(cur != orig) {
+        upper.putDouble(it, u); // Remember bound.
         ModifiableDBIDs newc = clusters.get(cur);
         newc.add(it);
         assignment.putInt(it, cur);
-        double[] newmean = sums.get(cur).getArrayRef(), oldmean = null;
-        if(orig >= 0) {
-          ModifiableDBIDs oldc = clusters.get(orig);
-          oldc.remove(it);
-          oldmean = sums.get(orig).getArrayRef();
-        }
+        double[] newmean = sums.get(cur).getArrayRef();
+        ModifiableDBIDs oldc = clusters.get(orig);
+        oldc.remove(it);
+        double[] oldmean = sums.get(orig).getArrayRef();
         for(int d = 0; d < fv.getDimensionality(); d++) {
-          double v = fv.doubleValue(d);
+          final double v = fv.doubleValue(d);
           newmean[d] += v;
-          if(oldmean != null) {
-            oldmean[d] -= v;
-          }
+          oldmean[d] -= v;
         }
         ++changed;
       }
