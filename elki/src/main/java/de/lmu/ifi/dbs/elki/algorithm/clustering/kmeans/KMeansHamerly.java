@@ -388,7 +388,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       if(distanceFunction instanceof SquaredEuclideanDistanceFunction) {
         return; // Proper choice.
       }
-      if(!distanceFunction.isMetric()) {
+      if(distanceFunction != null && !distanceFunction.isMetric()) {
         LOG.warning("Hamerly k-means requires a metric distance, and k-means should only be used with squared Euclidean distance!");
       }
     }

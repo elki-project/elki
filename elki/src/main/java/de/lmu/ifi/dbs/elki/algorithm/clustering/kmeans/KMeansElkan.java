@@ -393,7 +393,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       if(distanceFunction instanceof SquaredEuclideanDistanceFunction) {
         return; // Proper choice.
       }
-      if(!distanceFunction.isMetric()) {
+      if(distanceFunction != null && !distanceFunction.isMetric()) {
         LOG.warning("Elkan k-means requires a metric distance, and k-means should only be used with squared Euclidean distance!");
       }
     }
