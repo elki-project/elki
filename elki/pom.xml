@@ -166,7 +166,6 @@
 							<overview>${basedir}/src/main/javadoc/overview.html</overview>
 							<doctitle>ELKI</doctitle>
 							<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
-							<additionalparam>-nopackagediagram</additionalparam>
 							<groups>
 								<group>
 									<title>Algorithms</title>
