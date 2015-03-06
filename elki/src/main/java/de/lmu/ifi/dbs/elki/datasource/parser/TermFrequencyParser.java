@@ -117,7 +117,12 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     double len = 0;
 
     String curterm = null;
+    int c = 0;
     for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
+      if(isLabelColumn(c++)) {
+        labels.add(tokenizer.getSubstring());
+        continue;
+      }
       if(curterm == null) {
         curterm = tokenizer.getSubstring();
         continue;
