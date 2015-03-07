@@ -1,4 +1,4 @@
-package experimentalcode.shared.index.xtree;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
-import experimentalcode.shared.index.xtree.util.SplitHistory;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util.SplitHistory;
 
 public interface SplitHistorySpatialEntry extends Entry, SpatialComparable {
   /**

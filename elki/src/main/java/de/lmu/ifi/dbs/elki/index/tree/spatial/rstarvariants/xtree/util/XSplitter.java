@@ -1,4 +1,4 @@
-package experimentalcode.shared.index.xtree.util;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util;
 
 /*
  This file is part of ELKI:
@@ -23,6 +23,8 @@ package experimentalcode.shared.index.xtree.util;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntIterator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,17 +38,16 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.AbstractXTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.AbstractXTreeNode;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.XTreeDirectoryEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.XTreeSettings;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
-import experimentalcode.shared.index.xtree.AbstractXTree;
-import experimentalcode.shared.index.xtree.AbstractXTreeNode;
-import experimentalcode.shared.index.xtree.XTreeDirectoryEntry;
-import experimentalcode.shared.index.xtree.XTreeSettings;
-import gnu.trove.iterator.TIntIterator;
 
 /**
  * Provides methods for splitting X-tree nodes.

@@ -1,4 +1,4 @@
-package experimentalcode.shared.index.xtree.util;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util;
 
 /*
  This file is part of ELKI:

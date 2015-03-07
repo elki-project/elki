@@ -1,4 +1,4 @@
-package experimentalcode.shared.index.xtree;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 
 /*
  This file is part of ELKI:
@@ -49,13 +49,13 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.XTreeSettings.Overlap;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util.SplitHistory;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util.XSplitter;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import experimentalcode.shared.index.xtree.XTreeSettings.Overlap;
-import experimentalcode.shared.index.xtree.util.SplitHistory;
-import experimentalcode.shared.index.xtree.util.XSplitter;
 
 /**
  * Base class for XTree implementations and other extensions; derived from

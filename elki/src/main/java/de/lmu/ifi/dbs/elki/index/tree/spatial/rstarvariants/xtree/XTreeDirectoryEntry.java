@@ -1,4 +1,4 @@
-package experimentalcode.shared.index.xtree;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
@@ -28,7 +28,7 @@ import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
-import experimentalcode.shared.index.xtree.util.SplitHistory;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util.SplitHistory;
 
 public class XTreeDirectoryEntry extends SpatialDirectoryEntry implements SplitHistorySpatialEntry {
   /**
