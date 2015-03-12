@@ -41,7 +41,7 @@ public class UnionFindWeightedQuickUnionTest {
     assertFalse(uf.isConnected(range.get(0), range.get(7)));
     uf.union(range.get(0), range.get(1));
     assertTrue(uf.isConnected(range.get(0),range.get( 1)));
-    assertEquals(uf.maxTreeHeight(), 1);
+    assertEquals(uf.computeMaxTreeHeight(), 1);
     uf.union(range.get(2), range.get(3));
     assertFalse(uf.isConnected(range.get(0), range.get(2)));
     uf.union(range.get(0), range.get(2));
@@ -50,7 +50,7 @@ public class UnionFindWeightedQuickUnionTest {
     uf.union(range.get(6), range.get(7));
     uf.union(range.get(4),range.get( 6));
     uf.union(range.get(0),range.get( 4));
-    assertEquals(3, uf.maxTreeHeight());
+    assertEquals(3, uf.computeMaxTreeHeight());
     for(int i = 0; i < 8; i++) {
       for(int j = 0; j < 8; j++) {
         assertTrue(uf.isConnected(range.get(i), range.get(j)));
