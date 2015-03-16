@@ -61,8 +61,7 @@ public class UnionFindWeightedQuickUnion implements UnionFind<DBIDRef> {
     fromIndexToElement = new TIntObjectHashMap<>(elements.size());
     int counter = 0;
     for(DBIDIter iter = elements.iter(); iter.valid(); iter.advance()) {
-      DBID currentElement = DBIDUtil.deref(iter);
-      fromIndexToElement.put(counter, currentElement);
+      fromIndexToElement.put(counter, DBIDUtil.deref(iter));
       fromElementsToItsIndex.put(iter, counter);
       counter++;
     }
@@ -82,11 +81,10 @@ public class UnionFindWeightedQuickUnion implements UnionFind<DBIDRef> {
   }
 
   private int getElementIndex(DBIDRef element) {
-    Integer elementIndex = fromElementsToItsIndex.intValue(element);
+    int elementIndex = fromElementsToItsIndex.intValue(element);
     if(elementIndex > numberOfElements - 1) {
       throw new RuntimeException(element + " element  is not known");
     }
-
     return elementIndex;
   }
 
