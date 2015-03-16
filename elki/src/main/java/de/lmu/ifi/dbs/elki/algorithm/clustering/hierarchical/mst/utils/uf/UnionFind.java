@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.mst.utils.uf;
 
-import java.util.Collection;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,9 +23,14 @@ import java.util.Collection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+
 public interface UnionFind<T> {
   public int union(T p, T q);
+
   public boolean isConnected(T p, T q);
-  public Collection<T> getRoots();
+
+  public DBIDs getRoots();
+
   public int find(T p);
 }

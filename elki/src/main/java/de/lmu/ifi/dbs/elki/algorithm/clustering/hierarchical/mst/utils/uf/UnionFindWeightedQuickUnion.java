@@ -1,23 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.mst.utils.uf;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-
-import java.util.Collection;
-import java.util.LinkedList;
-
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -36,7 +23,18 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class UnionFindWeightedQuickUnion implements UnionFind<DBID> {
+import gnu.trove.map.hash.TIntObjectHashMap;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+
+public class UnionFindWeightedQuickUnion implements UnionFind<DBIDRef> {
 
   private int[] mappingToComponent;
 
@@ -61,16 +59,17 @@ public class UnionFindWeightedQuickUnion implements UnionFind<DBID> {
   private void createMappings(DBIDs elements) {
     fromElementsToItsIndex = DataStoreUtil.makeIntegerStorage(elements, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     fromIndexToElement = new TIntObjectHashMap<>(elements.size());
-    int counter=0;
+    int counter = 0;
     for(DBIDIter iter = elements.iter(); iter.valid(); iter.advance()) {
       DBID currentElement = DBIDUtil.deref(iter);
       fromIndexToElement.put(counter, currentElement);
-      fromElementsToItsIndex.put(currentElement, counter);
+      fromElementsToItsIndex.put(iter, counter);
       counter++;
     }
   }
 
-  public int find(DBID element) {
+  @Override
+  public int find(DBIDRef element) {
     int componentNumber = getElementIndex(element);
     return find(componentNumber);
   }
@@ -82,16 +81,17 @@ public class UnionFindWeightedQuickUnion implements UnionFind<DBID> {
     return componentNumber;
   }
 
-  private int getElementIndex(DBID element) {
+  private int getElementIndex(DBIDRef element) {
     Integer elementIndex = fromElementsToItsIndex.intValue(element);
     if(elementIndex > numberOfElements - 1) {
-      throw new RuntimeException(element+" element  is not known");
+      throw new RuntimeException(element + " element  is not known");
     }
 
     return elementIndex;
   }
 
-  public int union(DBID first, DBID second) {
+  @Override
+  public int union(DBIDRef first, DBIDRef second) {
     int firstIndex = getElementIndex(first);
     int secondIndex = getElementIndex(second);
     int firstComponent = find(firstIndex);
@@ -99,26 +99,26 @@ public class UnionFindWeightedQuickUnion implements UnionFind<DBID> {
     if(firstComponent == secondComponent) {
       return firstComponent;
     }
-    int newComponentNumber=-1;
+    int newComponentNumber = -1;
     if(height[firstComponent] > height[secondComponent]) {
       mappingToComponent[secondComponent] = firstComponent;
       height[firstComponent] = Math.max(height[firstComponent], height[secondComponent] + 1);
       // to find the roots
       height[secondComponent] = 0;
-      newComponentNumber=firstComponent;
+      newComponentNumber = firstComponent;
     }
     else {
       mappingToComponent[firstComponent] = secondComponent;
       height[secondComponent] = Math.max(height[secondComponent], height[firstComponent] + 1);
       // to find the roots
       height[firstComponent] = 0;
-      newComponentNumber=secondComponent;
+      newComponentNumber = secondComponent;
     }
     return newComponentNumber;
   }
 
   @Override
-  public boolean isConnected(DBID first, DBID second) {
+  public boolean isConnected(DBIDRef first, DBIDRef second) {
     return find(first) == find(second);
   }
 
@@ -133,8 +133,8 @@ public class UnionFindWeightedQuickUnion implements UnionFind<DBID> {
   }
 
   @Override
-  public Collection<DBID> getRoots() {
-    LinkedList<DBID> roots = new LinkedList<DBID>();
+  public DBIDs getRoots() {
+    ArrayModifiableDBIDs roots = DBIDUtil.newArray();
     for(int i = 0; i < mappingToComponent.length; i++) {
       // roots or one element in component
       if(mappingToComponent[i] == i) {
