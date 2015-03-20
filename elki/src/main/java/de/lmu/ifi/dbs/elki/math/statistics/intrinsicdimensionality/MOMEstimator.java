@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,30 +23,42 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Probability weighted moments based estimator using L-Moments
+ * Methods of moments estimator, using the first moment (i.e. average).
  * 
- * @author Jonathan von Brünken
+ * This could be generalized to higher order moments, but the variance increases
+ * with the order, and we need this to work well with small sample sizes.
+ * 
+ * Reference:
+ * <p>
+ * Amsaleg, L., Chelly, O., Furon, T., Girard, S., Houle, M. E., & Nett, M.<br />
+ * Estimating Continuous Intrinsic Dimensionality.<br />
+ * NII Technical Report NII-2014-001E.
+ * </p>
+ * 
  * @author Erich Schubert
  */
-public class LMomentsPWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
+@Reference(authors = "Amsaleg, L., Chelly, O., Furon, T., Girard, S., Houle, M. E., & Nett, M.", //
+title = "Estimating Continuous Intrinsic Dimensionality", //
+booktitle = "NII Technical Report NII-2014-001E.", //
+url = "http://www.nii.ac.jp/TechReports/14-001E.pdf")
+public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
-  public static final LMomentsPWMEstimator STATIC = new LMomentsPWMEstimator();
+  public static final MOMEstimator STATIC = new MOMEstimator();
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);
-    double w = adapter.getDouble(data, n - 1);
-    double[] excess = new double[n - 1];
-    for(int i = 0, j = n - 2; j >= 0; ++i, --j) {
-      excess[i] = w - adapter.getDouble(data, j);
+    double v1 = 0.;
+    final int num = n - 1;
+    for(int i = 0; i < num; i++) {
+      v1 += adapter.getDouble(data, i);
     }
-    double[] lmom = ProbabilityWeightedMoments.samLMR(excess, ArrayLikeUtil.doubleArrayAdapter(), 2);
-    return w / ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]);
+    v1 /= num * adapter.getDouble(data, n - 1);
+    return v1 / (1 - v1);
   }
 }

@@ -41,7 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "M. E. Houle, H. Kashima, M. Nett", //
 title = "Generalized expansion dimension", //
-booktitle = "12th International Conference on Data Mining Workshops (ICDMW)")
+booktitle = "12th International Conference on Data Mining Workshops (ICDMW)", //
+url = "http://dx.doi.org/10.1109/ICDMW.2012.94")
 public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.

@@ -22,48 +22,36 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
- * Maximum-Likelihood Estimator for intrinsic dimensionality.
+ * Probability weighted moments based estimator using L-Moments.
  * 
- * With additional harmonic mean of all sub-samples.
+ * Derived from the L-Moments estimation for the exponential distribution.
  * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
-public class MLEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
-  public static final MLEstimator STATIC = new MLEstimator();
+  public static final LMomentsEstimator STATIC = new LMomentsEstimator();
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);
-    if(n < 2) {
-      return 0.0;
+    double w = adapter.getDouble(data, n - 1);
+    double[] excess = new double[n - 1];
+    for(int i = 0, j = n - 2; j >= 0; ++i, --j) {
+      excess[i] = w - adapter.getDouble(data, j);
     }
-    double id = 0.0;
-    double sum = 0.0;
-    double w = adapter.getDouble(data, 1);
-    int p = 0;
-    int sumk = 0;
-    for(int i = 1; i < n; i++) {
-      for(; p < i; p++) {
-        double v = adapter.getDouble(data, p);
-        if(v > 0) {
-          sum += Math.log(v / w);
-        }
-      }
-      id -= sum;
-      sumk += i;
-      if(i < n - 1) {
-        final double w2 = adapter.getDouble(data, i + 1);
-        sum += i * Math.log(w / w2);
-        w = w2;
-      }
+    double[] lmom = ProbabilityWeightedMoments.samLMR(excess, ArrayLikeUtil.doubleArrayAdapter(), 2);
+    if(lmom[1] == 0) {
+      return w / (lmom[0] * 2); // Fallback to first moment only.
     }
-    return (double) sumk / id;
+    return w / ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]);
   }
 }
