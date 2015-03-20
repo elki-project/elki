@@ -5,6 +5,12 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.LMomentsPWMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MLEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;

@@ -1,4 +1,4 @@
-package experimentalcode.erich.intrinsicdimensionality;
+package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
 /*
  This file is part of ELKI:
@@ -23,44 +23,30 @@ package experimentalcode.erich.intrinsicdimensionality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
- * Maximum-Likelihood Estimator for intrinsic dimensionality.
- * 
- * With additional harmonic mean of all sub-samples.
+ * Probability weighted moments based estimator using L-Moments
  * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
-public class MLEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class LMomentsPWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
-  public static final MLEstimator STATIC = new MLEstimator();
+  public static final LMomentsPWMEstimator STATIC = new LMomentsPWMEstimator();
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);
-    if(n < 2) {
-      return 0.0;
+    double w = adapter.getDouble(data, n - 1);
+    double[] excess = new double[n];
+    for(int i = 0; i < n; ++i) {
+      excess[i] = w - adapter.getDouble(data, n - i - 1);
     }
-    double id = 0.0;
-    double sum = 0.0;
-    double w = adapter.getDouble(data, 1);
-    int p = 0;
-    int sumk = 0;
-    for(int i = 1; i < n; i++) {
-      for(; p < i; p++) {
-        sum += Math.log(adapter.getDouble(data, p) / w);
-      }
-      id -= sum;
-      sumk += i;
-      if(i < n - 1) {
-        final double w2 = adapter.getDouble(data, i + 1);
-        sum += i * Math.log(w / w2);
-        w = w2;
-      }
-    }
-    return (double) sumk / id;
+    double[] lmom = ProbabilityWeightedMoments.samLMR(excess, ArrayLikeUtil.doubleArrayAdapter(), 2);
+    return w / ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]);
   }
 }

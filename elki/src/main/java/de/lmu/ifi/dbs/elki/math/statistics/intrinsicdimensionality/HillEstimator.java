@@ -1,4 +1,4 @@
-package experimentalcode.erich.intrinsicdimensionality;
+package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
 /*
  This file is part of ELKI:

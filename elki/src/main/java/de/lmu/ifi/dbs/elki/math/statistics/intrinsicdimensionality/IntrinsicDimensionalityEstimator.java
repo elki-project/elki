@@ -1,6 +1,4 @@
-package experimentalcode.erich.intrinsicdimensionality;
-
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
 /*
  This file is part of ELKI:
@@ -24,10 +22,29 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
-public abstract class AbstractIntrinsicDimensionalityEstimator implements IntrinsicDimensionalityEstimator {
-  @Override
-  public double estimate(double[] distances) {
-    return estimate(distances, ArrayLikeUtil.DOUBLEARRAYADAPTER);
-  }
+/**
+ * Estimate the intrinsic dimensionality from a distance list.
+ * 
+ * @author Erich Schubert
+ */
+public interface IntrinsicDimensionalityEstimator {
+  /**
+   * Estimate from a distance list.
+   * 
+   * @param data Data
+   * @param adapter Array adapter
+   * @param <A> array type
+   * @return Estimated intrinsic dimensionality
+   */
+  <A> double estimate(A data, NumberArrayAdapter<?, A> adapter);
+
+  /**
+   * Estimate from a distance list.
+   * 
+   * @param distances Distances
+   * @return Estimated intrinsic dimensionality
+   */
+  double estimate(double[] distances);
 }
