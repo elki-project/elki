@@ -39,14 +39,17 @@ public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);
+    if(n == 2) {
+      double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
+      return v1 / (1 - v1);
+    }
     // Estimate first PWM (k=1), ignoring the last value:
     double v1 = 0.;
     final int num = n - 1;
     for(int i = 0; i < num; i++) {
-      // Note that our i starts at 0, i + 1 - 0.35 = i + 0.65
-      v1 += adapter.getDouble(data, i) * (i + 0.65);
+      v1 += adapter.getDouble(data, i) * i;
     }
-    v1 /= num * num;
+    v1 /= num * (num - 1);
     final double w = adapter.getDouble(data, n - 1);
     v1 /= w;
     return v1 / (1 - v1 * 2);
