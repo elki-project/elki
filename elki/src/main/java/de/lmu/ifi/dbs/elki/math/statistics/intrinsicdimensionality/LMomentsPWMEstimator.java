@@ -42,9 +42,9 @@ public class LMomentsPWMEstimator extends AbstractIntrinsicDimensionalityEstimat
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int n = adapter.size(data);
     double w = adapter.getDouble(data, n - 1);
-    double[] excess = new double[n];
-    for(int i = 0; i < n; ++i) {
-      excess[i] = w - adapter.getDouble(data, n - i - 1);
+    double[] excess = new double[n - 1];
+    for(int i = 0, j = n - 2; j >= 0; ++i, --j) {
+      excess[i] = w - adapter.getDouble(data, j);
     }
     double[] lmom = ProbabilityWeightedMoments.samLMR(excess, ArrayLikeUtil.doubleArrayAdapter(), 2);
     return w / ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]);
