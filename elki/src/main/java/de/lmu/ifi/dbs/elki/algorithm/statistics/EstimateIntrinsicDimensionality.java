@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
+package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
 /*
  This file is part of ELKI:
@@ -38,13 +38,25 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
-// TODO: make random configurable
+/**
+ * Estimate global average intrinsic dimensionality of a data set.
+ * 
+ * Note: this algorithm does not produce a result, but only logs statistics.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Data type
+ */
 public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
   /**
    * Class logger.
@@ -61,17 +73,22 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
    */
   private double samples;
 
+  /**
+   * Estimation method.
+   */
   private IntrinsicDimensionalityEstimator estimator = HillEstimator.STATIC;
 
   /**
    * Constructor.
    *
    * @param distanceFunction Distance function
+   * @param estimator Estimator
    * @param krate kNN rate
    * @param samples Sample size
    */
-  public EstimateIntrinsicDimensionality(DistanceFunction<? super O> distanceFunction, double krate, double samples) {
+  public EstimateIntrinsicDimensionality(DistanceFunction<? super O> distanceFunction, IntrinsicDimensionalityEstimator estimator, double krate, double samples) {
     super(distanceFunction);
+    this.estimator = estimator;
     this.krate = krate;
     this.samples = samples;
   }
@@ -125,10 +142,35 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     return LOG;
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   *
+   * @param <O> Object type
+   */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+    /**
+     * Estimation method
+     */
+    private static final OptionID ESTIMATOR_ID = new OptionID("idist.estimator", "Estimation method for intrinsic dimensionality.");
+
+    /**
+     * Number of kNN to use for each object.
+     */
     private static final OptionID KRATE_ID = new OptionID("idist.k", "Number of kNN (absolute or relative)");
 
+    /**
+     * Number of samples to draw from the data set.
+     */
     private static final OptionID SAMPLES_ID = new OptionID("idist.sampling", "Sample size (absolute or relative)");
+
+    /**
+     * Estimation method.
+     */
+    private IntrinsicDimensionalityEstimator estimator = HillEstimator.STATIC;
 
     /**
      * Number of neighbors to use.
@@ -143,6 +185,10 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      ObjectParameter<IntrinsicDimensionalityEstimator> estimatorP = new ObjectParameter<>(ESTIMATOR_ID, GEDEstimator.class);
+      if(config.grab(estimatorP)) {
+        estimator = estimatorP.instantiateClass(config);
+      }
       DoubleParameter krateP = new DoubleParameter(KRATE_ID, 50);
       if(config.grab(krateP)) {
         krate = krateP.doubleValue();
@@ -155,7 +201,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
 
     @Override
     protected EstimateIntrinsicDimensionality<O> makeInstance() {
-      return new EstimateIntrinsicDimensionality<>(distanceFunction, krate, samples);
+      return new EstimateIntrinsicDimensionality<>(distanceFunction, estimator, krate, samples);
     }
   }
 }
