@@ -61,10 +61,10 @@ public class ProbabilityWeightedMoments {
     final int n = adapter.size(data);
     final double[] xmom = new double[nmom];
     double weight = 1. / n;
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       final double val = adapter.getDouble(data, i);
       xmom[0] += weight * val;
-      for (int j = 1; j < nmom; j++) {
+      for(int j = 1; j < nmom; j++) {
         weight *= (n - i - j + 1) / (n - j + 1);
         xmom[j] += weight * val;
       }
@@ -85,10 +85,10 @@ public class ProbabilityWeightedMoments {
     final int n = adapter.size(data);
     final double[] xmom = new double[nmom];
     double weight = 1. / n;
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       final double val = adapter.getDouble(data, i);
       xmom[0] += weight * val;
-      for (int j = 1; j < nmom; j++) {
+      for(int j = 1; j < nmom; j++) {
         weight *= (i - j + 1) / (n - j + 1);
         xmom[j] += weight * val;
       }
@@ -110,11 +110,11 @@ public class ProbabilityWeightedMoments {
     final int n = adapter.size(data);
     final double[] xmom = new double[nmom << 1];
     double aweight = 1. / n, bweight = aweight;
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       final double val = adapter.getDouble(data, i);
       xmom[0] += aweight * val;
       xmom[1] += bweight * val;
-      for (int j = 1, k = 2; j < nmom; j++, k += 2) {
+      for(int j = 1, k = 2; j < nmom; j++, k += 2) {
         aweight *= (n - i - j + 1) / (n - j + 1);
         bweight *= (i - j + 1) / (n - j + 1);
         xmom[k + 1] += aweight * val;
@@ -132,21 +132,19 @@ public class ProbabilityWeightedMoments {
    * @param nmom Number of moments to compute
    * @return Array containing Lambda1, Lambda2, Tau3 ... TauN
    */
-  public static <A> double[] samLMR(A sorted, NumberArrayAdapter<?, A> adapter, final int nmom) {
+  public static <A> double[] samLMR(A sorted, NumberArrayAdapter<?, A> adapter, int nmom) {
     final int n = adapter.size(sorted);
-    if (nmom >= n) {
-      throw new ArithmeticException("Can't compute higher order moments for just" + n + " observations.");
-    }
     final double[] sum = new double[nmom];
+    nmom = n < nmom ? n : nmom;
     // Estimate probability weighted moments (unbiased)
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       double term = adapter.getDouble(sorted, i);
       // Robustness: skip bad values
-      if (Double.isInfinite(term) || Double.isNaN(term)) {
+      if(Double.isInfinite(term) || Double.isNaN(term)) {
         continue;
       }
       sum[0] += term;
-      for (int j = 1, z = i; j < nmom; j++, z--) {
+      for(int j = 1, z = i; j < nmom; j++, z--) {
         term *= z;
         sum[j] += term;
       }
@@ -154,25 +152,29 @@ public class ProbabilityWeightedMoments {
     // Normalize by "n choose (j + 1)"
     sum[0] /= n;
     double z = n;
-    for (int j = 1; j < nmom; j++) {
+    for(int j = 1; j < nmom; j++) {
       z *= n - j;
       sum[j] /= z;
     }
-    for (int k = nmom - 1; k >= 1; --k) {
+    for(int k = nmom - 1; k >= 1; --k) {
       double p = ((k & 1) == 0) ? +1 : -1;
       double temp = p * sum[0];
-      for (int i = 0; i < k; i++) {
+      for(int i = 0; i < k; i++) {
         double ai = i + 1.;
         p *= -(k + ai) * (k - i) / (ai * ai);
         temp += p * sum[i + 1];
       }
       sum[k] = temp;
     }
-    if (nmom > 2 && !(sum[1] > 0)) {
-      throw new ArithmeticException("Can't compute higher order moments for constant data. Sum: " + sum[1]);
+    // Handle case when lambda2 == 0, by setting tau3...tauN = 0:
+    if(nmom > 2 && !(sum[1] > 0)) {
+      for(int i = 2; i < nmom; i++) {
+        sum[i] = 0.; // tau3...tauN = 0.
+      }
+      return sum;
     }
     // Map lambda3...lambdaN to tau3...tauN
-    for (int i = 2; i < nmom; i++) {
+    for(int i = 2; i < nmom; i++) {
       sum[i] /= sum[1];
     }
     return sum;
