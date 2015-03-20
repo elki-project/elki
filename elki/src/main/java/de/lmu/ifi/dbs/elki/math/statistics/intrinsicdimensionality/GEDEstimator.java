@@ -50,8 +50,7 @@ public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final GEDEstimator STATIC = new GEDEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int len = adapter.size(data);
+  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
       throw new ArithmeticException("Cannot compute expansion dimensionality for a single observation.");
     }

@@ -39,9 +39,8 @@ public class MLEstimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final MLEstimator STATIC = new MLEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int n = adapter.size(data);
-    if(n < 2) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
+    if(len < 2) {
       return 0.0;
     }
     double id = 0.0;
@@ -49,7 +48,7 @@ public class MLEstimator extends AbstractIntrinsicDimensionalityEstimator {
     double w = adapter.getDouble(data, 1);
     int p = 0;
     int sumk = 0;
-    for(int i = 1; i < n; i++) {
+    for(int i = 1; i < len; i++) {
       for(; p < i; p++) {
         double v = adapter.getDouble(data, p);
         if(v > 0) {
@@ -58,7 +57,7 @@ public class MLEstimator extends AbstractIntrinsicDimensionalityEstimator {
       }
       id -= sum;
       sumk += i;
-      if(i < n - 1) {
+      if(i < len - 1) {
         final double w2 = adapter.getDouble(data, i + 1);
         sum += i * Math.log(w / w2);
         w = w2;

@@ -43,8 +43,28 @@ public interface IntrinsicDimensionalityEstimator {
   /**
    * Estimate from a distance list.
    * 
+   * @param data Data
+   * @param adapter Array adapter
+   * @param size Length
+   * @param <A> array type
+   * @return Estimated intrinsic dimensionality
+   */
+  <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, int size);
+
+  /**
+   * Estimate from a distance list.
+   * 
    * @param distances Distances
    * @return Estimated intrinsic dimensionality
    */
   double estimate(double[] distances);
+
+  /**
+   * Estimate from a distance list.
+   * 
+   * @param distances Distances
+   * @param size Valid size
+   * @return Estimated intrinsic dimensionality
+   */
+  double estimate(double[] distances, int size);
 }

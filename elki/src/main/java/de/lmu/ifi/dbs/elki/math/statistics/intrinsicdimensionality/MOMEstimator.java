@@ -51,14 +51,13 @@ public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final MOMEstimator STATIC = new MOMEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int n = adapter.size(data);
+  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     double v1 = 0.;
-    final int num = n - 1;
+    final int num = len - 1;
     for(int i = 0; i < num; i++) {
       v1 += adapter.getDouble(data, i);
     }
-    v1 /= num * adapter.getDouble(data, n - 1);
+    v1 /= num * adapter.getDouble(data, len - 1);
     return v1 / (1 - v1);
   }
 }

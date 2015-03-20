@@ -49,19 +49,18 @@ public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final HillEstimator STATIC = new HillEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int n = adapter.size(data);
-    if(n < 2) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
+    if(len < 2) {
       return 0.;
     }
     double sum = 0.;
-    for(int i = 0; i < n - 1; ++i) {
+    for(int i = 0; i < len - 1; ++i) {
       double v = adapter.getDouble(data, i);
       assert (v > 0.);
       sum += Math.log(v);
     }
-    sum /= (n - 1);
-    sum -= Math.log(adapter.getDouble(data, n - 1));
+    sum /= (len - 1);
+    sum -= Math.log(adapter.getDouble(data, len - 1));
     return -1. / sum;
   }
 }

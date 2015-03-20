@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,9 +23,27 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+
+/**
+ * Abstract base class for ID estimators.
+ * 
+ * @author Erich Schubert
+ */
 public abstract class AbstractIntrinsicDimensionalityEstimator implements IntrinsicDimensionalityEstimator {
   @Override
+  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
+    return estimate(data, adapter, adapter.size(data));
+  }
+
+  @Override
   public double estimate(double[] distances) {
-    return estimate(distances, ArrayLikeUtil.DOUBLEARRAYADAPTER);
+    return estimate(distances, ArrayLikeUtil.DOUBLEARRAYADAPTER, distances.length);
+  }
+
+  @Override
+  public double estimate(double[] distances, int size) {
+    return estimate(distances, ArrayLikeUtil.DOUBLEARRAYADAPTER, size);
   }
 }

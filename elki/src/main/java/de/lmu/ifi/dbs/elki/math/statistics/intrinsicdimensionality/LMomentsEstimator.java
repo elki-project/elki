@@ -41,17 +41,16 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
   public static final LMomentsEstimator STATIC = new LMomentsEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
-    final int n = adapter.size(data);
-    double w = adapter.getDouble(data, n - 1);
-    double[] excess = new double[n - 1];
-    for(int i = 0, j = n - 2; j >= 0; ++i, --j) {
-      excess[i] = adapter.getDouble(data, j) / w;
+  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
+    final double w = adapter.getDouble(data, len - 1);
+    double[] excess = new double[len - 1];
+    for(int i = 0, j = len - 2; j >= 0; ++i, --j) {
+      excess[i] = adapter.getDouble(data, j);
     }
     double[] lmom = ProbabilityWeightedMoments.samLMR(excess, ArrayLikeUtil.doubleArrayAdapter(), 2);
     if(lmom[1] == 0) {
-      return -.5 * (lmom[0] * 2); // Fallback to first moment only.
+      return -.5 * (lmom[0] * 2) / w; // Fallback to first moment only.
     }
-    return -.5 * ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]);
+    return -.5 * ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]) / w;
   }
 }
