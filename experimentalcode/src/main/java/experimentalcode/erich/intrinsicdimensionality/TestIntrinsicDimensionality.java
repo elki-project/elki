@@ -1,21 +1,5 @@
 package experimentalcode.erich.intrinsicdimensionality;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.LMomentsEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MLEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MOMEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -39,11 +23,74 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class TestIntrinsicDimensionality {
-  static int startk = 2, maxk = 10, samples = 1000, dim = 5;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Random;
 
-  public static void main(String[] args) {
-    Random rnd = new Random();
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.LMomentsEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MLEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+
+/**
+ * Class for testing the estimation quality of intrinsic dimensionality
+ * estimators.
+ * 
+ * @author Erich Schubert
+ */
+public class TestIntrinsicDimensionality extends AbstractApplication {
+  /**
+   * Benchmark parameters.
+   */
+  int startk = 3, maxk = 10, samples = 1000, dim = 5;
+
+  /**
+   * Random generator.
+   */
+  RandomFactory rnd;
+
+  /**
+   * Aggregation method.
+   */
+  Aggregate agg;
+
+  /**
+   * Constructor.
+   *
+   * @param startk Start value of k
+   * @param maxk Maximum value of k
+   * @param samples Number of samples
+   * @param dim Number of dimensions
+   * @param agg Aggregation method
+   * @param rnd Random seed.
+   */
+  public TestIntrinsicDimensionality(int startk, int maxk, int samples, int dim, Aggregate agg, RandomFactory rnd) {
+    this.startk = startk;
+    this.maxk = maxk;
+    this.samples = samples;
+    this.dim = dim;
+    this.agg = agg;
+    this.rnd = rnd;
+  }
+
+  @Override
+  public void run() throws UnableToComplyException {
+    double[][] dists = makeSample();
+
     ArrayList<IntrinsicDimensionalityEstimator> estimators = new ArrayList<>();
     ArrayList<String> abbreviat = new ArrayList<>();
     estimators.add(GEDEstimator.STATIC);
@@ -62,9 +109,36 @@ public class TestIntrinsicDimensionality {
     final int digits = (int) Math.ceil(Math.log10(maxk + 1));
     System.out.append(String.format("%" + digits + "s", "k"));
     for(int i = 0; i < estimators.size(); i++) {
-      System.out.format(Locale.ROOT, " %10s %10s", abbreviat.get(i) + "-Avg", abbreviat.get(i) + "-Dev");
+      for(String postfix : agg.description()) {
+        System.out.format(Locale.ROOT, " %10s", abbreviat.get(i) + "-" + postfix);
+      }
     }
     System.out.append(FormatUtil.NEWLINE);
+    double[][] v = new double[estimators.size()][samples];
+    for(int l = startk; l <= maxk; l++) {
+      String kstr = String.format("%0" + digits + "d", l);
+      for(int p = 0; p < samples; p++) {
+        for(int i = 0; i < estimators.size(); i++) {
+          v[i][p] = estimators.get(i).estimate(dists[p], l);
+        }
+      }
+      System.out.append(kstr);
+      for(int i = 0; i < estimators.size(); i++) {
+        for(double val : agg.aggregate(v[i])) {
+          System.out.format(Locale.ROOT, " %10f", val);
+        }
+      }
+      System.out.append(FormatUtil.NEWLINE);
+    }
+  }
+
+  /**
+   * Generate a data sample.
+   * 
+   * @return Data sample
+   */
+  protected double[][] makeSample() {
+    final Random rnd = this.rnd.getSingleThreadedRandom();
     double[][] dists = new double[samples][maxk + 1];
     final double e = 1. / dim;
     for(int p = 0; p < samples; p++) {
@@ -73,116 +147,189 @@ public class TestIntrinsicDimensionality {
       }
       Arrays.sort(dists[p]);
     }
-    PartialArrayAdapter ad = new PartialArrayAdapter();
-    double[][] v = new double[estimators.size()][samples];
-    for(int l = startk; l <= maxk; l++) {
-      String kstr = String.format("%0" + digits + "d", l);
-      ad.max = l;
-      for(int p = 0; p < samples; p++) {
-        for(int i = 0; i < estimators.size(); i++) {
-          v[i][p] = estimators.get(i).estimate(dists[p], ad);
+    return dists;
+  }
+
+  /**
+   * Aggregation methods.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static enum Aggregate {
+    /**
+     * Aggregate as mean and standard deviation.
+     */
+    MEAN_STDDEV {
+      @Override
+      double[] aggregate(double[] data) {
+        double avg = 0.;
+        for(double val : data) {
+          avg += val;
         }
+        avg /= data.length;
+        double sqsum = 0.;
+        for(double val : data) {
+          double v = val - avg;
+          sqsum += v * v;
+        }
+        sqsum /= data.length;
+        return new double[] { avg, Math.sqrt(sqsum) };
       }
-      System.out.append(kstr);
-      for(int i = 0; i < estimators.size(); i++) {
-        double mean = median(v[i]); // samples / sum[i];
-        double std = mad(v[i], mean);
-        System.out.format(Locale.ROOT, " %10f %10f", mean, std);
+
+      @Override
+      String[] description() {
+        return new String[] { "Mean", "Stddev" };
       }
-      System.out.append(FormatUtil.NEWLINE);
-    }
+    },
+    /**
+     * Harmonic mean.
+     */
+    HMEAN {
+      @Override
+      double[] aggregate(double[] data) {
+        double avg = 0.;
+        for(double val : data) {
+          avg += 1. / val;
+        }
+        return new double[] { data.length / avg };
+      }
+
+      @Override
+      String[] description() {
+        return new String[] { "HMean" };
+      }
+    },
+    /**
+     * Aggregate using median and MAD.
+     */
+    MED_MAD {
+      @Override
+      double[] aggregate(double[] data) {
+        double med = QuickSelect.median(data);
+        double[] devs = new double[data.length];
+        for(int i = 0; i < data.length; i++) {
+          devs[i] = Math.abs(data[i] - med);
+        }
+        double mad = QuickSelect.median(devs);
+        return new double[] { med, mad };
+      }
+
+      @Override
+      String[] description() {
+        return new String[] { "Med", "Mad" };
+      }
+    },
+    ;
+    /**
+     * Aggregate values.
+     * 
+     * @param data Data to aggregate.
+     * @return Aggregated values.
+     */
+    abstract double[] aggregate(double[] data);
+
+    /**
+     * Descriptions of the aggregate values.
+     * 
+     * @return Descriptions
+     */
+    abstract String[] description();
   }
 
-  static class PartialArrayAdapter implements NumberArrayAdapter<Double, double[]> {
-    int max;
-
-    @Override
-    public int size(double[] array) {
-      return max;
-    }
-
-    @Override
-    public Double get(double[] array, int off) throws IndexOutOfBoundsException {
-      return array[off];
-    }
-
-    @Override
-    public double getDouble(double[] array, int off) throws IndexOutOfBoundsException {
-      return array[off];
-    }
-
-    @Override
-    public float getFloat(double[] array, int off) throws IndexOutOfBoundsException {
-      return (float) array[off];
-    }
-
-    @Override
-    public int getInteger(double[] array, int off) throws IndexOutOfBoundsException {
-      return (int) array[off];
-    }
-
-    @Override
-    public short getShort(double[] array, int off) throws IndexOutOfBoundsException {
-      return (short) array[off];
-    }
-
-    @Override
-    public long getLong(double[] array, int off) throws IndexOutOfBoundsException {
-      return (long) array[off];
-    }
-
-    @Override
-    public byte getByte(double[] array, int off) throws IndexOutOfBoundsException {
-      return (byte) array[off];
-    }
+  /**
+   * Main method
+   */
+  public static void main(String[] args) {
+    runCLIApplication(TestIntrinsicDimensionality.class, args);
   }
 
-  private static double median(double[] v) {
-    return QuickSelect.median(v);
-  }
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractApplication.Parameterizer {
+    /**
+     * Initial neighborhood size.
+     */
+    public static final OptionID STARTK_ID = new OptionID("mink", "Minimum value of k.");
 
-  private static double mean(double[] v) {
-    double sum = 0.;
-    for(double val : v) {
-      sum += val;
+    /**
+     * Final neighborhood size.
+     */
+    public static final OptionID MAXK_ID = new OptionID("maxk", "Maximum value of k.");
+
+    /**
+     * Samples size.
+     */
+    public static final OptionID SAMPLE_ID = new OptionID("sample", "Sample size for averaging.");
+
+    /**
+     * Dimensionality.
+     */
+    public static final OptionID DIM_ID = new OptionID("dim", "Dimensionality.");
+
+    /**
+     * Random seed.
+     */
+    public static final OptionID SEED_ID = new OptionID("seed", "Random seed.");
+
+    /**
+     * Aggregation method.
+     */
+    public static final OptionID AGGREGATE_ID = new OptionID("aggregation", "Aggregation method.");
+
+    /**
+     * Benchmark parameters.
+     */
+    int startk = 3, maxk = 10, samples = 1000, dim = 5;
+
+    /**
+     * Aggregation method.
+     */
+    Aggregate agg;
+
+    /**
+     * Random generator.
+     */
+    RandomFactory rnd;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter startP = new IntParameter(STARTK_ID, 3);
+      if(config.grab(startP)) {
+        startk = startP.intValue();
+      }
+      IntParameter maxkP = new IntParameter(MAXK_ID, 20);
+      if(config.grab(maxkP)) {
+        maxk = maxkP.intValue();
+      }
+      IntParameter samplesP = new IntParameter(SAMPLE_ID, 1000);
+      if(config.grab(samplesP)) {
+        samples = samplesP.intValue();
+      }
+      RandomParameter seedP = new RandomParameter(SEED_ID);
+      if(config.grab(seedP)) {
+        rnd = seedP.getValue();
+      }
+      IntParameter dimP = new IntParameter(DIM_ID);
+      if(config.grab(dimP)) {
+        dim = dimP.intValue();
+      }
+      EnumParameter<Aggregate> aggP = new EnumParameter<>(AGGREGATE_ID, Aggregate.class, Aggregate.MED_MAD);
+      if(config.grab(aggP)) {
+        agg = aggP.getValue();
+      }
     }
-    return sum / v.length;
-  }
 
-  private static double gmean(double[] v) {
-    double sum = 0.;
-    for(double val : v) {
-      sum += 1. / val;
+    @Override
+    protected TestIntrinsicDimensionality makeInstance() {
+      return new TestIntrinsicDimensionality(startk, maxk, samples, dim, agg, rnd);
     }
-    return v.length / sum;
   }
-
-  private static double stddev(double[] v, double mean, int bias) {
-    double sum = 0.;
-    for(double val : v) {
-      val = val - mean;
-      sum += val * val;
-    }
-    sum /= (v.length - bias);
-    return (sum > 0) ? Math.sqrt(sum) : 0.;
-  }
-
-  private static double avdev(double[] v, double mean, int bias) {
-    double sum = 0.;
-    for(double val : v) {
-      val = val - mean;
-      sum += Math.abs(val);
-    }
-    sum /= (v.length - bias);
-    return sum;
-  }
-
-  private static double mad(double[] v, double mean) {
-    double[] devs = new double[v.length];
-    for(int i = 0; i < v.length; i++) {
-      devs[i] = Math.abs(v[i] - mean);
-    }
-    return QuickSelect.median(devs);
-  }
-
 }
