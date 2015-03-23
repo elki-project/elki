@@ -167,7 +167,7 @@ public class ProbabilityWeightedMoments {
       sum[k] = temp;
     }
     // Handle case when lambda2 == 0, by setting tau3...tauN = 0:
-    if(nmom > 2 && !(sum[1] > 0)) {
+    if(sum[1] == 0) {
       for(int i = 2; i < nmom; i++) {
         sum[i] = 0.; // tau3...tauN = 0.
       }
