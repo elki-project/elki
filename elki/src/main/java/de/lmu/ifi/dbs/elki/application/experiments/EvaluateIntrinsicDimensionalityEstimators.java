@@ -1,4 +1,4 @@
-package experimentalcode.erich.intrinsicdimensionality;
+package de.lmu.ifi.dbs.elki.application.experiments;
 
 /*
  This file is part of ELKI:
@@ -52,22 +52,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Erich Schubert
  */
-public class TestIntrinsicDimensionality extends AbstractApplication {
+public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplication {
   /**
    * Benchmark parameters.
    */
   int startk = 3, maxk = 10, samples = 1000, dim = 5;
 
   /**
-   * Random generator.
-   */
-  RandomFactory rnd;
-
-  /**
    * Aggregation method.
    */
   Aggregate agg;
 
+  /**
+   * Output format parameter.
+   */
+  OutputFormat format;
+
+  /**
+   * Random generator.
+   */
+  RandomFactory rnd;
+  
   /**
    * Constructor.
    *
@@ -76,14 +81,16 @@ public class TestIntrinsicDimensionality extends AbstractApplication {
    * @param samples Number of samples
    * @param dim Number of dimensions
    * @param agg Aggregation method
+   * @param format Output format
    * @param rnd Random seed.
    */
-  public TestIntrinsicDimensionality(int startk, int maxk, int samples, int dim, Aggregate agg, RandomFactory rnd) {
+  public EvaluateIntrinsicDimensionalityEstimators(int startk, int maxk, int samples, int dim, Aggregate agg, OutputFormat format, RandomFactory rnd) {
     this.startk = startk;
     this.maxk = maxk;
     this.samples = samples;
     this.dim = dim;
     this.agg = agg;
+    this.format = format;
     this.rnd = rnd;
   }
 
@@ -148,6 +155,17 @@ public class TestIntrinsicDimensionality extends AbstractApplication {
       Arrays.sort(dists[p]);
     }
     return dists;
+  }
+
+  /**
+   * Output format
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static enum OutputFormat {
+    TABULAR, TSV
   }
 
   /**
@@ -242,7 +260,7 @@ public class TestIntrinsicDimensionality extends AbstractApplication {
    * Main method
    */
   public static void main(String[] args) {
-    runCLIApplication(TestIntrinsicDimensionality.class, args);
+    runCLIApplication(EvaluateIntrinsicDimensionalityEstimators.class, args);
   }
 
   /**
@@ -284,6 +302,11 @@ public class TestIntrinsicDimensionality extends AbstractApplication {
     public static final OptionID AGGREGATE_ID = new OptionID("aggregation", "Aggregation method.");
 
     /**
+     * Output format.
+     */
+    public static final OptionID FORMAT_ID = new OptionID("output-format", "Output format (ascii, or tab separated).");
+
+    /**
      * Benchmark parameters.
      */
     int startk = 3, maxk = 10, samples = 1000, dim = 5;
@@ -292,6 +315,11 @@ public class TestIntrinsicDimensionality extends AbstractApplication {
      * Aggregation method.
      */
     Aggregate agg;
+    
+    /**
+     * Output format parameter.
+     */
+    OutputFormat format;
 
     /**
      * Random generator.
@@ -325,11 +353,15 @@ public class TestIntrinsicDimensionality extends AbstractApplication {
       if(config.grab(aggP)) {
         agg = aggP.getValue();
       }
+      EnumParameter<OutputFormat> formatP = new EnumParameter<>(FORMAT_ID, OutputFormat.class, OutputFormat.TABULAR);
+      if(config.grab(formatP)) {
+        format = formatP.getValue();
+      }
     }
 
     @Override
-    protected TestIntrinsicDimensionality makeInstance() {
-      return new TestIntrinsicDimensionality(startk, maxk, samples, dim, agg, rnd);
+    protected EvaluateIntrinsicDimensionalityEstimators makeInstance() {
+      return new EvaluateIntrinsicDimensionalityEstimators(startk, maxk, samples, dim, agg, format, rnd);
     }
   }
 }
