@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.application.experiments;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -72,7 +73,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    * Random generator.
    */
   RandomFactory rnd;
-  
+
   /**
    * Constructor.
    *
@@ -107,35 +108,62 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     estimators.add(HillEstimator.STATIC);
     abbreviat.add("Hill");
     estimators.add(MOMEstimator.STATIC);
-    abbreviat.add("MOM");
+    abbreviat.add("MoM");
     estimators.add(PWMEstimator.STATIC);
     abbreviat.add("PWM");
     estimators.add(LMomentsEstimator.STATIC);
     abbreviat.add("LMM");
 
+    PrintStream out = System.out; // TODO: add output file parameter?
     final int digits = (int) Math.ceil(Math.log10(maxk + 1));
-    System.out.append(String.format("%" + digits + "s", "k"));
-    for(int i = 0; i < estimators.size(); i++) {
-      for(String postfix : agg.description()) {
-        System.out.format(Locale.ROOT, " %10s", abbreviat.get(i) + "-" + postfix);
+    switch(format){
+    case TABULAR:
+      out.append(String.format("%" + digits + "s", "k"));
+      for(int i = 0; i < estimators.size(); i++) {
+        for(String postfix : agg.description()) {
+          out.format(Locale.ROOT, " %10s", abbreviat.get(i) + "-" + postfix);
+        }
       }
+      out.append(FormatUtil.NEWLINE);
+      break;
+    case TSV:
+      out.append("k");
+      for(int i = 0; i < estimators.size(); i++) {
+        for(String postfix : agg.description()) {
+          out.append('\t').append(abbreviat.get(i)).append('-').append(postfix);
+        }
+      }
+      out.append(FormatUtil.NEWLINE);
+      break;
     }
-    System.out.append(FormatUtil.NEWLINE);
     double[][] v = new double[estimators.size()][samples];
     for(int l = startk; l <= maxk; l++) {
-      String kstr = String.format("%0" + digits + "d", l);
       for(int p = 0; p < samples; p++) {
         for(int i = 0; i < estimators.size(); i++) {
           v[i][p] = estimators.get(i).estimate(dists[p], l);
         }
       }
-      System.out.append(kstr);
-      for(int i = 0; i < estimators.size(); i++) {
-        for(double val : agg.aggregate(v[i])) {
-          System.out.format(Locale.ROOT, " %10f", val);
+      switch(format){
+      case TABULAR:
+        out.append(String.format("%0" + digits + "d", l));
+        for(int i = 0; i < estimators.size(); i++) {
+          for(double val : agg.aggregate(v[i])) {
+            out.format(Locale.ROOT, " %10f", val);
+          }
         }
+        out.append(FormatUtil.NEWLINE);
+        break;
+      case TSV:
+        out.append(FormatUtil.NF.format(l));
+        for(int i = 0; i < estimators.size(); i++) {
+          for(double val : agg.aggregate(v[i])) {
+            out.append('\t');
+            out.append(FormatUtil.NF.format(val));
+          }
+        }
+        out.append(FormatUtil.NEWLINE);
+        break;
       }
-      System.out.append(FormatUtil.NEWLINE);
     }
   }
 
@@ -177,6 +205,24 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    */
   public static enum Aggregate {
     /**
+     * Aggregate using the mean only.
+     */
+    MEAN {
+      @Override
+      double[] aggregate(double[] data) {
+        double avg = 0.;
+        for(double val : data) {
+          avg += val;
+        }
+        return new double[] { avg / data.length };
+      }
+
+      @Override
+      String[] description() {
+        return new String[] { "Mean" };
+      }
+    },
+    /**
      * Aggregate as mean and standard deviation.
      */
     MEAN_STDDEV {
@@ -199,6 +245,34 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
       @Override
       String[] description() {
         return new String[] { "Mean", "Stddev" };
+      }
+    },
+    /**
+     * Aggregate as mean and standard deviation.
+     */
+    MEAN_STDDEV_MIN_MAX {
+      @Override
+      double[] aggregate(double[] data) {
+        double avg = 0.;
+        double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+        for(double val : data) {
+          avg += val;
+          min = (val < min) ? val : min;
+          max = (val > max) ? val : max;
+        }
+        avg /= data.length;
+        double sqsum = 0.;
+        for(double val : data) {
+          double v = val - avg;
+          sqsum += v * v;
+        }
+        sqsum /= data.length;
+        return new double[] { avg, Math.sqrt(sqsum), min, max };
+      }
+
+      @Override
+      String[] description() {
+        return new String[] { "Mean", "Stddev", "Min", "Max" };
       }
     },
     /**
@@ -239,6 +313,60 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
         return new String[] { "Med", "Mad" };
       }
     },
+    /**
+     * Aggregate using median and MAD.
+     */
+    MED_MAD_MIN_MAX {
+      @Override
+      double[] aggregate(double[] data) {
+        double med = QuickSelect.median(data);
+        double[] devs = new double[data.length];
+        double min = med, max = med;
+        for(int i = 0; i < data.length; i++) {
+          double v = data[i];
+          min = (v < min) ? v : min;
+          max = (v > max) ? v : max;
+          devs[i] = Math.abs(v - med);
+        }
+        double mad = QuickSelect.median(devs);
+        return new double[] { med, mad, min, max };
+      }
+
+      @Override
+      String[] description() {
+        return new String[] { "Med", "Mad", "Min", "Max" };
+      }
+    },
+    /**
+     * Selected quantiles.
+     */
+    QUANTILES {
+      @Override
+      double[] aggregate(double[] data) {
+        final double[] quants = { 0, .1, .25, .5, .75, .9, 1. };
+        final int l = data.length;
+        Arrays.sort(data); // QuickSelect would do, actually
+        double[] ret = new double[quants.length];
+        for(int i = 0; i < quants.length; i++) {
+          final double dleft = (l - 1) * quants[i];
+          final int ileft = (int) Math.floor(dleft);
+          final double err = dleft - ileft;
+          if(err < Double.MIN_NORMAL) {
+            ret[i] = data[ileft];
+          }
+          else {
+            ret[i] = data[ileft] + (data[ileft + 1] - data[ileft]) * err;
+          }
+        }
+        return ret;
+      }
+
+      @Override
+      String[] description() {
+        return new String[] { "Min", "Q10", "Q25", "Med", "Q75", "Q90", "Max" };
+      }
+    },
+    // Last alternative.
     ;
     /**
      * Aggregate values.
@@ -315,7 +443,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
      * Aggregation method.
      */
     Aggregate agg;
-    
+
     /**
      * Output format parameter.
      */

@@ -57,7 +57,7 @@ public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
     for(int i = 0; i < num; i++) {
       v1 += adapter.getDouble(data, i);
     }
-    v1 /= num * adapter.getDouble(data, len - 1);
+    v1 /= num * adapter.getDouble(data, num);
     return v1 / (1 - v1);
   }
 }
