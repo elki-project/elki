@@ -68,11 +68,11 @@ public class TestHashMapHierarchy implements JUnit4Test {
 
   private <O> void validate(Iter<O> iter, O[] all) {
     HashSet<O> seen = new HashSet<>(all.length);
-    for (; iter.valid(); iter.advance()) {
+    for(; iter.valid(); iter.advance()) {
       O cur = iter.get();
       boolean found = false;
-      for (int i = 0; i < all.length; i++) {
-        if (all[i].equals(cur)) {
+      for(int i = 0; i < all.length; i++) {
+        if(all[i].equals(cur)) {
           found = true;
           seen.add(cur);
           break;
@@ -81,5 +81,26 @@ public class TestHashMapHierarchy implements JUnit4Test {
       assertTrue("Object not found in master solution: " + cur, found);
     }
     assertEquals("Not all objects were seen.", all.length, seen.size());
+  }
+
+  @Test
+  public void testRemovals() {
+    final String a = "a", b = "b", c = "c";
+    HashMapHierarchy<Object> hier = new HashMapHierarchy<>();
+    hier.remove(a, b);
+    hier.remove(a);
+    hier.remove(b);
+    hier.add(a, b);
+    hier.remove(a, b);
+    hier.remove(a);
+    hier.add(a, b);
+    hier.remove(b);
+    hier.add(a, b);
+    hier.add(a, b);
+    hier.add(a, c);
+    assertEquals("Wrong number of children.", 2, hier.numChildren(a));
+    assertEquals("Wrong number of parents.", 1, hier.numParents(b));
+    hier.remove(a, b);
+    hier.remove(a, c);
   }
 }
