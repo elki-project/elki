@@ -281,7 +281,8 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
       }
       for(int i = 0; i < nump; i++) {
         if(parent.equals(parents[i])) {
-          System.arraycopy(parents, i + 1, parents, i, --nump - i);
+          --nump;
+          System.arraycopy(parents, i + 1, parents, i, nump - i);
           parents[nump] = null;
           break;
         }
@@ -302,7 +303,8 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
       }
       for(int i = 0; i < numc; i++) {
         if(child.equals(children[i])) {
-          System.arraycopy(children, i + 1, children, i, --numc - i);
+          --numc;
+          System.arraycopy(children, i + 1, children, i, numc - i);
           children[numc] = null;
           break;
         }

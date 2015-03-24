@@ -95,6 +95,9 @@ public class TestHashMapHierarchy implements JUnit4Test {
     hier.remove(a);
     hier.add(a, b);
     hier.remove(b);
+    hier.remove(a);
+    assertFalse(hier.iterAll().valid());
+    // Duplicate additions test:
     hier.add(a, b);
     hier.add(a, b);
     hier.add(a, c);
@@ -102,5 +105,24 @@ public class TestHashMapHierarchy implements JUnit4Test {
     assertEquals("Wrong number of parents.", 1, hier.numParents(b));
     hier.remove(a, b);
     hier.remove(a, c);
+    // Clear
+    hier.remove(a);
+    hier.remove(b);
+    hier.remove(c);
+    assertFalse(hier.iterAll().valid());
+    // Try removing 1...n children
+    for(int i = 1; i < 10; i++) {
+      for(int j = 0; j < i; j++) {
+        hier.add(a, Integer.valueOf(j));
+      }
+      assertEquals("Wrong number of children.", i, hier.numChildren(a));
+      for(int j = i - 1; j >= 0; --j) {
+        hier.remove(a, Integer.valueOf(j));
+        hier.remove(Integer.valueOf(j));
+      }
+      assertEquals("Wrong number of children.", 0, hier.numChildren(a));
+      hier.remove(a);
+      assertFalse(hier.iterAll().valid());
+    }
   }
 }
