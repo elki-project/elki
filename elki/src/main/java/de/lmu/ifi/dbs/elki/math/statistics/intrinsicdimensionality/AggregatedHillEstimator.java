@@ -23,46 +23,48 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Maximum-Likelihood Estimator for intrinsic dimensionality.
+ * Estimator using the weighted average of multiple hill estimators.
  * 
- * With additional harmonic mean of all sub-samples.
+ * Reference:
+ * <p>
+ * R. Huisman and K. G. Koedijk and C. J. M. Kool and F. Palm<br />
+ * Tail-Index Estimates in Small Samples<br />
+ * Journal of Business & Economic Statistics
+ * </p>
  * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
-public class MLEstimator extends AbstractIntrinsicDimensionalityEstimator {
+@Reference(authors = "R. Huisman and K. G. Koedijk and C. J. M. Kool and F. Palm", //
+title = "Tail-Index Estimates in Small Samples", //
+booktitle = "Journal of Business & Economic Statistics", //
+url = "http://dx.doi.org/10.1198/073500101316970421")
+public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
-  public static final MLEstimator STATIC = new MLEstimator();
+  public static final AggregatedHillEstimator STATIC = new AggregatedHillEstimator();
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.0;
+      return 0.;
     }
-    double id = 0.0;
-    double sum = 0.0;
-    double w = adapter.getDouble(data, 1);
-    int p = 0;
-    int sumk = 0;
+    double hsum = 0.;
+    double sum = Math.log(adapter.getDouble(data, 0));
     for(int i = 1; i < len; i++) {
-      for(; p < i; p++) {
-        double v = adapter.getDouble(data, p);
-        if(v > 0) {
-          sum += Math.log(v / w);
-        }
-      }
-      id -= sum;
-      sumk += i;
-      if(i < len - 1) {
-        final double w2 = adapter.getDouble(data, i + 1);
-        sum += i * Math.log(w / w2);
-        w = w2;
-      }
+      // The next observation:
+      final double v = adapter.getDouble(data, i);
+      assert (v > 0);
+      final double logv = Math.log(v);
+      // Aggregate hill estimations:
+      hsum += (sum / i - logv);
+      // Update sum for next hill.
+      sum += logv;
     }
-    return (double) sumk / id;
+    return -(len) / hsum;
   }
 }

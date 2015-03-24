@@ -26,7 +26,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Hill estimator of the intrinsic dimensionality.
+ * Hill estimator of the intrinsic dimensionality (maximum likelihood estimator
+ * for ID).
  * 
  * Reference:
  * <p>

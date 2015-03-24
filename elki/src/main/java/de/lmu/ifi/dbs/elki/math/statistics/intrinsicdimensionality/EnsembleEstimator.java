@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2014
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,44 +23,36 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Methods of moments estimator, using the first moment (i.e. average).
+ * Ensemble estimator taking the median of three of our best estimators.
  * 
- * This could be generalized to higher order moments, but the variance increases
- * with the order, and we need this to work well with small sample sizes.
- * 
- * Reference:
- * <p>
- * Amsaleg, L., Chelly, O., Furon, T., Girard, S., Houle, M. E., & Nett, M.<br />
- * Estimating Continuous Intrinsic Dimensionality.<br />
- * NII Technical Report NII-2014-001E.
- * </p>
- * 
+ * However, the method-of-moments estimator seems to work best at least on
+ * artificial distances - you don't benefit from always choosing the second
+ * best, so this ensemble approach does not appear to help.
+ *
+ * This is an experimental estimator. Please cite ELKI when using.
+ *
  * @author Erich Schubert
  */
-@Reference(authors = "Amsaleg, L., Chelly, O., Furon, T., Girard, S., Houle, M. E., & Nett, M.", //
-title = "Estimating Continuous Intrinsic Dimensionality", //
-booktitle = "NII Technical Report NII-2014-001E.", //
-url = "http://www.nii.ac.jp/TechReports/14-001E.pdf")
-public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class EnsembleEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
-  public static final MOMEstimator STATIC = new MOMEstimator();
+  public static final EnsembleEstimator STATIC = new EnsembleEstimator();
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
-      return 0.;
-    }
-    double v1 = 0.;
-    final int num = len - 1;
-    for(int i = 0; i < num; i++) {
-      v1 += adapter.getDouble(data, i);
-    }
-    v1 /= num * adapter.getDouble(data, num);
-    return v1 / (1 - v1);
+    double mom = MOMEstimator.STATIC.estimate(data, adapter, len);
+    double mle = HillEstimator.STATIC.estimate(data, adapter, len);
+    double ged = GEDEstimator.STATIC.estimate(data, adapter, len);
+    return (mom < mle) //
+    ? (mle < ged) ? mle : //
+    // A2) mom,lme < mle
+    (mom < ged) ? ged : mom //
+    // B) mle < mom
+    : (mom < ged) ? mom : //
+    // B2) mle, lme < mom
+    (mle < ged) ? ged : mle;
   }
 }

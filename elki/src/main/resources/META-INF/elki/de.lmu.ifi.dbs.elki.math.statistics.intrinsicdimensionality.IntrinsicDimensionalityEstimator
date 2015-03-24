@@ -1,7 +1,9 @@
-de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator
-de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MLEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MOMEstimator
+de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator
+de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator
+de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.ZipfEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.LMomentsEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWM2Estimator
+de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.EnsembleEstimator

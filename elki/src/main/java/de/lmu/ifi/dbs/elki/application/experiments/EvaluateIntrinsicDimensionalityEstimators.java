@@ -31,14 +31,15 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.LMomentsEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MLEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWM2Estimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.ZipfEstimator;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -98,24 +99,32 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
 
   @Override
   public void run() throws UnableToComplyException {
-    double[][] dists = makeSample();
-
-    ArrayList<IntrinsicDimensionalityEstimator> estimators = new ArrayList<>();
     ArrayList<String> abbreviat = new ArrayList<>();
-    estimators.add(GEDEstimator.STATIC);
-    abbreviat.add("GED");
-    estimators.add(MLEstimator.STATIC);
-    abbreviat.add("ML");
-    estimators.add(HillEstimator.STATIC);
+    ArrayList<IntrinsicDimensionalityEstimator> estimators = new ArrayList<>();
+    // Hill estimator
     abbreviat.add("Hill");
-    estimators.add(MOMEstimator.STATIC);
+    estimators.add(HillEstimator.STATIC);
+    // Aggregated hill estimator
+    abbreviat.add("AggHill");
+    estimators.add(AggregatedHillEstimator.STATIC);
+    // Zipf estimator (qq-estimator)
+    abbreviat.add("Zipf");
+    estimators.add(ZipfEstimator.STATIC);
+    // Method of Moments
     abbreviat.add("MoM");
-    estimators.add(PWMEstimator.STATIC);
-    abbreviat.add("PWM");
-    estimators.add(LMomentsEstimator.STATIC);
+    estimators.add(MOMEstimator.STATIC);
+    // Generalized expansion dimension
+    abbreviat.add("GED");
+    estimators.add(GEDEstimator.STATIC);
+    // L-Moments based
     abbreviat.add("LMM");
-    estimators.add(PWM2Estimator.STATIC);
+    estimators.add(LMomentsEstimator.STATIC);
+    // Probability weighted moments, using first moment only.
+    abbreviat.add("PWM");
+    estimators.add(PWMEstimator.STATIC);
+    // Probability weighted moments, using second moment.
     abbreviat.add("PWM2");
+    estimators.add(PWM2Estimator.STATIC);
 
     PrintStream out = System.out; // TODO: add output file parameter?
     final int digits = (int) Math.ceil(Math.log10(maxk + 1));
@@ -142,8 +151,11 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     double[][] v = new double[estimators.size()][samples];
     for(int l = startk; l <= maxk; l++) {
       for(int p = 0; p < samples; p++) {
+        // Prefer independent samples.
+        double[] dists = makeSample(l);
         for(int i = 0; i < estimators.size(); i++) {
-          v[i][p] = estimators.get(i).estimate(dists[p], l);
+          IntrinsicDimensionalityEstimator est = estimators.get(i);
+          v[i][p] = est.estimate(dists, l);
         }
       }
       switch(format){
@@ -173,18 +185,17 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
   /**
    * Generate a data sample.
    * 
+   * @param maxk Number of entries.
    * @return Data sample
    */
-  protected double[][] makeSample() {
+  protected double[] makeSample(int maxk) {
     final Random rnd = this.rnd.getSingleThreadedRandom();
-    double[][] dists = new double[samples][maxk + 1];
+    double[] dists = new double[maxk + 1];
     final double e = 1. / dim;
-    for(int p = 0; p < samples; p++) {
-      for(int i = 0; i <= maxk; i++) {
-        dists[p][i] = Math.pow(rnd.nextDouble(), e);
-      }
-      Arrays.sort(dists[p]);
+    for(int i = 0; i <= maxk; i++) {
+      dists[i] = Math.pow(rnd.nextDouble(), e);
     }
+    Arrays.sort(dists);
     return dists;
   }
 
@@ -294,6 +305,21 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
       @Override
       String[] description() {
         return new String[] { "HMean" };
+      }
+    },
+    /**
+     * Aggregate using median.
+     */
+    MEDIAN {
+      @Override
+      double[] aggregate(double[] data) {
+        double med = QuickSelect.median(data);
+        return new double[] { med };
+      }
+
+      @Override
+      String[] description() {
+        return new String[] { "Median" };
       }
     },
     /**

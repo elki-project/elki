@@ -27,6 +27,17 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 /**
  * Probability weighted moments based estimator.
  * 
+ * We use the unbiased weights of Maciunas Landwehr et al.:
+ * <p>
+ * J. Maciunas Landwehr and N. C. Matalas and J. R. Wallis<br />
+ * Probability weighted moments compared with some traditional techniques in
+ * estimating Gumbel parameters and quantiles.<br />
+ * Water Resources Research 15.5 (1979): 1055-1064.
+ * </p>
+ * but we pretend we had one additional data point at 0, to not lose valuable
+ * data. When implemented exactly, we would have to assign a weight of 0 to the
+ * first point. But since we are not using the mean, we don't want to do this.
+ * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
@@ -38,20 +49,23 @@ public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
+    if(len < 2) {
+      return 0.;
+    }
     if(len == 2) { // Fallback to MoM
       double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
       return v1 / (1 - v1);
     }
     final int num = len - 1; // Except for last
-    // Estimate first PWM (k=1), using plotting position i/(n-1):
+    // Estimate first PWM using data points 0..(num-1):
+    // In the following, we pretend we had one additional data point at -1!
     double v1 = 0.;
     for(int i = 0; i < num; i++) {
-      // TODO: by the Landwehr formula, we use the first data point!
-      v1 += adapter.getDouble(data, i) * i;
+      v1 += adapter.getDouble(data, i) * (i + 1);
     }
     // All scaling factors collected for performance reasons:
     final double w = adapter.getDouble(data, num);
-    v1 /= num * w * (num - 1);
+    v1 /= (num + 1) * w * (num);
     return v1 / (1 - 2 * v1);
   }
 }

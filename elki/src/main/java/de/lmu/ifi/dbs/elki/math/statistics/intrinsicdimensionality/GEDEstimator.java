@@ -52,22 +52,26 @@ public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      throw new ArithmeticException("Cannot compute expansion dimensionality for a single observation.");
+      return 0.;
     }
-    double[] meds = new double[(len << 1) - 1];
-    for(int r = 0; r < len; r++) {
-      final double d1 = adapter.getDouble(data, r);
-      int p = r;
-      for(int r2 = 0; r2 < len; r2++) {
-        if(r == r2) {
+    final int end = len - 1;
+    double[] meds = new double[end << 1];
+    // We only consider pairs with k < i, to avoid redundant computations.
+    for(int k = 0; k < end; k++) {
+      final double logdk = Math.log(adapter.getDouble(data, k));
+      double log1pk = Math.log1p(k);
+      int p = k; // k values are already occupied!
+      // We only consider pairs with k < i, to avoid redundant computations.
+      for(int i = k + 1; i < len; i++) {
+        final double logdi = Math.log(adapter.getDouble(data, i));
+        if(logdk == logdi) { // Would yield a division by 0.
           continue;
         }
-        final double d2 = adapter.getDouble(data, r2);
-        final double dim = Math.log((r + 1.) / (r2 + 1.)) / Math.log(d1 / d2);
+        final double dim = (log1pk - Math.log1p(i)) / (logdk - logdi);
         meds[p++] = dim;
       }
-      meds[r] = QuickSelect.median(meds, r, p);
+      meds[k] = QuickSelect.median(meds, k, p);
     }
-    return QuickSelect.median(meds, 0, len);
+    return QuickSelect.median(meds, 0, end);
   }
 }

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
@@ -40,20 +39,91 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
    */
   public static final LMomentsEstimator STATIC = new LMomentsEstimator();
 
+  /**
+   * Adapter to process an array in reverse order.
+   * 
+   * @author Erich Schubert
+   *
+   * @param <A> Array type
+   */
+  private static class ReverseAdapter<A> implements NumberArrayAdapter<Double, A> {
+    /**
+     * Last element
+     */
+    private int s;
+
+    /**
+     * Adapter class.
+     */
+    private NumberArrayAdapter<?, A> inner;
+
+    /**
+     * Constructor.
+     *
+     * @param inner Inner adapter
+     * @param size Size of array.
+     */
+    public ReverseAdapter(NumberArrayAdapter<?, A> inner, int size) {
+      this.inner = inner;
+      this.s = size - 1;
+    }
+
+    @Override
+    public int size(A array) {
+      return s + 1;
+    }
+
+    @Override
+    public Double get(A array, int off) throws IndexOutOfBoundsException {
+      return inner.getDouble(array, s - off);
+    }
+
+    @Override
+    public double getDouble(A array, int off) throws IndexOutOfBoundsException {
+      return inner.getDouble(array, s - off);
+    }
+
+    @Override
+    public float getFloat(A array, int off) throws IndexOutOfBoundsException {
+      return inner.getFloat(array, s - off);
+    }
+
+    @Override
+    public int getInteger(A array, int off) throws IndexOutOfBoundsException {
+      return inner.getInteger(array, s - off);
+    }
+
+    @Override
+    public short getShort(A array, int off) throws IndexOutOfBoundsException {
+      return inner.getShort(array, s - off);
+    }
+
+    @Override
+    public long getLong(A array, int off) throws IndexOutOfBoundsException {
+      return inner.getLong(array, s - off);
+    }
+
+    @Override
+    public byte getByte(A array, int off) throws IndexOutOfBoundsException {
+      return inner.getByte(array, s - off);
+    }
+  }
+
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
+    if(len < 2) {
+      return 0.;
+    }
     if(len == 2) { // Fallback to MoM
       double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
       return v1 / (1 - v1);
     }
-    final double w = adapter.getDouble(data, len - 1);
-    double[] excess = new double[len - 1];
-    for(int i = 0, j = len - 2; j >= 0; ++i, --j) {
-      excess[i] = adapter.getDouble(data, j);
-    }
-    double[] lmom = ProbabilityWeightedMoments.samLMR(excess, ArrayLikeUtil.doubleArrayAdapter(), 2);
-    if(lmom[1] == 0) {
-      return -.5 * (lmom[0] * 2) / w; // Fallback to first moment only.
+    final int k = len - 1;
+    final double w = adapter.getDouble(data, k);
+    double[] lmom = ProbabilityWeightedMoments.samLMR(data, new ReverseAdapter<>(adapter, len), 2);
+    if(lmom[1] == 0) { // Fallback to first moment only.
+      // TODO: is this the right thing to do?
+      return -.5 * (lmom[0] * 2) / w * (len + .5) * len;
     }
     return -.5 * ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]) / w;
   }
