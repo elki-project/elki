@@ -38,19 +38,20 @@ public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len == 2) {
+    if(len == 2) { // Fallback to MoM
       double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
       return v1 / (1 - v1);
     }
-    // Estimate first PWM (k=1), ignoring the last value:
+    final int num = len - 1; // Except for last
+    // Estimate first PWM (k=1), using plotting position i/(n-1):
     double v1 = 0.;
-    final int num = len - 1;
     for(int i = 0; i < num; i++) {
+      // TODO: by the Landwehr formula, we use the first data point!
       v1 += adapter.getDouble(data, i) * i;
     }
-    v1 /= num * (num - 1);
-    final double w = adapter.getDouble(data, len - 1);
-    v1 /= w;
-    return v1 / (1 - v1 * 2);
+    // All scaling factors collected for performance reasons:
+    final double w = adapter.getDouble(data, num);
+    v1 /= num * w * (num - 1);
+    return v1 / (1 - 2 * v1);
   }
 }

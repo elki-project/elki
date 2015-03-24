@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDime
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.LMomentsEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MLEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWM2Estimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
@@ -113,6 +114,8 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     abbreviat.add("PWM");
     estimators.add(LMomentsEstimator.STATIC);
     abbreviat.add("LMM");
+    estimators.add(PWM2Estimator.STATIC);
+    abbreviat.add("PWM2");
 
     PrintStream out = System.out; // TODO: add output file parameter?
     final int digits = (int) Math.ceil(Math.log10(maxk + 1));

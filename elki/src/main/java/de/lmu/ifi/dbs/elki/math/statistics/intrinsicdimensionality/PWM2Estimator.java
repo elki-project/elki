@@ -23,45 +23,42 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Hill estimator of the intrinsic dimensionality.
+ * Probability weighted moments based estimator, using the second moment.
  * 
- * Reference:
- * <p>
- * Hill, B. M.<br />
- * A simple general approach to inference about the tail of a distribution<br />
- * The annals of statistics, 3(5), 1163-1174
- * </p>
+ * It can be shown theoretically that this estimator is expected to have a
+ * higher variance than the one using the first moment only, it is included for
+ * completeness only.
  * 
- * @author Jonathan von Brünken
  * @author Erich Schubert
  */
-@Reference(authors = "Hill, B. M.", //
-title = "A simple general approach to inference about the tail of a distribution", //
-booktitle = "The annals of statistics, 3(5), 1163-1174", //
-url = "http://dx.doi.org/10.1214/aos/1176343247")
-public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
+public class PWM2Estimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
-  public static final HillEstimator STATIC = new HillEstimator();
+  public static final PWM2Estimator STATIC = new PWM2Estimator();
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
-      return 0.;
+    if(len == 2) { // Fallback to MoM
+      double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
+      return v1 / (1 - v1);
     }
-    final int k = len - 1;
-    double sum = 0.;
-    for(int i = 0; i < k; ++i) {
-      double v = adapter.getDouble(data, i);
-      assert (v > 0.);
-      sum += Math.log(v);
+    if(len == 3) { // Fallback to first moment only
+      double v1 = adapter.getDouble(data, 1) * .5 / adapter.getDouble(data, 2);
+      return v1 / (1 - 2 * v1);
     }
-    sum /= k;
-    sum -= Math.log(adapter.getDouble(data, k));
-    return -1. / sum;
+    final int num = len - 1; // Except for last
+    // Estimate second PWM (k=2), using plotting position i/(n-1):
+    double v2 = 0.;
+    // TODO: by the Landwehr formula, we lose the first two data points:
+    for(int i = 2; i < num; i++) {
+      v2 += adapter.getDouble(data, i) * i * (i - 1);
+    }
+    // All scaling factors collected for performance reasons
+    final double w = adapter.getDouble(data, num);
+    v2 /= num * w * (num - 1.) * (num - 2.);
+    return v2 / (1 - 3 * v2);
   }
 }

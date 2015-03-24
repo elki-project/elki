@@ -42,6 +42,10 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
+    if(len == 2) { // Fallback to MoM
+      double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
+      return v1 / (1 - v1);
+    }
     final double w = adapter.getDouble(data, len - 1);
     double[] excess = new double[len - 1];
     for(int i = 0, j = len - 2; j >= 0; ++i, --j) {
