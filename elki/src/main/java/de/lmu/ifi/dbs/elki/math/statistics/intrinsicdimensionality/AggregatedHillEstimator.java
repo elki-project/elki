@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Estimator using the weighted average of multiple hill estimators.
@@ -66,5 +67,19 @@ public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEsti
       sum += logv;
     }
     return -(len) / hsum;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected AggregatedHillEstimator makeInstance() {
+      return STATIC;
+    }
   }
 }

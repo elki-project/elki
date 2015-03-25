@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Generalized Expansion Dimension for estimating the intrinsic dimensionality.
@@ -73,5 +74,19 @@ public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
       meds[k] = QuickSelect.median(meds, k, p);
     }
     return QuickSelect.median(meds, 0, end);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected GEDEstimator makeInstance() {
+      return STATIC;
+    }
   }
 }

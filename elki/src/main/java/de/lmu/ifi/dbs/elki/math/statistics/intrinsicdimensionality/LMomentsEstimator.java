@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  */
 import de.lmu.ifi.dbs.elki.math.statistics.ProbabilityWeightedMoments;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Probability weighted moments based estimator using L-Moments.
@@ -38,6 +39,25 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
    * Static instance.
    */
   public static final LMomentsEstimator STATIC = new LMomentsEstimator();
+
+  @Override
+  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
+    if(len < 2) {
+      return 0.;
+    }
+    if(len == 2) { // Fallback to MoM
+      double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
+      return v1 / (1 - v1);
+    }
+    final int k = len - 1;
+    final double w = adapter.getDouble(data, k);
+    double[] lmom = ProbabilityWeightedMoments.samLMR(data, new ReverseAdapter<>(adapter, len), 2);
+    if(lmom[1] == 0) { // Fallback to first moment only.
+      // TODO: is this the right thing to do? When does this happen?
+      return -.5 * (lmom[0] * 2) / w * (len + .5) * len;
+    }
+    return -.5 * ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]) / w;
+  }
 
   /**
    * Adapter to process an array in reverse order.
@@ -109,22 +129,17 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
     }
   }
 
-  @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
-      return 0.;
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected LMomentsEstimator makeInstance() {
+      return STATIC;
     }
-    if(len == 2) { // Fallback to MoM
-      double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
-      return v1 / (1 - v1);
-    }
-    final int k = len - 1;
-    final double w = adapter.getDouble(data, k);
-    double[] lmom = ProbabilityWeightedMoments.samLMR(data, new ReverseAdapter<>(adapter, len), 2);
-    if(lmom[1] == 0) { // Fallback to first moment only.
-      // TODO: is this the right thing to do?
-      return -.5 * (lmom[0] * 2) / w * (len + .5) * len;
-    }
-    return -.5 * ((lmom[0] * lmom[0] / lmom[1]) - lmom[0]) / w;
   }
 }

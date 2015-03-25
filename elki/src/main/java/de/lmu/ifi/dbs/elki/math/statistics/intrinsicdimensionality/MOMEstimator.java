@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Methods of moments estimator, using the first moment (i.e. average).
@@ -62,5 +63,19 @@ public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
     }
     v1 /= num * adapter.getDouble(data, num);
     return v1 / (1 - v1);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected MOMEstimator makeInstance() {
+      return STATIC;
+    }
   }
 }

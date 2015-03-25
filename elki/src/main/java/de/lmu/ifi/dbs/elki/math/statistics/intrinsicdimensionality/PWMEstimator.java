@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Probability weighted moments based estimator.
@@ -37,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * but we pretend we had one additional data point at 0, to not lose valuable
  * data. When implemented exactly, we would have to assign a weight of 0 to the
  * first point. But since we are not using the mean, we don't want to do this.
+ * This hack causes this estimator to have a bias to underestimate the ID.
  * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
@@ -67,5 +69,19 @@ public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
     final double w = adapter.getDouble(data, num);
     v1 /= (num + 1) * w * (num);
     return v1 / (1 - 2 * v1);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected PWMEstimator makeInstance() {
+      return STATIC;
+    }
   }
 }

@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Hill estimator of the intrinsic dimensionality (maximum likelihood estimator
@@ -64,5 +65,19 @@ public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
     sum /= k;
     sum -= Math.log(adapter.getDouble(data, k));
     return -1. / sum;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected HillEstimator makeInstance() {
+      return STATIC;
+    }
   }
 }

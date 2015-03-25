@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  */
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Zipf estimator (qq-estimator) of the intrinsic dimensionality.
@@ -84,5 +85,19 @@ public class ZipfEstimator extends AbstractIntrinsicDimensionalityEstimator {
     }
     double gamma = (len * wls - ws * ls) / (len * wws - ws * ws);
     return -1. / gamma;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected ZipfEstimator makeInstance() {
+      return STATIC;
+    }
   }
 }
