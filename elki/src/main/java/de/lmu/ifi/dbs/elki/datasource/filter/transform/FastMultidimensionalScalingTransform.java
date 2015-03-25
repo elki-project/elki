@@ -120,51 +120,13 @@ public class FastMultidimensionalScalingTransform<O> implements ObjectFilter {
       }
 
       // Compute distance matrix.
-      double[][] imat = new double[size][size];
-      {
-        boolean squared = dist instanceof SquaredEuclideanDistanceFunction;
-        FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix.", (size * (size - 1)) >>> 1, LOG) : null;
-        for(int x = 0; x < size; x++) {
-          final O ox = castColumn.get(x);
-          for(int y = x + 1; y < size; y++) {
-            final O oy = castColumn.get(y);
-            double distance = dist.distance(ox, oy);
-            imat[x][y] = distance * (squared ? -.5 : -.5 * distance);
-            LOG.incrementProcessed(dprog);
-          }
-        }
-        LOG.ensureCompleted(dprog);
-      }
+      double[][] imat = computeDistanceMatrix(castColumn, size);
       ClassicMultidimensionalScalingTransform.doubleCenterSymmetric(imat);
       // Find eigenvectors.
       {
-        Random rnd = new Random(); // FIXME: make parameterizable
         double[][] evs = new double[tdim][size];
-        double[] tmp = new double[size];
         double[] lambda = new double[tdim];
-        FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Learning projections.", tdim, LOG) : null;
-        for(int d = 0; d < tdim; d++) {
-          double[] cur = evs[d];
-          randomInitialization(cur, rnd);
-          double l = 0.;
-          for(int iter = 0; iter < 100; iter++) {
-            l = multiply(imat, cur, tmp);
-            double delta = updateEigenvector(tmp, cur, l);
-            if(delta < 1e-14) {
-              break;
-            }
-          }
-          lambda[d] = l;
-          if(d + 1 < tdim) {
-            for(int i = 0; i < size; i++) {
-              for(int j = 0; j < size; j++) {
-                imat[i][j] -= l * cur[i] * cur[j];
-              }
-            }
-          }
-          LOG.incrementProcessed(prog);
-        }
-        LOG.ensureCompleted(prog);
+        findEigenVectors(imat, size, evs, lambda);
 
         // Scaling factors.
         for(int d = 0; d < tdim; d++) {
@@ -184,7 +146,54 @@ public class FastMultidimensionalScalingTransform<O> implements ObjectFilter {
     return bundle;
   }
 
-  private void randomInitialization(double[] out, Random rnd) {
+  protected void findEigenVectors(double[][] imat, final int size, double[][] evs, double[] lambda) {
+    double[] tmp = new double[size];
+    Random rnd = new Random(); // FIXME: make parameterizable
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Learning projections.", tdim, LOG) : null;
+    for(int d = 0; d < tdim; d++) {
+      double[] cur = evs[d];
+      randomInitialization(cur, rnd);
+      double l = 0.;
+      for(int iter = 0; iter < 100; iter++) {
+        l = multiply(imat, cur, tmp);
+        double delta = updateEigenvector(tmp, cur, l);
+        if(delta < 1e-14) {
+          break;
+        }
+      }
+      lambda[d] = l;
+      if(d + 1 < tdim) {
+        for(int i = 0; i < size; i++) {
+          for(int j = 0; j < size; j++) {
+            imat[i][j] -= l * cur[i] * cur[j];
+          }
+        }
+      }
+      LOG.incrementProcessed(prog);
+    }
+    LOG.ensureCompleted(prog);
+  }
+
+  protected double[][] computeDistanceMatrix(final List<O> castColumn, final int size) {
+    double[][] imat = new double[size][size];
+    boolean squared = dist instanceof SquaredEuclideanDistanceFunction;
+    FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix.", (size * (size - 1)) >>> 1, LOG) : null;
+    for(int x = 0; x < size; x++) {
+      final O ox = castColumn.get(x);
+      for(int y = x + 1; y < size; y++) {
+        final O oy = castColumn.get(y);
+        double distance = dist.distance(ox, oy);
+        distance *= (squared ? -.5 : -.5 * distance);
+        imat[x][y] = distance;
+        imat[y][x] = distance;
+        LOG.incrementProcessed(dprog);
+      }
+    }
+    LOG.ensureCompleted(dprog);
+    return imat;
+  }
+
+  protected void randomInitialization(double[] out, Random rnd) {
     double l2 = 0.;
     while(!(l2 > 0)) {
       for(int d = 0; d < out.length; d++) {
