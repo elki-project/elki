@@ -50,6 +50,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuZTestOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.SLOM
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.SOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.TrimmedMeanApproach
+de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IntrinsicDimensionalityOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.meta.ExternalDoubleOutlierScore
 de.lmu.ifi.dbs.elki.algorithm.outlier.meta.FeatureBagging
 de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS
