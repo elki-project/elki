@@ -113,9 +113,9 @@ public class OutlierRankingEvaluation implements Evaluator {
     g.addMeasure("Maximum F1", maxf1, 0., 1., 0., false);
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
-      LOG.statistics(new DoubleStatistic(key + ".precision.average", rocauc));
-      LOG.statistics(new DoubleStatistic(key + ".precision.r", rocauc));
-      LOG.statistics(new DoubleStatistic(key + ".f1.maximum", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".precision.average", avep));
+      LOG.statistics(new DoubleStatistic(key + ".precision.r", rprec));
+      LOG.statistics(new DoubleStatistic(key + ".f1.maximum", maxf1));
     }
     return res;
   }
