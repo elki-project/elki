@@ -122,7 +122,7 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
 
     DBIDRef first = DBIDUtil.randomSample(ids, 1, rnd).iter();
     means.add(first);
-    O prevmean = relation.get(first);
+    DBIDVar prevmean = DBIDUtil.newVar(first);
 
     DBIDVar best = DBIDUtil.newVar(first);
     for(int i = (dropfirst ? 0 : 1); i < k; i++) {
@@ -148,7 +148,7 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
         means.clear(); // Remove temporary first element.
       }
       store.putDouble(best, Double.NaN); // So it won't be chosen twice.
-      prevmean = relation.get(best);
+      prevmean.set(best);
       means.add(best);
     }
 
