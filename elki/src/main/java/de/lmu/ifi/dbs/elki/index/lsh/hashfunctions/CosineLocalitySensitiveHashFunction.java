@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily.Projection;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,23 +23,51 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjection
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class CosineLocalitySensitiveHashFunction implements LocalitySensitiveHashFunction<NumberVector>{
-  
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily.Projection;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
+/**
+ * Random projection family to use with sparse vectors.
+ * 
+ * Reference:
+ * <p>
+ * M.S. Charikar<br />
+ * Similarity estimation techniques from rounding algorithms<br />
+ * Proc. 34th ACM Symposium on Theory of computing, STOC'02
+ * </p>
+ * 
+ * @author Evgeniy Faerman
+ */
+@Reference(authors = "M.S. Charikar", //
+title = "Similarity estimation techniques from rounding algorithms", //
+booktitle = "Proc. 34th ACM Symposium on Theory of computing, STOC'02", //
+url = "https://dx.doi.org/10.1145%2F509907.509965")
+public class CosineLocalitySensitiveHashFunction implements LocalitySensitiveHashFunction<NumberVector> {
+  /**
+   * Projection function.
+   */
   private RandomProjectionFamily.Projection projection;
+
+  /**
+   * Constructor.
+   *
+   * @param projection Projection
+   */
   public CosineLocalitySensitiveHashFunction(Projection projection) {
-    this.projection=projection;
+    this.projection = projection;
   }
+
   @Override
   public int hashObject(NumberVector obj) {
     double[] projectionResult = projection.project(obj);
-    int hashValue=0;
+    int hashValue = 0;
     for(int i = 0; i < projectionResult.length; i++) {
-      if(projectionResult[i]>0)
-      {
-        hashValue=hashValue+(1<<i);
+      if(projectionResult[i] > 0) {
+        hashValue = hashValue + (1 << i);
       }
     }
     return hashValue;
   }
-
 }

@@ -1,26 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.lsh.hashfamilies;
 
-import java.util.ArrayList;
-
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.CosineLocalitySensitiveHashFunction;
-import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomHyperplaneProjectionFamily;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -43,7 +22,44 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.CosineLocalitySensitiveHashFunction;
+import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomHyperplaneProjectionFamily;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+
+/**
+ * Hash function family to use with Cosine distance.
+ * 
+ * Reference:
+ * <p>
+ * M.S. Charikar<br />
+ * Similarity estimation techniques from rounding algorithms<br />
+ * Proc. 34th ACM Symposium on Theory of computing, STOC'02
+ * </p>
+ * 
+ * @author Evgeniy Faerman
+ */
+@Reference(authors = "M.S. Charikar", //
+title = "Similarity estimation techniques from rounding algorithms", //
+booktitle = "Proc. 34th ACM Symposium on Theory of computing, STOC'02", //
+url = "https://dx.doi.org/10.1145%2F509907.509965")
 public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**
    * Projection family to use.
@@ -55,6 +71,12 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
    */
   private int k;
 
+  /**
+   * Constructor.
+   *
+   * @param k Number of projections to use.
+   * @param random Random factory.
+   */
   public CosineHashFunctionFamily(int k, RandomFactory random) {
     super();
     this.proj = new RandomHyperplaneProjectionFamily(random);
@@ -81,13 +103,15 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
   public boolean isCompatible(DistanceFunction<?> df) {
     return df instanceof CosineDistanceFunction;
   }
+
   /**
    * Parameterization class.
    * 
+   * @author Evgeniy Faerman
    * 
    * @apiviz.exclude
    */
-  public  static class Parameterizer extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter for fixing the random seed.
      */
@@ -104,11 +128,6 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
     RandomFactory random;
 
     /**
-     * Width of each bin.
-     */
-    double width;
-
-    /**
      * The number of projections to use for each hash function.
      */
     int k;
@@ -121,15 +140,16 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
         random = randP.getValue();
       }
 
-      IntParameter lP = new IntParameter(NUMPROJ_ID);
-      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter lP = new IntParameter(NUMPROJ_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(lP)) {
         k = lP.intValue();
       }
     }
+
     @Override
     protected CosineHashFunctionFamily makeInstance() {
-      return new CosineHashFunctionFamily(k,random);
+      return new CosineHashFunctionFamily(k, random);
     }
   }
 }

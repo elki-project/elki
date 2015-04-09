@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.lsh.hashfamilies;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,24 +23,29 @@ import org.junit.Test;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
-public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest {
-
+/**
+ * Unit test for random hyperplane / cosine distance.
+ * 
+ * @author Evgeniy Faerman
+ */
+public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testHashFunctionOneProjection() {
     // test with {1,1,-1,1,-1}
@@ -64,7 +66,7 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest {
 
   private LocalitySensitiveHashFunction<? super NumberVector> createCosineHashFunction(int numberOfProjections) {
     ListParameterization params = new ListParameterization();
-    params.addParameter(CosineHashFunctionFamily.Parameterizer.RANDOM_ID, RandomFactory.get(3l));
+    params.addParameter(CosineHashFunctionFamily.Parameterizer.RANDOM_ID, RandomFactory.get(3L));
     params.addParameter(CosineHashFunctionFamily.Parameterizer.NUMPROJ_ID, numberOfProjections);
     CosineHashFunctionFamily cosineFamily = ClassGenericsUtil.parameterizeOrAbort(CosineHashFunctionFamily.class, params);
     LocalitySensitiveHashFunction<? super NumberVector> hashFunction = cosineFamily.generateHashFunctions(mockRelation(5), numberOfProjections).get(0);
@@ -72,79 +74,6 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest {
   }
 
   private Relation<NumberVector> mockRelation(final int dimension) {
-    return new Relation<NumberVector>() {
-
-      @Override
-      public ResultHierarchy getHierarchy() {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public void setHierarchy(ResultHierarchy hierarchy) {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public String getLongName() {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public String getShortName() {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public Database getDatabase() {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public NumberVector get(DBIDRef id) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public void set(DBIDRef id, NumberVector val) {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public void delete(DBIDRef id) {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public SimpleTypeInformation<NumberVector> getDataTypeInformation() {
-        return VectorFieldTypeInformation.typeRequest(NumberVector.class, dimension, dimension);
-      }
-
-      @Override
-      public DBIDs getDBIDs() {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public DBIDIter iterDBIDs() {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public int size() {
-        // TODO Auto-generated method stub
-        return 0;
-      }
-    };
+    return new MaterializedRelation<>(null, VectorFieldTypeInformation.typeRequest(NumberVector.class, dimension, dimension), DBIDUtil.EMPTYDBIDS);
   }
-
 }

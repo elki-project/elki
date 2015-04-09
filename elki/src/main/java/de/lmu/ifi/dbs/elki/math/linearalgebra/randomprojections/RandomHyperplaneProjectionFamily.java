@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,24 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  */
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
+/**
+ * Random hyperplane projection family.
+ * 
+ * Reference:
+ * <p>
+ * M.S. Charikar<br />
+ * Similarity estimation techniques from rounding algorithms<br />
+ * Proc. 34th ACM Symposium on Theory of computing, STOC'02
+ * </p>
+ * 
+ * @author Evgeniy Faerman
+ */
+@Reference(authors = "M.S. Charikar", //
+title = "Similarity estimation techniques from rounding algorithms", //
+booktitle = "Proc. 34th ACM Symposium on Theory of computing, STOC'02", //
+url = "https://dx.doi.org/10.1145%2F509907.509965")
 public class RandomHyperplaneProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Constructor.
@@ -40,7 +57,7 @@ public class RandomHyperplaneProjectionFamily extends AbstractRandomProjectionFa
     Matrix projectionMatrix = new Matrix(k, dim);
     for(int i = 0; i < k; ++i) {
       for(int j = 0; j < dim; ++j) {
-        final double value = random.nextBoolean() ? 1 :-1;
+        final double value = random.nextBoolean() ? 1 : -1;
         projectionMatrix.set(i, j, value);
       }
     }
@@ -50,7 +67,7 @@ public class RandomHyperplaneProjectionFamily extends AbstractRandomProjectionFa
   /**
    * Parameterization class.
    * 
-   * @author Erich Schubert
+   * @author Evgeniy Faerman
    * 
    * @apiviz.exclude
    */
