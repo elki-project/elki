@@ -1,8 +1,16 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
+package de.lmu.ifi.dbs.elki.index.preprocessed.fastoptics;
 
 /* 
- Copyright (C) 2014
+ Copyright (C) 2015
  Johannes Schneider, ABB Research, Switzerland, johannes.schneider@alumni.ethz.ch
+
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.FastOPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -49,22 +58,43 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
- * Random Projections used for computing neighbors and density estimates
+ * Random Projections used for computing neighbors and density estimates.
  * 
+ * This index is specialized for the algorithm
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.optics.FastOPTICS}
+ * 
+ * Reference:
+ * <p>
+ * Schneider, J., & Vlachos, M<br />
+ * Fast parameterless density-based clustering via random projections<br />
+ * Proc. 22nd ACM international conference on Conference on Information &
+ * Knowledge Management (CIKM)
+ * </p>
+ * 
+ * This is based on the original code provided by Johannes Schneider, with
+ * ELKIfications and optimizations by Erich Schubert.
+ * 
+ * TODO: implement one of the Index APIs?
+ *
  * @author Johannes Schneider
  * @author Erich Schubert
  */
-public class RandProNeighsAndDensities<V extends NumberVector> {
+@Reference(authors = "Schneider, J., & Vlachos, M", //
+title = "Fast parameterless density-based clustering via random projections", //
+booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
+url = "http://dx.doi.org/10.1145/2505515.2505590")
+public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(RandProNeighsAndDensities.class);
+  private static final Logging LOG = Logging.getLogger(RandomProjectedNeighborssAndDensities.class);
 
   /**
    * Default constant used to compute number of projections as well as number of
@@ -116,7 +146,7 @@ public class RandProNeighsAndDensities<V extends NumberVector> {
    *
    * @param rnd Random factory.
    */
-  public RandProNeighsAndDensities(RandomFactory rnd) {
+  public RandomProjectedNeighborssAndDensities(RandomFactory rnd) {
     this.rnd = rnd;
   }
 
@@ -133,16 +163,15 @@ public class RandProNeighsAndDensities<V extends NumberVector> {
     this.minSplitSize = minSplitSize;
     final int size = points.size();
     final int dim = RelationUtil.dimensionality(points);
-    this.points = points;// new float[N][nDimensions];
+    this.points = points;
 
     // perform O(log N+log dim) splits of the entire point sets projections
     int nPointSetSplits = (int) (logOProjectionConst * MathUtil.log2(size * dim + 1));
-    // perform O(log N+log dim) projections of the point set onto a random
-    // line
+    // perform O(log N+log dim) projections of the point set onto a random line
     int nProject1d = (int) (logOProjectionConst * MathUtil.log2(size * dim + 1));
 
-    LOG.statistics(new LongStatistic(RandProNeighsAndDensities.class.getName() + ".partition-size", nPointSetSplits));
-    LOG.statistics(new LongStatistic(RandProNeighsAndDensities.class.getName() + ".num-projections", nProject1d));
+    LOG.statistics(new LongStatistic(RandomProjectedNeighborssAndDensities.class.getName() + ".partition-size", nPointSetSplits));
+    LOG.statistics(new LongStatistic(RandomProjectedNeighborssAndDensities.class.getName() + ".num-projections", nProject1d));
     splitsets = new ArrayList<>();
 
     // perform projections of points
@@ -417,7 +446,7 @@ public class RandProNeighsAndDensities<V extends NumberVector> {
     /**
      * Random seed parameter.
      */
-    public static final OptionID RANDOM_ID = new OptionID("randomproj.seed", "Random seed for generating projections.");
+    public static final OptionID RANDOM_ID = new OptionID("fastoptics.randomproj.seed", "Random seed for generating projections.");
 
     /**
      * Random factory.
@@ -434,8 +463,8 @@ public class RandProNeighsAndDensities<V extends NumberVector> {
     }
 
     @Override
-    protected RandProNeighsAndDensities<NumberVector> makeInstance() {
-      return new RandProNeighsAndDensities<>(rnd);
+    protected RandomProjectedNeighborssAndDensities<NumberVector> makeInstance() {
+      return new RandomProjectedNeighborssAndDensities<>(rnd);
     }
   }
 }

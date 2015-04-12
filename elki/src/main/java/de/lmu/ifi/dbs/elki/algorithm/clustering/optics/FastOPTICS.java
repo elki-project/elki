@@ -1,8 +1,16 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 /* 
- Copyright (C) 2014
+ Copyright (C) 2015
  Johannes Schneider, ABB Research,Switzerland, johannes.schneider@alumni.ethz.ch
+
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.preprocessed.fastoptics.RandomProjectedNeighborssAndDensities;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -50,6 +59,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * FastOPTICS algorithm (Fast approximation of OPTICS)
  * 
  * Note that this is <em>not</em> FOPTICS as in "Fuzzy OPTICS"!
+ * 
+ * Reference:
+ * <p>
+ * Schneider, J., & Vlachos, M<br />
+ * Fast parameterless density-based clustering via random projections<br />
+ * Proc. 22nd ACM international conference on Conference on Information &
+ * Knowledge Management (CIKM)
+ * </p>
+ * 
+ * This is based on the original code provided by Johannes Schneider, with
+ * ELKIfications and optimizations by Erich Schubert.
  * 
  * @author Johannes Schneider
  * @author Erich Schubert
@@ -103,7 +123,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
   /**
    * Index.
    */
-  RandProNeighsAndDensities<V> index;
+  RandomProjectedNeighborssAndDensities<V> index;
 
   /**
    * Constructor.
@@ -111,7 +131,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
    * @param minpts Minimum number of neighbors.
    * @param algo Index
    */
-  public FastOPTICS(int minpts, RandProNeighsAndDensities<V> algo) {
+  public FastOPTICS(int minpts, RandomProjectedNeighborssAndDensities<V> algo) {
     super();
     this.minPts = minpts;
     this.index = algo;
@@ -221,7 +241,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     /**
      * Random projection index.
      */
-    RandProNeighsAndDensities<V> index;
+    RandomProjectedNeighborssAndDensities<V> index;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -231,7 +251,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
       if(config.grab(minptsP)) {
         minpts = minptsP.intValue();
       }
-      Class<RandProNeighsAndDensities<V>> clz = ClassGenericsUtil.uglyCastIntoSubclass(RandProNeighsAndDensities.class);
+      Class<RandomProjectedNeighborssAndDensities<V>> clz = ClassGenericsUtil.uglyCastIntoSubclass(RandomProjectedNeighborssAndDensities.class);
       index = config.tryInstantiate(clz);
     }
 
