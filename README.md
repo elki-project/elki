@@ -64,3 +64,19 @@ Our primary "support" medium is this *community* mailing list. We appreciate if 
  * Fairness - It is easy to do an unfair comparison by badly implementing a competitor. We try to implement every method as good as we can, and by publishing the source code allow for external improvements. We try to add all proposed improvements, such as index structures for faster range and kNN queries
  * Performance - the modular architecture of ELKI allows optimized versions of algorithms and index structures for acceleration
  * Progress - ELKI is changing with every release. To accomodate new features and enhance performance, API breakages are unavoidable. We hope to get a stable API with the 1.0 release, but we are not there yet.
+
+## Building ELKI
+
+ELKI is built using [Maven](https://maven.apache.org/):
+
+    mvn package
+
+will produce an executable `jar` file named `elki/target/elki-<VERSION>.jar`.
+
+To build the SVG based visualization add-on, use
+
+    mvn -P svg package
+
+which produces an executable `jar` file named `addons/batikvis/target/elki-batik-visualization-<VERSION>.jar`
+
+Required dependencies can be found in the folder `dependency` next to the `jar` file.
