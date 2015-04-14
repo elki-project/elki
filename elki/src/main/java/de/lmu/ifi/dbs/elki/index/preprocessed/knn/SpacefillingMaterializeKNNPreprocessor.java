@@ -1,10 +1,10 @@
-package experimentalcode.erich.approxknn;
+package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -62,9 +63,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Compute the nearest neighbors approximatively using space filling curves.
- * 
+ *
+ * Reference:
+ * <p>
+ * E. Schubert, A. Zimek, H.-P. Kriegel<br />
+ * Fast and Scalable Outlier Detection with Approximate Nearest Neighbor
+ * Ensembles<br />
+ * Proc. 20th International Conference on Database Systems for Advanced
+ * Applications (DASFAA), Hanoi, Vietnam, 2015.
+ * </p>
+ *
  * @author Erich Schubert
  */
+@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
+title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
+booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
+url = "http://dx.doi.org/10.1007/978-3-319-18123-3_2")
 public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Class logger

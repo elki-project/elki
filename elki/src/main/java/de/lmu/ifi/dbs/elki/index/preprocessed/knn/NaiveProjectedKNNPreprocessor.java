@@ -1,10 +1,10 @@
-package experimentalcode.erich.approxknn;
+package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -68,8 +69,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 /**
  * Compute the approximate k nearest neighbors using 1 dimensional projections.
  * 
+ * This serves as a comparison method in:
+ * <p>
+ * E. Schubert, A. Zimek, H.-P. Kriegel<br />
+ * Fast and Scalable Outlier Detection with Approximate Nearest Neighbor
+ * Ensembles<br />
+ * Proc. 20th International Conference on Database Systems for Advanced
+ * Applications (DASFAA), Hanoi, Vietnam, 2015.
+ * </p>
+ * 
  * @author Erich Schubert
  */
+@Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
+title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
+booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
+url = "http://dx.doi.org/10.1007/978-3-319-18123-3_2")
 public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends AbstractIndex<O> implements KNNIndex<O> {
   /**
    * Class logger.
@@ -130,13 +144,11 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
   @Override
   public void initialize() {
-    if(positions == null) {
-      if(relation.size() > 0) {
-        preprocess();
-      }
-    }
-    else {
+    if(positions != null) {
       throw new UnsupportedOperationException("Preprocessor already ran.");
+    }
+    if(relation.size() > 0) {
+      preprocess();
     }
   }
 
