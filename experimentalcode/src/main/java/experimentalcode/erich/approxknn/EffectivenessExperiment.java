@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -45,13 +46,13 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.MillisTimeDuration;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
 
 /**
  * Simple experiment to estimate the effects of approximating the kNN with space
@@ -76,7 +77,7 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
     LOG.statistics(new LongStatistic("approxknn.dataset.dims", RelationUtil.dimensionality(rel)));
 
     final int numcurves = 9;
-    List<ArrayList<SpatialRef>> curves = initializeCurves(rel, ids, numcurves);
+    List<ArrayList<SpatialPair<DBID, NumberVector>>> curves = initializeCurves(rel, ids, numcurves);
     WritableDataStore<int[]> positions = indexPositions(ids, numcurves, curves);
 
     // True kNN value
@@ -200,7 +201,7 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
     LOG.statistics(new DoubleStatistic("approxnn.rtree.distc.stddev", distcmv[numvars].getSampleStddev()));
   }
 
-  public ModifiableDBIDs mergeCandidates(DBIDs ids, final int numcurves, int mask, List<ArrayList<SpatialRef>> curves, final int halfwin, DBIDIter id, int[] posi) {
+  public ModifiableDBIDs mergeCandidates(DBIDs ids, final int numcurves, int mask, List<ArrayList<SpatialPair<DBID, NumberVector>>> curves, final int halfwin, DBIDIter id, int[] posi) {
     assert (mask > 0);
     ModifiableDBIDs cands = DBIDUtil.newHashSet();
     cands.add(id);
@@ -209,20 +210,20 @@ public class EffectivenessExperiment extends AbstractSFCExperiment {
       if (((1 << c) & mask) == 0) {
         continue;
       }
-      ArrayList<SpatialRef> curve = curves.get(c);
-      assert (DBIDUtil.equal(curve.get(posi[c]).id, id));
+      ArrayList<SpatialPair<DBID, NumberVector>> curve = curves.get(c);
+      assert (DBIDUtil.equal(curve.get(posi[c]).first, id));
       if (posi[c] <= halfwin) {
         for (int off = 0; off <= 2 * halfwin; off++) {
-          cands.add(curve.get(off).id);
+          cands.add(curve.get(off).first);
         }
       } else if (posi[c] + halfwin >= ids.size()) {
         for (int off = ids.size() - 2 * halfwin - 1; off < ids.size(); off++) {
-          cands.add(curve.get(off).id);
+          cands.add(curve.get(off).first);
         }
       } else {
         for (int off = 1; off <= halfwin; off++) {
-          cands.add(curve.get(posi[c] - off).id);
-          cands.add(curve.get(posi[c] + off).id);
+          cands.add(curve.get(posi[c] - off).first);
+          cands.add(curve.get(posi[c] + off).first);
         }
       }
     }

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -45,9 +44,10 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
@@ -132,20 +132,20 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
   @Override
   protected void preprocess() {
     // Prepare space filling curve:
-    final long starttime = System.nanoTime();
+    final long starttime = System.currentTimeMillis();
     final int size = relation.size();
 
     final int numgen = curvegen.size();
     final int numcurves = numgen * variants;
-    List<List<SpatialRef>> curves = new ArrayList<>(numcurves);
+    List<List<SpatialPair<DBID, NumberVector>>> curves = new ArrayList<>(numcurves);
     for(int i = 0; i < numcurves; i++) {
-      curves.add(new ArrayList<SpatialRef>(size));
+      curves.add(new ArrayList<SpatialPair<DBID, NumberVector>>(size));
     }
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final NumberVector v = relation.get(iditer);
-      SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
-      for(List<SpatialRef> curve : curves) {
+      SpatialPair<DBID, NumberVector> ref = new SpatialPair<DBID, NumberVector>(DBIDUtil.deref(iditer), v);
+      for(List<SpatialPair<DBID, NumberVector>> curve : curves) {
         curve.add(ref);
       }
     }
@@ -181,16 +181,16 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
     // Build position index, DBID -> position in the three curves
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
     for(int cnum = 0; cnum < numcurves; cnum++) {
-      Iterator<SpatialRef> it = curves.get(cnum).iterator();
+      Iterator<SpatialPair<DBID, NumberVector>> it = curves.get(cnum).iterator();
       for(int i = 0; it.hasNext(); i++) {
-        SpatialRef r = it.next();
+        SpatialPair<DBID, NumberVector> r = it.next();
         final int[] data;
         if(cnum == 0) {
           data = new int[numcurves];
-          positions.put(r.id, data);
+          positions.put(r.first, data);
         }
         else {
-          data = positions.get(r.id);
+          data = positions.get(r.first);
         }
         data[cnum] = i;
       }
@@ -205,11 +205,11 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
       cands.clear();
       int[] posi = positions.get(iditer);
       for(int i = 0; i < posi.length; i++) {
-        List<SpatialRef> curve = curves.get(i);
+        List<SpatialPair<DBID, NumberVector>> curve = curves.get(i);
         final int start = Math.max(0, posi[i] - wsize);
         final int end = Math.min(posi[i] + wsize + 1, curve.size());
         for(int pos = start; pos < end; pos++) {
-          cands.add(curve.get(pos).id);
+          cands.add(curve.get(pos).first);
         }
       }
 
@@ -225,9 +225,9 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
       mean.put(distc / (double) k);
     }
 
-    final long end = System.nanoTime();
-    if(LOG.isVerbose()) {
-      LOG.verbose("SFC preprocessor took " + ((end - starttime) / 1.E6) + " milliseconds and " + mean.getMean() + " * k distance computations on average.");
+    final long end = System.currentTimeMillis();
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".construction-time.ms", end - starttime));
     }
   }
 
@@ -259,51 +259,6 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
       }
     }
     return super.getKNNQuery(distQ, hints);
-  }
-
-  /**
-   * Object used in spatial sorting, combining the spatial object and the object
-   * ID.
-   * 
-   * @author Erich Schubert
-   */
-  protected static class SpatialRef implements SpatialComparable {
-    /**
-     * Object reference.
-     */
-    protected DBID id;
-
-    /**
-     * Vector.
-     */
-    protected NumberVector vec;
-
-    /**
-     * Constructor.
-     * 
-     * @param id
-     * @param vec
-     */
-    protected SpatialRef(DBID id, NumberVector vec) {
-      super();
-      this.id = id;
-      this.vec = vec;
-    }
-
-    @Override
-    public int getDimensionality() {
-      return vec.getDimensionality();
-    }
-
-    @Override
-    public double getMin(int dimension) {
-      return vec.getMin(dimension);
-    }
-
-    @Override
-    public double getMax(int dimension) {
-      return vec.getMax(dimension);
-    }
   }
 
   /**

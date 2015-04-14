@@ -33,10 +33,12 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.MillisTimeDuration;
@@ -46,7 +48,6 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
-import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
 
 /**
  * Simple experiment to estimate the effects of approximating the kNN with space
@@ -55,37 +56,37 @@ import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
  * @author Erich Schubert
  */
 public abstract class AbstractSFCExperiment extends AbstractApplication {
-  protected WritableDataStore<int[]> indexPositions(DBIDs ids, final int numcurves, List<ArrayList<SpatialRef>> curves) {
+  protected WritableDataStore<int[]> indexPositions(DBIDs ids, final int numcurves, List<ArrayList<SpatialPair<DBID, NumberVector>>> curves) {
     // Build position index, DBID -> position in the three curves
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
     {
       {
-        ArrayList<SpatialRef> first = curves.get(0);
-        Iterator<SpatialRef> it = first.iterator();
+        ArrayList<SpatialPair<DBID, NumberVector>> first = curves.get(0);
+        Iterator<SpatialPair<DBID, NumberVector>> it = first.iterator();
         for (int i = 0; it.hasNext(); i++) {
-          SpatialRef r = it.next();
+          SpatialPair<DBID, NumberVector> r = it.next();
           final int[] buf = new int[numcurves];
           Arrays.fill(buf, -1);
           buf[0] = i;
-          positions.put(r.id, buf);
+          positions.put(r.first, buf);
         }
       }
       for (int c = 1; c < numcurves; c++) {
-        Iterator<SpatialRef> it = curves.get(c).iterator();
+        Iterator<SpatialPair<DBID, NumberVector>> it = curves.get(c).iterator();
         for (int i = 0; it.hasNext(); i++) {
-          SpatialRef r = it.next();
-          int[] data = positions.get(r.id);
+          SpatialPair<DBID, NumberVector> r = it.next();
+          int[] data = positions.get(r.first);
           data[c] = i;
-          positions.put(r.id, data);
+          positions.put(r.first, data);
         }
       }
     }
     return positions;
   }
 
-  protected List<ArrayList<SpatialRef>> initializeCurves(Relation<NumberVector> rel, DBIDs ids, final int numcurves) {
+  protected List<ArrayList<SpatialPair<DBID, NumberVector>>> initializeCurves(Relation<NumberVector> rel, DBIDs ids, final int numcurves) {
     Duration proj = new MillisTimeDuration("approxnn.project").begin();
-    List<ArrayList<SpatialRef>> curves = allocateCurves(rel, ids, numcurves);
+    List<ArrayList<SpatialPair<DBID, NumberVector>>> curves = allocateCurves(rel, ids, numcurves);
     Random random = new Random(0);
 
     // Sort spatially
@@ -166,12 +167,12 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
 
   abstract protected Logging getLogger();
 
-  protected static List<ArrayList<SpatialRef>> allocateCurves(Relation<NumberVector> rel, DBIDs ids, final int numcurves) {
-    List<ArrayList<SpatialRef>> curves = new ArrayList<>(numcurves);
-    ArrayList<SpatialRef> first = new ArrayList<>(ids.size());
+  protected static List<ArrayList<SpatialPair<DBID, NumberVector>>> allocateCurves(Relation<NumberVector> rel, DBIDs ids, final int numcurves) {
+    List<ArrayList<SpatialPair<DBID, NumberVector>>> curves = new ArrayList<>(numcurves);
+    ArrayList<SpatialPair<DBID, NumberVector>> first = new ArrayList<>(ids.size());
     for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       final NumberVector v = rel.get(id);
-      SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
+      SpatialPair<DBID, NumberVector> ref = new SpatialPair<DBID, NumberVector>(DBIDUtil.deref(id), v);
       first.add(ref);
     }
     curves.add(first);
@@ -181,7 +182,7 @@ public abstract class AbstractSFCExperiment extends AbstractApplication {
     return curves;
   }
 
-  protected void sortSpatially(String name, SpatialSorter spatialSorter, ArrayList<SpatialRef> c, double[] mms, int[] dims) {
+  protected void sortSpatially(String name, SpatialSorter spatialSorter, ArrayList<SpatialPair<DBID, NumberVector>> c, double[] mms, int[] dims) {
     Duration dur = new MillisTimeDuration("approxnn.sort-" + name).begin();
     spatialSorter.sort(c, 0, c.size(), mms, dims);
     getLogger().statistics(dur.end());

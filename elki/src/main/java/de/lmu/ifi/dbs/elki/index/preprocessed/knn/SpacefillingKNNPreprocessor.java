@@ -29,7 +29,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -51,8 +50,10 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
@@ -112,7 +113,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
   /**
    * Curve storage
    */
-  List<List<SpatialRef>> curves = null;
+  List<List<SpatialPair<DBID, NumberVector>>> curves = null;
 
   /**
    * Curve position storage
@@ -170,21 +171,21 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
   }
 
   protected void preprocess() {
-    final long starttime = System.nanoTime();
+    final long starttime = System.currentTimeMillis();
     final int size = relation.size();
 
     final int numgen = curvegen.size();
     final int numcurves = variants; // numgen * variants;
     curves = new ArrayList<>(numcurves);
     for(int i = 0; i < numcurves; i++) {
-      curves.add(new ArrayList<SpatialRef>(size));
+      curves.add(new ArrayList<SpatialPair<DBID, NumberVector>>(size));
     }
 
     if(proj == null) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         final NumberVector v = relation.get(iditer);
-        SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
-        for(List<SpatialRef> curve : curves) {
+        SpatialPair<DBID, NumberVector> ref = new SpatialPair<DBID, NumberVector>(DBIDUtil.deref(iditer), v);
+        for(List<SpatialPair<DBID, NumberVector>> curve : curves) {
           curve.add(ref);
         }
       }
@@ -225,7 +226,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
       final double[] mms = new double[odim << 1];
 
       for(int j = 0; j < numcurves; j++) {
-        final List<SpatialRef> curve = curves.get(j);
+        final List<SpatialPair<DBID, NumberVector>> curve = curves.get(j);
         final RandomProjectionFamily.Projection mat = proj.generateProjection(idim, dim);
         final int ctype = numgen > 1 ? random.nextInt(numgen) : 0;
 
@@ -237,7 +238,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
         // Project data set:
         for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
           double[] proj = mat.project(relation.get(iditer));
-          curve.add(new SpatialRef(DBIDUtil.deref(iditer), factory.newNumberVector(proj)));
+          curve.add(new SpatialPair<DBID, NumberVector>(DBIDUtil.deref(iditer), factory.newNumberVector(proj)));
           for(int d2 = 0, d = 0; d2 < mms.length; d2 += 2, d++) {
             mms[d2] = Math.min(mms[d2], proj[d]);
             mms[d2 + 1] = Math.max(mms[d2 + 1], proj[d]);
@@ -265,23 +266,23 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
     // Build position index, DBID -> position in the three curves
     positions = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
     for(int cnum = 0; cnum < numcurves; cnum++) {
-      Iterator<SpatialRef> it = curves.get(cnum).iterator();
+      Iterator<SpatialPair<DBID, NumberVector>> it = curves.get(cnum).iterator();
       for(int i = 0; it.hasNext(); i++) {
-        SpatialRef r = it.next();
+        SpatialPair<DBID, NumberVector> r = it.next();
         final int[] data;
         if(cnum == 0) {
           data = new int[numcurves];
-          positions.put(r.id, data);
+          positions.put(r.first, data);
         }
         else {
-          data = positions.get(r.id);
+          data = positions.get(r.first);
         }
         data[cnum] = i;
       }
     }
-    final long end = System.nanoTime();
-    if(LOG.isVerbose()) {
-      LOG.verbose("SFC preprocessor took " + ((end - starttime) / 1.E6) + " milliseconds.");
+    final long end = System.currentTimeMillis();
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".construction-time.ms", end - starttime));
     }
   }
 
@@ -373,11 +374,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
       ModifiableDBIDs cands = DBIDUtil.newHashSet(2 * wsize * curves.size());
       final int[] posi = positions.get(id);
       for(int i = 0; i < posi.length; i++) {
-        List<SpatialRef> curve = curves.get(i);
+        List<SpatialPair<DBID, NumberVector>> curve = curves.get(i);
         final int start = Math.max(0, posi[i] - wsize);
         final int end = Math.min(posi[i] + wsize + 1, curve.size());
         for(int j = start; j < end; j++) {
-          cands.add(curve.get(j).id);
+          cands.add(curve.get(j).first);
         }
       }
       // Refine:
@@ -400,51 +401,6 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
     @Override
     public KNNList getKNNForObject(O obj, int k) {
       throw new AbortException("Not yet implemented");
-    }
-  }
-
-  /**
-   * Object used in spatial sorting, combining the spatial object and the object
-   * ID.
-   * 
-   * @author Erich Schubert
-   */
-  protected static class SpatialRef implements SpatialComparable {
-    /**
-     * Object reference.
-     */
-    protected DBID id;
-
-    /**
-     * Spatial vector.
-     */
-    protected NumberVector vec;
-
-    /**
-     * Constructor.
-     * 
-     * @param id
-     * @param vec
-     */
-    protected SpatialRef(DBID id, NumberVector vec) {
-      super();
-      this.id = id;
-      this.vec = vec;
-    }
-
-    @Override
-    public int getDimensionality() {
-      return vec.getDimensionality();
-    }
-
-    @Override
-    public double getMin(int dimension) {
-      return vec.getMin(dimension);
-    }
-
-    @Override
-    public double getMax(int dimension) {
-      return vec.getMax(dimension);
     }
   }
 

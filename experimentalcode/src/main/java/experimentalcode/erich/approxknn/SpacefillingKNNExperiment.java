@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -44,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -53,7 +55,6 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
 
 /**
  * Simple experiment to estimate the effects of approximating the kNN with space
@@ -71,13 +72,13 @@ public class SpacefillingKNNExperiment {
     Relation<NumberVector> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
 
-    List<SpatialRef> zs = new ArrayList<>(ids.size());
-    List<SpatialRef> ps = new ArrayList<>(ids.size());
-    List<SpatialRef> hs = new ArrayList<>(ids.size());
+    List<SpatialPair<DBID, NumberVector>> zs = new ArrayList<>(ids.size());
+    List<SpatialPair<DBID, NumberVector>> ps = new ArrayList<>(ids.size());
+    List<SpatialPair<DBID, NumberVector>> hs = new ArrayList<>(ids.size());
     {
       for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         final NumberVector v = rel.get(id);
-        SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
+        SpatialPair<DBID, NumberVector> ref = new SpatialPair<DBID, NumberVector>(DBIDUtil.deref(id), v);
         zs.add(ref);
         ps.add(ref);
         hs.add(ref);
@@ -91,28 +92,28 @@ public class SpacefillingKNNExperiment {
     // Build position index, DBID -> position in the three curves
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
     {
-      Iterator<SpatialRef> it = zs.iterator();
+      Iterator<SpatialPair<DBID, NumberVector>> it = zs.iterator();
       for (int i = 0; it.hasNext(); i++) {
-        SpatialRef r = it.next();
-        positions.put(r.id, new int[] { i, -1, -1 });
+        SpatialPair<DBID, NumberVector> r = it.next();
+        positions.put(r.first, new int[] { i, -1, -1 });
       }
     }
     {
-      Iterator<SpatialRef> it = ps.iterator();
+      Iterator<SpatialPair<DBID, NumberVector>> it = ps.iterator();
       for (int i = 0; it.hasNext(); i++) {
-        SpatialRef r = it.next();
-        int[] data = positions.get(r.id);
+        SpatialPair<DBID, NumberVector> r = it.next();
+        int[] data = positions.get(r.first);
         data[1] = i;
-        positions.put(r.id, data);
+        positions.put(r.first, data);
       }
     }
     {
-      Iterator<SpatialRef> it = hs.iterator();
+      Iterator<SpatialPair<DBID, NumberVector>> it = hs.iterator();
       for (int i = 0; it.hasNext(); i++) {
-        SpatialRef r = it.next();
-        int[] data = positions.get(r.id);
+        SpatialPair<DBID, NumberVector> r = it.next();
+        int[] data = positions.get(r.first);
         data[2] = i;
-        positions.put(r.id, data);
+        positions.put(r.first, data);
       }
     }
 
@@ -133,14 +134,14 @@ public class SpacefillingKNNExperiment {
       // Approximate NN in Z curve only
       {
         ModifiableDBIDs candz = DBIDUtil.newHashSet();
-        candz.add(zs.get(posi[0]).id);
+        candz.add(zs.get(posi[0]).first);
         assert (candz.size() == 1);
         for (int off = 1; off < maxoff; off++) {
           if (posi[0] - off >= 0) {
-            candz.add(zs.get(posi[0] - off).id);
+            candz.add(zs.get(posi[0] - off).first);
           }
           if (posi[0] + off < ids.size()) {
-            candz.add(zs.get(posi[0] + off).id);
+            candz.add(zs.get(posi[0] + off).first);
           }
 
           final int isize = DBIDUtil.intersectionSize(trueIds, candz);
@@ -150,14 +151,14 @@ public class SpacefillingKNNExperiment {
       // Approximate NN in Peano curve only
       {
         ModifiableDBIDs candp = DBIDUtil.newHashSet();
-        candp.add(ps.get(posi[1]).id);
+        candp.add(ps.get(posi[1]).first);
         assert (candp.size() == 1);
         for (int off = 1; off < maxoff; off++) {
           if (posi[1] - off >= 0) {
-            candp.add(ps.get(posi[1] - off).id);
+            candp.add(ps.get(posi[1] - off).first);
           }
           if (posi[1] + off < ids.size()) {
-            candp.add(ps.get(posi[1] + off).id);
+            candp.add(ps.get(posi[1] + off).first);
           }
 
           final int isize = DBIDUtil.intersectionSize(trueIds, candp);
@@ -167,14 +168,14 @@ public class SpacefillingKNNExperiment {
       // Approximate NN in Hilbert curve only
       {
         ModifiableDBIDs candh = DBIDUtil.newHashSet();
-        candh.add(hs.get(posi[2]).id);
+        candh.add(hs.get(posi[2]).first);
         assert (candh.size() == 1);
         for (int off = 1; off < maxoff; off++) {
           if (posi[2] - off >= 0) {
-            candh.add(hs.get(posi[2] - off).id);
+            candh.add(hs.get(posi[2] - off).first);
           }
           if (posi[2] + off < ids.size()) {
-            candh.add(hs.get(posi[2] + off).id);
+            candh.add(hs.get(posi[2] + off).first);
           }
 
           final int isize = DBIDUtil.intersectionSize(trueIds, candh);
@@ -184,27 +185,27 @@ public class SpacefillingKNNExperiment {
       // Approximate NN in Z + Peano + Hilbert curves
       {
         ModifiableDBIDs cands = DBIDUtil.newHashSet();
-        cands.add(zs.get(posi[0]).id);
-        cands.add(ps.get(posi[1]).id);
+        cands.add(zs.get(posi[0]).first);
+        cands.add(ps.get(posi[1]).first);
         assert (cands.size() == 1);
         for (int off = 1; off < maxoff; off++) {
           if (posi[0] - off >= 0) {
-            cands.add(zs.get(posi[0] - off).id);
+            cands.add(zs.get(posi[0] - off).first);
           }
           if (posi[0] + off < ids.size()) {
-            cands.add(zs.get(posi[0] + off).id);
+            cands.add(zs.get(posi[0] + off).first);
           }
           if (posi[1] - off >= 0) {
-            cands.add(ps.get(posi[1] - off).id);
+            cands.add(ps.get(posi[1] - off).first);
           }
           if (posi[1] + off < ids.size()) {
-            cands.add(ps.get(posi[1] + off).id);
+            cands.add(ps.get(posi[1] + off).first);
           }
           if (posi[2] - off >= 0) {
-            cands.add(hs.get(posi[2] - off).id);
+            cands.add(hs.get(posi[2] - off).first);
           }
           if (posi[2] + off < ids.size()) {
-            cands.add(hs.get(posi[2] + off).id);
+            cands.add(hs.get(posi[2] + off).first);
           }
 
           final int isize = DBIDUtil.intersectionSize(trueIds, cands);

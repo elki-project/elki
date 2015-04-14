@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -39,13 +40,13 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPair;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.MillisTimeDuration;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import experimentalcode.erich.approxknn.SpacefillingKNNPreprocessor.SpatialRef;
 
 /**
  * Simple experiment to estimate the effects of approximating the kNN with space
@@ -70,7 +71,7 @@ public class SFCRuntimeExperiment extends AbstractSFCExperiment {
     LOG.statistics(new LongStatistic("approxknn.dataset.dims", RelationUtil.dimensionality(rel)));
 
     final int numcurves = 9;
-    List<ArrayList<SpatialRef>> curves = initializeCurves(rel, ids, numcurves);
+    List<ArrayList<SpatialPair<DBID, NumberVector>>> curves = initializeCurves(rel, ids, numcurves);
     WritableDataStore<int[]> positions = indexPositions(ids, numcurves, curves);
 
     // True kNN value
@@ -85,14 +86,14 @@ public class SFCRuntimeExperiment extends AbstractSFCExperiment {
       ModifiableDBIDs cands = DBIDUtil.newHashSet();
       cands.add(id);
       for (int c = 0; c < numcurves; c++) {
-        ArrayList<SpatialRef> curve = curves.get(c);
-        assert (DBIDUtil.equal(curve.get(posi[c]).id, id));
+        ArrayList<SpatialPair<DBID, NumberVector>> curve = curves.get(c);
+        assert (DBIDUtil.equal(curve.get(posi[c]).first, id));
         for (int off = 1; off <= halfwin; off++) {
           if (posi[c] - off >= 0) {
-            cands.add(curve.get(posi[c] - off).id);
+            cands.add(curve.get(posi[c] - off).first);
           }
           if (posi[c] + off < ids.size()) {
-            cands.add(curve.get(posi[c] + off).id);
+            cands.add(curve.get(posi[c] + off).first);
           }
         }
       }
