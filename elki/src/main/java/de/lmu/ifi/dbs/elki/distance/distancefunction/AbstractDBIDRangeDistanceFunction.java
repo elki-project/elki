@@ -50,7 +50,7 @@ public abstract class AbstractDBIDRangeDistanceFunction extends AbstractDatabase
 
   @SuppressWarnings("unchecked")
   @Override
-  public final <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
+  public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
     return (DistanceQuery<O>) new DBIDRangeDistanceQuery((Relation<DBID>) database, this);
   }
 }

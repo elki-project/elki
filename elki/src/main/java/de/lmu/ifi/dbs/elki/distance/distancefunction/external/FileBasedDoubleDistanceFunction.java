@@ -32,6 +32,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -45,12 +48,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Distance function that is based on double distances given by a distance
- * matrix of an external ascii file.
- * 
+ * matrix of an external ASCII file.
+ *
+ * Note: parsing an ASCII file is rather expensive.
+ *
  * See {@link AsciiDistanceParser} for the default input format.
- * 
+ *
  * TODO: use a {@code double[]} instead of the hash map.
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
  */
@@ -63,6 +68,16 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
   private TLongDoubleMap cache;
 
   /**
+   * Distance parser
+   */
+  private DistanceParser parser;
+
+  /**
+   * Input file of distance matrix
+   */
+  private File matrixfile;
+
+  /**
    * Constructor.
    * 
    * @param parser Parser
@@ -70,12 +85,21 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
    */
   public FileBasedDoubleDistanceFunction(DistanceParser parser, File matrixfile) {
     super();
-    try {
-      loadCache(parser, matrixfile);
+    this.parser = parser;
+    this.matrixfile = matrixfile;
+  }
+
+  @Override
+  public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
+    if(cache == null) {
+      try {
+        loadCache(parser, matrixfile);
+      }
+      catch(IOException e) {
+        throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
+      }
     }
-    catch(IOException e) {
-      throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
-    }
+    return super.instantiate(database);
   }
 
   @Override
@@ -155,8 +179,14 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
     public static final OptionID PARSER_ID = new OptionID("distance.parser", //
     "Parser used to load the distance matrix.");
 
+    /**
+     * Input file.
+     */
     protected File matrixfile = null;
 
+    /**
+     * Parser for input file.
+     */
     protected DistanceParser parser = null;
 
     @Override
