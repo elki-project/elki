@@ -80,12 +80,12 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
     /**
      * Parameter for starting ID to generate
      */
-    private static final OptionID START_ID = new OptionID("idgen.start", "First integer DBID to generate.");
+    public static final OptionID START_ID = new OptionID("idgen.start", "First integer DBID to generate.");
 
     /**
      * Parameter for number of IDs to generate
      */
-    private static final OptionID COUNT_ID = new OptionID("idgen.count", "Number of DBID to generate.");
+    public static final OptionID COUNT_ID = new OptionID("idgen.count", "Number of DBID to generate.");
 
     /**
      * Begin of interval
