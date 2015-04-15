@@ -61,6 +61,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * management of relations, indexes and events as well as default query
  * matching.
  * 
+ * Note: when debugging index usage, set logging for this package to FINEST via
+ * <tt>-enableDebug de.lmu.ifi.dbs.elki.database=FINEST</tt>
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.composedOf DatabaseEventManager
@@ -163,12 +166,12 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     while(iter.hasPrevious()) {
       Index idx = iter.previous();
       if(idx instanceof DistanceIndex) {
-        if(getLogger().isDebuggingFinest()) {
-          getLogger().debugFinest("Considering index for kNN Query: " + idx);
-        }
         @SuppressWarnings("unchecked")
         final DistanceIndex<O> distanceIndex = (DistanceIndex<O>) idx;
         DistanceQuery<O> q = distanceIndex.getDistanceQuery(distanceFunction, hints);
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for distance query: " + idx);
+        }
         if(q != null) {
           return q;
         }
@@ -182,6 +185,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
+    // TODO: add indexing support for similarities!
     return similarityFunction.instantiate(objQuery);
   }
 
@@ -194,12 +198,12 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     while(iter.hasPrevious()) {
       Index idx = iter.previous();
       if(idx instanceof KNNIndex) {
-        if(getLogger().isDebuggingFinest()) {
-          getLogger().debugFinest("Considering index for kNN Query: " + idx);
-        }
         @SuppressWarnings("unchecked")
         final KNNIndex<O> knnIndex = (KNNIndex<O>) idx;
         KNNQuery<O> q = knnIndex.getKNNQuery(distanceQuery, hints);
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for kNN query: " + idx);
+        }
         if(q != null) {
           return q;
         }
@@ -211,6 +215,18 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
+    }
+    if(getLogger().isDebuggingFinest() && indexes.size() > 0) {
+      StringBuilder buf = new StringBuilder();
+      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
+      buf.append("Distance query: ").append(distanceQuery).append('\n');
+      if(hints.length > 0) {
+        buf.append("Hints:");
+        for(Object o : hints) {
+          buf.append(' ').append(o);
+        }
+      }
+      getLogger().debugFinest(buf.toString());
     }
     return QueryUtil.getLinearScanKNNQuery(distanceQuery);
   }
@@ -224,12 +240,12 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     while(iter.hasPrevious()) {
       Index idx = iter.previous();
       if(idx instanceof RangeIndex) {
-        if(getLogger().isDebuggingFinest()) {
-          getLogger().debugFinest("Considering index for range query: " + idx);
-        }
         @SuppressWarnings("unchecked")
         final RangeIndex<O> rangeIndex = (RangeIndex<O>) idx;
         RangeQuery<O> q = rangeIndex.getRangeQuery(distanceQuery, hints);
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + idx);
+        }
         if(q != null) {
           return q;
         }
@@ -241,6 +257,18 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
       if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
         return null;
       }
+    }
+    if(getLogger().isDebuggingFinest() && indexes.size() > 0) {
+      StringBuilder buf = new StringBuilder();
+      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
+      buf.append("Distance query: ").append(distanceQuery).append('\n');
+      if(hints.length > 0) {
+        buf.append("Hints:");
+        for(Object o : hints) {
+          buf.append(' ').append(o);
+        }
+      }
+      getLogger().debugFinest(buf.toString());
     }
     return QueryUtil.getLinearScanRangeQuery(distanceQuery);
   }
@@ -260,6 +288,9 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         @SuppressWarnings("unchecked")
         final RKNNIndex<O> rknnIndex = (RKNNIndex<O>) idx;
         RKNNQuery<O> q = rknnIndex.getRKNNQuery(distanceQuery, hints);
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + idx);
+        }
         if(q != null) {
           return q;
         }
@@ -275,6 +306,18 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
       if(hint instanceof Integer) {
         maxk = (Integer) hint;
       }
+    }
+    if(getLogger().isDebuggingFinest() && indexes.size() > 0) {
+      StringBuilder buf = new StringBuilder();
+      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
+      buf.append("Distance query: ").append(distanceQuery).append('\n');
+      if(hints.length > 0) {
+        buf.append("Hints:");
+        for(Object o : hints) {
+          buf.append(' ').append(o);
+        }
+      }
+      getLogger().debugFinest(buf.toString());
     }
     KNNQuery<O> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
     return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
