@@ -68,10 +68,9 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
       throw new AbortException("Database size is incorrect!");
     }
     // sort them
-    // TODO: Inverted scores!
     Arrays.sort(scores);
   }
-  
+
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
     scores = ArrayLikeUtil.toPrimitiveDoubleArray(array, adapter);
@@ -91,12 +90,16 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
     assert (scores != null) : "prepare() was not run prior to using the scaling function.";
-    int pos = Arrays.binarySearch(scores, value);
-    if(inverted) {
-      return 1.0 - ((double) pos) / scores.length;
+    final int pos = Arrays.binarySearch(scores, value);
+    int first = pos, last = pos;
+    // Check for ties:
+    while(first > 0 && scores[first - 1] == value) {
+      --first;
     }
-    else {
-      return ((double) pos) / scores.length;
+    while(last + 1 < scores.length && scores[last + 1] == value) {
+      ++last;
     }
+    double v = (first + last) * .5 / (scores.length - 1.);
+    return (inverted) ? (1.0 - v) : v;
   }
 }
