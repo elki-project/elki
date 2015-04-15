@@ -24,6 +24,8 @@ package de.lmu.ifi.dbs.elki.data.model;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Cluster model using "core" objects. Currently only used by the Generalized
@@ -31,7 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @author Erich Schubert
  */
-public class CoreObjectsModel extends AbstractModel {
+public class CoreObjectsModel extends AbstractModel implements TextWriteable {
   /**
    * Objects that are part of the cluster core.
    */
@@ -59,5 +61,11 @@ public class CoreObjectsModel extends AbstractModel {
   @Override
   public String toString() {
     return "CoreModel";
+  }
+
+  @Override
+  public void writeToText(TextWriterStream out, String label) {
+    super.writeToText(out, label);
+    out.commentPrintLn("Number of core points: " + core.size());
   }
 }
