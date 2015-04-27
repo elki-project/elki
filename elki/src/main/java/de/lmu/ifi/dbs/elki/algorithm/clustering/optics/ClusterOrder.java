@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -48,7 +49,6 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * 
  * @apiviz.landmark
  */
-// FIXME: checkout that output format is usable!
 public class ClusterOrder extends BasicResult implements OrderingResult {
   /**
    * Cluster order.
@@ -123,7 +123,7 @@ public class ClusterOrder extends BasicResult implements OrderingResult {
   }
 
   @Override
-  public DBIDs getDBIDs() {
+  public ArrayDBIDs getDBIDs() {
     return ids;
   }
 
