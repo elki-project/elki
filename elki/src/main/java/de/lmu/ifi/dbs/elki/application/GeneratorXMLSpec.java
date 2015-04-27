@@ -102,15 +102,13 @@ public class GeneratorXMLSpec extends AbstractApplication {
     try {
       if(outputFile.exists()) {
         if(LOG.isVerbose()) {
-          LOG.verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");
+          LOG.verbose("The file " + outputFile + " already exists, " + "the generator result will be APPENDED.");
         }
       }
 
-      OutputStreamWriter outStream = new FileWriter(outputFile, true);
-      writeClusters(outStream, data);
-
-      outStream.flush();
-      outStream.close();
+      try (OutputStreamWriter outStream = new FileWriter(outputFile, true)) {
+        writeClusters(outStream, data);
+      }
     }
     catch(FileNotFoundException e) {
       throw new UnableToComplyException(e);
@@ -158,57 +156,56 @@ public class GeneratorXMLSpec extends AbstractApplication {
       }
     }
     // compute global discard values
-    int totalsize = 0;
-    int totaldisc = 0;
+    int totalsize = 0, totaldisc = 0;
     for(Entry<Model, TIntList> ent : modelMap.entrySet()) {
-      totalsize = totalsize + ent.getValue().size();
+      totalsize += ent.getValue().size();
       if(ent.getKey() instanceof GeneratorSingleCluster) {
-        totaldisc = totaldisc + ((GeneratorSingleCluster) ent.getKey()).getDiscarded();
+        totaldisc += ((GeneratorSingleCluster) ent.getKey()).getDiscarded();
       }
     }
     double globdens = (double) (totalsize + totaldisc) / totalsize;
-    outStream.write("########################################################" + LINE_SEPARATOR);
-    outStream.write("## Number of clusters: " + models.size() + LINE_SEPARATOR);
+    outStream.append("########################################################").append(LINE_SEPARATOR);
+    outStream.append("## Number of clusters: " + models.size()).append(LINE_SEPARATOR);
     for(Model model : models) {
       TIntList ids = modelMap.get(model);
-      outStream.write("########################################################" + LINE_SEPARATOR);
-      outStream.write("## Size: " + ids.size() + LINE_SEPARATOR);
+      outStream.append("########################################################").append(LINE_SEPARATOR);
+      outStream.append("## Size: " + ids.size()).append(LINE_SEPARATOR);
       if(model instanceof GeneratorSingleCluster) {
         GeneratorSingleCluster cursclus = (GeneratorSingleCluster) model;
-        outStream.write("########################################################" + LINE_SEPARATOR);
-        outStream.write("## Cluster: " + cursclus.getName() + LINE_SEPARATOR);
+        outStream.append("########################################################").append(LINE_SEPARATOR);
+        outStream.append("## Cluster: ").append(cursclus.getName()).append(LINE_SEPARATOR);
         Vector cmin = cursclus.getClipmin();
         Vector cmax = cursclus.getClipmax();
         if(cmin != null && cmax != null) {
-          outStream.write("## Clipping: " + cmin.toString() + " - " + cmax.toString() + LINE_SEPARATOR);
+          outStream.append("## Clipping: ").append(cmin.toString())//
+          .append(" - ").append(cmax.toString()).append(LINE_SEPARATOR);
         }
-        outStream.write("## Density correction factor: " + cursclus.getDensityCorrection() + LINE_SEPARATOR);
-        outStream.write("## Generators:" + LINE_SEPARATOR);
+        outStream.append("## Density correction factor: " + cursclus.getDensityCorrection()).append(LINE_SEPARATOR);
+        outStream.append("## Generators:").append(LINE_SEPARATOR);
         for(int i = 0; i < cursclus.getDim(); i++) {
           Distribution gen = cursclus.getDistribution(i);
-          outStream.write("##   " + gen.toString() + LINE_SEPARATOR);
+          outStream.append("##   ").append(gen.toString()).append(LINE_SEPARATOR);
         }
         if(cursclus.getTransformation() != null && cursclus.getTransformation().getTransformation() != null) {
-          outStream.write("## Affine transformation matrix:" + LINE_SEPARATOR);
-          outStream.write(FormatUtil.format(cursclus.getTransformation().getTransformation(), "## ") + LINE_SEPARATOR);
+          outStream.append("## Affine transformation matrix:").append(LINE_SEPARATOR);
+          outStream.append(FormatUtil.format(cursclus.getTransformation().getTransformation(), "## ")).append(LINE_SEPARATOR);
         }
-        outStream.write("## Discards: " + cursclus.getDiscarded() + " Retries left: " + cursclus.getRetries() + LINE_SEPARATOR);
+        outStream.append("## Discards: " + cursclus.getDiscarded() + " Retries left: " + cursclus.getRetries()).append(LINE_SEPARATOR);
         double corf = /* cursclus.overweight */(double) (cursclus.getSize() + cursclus.getDiscarded()) / cursclus.getSize() / globdens;
-        outStream.write("## Density correction factor estimation: " + corf + LINE_SEPARATOR);
-
+        outStream.append("## Density correction factor estimation: " + corf).append(LINE_SEPARATOR);
       }
-      outStream.write("########################################################" + LINE_SEPARATOR);
+      outStream.append("########################################################").append(LINE_SEPARATOR);
       for(TIntIterator iter = ids.iterator(); iter.hasNext();) {
         int num = iter.next();
         for(int c = 0; c < data.metaLength(); c++) {
           if(c != modelcol) {
-            if (c > 0) {
-              outStream.write(" ");
+            if(c > 0) {
+              outStream.append(' ');
             }
-            outStream.write(data.data(num, c).toString());
+            outStream.append(data.data(num, c).toString());
           }
         }
-        outStream.write(LINE_SEPARATOR);
+        outStream.append(LINE_SEPARATOR);
       }
     }
   }
@@ -234,9 +231,9 @@ public class GeneratorXMLSpec extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      // Output file
-      outputFile = getParameterOutputFile(config, "the file to write the generated data set into, if the file already exists, the generated points will be appended to this file.");
       generator = config.tryInstantiate(GeneratorXMLDatabaseConnection.class);
+      // Output file
+      outputFile = getParameterOutputFile(config, "The file to write the generated data set into, if the file already exists, the generated points will be appended to this file.");
     }
 
     @Override
