@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -149,8 +150,9 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * @param rel Data relation
    * @param dq Distance query
    * @param c Clustering
+   * @return Average silhouette
    */
-  public void evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+  public double evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
     int noisecount = 0;
@@ -232,10 +234,29 @@ public class EvaluateSilhouette<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", penalty * msil.getSampleStddev()));
     }
 
-    EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
-    MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
+    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(c, EvaluationResult.class);
+    EvaluationResult ev = null;
+    for(EvaluationResult e : ers) {
+      if("internal evaluation".equals(e.getShortName())) {
+        ev = e;
+        break;
+      }
+    }
+    if(ev == null) {
+      ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
+      db.getHierarchy().add(c, ev);
+    }
+    MeasurementGroup g = null;
+    for(MeasurementGroup j : ev) {
+      if("Distance-based Evaluation".equals(j.getName())) {
+        g = j;
+        break;
+      }
+    }
+    g = g != null ? g : ev.newGroup("Distance-based Evaluation");
     g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(penalty * msil.getSampleStddev()), penalty * msil.getMean(), -1., 1., 0., false);
-    db.getHierarchy().add(c, ev);
+    db.getHierarchy().resultChanged(ev);
+    return penalty * msil.getMean();
   }
 
   @Override

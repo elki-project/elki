@@ -1,10 +1,10 @@
-package experimentalcode.students.baierst.thesis;
+package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
 
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,8 +35,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSilhouette;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.NoiseHandling;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
@@ -60,17 +58,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Stephan Baier
  * @author Erich Schubert
  */
-public class EvaluateSSWC implements Evaluator {
+public class EvaluateSimplifiedSilhouette implements Evaluator {
 
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSSWC.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateSimplifiedSilhouette.class);
 
   /**
    * Option for noise handling.
    */
-  private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
+  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
   /**
    * Distance function to use.
@@ -80,7 +78,7 @@ public class EvaluateSSWC implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateSSWC.class.getName();
+  private String key = EvaluateSimplifiedSilhouette.class.getName();
 
   /**
    * Constructor.
@@ -88,7 +86,7 @@ public class EvaluateSSWC implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateSSWC(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
+  public EvaluateSimplifiedSilhouette(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
@@ -100,8 +98,9 @@ public class EvaluateSSWC implements Evaluator {
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
+   * @return Mean simplified silhouette
    */
-  public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
     // Collect cluster centroids
@@ -176,7 +175,6 @@ public class EvaluateSSWC implements Evaluator {
         min = min < Double.POSITIVE_INFINITY ? min : a;
         mssil.put((min - a) / (min > a ? min : a));
       }
-      i++;
     }
 
     double penalty = 1.;
@@ -190,10 +188,29 @@ public class EvaluateSSWC implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.stddev", penalty * mssil.getSampleStddev()));
     }
 
-    EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
-    MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
+    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(c, EvaluationResult.class);
+    EvaluationResult ev = null;
+    for(EvaluationResult e : ers) {
+      if("internal evaluation".equals(e.getShortName())) {
+        ev = e;
+        break;
+      }
+    }
+    if(ev == null) {
+      ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
+      db.getHierarchy().add(c, ev);
+    }
+    MeasurementGroup g = null;
+    for(MeasurementGroup j : ev) {
+      if("Distance-based Evaluation".equals(j.getName())) {
+        g = j;
+        break;
+      }
+    }
+    g = g != null ? g : ev.newGroup("Distance-based Evaluation");
     g.addMeasure("Simplified Silhouette +-" + FormatUtil.NF2.format(penalty * mssil.getSampleStddev()), penalty * mssil.getMean(), -1., 1., 0., false);
-    db.getHierarchy().add(c, ev);
+    db.getHierarchy().resultChanged(ev);
+    return penalty * mssil.getMean();
   }
 
   @Override
@@ -226,7 +243,7 @@ public class EvaluateSSWC implements Evaluator {
     /**
      * Option, how noise should be treated.
      */
-    private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
+    private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -237,15 +254,15 @@ public class EvaluateSSWC implements Evaluator {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.IGNORE_NOISE_WITH_PENALTY);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }
     }
 
     @Override
-    protected EvaluateSSWC makeInstance() {
-      return new EvaluateSSWC(distance, noiseOption);
+    protected EvaluateSimplifiedSilhouette makeInstance() {
+      return new EvaluateSimplifiedSilhouette(distance, noiseOption);
     }
   }
 }
