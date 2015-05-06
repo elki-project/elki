@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
@@ -73,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -104,11 +105,6 @@ public class EvaluateSilhouette<O> implements Evaluator {
   private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
 
   /**
-   * Keep noise "clusters" merged, instead of breaking them into singletons.
-   */
-  private boolean mergenoise = false;
-
-  /**
    * Distance function to use.
    */
   private DistanceFunction<? super O> distance;
@@ -119,6 +115,23 @@ public class EvaluateSilhouette<O> implements Evaluator {
   private String key = EvaluateSilhouette.class.getName();
 
   /**
+   * Option for noise handling.
+   */
+  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+
+  /**
+   * Constructor.
+   * 
+   * @param distance Distance function
+   * @param noiseOption Handling of "noise" clusters.
+   */
+  public EvaluateSilhouette(DistanceFunction<? super O> distance, NoiseHandling noiseOption) {
+    super();
+    this.distance = distance;
+    this.noiseOption = noiseOption;
+  }
+
+  /**
    * Constructor.
    * 
    * @param distance Distance function
@@ -126,9 +139,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    *        into singletons.
    */
   public EvaluateSilhouette(DistanceFunction<? super O> distance, boolean mergenoise) {
-    super();
-    this.distance = distance;
-    this.mergenoise = mergenoise;
+    this(distance, mergenoise ? NoiseHandling.MERGE_NOISE : NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
   }
 
   /**
@@ -142,11 +153,23 @@ public class EvaluateSilhouette<O> implements Evaluator {
   public void evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
+    int noisecount = 0;
     for(Cluster<?> cluster : clusters) {
-      if(cluster.size() <= 1 || treatAsSingletons(cluster)) {
-        // As suggested in Rousseeuw, we use 0 for singletons.
-        msil.put(0., cluster.size());
-        continue;
+      // Note: we treat 1-element clusters the same as noise.
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+        case IGNORE_NOISE_WITH_PENALTY:
+          noisecount += cluster.size();
+          continue;
+        case TREAT_NOISE_AS_SINGLETONS:
+          // As suggested in Rousseeuw, we use 0 for singletons.
+          msil.put(0., cluster.size());
+          continue;
+        case MERGE_NOISE:
+          // Treat as cluster below
+          break;
+        }
       }
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
       double[] as = new double[ids.size()]; // temporary storage.
@@ -166,15 +189,24 @@ public class EvaluateSilhouette<O> implements Evaluator {
           if(ocluster == /* yes, reference identity */cluster) {
             continue;
           }
-          if(treatAsSingletons(ocluster)) {
-            // Treat noise cluster as singletons:
-            for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
-              double dist = dq.distance(it1, it3);
-              if(dist < min) {
-                min = dist;
+          if(ocluster.isNoise()) {
+            switch(noiseOption){
+            case IGNORE_NOISE:
+            case IGNORE_NOISE_WITH_PENALTY:
+              continue;
+            case MERGE_NOISE:
+              // No special treatment
+              break;
+            case TREAT_NOISE_AS_SINGLETONS:
+              // Treat noise cluster as singletons:
+              for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
+                double dist = dq.distance(it1, it3);
+                if(dist < min) {
+                  min = dist;
+                }
               }
+              continue;
             }
-            continue;
           }
           final DBIDs oids = ocluster.getIDs();
           double b = 0.;
@@ -189,27 +221,21 @@ public class EvaluateSilhouette<O> implements Evaluator {
         msil.put((min - a) / Math.max(min, a));
       }
     }
+    double penalty = 1.;
+    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
+      penalty = (rel.size() - noisecount) / (double) rel.size();
+    }
     if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(key + ".silhouette.noise", mergenoise ? 1L : 0L));
-      LOG.statistics(new DoubleStatistic(key + ".silhouette.mean", msil.getMean()));
-      LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", msil.getSampleStddev()));
+      LOG.statistics(new StringStatistic(key + ".silhouette.noise-handling", noiseOption.toString()));
+      LOG.statistics(new LongStatistic(key + ".silhouette.noise", noisecount));
+      LOG.statistics(new DoubleStatistic(key + ".silhouette.mean", penalty * msil.getMean()));
+      LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", penalty * msil.getSampleStddev()));
     }
 
     EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
-    g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(msil.getSampleStddev()), msil.getMean(), -1., 1., 0., false);
+    g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(penalty * msil.getSampleStddev()), penalty * msil.getMean(), -1., 1., 0., false);
     db.getHierarchy().add(c, ev);
-  }
-
-  /**
-   * Test whether to treat a cluster as noise cluster.
-   * 
-   * @param cluster Cluster to analyze
-   * @return True, when the cluster is considered noise.
-   */
-  private boolean treatAsSingletons(Cluster<?> cluster) {
-    // mergenoise = true => treat noise cluster as cluster
-    return mergenoise && cluster.isNoise();
   }
 
   @Override
@@ -242,7 +268,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     /**
      * Parameter to treat noise as a single cluster.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("silhouette.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID NOISE_ID = new OptionID("silhouette.noisehandling", "Treat noise as a cluster, not as singletons.");
 
     /**
      * Distance function to use.
@@ -250,9 +276,9 @@ public class EvaluateSilhouette<O> implements Evaluator {
     private DistanceFunction<? super O> distance;
 
     /**
-     * Keep noise "clusters" merged.
+     * Noise handling
      */
-    private boolean mergenoise = false;
+    private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -262,15 +288,15 @@ public class EvaluateSilhouette<O> implements Evaluator {
         distance = distP.instantiateClass(config);
       }
 
-      Flag noiseP = new Flag(MERGENOISE_ID);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
       if(config.grab(noiseP)) {
-        mergenoise = noiseP.isTrue();
+        noiseOption = noiseP.getValue();
       }
     }
 
     @Override
     protected EvaluateSilhouette<O> makeInstance() {
-      return new EvaluateSilhouette<>(distance, mergenoise);
+      return new EvaluateSilhouette<>(distance, noiseOption);
     }
   }
 }

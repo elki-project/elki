@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.NoiseHandling;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
@@ -27,7 +28,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.students.baierst.thesis.utils.ClusteringUtils;
-import experimentalcode.students.baierst.thesis.utils.NoiseOption;
 
 /*
  This file is part of ELKI:
@@ -74,7 +74,7 @@ public class EvaluateDB<O> implements Evaluator {
   /**
    * Option for noise handling.
    */
-  private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
+  private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
 
   /**
    * Distance function to use.
@@ -87,7 +87,7 @@ public class EvaluateDB<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateDB(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseOption noiseOpt) {
+  public EvaluateDB(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
     super();
     this.distanceFunction = distance;
     this.noiseOption = noiseOpt;
@@ -104,7 +104,7 @@ public class EvaluateDB<O> implements Evaluator {
 
     List<? extends Cluster<?>> clusters;
 
-    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)) {
+    if(noiseOption.equals(NoiseHandling.TREAT_NOISE_AS_SINGLETONS)) {
       clusters = ClusteringUtils.convertNoiseToSingletons(c);
     }
     else {
@@ -118,7 +118,7 @@ public class EvaluateDB<O> implements Evaluator {
     ArrayList<Double> withinGroupDists = new ArrayList<Double>();
     for(Cluster<?> cluster : clusters) {
       
-      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+      if(cluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
         countNoise += cluster.size();
         continue;
       }
@@ -162,7 +162,7 @@ public class EvaluateDB<O> implements Evaluator {
 
     double daviesBouldinMean = daviesBouldin.getMean();
 
-    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
+    if(noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY)) {
 
       double penalty = 1;
 
@@ -223,7 +223,7 @@ public class EvaluateDB<O> implements Evaluator {
     /**
      * Option, how noise should be treated.
      */
-    private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
+    private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -234,7 +234,7 @@ public class EvaluateDB<O> implements Evaluator {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      EnumParameter<NoiseOption> noiseP = new EnumParameter<NoiseOption>(NOISE_OPTION_ID, NoiseOption.class, NoiseOption.IGNORE_NOISE_WITH_PENALTY);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_OPTION_ID, NoiseHandling.class, NoiseHandling.IGNORE_NOISE_WITH_PENALTY);
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }

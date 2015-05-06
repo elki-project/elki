@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.NoiseHandling;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 /*
@@ -50,7 +51,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import experimentalcode.students.baierst.thesis.utils.ClusteringUtils;
-import experimentalcode.students.baierst.thesis.utils.NoiseOption;
 
 /**
  * Compute the Gamma Criterion of a data set.
@@ -74,7 +74,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
   /**
    * Option for noise handling.
    */
-  private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
+  private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
 
   /**
    * Distance function to use.
@@ -87,7 +87,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateConcordantPairs(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseOption noiseOpt) {
+  public EvaluateConcordantPairs(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
     super();
     this.distanceFunction = distance;
     this.noiseOption = noiseOpt;
@@ -104,7 +104,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
 
     List<? extends Cluster<?>> clusters;
 
-    if(noiseOption.equals(NoiseOption.TREAT_NOISE_AS_SINGLETONS)) {
+    if(noiseOption.equals(NoiseHandling.TREAT_NOISE_AS_SINGLETONS)) {
       clusters = ClusteringUtils.convertNoiseToSingletons(c);
     }
     else {
@@ -117,7 +117,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     int discordantPairs = 0;
 
     for(Cluster<?> cluster : clusters) {
-      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+      if(cluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
         countNoise += cluster.size();
         continue;
       }
@@ -133,12 +133,12 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
           double withinDist = distanceFunction.distance(rel.get(it1), rel.get(it2));
           for(int i = 0; i < clusters.size(); i++) {
             Cluster<?> ocluster1 = clusters.get(i);
-            if(ocluster1.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+            if(ocluster1.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
               continue;
             }
             for(int j = i + 1; j < clusters.size(); j++) {
               Cluster<?> ocluster2 = clusters.get(j);
-              if(ocluster2.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+              if(ocluster2.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
                 continue;
               }
               for(DBIDIter oit1 = ocluster1.getIDs().iter(); oit1.valid(); oit1.advance()) {
@@ -160,11 +160,11 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     double bd = 0;
 
     for(Cluster<?> cluster : clusters) {
-      if(cluster.isNoise() && (noiseOption.equals(NoiseOption.IGNORE_NOISE) || noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY))) {
+      if(cluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
         continue;
       }
       wd += cluster.size() * (cluster.size() - 1.) / 2.;
-      if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY) || noiseOption.equals(NoiseOption.IGNORE_NOISE)) {
+      if(noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY) || noiseOption.equals(NoiseHandling.IGNORE_NOISE)) {
         bd += cluster.size() * (rel.size() - countNoise - cluster.size());
       }
       else {
@@ -176,7 +176,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     double gamma = (concordantPairs - discordantPairs) / (concordantPairs + discordantPairs);
 
     double t;
-    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY) || noiseOption.equals(NoiseOption.IGNORE_NOISE)) {
+    if(noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY) || noiseOption.equals(NoiseHandling.IGNORE_NOISE)) {
       t = ((rel.size() - countNoise) * (rel.size() - countNoise - 1)) / 2.;
     }
     else {
@@ -188,7 +188,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     double tau = (concordantPairs - discordantPairs) / Math.sqrt((((t * (t - 1.)) / 2.) - wd - bd) * (t * (t - 1.) / 2.));
 
     // compute penalty, if necessary
-    if(noiseOption.equals(NoiseOption.IGNORE_NOISE_WITH_PENALTY)) {
+    if(noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY)) {
 
       double penalty = 1;
 
@@ -252,7 +252,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     /**
      * Option, how noise should be treated.
      */
-    private NoiseOption noiseOption = NoiseOption.IGNORE_NOISE_WITH_PENALTY;
+    private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -262,7 +262,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      EnumParameter<NoiseOption> noiseP = new EnumParameter<NoiseOption>(NOISE_OPTION_ID, NoiseOption.class, NoiseOption.IGNORE_NOISE_WITH_PENALTY);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_OPTION_ID, NoiseHandling.class, NoiseHandling.IGNORE_NOISE_WITH_PENALTY);
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }

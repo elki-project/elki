@@ -1,4 +1,4 @@
-package experimentalcode.students.baierst.thesis.utils;
+package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
 
 /*
  This file is part of ELKI:
@@ -27,10 +27,14 @@ package experimentalcode.students.baierst.thesis.utils;
  * Options for handling noise in internal measures.
  * 
  * @author Stephan Baier
- * 
  */
-public enum NoiseOption {
-
-  MERGE_NOISE, TREAT_NOISE_AS_SINGLETONS, IGNORE_NOISE, IGNORE_NOISE_WITH_PENALTY;
-
+public enum NoiseHandling {
+  /** Merge all noise into a cluster */
+  MERGE_NOISE,
+  /** Consider each noise point a separate cluster */
+  TREAT_NOISE_AS_SINGLETONS,
+  /** Ignore all noise points */
+  IGNORE_NOISE,
+  /** Ignore noise points, but penalize their presence */
+  IGNORE_NOISE_WITH_PENALTY;
 }
