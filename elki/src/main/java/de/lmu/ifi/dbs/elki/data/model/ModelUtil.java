@@ -24,7 +24,9 @@ package de.lmu.ifi.dbs.elki.data.model;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
@@ -82,7 +84,7 @@ public final class ModelUtil {
   }
 
   /**
-   * Get (and convert!) the representative vector for a cluster model.
+   * Get the representative vector for a cluster model.
    * 
    * <b>Only representative-based models are supported!</b>
    * 
@@ -109,5 +111,34 @@ public final class ModelUtil {
       return null; // Inconvertible
     }
     return null;
+  }
+
+  /**
+   * Get the representative vector for a cluster model, or compute the centroid.
+   *
+   * @param model Model
+   * @param relation Data relation (for representatives specified per DBID)
+   * @param ids Cluster ids (must not be empty.
+   * @return Vector of type V, {@code null} if not supported.
+   * @param <V> desired vector type
+   */
+  public static <V extends NumberVector> V getPrototypeOrCentroid(Model model, Relation<? extends V> relation, DBIDs ids, NumberVector.Factory<V> factory) {
+    assert (ids.size() > 0);
+    V v = getPrototype(model, relation, factory);
+    return v != null ? v : factory.newNumberVector(Centroid.make(relation, ids));
+  }
+
+  /**
+   * Get the representative vector for a cluster model, or compute the centroid.
+   *
+   * @param model Model
+   * @param relation Data relation (for representatives specified per DBID)
+   * @param ids Cluster ids (must not be empty.
+   * @return Some {@link NumberVector}.
+   */
+  public static NumberVector getPrototypeOrCentroid(Model model, Relation<? extends NumberVector> relation, DBIDs ids) {
+    assert (ids.size() > 0);
+    NumberVector v = getPrototype(model, relation);
+    return v != null ? v : Centroid.make(relation, ids);
   }
 }
