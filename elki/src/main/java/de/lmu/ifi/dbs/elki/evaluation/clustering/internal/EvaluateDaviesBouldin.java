@@ -1,33 +1,38 @@
-package experimentalcode.students.baierst.measures;
+package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
+
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.ModelUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.NoiseHandling;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import experimentalcode.students.baierst.thesis.utils.ClusteringUtils;
 
 /*
  This file is part of ELKI:
@@ -58,23 +63,26 @@ import experimentalcode.students.baierst.thesis.utils.ClusteringUtils;
  * Reference:
  * <p>
  * D. L. Davies and D. W. Bouldin<br />
- * A cluster separation measure<br />
- * In: IEEE Trans Pattern Anal MAch Intell 1, 1979
+ * A Cluster Separation Measure<br />
+ * In: IEEE Transactions Pattern Analysis and Machine Intelligence PAMI-1(2)
  * </p>
  * 
  * @author Stephan Baier
- * 
  */
-public class EvaluateDB<O> implements Evaluator {
+@Reference(authors = "D. L. Davies and D. W. Bouldin", //
+title = "A Cluster Separation Measure",//
+booktitle = "IEEE Transactions Pattern Analysis and Machine Intelligence PAMI-1(2)", //
+url = "http://dx.doi.org/10.1109/TPAMI.1979.4766909")
+public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateDB.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateDaviesBouldin.class);
 
   /**
    * Option for noise handling.
    */
-  private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
+  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
   /**
    * Distance function to use.
@@ -82,12 +90,17 @@ public class EvaluateDB<O> implements Evaluator {
   private PrimitiveDistanceFunction<? super NumberVector> distanceFunction;
 
   /**
+   * Key for logging statistics.
+   */
+  private String key = EvaluateDaviesBouldin.class.getName();
+
+  /**
    * Constructor.
    * 
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateDB(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
+  public EvaluateDaviesBouldin(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
     super();
     this.distanceFunction = distance;
     this.noiseOption = noiseOpt;
@@ -99,88 +112,103 @@ public class EvaluateDB<O> implements Evaluator {
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
+   * @return DB-index
    */
-  public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
-
-    List<? extends Cluster<?>> clusters;
-
-    if(noiseOption.equals(NoiseHandling.TREAT_NOISE_AS_SINGLETONS)) {
-      clusters = ClusteringUtils.convertNoiseToSingletons(c);
-    }
-    else {
-      clusters = c.getAllClusters();
-    }
-
-    int countNoise = 0;
+  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    int noisecount = 0;
 
     // precompute all centroids and within-group distances
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
-    ArrayList<Double> withinGroupDists = new ArrayList<Double>();
+    TDoubleList withinGroupDists = new TDoubleArrayList();
     for(Cluster<?> cluster : clusters) {
-      
-      if(cluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
-        countNoise += cluster.size();
-        continue;
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+        case IGNORE_NOISE_WITH_PENALTY:
+          noisecount += cluster.size();
+          centroids.add(null);
+          break;
+        case MERGE_NOISE:
+        case TREAT_NOISE_AS_SINGLETONS:
+          break;
+        }
       }
-
-      NumberVector currentCentroid = Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel);
-      centroids.add(currentCentroid);
-      double wD = 0;
+      NumberVector p = ModelUtil.getPrototype(cluster.getModel(), rel);
+      if(p == null) {
+        p = Centroid.make(rel, cluster.getIDs());
+      }
+      centroids.add(p);
+      double wD = 0.;
       for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-        wD += distanceFunction.distance(currentCentroid, rel.get(it1));
+        wD += distanceFunction.distance(p, rel.get(it1));
       }
-      withinGroupDists.add(wD * (1. / cluster.size()));
+      withinGroupDists.add(wD / cluster.size());
     }
+    assert (withinGroupDists.size() == clusters.size());
+    assert (centroids.size() == clusters.size());
 
-    MeanVariance daviesBouldin = new MeanVariance();
+    Mean daviesBouldin = new Mean();
 
-    int i = 0;
-    for(NumberVector centroid : centroids) {
+    for(int i = 0; i < clusters.size(); i++) {
+      NumberVector centroid = centroids.get(i);
+      if(centroid == null) {
+        continue; // Singleton / Noise
+      }
       /* maximum within-to-between cluster spread */
       double max = 0;
-
-      int o = 0;
-      for(NumberVector ocentroid : centroids) {
-        if(ocentroid == centroid) {
-          o++;
+      for(int j = 0; j < clusters.size(); j++) {
+        NumberVector ocentroid = centroids.get(j);
+        if(ocentroid == null || ocentroid == centroid) {
           continue;
         }
         /* bD = between group distance */
         double bD = distanceFunction.distance(centroid, ocentroid);
         /* d = within-to-between cluster spread */
-        double d = (withinGroupDists.get(i) + withinGroupDists.get(o) / bD);
-        if(d > max) {
-          max = d;
-        }
-        o++;
+        double d = (withinGroupDists.get(i) + withinGroupDists.get(j)) / bD;
+        max = d > max ? d : max;
       }
-
       daviesBouldin.put(max);
-
-      i++;
     }
 
-    double daviesBouldinMean = daviesBouldin.getMean();
+    double penalty = 1.;
+    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
+      penalty = (rel.size() - noisecount) / (double) rel.size();
+    }
+    else if(noisecount > 0) {
+      LOG.warning("Ignoring " + noisecount + " noise objects for Davies Bouldin index. The result may be biased.");
+    }
+    double daviesBouldinMean = penalty * daviesBouldin.getMean();
 
-    if(noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY)) {
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(key + ".db-index.noise-handling", noiseOption.toString()));
+      LOG.statistics(new LongStatistic(key + ".db-index.noise", noisecount));
+      LOG.statistics(new DoubleStatistic(key + ".db-index", daviesBouldinMean));
+    }
 
-      double penalty = 1;
-
-      if(countNoise != 0) {
-        penalty = ((double) rel.size() - (double) countNoise) / (double) rel.size();
+    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(c, EvaluationResult.class);
+    EvaluationResult ev = null;
+    for(EvaluationResult e : ers) {
+      if("internal evaluation".equals(e.getShortName())) {
+        ev = e;
+        break;
       }
-
-      daviesBouldinMean = penalty * daviesBouldinMean;
     }
-
-    if(LOG.isVerbose()) {
-      LOG.verbose("Davies-Bouldin: " + daviesBouldinMean);
+    if(ev == null) {
+      ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
+      db.getHierarchy().add(c, ev);
     }
-    // Build a primitive result attachment:
-    Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { daviesBouldinMean }));
-    db.getHierarchy().add(c, new CollectionResult<>("Davies Bouldin Index", "davies-bouldin", col));
-
+    MeasurementGroup g = null;
+    for(MeasurementGroup j : ev) {
+      if("Distance-based Evaluation".equals(j.getName())) {
+        g = j;
+        break;
+      }
+    }
+    g = g != null ? g : ev.newGroup("Distance-based Evaluation");
+    g.addMeasure("Davies Bouldin Index", daviesBouldinMean, 0., 1., 0., true);
+    db.getHierarchy().resultChanged(ev);
+    return daviesBouldinMean;
   }
 
   @Override
@@ -204,7 +232,7 @@ public class EvaluateDB<O> implements Evaluator {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter for choosing the distance function.
      */
@@ -213,7 +241,7 @@ public class EvaluateDB<O> implements Evaluator {
     /**
      * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID NOISE_OPTION_ID = new OptionID("davies-bouldin.noiseoption", "option, how noise should be treated.");
+    public static final OptionID NOISE_ID = new OptionID("davies-bouldin.noisehandling", "Controls how noise should be treated.");
 
     /**
      * Distance function to use.
@@ -234,7 +262,7 @@ public class EvaluateDB<O> implements Evaluator {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_OPTION_ID, NoiseHandling.class, NoiseHandling.IGNORE_NOISE_WITH_PENALTY);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }
@@ -242,8 +270,8 @@ public class EvaluateDB<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluateDB<O> makeInstance() {
-      return new EvaluateDB<>(distance, noiseOption);
+    protected EvaluateDaviesBouldin makeInstance() {
+      return new EvaluateDaviesBouldin(distance, noiseOption);
     }
   }
 
