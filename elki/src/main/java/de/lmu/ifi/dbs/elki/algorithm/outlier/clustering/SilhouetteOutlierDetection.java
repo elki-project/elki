@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSilhouette;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.NoiseHandling;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
@@ -53,7 +54,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -94,22 +95,21 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
   ClusteringAlgorithm<?> clusterer;
 
   /**
-   * Keep noise "clusters" merged, instead of breaking them into singletons.
+   * Option for noise handling.
    */
-  private boolean mergenoise = false;
+  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
   /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
    * @param clusterer Clustering algorithm
-   * @param mergenoise Flag to keep "noise" clusters merged, instead of breaking
-   *        them into singletons.
+   * @param noiseOption Noise handling option.
    */
-  public SilhouetteOutlierDetection(DistanceFunction<? super O> distanceFunction, ClusteringAlgorithm<?> clusterer, boolean mergenoise) {
+  public SilhouetteOutlierDetection(DistanceFunction<? super O> distanceFunction, ClusteringAlgorithm<?> clusterer, NoiseHandling noiseOption) {
     super(distanceFunction);
     this.clusterer = clusterer;
-    this.mergenoise = mergenoise;
+    this.noiseOption = noiseOption;
   }
 
   @Override
@@ -123,15 +123,25 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     DoubleMinMax mm = new DoubleMinMax();
 
+    int noisecount = 0;
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     for(Cluster<?> cluster : clusters) {
-      if(cluster.size() <= 1 || (!mergenoise && cluster.isNoise())) {
-        // As suggested in Rousseeuw, we use 0 for singletons.
-        for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-          scores.put(iter, 0.);
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE_WITH_PENALTY:
+          noisecount += cluster.size();
+        case IGNORE_NOISE:
+        case TREAT_NOISE_AS_SINGLETONS:
+          // As suggested in Rousseeuw, we use 0 for singletons.
+          for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+            scores.put(iter, 0.);
+          }
+          mm.put(0.);
+          continue;
+        case MERGE_NOISE:
+          // Treat as cluster below
+          break;
         }
-        mm.put(0.);
-        continue;
       }
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
       double[] as = new double[ids.size()]; // temporary storage.
@@ -151,15 +161,24 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
           if(ocluster == /* yes, reference identity */cluster) {
             continue;
           }
-          if(!mergenoise && ocluster.isNoise()) {
-            // Treat noise cluster as singletons:
-            for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
-              double dist = dq.distance(it1, it3);
-              if(dist < min) {
-                min = dist;
+          if(ocluster.isNoise()) {
+            switch(noiseOption){
+            case IGNORE_NOISE:
+            case IGNORE_NOISE_WITH_PENALTY:
+              continue;
+            case MERGE_NOISE:
+              // No special treatment
+              break;
+            case TREAT_NOISE_AS_SINGLETONS:
+              // Treat noise cluster as singletons:
+              for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
+                double dist = dq.distance(it1, it3);
+                if(dist < min) {
+                  min = dist;
+                }
               }
+              continue;
             }
-            continue;
           }
           final DBIDs oids = ocluster.getIDs();
           double b = 0.;
@@ -176,10 +195,19 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
         mm.put(score);
       }
     }
+    double penalty = 1.;
+    // Apply penalty term, if enabled:
+    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
+      penalty = (relation.size() - noisecount) / (double) relation.size();
+      // Apply penalty
+      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+        scores.putDouble(iter, scores.doubleValue(iter) * penalty);
+      }
+    }
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Silhouette Coefficients", "silhouette-outlier", scores, relation.getDBIDs());
-    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), -1., 1., .5);
+    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin() * penalty, mm.getMax() * penalty, -1., 1., .5);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
@@ -226,9 +254,9 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
     ClusteringAlgorithm<?> clusterer;
 
     /**
-     * Keep noise "clusters" merged, instead of breaking them into singletons.
+     * Noise handling
      */
-    private boolean mergenoise = false;
+    private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -239,15 +267,15 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
         clusterer = clusterP.instantiateClass(config);
       }
 
-      Flag noiseP = new Flag(EvaluateSilhouette.Parameterizer.MERGENOISE_ID);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
       if(config.grab(noiseP)) {
-        mergenoise = noiseP.isTrue();
+        noiseOption = noiseP.getValue();
       }
     }
 
     @Override
     protected SilhouetteOutlierDetection<O> makeInstance() {
-      return new SilhouetteOutlierDetection<>(distanceFunction, clusterer, mergenoise);
+      return new SilhouetteOutlierDetection<>(distanceFunction, clusterer, noiseOption);
     }
   }
 }
