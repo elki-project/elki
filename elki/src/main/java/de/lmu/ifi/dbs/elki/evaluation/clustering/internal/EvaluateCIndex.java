@@ -1,10 +1,10 @@
-package experimentalcode.students.baierst.measures;
+package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
 
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,34 +23,37 @@ package experimentalcode.students.baierst.measures;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
+
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.NoiseHandling;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import experimentalcode.students.baierst.thesis.utils.ClusteringUtils;
 
 /**
  * Compute the C-index of a data set.
@@ -60,12 +63,16 @@ import experimentalcode.students.baierst.thesis.utils.ClusteringUtils;
  * L. J. Hubert and J.R. Levin <br />
  * A general statistical framework for assessing categorical clustering in free
  * recall<br />
- * Psychol Bull 10, 1976
+ * Psychological Bulletin, Vol. 83(6)
  * </p>
  * 
  * @author Stephan Baier
- * 
+ * @author Erich Schubert
  */
+@Reference(authors = "L. J. Hubert and J. R. Levin", //
+title = "A general statistical framework for assessing categorical clustering in free recall.", //
+booktitle = "Psychological Bulletin, Vol. 83(6)", //
+url = "http://dx.doi.org/10.1037/0033-2909.83.6.1072")
 public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Logger for debug output.
@@ -75,12 +82,17 @@ public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Option for noise handling.
    */
-  private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
+  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
   /**
    * Distance function to use.
    */
-  private PrimitiveDistanceFunction<? super NumberVector> distanceFunction;
+  private DistanceFunction<? super O> distance;
+
+  /**
+   * Key for logging statistics.
+   */
+  private String key = EvaluateCIndex.class.getName();
 
   /**
    * Constructor.
@@ -88,9 +100,9 @@ public class EvaluateCIndex<O> implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateCIndex(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
+  public EvaluateCIndex(DistanceFunction<? super O> distance, NoiseHandling noiseOpt) {
     super();
-    this.distanceFunction = distance;
+    this.distance = distance;
     this.noiseOption = noiseOpt;
   }
 
@@ -100,41 +112,51 @@ public class EvaluateCIndex<O> implements Evaluator {
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
+   * @return C-Index
    */
-  public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
-    List<? extends Cluster<?>> clusters;
+  public double evaluateClustering(Database db, Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+    List<? extends Cluster<?>> clusters = c.getAllClusters();
 
-    if(noiseOption.equals(NoiseHandling.TREAT_NOISE_AS_SINGLETONS)) {
-      clusters = ClusteringUtils.convertNoiseToSingletons(c);
-    }
-    else {
-      clusters = c.getAllClusters();
-    }
+    int noisecount = 0;
 
-    int countNoise = 0;
-
-    /* w is the number of within group distances */
-    int w = 0;
-    ArrayList<Double> pairDists = new ArrayList<Double>();
+    /* theta is the sum, w the number of within group distances */
     double theta = 0;
+    int w = 0;
+    TDoubleList pairDists = new TDoubleArrayList();
 
     for(int i = 0; i < clusters.size(); i++) {
       Cluster<?> cluster = clusters.get(i);
-      if(cluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
-        countNoise += cluster.size();
-        continue;
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+        case IGNORE_NOISE_WITH_PENALTY:
+          noisecount += cluster.size();
+          continue;
+        case TREAT_NOISE_AS_SINGLETONS:
+          continue;
+        case MERGE_NOISE:
+          break; // Treat like a cluster
+        }
       }
       for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
+        O obj = rel.get(it1);
         for(int j = i; j < clusters.size(); j++) {
           Cluster<?> ocluster = clusters.get(j);
-          if(ocluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
-            continue;
+          if(ocluster.size() <= 1 || ocluster.isNoise()) {
+            switch(noiseOption){
+            case IGNORE_NOISE:
+            case IGNORE_NOISE_WITH_PENALTY:
+              continue;
+            case TREAT_NOISE_AS_SINGLETONS:
+            case MERGE_NOISE:
+              break; // Treat like a cluster
+            }
           }
           for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
             if(DBIDUtil.equal(it1, it2)) {
               continue;
             }
-            double dist = distanceFunction.distance(rel.get(it1), rel.get(it2));
+            double dist = dq.distance(obj, rel.get(it2));
             pairDists.add(dist);
             if(ocluster == cluster) {
               theta += dist;
@@ -145,48 +167,50 @@ public class EvaluateCIndex<O> implements Evaluator {
       }
     }
 
-    Collections.sort(pairDists);
-    double min = 0;
-    int i = 0;
-    for(double dist : pairDists) {
-      if(i >= w) {
-        break;
-      }
-      min += dist;
-      i++;
+    // Simulate best and worst cases:
+    pairDists.sort();
+    double min = 0, max = 0;
+    for(int i = 0, j = pairDists.size() - 1; i < w; i++, j--) {
+      min += pairDists.get(i);
+      max += pairDists.get(j);
     }
 
-    Collections.reverse(pairDists);
-    double max = 0;
-    i = 0;
-    for(double dist : pairDists) {
-      if(i >= w) {
-        break;
-      }
-      max += dist;
-      i++;
-    }
+    double cIndex = (max > min) ? (theta - min) / (max - min) : 0.;
 
-    double cIndex = (theta - min) / (max - min);
-
-    if(noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY)) {
-
-      double penalty = 1;
-
-      if(countNoise != 0) {
-        penalty = ((double) rel.size() - (double) countNoise) / (double) rel.size();
-      }
+    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
+      double penalty = (rel.size() - noisecount) / (double) rel.size();
       cIndex = penalty * cIndex;
     }
 
-    if(LOG.isVerbose()) {
-      LOG.verbose("c-index: " + cIndex);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(key + ".c-index.noise-handling", noiseOption.toString()));
+      LOG.statistics(new LongStatistic(key + ".c-index.noise", noisecount));
+      LOG.statistics(new DoubleStatistic(key + ".c-index", cIndex));
     }
-    // Build a primitive result attachment:
-    Collection<DoubleVector> col = new ArrayList<>();
-    col.add(new DoubleVector(new double[] { cIndex }));
-    db.getHierarchy().add(c, new CollectionResult<>("C-Index", "c-index", col));
 
+    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(c, EvaluationResult.class);
+    EvaluationResult ev = null;
+    for(EvaluationResult e : ers) {
+      if("internal evaluation".equals(e.getShortName())) {
+        ev = e;
+        break;
+      }
+    }
+    if(ev == null) {
+      ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
+      db.getHierarchy().add(c, ev);
+    }
+    MeasurementGroup g = null;
+    for(MeasurementGroup j : ev) {
+      if("Distance-based Evaluation".equals(j.getName())) {
+        g = j;
+        break;
+      }
+    }
+    g = g != null ? g : ev.newGroup("Distance-based Evaluation");
+    g.addMeasure("C-Index", cIndex, 0., 1., 0., true);
+    db.getHierarchy().resultChanged(ev);
+    return cIndex;
   }
 
   @Override
@@ -196,10 +220,11 @@ public class EvaluateCIndex<O> implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(baseResult);
-    Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
+    Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
+    DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, (Relation<? extends NumberVector>) rel, c);
+      evaluateClustering(db, rel, dq, c);
     }
   }
 
@@ -207,6 +232,7 @@ public class EvaluateCIndex<O> implements Evaluator {
    * Parameterization class.
    * 
    * @author Stephan Baier
+   * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
@@ -219,12 +245,12 @@ public class EvaluateCIndex<O> implements Evaluator {
     /**
      * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID NOISE_OPTION_ID = new OptionID("c-index.noiseoption", "option, how noise should be treated.");
+    public static final OptionID NOISE_ID = new OptionID("c-index.noisehandling", "option, how noise should be treated.");
 
     /**
      * Distance function to use.
      */
-    private PrimitiveDistanceFunction<NumberVector> distance;
+    private DistanceFunction<? super O> distance;
 
     /**
      * Option, how noise should be treated.
@@ -234,16 +260,15 @@ public class EvaluateCIndex<O> implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, ManhattanDistanceFunction.class);
+      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_OPTION_ID, NoiseHandling.class, NoiseHandling.IGNORE_NOISE_WITH_PENALTY);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }
-
     }
 
     @Override
