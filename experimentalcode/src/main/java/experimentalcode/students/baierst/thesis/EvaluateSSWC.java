@@ -23,44 +23,44 @@ package experimentalcode.students.baierst.thesis;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.ModelUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSilhouette;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.internal.NoiseHandling;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import experimentalcode.students.baierst.thesis.utils.ClusteringUtils;
 
 /**
  * Compute the simplified silhouette of a data set.
  * 
  * @author Stephan Baier
- * 
- * @param <O> Object type
+ * @author Erich Schubert
  */
-public class EvaluateSSWC<O> implements Evaluator {
+public class EvaluateSSWC implements Evaluator {
 
   /**
    * Logger for debug output.
@@ -75,7 +75,12 @@ public class EvaluateSSWC<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private PrimitiveDistanceFunction<? super NumberVector> distanceFunction;
+  private PrimitiveDistanceFunction<? super NumberVector> distance;
+
+  /**
+   * Key for logging statistics.
+   */
+  private String key = EvaluateSSWC.class.getName();
 
   /**
    * Constructor.
@@ -85,7 +90,7 @@ public class EvaluateSSWC<O> implements Evaluator {
    */
   public EvaluateSSWC(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
     super();
-    this.distanceFunction = distance;
+    this.distance = distance;
     this.noiseOption = noiseOpt;
   }
 
@@ -94,98 +99,101 @@ public class EvaluateSSWC<O> implements Evaluator {
    * 
    * @param db Database
    * @param rel Data relation
-   * @param dq Distance query
    * @param c Clustering
    */
-  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
-    List<? extends Cluster<?>> clusters;
+  public void evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+    List<? extends Cluster<?>> clusters = c.getAllClusters();
 
-    if(noiseOption.equals(NoiseHandling.TREAT_NOISE_AS_SINGLETONS)) {
-      clusters = ClusteringUtils.convertNoiseToSingletons(c);
-    }
-    else {
-      clusters = c.getAllClusters();
-    }
-
-    int countNoise = 0;
-
-    MeanVariance mssil = new MeanVariance();
-
-    // precompute all centroids
+    // Collect cluster centroids
+    int noisecount = 0;
     ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
 
     for(Cluster<?> cluster : clusters) {
-      if(cluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
-        countNoise += cluster.size();
-        continue;
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+        case IGNORE_NOISE_WITH_PENALTY:
+        case TREAT_NOISE_AS_SINGLETONS:
+          noisecount += cluster.size();
+          centroids.add(null);
+          continue;
+        case MERGE_NOISE:
+          // Continue.
+          break;
+        }
       }
-      centroids.add(Centroid.make((Relation<? extends NumberVector>) rel, cluster.getIDs()).toVector(rel));
+      NumberVector p = ModelUtil.getPrototype(cluster.getModel(), rel);
+      if(p == null) {
+        p = Centroid.make(rel, cluster.getIDs());
+      }
+      centroids.add(p);
     }
+    assert (centroids.size() == clusters.size());
 
-    int i = 0;
+    MeanVariance mssil = new MeanVariance();
+
+    int i = -1;
     for(Cluster<?> cluster : clusters) {
-
-      if(cluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
+      i++; // Count all clusters.
+      if(cluster.size() <= 1) {
+        // As suggested in Rousseeuw, we use 0 for singletons.
+        mssil.put(0., cluster.size());
         continue;
       }
+      if(cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+        case IGNORE_NOISE_WITH_PENALTY:
+          continue;
+        case TREAT_NOISE_AS_SINGLETONS:
+          // As suggested in Rousseeuw, we use 0 for singletons.
+          mssil.put(0., cluster.size());
+          continue;
+        case MERGE_NOISE:
+          // Continue as with clusters.
+          break;
+        }
+      }
 
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-      DBIDArrayIter it1 = ids.iter();
-      for(it1.seek(0); it1.valid(); it1.advance()) {
+      // Cluster center:
+      final NumberVector center = centroids.get(i);
+      assert (center != null);
+      for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
+        NumberVector obj = rel.get(it);
         // a: Distance to own centroid
-        double a = distanceFunction.distance(centroids.get(i), rel.get(it1));
+        double a = distance.distance(center, obj);
 
         // b: Distance to other clusters centroids:
         double min = Double.POSITIVE_INFINITY;
-        int j = 0;
-        for(Cluster<?> ocluster : clusters) {
-
-          if(ocluster.isNoise() && (noiseOption.equals(NoiseHandling.IGNORE_NOISE) || noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY))) {
-            continue;
+        for(NumberVector other : centroids) {
+          if(other != null && other != center) {
+            double dist = distance.distance(other, obj);
+            min = dist < min ? dist : min;
           }
-          if(ocluster == cluster) {
-            j++;
-            continue;
-          }
-
-          double b = distanceFunction.distance(centroids.get(j), rel.get(it1));
-
-          if(b < min) {
-            min = b;
-          }
-          j++;
         }
 
-        if(cluster.size() <= 1) {
-          // put 0 for singletons
-          mssil.put(0);
-
-          continue;
-        }
-
-        mssil.put((min - a) / Math.max(min, a));
+        // One cluster only?
+        min = min < Double.POSITIVE_INFINITY ? min : a;
+        mssil.put((min - a) / (min > a ? min : a));
       }
       i++;
     }
 
-    double sswc = mssil.getMean();
-
-    if(noiseOption.equals(NoiseHandling.IGNORE_NOISE_WITH_PENALTY)) {
-
-      double penalty = 1;
-
-      if(countNoise != 0) {
-        penalty = ((double) rel.size() - (double) countNoise) / (double) rel.size();
-      }
-
-      sswc = penalty * sswc;
+    double penalty = 1.;
+    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
+      penalty = (rel.size() - noisecount) / (double) rel.size();
+    }
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(key + ".simplified-silhouette.noise-handling", noiseOption.toString()));
+      LOG.statistics(new LongStatistic(key + ".simplified-silhouette.noise", noisecount));
+      LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.mean", penalty * mssil.getMean()));
+      LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.stddev", penalty * mssil.getSampleStddev()));
     }
 
-    if(LOG.isVerbose()) {
-      LOG.verbose("Mean Simplified Silhouette: " + sswc);
-    }
-
-    return sswc;      
+    EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
+    MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
+    g.addMeasure("Simplified Silhouette +-" + FormatUtil.NF2.format(penalty * mssil.getSampleStddev()), penalty * mssil.getMean(), -1., 1., 0., false);
+    db.getHierarchy().add(c, ev);
   }
 
   @Override
@@ -195,40 +203,25 @@ public class EvaluateSSWC<O> implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(baseResult);
-    Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
+    Relation<? extends NumberVector> rel = db.getRelation(this.distance.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      double sswc = evaluateClustering(db, (Relation<? extends NumberVector>) rel, c);
-      
-      // Build a primitive result attachment:
-      Collection<DoubleVector> col = new ArrayList<>();
-      col.add(new DoubleVector(new double[] { sswc }));
-      db.getHierarchy().add(c, new CollectionResult<>("Simplified Silhouette coefficient", "sswc", col));      
+      evaluateClustering(db, rel, c);
     }
   }
 
   /**
    * Parameterization class.
    * 
-   * @author Stephan Baier
+   * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
-    /**
-     * Parameter for choosing the distance function.
-     */
-    public static final OptionID DISTANCE_ID = new OptionID("simplified-silhouette.distance", "Distance function to use for computing the silhouette.");
-
-    /**
-     * Parameter for the option, how noise should be treated.
-     */
-    public static final OptionID NOISE_OPTION_ID = new OptionID("simplified-silhouette.noiseoption", "option, how noise should be treated.");
-
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Distance function to use.
      */
-    private PrimitiveDistanceFunction<NumberVector> distance;
+    private PrimitiveDistanceFunction<? super NumberVector> distance;
 
     /**
      * Option, how noise should be treated.
@@ -239,21 +232,20 @@ public class EvaluateSSWC<O> implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(EvaluateSilhouette.Parameterizer.DISTANCE_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }
 
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_OPTION_ID, NoiseHandling.class, NoiseHandling.IGNORE_NOISE_WITH_PENALTY);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.IGNORE_NOISE_WITH_PENALTY);
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }
-
     }
 
     @Override
-    protected EvaluateSSWC<? extends NumberVector> makeInstance() {
-      return new EvaluateSSWC<>(distance, noiseOption);
+    protected EvaluateSSWC makeInstance() {
+      return new EvaluateSSWC(distance, noiseOption);
     }
   }
 }

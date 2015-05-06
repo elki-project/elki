@@ -110,14 +110,14 @@ public class EvaluateSilhouette<O> implements Evaluator {
   private DistanceFunction<? super O> distance;
 
   /**
-   * Key for logging statistics.
-   */
-  private String key = EvaluateSilhouette.class.getName();
-
-  /**
    * Option for noise handling.
    */
   private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+
+  /**
+   * Key for logging statistics.
+   */
+  private String key = EvaluateSilhouette.class.getName();
 
   /**
    * Constructor.
@@ -214,11 +214,11 @@ public class EvaluateSilhouette<O> implements Evaluator {
             b += dq.distance(it1, it3);
           }
           b /= oids.size();
-          if(b < min) {
-            min = b;
-          }
+          min = b < min ? b : min;
         }
-        msil.put((min - a) / Math.max(min, a));
+        // One cluster only?
+        min = min < Double.POSITIVE_INFINITY ? min : a;
+        msil.put((min - a) / (min > a ? min : a));
       }
     }
     double penalty = 1.;
