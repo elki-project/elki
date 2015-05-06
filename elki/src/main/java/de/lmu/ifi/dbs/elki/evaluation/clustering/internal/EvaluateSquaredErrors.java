@@ -27,7 +27,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ModelUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -37,7 +36,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 /*
@@ -92,7 +90,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator {
+public class EvaluateSquaredErrors implements Evaluator {
   /**
    * Logger for debug output.
    */
@@ -106,7 +104,7 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
   /**
    * Distance function to use.
    */
-  private NumberVectorDistanceFunction<? super O> distance;
+  private NumberVectorDistanceFunction<?> distance;
 
   /**
    * Key for logging statistics.
@@ -120,7 +118,7 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
    * @param mergenoise Flag to treat noise as clusters, instead of breaking them
    *        into singletons.
    */
-  public EvaluateSquaredErrors(NumberVectorDistanceFunction<? super O> distance, boolean mergenoise) {
+  public EvaluateSquaredErrors(NumberVectorDistanceFunction<?> distance, boolean mergenoise) {
     super();
     this.distance = distance;
     this.mergenoise = mergenoise;
@@ -132,8 +130,9 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
+   * @return ssq
    */
-  public void evaluateClustering(Database db, Relation<O> rel, Clustering<?> c) {
+  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
     boolean square = !(distance instanceof SquaredEuclideanDistanceFunction);
 
     List<? extends Cluster<?>> clusters = c.getAllClusters();
@@ -142,14 +141,9 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
       if(cluster.size() <= 1 || treatAsSingletons(cluster)) {
         continue;
       }
-      Model m = cluster.getModel();
-      NumberVector center = ModelUtil.getPrototype(m, rel);
-      if(center == null) {
-        center = Centroid.make(rel, cluster.getIDs());
-      }
-
+      NumberVector center = ModelUtil.getPrototypeOrCentroid(cluster.getModel(), rel, cluster.getIDs());
       for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-        double d = distance.distance(center, rel.get(it1));
+        final double d = distance.distance(center, rel.get(it1));
         sum += d;
         ssq += square ? d * d : d;
       }
@@ -166,6 +160,7 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("RMSD", Math.sqrt(ssq / rel.size()), 0., Double.POSITIVE_INFINITY, true);
     db.getHierarchy().add(c, ev);
+    return ssq;
   }
 
   /**
@@ -186,7 +181,7 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
       return;
     }
     Database db = ResultUtil.findDatabase(baseResult);
-    Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
+    Relation<NumberVector> rel = db.getRelation(distance.getInputTypeRestriction());
     for(Clustering<?> c : crs) {
       evaluateClustering(db, rel, c);
     }
@@ -199,7 +194,7 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter for choosing the distance function.
      */
@@ -213,7 +208,7 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
     /**
      * Distance function to use.
      */
-    private NumberVectorDistanceFunction<? super O> distance;
+    private NumberVectorDistanceFunction<?> distance;
 
     /**
      * Keep noise "clusters" merged.
@@ -223,7 +218,7 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<NumberVectorDistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<?>> distP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if(config.grab(distP)) {
         distance = distP.instantiateClass(config);
       }
@@ -235,8 +230,8 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
     }
 
     @Override
-    protected EvaluateSquaredErrors<O> makeInstance() {
-      return new EvaluateSquaredErrors<>(distance, mergenoise);
+    protected EvaluateSquaredErrors makeInstance() {
+      return new EvaluateSquaredErrors(distance, mergenoise);
     }
   }
 }

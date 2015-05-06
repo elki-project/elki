@@ -154,22 +154,21 @@ public class EvaluateSilhouette<O> implements Evaluator {
   public double evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
-    int noisecount = 0;
+    int ignorednoise = 0;
     for(Cluster<?> cluster : clusters) {
       // Note: we treat 1-element clusters the same as noise.
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
         case IGNORE_NOISE_WITH_PENALTY:
-          noisecount += cluster.size();
-          continue;
+          ignorednoise += cluster.size();
+          continue; // Ignore noise elements
         case TREAT_NOISE_AS_SINGLETONS:
           // As suggested in Rousseeuw, we use 0 for singletons.
           msil.put(0., cluster.size());
           continue;
         case MERGE_NOISE:
-          // Treat as cluster below
-          break;
+          break; // Treat as cluster below
         }
       }
       ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
@@ -184,60 +183,61 @@ public class EvaluateSilhouette<O> implements Evaluator {
           as[it2.getOffset()] += dist;
         }
         a /= (ids.size() - 1);
-        // b: other clusters:
-        double min = Double.POSITIVE_INFINITY;
+        // b: minimum average distance to other clusters:
+        double b = Double.POSITIVE_INFINITY;
         for(Cluster<?> ocluster : clusters) {
           if(ocluster == /* yes, reference identity */cluster) {
-            continue;
+            continue; // Same cluster
           }
-          if(ocluster.isNoise()) {
+          if(ocluster.size() <= 1 || ocluster.isNoise()) {
             switch(noiseOption){
             case IGNORE_NOISE:
             case IGNORE_NOISE_WITH_PENALTY:
-              continue;
-            case MERGE_NOISE:
-              // No special treatment
-              break;
+              continue; // Ignore noise elements
             case TREAT_NOISE_AS_SINGLETONS:
               // Treat noise cluster as singletons:
               for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
-                double dist = dq.distance(it1, it3);
-                if(dist < min) {
-                  min = dist;
-                }
+                final double dist = dq.distance(it1, it3);
+                b = dist < b ? dist : b; // Minimum average
               }
               continue;
+            case MERGE_NOISE:
+              break; // Treat as cluster below
             }
           }
           final DBIDs oids = ocluster.getIDs();
-          double b = 0.;
+          double btmp = 0.;
           for(DBIDIter it3 = oids.iter(); it3.valid(); it3.advance()) {
-            b += dq.distance(it1, it3);
+            btmp += dq.distance(it1, it3);
           }
-          b /= oids.size();
-          min = b < min ? b : min;
+          btmp /= oids.size(); // Average
+          b = btmp < b ? btmp : b; // Minimum average
         }
         // One cluster only?
-        min = min < Double.POSITIVE_INFINITY ? min : a;
-        msil.put((min - a) / (min > a ? min : a));
+        b = b < Double.POSITIVE_INFINITY ? b : a;
+        msil.put((b - a) / (b > a ? b : a));
       }
     }
     double penalty = 1.;
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
-      penalty = (rel.size() - noisecount) / (double) rel.size();
+    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && ignorednoise > 0) {
+      penalty = (rel.size() - ignorednoise) / (double) rel.size();
     }
+    final double meansil = penalty * msil.getMean();
+    final double stdsil = penalty * msil.getSampleStddev();
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".silhouette.noise-handling", noiseOption.toString()));
-      LOG.statistics(new LongStatistic(key + ".silhouette.noise", noisecount));
-      LOG.statistics(new DoubleStatistic(key + ".silhouette.mean", penalty * msil.getMean()));
-      LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", penalty * msil.getSampleStddev()));
+      if(ignorednoise > 0) {
+        LOG.statistics(new LongStatistic(key + ".silhouette.noise", ignorednoise));
+      }
+      LOG.statistics(new DoubleStatistic(key + ".silhouette.mean", meansil));
+      LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", stdsil));
     }
 
     EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
-    g.addMeasure("Silhouette coefficient +-" + FormatUtil.NF2.format(penalty * msil.getSampleStddev()), penalty * msil.getMean(), -1., 1., 0., false);
+    g.addMeasure("Silhouette +-" + FormatUtil.NF2.format(stdsil), meansil, -1., 1., 0., false);
     db.getHierarchy().resultChanged(ev);
-    return penalty * msil.getMean();
+    return meansil;
   }
 
   @Override
@@ -270,7 +270,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     /**
      * Parameter to treat noise as a single cluster.
      */
-    public static final OptionID NOISE_ID = new OptionID("silhouette.noisehandling", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID NOISE_ID = new OptionID("silhouette.noisehandling", "Control how noise should be treated.");
 
     /**
      * Distance function to use.

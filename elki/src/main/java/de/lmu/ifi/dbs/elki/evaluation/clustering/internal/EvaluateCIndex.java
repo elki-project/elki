@@ -116,11 +116,10 @@ public class EvaluateCIndex<O> implements Evaluator {
   public double evaluateClustering(Database db, Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
-    int noisecount = 0;
-
-    /* theta is the sum, w the number of within group distances */
+    // theta is the sum, w the number of within group distances
     double theta = 0;
     int w = 0;
+    int ignorednoise = 0;
     TDoubleList pairDists = new TDoubleArrayList();
 
     for(int i = 0; i < clusters.size(); i++) {
@@ -129,35 +128,36 @@ public class EvaluateCIndex<O> implements Evaluator {
         switch(noiseOption){
         case IGNORE_NOISE:
         case IGNORE_NOISE_WITH_PENALTY:
-          noisecount += cluster.size();
-          continue;
+          ignorednoise += cluster.size();
+          continue; // Ignore
         case TREAT_NOISE_AS_SINGLETONS:
-          continue;
+          continue; // No within-cluster distances!
         case MERGE_NOISE:
           break; // Treat like a cluster
         }
       }
       for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
         O obj = rel.get(it1);
+        // Compare object to every cluster, but only once
         for(int j = i; j < clusters.size(); j++) {
           Cluster<?> ocluster = clusters.get(j);
           if(ocluster.size() <= 1 || ocluster.isNoise()) {
             switch(noiseOption){
             case IGNORE_NOISE:
             case IGNORE_NOISE_WITH_PENALTY:
-              continue;
+              continue; // Ignore this cluster.
             case TREAT_NOISE_AS_SINGLETONS:
             case MERGE_NOISE:
               break; // Treat like a cluster
             }
           }
           for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
-            if(DBIDUtil.equal(it1, it2)) {
+            if(DBIDUtil.compare(it1, it2) <= 0) { // Only once.
               continue;
             }
             double dist = dq.distance(obj, rel.get(it2));
             pairDists.add(dist);
-            if(ocluster == cluster) {
+            if(ocluster == cluster) { // Within-cluster distances.
               theta += dist;
               w++;
             }
@@ -176,14 +176,16 @@ public class EvaluateCIndex<O> implements Evaluator {
 
     double cIndex = (max > min) ? (theta - min) / (max - min) : 0.;
 
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
-      double penalty = (rel.size() - noisecount) / (double) rel.size();
+    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && ignorednoise > 0) {
+      double penalty = (rel.size() - ignorednoise) / (double) rel.size();
       cIndex = penalty * cIndex;
     }
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".c-index.noise-handling", noiseOption.toString()));
-      LOG.statistics(new LongStatistic(key + ".c-index.noise", noisecount));
+      if(ignorednoise > 0) {
+        LOG.statistics(new LongStatistic(key + ".c-index.ignored", ignorednoise));
+      }
       LOG.statistics(new DoubleStatistic(key + ".c-index", cIndex));
     }
 
@@ -226,7 +228,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     /**
      * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID NOISE_ID = new OptionID("c-index.noisehandling", "option, how noise should be treated.");
+    public static final OptionID NOISE_ID = new OptionID("c-index.noisehandling", "Control how noise should be treated.");
 
     /**
      * Distance function to use.

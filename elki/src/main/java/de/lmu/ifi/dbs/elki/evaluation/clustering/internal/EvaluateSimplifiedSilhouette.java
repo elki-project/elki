@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.model.ModelUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -55,11 +54,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Compute the simplified silhouette of a data set.
  * 
+ * The simplified silhouette does not use pairwise distances, but distances to
+ * centroids only.
+ * 
  * @author Stephan Baier
  * @author Erich Schubert
  */
 public class EvaluateSimplifiedSilhouette implements Evaluator {
-
   /**
    * Logger for debug output.
    */
@@ -73,7 +74,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
   /**
    * Distance function to use.
    */
-  private PrimitiveDistanceFunction<? super NumberVector> distance;
+  private NumberVectorDistanceFunction<?> distance;
 
   /**
    * Key for logging statistics.
@@ -86,7 +87,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
-  public EvaluateSimplifiedSilhouette(PrimitiveDistanceFunction<? super NumberVector> distance, NoiseHandling noiseOpt) {
+  public EvaluateSimplifiedSilhouette(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
@@ -102,38 +103,14 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
    */
   public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
-
-    // Collect cluster centroids
-    int noisecount = 0;
-    ArrayList<NumberVector> centroids = new ArrayList<NumberVector>();
-
-    for(Cluster<?> cluster : clusters) {
-      if(cluster.size() <= 1 || cluster.isNoise()) {
-        switch(noiseOption){
-        case IGNORE_NOISE:
-        case IGNORE_NOISE_WITH_PENALTY:
-        case TREAT_NOISE_AS_SINGLETONS:
-          noisecount += cluster.size();
-          centroids.add(null);
-          continue;
-        case MERGE_NOISE:
-          // Continue.
-          break;
-        }
-      }
-      NumberVector p = ModelUtil.getPrototype(cluster.getModel(), rel);
-      if(p == null) {
-        p = Centroid.make(rel, cluster.getIDs());
-      }
-      centroids.add(p);
-    }
-    assert (centroids.size() == clusters.size());
+    NumberVector[] centroids = new NumberVector[clusters.size()];
+    int ignorednoise = centroids(rel, clusters, centroids, noiseOption);
 
     MeanVariance mssil = new MeanVariance();
 
-    int i = -1;
-    for(Cluster<?> cluster : clusters) {
-      i++; // Count all clusters.
+    Iterator<? extends Cluster<?>> ci = clusters.iterator();
+    for(int i = 0; ci.hasNext(); i++) {
+      Cluster<?> cluster = ci.next();
       if(cluster.size() <= 1) {
         // As suggested in Rousseeuw, we use 0 for singletons.
         mssil.put(0., cluster.size());
@@ -143,19 +120,18 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
         switch(noiseOption){
         case IGNORE_NOISE:
         case IGNORE_NOISE_WITH_PENALTY:
-          continue;
+          continue; // Ignore elements
         case TREAT_NOISE_AS_SINGLETONS:
           // As suggested in Rousseeuw, we use 0 for singletons.
           mssil.put(0., cluster.size());
           continue;
         case MERGE_NOISE:
-          // Continue as with clusters.
-          break;
+          break; // Treat as cluster below
         }
       }
 
       // Cluster center:
-      final NumberVector center = centroids.get(i);
+      final NumberVector center = centroids[i];
       assert (center != null);
       for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
         NumberVector obj = rel.get(it);
@@ -164,35 +140,91 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
 
         // b: Distance to other clusters centroids:
         double min = Double.POSITIVE_INFINITY;
-        for(NumberVector other : centroids) {
-          if(other != null && other != center) {
-            double dist = distance.distance(other, obj);
-            min = dist < min ? dist : min;
+        Iterator<? extends Cluster<?>> cj = clusters.iterator();
+        for(int j = 0; cj.hasNext(); j++) {
+          Cluster<?> ocluster = cj.next();
+          if(i == j) {
+            continue;
           }
+          NumberVector other = centroids[j];
+          if(other == null) { // Noise!
+            switch(noiseOption){
+            case IGNORE_NOISE:
+            case IGNORE_NOISE_WITH_PENALTY:
+              continue;
+            case TREAT_NOISE_AS_SINGLETONS:
+              // Treat each object like a centroid!
+              for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
+                double dist = distance.distance(rel.get(it2), obj);
+                min = dist < min ? dist : min;
+              }
+              continue;
+            case MERGE_NOISE:
+              break; // Treat as cluster below, but should not be reachable.
+            }
+          }
+          // Clusters: use centroid.
+          double dist = distance.distance(other, obj);
+          min = dist < min ? dist : min;
         }
 
-        // One cluster only?
+        // One 'real' cluster only?
         min = min < Double.POSITIVE_INFINITY ? min : a;
         mssil.put((min - a) / (min > a ? min : a));
       }
     }
 
     double penalty = 1.;
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
-      penalty = (rel.size() - noisecount) / (double) rel.size();
+    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && ignorednoise > 0) {
+      penalty = (rel.size() - ignorednoise) / (double) rel.size();
     }
+    final double meanssil = penalty * mssil.getMean();
+    final double stdssil = penalty * mssil.getSampleStddev();
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".simplified-silhouette.noise-handling", noiseOption.toString()));
-      LOG.statistics(new LongStatistic(key + ".simplified-silhouette.noise", noisecount));
-      LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.mean", penalty * mssil.getMean()));
-      LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.stddev", penalty * mssil.getSampleStddev()));
+      if(ignorednoise > 0) {
+        LOG.statistics(new LongStatistic(key + ".simplified-silhouette.ignored", ignorednoise));
+      }
+      LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.mean", meanssil));
+      LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.stddev", stdssil));
     }
 
     EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
-    g.addMeasure("Simplified Silhouette +-" + FormatUtil.NF2.format(penalty * mssil.getSampleStddev()), penalty * mssil.getMean(), -1., 1., 0., false);
+    g.addMeasure("Simp. Silhouette +-" + FormatUtil.NF2.format(stdssil), meanssil, -1., 1., 0., false);
     db.getHierarchy().resultChanged(ev);
-    return penalty * mssil.getMean();
+    return meanssil;
+  }
+
+  /**
+   * Compute centroids.
+   * 
+   * @param rel Data relation
+   * @param clusters Clusters
+   * @param centroids Output array for centroids
+   * @return Number of ignored noise elements.
+   */
+  public static int centroids(Relation<? extends NumberVector> rel, List<? extends Cluster<?>> clusters, NumberVector[] centroids, NoiseHandling noiseOption) {
+    assert (centroids.length == clusters.size());
+    int ignorednoise = 0;
+    Iterator<? extends Cluster<?>> ci = clusters.iterator();
+    for(int i = 0; ci.hasNext(); i++) {
+      Cluster<?> cluster = ci.next();
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+        case IGNORE_NOISE_WITH_PENALTY:
+          ignorednoise += cluster.size();
+        case TREAT_NOISE_AS_SINGLETONS:
+          centroids[i] = null;
+          continue;
+        case MERGE_NOISE:
+          break; // Treat as cluster below
+        }
+      }
+      centroids[i] = ModelUtil.getPrototypeOrCentroid(cluster.getModel(), rel, cluster.getIDs());
+    }
+    return ignorednoise;
   }
 
   @Override
@@ -220,7 +252,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
     /**
      * Distance function to use.
      */
-    private PrimitiveDistanceFunction<? super NumberVector> distance;
+    private NumberVectorDistanceFunction<?> distance;
 
     /**
      * Option, how noise should be treated.
@@ -231,7 +263,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<PrimitiveDistanceFunction<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(EvaluateSilhouette.Parameterizer.DISTANCE_ID, PrimitiveDistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = new ObjectParameter<>(EvaluateSilhouette.Parameterizer.DISTANCE_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }
