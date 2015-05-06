@@ -160,8 +160,8 @@ public class EvaluateSquaredErrors<O extends NumberVector> implements Evaluator 
       LOG.statistics(new DoubleStatistic(key + ".rmsd", Math.sqrt(ssq / rel.size())));
     }
 
-    EvaluationResult ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
-    MeasurementGroup g = ev.newGroup("Distance-based Evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Mean distance", sum / rel.size(), 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("RMSD", Math.sqrt(ssq / rel.size()), 0., Double.POSITIVE_INFINITY, true);

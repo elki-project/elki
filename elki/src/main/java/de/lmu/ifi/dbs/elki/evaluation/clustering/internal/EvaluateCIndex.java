@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -188,26 +187,8 @@ public class EvaluateCIndex<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".c-index", cIndex));
     }
 
-    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(c, EvaluationResult.class);
-    EvaluationResult ev = null;
-    for(EvaluationResult e : ers) {
-      if("internal evaluation".equals(e.getShortName())) {
-        ev = e;
-        break;
-      }
-    }
-    if(ev == null) {
-      ev = new EvaluationResult("Internal Clustering Evaluation", "internal evaluation");
-      db.getHierarchy().add(c, ev);
-    }
-    MeasurementGroup g = null;
-    for(MeasurementGroup j : ev) {
-      if("Distance-based Evaluation".equals(j.getName())) {
-        g = j;
-        break;
-      }
-    }
-    g = g != null ? g : ev.newGroup("Distance-based Evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("C-Index", cIndex, 0., 1., 0., true);
     db.getHierarchy().resultChanged(ev);
     return cIndex;
