@@ -69,6 +69,21 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
     return g;
   }
 
+  /**
+   * Find or add a new measurement group.
+   * 
+   * @param label Group name
+   * @return Measurement group.
+   */
+  public EvaluationResult.MeasurementGroup findOrCreateGroup(String label) {
+    for(EvaluationResult.MeasurementGroup g : groups) {
+      if(label.equals(g.getName())) {
+        return g;
+      }
+    }
+    return newGroup(label);
+  }
+
   @Override
   public void writeToText(TextWriterStream out, String label) {
     for(EvaluationResult.MeasurementGroup g : groups) {
@@ -116,6 +131,31 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
       r += 1 + m.measurements.size();
     }
     return r;
+  }
+
+  /**
+   * Find or create an evaluation result.
+   * 
+   * @param hierarchy Result hierarchy.
+   * @param parent Parent result
+   * @param name Long name
+   * @param shortname Short name
+   * @return Evaluation result
+   */
+  public static EvaluationResult findOrCreate(ResultHierarchy hierarchy, Result parent, String name, String shortname) {
+    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(parent, EvaluationResult.class);
+    EvaluationResult ev = null;
+    for(EvaluationResult e : ers) {
+      if(shortname.equals(e.getShortName())) {
+        ev = e;
+        break;
+      }
+    }
+    if(ev == null) {
+      ev = new EvaluationResult(name, shortname);
+      hierarchy.add(parent, ev);
+    }
+    return ev;
   }
 
   /**
