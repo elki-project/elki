@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2014
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
@@ -51,56 +52,57 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Compute the Variance Ratio Criteria of a data set.
+ * 
+ * Compute the PBM of a data set
  * 
  * Reference:
  * <p>
- * R. B. Calinski and J. Harabasz<br />
- * A dendrite method for cluster analysis<br />
- * Communications in Statistics-theory and Methods, 3(1)
+ * M. K. Pakhira, and S. Bandyopadhyay, and U. Maulik<br />
+ * Validity index for crisp and fuzzy clusters<br />
+ * Pattern recognition, 37(3)
  * </p>
  * 
  * @author Stephan Baier
  * @author Erich Schubert
  */
-@Reference(authors = "R. B. Calinski and J. Harabasz", //
-title = "A dendrite method for cluster analysis",//
-booktitle = "Communications in Statistics-theory and Methods, 3(1)",//
-url = "http://dx.doi.org/10.1080/03610927408827101")
-public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
+@Reference(authors = "M. K. Pakhira, and S. Bandyopadhyay, and U. Maulik", //
+title = "Validity index for crisp and fuzzy clusters",//
+booktitle = "Pattern recognition, 37(3)",//
+url = "http://dx.doi.org/10.1016/j.patcog.2003.06.005")
+public class EvaluatePBMIndex implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateVarianceRatioCriteria.class);
+  private static final Logging LOG = Logging.getLogger(EvaluatePBMIndex.class);
 
   /**
    * Option for noise handling.
    */
-  private NoiseHandling noiseOption;
+  private NoiseHandling noiseHandling;
 
   /**
-   * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
+   * Distance function to use.
    */
-  private boolean penalize = true;
+  private NumberVectorDistanceFunction<?> distanceFunction;
 
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateVarianceRatioCriteria.class.getName();
+  private String key = EvaluatePBMIndex.class.getName();
 
   /**
    * Constructor.
    * 
+   * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
-   * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateVarianceRatioCriteria(NoiseHandling opt, boolean penalize) {
+  public EvaluatePBMIndex(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt) {
     super();
-    this.noiseOption = opt;
-    this.penalize = penalize;
+    this.distanceFunction = distance;
+    this.noiseHandling = noiseOpt;
   }
 
   /**
@@ -108,18 +110,57 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    * 
    * @param db Database
    * @param rel Data relation
+   * @param dq Distance query
    * @param c Clustering
-   * @return Variance Ratio Criteria
+   * @return PBM
    */
   public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     NumberVector[] centroids = new NumberVector[clusters.size()];
-    int ignorednoise = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
+    int ignorednoise = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseHandling);
 
     // Build global centroid and cluster count:
     final int dim = RelationUtil.dimensionality(rel);
     Centroid overallCentroid = new Centroid(dim);
-    int clustercount = globalCentroid(overallCentroid, rel, clusters, centroids, noiseOption);
+    EvaluateVarianceRatioCriteria.globalCentroid(overallCentroid, rel, clusters, centroids, noiseHandling);
+
+    // Maximum distance between centroids:
+    double max = 0;
+    for(int i = 0; i < centroids.length; i++) {
+      if(centroids[i] == null && noiseHandling != NoiseHandling.TREAT_NOISE_AS_SINGLETONS) {
+        continue;
+      }
+      for(int j = i + 1; j < centroids.length; j++) {
+        if(centroids[j] == null && noiseHandling != NoiseHandling.TREAT_NOISE_AS_SINGLETONS) {
+          continue;
+        }
+        if(centroids[i] == null && centroids[j] == null) {
+          // Need to compute pairwise distances of noise clusters.
+          for(DBIDIter iti = clusters.get(i).getIDs().iter(); iti.valid(); iti.advance()) {
+            for(DBIDIter itj = clusters.get(j).getIDs().iter(); itj.valid(); itj.advance()) {
+              double dist = distanceFunction.distance(rel.get(iti), rel.get(itj));
+              max = dist > max ? dist : max;
+            }
+          }
+        }
+        else if(centroids[i] == null) {
+          for(DBIDIter iti = clusters.get(i).getIDs().iter(); iti.valid(); iti.advance()) {
+            double dist = distanceFunction.distance(rel.get(iti), centroids[j]);
+            max = dist > max ? dist : max;
+          }
+        }
+        else if(centroids[j] == null) {
+          for(DBIDIter itj = clusters.get(j).getIDs().iter(); itj.valid(); itj.advance()) {
+            double dist = distanceFunction.distance(centroids[i], rel.get(itj));
+            max = dist > max ? dist : max;
+          }
+        }
+        else {
+          double dist = distanceFunction.distance(centroids[i], centroids[j]);
+          max = dist > max ? dist : max;
+        }
+      }
+    }
 
     // a: Distance to own centroid
     // b: Distance to overall centroid
@@ -128,7 +169,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     for(int i = 0; ci.hasNext(); i++) {
       Cluster<?> cluster = ci.next();
       if(cluster.size() <= 1 || cluster.isNoise()) {
-        switch(noiseOption){
+        switch(noiseHandling){
         case IGNORE_NOISE:
           continue; // Ignored
         case TREAT_NOISE_AS_SINGLETONS:
@@ -141,67 +182,29 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
           break; // Treat like a cluster below:
         }
       }
+
       for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-        NumberVector vec = rel.get(it);
-        a += SquaredEuclideanDistanceFunction.STATIC.distance(centroids[i], vec);
-        b += SquaredEuclideanDistanceFunction.STATIC.distance(overallCentroid, vec);
+        NumberVector obj = rel.get(it);
+        a += distanceFunction.distance(centroids[i], obj);
+        b += distanceFunction.distance(overallCentroid, obj);
       }
     }
 
-    double vrc = ((b - a) / a) * ((rel.size() - clustercount) / (clustercount - 1.));
-    // Only if {@link NoiseHandling#IGNORE_NOISE}:
-    if(penalize && ignorednoise > 0) {
-      vrc *= (rel.size() - ignorednoise) / (double) rel.size();
-    }
+    final double pbm = (1. / centroids.length) * (b / a) * max;
+
     if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(key + ".vrc.noise-handling", noiseOption.toString()));
+      LOG.statistics(new StringStatistic(key + ".pbm.noise-handling", noiseHandling.toString()));
       if(ignorednoise > 0) {
-        LOG.statistics(new LongStatistic(key + ".vrc.ignored", ignorednoise));
+        LOG.statistics(new LongStatistic(key + ".pbm.ignored", ignorednoise));
       }
-      LOG.statistics(new DoubleStatistic(key + ".vrc", vrc));
+      LOG.statistics(new DoubleStatistic(key + ".pbm", pbm));
     }
 
     EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
-    g.addMeasure("Variance Ratio Criteria", vrc, 0., 1., 0., false);
-    return vrc;
-  }
-
-  /**
-   * Update the global centroid.
-   * 
-   * @param overallCentroid Centroid to udpate
-   * @param rel Data relation
-   * @param clusters Clusters
-   * @param centroids Cluster centroids
-   * @return Number of clusters
-   */
-  public static int globalCentroid(Centroid overallCentroid, Relation<? extends NumberVector> rel, List<? extends Cluster<?>> clusters, NumberVector[] centroids, NoiseHandling noiseOption) {
-    int clustercount = 0;
-    Iterator<? extends Cluster<?>> ci = clusters.iterator();
-    for(int i = 0; ci.hasNext(); i++) {
-      Cluster<?> cluster = ci.next();
-      if(cluster.size() <= 1 || cluster.isNoise()) {
-        switch(noiseOption){
-        case IGNORE_NOISE:
-          continue; // Ignore completely
-        case TREAT_NOISE_AS_SINGLETONS:
-          clustercount += cluster.size();
-          // Update global centroid:
-          for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-            overallCentroid.put(rel.get(it));
-          }
-          continue; // With NEXT cluster.
-        case MERGE_NOISE:
-          break; // Treat as cluster below:
-        }
-      }
-      // Update centroid:
-      assert (centroids[i] != null);
-      overallCentroid.put(centroids[i], cluster.size());
-      ++clustercount;
-    }
-    return clustercount;
+    g.addMeasure("PBM-Index", pbm, 0., Double.POSITIVE_INFINITY, 0., false);
+    db.getHierarchy().resultChanged(ev);
+    return pbm;
   }
 
   @Override
@@ -211,7 +214,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(baseResult);
-    Relation<? extends NumberVector> rel = db.getRelation(EuclideanDistanceFunction.STATIC.getInputTypeRestriction());
+    Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
       evaluateClustering(db, (Relation<? extends NumberVector>) rel, c);
@@ -222,50 +225,50 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    * Parameterization class.
    * 
    * @author Stephan Baier
+   * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter for choosing the distance function.
+     */
+    public static final OptionID DISTANCE_ID = new OptionID("pbm.distance", "Distance function to use for computing PBM.");
+
     /**
      * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID NOISE_ID = new OptionID("vrc.noisehandling", "Control how noise should be treated.");
+    public static final OptionID NOISE_ID = new OptionID("pbm.noisehandling", "option, how noise should be treated.");
 
     /**
-     * Do not penalize ignored noise.
+     * Distance function to use.
      */
-    public static final OptionID NO_PENALIZE_ID = new OptionID("silhouette.no-penalize-noise", "Do not penalize ignored noise.");
+    private NumberVectorDistanceFunction<?> distance;
 
     /**
      * Option, how noise should be treated.
      */
-    private NoiseHandling noiseOption;
-
-    /**
-     * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
-     */
-    private boolean penalize = true;
+    private NoiseHandling noiseHandling;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
-      if(config.grab(noiseP)) {
-        noiseOption = noiseP.getValue();
+      ObjectParameter<NumberVectorDistanceFunction<?>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
+      if(config.grab(distanceFunctionP)) {
+        distance = distanceFunctionP.instantiateClass(config);
       }
 
-      if(noiseOption == NoiseHandling.IGNORE_NOISE) {
-        Flag penalizeP = new Flag(NO_PENALIZE_ID);
-        if(config.grab(penalizeP)) {
-          penalize = penalizeP.isFalse();
-        }
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
+      if(config.grab(noiseP)) {
+        noiseHandling = noiseP.getValue();
       }
     }
 
     @Override
-    protected EvaluateVarianceRatioCriteria<? extends NumberVector> makeInstance() {
-      return new EvaluateVarianceRatioCriteria<>(noiseOption, penalize);
+    protected EvaluatePBMIndex makeInstance() {
+      return new EvaluatePBMIndex(distance, noiseHandling);
     }
   }
+
 }
