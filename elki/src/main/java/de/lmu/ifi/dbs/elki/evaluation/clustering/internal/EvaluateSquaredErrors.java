@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -97,9 +97,9 @@ public class EvaluateSquaredErrors implements Evaluator {
   private static final Logging LOG = Logging.getLogger(EvaluateSquaredErrors.class);
 
   /**
-   * Keep noise "clusters" merged, instead of breaking them into singletons.
+   * Handling of Noise clusters
    */
-  private boolean mergenoise = false;
+  private NoiseHandling noiseOption;
 
   /**
    * Distance function to use.
@@ -114,14 +114,13 @@ public class EvaluateSquaredErrors implements Evaluator {
   /**
    * Constructor.
    * 
-   * @param distance Distance function
-   * @param mergenoise Flag to treat noise as clusters, instead of breaking them
-   *        into singletons.
+   * @param distance Distance function to use.
+   * @param noiseOption Control noise handling.
    */
-  public EvaluateSquaredErrors(NumberVectorDistanceFunction<?> distance, boolean mergenoise) {
+  public EvaluateSquaredErrors(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOption) {
     super();
     this.distance = distance;
-    this.mergenoise = mergenoise;
+    this.noiseOption = noiseOption;
   }
 
   /**
@@ -134,12 +133,22 @@ public class EvaluateSquaredErrors implements Evaluator {
    */
   public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
     boolean square = !(distance instanceof SquaredEuclideanDistanceFunction);
+    int ignorednoise = 0;
 
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     double ssq = 0, sum = 0;
     for(Cluster<?> cluster : clusters) {
-      if(cluster.size() <= 1 || treatAsSingletons(cluster)) {
-        continue;
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+        case IGNORE_NOISE_WITH_PENALTY:
+          ignorednoise += cluster.size();
+          continue;
+        case TREAT_NOISE_AS_SINGLETONS:
+          continue;
+        case MERGE_NOISE:
+          break; // Treat as cluster below:
+        }
       }
       NumberVector center = ModelUtil.getPrototypeOrCentroid(cluster.getModel(), rel, cluster.getIDs());
       for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
@@ -148,30 +157,20 @@ public class EvaluateSquaredErrors implements Evaluator {
         ssq += square ? d * d : d;
       }
     }
+    final int div = Math.max(1, rel.size() - ignorednoise);
     if(LOG.isStatistics()) {
-      LOG.statistics(new DoubleStatistic(key + ".mean", sum / rel.size()));
+      LOG.statistics(new DoubleStatistic(key + ".mean", sum / div));
       LOG.statistics(new DoubleStatistic(key + ".ssq", ssq));
-      LOG.statistics(new DoubleStatistic(key + ".rmsd", Math.sqrt(ssq / rel.size())));
+      LOG.statistics(new DoubleStatistic(key + ".rmsd", Math.sqrt(ssq / div)));
     }
 
     EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
-    g.addMeasure("Mean distance", sum / rel.size(), 0., Double.POSITIVE_INFINITY, true);
+    g.addMeasure("Mean distance", sum / div, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
-    g.addMeasure("RMSD", Math.sqrt(ssq / rel.size()), 0., Double.POSITIVE_INFINITY, true);
+    g.addMeasure("RMSD", Math.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
     db.getHierarchy().add(c, ev);
     return ssq;
-  }
-
-  /**
-   * Test whether to treat a cluster as noise cluster.
-   * 
-   * @param cluster Cluster to analyze
-   * @return True, when the cluster is considered noise.
-   */
-  private boolean treatAsSingletons(Cluster<?> cluster) {
-    // mergenoise = true => treat noise cluster as cluster
-    return mergenoise && cluster.isNoise();
   }
 
   @Override
@@ -203,7 +202,7 @@ public class EvaluateSquaredErrors implements Evaluator {
     /**
      * Parameter to treat noise as a single cluster.
      */
-    public static final OptionID MERGENOISE_ID = new OptionID("ssq.noisecluster", "Treat noise as a cluster, not as singletons.");
+    public static final OptionID NOISE_ID = new OptionID("ssq.noisehandling", "Control how noise should be treated.");
 
     /**
      * Distance function to use.
@@ -211,9 +210,9 @@ public class EvaluateSquaredErrors implements Evaluator {
     private NumberVectorDistanceFunction<?> distance;
 
     /**
-     * Keep noise "clusters" merged.
+     * Handling of noise clusters.
      */
-    private boolean mergenoise = false;
+    private NoiseHandling noiseOption;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -223,15 +222,15 @@ public class EvaluateSquaredErrors implements Evaluator {
         distance = distP.instantiateClass(config);
       }
 
-      Flag noiseP = new Flag(MERGENOISE_ID);
+      EnumParameter<NoiseHandling> noiseP = new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
       if(config.grab(noiseP)) {
-        mergenoise = noiseP.isTrue();
+        noiseOption = noiseP.getValue();
       }
     }
 
     @Override
     protected EvaluateSquaredErrors makeInstance() {
-      return new EvaluateSquaredErrors(distance, mergenoise);
+      return new EvaluateSquaredErrors(distance, noiseOption);
     }
   }
 }

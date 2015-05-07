@@ -280,7 +280,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     /**
      * Noise handling
      */
-    private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+    private NoiseHandling noiseOption;
 
     @Override
     protected void makeOptions(Parameterization config) {

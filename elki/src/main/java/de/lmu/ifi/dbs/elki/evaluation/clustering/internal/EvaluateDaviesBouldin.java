@@ -77,7 +77,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Option for noise handling.
    */
-  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+  private NoiseHandling noiseOption;
 
   /**
    * Distance function to use.
@@ -245,7 +245,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
     /**
      * Option, how noise should be treated.
      */
-    private NoiseHandling noiseOption = NoiseHandling.IGNORE_NOISE_WITH_PENALTY;
+    private NoiseHandling noiseOption;
 
     @Override
     protected void makeOptions(Parameterization config) {

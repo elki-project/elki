@@ -78,7 +78,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   /**
    * Option for noise handling.
    */
-  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+  private NoiseHandling noiseOption;
 
   /**
    * Key for logging statistics.
@@ -228,7 +228,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     /**
      * Option, how noise should be treated.
      */
-    private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+    private NoiseHandling noiseOption;
 
     @Override
     protected void makeOptions(Parameterization config) {
