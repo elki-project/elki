@@ -190,7 +190,7 @@ public class EvaluatePBMIndex implements Evaluator {
       }
     }
 
-    final double pbm = (1. / centroids.length) * (b / a) * max;
+    final double pbm = Math.pow((1. / centroids.length) * (b / a) * max, 2.);
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".pbm.noise-handling", noiseHandling.toString()));
@@ -238,7 +238,7 @@ public class EvaluatePBMIndex implements Evaluator {
     /**
      * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID NOISE_ID = new OptionID("pbm.noisehandling", "option, how noise should be treated.");
+    public static final OptionID NOISE_ID = new OptionID("pbm.noisehandling", "Control how noise should be treated.");
 
     /**
      * Distance function to use.
