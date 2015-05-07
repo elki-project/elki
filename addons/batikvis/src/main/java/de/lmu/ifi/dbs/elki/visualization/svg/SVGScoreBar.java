@@ -42,6 +42,11 @@ public class SVGScoreBar {
   protected double val, min = 0., max = 1.;
 
   /**
+   * Reversed flag.
+   */
+  protected boolean reversed = false;
+
+  /**
    * Label (on the right)
    */
   protected String label = null;
@@ -69,6 +74,15 @@ public class SVGScoreBar {
     this.val = val;
     this.min = min;
     this.max = max;
+  }
+
+  /**
+   * Set the reversed flag.
+   * 
+   * @param reversed Reversed flag.
+   */
+  public void setReversed(boolean reversed) {
+    this.reversed = reversed;
   }
 
   /**
@@ -110,8 +124,15 @@ public class SVGScoreBar {
     barchart.appendChild(bar);
 
     if(val >= min && val <= max && min < max) {
-      double fpos = (val - min) / (max - min) * (width - (0.04 * height));
-      Element chart = svgp.svgRect(x + 0.02 * height, y + 0.02 * height, fpos, height - 0.04 * height);
+      final double frame = 0.02 * height;
+      double fpos = (val - min) / (max - min) * (width - 2 * frame);
+      Element chart;
+      if(reversed) {
+        chart = svgp.svgRect(x + frame + fpos, y + frame, width - fpos - 2 * frame, height - 2 * frame);
+      }
+      else {
+        chart = svgp.svgRect(x + frame, y + frame, fpos, height - 2 * frame);
+      }
       chart.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#d4e4f1");
       chart.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
       chart.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, String.valueOf(height * 0.01));

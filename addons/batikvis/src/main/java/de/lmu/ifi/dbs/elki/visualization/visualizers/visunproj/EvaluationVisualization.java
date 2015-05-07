@@ -93,9 +93,10 @@ public class EvaluationVisualization extends AbstractVisFactory {
     }
   }
 
-  private double addBarChart(SVGPlot svgp, Element parent, double ypos, String label, double value, double minValue, double maxValue, double baseValue) {
+  private double addBarChart(SVGPlot svgp, Element parent, double ypos, String label, double value, double minValue, double maxValue, double baseValue, boolean reversed) {
     SVGScoreBar barchart = new SVGScoreBar();
     barchart.setFill(value, baseValue == baseValue ? baseValue : minValue, maxValue);
+    barchart.setReversed(reversed);
     barchart.showValues(FormatUtil.NF4);
     barchart.addLabel(label);
     parent.appendChild(barchart.build(svgp, 0.0, ypos, BARLENGTH, BARHEIGHT));
@@ -129,7 +130,7 @@ public class EvaluationVisualization extends AbstractVisFactory {
     for(EvaluationResult.MeasurementGroup g : sr) {
       ypos = addHeader(svgp, parent, ypos, g.getName());
       for(EvaluationResult.Measurement m : g) {
-        ypos = addBarChart(svgp, parent, ypos, m.getName(), m.getVal(), m.getMin(), m.getMax(), m.getExp());
+        ypos = addBarChart(svgp, parent, ypos, m.getName(), m.getVal(), m.getMin(), m.getMax(), m.getExp(), m.lowerIsBetter());
       }
     }
 
