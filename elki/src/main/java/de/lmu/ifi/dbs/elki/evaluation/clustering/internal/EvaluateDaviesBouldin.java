@@ -134,7 +134,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
           double d = (withinGroupDistancei + withinGroupDistance[j]) / bD;
           max = d > max ? d : max;
         }
-        else if(noiseOption != NoiseHandling.IGNORE_NOISE && noiseOption != NoiseHandling.IGNORE_NOISE_WITH_PENALTY) {
+        else if(noiseOption != NoiseHandling.IGNORE_NOISE) {
           if(centroid != null) {
             double d = Double.POSITIVE_INFINITY;
             // Find the closest element
@@ -160,14 +160,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
       daviesBouldin.put(max);
     }
 
-    double penalty = 1.;
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
-      penalty = (rel.size() - noisecount) / (double) rel.size();
-    }
-    else if(noisecount > 0) {
-      LOG.warning("Ignoring " + noisecount + " noise objects for Davies Bouldin index. The result may be biased.");
-    }
-    double daviesBouldinMean = penalty * daviesBouldin.getMean();
+    final double daviesBouldinMean = daviesBouldin.getMean();
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".db-index.noise-handling", noiseOption.toString()));

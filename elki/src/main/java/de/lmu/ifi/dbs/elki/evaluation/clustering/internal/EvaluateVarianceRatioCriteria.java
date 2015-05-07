@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Compute the Variance Ratio Criteria of a data set.
@@ -81,6 +82,11 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   private NoiseHandling noiseOption;
 
   /**
+   * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
+   */
+  private boolean penalize = true;
+
+  /**
    * Key for logging statistics.
    */
   private String key = EvaluateVarianceRatioCriteria.class.getName();
@@ -88,12 +94,13 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   /**
    * Constructor.
    * 
-   * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
+   * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateVarianceRatioCriteria(NoiseHandling opt) {
+  public EvaluateVarianceRatioCriteria(NoiseHandling opt, boolean penalize) {
     super();
     this.noiseOption = opt;
+    this.penalize = penalize;
   }
 
   /**
@@ -123,7 +130,6 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
-        case IGNORE_NOISE_WITH_PENALTY:
           continue; // Ignored
         case TREAT_NOISE_AS_SINGLETONS:
           // Singletons: a = 0 by definition.
@@ -143,7 +149,8 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     }
 
     double vrc = ((b - a) / a) * ((rel.size() - clustercount) / (clustercount - 1.));
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && ignorednoise > 0) {
+    // Only if {@link NoiseHandling#IGNORE_NOISE}:
+    if(penalize && ignorednoise > 0) {
       vrc *= (rel.size() - ignorednoise) / (double) rel.size();
     }
     if(LOG.isStatistics()) {
@@ -156,7 +163,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
 
     EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
-    g.addMeasure("Variance Ratio Criteria", vrc, 0., 1., 0., true);
+    g.addMeasure("Variance Ratio Criteria", vrc, 0., 1., 0., false);
     return vrc;
   }
 
@@ -177,7 +184,6 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
-        case IGNORE_NOISE_WITH_PENALTY:
           continue; // Ignore completely
         case TREAT_NOISE_AS_SINGLETONS:
           clustercount += cluster.size();
@@ -226,9 +232,19 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     public static final OptionID NOISE_ID = new OptionID("vrc.noisehandling", "Control how noise should be treated.");
 
     /**
+     * Do not penalize ignored noise.
+     */
+    public static final OptionID NO_PENALIZE_ID = new OptionID("silhouette.no-penalize-noise", "Do not penalize ignored noise.");
+
+    /**
      * Option, how noise should be treated.
      */
     private NoiseHandling noiseOption;
+
+    /**
+     * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
+     */
+    private boolean penalize = true;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -238,11 +254,18 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }
+
+      if(noiseOption == NoiseHandling.IGNORE_NOISE) {
+        Flag penalizeP = new Flag(NO_PENALIZE_ID);
+        if(config.grab(penalizeP)) {
+          penalize = penalizeP.isFalse();
+        }
+      }
     }
 
     @Override
     protected EvaluateVarianceRatioCriteria<? extends NumberVector> makeInstance() {
-      return new EvaluateVarianceRatioCriteria<>(noiseOption);
+      return new EvaluateVarianceRatioCriteria<>(noiseOption, penalize);
     }
   }
 }

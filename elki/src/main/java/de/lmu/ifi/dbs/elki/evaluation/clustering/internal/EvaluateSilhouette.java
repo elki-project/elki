@@ -75,6 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -112,7 +113,12 @@ public class EvaluateSilhouette<O> implements Evaluator {
   /**
    * Option for noise handling.
    */
-  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+  private NoiseHandling noiseOption;
+
+  /**
+   * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
+   */
+  private boolean penalize = true;
 
   /**
    * Key for logging statistics.
@@ -124,11 +130,13 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * 
    * @param distance Distance function
    * @param noiseOption Handling of "noise" clusters.
+   * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateSilhouette(DistanceFunction<? super O> distance, NoiseHandling noiseOption) {
+  public EvaluateSilhouette(DistanceFunction<? super O> distance, NoiseHandling noiseOption, boolean penalize) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOption;
+    this.penalize = penalize;
   }
 
   /**
@@ -139,7 +147,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    *        into singletons.
    */
   public EvaluateSilhouette(DistanceFunction<? super O> distance, boolean mergenoise) {
-    this(distance, mergenoise ? NoiseHandling.MERGE_NOISE : NoiseHandling.TREAT_NOISE_AS_SINGLETONS);
+    this(distance, mergenoise ? NoiseHandling.MERGE_NOISE : NoiseHandling.TREAT_NOISE_AS_SINGLETONS, true);
   }
 
   /**
@@ -160,7 +168,6 @@ public class EvaluateSilhouette<O> implements Evaluator {
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
-        case IGNORE_NOISE_WITH_PENALTY:
           ignorednoise += cluster.size();
           continue; // Ignore noise elements
         case TREAT_NOISE_AS_SINGLETONS:
@@ -192,7 +199,6 @@ public class EvaluateSilhouette<O> implements Evaluator {
           if(ocluster.size() <= 1 || ocluster.isNoise()) {
             switch(noiseOption){
             case IGNORE_NOISE:
-            case IGNORE_NOISE_WITH_PENALTY:
               continue; // Ignore noise elements
             case TREAT_NOISE_AS_SINGLETONS:
               // Treat noise cluster as singletons:
@@ -219,7 +225,8 @@ public class EvaluateSilhouette<O> implements Evaluator {
       }
     }
     double penalty = 1.;
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && ignorednoise > 0) {
+    // Only if {@link NoiseHandling#IGNORE_NOISE}:
+    if(penalize && ignorednoise > 0) {
       penalty = (rel.size() - ignorednoise) / (double) rel.size();
     }
     final double meansil = penalty * msil.getMean();
@@ -273,6 +280,11 @@ public class EvaluateSilhouette<O> implements Evaluator {
     public static final OptionID NOISE_ID = new OptionID("silhouette.noisehandling", "Control how noise should be treated.");
 
     /**
+     * Do not penalize ignored noise.
+     */
+    public static final OptionID NO_PENALIZE_ID = new OptionID("silhouette.no-penalize-noise", "Do not penalize ignored noise.");
+
+    /**
      * Distance function to use.
      */
     private DistanceFunction<? super O> distance;
@@ -281,6 +293,11 @@ public class EvaluateSilhouette<O> implements Evaluator {
      * Noise handling
      */
     private NoiseHandling noiseOption;
+
+    /**
+     * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
+     */
+    private boolean penalize = true;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -294,11 +311,18 @@ public class EvaluateSilhouette<O> implements Evaluator {
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }
+
+      if(noiseOption == NoiseHandling.IGNORE_NOISE) {
+        Flag penalizeP = new Flag(NO_PENALIZE_ID);
+        if(config.grab(penalizeP)) {
+          penalize = penalizeP.isFalse();
+        }
+      }
     }
 
     @Override
     protected EvaluateSilhouette<O> makeInstance() {
-      return new EvaluateSilhouette<>(distance, noiseOption);
+      return new EvaluateSilhouette<>(distance, noiseOption, penalize);
     }
   }
 }

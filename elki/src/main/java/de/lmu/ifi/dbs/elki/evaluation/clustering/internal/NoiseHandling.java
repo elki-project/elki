@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  * Options for handling noise in internal measures.
  * 
  * @author Stephan Baier
+ * @author Erich Schubert
  */
 public enum NoiseHandling {
   /** Merge all noise into a cluster */
@@ -35,6 +36,4 @@ public enum NoiseHandling {
   TREAT_NOISE_AS_SINGLETONS,
   /** Ignore all noise points */
   IGNORE_NOISE,
-  /** Ignore noise points, but penalize their presence */
-  IGNORE_NOISE_WITH_PENALTY;
 }

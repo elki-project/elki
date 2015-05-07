@@ -127,7 +127,6 @@ public class EvaluateCIndex<O> implements Evaluator {
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
-        case IGNORE_NOISE_WITH_PENALTY:
           ignorednoise += cluster.size();
           continue; // Ignore
         case TREAT_NOISE_AS_SINGLETONS:
@@ -144,7 +143,6 @@ public class EvaluateCIndex<O> implements Evaluator {
           if(ocluster.size() <= 1 || ocluster.isNoise()) {
             switch(noiseOption){
             case IGNORE_NOISE:
-            case IGNORE_NOISE_WITH_PENALTY:
               continue; // Ignore this cluster.
             case TREAT_NOISE_AS_SINGLETONS:
             case MERGE_NOISE:
@@ -175,11 +173,6 @@ public class EvaluateCIndex<O> implements Evaluator {
     }
 
     double cIndex = (max > min) ? (theta - min) / (max - min) : 0.;
-
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && ignorednoise > 0) {
-      double penalty = (rel.size() - ignorednoise) / (double) rel.size();
-      cIndex = penalty * cIndex;
-    }
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".c-index.noise-handling", noiseOption.toString()));

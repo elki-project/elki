@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -77,6 +78,11 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
   private NumberVectorDistanceFunction<?> distance;
 
   /**
+   * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
+   */
+  private boolean penalize = true;
+
+  /**
    * Key for logging statistics.
    */
   private String key = EvaluateSimplifiedSilhouette.class.getName();
@@ -86,11 +92,13 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
    * 
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
+   * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateSimplifiedSilhouette(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt) {
+  public EvaluateSimplifiedSilhouette(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt, boolean penalize) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
+    this.penalize = penalize;
   }
 
   /**
@@ -119,7 +127,6 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
       if(cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
-        case IGNORE_NOISE_WITH_PENALTY:
           continue; // Ignore elements
         case TREAT_NOISE_AS_SINGLETONS:
           // As suggested in Rousseeuw, we use 0 for singletons.
@@ -150,7 +157,6 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
           if(other == null) { // Noise!
             switch(noiseOption){
             case IGNORE_NOISE:
-            case IGNORE_NOISE_WITH_PENALTY:
               continue;
             case TREAT_NOISE_AS_SINGLETONS:
               // Treat each object like a centroid!
@@ -175,7 +181,8 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
     }
 
     double penalty = 1.;
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && ignorednoise > 0) {
+    // Only if {@link NoiseHandling#IGNORE_NOISE}:
+    if(penalize && ignorednoise > 0) {
       penalty = (rel.size() - ignorednoise) / (double) rel.size();
     }
     final double meanssil = penalty * mssil.getMean();
@@ -213,7 +220,6 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
-        case IGNORE_NOISE_WITH_PENALTY:
           ignorednoise += cluster.size();
         case TREAT_NOISE_AS_SINGLETONS:
           centroids[i] = null;
@@ -259,6 +265,11 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
      */
     private NoiseHandling noiseOption;
 
+    /**
+     * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
+     */
+    private boolean penalize = true;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -272,11 +283,18 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
       if(config.grab(noiseP)) {
         noiseOption = noiseP.getValue();
       }
+
+      if(noiseOption == NoiseHandling.IGNORE_NOISE) {
+        Flag penalizeP = new Flag(EvaluateSilhouette.Parameterizer.NO_PENALIZE_ID);
+        if(config.grab(penalizeP)) {
+          penalize = penalizeP.isFalse();
+        }
+      }
     }
 
     @Override
     protected EvaluateSimplifiedSilhouette makeInstance() {
-      return new EvaluateSimplifiedSilhouette(distance, noiseOption);
+      return new EvaluateSimplifiedSilhouette(distance, noiseOption, penalize);
     }
   }
 }

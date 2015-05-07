@@ -141,7 +141,6 @@ public class EvaluateSquaredErrors implements Evaluator {
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
-        case IGNORE_NOISE_WITH_PENALTY:
           ignorednoise += cluster.size();
           continue;
         case TREAT_NOISE_AS_SINGLETONS:
