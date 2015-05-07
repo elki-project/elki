@@ -2,7 +2,13 @@ de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation
 de.lmu.ifi.dbs.elki.evaluation.NoAutomaticEvaluation
 de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSilhouette
+de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSimplifiedSilhouette
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSquaredErrors
+de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateDaviesBouldin
+de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateConcordantPairs
+de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateVarianceRatioCriteria
+de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluatePBMIndex
+de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateCIndex
 de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.ClusterPairSegmentAnalysis
 de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram
 de.lmu.ifi.dbs.elki.evaluation.index.IndexPurity
