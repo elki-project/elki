@@ -107,13 +107,13 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
    */
   public PointerDensityHierarchyRepresentationResult run(Database db, Relation<O> relation) {
     final DistanceQuery<O> distQ = db.getDistanceQuery(relation, getDistanceFunction());
-    final KNNQuery<O> knnQ = db.getKNNQuery(distQ, minPts + 1);
+    final KNNQuery<O> knnQ = db.getKNNQuery(distQ, minPts);
     // We need array addressing later.
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
 
     // Compute the core distances
     // minPts + 1: ignore query point.
-    final WritableDoubleDataStore coredists = computeCoreDists(ids, knnQ, minPts + 1);
+    final WritableDoubleDataStore coredists = computeCoreDists(ids, knnQ, minPts);
 
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);

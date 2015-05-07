@@ -302,7 +302,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
     /**
      * Option ID for linkage parameter.
      */
-    public static final OptionID MIN_PTS_ID = new OptionID("hdbscan.minPts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
+    public static final OptionID MIN_PTS_ID = new OptionID("hdbscan.minPts", "Threshold for minimum number of points in the epsilon-neighborhood of a point (including this point).");
 
     /**
      * Minimum size of core.
@@ -314,7 +314,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
       super.makeOptions(config); // distanceFunction
 
       IntParameter minptsP = new IntParameter(MIN_PTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(minptsP)) {
         minPts = minptsP.getValue();
       }

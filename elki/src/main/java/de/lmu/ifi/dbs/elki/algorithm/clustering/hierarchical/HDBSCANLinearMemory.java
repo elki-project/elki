@@ -105,13 +105,13 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
    */
   public PointerDensityHierarchyRepresentationResult run(Database db, Relation<O> relation) {
     final DistanceQuery<O> distQ = db.getDistanceQuery(relation, getDistanceFunction());
-    final KNNQuery<O> knnQ = db.getKNNQuery(distQ, minPts + 1);
+    final KNNQuery<O> knnQ = db.getKNNQuery(distQ, minPts);
     // We need array addressing later.
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
 
     // 1. Compute the core distances
     // minPts + 1: ignore query point.
-    final WritableDoubleDataStore coredists = computeCoreDists(ids, knnQ, minPts + 1);
+    final WritableDoubleDataStore coredists = computeCoreDists(ids, knnQ, minPts);
 
     final int numedges = ids.size() - 1;
     DoubleLongHeap heap = new DoubleLongMinHeap(numedges);
