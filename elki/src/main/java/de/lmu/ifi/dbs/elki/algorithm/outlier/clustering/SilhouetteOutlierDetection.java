@@ -123,13 +123,10 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     DoubleMinMax mm = new DoubleMinMax();
 
-    int noisecount = 0;
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     for(Cluster<?> cluster : clusters) {
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
-        case IGNORE_NOISE_WITH_PENALTY:
-          noisecount += cluster.size();
         case IGNORE_NOISE:
         case TREAT_NOISE_AS_SINGLETONS:
           // As suggested in Rousseeuw, we use 0 for singletons.
@@ -164,7 +161,6 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
           if(ocluster.isNoise()) {
             switch(noiseOption){
             case IGNORE_NOISE:
-            case IGNORE_NOISE_WITH_PENALTY:
               continue;
             case MERGE_NOISE:
               // No special treatment
@@ -195,19 +191,9 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
         mm.put(score);
       }
     }
-    double penalty = 1.;
-    // Apply penalty term, if enabled:
-    if(noiseOption == NoiseHandling.IGNORE_NOISE_WITH_PENALTY && noisecount > 0) {
-      penalty = (relation.size() - noisecount) / (double) relation.size();
-      // Apply penalty
-      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-        scores.putDouble(iter, scores.doubleValue(iter) * penalty);
-      }
-    }
-
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Silhouette Coefficients", "silhouette-outlier", scores, relation.getDBIDs());
-    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin() * penalty, mm.getMax() * penalty, -1., 1., .5);
+    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), -1., 1., .5);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
