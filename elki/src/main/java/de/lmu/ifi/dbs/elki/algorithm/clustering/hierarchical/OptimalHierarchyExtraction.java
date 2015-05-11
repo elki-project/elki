@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
@@ -61,6 +62,9 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * 
  * In contrast to the authors top-down approach, we use a bottom-up approach
  * based on the more efficient pointer representation introduced in SLINK.
+ * 
+ * In particular, it can also be used to extract a hierarchy from a hierarchical
+ * agglomerative clustering.
  * 
  * Reference:
  * <p>
@@ -99,15 +103,22 @@ public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clusterin
   private HierarchicalClusteringAlgorithm algorithm;
 
   /**
+   * Return a hierarchical result.
+   */
+  private boolean hierarchical = true;
+
+  /**
    * Constructor.
    * 
    * @param algorithm Algorithm to run
    * @param minClSize Minimum cluster size
+   * @param hierarchical Produce a hierarchical result
    */
-  public OptimalHierarchyExtraction(HierarchicalClusteringAlgorithm algorithm, int minClSize) {
+  public OptimalHierarchyExtraction(HierarchicalClusteringAlgorithm algorithm, int minClSize, boolean hierarchical) {
     super();
     this.algorithm = algorithm;
     this.minClSize = minClSize;
+    this.hierarchical = hierarchical;
   }
 
   @Override
@@ -220,12 +231,13 @@ public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     // Build final dendrogram:
     final Clustering<DendrogramModel> dendrogram = new Clustering<>("Hierarchical Clustering", "hierarchical-clustering");
+    Cluster<DendrogramModel> nclus = null;
     if(noise.size() > 0) {
-      Cluster<DendrogramModel> nclus = new Cluster<>("Noise", noise, true, new DendrogramModel(Double.POSITIVE_INFINITY));
+      nclus = new Cluster<>("Noise", noise, true, new DendrogramModel(Double.POSITIVE_INFINITY));
       dendrogram.addToplevelCluster(nclus);
     }
     for(TempCluster clus : toplevel) {
-      clus.finalizeCluster(dendrogram, false);
+      clus.finalizeCluster(dendrogram, nclus, false, hierarchical);
     }
     return dendrogram;
   }
@@ -416,26 +428,41 @@ public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * Make the cluster for the given object
      * 
      * @param clustering Parent clustering
-     * @param lead Leading object
+     * @param parent Parent cluster (for hierarchical output)
+     * @param flatten Flag to flatten all clusters below.
+     * @param hierarchical Hierarchical outpu
      */
-    private void finalizeCluster(Clustering<DendrogramModel> clustering, boolean flatten) {
-      collectChildren(clustering, this, flatten);
-      if(members.size() > 0) {
-        final String name = "C_" + FormatUtil.NF6.format(dist);
-        clustering.addToplevelCluster(new Cluster<>(name, members, new DendrogramModel(dist)));
+    private void finalizeCluster(Clustering<DendrogramModel> clustering, Cluster<DendrogramModel> parent, boolean flatten, boolean hierarchical) {
+      final String name = "C_" + FormatUtil.NF6.format(dist);
+      Cluster<DendrogramModel> clus = new Cluster<>(name, members, new DendrogramModel(dist));
+      if(hierarchical && parent != null) { // Hierarchical output
+        clustering.addChildCluster(parent, clus);
       }
+      else {
+        clustering.addToplevelCluster(clus);
+      }
+      collectChildren(clustering, this, clus, flatten, hierarchical);
       members = null;
       children = null;
     }
 
-    private void collectChildren(Clustering<DendrogramModel> clustering, TempCluster cur, boolean flatten) {
+    /**
+     * Recursive flattening of clusters.
+     * 
+     * @param clustering Output clustering
+     * @param cur Current temporary cluster
+     * @param clus Output cluster
+     * @param flatten Flag to indicate everything below should be flattened.
+     * @param hierarchical Hierarchical output
+     */
+    private void collectChildren(Clustering<DendrogramModel> clustering, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten, boolean hierarchical) {
       for(TempCluster child : cur.children) {
         if(flatten || child.totalStability() < 0) {
           members.addDBIDs(child.members);
-          collectChildren(clustering, child, flatten);
+          collectChildren(clustering, child, clus, flatten, hierarchical);
         }
         else {
-          child.finalizeCluster(clustering, true);
+          child.finalizeCluster(clustering, clus, true, hierarchical);
         }
       }
     }
@@ -460,6 +487,11 @@ public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     public static final OptionID MINCLUSTERSIZE_ID = new OptionID("hdbscan.minclsize", "The minimum cluster size.");
 
     /**
+     * Produce a hierarchical result.
+     */
+    public static final OptionID HIERARCHICAL_ID = new OptionID("hdbscan.hierarchical", "Produce a hierarchical output.");
+
+    /**
      * Minimum cluster size.
      */
     int minClSize = 1;
@@ -468,6 +500,11 @@ public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * The hierarchical clustering algorithm to run.
      */
     HierarchicalClusteringAlgorithm algorithm;
+
+    /**
+     * Return a hierarchical result.
+     */
+    boolean hierarchical = true;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -482,11 +519,16 @@ public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       if(config.grab(minclustersP)) {
         minClSize = minclustersP.intValue();
       }
+
+      Flag hierarchicalF = new Flag(HIERARCHICAL_ID);
+      if(config.grab(hierarchicalF)) {
+        hierarchical = hierarchicalF.isTrue();
+      }
     }
 
     @Override
     protected OptimalHierarchyExtraction makeInstance() {
-      return new OptimalHierarchyExtraction(algorithm, minClSize);
+      return new OptimalHierarchyExtraction(algorithm, minClSize, hierarchical);
     }
   }
 }
