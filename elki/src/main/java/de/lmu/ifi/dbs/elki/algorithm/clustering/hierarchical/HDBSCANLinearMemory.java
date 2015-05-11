@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;

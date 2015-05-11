@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * Interface for hierarchical clustering algorithms.
  * 
  * This interface allows the algorithms to be used by e.g.
- * {@link ExtractFlatClusteringFromHierarchy}.
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy}.
  * 
  * @author Erich Schubert
  * 

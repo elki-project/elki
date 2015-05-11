@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction;
 
 /*
  This file is part of ELKI:
@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerDensityHierarchyRepresentationResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
@@ -86,11 +89,11 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
 booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
 url = "http://dx.doi.org/10.1007/978-3-642-37456-2_14")
-public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
+public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(OptimalHierarchyExtraction.class);
+  private static final Logging LOG = Logging.getLogger(HDBSCANHierarchyExtraction.class);
 
   /**
    * Minimum cluster size.
@@ -114,7 +117,7 @@ public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    * @param minClSize Minimum cluster size
    * @param hierarchical Produce a hierarchical result
    */
-  public OptimalHierarchyExtraction(HierarchicalClusteringAlgorithm algorithm, int minClSize, boolean hierarchical) {
+  public HDBSCANHierarchyExtraction(HierarchicalClusteringAlgorithm algorithm, int minClSize, boolean hierarchical) {
     super();
     this.algorithm = algorithm;
     this.minClSize = minClSize;
@@ -527,8 +530,8 @@ public class OptimalHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     }
 
     @Override
-    protected OptimalHierarchyExtraction makeInstance() {
-      return new OptimalHierarchyExtraction(algorithm, minClSize, hierarchical);
+    protected HDBSCANHierarchyExtraction makeInstance() {
+      return new HDBSCANHierarchyExtraction(algorithm, minClSize, hierarchical);
     }
   }
 }

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction;
 
 /*
  This file is part of ELKI:
@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerDensityHierarchyRepresentationResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;

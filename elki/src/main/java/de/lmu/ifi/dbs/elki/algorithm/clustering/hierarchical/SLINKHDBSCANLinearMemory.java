@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -63,8 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * 
  * This implementation does <em>not</em> include the cluster extraction
  * discussed as Step 4. This functionality should however already be provided by
- * {@link ExtractFlatClusteringFromHierarchy}. For this reason, we also do
- * <em>not include self-edges</em>.
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction}
+ * . For this reason, we also do <em>not include self-edges</em>.
  * 
  * Reference:
  * <p>

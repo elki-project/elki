@@ -5,13 +5,13 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation.AffinityPropagation
 de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.LSDBC
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.OptimalHierarchyExtraction
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.ExtractFlatClusteringFromHierarchy
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SimplifiedHierarchyExtraction
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansElkan
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd

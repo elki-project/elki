@@ -32,8 +32,9 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * The pointer representation of a hierarchical clustering. Each object is
  * represented by a parent object and the distance at which it joins the parent
  * objects cluster. This is a rather compact and bottom-up representation of
- * clusters, the class {@link ExtractFlatClusteringFromHierarchy} can be used to
- * extract partitions from this graph.
+ * clusters, the class
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy}
+ * can be used to extract partitions from this graph.
  *
  * @author Erich Schubert
  */

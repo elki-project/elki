@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 import org.junit.Test;
 
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,8 +27,8 @@ import org.junit.Test;
  */
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.ExtractFlatClusteringFromHierarchy;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.database.AbstractDatabase;

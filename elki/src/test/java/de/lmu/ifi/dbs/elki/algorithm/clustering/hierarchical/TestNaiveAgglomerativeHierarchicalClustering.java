@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
