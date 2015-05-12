@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
  */
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.KNNDistancesSampler.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -40,9 +39,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
-import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -125,9 +123,9 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
       knnDistances[i] = neighbors.getKNNDistance();
       LOG.incrementProcessed(prog);
     }
-    Arrays.sort(knnDistances);
     LOG.ensureCompleted(prog);
-    return new KNNDistanceOrderResult("kNN distances sample", "knn-distances", knnDistances);
+
+    return new KNNDistanceOrderResult(knnDistances, k);
   }
 
   @Override
@@ -141,53 +139,41 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
   }
 
   /**
-   * Wraps a list containing the knn distances.
+   * Curve result for a list containing the knn distances.
    * 
    * @author Arthur Zimek
    * 
    * @apiviz.exclude
    */
-  public static class KNNDistanceOrderResult extends BasicResult implements IterableResult<Double> {
+  public static class KNNDistanceOrderResult extends XYCurve {
     /**
-     * Store the kNN Distances
+     * Number of neighbors considered for this KNNDIstanceOrder
      */
-    private final double[] knnDistances;
+    private int k;
 
     /**
      * Construct result
      * 
-     * @param name The long name (for pretty printing)
-     * @param shortname the short name (for filenames etc.)
      * @param knnDistances distance list to wrap.
+     * @param k number of neighbors considered
      */
-    public KNNDistanceOrderResult(String name, String shortname, final double[] knnDistances) {
-      super(name, shortname);
-      this.knnDistances = knnDistances;
+    public KNNDistanceOrderResult(double[] knnDistances, int k) {
+      super("Objects", k + "-NN-distance", knnDistances.length + 1);
+      this.k = k;
+      Arrays.sort(knnDistances);
+      for(int j = 0; j < knnDistances.length; j++) {
+        this.addAndSimplify(knnDistances.length - j, knnDistances[j]);
+      }
     }
 
-    /**
-     * Return an iterator.
-     */
     @Override
-    public Iterator<Double> iterator() {
-      return new Iterator<Double>() {
-        int pos = 0;
+    public String getLongName() {
+      return k + "-NN distance order";
+    }
 
-        @Override
-        public boolean hasNext() {
-          return (pos < knnDistances.length);
-        }
-
-        @Override
-        public Double next() {
-          return knnDistances[pos++];
-        }
-
-        @Override
-        public void remove() {
-          throw new UnsupportedOperationException();
-        }
-      };
+    @Override
+    public String getShortName() {
+      return k + "-NNDistanceOrder";
     }
   }
 
