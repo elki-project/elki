@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -92,6 +92,17 @@ public class CLARA<V> extends KMedoidsPAM<V> {
    */
   RandomFactory random;
 
+  /**
+   * Constructor.
+   *
+   * @param distanceFunction Distance function to use
+   * @param k Number of clusters to produce
+   * @param maxiter Maximum number of iterations
+   * @param initializer Initialization function
+   * @param numsamples Number of samples (sampling iterations)
+   * @param sampling Sampling rate (absolute or relative)
+   * @param random Random generator
+   */
   public CLARA(DistanceFunction<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, int numsamples, double sampling, RandomFactory random) {
     super(distanceFunction, k, maxiter, initializer);
     this.numsamples = numsamples;
