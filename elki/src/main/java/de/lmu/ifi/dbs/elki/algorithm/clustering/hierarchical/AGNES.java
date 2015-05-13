@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -49,14 +50,32 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Hierarchical Agglomerative Clustering (HAC) is a classic hierarchical
- * clustering algorithm. Initially, each element is its own cluster; the closest
- * clusters are merged at every step, until all the data has become a single
- * cluster.
- * 
+ * Hierarchical Agglomerative Clustering (HAC) or Agglomerative Nesting (AGNES)
+ * is a classic hierarchical clustering algorithm. Initially, each element is
+ * its own cluster; the closest clusters are merged at every step, until all the
+ * data has become a single cluster.
+ *
  * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
  * 
+ * This implementation uses the pointer-based representation used by SLINK, so
+ * that the extraction algorithms we have can be used with either of them.
+ *
+ * The algorithm is believed to be first published (for single-linkage) by:
+ * <p>
+ * P. H. Sneath<br />
+ * The application of computers to taxonomy<br />
+ * Journal of general microbiology, 17(1).
+ * </p>
+ *
+ * This algorithm is also known as AGNES (Agglomerative Nesting), where the use
+ * of alternative linkage criterions is discussed:
+ * <p>
+ * L. Kaufman and P. J. Rousseeuw<br />
+ * Agglomerative Nesting (Program AGNES),<br />
+ * in Finding Groups in Data: An Introduction to Cluster Analysis
+ * </p>
+ *
  * Reference for the unified concept:
  * <p>
  * G. N. Lance and W. T. Williams<br />
@@ -64,29 +83,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <br/>
  * The computer journal 9.4 (1967): 373-380.
  * </p>
- * 
+ *
  * See also:
  * <p>
  * R. M. Cormack<br />
  * A Review of Classification<br />
  * Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf LinkageMethod
- * 
+ *
  * @param <O> Object type
  */
-@Reference(authors = "G. N. Lance and W. T. Williams", //
-title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
-booktitle = "The computer journal 9.4", //
-url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
-public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+@Reference(authors = "L. Kaufman and P. J. Rousseeuw",//
+title = "Agglomerative Nesting (Program AGNES)", //
+booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
+url = "http://dx.doi.org/10.1002/9780470316801.ch5")
+@Alias({ "HAC", "NaiveAgglomerativeHierarchicalClustering", //
+"de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering" })
+public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(NaiveAgglomerativeHierarchicalClustering.class);
+  private static final Logging LOG = Logging.getLogger(AGNES.class);
 
   /**
    * Current linkage method in use.
@@ -99,10 +120,19 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
    * @param distanceFunction Distance function to use
    * @param linkage Linkage method
    */
-  public NaiveAgglomerativeHierarchicalClustering(DistanceFunction<? super O> distanceFunction, LinkageMethod linkage) {
+  public AGNES(DistanceFunction<? super O> distanceFunction, LinkageMethod linkage) {
     super(distanceFunction);
     this.linkage = linkage;
   }
+
+  /**
+   * Additional historical reference for single-linkage.
+   */
+  @Reference(authors = "P. H. Sneath", //
+  title = "The application of computers to taxonomy", //
+  booktitle = "Journal of general microbiology, 17(1)", //
+  url = "http://dx.doi.org/10.1099/00221287-17-1-201")
+  public static final Void ADDITIONAL_REFERENCE = null;
 
   /**
    * Run the algorithm
@@ -284,8 +314,8 @@ public class NaiveAgglomerativeHierarchicalClustering<O> extends AbstractDistanc
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering<O> makeInstance() {
-      return new NaiveAgglomerativeHierarchicalClustering<>(distanceFunction, linkage);
+    protected AGNES<O> makeInstance() {
+      return new AGNES<>(distanceFunction, linkage);
     }
   }
 }

@@ -2,7 +2,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.CanopyPreClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.LSDBC
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory

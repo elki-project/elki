@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * 
  * @author Erich Schubert
  */
-public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestAGNES extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   // TODO: add more data sets.
 
   /**
@@ -55,8 +55,8 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     ListParameterization params = new ListParameterization();
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
-    params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
+    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
     ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
@@ -79,7 +79,7 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     ListParameterization params = new ListParameterization();
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
+    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
     ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
@@ -102,8 +102,8 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     ListParameterization params = new ListParameterization();
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
-    params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
+    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
     ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
@@ -126,8 +126,8 @@ public class TestNaiveAgglomerativeHierarchicalClustering extends AbstractSimple
     ListParameterization params = new ListParameterization();
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering.class);
-    params.addParameter(NaiveAgglomerativeHierarchicalClustering.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);
+    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);
     ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
