@@ -169,8 +169,15 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
+    int wsize = size;
     for(int i = 1; i < size; i++) {
-      findMerge(scratch, ix, iy, pi, lambda, csize);
+      int x = findMerge(wsize, scratch, ix, iy, pi, lambda, csize);
+      if(x == wsize - 1) {
+        --wsize;
+        for(ix.seek(wsize - 1); lambda.doubleValue(ix) < Double.POSITIVE_INFINITY; ix.retract()) {
+          --wsize;
+        }
+      }
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -213,43 +220,47 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   /**
    * Perform the next merge step in AGNES.
    * 
+   * @param size Data set size
    * @param scratch Scratch space.
    * @param ix First iterator
    * @param iy Second iterator
    * @param pi Parent storage
    * @param lambda Lambda (join distance) storage
    * @param csize Cluster sizes
+   * @return x, for shrinking the working set.
    */
-  protected void findMerge(double[] scratch, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableIntegerDataStore csize) {
+  protected int findMerge(int size, double[] scratch, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableIntegerDataStore csize) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
-    for(ix.seek(0); ix.valid(); ix.advance()) {
+    for(int ox = 0, xbase = 0; ox < size; xbase += ox++) {
       // Skip if object has already joined a cluster:
-      if(lambda.doubleValue(ix) < Double.POSITIVE_INFINITY) {
+      if(lambda.doubleValue(ix.seek(ox)) < Double.POSITIVE_INFINITY) {
         continue;
       }
-      final int xbase = triangleSize(ix.getOffset());
-      for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
+      assert (xbase == triangleSize(ox));
+      for(int oy = 0; oy < ox; oy++) {
         // Skip if object has already joined a cluster:
-        if(lambda.doubleValue(iy) < Double.POSITIVE_INFINITY) {
+        if(lambda.doubleValue(iy.seek(oy)) < Double.POSITIVE_INFINITY) {
           continue;
         }
-        final int idx = xbase + iy.getOffset();
+        final int idx = xbase + oy;
         if(scratch[idx] <= mindist) {
           mindist = scratch[idx];
-          x = ix.getOffset();
-          y = iy.getOffset();
+          x = ox;
+          y = oy;
         }
       }
     }
     assert (x >= 0 && y >= 0);
-    merge(scratch, ix, iy, pi, lambda, csize, mindist, x, y);
+    merge(size, scratch, ix, iy, pi, lambda, csize, mindist, x, y);
+    return x;
   }
 
   /**
    * Execute the cluster merge.
    * 
+   * @param size Data set size
    * @param scratch Scratch space.
    * @param ix First iterator
    * @param iy Second iterator
@@ -260,7 +271,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void merge(double[] scratch, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableIntegerDataStore csize, double mindist, int x, int y) {
+  protected void merge(int size, double[] scratch, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableIntegerDataStore csize, double mindist, int x, int y) {
     // Avoid allocating memory, by reusing existing iterators:
     ix.seek(x);
     iy.seek(y);
@@ -277,12 +288,13 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     csize.put(iy, sizex + sizey);
 
     // Note: this changes iy.
-    updateMatrix(scratch, iy, lambda, csize, mindist, x, y, sizex, sizey);
+    updateMatrix(size, scratch, iy, lambda, csize, mindist, x, y, sizex, sizey);
   }
 
   /**
    * Update the scratch distance matrix.
    * 
+   * @param size Data set size
    * @param scratch Scratch matrix.
    * @param ij Iterator to reuse
    * @param lambda Lambda (join distance) storage
@@ -293,39 +305,37 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param sizex Old size of first cluster
    * @param sizey Old size of second cluster
    */
-  protected void updateMatrix(double[] scratch, DBIDArrayIter ij, WritableDoubleDataStore lambda, WritableIntegerDataStore csize, double mindist, int x, int y, final int sizex, final int sizey) {
+  protected void updateMatrix(int size, double[] scratch, DBIDArrayIter ij, WritableDoubleDataStore lambda, WritableIntegerDataStore csize, double mindist, int x, int y, final int sizex, final int sizey) {
     // Update distance matrix. Note: miny < minx
     final int xbase = triangleSize(x), ybase = triangleSize(y);
 
-    ij.seek(0);
     // Write to (y, j), with j < y
-    for(; ij.getOffset() < y; ij.advance()) {
-      if(lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+    int j = 0;
+    for(; j < y; j++) {
+      if(lambda.doubleValue(ij.seek(j)) < Double.POSITIVE_INFINITY) {
         continue;
       }
-      final int j = ij.getOffset();
       final int sizej = csize.intValue(ij);
-      scratch[ybase + j] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[ybase + j], sizej, mindist);
+      final int yb = ybase + j;
+      scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], sizej, mindist);
     }
-    ij.advance(); // Skip y
+    j++; // Skip y
     // Write to (j, y), with y < j < x
-    for(; ij.getOffset() < x; ij.advance()) {
-      if(lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+    int jbase = triangleSize(j);
+    for(; j < x; jbase += j++) {
+      if(lambda.doubleValue(ij.seek(j)) < Double.POSITIVE_INFINITY) {
         continue;
       }
-      final int j = ij.getOffset();
-      final int jbase = triangleSize(j);
       final int sizej = csize.intValue(ij);
-      scratch[jbase + y] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jbase + y], sizej, mindist);
+      final int jb = jbase + y;
+      scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], sizej, mindist);
     }
-    ij.advance(); // Skip x
+    jbase += j++; // Skip x
     // Write to (j, y), with y < x < j
-    for(; ij.valid(); ij.advance()) {
-      if(lambda.doubleValue(ij) < Double.POSITIVE_INFINITY) {
+    for(; j < size; jbase += j++) {
+      if(lambda.doubleValue(ij.seek(j)) < Double.POSITIVE_INFINITY) {
         continue;
       }
-      final int j = ij.getOffset();
-      final int jbase = triangleSize(j);
       final int sizej = csize.intValue(ij);
       scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], sizej, mindist);
     }
