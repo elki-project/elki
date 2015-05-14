@@ -8,8 +8,9 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.LSDBC
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly

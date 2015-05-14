@@ -1,5 +1,6 @@
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
 tutorial.clustering.NaiveAgglomerativeHierarchicalClustering4
