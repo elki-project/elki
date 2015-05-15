@@ -43,7 +43,7 @@ There is a list of [Publications](http://elki.dbs.ifi.lmu.de/wiki/Publications) 
 ## Efficiency Benchmarking with ELKI
 
 ELKI is quite fast (see [some of our benchmark results](http://elki.dbs.ifi.lmu.de/wiki/Benchmarking)) but the focus lies on a *broad coverage of algorithms and variations*.
-We discourage cross-platform benchmarking, because it is easy to produce misleading results by comparing apples and oranges. For fair comparability, you should implement all algorithms within ELKI, and use the same APIs. We have also observed Java JDK versions have a large impact on the runtime performance. To make your results reproducabe, please [cite](http://elki.dbs.ifi.lmu.de/wiki/Publications) the version you have been using. See also [Benchmarking](http://elki.dbs.ifi.lmu.de/wiki/Benchmarking).
+We discourage cross-platform benchmarking, because it is easy to produce misleading results by comparing apples and oranges. For fair comparability, you should implement all algorithms within ELKI, and use the same APIs. We have also observed Java JDK versions have a large impact on the runtime performance. To make your results reproducible, please [cite](http://elki.dbs.ifi.lmu.de/wiki/Publications) the version you have been using. See also [Benchmarking](http://elki.dbs.ifi.lmu.de/wiki/Benchmarking).
 
 
 ## Bug Reports and Contact
