@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -59,6 +60,11 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
   private static final Logging LOG = Logging.getLogger(SingleAssignmentKMeans.class);
 
   /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = SingleAssignmentKMeans.class.getName();
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction distance function
@@ -75,6 +81,9 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
       return new Clustering<>("k-Means Assignment", "kmeans-assignment");
     }
     // Choose initial means
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    }
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();

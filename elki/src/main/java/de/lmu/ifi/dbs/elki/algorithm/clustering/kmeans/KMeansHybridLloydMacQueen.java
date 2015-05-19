@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
@@ -62,6 +64,11 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
   private static final Logging LOG = Logging.getLogger(KMeansHybridLloydMacQueen.class);
 
   /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = KMeansHybridLloydMacQueen.class.getName();
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction distance function
@@ -79,6 +86,9 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    }
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -90,7 +100,8 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
-    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration += 2) {
+    int iteration = 0;
+    for(; maxiter <= 0 || iteration < maxiter; iteration += 2) {
       { // MacQueen
         LOG.incrementProcessed(prog);
         boolean changed = macQueenIterate(relation, means, clusters, assignment, varsum);
@@ -112,6 +123,9 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
       }
     }
     LOG.setCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    }
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");

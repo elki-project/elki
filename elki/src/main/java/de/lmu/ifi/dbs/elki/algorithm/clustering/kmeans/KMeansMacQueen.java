@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -81,6 +83,11 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
   private static final Logging LOG = Logging.getLogger(KMeansMacQueen.class);
 
   /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = KMeansMacQueen.class.getName();
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction distance function
@@ -98,6 +105,9 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    }
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -109,7 +119,8 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
     // Iterate MacQueen
-    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+    int iteration = 0;
+    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       boolean changed = macQueenIterate(relation, means, clusters, assignment, varsum);
       logVarstat(varstat, varsum);
@@ -118,6 +129,9 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
       }
     }
     LOG.setCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    }
 
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {

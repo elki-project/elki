@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -75,6 +77,11 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
   private static final Logging LOG = Logging.getLogger(KMediansLloyd.class);
 
   /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = KMediansLloyd.class.getName();
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction distance function
@@ -92,6 +99,9 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
       return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    }
     List<Vector> medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -102,7 +112,8 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
     double[] distsum = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medians iteration", LOG) : null;
-    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+    int iteration = 0;
+    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       boolean changed = assignToNearestCluster(relation, medians, clusters, assignment, distsum);
       // Stop if no cluster assignment changed.
@@ -113,6 +124,9 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
       medians = medians(clusters, medians, relation);
     }
     LOG.setCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    }
     // Wrap result
     Clustering<MeanModel> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     for(int i = 0; i < clusters.size(); i++) {

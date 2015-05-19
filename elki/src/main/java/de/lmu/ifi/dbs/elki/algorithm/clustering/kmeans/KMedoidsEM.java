@@ -48,6 +48,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -79,6 +81,11 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
    */
   private static final Logging LOG = Logging.getLogger(KMedoidsEM.class);
 
+  /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = KMedoidsEM.class.getName();
+  
   /**
    * Holds the value of {@link AbstractKMeans#K_ID}.
    */
@@ -122,6 +129,9 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
     }
     DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
     // Choose initial medoids
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    }
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, relation.getDBIDs(), distQ));
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -136,8 +146,8 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medoids iteration", LOG) : null;
     // Swap phase
-    boolean changed = true;
-    while(changed) {
+    int iteration = 0;
+    for(boolean changed = true; changed; iteration++) {
       LOG.incrementProcessed(prog);
       changed = false;
       // Try to swap the medoid with a better cluster member:
@@ -170,6 +180,9 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
       }
     }
     LOG.setCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    }
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");

@@ -52,6 +52,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -86,6 +88,11 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(KMedoidsPAM.class);
+
+  /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = KMedoidsPAM.class.getName();
 
   /**
    * The number of clusters to produce.
@@ -131,6 +138,9 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
     DBIDs ids = relation.getDBIDs();
     // Choose initial medoids
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    }
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, ids, distQ));
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -166,8 +176,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
     // Swap phase
     DBIDVar bestid = DBIDUtil.newVar();
-    boolean changed = true;
-    while(changed) {
+    int iteration = 0;
+    for(boolean changed = true; changed; iteration++) {
       LOG.incrementProcessed(prog);
       changed = false;
       // Try to swap the medoid with a better cluster member:
@@ -228,6 +238,9 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       }
     }
     LOG.setCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    }
   }
 
   /**

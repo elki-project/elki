@@ -48,6 +48,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -79,6 +81,11 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
   private static final Logging LOG = Logging.getLogger(KMeansBatchedLloyd.class);
 
   /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = KMeansBatchedLloyd.class.getName();
+
+  /**
    * Number of blocks to use.
    */
   int blocks;
@@ -108,6 +115,9 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     // Choose initial means
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initializer", initializer.toString()));
+    }
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
 
     // Setup cluster assignment store
@@ -125,7 +135,8 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
-    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+    int iteration = 0;
+    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       boolean changed = false;
       FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Batch", parts.length, LOG) : null;
@@ -149,6 +160,9 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
       }
     }
     LOG.setCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    }
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");

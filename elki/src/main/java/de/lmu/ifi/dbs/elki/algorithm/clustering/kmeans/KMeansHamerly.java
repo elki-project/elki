@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -78,6 +79,11 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   private static final Logging LOG = Logging.getLogger(KMeansHamerly.class);
 
   /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = KMeansHamerly.class.getName();
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction distance function
@@ -95,6 +101,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initializer", initializer.toString()));
+    }
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -115,8 +124,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     double[] sep = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    LongStatistic varstat = LOG.isStatistics() ? new LongStatistic(this.getClass().getName() + ".reassignments") : null;
-    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+    LongStatistic varstat = LOG.isStatistics() ? new LongStatistic(KEY + ".reassignments") : null;
+    int iteration = 0;
+    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       int changed;
       if(iteration == 0) {
@@ -149,6 +159,10 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
     }
     LOG.setCompleted(prog);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+    }
+
     upper.destroy();
     lower.destroy();
 

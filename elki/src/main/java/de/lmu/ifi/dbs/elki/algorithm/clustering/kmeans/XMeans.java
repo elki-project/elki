@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -89,6 +90,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(XMeans.class);
+
+  /**
+   * Key for statistics logging.
+   */
+  private static final String KEY = XMeans.class.getName();
 
   /**
    * Inner k-means algorithm.
@@ -151,6 +157,9 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
     // Run initial k-means to find at least k_min clusters
     innerKMeans.setK(k_min);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    }
     splitInitializer.setInitialMeans(initializer.chooseInitialMeans(database, relation, k_min, getDistanceFunction(), Vector.FACTORY));
     Clustering<M> clustering = innerKMeans.run(database, relation);
 
