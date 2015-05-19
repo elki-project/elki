@@ -34,15 +34,29 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Initialize K-means by randomly choosing k exsiting elements as cluster
+ * Initialize K-means by randomly choosing k existing elements as cluster
  * centers.
+ * 
+ * This initialization is attributed to:
+ * <p>
+ * E. W. Forgy<br />
+ * Cluster analysis of multivariate data : efficiency versus interpretability of
+ * classifications<br />
+ * Abstract published in Biometrics 21(3)
+ * </p>
+ * but we were unable to verify this so far (apparently, only an abstract is
+ * available in Biometrics).
  * 
  * @author Erich Schubert
  * 
  * @param <O> Vector type
  */
+@Reference(authors = "E. W. Forgy", //
+title = "Cluster analysis of multivariate data: efficiency versus interpretability of classifications", //
+booktitle = "Biometrics 21(3)")
 public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Constructor.
@@ -62,7 +76,7 @@ public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<
     }
     return means;
   }
-  
+
   @Override
   public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distanceFunction) {
     return DBIDUtil.randomSample(ids, k, rnd);
