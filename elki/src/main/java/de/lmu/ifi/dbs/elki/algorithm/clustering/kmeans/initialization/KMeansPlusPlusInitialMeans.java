@@ -59,7 +59,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @param <O> Vector type
  */
-@Reference(authors = "D. Arthur, S. Vassilvitskii", title = "k-means++: the advantages of careful seeding", booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", url = "http://dx.doi.org/10.1145/1283383.1283494")
+@Reference(authors = "D. Arthur, S. Vassilvitskii", //
+title = "k-means++: the advantages of careful seeding", //
+booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", //
+url = "http://dx.doi.org/10.1145/1283383.1283494")
 public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Constructor.
@@ -86,11 +89,12 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
 
     Random random = rnd.getSingleThreadedRandom();
     DBIDRef first = DBIDUtil.randomSample(ids, 1, random).iter();
-    means.add(factory.newNumberVector(relation.get(first)));
+    T firstvec = relation.get(first);
+    means.add(factory.newNumberVector(firstvec));
 
     // Initialize weights
-    double weightsum = initialWeights(weights, ids, first, distQ);
-    while(means.size() < k) {
+    double weightsum = initialWeights(weights, ids, firstvec, distQ);
+    while(true) {
       if(weightsum > Double.MAX_VALUE) {
         LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - too many data points, too large squared distances?");
       }
@@ -100,11 +104,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
       double r = random.nextDouble() * weightsum, s = 0.;
       DBIDIter it = ids.iter();
       for(; s < r && it.valid(); it.advance()) {
-        double w = weights.doubleValue(it);
-        if(w != w) {
-          continue; // NaN: already chosen.
-        }
-        s += w;
+        s += weights.doubleValue(it);
       }
       if(!it.valid()) { // Rare case, but happens due to floating math
         weightsum -= (r - s); // Decrease
@@ -113,8 +113,11 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
       // Add new mean:
       final T newmean = relation.get(it);
       means.add(factory.newNumberVector(newmean));
+      if(means.size() >= k) {
+        break;
+      }
       // Update weights:
-      weights.putDouble(it, Double.NaN);
+      weights.putDouble(it, 0.);
       // Choose optimized version for double distances, if applicable.
       weightsum = updateWeights(weights, ids, newmean, distQ);
     }
@@ -139,27 +142,29 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
     means.add(first);
 
     // Initialize weights
-    double weightsum = initialWeights(weights, ids, first, distQ);
-    while(means.size() < k) {
+    double weightsum = initialWeights(weights, ids, rel.get(first), distQ);
+    while(true) {
       if(weightsum > Double.MAX_VALUE) {
         LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - too many data points, too large squared distances?");
       }
       if(weightsum < Double.MIN_NORMAL) {
-        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few data points?");
+        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few unique data points?");
       }
       double r = random.nextDouble() * weightsum;
+      while(r <= 0 && weightsum > Double.MIN_NORMAL) {
+        r = random.nextDouble() * weightsum; // Try harder to not choose 0.
+      }
       DBIDIter it = ids.iter();
       for(; r > 0. && it.valid(); it.advance()) {
-        double w = weights.doubleValue(it);
-        if(w != w) {
-          continue; // NaN: alrady chosen.
-        }
-        r -= w;
+        r -= weights.doubleValue(it);
       }
       // Add new mean:
       means.add(it);
+      if(means.size() >= k) {
+        break;
+      }
       // Update weights:
-      weights.putDouble(it, Double.NaN);
+      weights.putDouble(it, 0.);
       weightsum = updateWeights(weights, ids, rel.get(it), distQ);
     }
 
@@ -174,8 +179,9 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
    * @param latest Added ID
    * @param distQ Distance query
    * @return Weight sum
+   * @param <T> Object type
    */
-  protected double initialWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<?> distQ) {
+  protected <T> double initialWeights(WritableDoubleDataStore weights, DBIDs ids, T latest, DistanceQuery<? super T> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       // Distance will usually already be squared
@@ -194,13 +200,14 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
    * @param latest Added ID
    * @param distQ Distance query
    * @return Weight sum
+   * @param <T> Object type
    */
   protected <T> double updateWeights(WritableDoubleDataStore weights, DBIDs ids, T latest, DistanceQuery<? super T> distQ) {
     double weightsum = 0.;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       double weight = weights.doubleValue(it);
-      if(weight != weight) {
-        continue; // NaN: already chosen!
+      if(weight <= 0.) {
+        continue; // Duplicate, or already chosen.
       }
       double newweight = distQ.distance(latest, it);
       if(newweight < weight) {
