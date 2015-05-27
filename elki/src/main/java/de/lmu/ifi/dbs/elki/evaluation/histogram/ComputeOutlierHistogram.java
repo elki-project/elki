@@ -228,12 +228,16 @@ public class ComputeOutlierHistogram implements Evaluator {
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double result = or.getScores().doubleValue(iter);
       result = scaling.getScaled(result);
-      hist.putData(result, negative);
+      if(result > Double.NEGATIVE_INFINITY && result < Double.POSITIVE_INFINITY) {
+        hist.putData(result, negative);
+      }
     }
     for(DBIDIter iter = outlierIds.iter(); iter.valid(); iter.advance()) {
       double result = or.getScores().doubleValue(iter);
       result = scaling.getScaled(result);
-      hist.putData(result, positive);
+      if(result > Double.NEGATIVE_INFINITY && result < Double.POSITIVE_INFINITY) {
+        hist.putData(result, positive);
+      }
     }
     Collection<DoubleVector> collHist = new ArrayList<>(hist.getNumBins());
     for(ObjHistogram.Iter<DoubleDoublePair> iter = hist.iter(); iter.valid(); iter.advance()) {
