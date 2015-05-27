@@ -196,4 +196,9 @@ public class DoubleMinMax {
     min = Double.POSITIVE_INFINITY;
     max = Double.NEGATIVE_INFINITY;
   }
+
+  @Override
+  public String toString() {
+    return "DoubleMinMax[min=" + min + ", max=" + max + "]";
+  }
 }
