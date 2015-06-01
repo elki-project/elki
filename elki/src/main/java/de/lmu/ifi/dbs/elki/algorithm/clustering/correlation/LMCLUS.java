@@ -237,9 +237,10 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * @return Deviation score
    */
   private double deviation(Vector delta, Matrix beta) {
-    double a = delta.euclideanLength();
-    double b = beta.transposeTimes(delta).euclideanLength();
-    return Math.sqrt((a * a) - (b * b));
+    final double a = delta.squaredEuclideanLength();
+    final double b = beta.transposeTimes(delta).squaredEuclideanLength();
+
+    return (a > b) ? Math.sqrt(a - b) : 0.;
   }
 
   /**

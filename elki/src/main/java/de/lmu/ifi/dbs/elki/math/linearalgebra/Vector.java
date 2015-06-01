@@ -497,6 +497,20 @@ public class Vector implements NumberVector {
   }
 
   /**
+   * Returns the squared length of this vector: v^T * v.
+   * 
+   * @return the squared length of this vector
+   */
+  public final double squaredEuclideanLength() {
+    double acc = 0.0;
+    for(int row = 0; row < elements.length; row++) {
+      final double v = elements[row];
+      acc += v * v;
+    }
+    return acc;
+  }
+
+  /**
    * Returns the length of this vector.
    * 
    * @return the length of this vector

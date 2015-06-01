@@ -242,7 +242,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     double worstscore = Double.NEGATIVE_INFINITY;
     int i = 0;
     for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
-      double err = E.getRow(i).euclideanLength();
+      double err = E.getRow(i).squaredEuclideanLength();
       // double err = Math.abs(E.get(i, 0));
       if(err > worstscore) {
         worstscore = err;
@@ -250,7 +250,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
       }
     }
 
-    return new Pair<>(worstid, worstscore);
+    return new Pair<>(worstid, Math.sqrt(worstscore));
   }
 
   @Override
