@@ -1,6 +1,7 @@
 de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation
 de.lmu.ifi.dbs.elki.evaluation.NoAutomaticEvaluation
 de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering
+de.lmu.ifi.dbs.elki.evaluation.clustering.LogClusterSizes
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSilhouette
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSimplifiedSilhouette
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateSquaredErrors
