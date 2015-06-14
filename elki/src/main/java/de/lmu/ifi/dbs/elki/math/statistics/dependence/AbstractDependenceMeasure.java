@@ -92,7 +92,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    * @param len Length of data
    * @return Array of scores
    */
-  protected static <A> double[] computeNormalizedRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
+  public static <A> double[] computeNormalizedRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
     // Sort the objects:
     int[] s1 = sortedIndex(adapter, data, len);
     final double norm = .5 / (len - 1);
@@ -121,7 +121,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    * @param len Length of data
    * @return Array of scores
    */
-  protected static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
+  public static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
     // Sort the objects:
     int[] s1 = sortedIndex(adapter, data, len);
     return ranks(adapter, data, s1);
@@ -137,7 +137,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    * @param idx Data index
    * @return Array of scores
    */
-  protected static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx) {
+  public static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx) {
     final int len = idx.length;
     double[] ret = new double[len];
     for(int i = 0; i < len;) {
@@ -163,7 +163,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    * @param len Length of data
    * @return Sorted index
    */
-  protected static <A> int[] sortedIndex(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
+  public static <A> int[] sortedIndex(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
     int[] s1 = MathUtil.sequence(0, len);
     IntegerArrayQuickSort.sort(s1, new IntegerComparator() {
       @Override
@@ -183,7 +183,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
    * @param bins Number of bins
    * @return Array of bin numbers [0;bin[
    */
-  protected static <A> int[] discretize(NumberArrayAdapter<?, A> adapter, A data, final int len, final int bins) {
+  public static <A> int[] discretize(NumberArrayAdapter<?, A> adapter, A data, final int len, final int bins) {
     double min = adapter.getDouble(data, 0), max = min;
     for(int i = 1; i < len; i++) {
       double v = adapter.getDouble(data, i);

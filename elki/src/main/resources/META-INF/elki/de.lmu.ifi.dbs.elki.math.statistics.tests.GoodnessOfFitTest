@@ -1,2 +1,3 @@
 de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest
 de.lmu.ifi.dbs.elki.math.statistics.tests.WelchTTest
+de.lmu.ifi.dbs.elki.math.statistics.tests.StandardizedTwoSampleAndersonDarlingTest
