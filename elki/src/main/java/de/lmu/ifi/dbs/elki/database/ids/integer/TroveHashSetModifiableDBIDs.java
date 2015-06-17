@@ -25,11 +25,13 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 import gnu.trove.impl.hash.THashPrimitiveIterator;
 import gnu.trove.impl.hash.TIntHash;
+import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.set.hash.TIntHashSet;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
@@ -153,6 +155,28 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
     }
     buf.append(']');
     return buf.toString();
+  }
+
+  @Override
+  public void pop(DBIDVar outvar) {
+    final byte[] states = store._states;
+    int i = store.capacity();
+    while(i-- > 0 && (states[i] != TPrimitiveHash.FULL)) {
+      ; // Not occupied. Continue
+    }
+    if(i < 0) {
+      outvar.unset();
+      return;
+    }
+    final int val = store._set[i];
+    if(outvar instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar) outvar).internalSetIndex(val);
+    }
+    else { // Fallback, should not happen (more expensive).
+      outvar.set(DBIDUtil.importInteger(val));
+    }
+    // Unfortunately, not visible: store.removeAt(i);
+    store.remove(val);
   }
 
   /**

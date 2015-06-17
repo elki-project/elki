@@ -40,4 +40,11 @@ public interface HashSetModifiableDBIDs extends HashSetDBIDs, ModifiableDBIDs {
   // To help the compilers...
   @Override
   DBIDMIter iter();
+
+  /**
+   * Pop (get and remove) one DBID from the set, into a variable.
+   *
+   * @param outvar Output variable
+   */
+  public void pop(DBIDVar outvar);
 }
