@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,6 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @author Katharina Rausch
  */
-public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestDBSCAN extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run DBSCAN with fixed parameters and compare the result to a golden
    * standard.
@@ -92,52 +91,5 @@ public class TestDBSCANResults extends AbstractSimpleAlgorithmTest implements JU
     Clustering<Model> result = dbscan.run(db);
     testFMeasure(db, result, 0.954382);
     testClusterSizes(result, new int[] { 11, 200, 203, 224 });
-  }
-
-  /**
-   * Run DBSCAN with fixed parameters and compare the result to a golden
-   * standard.
-   * 
-   * @throws ParameterException
-   */
-  @Test
-  public void testGDBSCANResults() {
-    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-
-    // setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.04);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
-    GeneralizedDBSCAN dbscan = ClassGenericsUtil.parameterizeOrAbort(GeneralizedDBSCAN.class, params);
-    testParameterizationOk(params);
-
-    // run DBSCAN on database
-    Clustering<Model> result = dbscan.run(db);
-
-    testClusterSizes(result, new int[] { 29, 50, 101, 150 });
-    testFMeasure(db, result, 0.996413);
-  }
-
-  /**
-   * Run DBSCAN with fixed parameters and compare the result to a golden
-   * standard.
-   * 
-   * @throws ParameterException
-   */
-  @Test
-  public void testGDBSCANOnSingleLinkDataset() {
-    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-
-    // Setup algorithm
-    ListParameterization params = new ListParameterization();
-    params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 11.5);
-    params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 120);
-    GeneralizedDBSCAN dbscan = ClassGenericsUtil.parameterizeOrAbort(GeneralizedDBSCAN.class, params);
-    testParameterizationOk(params);
-
-    // run DBSCAN on database
-    Clustering<Model> result = dbscan.run(db);
-    testClusterSizes(result, new int[] { 11, 200, 203, 224 });
-    testFMeasure(db, result, 0.954382);
   }
 }

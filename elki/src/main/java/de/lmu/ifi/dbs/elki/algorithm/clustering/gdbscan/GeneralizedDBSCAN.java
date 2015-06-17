@@ -42,10 +42,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -282,12 +283,13 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      */
     protected int expandCluster(final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, final FiniteProgress progress) {
       int clustersize = 1; // initial seed!
-      final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray();
+      final HashSetModifiableDBIDs activeSet = DBIDUtil.newHashSet();
       npred.addDBIDs(activeSet, neighbors);
       // run expandCluster as long as this set is non-empty (non-recursive
       // implementation)
+      final DBIDVar id = DBIDUtil.newVar();
       while(!activeSet.isEmpty()) {
-        final DBID id = activeSet.remove(activeSet.size() - 1);
+        activeSet.pop(id);
         // Assign object to cluster
         final int oldclus = clusterids.intValue(id);
         if(oldclus == NOISE) {
