@@ -59,7 +59,8 @@ public class Tokenizer implements Iter {
    */
   public Tokenizer(Pattern colSep, String quoteChars) {
     super();
-    this.matcher = colSep.matcher("Dummy text");
+    assert (colSep != null) : "Column separator may not be null.";
+    this.matcher = colSep.matcher("");
     this.quoteChars = quoteChars != null ? quoteChars.toCharArray() : new char[0];
   }
 

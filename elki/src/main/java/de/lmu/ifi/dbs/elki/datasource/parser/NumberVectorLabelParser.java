@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -134,12 +135,25 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
   Event nextevent = null;
 
   /**
+   * Constructor.
+   *
+   * @param format Input format
+   * @param labelIndices Column indexes that are not numeric.
+   * @param factory Vector factory
+   */
+  public NumberVectorLabelParser(CSVReaderFormat format, BitSet labelIndices, Factory<V> factory) {
+    super(format);
+    this.labelIndices = labelIndices;
+    this.factory = factory;
+  }
+
+  /**
    * Constructor with defaults.
    * 
    * @param factory Vector factory
    */
   public NumberVectorLabelParser(NumberVector.Factory<V> factory) {
-    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHARS, Pattern.compile(COMMENT_PATTERN), null, factory);
+    this(CSVReaderFormat.DEFAULT_FORMAT, null, factory);
   }
 
   /**
@@ -148,13 +162,11 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * @param colSep Column separator
    * @param quoteChars Quote character
    * @param comment Comment pattern
-   * @param labelIndices Column indexes that are numeric.
+   * @param labelIndices Column indexes that are not numeric.
    * @param factory Vector factory
    */
   public NumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V> factory) {
-    super(colSep, quoteChars, comment);
-    this.labelIndices = labelIndices;
-    this.factory = factory;
+    this(new CSVReaderFormat(colSep, quoteChars, comment), labelIndices, factory);
   }
 
   /**
@@ -414,7 +426,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
 
     @Override
     protected NumberVectorLabelParser<V> makeInstance() {
-      return new NumberVectorLabelParser<>(colSep, quoteChars, comment, labelIndices, factory);
+      return new NumberVectorLabelParser<>(format, labelIndices, factory);
     }
   }
 }

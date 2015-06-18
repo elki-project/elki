@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,9 +39,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Parser to load polygon data (2D and 3D only) from a simple format. One record
@@ -64,7 +61,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
   /**
    * Pattern to catch coordinates
    */
-  public static final Pattern COORD = Pattern.compile("^(" + NUMBER_PATTERN + "),\\s*(" + NUMBER_PATTERN + ")(?:,\\s*(" + NUMBER_PATTERN + "))?$");
+  public static final Pattern COORD = Pattern.compile("^(" + CSVReaderFormat.NUMBER_PATTERN + "),\\s*(" + CSVReaderFormat.NUMBER_PATTERN + ")(?:,\\s*(" + CSVReaderFormat.NUMBER_PATTERN + "))?$");
 
   /**
    * Polygon separator
@@ -74,12 +71,10 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
   /**
    * Constructor.
    * 
-   * @param colSep Column separator
-   * @param quoteChars Quotation character
-   * @param comment Comment pattern
+   * @param format Input format
    */
-  public SimplePolygonParser(Pattern colSep, String quoteChars, Pattern comment) {
-    super(colSep, quoteChars, comment);
+  public SimplePolygonParser(CSVReaderFormat format) {
+    super(format);
   }
 
   @Override
@@ -189,25 +184,8 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
    */
   public static class Parameterizer extends AbstractParser.Parameterizer {
     @Override
-    protected void makeOptions(Parameterization config) {
-      PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, "\\s+");
-      if(config.grab(colParam)) {
-        colSep = colParam.getValue();
-      }
-      StringParameter quoteParam = new StringParameter(QUOTE_ID, QUOTE_CHARS);
-      if(config.grab(quoteParam)) {
-        quoteChars = quoteParam.getValue();
-      }
-
-      PatternParameter commentP = new PatternParameter(COMMENT_ID, COMMENT_PATTERN);
-      if(config.grab(commentP)) {
-        comment = commentP.getValue();
-      }
-    }
-
-    @Override
     protected SimplePolygonParser makeInstance() {
-      return new SimplePolygonParser(colSep, quoteChars, comment);
+      return new SimplePolygonParser(format);
     }
   }
 }

@@ -23,16 +23,12 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
 import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Abstract superclass for all parsers providing the option handler for handling
@@ -44,35 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @apiviz.composedOf Tokenizer
  */
 public abstract class AbstractParser {
-  /**
-   * A pattern defining whitespace.
-   */
-  public static final String DEFAULT_SEPARATOR = "\\s*[,;\\s]\\s*";
-
-  /**
-   * A quote pattern
-   */
-  public static final String QUOTE_CHARS = "\"'";
-
-  /**
-   * A pattern catching most numbers that can be parsed using
-   * Double.parseDouble:
-   * 
-   * Some examples: <code>1</code> <code>1.</code> <code>1.2</code>
-   * <code>.2</code> <code>-.2e-03</code>
-   */
-  public static final String NUMBER_PATTERN = "[+-]?(?:\\d+\\.?|\\d*\\.\\d+)?(?:[eE][-]?\\d+)?";
-
-  /**
-   * Default pattern for comments.
-   */
-  public static final String COMMENT_PATTERN = "^\\s*(#|//|;).*$";
-
-  /**
-   * A sign to separate attributes.
-   */
-  public static final String ATTRIBUTE_CONCATENATION = " ";
-
   /**
    * Tokenized reader.
    */
@@ -86,13 +53,11 @@ public abstract class AbstractParser {
   /**
    * Constructor.
    * 
-   * @param colSep Column separator
-   * @param quoteChars Quote character
-   * @param comment Comment pattern
+   * @param format Input format.
    */
-  public AbstractParser(Pattern colSep, String quoteChars, Pattern comment) {
+  public AbstractParser(CSVReaderFormat format) {
     super();
-    this.reader = new TokenizedReader(colSep, quoteChars, comment);
+    this.reader = format.makeReader();
     this.tokenizer = reader.getTokenizer();
   }
 
@@ -129,52 +94,14 @@ public abstract class AbstractParser {
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**
-     * OptionID for the column separator parameter (defaults to whitespace as in
-     * {@link #DEFAULT_SEPARATOR}.
+     * Reader format.
      */
-    public static final OptionID COLUMN_SEPARATOR_ID = new OptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
-
-    /**
-     * OptionID for the quote character parameter (defaults to a double
-     * quotation mark as in {@link AbstractParser#QUOTE_CHARS}.
-     */
-    public static final OptionID QUOTE_ID = new OptionID("parser.quote", "Quotation characters. By default, both double and single ASCII quotes are accepted.");
-
-    /**
-     * Comment pattern.
-     */
-    public static final OptionID COMMENT_ID = new OptionID("string.comment", "Ignore lines in the input file that satisfy this pattern.");
-
-    /**
-     * Stores the column separator pattern
-     */
-    protected Pattern colSep = null;
-
-    /**
-     * Stores the quotation character
-     */
-    protected String quoteChars = QUOTE_CHARS;
-
-    /**
-     * Comment pattern.
-     */
-    protected Pattern comment = null;
+    protected CSVReaderFormat format;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, DEFAULT_SEPARATOR);
-      if(config.grab(colParam)) {
-        colSep = colParam.getValue();
-      }
-      StringParameter quoteParam = new StringParameter(QUOTE_ID, QUOTE_CHARS);
-      if(config.grab(quoteParam)) {
-        quoteChars = quoteParam.getValue();
-      }
-      PatternParameter commentP = new PatternParameter(COMMENT_ID, COMMENT_PATTERN);
-      if(config.grab(commentP)) {
-        comment = commentP.getValue();
-      }
+      format = ClassGenericsUtil.parameterizeOrAbort(CSVReaderFormat.class, config);
     }
 
     @Override

@@ -135,7 +135,7 @@ public class StringParser implements Parser {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter commentP = new PatternParameter(AbstractParser.Parameterizer.COMMENT_ID, "^\\s*#.*$");
+      PatternParameter commentP = new PatternParameter(CSVReaderFormat.Parameterizer.COMMENT_ID, "^\\s*#.*$");
       if(config.grab(commentP)) {
         comment = commentP.getValue();
       }

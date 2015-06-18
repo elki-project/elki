@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  */
 
 import java.io.InputStream;
-import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -38,12 +37,10 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
   /**
    * Constructor.
    * 
-   * @param colSep Column separator pattern
-   * @param quoteChars Quote characters
-   * @param comment Comment pattern
+   * @param format Reader format
    */
-  public AbstractStreamingParser(Pattern colSep, String quoteChars, Pattern comment) {
-    super(colSep, quoteChars, comment);
+  public AbstractStreamingParser(CSVReaderFormat format) {
+    super(format);
   }
 
   @Override

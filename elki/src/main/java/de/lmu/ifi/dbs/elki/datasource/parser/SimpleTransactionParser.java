@@ -30,7 +30,6 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -97,12 +96,10 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
   /**
    * Constructor.
    * 
-   * @param colSep Column separator
-   * @param quoteChars Quote character
-   * @param comment Comment pattern
+   * @param format Input format
    */
-  public SimpleTransactionParser(Pattern colSep, String quoteChars, Pattern comment) {
-    super(colSep, quoteChars, comment);
+  public SimpleTransactionParser(CSVReaderFormat format) {
+    super(format);
     keymap = new TObjectIntHashMap<>(1001, .5f, -1);
   }
 
@@ -194,7 +191,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
   public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
     @Override
     protected SimpleTransactionParser makeInstance() {
-      return new SimpleTransactionParser(colSep, quoteChars, comment);
+      return new SimpleTransactionParser(format);
     }
   }
 }

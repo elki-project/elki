@@ -24,9 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  */
 
 import gnu.trove.list.array.TLongArrayList;
-
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -64,12 +61,10 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
   /**
    * Constructor.
    * 
-   * @param colSep Column separator
-   * @param quoteChars Quotation character
-   * @param comment Comment pattern
+   * @param format Input format
    */
-  public BitVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment) {
-    super(colSep, quoteChars, comment, null, BitVector.FACTORY);
+  public BitVectorLabelParser(CSVReaderFormat format) {
+    super(format, null, BitVector.FACTORY);
   }
 
   @Override
@@ -117,7 +112,7 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
   public static class Parameterizer extends AbstractParser.Parameterizer {
     @Override
     protected BitVectorLabelParser makeInstance() {
-      return new BitVectorLabelParser(colSep, quoteChars, comment);
+      return new BitVectorLabelParser(format);
     }
   }
 }

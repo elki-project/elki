@@ -25,14 +25,13 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
+import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parser for parsing one distance value per line.
@@ -57,12 +56,10 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
   /**
    * Constructor.
    * 
-   * @param colSep Column separator pattern
-   * @param quoteChars Quote characters
-   * @param comment Comment pattern
+   * @param format Input format
    */
-  public AsciiDistanceParser(Pattern colSep, String quoteChars, Pattern comment) {
-    super(colSep, quoteChars, comment);
+  public AsciiDistanceParser(CSVReaderFormat format) {
+    super(format);
   }
 
   @Override
@@ -153,13 +150,8 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
    */
   public static class Parameterizer extends AbstractParser.Parameterizer {
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
-    @Override
     protected AsciiDistanceParser makeInstance() {
-      return new AsciiDistanceParser(colSep, quoteChars, comment);
+      return new AsciiDistanceParser(format);
     }
   }
 }

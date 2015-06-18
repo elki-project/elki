@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
  * Reader that will tokenize the input data as desired.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Tokenizer
  */
 public class TokenizedReader extends BufferedLineReader {
   /**

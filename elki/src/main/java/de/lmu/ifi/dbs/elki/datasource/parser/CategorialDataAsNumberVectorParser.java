@@ -78,20 +78,18 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
    * @param factory Vector factory
    */
   public CategorialDataAsNumberVectorParser(NumberVector.Factory<V> factory) {
-    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHARS, Pattern.compile(COMMENT_PATTERN), null, factory);
+    this(CSVReaderFormat.DEFAULT_FORMAT, null, factory);
   }
 
   /**
    * Constructor.
    * 
-   * @param colSep Column separator
-   * @param quoteChars Quote character
-   * @param comment Comment pattern
+   * @param format Input format
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public CategorialDataAsNumberVectorParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V> factory) {
-    super(colSep, quoteChars, comment, labelIndices, factory);
+  public CategorialDataAsNumberVectorParser(CSVReaderFormat format, BitSet labelIndices, NumberVector.Factory<V> factory) {
+    super(format, labelIndices, factory);
   }
 
   @Override
@@ -155,7 +153,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
   public static class Parameterizer<V extends NumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override
     protected CategorialDataAsNumberVectorParser<V> makeInstance() {
-      return new CategorialDataAsNumberVectorParser<>(colSep, quoteChars, comment, labelIndices, factory);
+      return new CategorialDataAsNumberVectorParser<>(format, labelIndices, factory);
     }
   }
 }

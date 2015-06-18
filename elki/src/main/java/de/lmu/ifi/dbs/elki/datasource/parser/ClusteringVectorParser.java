@@ -34,7 +34,6 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -131,12 +130,10 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
   /**
    * Constructor.
    * 
-   * @param colSep Column separator
-   * @param quoteChars Quote character
-   * @param comment Comment pattern
+   * @param format Input format
    */
-  public ClusteringVectorParser(Pattern colSep, String quoteChars, Pattern comment) {
-    super(colSep, quoteChars, comment);
+  public ClusteringVectorParser(CSVReaderFormat format) {
+    super(format);
   }
 
   @Override
@@ -261,7 +258,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
   public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
     @Override
     protected ClusteringVectorParser makeInstance() {
-      return new ClusteringVectorParser(colSep, quoteChars, comment);
+      return new ClusteringVectorParser(format);
     }
   }
 }

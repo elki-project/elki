@@ -102,6 +102,18 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   /**
    * Constructor.
    * 
+   * @param format Input format
+   * @param labelIndices Indices to use as labels
+   * @param factory Vector factory
+   */
+  public SparseNumberVectorLabelParser(CSVReaderFormat format, BitSet labelIndices, SparseNumberVector.Factory<V> factory) {
+    super(format, labelIndices, factory);
+    this.sparsefactory = factory;
+  }
+
+  /**
+   * Constructor.
+   * 
    * @param colSep Column separator
    * @param quoteChars Quotation character
    * @param comment Comment pattern
@@ -188,7 +200,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
 
     @Override
     protected SparseNumberVectorLabelParser<V> makeInstance() {
-      return new SparseNumberVectorLabelParser<>(colSep, quoteChars, comment, labelIndices, (SparseNumberVector.Factory<V>) factory);
+      return new SparseNumberVectorLabelParser<>(format, labelIndices, (SparseNumberVector.Factory<V>) factory);
     }
   }
 }

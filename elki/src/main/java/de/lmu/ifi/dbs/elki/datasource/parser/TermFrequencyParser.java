@@ -30,7 +30,6 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
@@ -100,13 +99,11 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
    * Constructor.
    * 
    * @param normalize Normalize
-   * @param colSep Column separator
-   * @param quoteChars Quotation character
-   * @param comment Comment pattern
+   * @param format Input format
    * @param labelIndices Indices to use as labels
    */
-  public TermFrequencyParser(boolean normalize, Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V> factory) {
-    super(colSep, quoteChars, comment, labelIndices, factory);
+  public TermFrequencyParser(boolean normalize, CSVReaderFormat format, BitSet labelIndices, SparseNumberVector.Factory<V> factory) {
+    super(format, labelIndices, factory);
     this.normalize = normalize;
     this.keymap = new TObjectIntHashMap<>(1001, .5f, -1);
     this.sparsefactory = factory;
@@ -219,7 +216,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
 
     @Override
     protected TermFrequencyParser<V> makeInstance() {
-      return new TermFrequencyParser<>(normalize, colSep, quoteChars, comment, labelIndices, (SparseNumberVector.Factory<V>) factory);
+      return new TermFrequencyParser<>(normalize, format, labelIndices, (SparseNumberVector.Factory<V>) factory);
     }
   }
 }

@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
+import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -144,7 +144,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
   public OutlierResult run(Database database, Relation<?> relation) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
-    Pattern colSep = Pattern.compile(AbstractParser.DEFAULT_SEPARATOR);
+    Pattern colSep = Pattern.compile(CSVReaderFormat.DEFAULT_SEPARATOR);
     DoubleMinMax minmax = new DoubleMinMax();
     InputStream in;
     try {
