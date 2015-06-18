@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,10 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
@@ -69,22 +67,15 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
 
   @Override
   public void parse(InputStream in, DistanceCacheWriter cache) {
-    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    int lineNumber = 1;
+    reader.reset(in);
 
     int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Parsing distance matrix", LOG) : null;
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
+      while(reader.nextLineExceptComments()) {
         LOG.incrementProcessed(prog);
-        // Skip empty lines and comments
-        if(line.length() <= 0 || isComment(line)) {
-          continue;
-        }
-        tokenizer.initialize(line, 0, lengthWithoutLinefeed(line));
-
         if(!tokenizer.valid()) {
-          throw new IllegalArgumentException("Less than three values in line " + lineNumber);
+          throw new IllegalArgumentException("Less than three values in line " + reader.getLineNumber());
         }
         int id1, id2;
         try {
@@ -92,10 +83,10 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
           tokenizer.advance();
         }
         catch(NumberFormatException e) {
-          throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is not an integer!");
+          throw new IllegalArgumentException("Error in line " + reader.getLineNumber() + ": id1 is not an integer!");
         }
         if(!tokenizer.valid()) {
-          throw new IllegalArgumentException("Less than three values in line " + lineNumber);
+          throw new IllegalArgumentException("Less than three values in line " + reader.getLineNumber());
         }
 
         try {
@@ -103,10 +94,10 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
           tokenizer.advance();
         }
         catch(NumberFormatException e) {
-          throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is not an integer!");
+          throw new IllegalArgumentException("Error in line " + reader.getLineNumber() + ": id2 is not an integer!");
         }
         if(!tokenizer.valid()) {
-          throw new IllegalArgumentException("Less than three values in line " + lineNumber);
+          throw new IllegalArgumentException("Less than three values in line " + reader.getLineNumber());
         }
 
         // Track minimum and maximum
@@ -124,16 +115,16 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
           cache.put(id1, id2, distance);
         }
         catch(IllegalArgumentException e) {
-          throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage(), e);
+          throw new IllegalArgumentException("Error in line " + reader.getLineNumber() + ":" + e.getMessage(), e);
         }
         tokenizer.advance();
         if(tokenizer.valid()) {
-          throw new IllegalArgumentException("More than three values in line " + lineNumber);
+          throw new IllegalArgumentException("More than three values in line " + reader.getLineNumber());
         }
       }
     }
     catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
+      throw new IllegalArgumentException("Error while parsing line " + reader.getLineNumber() + ".");
     }
 
     LOG.setCompleted(prog);

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
 import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -74,12 +74,12 @@ public abstract class AbstractParser {
   public static final String ATTRIBUTE_CONCATENATION = " ";
 
   /**
-   * Comment pattern.
+   * Tokenized reader.
    */
-  private Matcher comment = null;
+  protected TokenizedReader reader;
 
   /**
-   * String tokenizer.
+   * Tokenizer.
    */
   protected Tokenizer tokenizer;
 
@@ -92,26 +92,8 @@ public abstract class AbstractParser {
    */
   public AbstractParser(Pattern colSep, String quoteChars, Pattern comment) {
     super();
-    this.tokenizer = new Tokenizer(colSep, quoteChars);
-    this.comment = comment.matcher("");
-  }
-
-  /**
-   * Get the length of the string, not taking trailing linefeeds into account.
-   * 
-   * @param line Input line
-   * @return Length
-   */
-  public static int lengthWithoutLinefeed(CharSequence line) {
-    int length = line.length();
-    while(length > 0) {
-      char last = line.charAt(length - 1);
-      if(last != '\n' && last != '\r') {
-        break;
-      }
-      --length;
-    }
-    return length;
+    this.reader = new TokenizedReader(colSep, quoteChars, comment);
+    this.tokenizer = reader.getTokenizer();
   }
 
   /**
@@ -126,19 +108,6 @@ public abstract class AbstractParser {
    */
   public void cleanup() {
     tokenizer.cleanup();
-    if(comment != null) {
-      comment.reset("");
-    }
-  }
-
-  /**
-   * Match a comment line.
-   * 
-   * @param line Line to test
-   * @return {@code true} if the line matches the comment pattern.
-   */
-  protected boolean isComment(CharSequence line) {
-    return (comment != null && comment.reset(line).matches());
   }
 
   /**

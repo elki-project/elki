@@ -190,7 +190,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       return ret;
     }
     try {
-      while(nextLineExceptComments()) {
+      while(reader.nextLineExceptComments()) {
         if(parseLineInternal()) {
           final int curdim = curvec.getDimensionality();
           if(curdim > maxdim || mindim > curdim) {

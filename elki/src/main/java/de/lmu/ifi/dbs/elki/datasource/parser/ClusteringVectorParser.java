@@ -154,7 +154,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
       return ret;
     }
     try {
-      while(nextLineExceptComments()) {
+      while(reader.nextLineExceptComments()) {
         buf1.clear();
         lbl.clear();
         TIntIntMap csize = new TIntIntHashMap();

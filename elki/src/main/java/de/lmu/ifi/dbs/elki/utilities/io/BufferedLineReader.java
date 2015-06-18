@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import de.lmu.ifi.dbs.elki.datasource.parser.AbstractStreamingParser;
-
 /**
  * Class for buffered IO, avoiding some of the overheads of the Java API.
  * 
@@ -41,17 +39,35 @@ public class BufferedLineReader implements AutoCloseable {
   /**
    * Line reader.
    */
-  private LineReader reader;
+  private LineReader reader = null;
 
   /**
    * The buffer we read the data into.
    */
-  private StringBuilder buf = new StringBuilder();
+  protected StringBuilder buf = new StringBuilder();
 
   /**
    * Current line number.
    */
-  private int lineNumber = 0;
+  protected int lineNumber = 0;
+
+  /**
+   * Constructor. Use {@link #reset} to assign an input stream.
+   */
+  public BufferedLineReader() {
+    super();
+    this.reader = null;
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param in Line reader
+   */
+  public BufferedLineReader(LineReader in) {
+    super();
+    reader = in;
+  }
 
   /**
    * Constructor.
@@ -59,7 +75,7 @@ public class BufferedLineReader implements AutoCloseable {
    * @param in Input stream
    */
   public BufferedLineReader(InputStream in) {
-    this(new InputStreamReader(in));
+    this(new LineReader(new InputStreamReader(in)));
   }
 
   /**
@@ -68,11 +84,58 @@ public class BufferedLineReader implements AutoCloseable {
    * @param in Input stream reader
    */
   public BufferedLineReader(InputStreamReader in) {
-    reader = new LineReader(in);
+    this(new LineReader(in));
+  }
+
+  /**
+   * Reset the current reader (but do <em>not</em> close the stream).
+   */
+  public void reset() {
+    reader = null;
+    buf.setLength(0);
+    lineNumber = 0;
+  }
+
+  /**
+   * Reset to a new line reader.
+   * 
+   * <b>A previous reader will not be closed automatically!</b>
+   * 
+   * @param r New reader
+   */
+  public void reset(LineReader r) {
+    reset();
+    this.reader = r;
+  }
+
+  /**
+   * Reset to a new line reader.
+   * 
+   * <b>A previous stream will not be closed automatically!</b>
+   * 
+   * @param in New input stream reader
+   */
+  public void reset(InputStream in) {
+    reset();
+    this.reader = new LineReader(in);
+  }
+
+  /**
+   * Reset to a new line reader.
+   * 
+   * <b>A previous stream will not be closed automatically!</b>
+   * 
+   * @param in New input stream reader
+   */
+  public void reset(InputStreamReader in) {
+    reset();
+    this.reader = new LineReader(in);
   }
 
   /**
    * Get the reader buffer.
+   * 
+   * <b>After a call to {@code nextLine()}, the buffer will be overwitten!</b>
    * 
    * @return Buffer.
    */
@@ -98,8 +161,7 @@ public class BufferedLineReader implements AutoCloseable {
   public boolean nextLine() throws IOException {
     while(reader.readLine(buf.delete(0, buf.length()))) {
       ++lineNumber;
-      final int len = AbstractStreamingParser.lengthWithoutLinefeed(buf);
-      if(len > 0) {
+      if(lengthWithoutLinefeed(buf) > 0) {
         return true;
       }
     }
@@ -111,5 +173,23 @@ public class BufferedLineReader implements AutoCloseable {
     reader.close();
     buf.setLength(0);
     buf.trimToSize();
+  }
+
+  /**
+   * Get the length of the string, not taking trailing linefeeds into account.
+   * 
+   * @param line Input line
+   * @return Length
+   */
+  public static int lengthWithoutLinefeed(CharSequence line) {
+    int length = line.length();
+    while(length > 0) {
+      char last = line.charAt(length - 1);
+      if(last != '\n' && last != '\r') {
+        break;
+      }
+      --length;
+    }
+    return length;
   }
 }

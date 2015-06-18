@@ -23,10 +23,8 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -86,19 +84,14 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
 
   @Override
   public MultipleObjectsBundle parse(InputStream in) {
-    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    int lineNumber = 1;
+    reader.reset(in);
 
     List<PolygonsObject> polys = new ArrayList<>();
     List<LabelList> labels = null;
     List<ExternalID> eids = new ArrayList<>();
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        // Skip empty lines and comments
-        if(line.length() <= 0 || isComment(line)) {
-          continue;
-        }
-        Object[] objs = parseLine(line);
+      while(reader.nextLineExceptComments()) {
+        Object[] objs = parseLine();
         polys.add((PolygonsObject) objs[0]);
         if(objs[1] != null) {
           if(labels == null) {
@@ -113,7 +106,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       }
     }
     catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
+      throw new IllegalArgumentException("Error while parsing line " + reader.getLineNumber() + ".");
     }
 
     if(labels != null) {
@@ -127,18 +120,17 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
   /**
    * Parse a single line.
    * 
-   * @param line Line to parse
-   * 
    * @return Parsed polygon
    */
-  private Object[] parseLine(String line) {
+  private Object[] parseLine() {
     ExternalID eid = null;
     List<Polygon> polys = new ArrayList<>(1);
     ArrayList<String> labels = new ArrayList<>(); // TODO: reuse?
 
     List<Vector> coords = new ArrayList<>();
-    for(tokenizer.initialize(line, 0, lengthWithoutLinefeed(line)); tokenizer.valid(); tokenizer.advance()) {
-      Matcher m = COORD.matcher(line).region(tokenizer.getStart(), tokenizer.getEnd());
+    Matcher m = COORD.matcher(reader.getBuffer());
+    for(/* initialized by nextLineExceptComments */; tokenizer.valid(); tokenizer.advance()) {
+      m.region(tokenizer.getStart(), tokenizer.getEnd());
       if(m.find()) {
         try {
           double c1 = FormatUtil.parseDouble(m.group(1));
@@ -157,9 +149,10 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
         }
       }
       // Match polygon separator:
+      // FIXME: Avoid unnecessary subSequence call.
       final int len = tokenizer.getEnd() - tokenizer.getStart();
       if(POLYGON_SEPARATOR.length() == len && //
-      POLYGON_SEPARATOR.regionMatches(0, line, tokenizer.getStart(), len)) {
+      reader.getBuffer().subSequence(tokenizer.getStart(), tokenizer.getEnd()).equals(POLYGON_SEPARATOR)) {
         if(coords.size() > 0) {
           polys.add(new Polygon(coords));
           coords = new ArrayList<>();

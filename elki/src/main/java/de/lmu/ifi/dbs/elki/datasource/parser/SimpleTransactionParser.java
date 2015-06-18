@@ -120,7 +120,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
       return ret;
     }
     try {
-      while(nextLineExceptComments()) {
+      while(reader.nextLineExceptComments()) {
         // Don't reuse bitsets, will not be copied by BitVector constructor.
         buf.clear();
         for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
