@@ -23,12 +23,10 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +53,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
+import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -68,7 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 /**
  * External outlier detection scores, loading outlier scores from an external
- * file.
+ * file. This class is meant to be able to read the default output of ELKI, i.e.
+ * one object per line, with the DBID specified as <tt>ID=</tt> and the outlier
+ * score specified with an algorithm-specific prefix.
  * 
  * @author Erich Schubert
  * 
@@ -144,52 +146,47 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
   public OutlierResult run(Database database, Relation<?> relation) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
-    Pattern colSep = Pattern.compile(CSVReaderFormat.DEFAULT_SEPARATOR);
     DoubleMinMax minmax = new DoubleMinMax();
-    InputStream in;
-    try {
-      in = FileUtil.tryGzipInput(new FileInputStream(file));
-      BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-      for(String line; (line = reader.readLine()) != null;) {
-        if(line.startsWith(COMMENT)) {
-          continue;
+    try (InputStream in = FileUtil.tryGzipInput(new FileInputStream(file));//
+        TokenizedReader reader = CSVReaderFormat.DEFAULT_FORMAT.makeReader()) {
+      Tokenizer tokenizer = reader.getTokenizer();
+      CharSequence buf = reader.getBuffer();
+      Matcher mi = idpattern.matcher(buf), ms = scorepattern.matcher(buf);
+      reader.reset(in);
+      while(reader.nextLineExceptComments()) {
+        Integer id = null;
+        double score = Double.NaN;
+        for(/* initialized by nextLineExceptComments */; tokenizer.valid(); tokenizer.advance()) {
+          mi.region(tokenizer.getStart(), tokenizer.getEnd());
+          ms.region(tokenizer.getStart(), tokenizer.getEnd());
+          final boolean mif = mi.find();
+          final boolean msf = ms.find();
+          if(mif && msf) {
+            throw new AbortException("ID pattern and score pattern both match value: " + tokenizer.getSubstring());
+          }
+          if(mif) {
+            if(id != null) {
+              throw new AbortException("ID pattern matched twice: previous value " + id + " second value: " + tokenizer.getSubstring());
+            }
+            id = Integer.parseInt(buf.subSequence(mi.end(), tokenizer.getEnd()).toString());
+          }
+          if(msf) {
+            if(!Double.isNaN(score)) {
+              throw new AbortException("Score pattern matched twice: previous value " + score + " second value: " + tokenizer.getSubstring());
+            }
+            score = FormatUtil.parseDouble((buf.subSequence(ms.end(), tokenizer.getEnd()).toString()));
+          }
         }
-        else if(line.length() > 0) {
-          String[] cols = colSep.split(line);
-          Integer id = null;
-          double score = Double.NaN;
-          for(String str : cols) {
-            Matcher mi = idpattern.matcher(str);
-            Matcher ms = scorepattern.matcher(str);
-            final boolean mif = mi.find();
-            final boolean msf = ms.find();
-            if(mif && msf) {
-              throw new AbortException("ID pattern and score pattern both match value: " + str);
-            }
-            if(mif) {
-              if(id != null) {
-                throw new AbortException("ID pattern matched twice: previous value " + id + " second value: " + str);
-              }
-              id = Integer.parseInt(str.substring(mi.end()));
-            }
-            if(msf) {
-              if(!Double.isNaN(score)) {
-                throw new AbortException("Score pattern matched twice: previous value " + score + " second value: " + str);
-              }
-              score = FormatUtil.parseDouble(str.substring(ms.end()));
-            }
-          }
-          if(id != null && !Double.isNaN(score)) {
-            scores.putDouble(DBIDUtil.importInteger(id), score);
-            minmax.put(score);
-          }
-          else if(id == null && Double.isNaN(score)) {
-            LOG.warning("Line did not match either ID nor score nor comment: " + line);
-          }
-          else {
-            throw new AbortException("Line matched only ID or only SCORE patterns: " + line);
-          }
+        if(id != null && !Double.isNaN(score)) {
+          scores.putDouble(DBIDUtil.importInteger(id), score);
+          minmax.put(score);
+        }
+        else if(id == null && Double.isNaN(score)) {
+          LOG.warning("Line did not match either ID nor score nor comment: " + reader.getLineNumber());
+        }
+        else {
+          throw new AbortException("Line matched only ID or only SCORE patterns: " + reader.getLineNumber());
         }
       }
     }
@@ -220,7 +217,6 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     }
     meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax());
     or = new OutlierResult(meta, scoresult);
-
     return or;
   }
 
