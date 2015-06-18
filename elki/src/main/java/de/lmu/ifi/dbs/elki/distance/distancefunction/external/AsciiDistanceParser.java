@@ -26,12 +26,16 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
+import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parser for parsing one distance value per line.
@@ -47,11 +51,21 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Description("Parser for the following line format:\n" //
     + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" //
     + "The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
-public class AsciiDistanceParser extends AbstractParser implements DistanceParser {
+public class AsciiDistanceParser implements DistanceParser {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(AsciiDistanceParser.class);
+
+  /**
+   * Tokenized reader.
+   */
+  protected TokenizedReader reader;
+
+  /**
+   * Tokenizer.
+   */
+  protected Tokenizer tokenizer;
 
   /**
    * Constructor.
@@ -59,7 +73,9 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
    * @param format Input format
    */
   public AsciiDistanceParser(CSVReaderFormat format) {
-    super(format);
+    super();
+    this.reader = format.makeReader();
+    this.tokenizer = reader.getTokenizer();
   }
 
   @Override
@@ -136,11 +152,6 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
     }
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 
@@ -148,7 +159,18 @@ public class AsciiDistanceParser extends AbstractParser implements DistanceParse
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParser.Parameterizer {
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Reader format.
+     */
+    protected CSVReaderFormat format;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      format = ClassGenericsUtil.parameterizeOrAbort(CSVReaderFormat.class, config);
+    }
+
     @Override
     protected AsciiDistanceParser makeInstance() {
       return new AsciiDistanceParser(format);

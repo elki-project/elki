@@ -23,24 +23,43 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
+import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Base class for streaming parsers.
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractStreamingParser extends AbstractParser implements StreamingParser {
+public abstract class AbstractStreamingParser implements StreamingParser {
+  /**
+   * Tokenized reader.
+   */
+  protected TokenizedReader reader;
+
+  /**
+   * Tokenizer.
+   */
+  protected Tokenizer tokenizer;
+
   /**
    * Constructor.
    * 
    * @param format Reader format
    */
   public AbstractStreamingParser(CSVReaderFormat format) {
-    super(format);
+    super();
+    this.reader = format.makeReader();
+    this.tokenizer = reader.getTokenizer();
   }
 
   @Override
@@ -68,5 +87,45 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
   @Override
   public MultipleObjectsBundle asMultipleObjectsBundle() {
     return MultipleObjectsBundle.fromStream(this);
+  }
+
+  @Override
+  public void cleanup() {
+    try {
+      reader.close();
+    }
+    catch(IOException e) {
+      getLogger().exception(e);
+    }
+  }
+
+  /**
+   * Get the logger for this class.
+   *
+   * @return Logger.
+   */
+  protected abstract Logging getLogger();
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public abstract static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Reader format.
+     */
+    protected CSVReaderFormat format;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      format = ClassGenericsUtil.parameterizeOrAbort(CSVReaderFormat.class, config);
+    }
+
+    @Override
+    protected abstract AbstractStreamingParser makeInstance();
   }
 }

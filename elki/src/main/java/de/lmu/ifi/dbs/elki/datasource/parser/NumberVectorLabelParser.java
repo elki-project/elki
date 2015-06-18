@@ -358,7 +358,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParser.Parameterizer {
+  public static class Parameterizer<V extends NumberVector> extends AbstractStreamingParser.Parameterizer {
     /**
      * A comma separated list of the indices of labels (may be numeric),
      * counting whitespace separated entries in a line starting with 0. The

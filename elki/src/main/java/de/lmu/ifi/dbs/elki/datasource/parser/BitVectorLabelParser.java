@@ -109,7 +109,7 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParser.Parameterizer {
+  public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
     @Override
     protected BitVectorLabelParser makeInstance() {
       return new BitVectorLabelParser(format);

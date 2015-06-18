@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -52,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.has PolygonsObject
  */
-public class SimplePolygonParser extends AbstractParser implements Parser {
+public class SimplePolygonParser extends AbstractStreamingParser {
   /**
    * Class logger
    */
@@ -69,6 +68,11 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
   public static final String POLYGON_SEPARATOR = "--";
 
   /**
+   * Event to report next.
+   */
+  Event nextevent = null;
+
+  /**
    * Constructor.
    * 
    * @param format Input format
@@ -77,52 +81,115 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     super(format);
   }
 
-  @Override
-  public MultipleObjectsBundle parse(InputStream in) {
-    reader.reset(in);
+  /**
+   * Metadata.
+   */
+  protected BundleMeta meta = null;
 
-    List<PolygonsObject> polys = new ArrayList<>();
-    List<LabelList> labels = null;
-    List<ExternalID> eids = new ArrayList<>();
+  /**
+   * Whether or not the data set has labels.
+   */
+  protected boolean haslabels = false;
+
+  /**
+   * Current polygon.
+   */
+  protected PolygonsObject curpoly = null;
+
+  /**
+   * Current labels.
+   */
+  protected LabelList curlbl = null;
+
+  /**
+   * Current external id.
+   */
+  protected ExternalID cureid = null;
+
+  /**
+   * (Reused) storage of coordinates.
+   */
+  final private List<Vector> coords = new ArrayList<>();
+
+  /**
+   * (Reused) storage of polygons.
+   */
+  final private List<Polygon> polys = new ArrayList<>();
+
+  /**
+   * (Reused) store for labels.
+   */
+  final private ArrayList<String> labels = new ArrayList<>();
+
+  @Override
+  public Event nextEvent() {
+    if(nextevent != null) {
+      Event ret = nextevent;
+      nextevent = null;
+      return ret;
+    }
     try {
       while(reader.nextLineExceptComments()) {
-        Object[] objs = parseLine();
-        polys.add((PolygonsObject) objs[0]);
-        if(objs[1] != null) {
-          if(labels == null) {
-            labels = new ArrayList<>();
-            for(int i = 0; i < polys.size() - 1; i++) {
-              labels.add(null);
-            }
+        if(parseLine()) {
+          if(meta == null || (curlbl != null && !haslabels)) {
+            haslabels = haslabels || curlbl != null;
+            buildMeta();
+            nextevent = Event.NEXT_OBJECT;
+            return Event.META_CHANGED;
           }
-          labels.add((LabelList) objs[1]);
+          return Event.META_CHANGED;
         }
-        eids.add((ExternalID) objs[2]);
       }
+      return Event.END_OF_STREAM;
     }
     catch(IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + reader.getLineNumber() + ".");
     }
+  }
 
-    if(labels != null) {
-      return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.LABELLIST, labels, TypeUtil.EXTERNALID, eids);
+  /**
+   * Update the meta element.
+   */
+  protected void buildMeta() {
+    if(haslabels) {
+      meta = new BundleMeta(3);
+      meta.add(TypeUtil.POLYGON_TYPE);
+      meta.add(TypeUtil.EXTERNALID);
+      meta.add(TypeUtil.LABELLIST);
     }
     else {
-      return MultipleObjectsBundle.makeSimple(TypeUtil.POLYGON_TYPE, polys, TypeUtil.EXTERNALID, eids);
+      meta = new BundleMeta(2);
+      meta.add(TypeUtil.POLYGON_TYPE);
+      meta.add(TypeUtil.EXTERNALID);
     }
+  }
+
+  @Override
+  public BundleMeta getMeta() {
+    return meta;
+  }
+
+  @Override
+  public Object data(int rnum) {
+    if(rnum > (haslabels ? 2 : 1)) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    return (rnum == 0) ? curpoly : (rnum == 1) ? cureid : curlbl;
   }
 
   /**
    * Parse a single line.
    * 
-   * @return Parsed polygon
+   * @return {@code true} if the line was read successful.
    */
-  private Object[] parseLine() {
-    ExternalID eid = null;
-    List<Polygon> polys = new ArrayList<>(1);
-    ArrayList<String> labels = new ArrayList<>(); // TODO: reuse?
+  private boolean parseLine() {
+    cureid = null;
+    curpoly = null;
+    curlbl = null;
+    polys.clear();
+    coords.clear();
+    labels.clear();
 
-    List<Vector> coords = new ArrayList<>();
     Matcher m = COORD.matcher(reader.getBuffer());
     for(/* initialized by nextLineExceptComments */; tokenizer.valid(); tokenizer.advance()) {
       m.region(tokenizer.getStart(), tokenizer.getEnd());
@@ -149,15 +216,14 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       if(POLYGON_SEPARATOR.length() == len && //
       reader.getBuffer().subSequence(tokenizer.getStart(), tokenizer.getEnd()).equals(POLYGON_SEPARATOR)) {
         if(coords.size() > 0) {
-          polys.add(new Polygon(coords));
-          coords = new ArrayList<>();
+          polys.add(new Polygon(new ArrayList<>(coords)));
         }
         continue;
       }
       String cur = tokenizer.getSubstring();
       // First label will become the External ID
-      if(eid == null) {
-        eid = new ExternalID(cur);
+      if(cureid == null) {
+        cureid = new ExternalID(cur);
       }
       else {
         labels.add(cur);
@@ -167,7 +233,9 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     if(coords.size() > 0) {
       polys.add(new Polygon(coords));
     }
-    return new Object[] { new PolygonsObject(polys), LabelList.make(labels), eid };
+    curpoly = new PolygonsObject(polys);
+    curlbl = (haslabels || labels.size() > 0) ? LabelList.make(labels) : null;
+    return true;
   }
 
   @Override
@@ -182,7 +250,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParser.Parameterizer {
+  public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
     @Override
     protected SimplePolygonParser makeInstance() {
       return new SimplePolygonParser(format);
