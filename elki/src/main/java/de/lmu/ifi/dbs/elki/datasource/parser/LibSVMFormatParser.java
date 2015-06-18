@@ -106,7 +106,7 @@ public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumb
         if(comment.charAt(0) == '#') {
           break;
         }
-        throw new RuntimeException("Parsing error in line " + getLineNumber() + ": expected data, got " + comment);
+        throw new RuntimeException("Parsing error in line " + reader.getLineNumber() + ": expected data, got " + comment);
       }
     }
     curvec = sparsefactory.newNumberVector(values, thismax);

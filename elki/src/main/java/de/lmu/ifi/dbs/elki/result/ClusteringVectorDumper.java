@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.meta.ExternalClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -57,7 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * whitespace separated cluster indexes
  * </p>
  * 
- * This format can be read using {@link ClusteringVectorParser} for analysis.
+ * This format can be read using {@link ClusteringVectorParser} for meta
+ * analysis, or read as clustering using {@link ExternalClustering}.
  * 
  * @author Erich Schubert
  */

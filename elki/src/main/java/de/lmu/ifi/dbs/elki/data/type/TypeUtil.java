@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.data.type;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
@@ -221,6 +222,11 @@ public final class TypeUtil {
    * Any feature vector type.
    */
   public static final VectorTypeInformation<FeatureVector<?>> FEATURE_VECTORS = VectorTypeInformation.typeRequest(FeatureVector.class);
+
+  /**
+   * Clustering.
+   */
+  public static final SimpleTypeInformation<Clustering<?>> CLUSTERING = new SimpleTypeInformation<>(Clustering.class);
 
   /**
    * Make a type array easily.

@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
@@ -220,7 +219,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
       return Event.END_OF_STREAM;
     }
     catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + getLineNumber() + ".");
+      throw new IllegalArgumentException("Error while parsing line " + reader.getLineNumber() + ".");
     }
   }
 
@@ -239,7 +238,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
   public BundleMeta getMeta() {
     if(meta == null) {
       meta = new BundleMeta(haslbl ? 2 : 1);
-      meta.add(new SimpleTypeInformation<>(Clustering.class, "Clusters"));
+      meta.add(TypeUtil.CLUSTERING);
       if(haslbl) {
         meta.add(TypeUtil.LABELLIST);
       }

@@ -23,39 +23,24 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.utilities.io.LineReader;
+import de.lmu.ifi.dbs.elki.utilities.io.BufferedLineReader;
 
 /**
  * Base class for streaming parsers.
- * 
- * TODO: build our own replacement for {@link BufferedReader}, which recycles
- * the string builder.
  * 
  * @author Erich Schubert
  */
 public abstract class AbstractStreamingParser extends AbstractParser implements StreamingParser {
   /**
-   * Line reader.
+   * Input reader.
    */
-  private LineReader reader;
-
-  /**
-   * The buffer we read the data into.
-   */
-  private StringBuilder buf = new StringBuilder();
-
-  /**
-   * Current line number.
-   */
-  private int lineNumber;
+  BufferedLineReader reader;
 
   /**
    * Constructor.
@@ -76,17 +61,7 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
 
   @Override
   public void initStream(InputStream in) {
-    reader = new LineReader(new InputStreamReader(in));
-    lineNumber = 0;
-  }
-
-  /**
-   * Get the current line number.
-   * 
-   * @return Current line number
-   */
-  protected int getLineNumber() {
-    return lineNumber;
+    reader = new BufferedLineReader(in);
   }
 
   @Override
@@ -106,11 +81,10 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
    * @return The next line, or {@code null}.
    */
   protected boolean nextLineExceptComments() throws IOException {
-    while(reader.readLine(buf.delete(0, buf.length()))) {
-      ++lineNumber;
-      final int len = lengthWithoutLinefeed(buf);
-      if(len > 0 && !isComment(buf)) {
-        tokenizer.initialize(buf, 0, len);
+    final CharSequence buf = reader.getBuffer();
+    while(reader.nextLine()) {
+      if(!isComment(buf)) {
+        tokenizer.initialize(buf, 0, buf.length());
         return true;
       }
     }
@@ -124,8 +98,6 @@ public abstract class AbstractStreamingParser extends AbstractParser implements 
       if(reader != null) {
         reader.close();
       }
-      buf.setLength(0);
-      buf.trimToSize();
     }
     catch(IOException e) {
       // Ignore - maybe already closed.

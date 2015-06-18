@@ -152,7 +152,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
       return Event.META_CHANGED; // Force a final meta update.
     }
     catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + getLineNumber() + ".");
+      throw new IllegalArgumentException("Error while parsing line " + reader.getLineNumber() + ".");
     }
   }
 

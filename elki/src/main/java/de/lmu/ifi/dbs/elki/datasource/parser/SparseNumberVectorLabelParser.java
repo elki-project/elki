@@ -129,7 +129,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
           // Respect labelIndices.
           if(!isLabelColumn(index)) {
             if(!tokenizer.valid()) {
-              throw new AbortException("Parser expected double value, but line ended too early: " + getLineNumber());
+              throw new AbortException("Parser expected double value, but line ended too early: " + reader.getLineNumber());
             }
             double attribute = tokenizer.getDouble();
             thismax = index >= thismax ? index + 1 : thismax;

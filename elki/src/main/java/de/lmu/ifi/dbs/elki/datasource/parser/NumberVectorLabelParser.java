@@ -211,7 +211,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       return Event.END_OF_STREAM;
     }
     catch(IOException e) {
-      throw new IllegalArgumentException("Error while parsing line " + getLineNumber() + ".");
+      throw new IllegalArgumentException("Error while parsing line " + reader.getLineNumber() + ".");
     }
   }
 
@@ -275,7 +275,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       }
     }
     // Maybe a label row?
-    if(getLineNumber() == 1 && attributes.size() == 0) {
+    if(reader.getLineNumber() == 1 && attributes.size() == 0) {
       columnnames = new ArrayList<>(labels);
       haslabels = false;
       curvec = null;
