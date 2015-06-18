@@ -170,7 +170,9 @@ public class BufferedLineReader implements AutoCloseable {
 
   @Override
   public void close() throws IOException {
-    reader.close();
+    if(reader != null) {
+      reader.close();
+    }
     buf.setLength(0);
     buf.trimToSize();
   }
