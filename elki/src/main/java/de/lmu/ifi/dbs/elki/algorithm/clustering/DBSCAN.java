@@ -35,10 +35,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -165,13 +166,12 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
 
     Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
     result.addToplevelCluster(n);
-
     return result;
   }
 
   /**
    * DBSCAN-function expandCluster.
-   * <p/>
+   *
    * Border-Objects become members of the first possible cluster.
    * 
    * @param relation Database relation to run on
@@ -193,44 +193,23 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
       return;
     }
 
-    // try to expand the cluster
-    ModifiableDBIDs seeds = DBIDUtil.newHashSet();
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
-    for(DBIDIter seed = neighbors.iter(); seed.valid(); seed.advance()) {
-      if(!processedIDs.contains(seed)) {
-        currentCluster.add(seed);
-        processedIDs.add(seed);
-        seeds.add(seed);
-      }
-      else if(noise.contains(seed)) {
-        currentCluster.add(seed);
-        noise.remove(seed);
-      }
-    }
-    seeds.remove(startObjectID);
+    currentCluster.add(startObjectID);
+    processedIDs.add(startObjectID);
 
+    // try to expand the cluster
+    HashSetModifiableDBIDs seeds = DBIDUtil.newHashSet();
+    processNeighbors(neighbors, currentCluster, seeds);
+    assert (!seeds.remove(startObjectID));
+
+    DBIDVar o = DBIDUtil.newVar();
     while(!seeds.isEmpty()) {
-      DBIDMIter o = seeds.iter();
+      seeds.pop(o);
       DBIDs neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
-      o.remove();
 
       if(neighborhood.size() >= minpts) {
-        for(DBIDIter neighbor = neighborhood.iter(); neighbor.valid(); neighbor.advance()) {
-          boolean inNoise = noise.contains(neighbor);
-          boolean unclassified = !processedIDs.contains(neighbor);
-          if(inNoise || unclassified) {
-            if(unclassified) {
-              seeds.add(neighbor);
-            }
-            currentCluster.add(neighbor);
-            processedIDs.add(neighbor);
-            if(inNoise) {
-              noise.remove(neighbor);
-            }
-          }
-        }
+        processNeighbors(neighborhood, currentCluster, seeds);
       }
-
       if(processedIDs.size() == relation.size() && noise.size() == 0) {
         break;
       }
@@ -241,13 +220,25 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
         clusprog.setProcessed(numClusters, LOG);
       }
     }
-    if(currentCluster.size() >= minpts) {
-      resultList.add(currentCluster);
-    }
-    else {
-      noise.addDBIDs(currentCluster);
-      noise.add(startObjectID);
-      processedIDs.add(startObjectID);
+    resultList.add(currentCluster);
+  }
+
+  /**
+   * Process a single core point.
+   * 
+   * @param neighborhood Neighborhood
+   * @param currentCluster Current cluster
+   * @param seeds Seed set
+   */
+  private void processNeighbors(DBIDs neighborhood, ModifiableDBIDs currentCluster, HashSetModifiableDBIDs seeds) {
+    for(DBIDIter neighbor = neighborhood.iter(); neighbor.valid(); neighbor.advance()) {
+      if(processedIDs.add(neighbor)) {
+        seeds.add(neighbor);
+      }
+      else if(!noise.remove(neighbor)) {
+        continue;
+      }
+      currentCluster.add(neighbor);
     }
   }
 
