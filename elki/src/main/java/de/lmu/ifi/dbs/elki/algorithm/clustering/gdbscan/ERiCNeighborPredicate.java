@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -188,8 +187,8 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
     }
 
     @Override
-    public void addDBIDs(ModifiableDBIDs ids, DBIDs neighbors) {
-      ids.addDBIDs(neighbors);
+    public DBIDIter iterDBIDs(DBIDs neighbors) {
+      return neighbors.iter();
     }
 
     /**

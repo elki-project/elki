@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -254,8 +253,8 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
     }
 
     @Override
-    public void addDBIDs(ModifiableDBIDs ids, PreDeConModel neighbors) {
-      ids.addDBIDs(neighbors.ids);
+    public DBIDIter iterDBIDs(PreDeConModel neighbors) {
+      return neighbors.ids.iter();
     }
   }
 

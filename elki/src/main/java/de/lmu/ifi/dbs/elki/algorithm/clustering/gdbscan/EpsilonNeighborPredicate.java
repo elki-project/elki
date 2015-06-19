@@ -30,10 +30,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -50,8 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * <p>
  * Reference: <br>
- * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: A Density-Based Algorithm for
- * Discovering Clusters in Large Spatial Databases with Noise. <br>
+ * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu<br />
+ * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
+ * with Noise. <br />
  * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
  * Portland, OR, 1996.
  * </p>
@@ -150,8 +151,8 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
     }
 
     @Override
-    public void addDBIDs(ModifiableDBIDs ids, DoubleDBIDList neighbors) {
-      ids.addDBIDs(neighbors);
+    public DBIDIter iterDBIDs(DoubleDBIDList neighbors) {
+      return neighbors.iter();
     }
   }
 

@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -269,8 +268,8 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     }
 
     @Override
-    public void addDBIDs(ModifiableDBIDs ids, COPACModel neighbors) {
-      ids.addDBIDs(neighbors.ids);
+    public DBIDIter iterDBIDs(COPACModel neighbors) {
+      return neighbors.ids.iter();
     }
 
     /**

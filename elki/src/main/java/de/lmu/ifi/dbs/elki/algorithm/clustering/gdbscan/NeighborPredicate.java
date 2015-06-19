@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
 /**
  * Get the neighbors of an object
@@ -82,13 +82,13 @@ public interface NeighborPredicate {
      * @return Database ids
      */
     public DBIDs getIDs();
-    
+
     /**
      * Add the neighbors to a DBID set
      * 
-     * @param ids ID set
-     * @param neighbors Neighbors to add
+     * @param neighbors Neighbors to iterate over
+     * @return iterator
      */
-    public void addDBIDs(ModifiableDBIDs ids, T neighbors);
+    public DBIDIter iterDBIDs(T neighbors);
   }
 }

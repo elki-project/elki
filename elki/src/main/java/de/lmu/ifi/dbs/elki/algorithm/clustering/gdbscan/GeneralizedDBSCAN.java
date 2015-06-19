@@ -24,9 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  */
 
 import gnu.trove.list.array.TIntArrayList;
-
-import java.util.ArrayList;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -43,10 +40,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -60,9 +57,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Generalized DBSCAN, density-based clustering with noise.
+ *
+ * Reference:
  * <p>
- * Reference:<br />
- * Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu:<br />
+ * Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu<br />
  * Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its
  * Applications<br />
  * In: Data Mining and Knowledge Discovery, 1998.
@@ -200,6 +198,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       final TIntArrayList clustersizes = new TIntArrayList();
       clustersizes.add(0); // Unprocessed dummy value.
       clustersizes.add(0); // Noise counter.
+      final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray();
 
       // Implementation Note: using Integer objects should result in
       // reduced memory use in the HashMap!
@@ -214,13 +213,10 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         final T neighbors = npred.getNeighbors(id);
         // Evaluate Core-Point predicate:
         if(corepred.isCorePoint(id, neighbors)) {
-          clusterids.putInt(id, clusterid);
-          clustersizes.add(expandCluster(clusterid, clusterids, neighbors, progress));
+          LOG.incrementProcessed(clusprogress);
+          clustersizes.add(expandCluster(id, clusterid, clusterids, neighbors, activeSet, progress));
           // start next cluster on next iteration.
           ++clusterid;
-          if(clusprogress != null) {
-            clusprogress.setProcessed(clusterid, LOG);
-          }
         }
         else {
           // otherwise, it's a noise point
@@ -235,38 +231,32 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       LOG.setCompleted(clusprogress);
 
       // Transform cluster ID mapping into a clustering result:
-      ArrayList<ArrayModifiableDBIDs> clusterlists = new ArrayList<>(clusterid);
-      ArrayList<ArrayModifiableDBIDs> corelists = coremodel ? new ArrayList<ArrayModifiableDBIDs>(clusterid) : null;
+      ArrayModifiableDBIDs[] clusterlists = new ArrayModifiableDBIDs[clusterid];
+      ArrayModifiableDBIDs[] corelists = coremodel ? new ArrayModifiableDBIDs[clusterid] : null;
       // add storage containers for clusters
       for(int i = 0; i < clustersizes.size(); i++) {
-        clusterlists.add(DBIDUtil.newArray(clustersizes.get(i)));
+        clusterlists[i] = DBIDUtil.newArray(clustersizes.get(i));
         if(corelists != null) {
-          corelists.add(DBIDUtil.newArray(clustersizes.get(i)));
+          corelists[i] = DBIDUtil.newArray(clustersizes.get(i));
         }
       }
       // do the actual inversion
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         // Negative values are non-core points:
-        int cid = clusterids.intValue(id);
-        int cluster = Math.abs(cid);
-        clusterlists.get(cluster).add(id);
+        final int cid = clusterids.intValue(id);
+        final int cluster = cid < 0 ? -cid : cid;
+        clusterlists[cluster].add(id);
         if(corelists != null && cid > NOISE) {
-          corelists.get(cluster).add(id);
+          corelists[cluster].add(id);
         }
       }
       clusterids.destroy();
 
       Clustering<Model> result = new Clustering<>("GDBSCAN", "gdbscan-clustering");
-      for(int cid = NOISE; cid < clusterlists.size(); cid++) {
+      for(int cid = NOISE; cid < clusterlists.length; cid++) {
         boolean isNoise = (cid == NOISE);
-        Cluster<Model> c;
-        if(corelists != null) {
-          c = new Cluster<Model>(clusterlists.get(cid), isNoise, new CoreObjectsModel(corelists.get(cid)));
-        }
-        else {
-          c = new Cluster<Model>(clusterlists.get(cid), isNoise, ClusterModel.CLUSTER);
-        }
-        result.addToplevelCluster(c);
+        Model m = coremodel ? new CoreObjectsModel(corelists[cid]) : ClusterModel.CLUSTER;
+        result.addToplevelCluster(new Cluster<Model>(clusterlists[cid], isNoise, m));
       }
       return result;
     }
@@ -277,44 +267,52 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * @param clusterid ID of the current cluster.
      * @param clusterids Current object to cluster mapping.
      * @param neighbors Neighbors acquired by initial getNeighbors call.
+     * @param activeSet Set to manage active candidates.
      * @param progress Progress logging
-     * 
      * @return cluster size
      */
-    protected int expandCluster(final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, final FiniteProgress progress) {
-      int clustersize = 1; // initial seed!
-      final HashSetModifiableDBIDs activeSet = DBIDUtil.newHashSet();
-      npred.addDBIDs(activeSet, neighbors);
-      // run expandCluster as long as this set is non-empty (non-recursive
-      // implementation)
+    protected int expandCluster(final DBIDRef seed, final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, ArrayModifiableDBIDs activeSet, final FiniteProgress progress) {
+      assert (activeSet.size() == 0);
+      int clustersize = 1 + processCorePoint(seed, neighbors, clusterid, clusterids, activeSet);
+      // run expandCluster as long as there is another seed
       final DBIDVar id = DBIDUtil.newVar();
       while(!activeSet.isEmpty()) {
         activeSet.pop(id);
-        // Assign object to cluster
-        final int oldclus = clusterids.intValue(id);
-        if(oldclus == NOISE) {
-          clustersize += 1;
-          // Non core point cluster member:
-          clusterids.putInt(id, -clusterid);
+        // Evaluate Neighborhood predicate
+        final T newneighbors = npred.getNeighbors(id);
+        // Evaluate Core-Point predicate
+        if(corepred.isCorePoint(id, newneighbors)) {
+          clustersize += processCorePoint(id, newneighbors, clusterid, clusterids, activeSet);
         }
-        else if(oldclus == UNPROCESSED) {
-          clustersize += 1;
-          // expandCluster again:
-          // Evaluate Neighborhood predicate
-          final T newneighbors = npred.getNeighbors(id);
-          // Evaluate Core-Point predicate
-          if(corepred.isCorePoint(id, newneighbors)) {
-            // Note: the recursion is unrolled into iteration over the active
-            // set.
-            npred.addDBIDs(activeSet, newneighbors);
-            clusterids.putInt(id, clusterid);
-          }
-          else {
-            // Non core point cluster member:
-            clusterids.putInt(id, -clusterid);
-          }
-          LOG.incrementProcessed(progress);
+        LOG.incrementProcessed(progress);
+      }
+      return clustersize;
+    }
+
+    /**
+     * Process a single core point.
+     * 
+     * @param seed Point to process
+     * @param newneighbors New neighbors
+     * @param clusterid Cluster to add to
+     * @param clusterids Cluster assignment storage.
+     * @param activeSet Active set of cluster seeds
+     * @return Number of new points added to cluster
+     */
+    protected int processCorePoint(final DBIDRef seed, T newneighbors, final int clusterid, final WritableIntegerDataStore clusterids, ArrayModifiableDBIDs activeSet) {
+      clusterids.putInt(seed, clusterid); // Core point now
+      int clustersize = 0;
+      // The recursion is unrolled into iteration over the active set.
+      for(DBIDIter it = npred.iterDBIDs(newneighbors); it.valid(); it.advance()) {
+        final int oldassign = clusterids.intValue(it);
+        if(oldassign == UNPROCESSED) {
+          activeSet.add(it);
         }
+        else if(oldassign != NOISE) {
+          continue; // Member of some cluster.
+        }
+        clustersize++;
+        clusterids.putInt(it, -clusterid);
       }
       return clustersize;
     }

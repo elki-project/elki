@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -87,7 +86,8 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   /**
    * Tool to help with parameterization.
    */
-  private MeanVariance mvSize = new MeanVariance(), mvSize2 = new MeanVariance(), mvCorDim = new MeanVariance();
+  private MeanVariance mvSize = new MeanVariance(),
+      mvSize2 = new MeanVariance(), mvCorDim = new MeanVariance();
 
   /**
    * The Filtered PCA Runner
@@ -161,7 +161,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
         survivors.add(iter);
       }
     }
-    if (cordim <= settings.lambda) {
+    if(cordim <= settings.lambda) {
       mvSize2.put(survivors.size());
     }
     mvCorDim.put(cordim);
@@ -209,8 +209,8 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     }
 
     @Override
-    public void addDBIDs(ModifiableDBIDs ids, PreDeConModel neighbors) {
-      ids.addDBIDs(neighbors.ids);
+    public DBIDIter iterDBIDs(PreDeConModel neighbors) {
+      return neighbors.ids.iter();
     }
   }
 
