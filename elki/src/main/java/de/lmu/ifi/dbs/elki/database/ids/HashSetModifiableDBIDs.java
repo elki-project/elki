@@ -35,16 +35,9 @@ public interface HashSetModifiableDBIDs extends HashSetDBIDs, ModifiableDBIDs {
    * @param set second set
    * @return true when modified
    */
-  public boolean retainAll(DBIDs set);
+  boolean retainAll(DBIDs set);
 
   // To help the compilers...
   @Override
   DBIDMIter iter();
-
-  /**
-   * Pop (get and remove) one DBID from the set, into a variable.
-   *
-   * @param outvar Output variable
-   */
-  public void pop(DBIDVar outvar);
 }

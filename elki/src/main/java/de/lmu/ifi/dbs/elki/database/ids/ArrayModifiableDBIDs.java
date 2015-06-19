@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
-import java.util.Comparator;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,6 +22,7 @@ import java.util.Comparator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.Comparator;
 
 /**
  * Array-oriented implementation of a modifiable DBID collection.
@@ -60,7 +59,7 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
    * @param i Index
    * @return value removed
    */
-  public DBID remove(int i);
+  DBID remove(int i);
 
   /**
    * Replace the i'th entry (starting at 0)
@@ -69,7 +68,7 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
    * @param newval New value
    * @return previous value
    */
-  public DBID set(int i, DBIDRef newval);
+  DBID set(int i, DBIDRef newval);
 
   /**
    * Insert at position i (starting at 0, moving the remainder by one position).
@@ -79,7 +78,7 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
    * @param i Index
    * @param newval New value
    */
-  public void insert(int i, DBIDRef newval);
+  void insert(int i, DBIDRef newval);
 
   /**
    * Swap DBIDs add positions a and b.
@@ -87,8 +86,8 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
    * @param a First position
    * @param b Second position
    */
-  public void swap(int a, int b);
+  void swap(int a, int b);
 
   @Override
-  public DBIDArrayMIter iter();
+  DBIDArrayMIter iter();
 }

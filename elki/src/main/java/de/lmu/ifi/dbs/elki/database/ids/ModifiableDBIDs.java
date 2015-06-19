@@ -88,4 +88,11 @@ public interface ModifiableDBIDs extends DBIDs {
    */
   @Override
   DBIDMIter iter();
+
+  /**
+   * Pop (get and remove) one DBID from the set, into a variable.
+   *
+   * @param outvar Output variable
+   */
+  void pop(DBIDVar outvar);
 }

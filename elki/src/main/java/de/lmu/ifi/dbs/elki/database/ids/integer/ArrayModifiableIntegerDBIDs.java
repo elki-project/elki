@@ -271,6 +271,17 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   }
 
   @Override
+  public void pop(DBIDVar var) {
+    if(var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar) var).internalSetIndex(store[size - 1]);
+    }
+    else {
+      // less efficient, involves object creation.
+      var.set(get(size - 1));
+    }
+  }
+
+  @Override
   public Slice slice(int begin, int end) {
     return new Slice(begin, end);
   }
