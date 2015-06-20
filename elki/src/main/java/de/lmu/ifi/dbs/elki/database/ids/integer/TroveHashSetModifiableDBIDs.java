@@ -159,6 +159,9 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
 
   @Override
   public void pop(DBIDVar outvar) {
+    if(store.size() == 0) {
+      throw new ArrayIndexOutOfBoundsException("Cannot pop() from an empty array.");
+    }
     final byte[] states = store._states;
     int i = store.capacity();
     while(i-- > 0 && (states[i] != TPrimitiveHash.FULL)) {

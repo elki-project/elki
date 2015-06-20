@@ -276,13 +276,12 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
       throw new ArrayIndexOutOfBoundsException("Cannot pop() from an empty array.");
     }
     if(var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar) var).internalSetIndex(store[size - 1]);
+      ((IntegerDBIDVar) var).internalSetIndex(store[--size]);
     }
     else {
       // less efficient, involves object creation.
-      var.set(get(size - 1));
+      var.set(get(--size));
     }
-    --size;
   }
 
   @Override
