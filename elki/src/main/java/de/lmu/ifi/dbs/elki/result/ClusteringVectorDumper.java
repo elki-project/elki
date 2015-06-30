@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.meta.ExternalClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
