@@ -24,12 +24,12 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
  */
 
 import java.util.Arrays;
-import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -57,15 +57,15 @@ public class TopologicalSplitter implements SplitStrategy {
   }
 
   @Override
-  public <E extends SpatialComparable, A> BitSet split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
+  public <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
     Split<A, E> split = new Split<>(entries, getter);
     split.chooseSplitAxis(minEntries);
     split.chooseSplitPoint(minEntries);
 
     assert (split.splitPoint < split.size) : "Invalid split produced. Size: " + getter.size(entries) + " minEntries: " + minEntries + " split.size: " + split.size;
-    BitSet assignment = new BitSet(split.size);
+    long[] assignment = BitsUtil.zero(split.size);
     for(int i = split.splitPoint; i < split.size; i++) {
-      assignment.set(split.bestSorting[i].second);
+      BitsUtil.setI(assignment, split.bestSorting[i].second);
     }
     return assignment;
   }

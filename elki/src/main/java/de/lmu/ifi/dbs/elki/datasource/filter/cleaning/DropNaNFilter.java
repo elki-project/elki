@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.cleaning;
  */
 
 import java.util.ArrayList;
-import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -33,6 +32,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -55,7 +55,7 @@ public class DropNaNFilter extends AbstractStreamFilter {
   /**
    * Columns to check.
    */
-  private BitSet densecols = null;
+  private long[] densecols = null;
 
   /**
    * Constructor.
@@ -89,7 +89,7 @@ public class DropNaNFilter extends AbstractStreamFilter {
           updateMeta(source.getMeta());
         }
         boolean good = true;
-        for(int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
+        for(int j = BitsUtil.nextSetBit(densecols, 0); j >= 0; j = BitsUtil.nextSetBit(densecols, j + 1)) {
           NumberVector v = (NumberVector) source.data(j);
           if(v == null) {
             good = false;
@@ -117,23 +117,18 @@ public class DropNaNFilter extends AbstractStreamFilter {
    */
   private void updateMeta(BundleMeta meta) {
     int cols = meta.size();
-    if(densecols == null) {
-      densecols = new BitSet();
-    }
-    else {
-      densecols.clear();
-    }
+    densecols = BitsUtil.zero(cols);
     for(int i = 0; i < cols; i++) {
       if(TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
         throw new AbortException("Filtering sparse vectors is not yet supported by this filter. Please contribute.");
       }
       // TODO: only check for double and float?
       if(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(meta.get(i))) {
-        densecols.set(i);
+        BitsUtil.setI(densecols, i);
         continue;
       }
       if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(meta.get(i))) {
-        densecols.set(i);
+        BitsUtil.setI(densecols, i);
         continue;
       }
     }
@@ -153,7 +148,7 @@ public class DropNaNFilter extends AbstractStreamFilter {
     for(int i = 0; i < objects.dataLength(); i++) {
       final Object[] row = objects.getRow(i);
       boolean good = true;
-      for(int j = densecols.nextSetBit(0); j >= 0; j = densecols.nextSetBit(j + 1)) {
+      for(int j = BitsUtil.nextSetBit(densecols, 0); j >= 0; j = BitsUtil.nextSetBit(densecols, j + 1)) {
         NumberVector v = (NumberVector) row[j];
         if(v == null) {
           good = false;

@@ -23,11 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -38,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class DoubleListParameter extends ListParameter<DoubleListParameter, Double> {
+public class DoubleListParameter extends ListParameter<DoubleListParameter, double[]> {
   /**
    * Constructs a list parameter with the given optionID and optional flag.
    * 
@@ -60,54 +56,32 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, Doub
 
   @Override
   public String getValueAsString() {
-    return FormatUtil.format(ArrayLikeUtil.toPrimitiveDoubleArray(getValue()), LIST_SEP);
+    return FormatUtil.format(getValue(), LIST_SEP);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  protected List<Double> parseValue(Object obj) throws ParameterException {
-    try {
-      List<?> l = List.class.cast(obj);
-      // do extra validation:
-      for(Object o : l) {
-        if(!(o instanceof Double)) {
-          throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
-        }
-      }
-      // TODO: can we use reflection to get extra checks?
-      // TODO: Should we copy the list?
-      return (List<Double>) l;
-    }
-    catch(ClassCastException e) {
-      // continue with others
+  protected double[] parseValue(Object obj) throws ParameterException {
+    if(obj instanceof double[]) {
+      return double[].class.cast(obj);
     }
     if(obj instanceof String) {
       String[] values = SPLIT.split((String) obj);
-      ArrayList<Double> doubleValue = new ArrayList<>(values.length);
-      for(String val : values) {
-        doubleValue.add(FormatUtil.parseDouble(val));
+      double[] doubleValue = new double[values.length];
+      for(int i = 0; i < values.length; i++) {
+        doubleValue[i++] = FormatUtil.parseDouble(values[i]);
       }
       return doubleValue;
     }
     if(obj instanceof Double) {
-      ArrayList<Double> doubleValue = new ArrayList<>(1);
-      doubleValue.add((Double) obj);
-      return doubleValue;
+      return new double[] { (Double) obj };
     }
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Double values!");
   }
 
-  /**
-   * Sets the default value of this parameter.
-   * 
-   * @param allListDefaultValue default value for all list elements of this
-   *        parameter
-   */
-  // Unused?
-  /*
-   * public void setDefaultValue(double allListDefaultValue) { for(int i = 0; i
-   * < defaultValue.size(); i++) { defaultValue.set(i, allListDefaultValue); } }
-   */
+  @Override
+  public int size() {
+    return getValue().length;
+  }
 
   /**
    * Returns a string representation of the parameter's type.

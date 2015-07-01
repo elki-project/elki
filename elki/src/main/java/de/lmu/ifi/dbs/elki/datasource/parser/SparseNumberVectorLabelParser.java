@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -106,7 +105,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
    * @param labelIndices Indices to use as labels
    * @param factory Vector factory
    */
-  public SparseNumberVectorLabelParser(CSVReaderFormat format, BitSet labelIndices, SparseNumberVector.Factory<V> factory) {
+  public SparseNumberVectorLabelParser(CSVReaderFormat format, long[] labelIndices, SparseNumberVector.Factory<V> factory) {
     super(format, labelIndices, factory);
     this.sparsefactory = factory;
   }
@@ -120,7 +119,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
    * @param labelIndices Indices to use as labels
    * @param factory Vector factory
    */
-  public SparseNumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, SparseNumberVector.Factory<V> factory) {
+  public SparseNumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, long[] labelIndices, SparseNumberVector.Factory<V> factory) {
     super(colSep, quoteChars, comment, labelIndices, factory);
     this.sparsefactory = factory;
   }

@@ -35,11 +35,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @apiviz.composedOf ParameterConstraint oneway 1 n
  */
-public class ListEachConstraint<T> implements ParameterConstraint<List<T>> {
+public class ListEachConstraint implements ParameterConstraint<int[]> {
   /**
    * Constraints
    */
-  private List<ParameterConstraint<? super T>> constraints;
+  private List<ParameterConstraint<? super Integer>> constraints;
 
   /**
    * Constructor.
@@ -54,7 +54,7 @@ public class ListEachConstraint<T> implements ParameterConstraint<List<T>> {
    * 
    * @param constraint Constraint to apply to all elements
    */
-  public ListEachConstraint(ParameterConstraint<? super T> constraint) {
+  public ListEachConstraint(ParameterConstraint<? super Integer> constraint) {
     super();
     this.constraints = new ArrayList<>(1);
     this.constraints.add(constraint);
@@ -65,14 +65,14 @@ public class ListEachConstraint<T> implements ParameterConstraint<List<T>> {
    * 
    * @param constraint Constraint
    */
-  public void addConstraint(ParameterConstraint<? super T> constraint) {
+  public void addConstraint(ParameterConstraint<? super Integer> constraint) {
     this.constraints.add(constraint);
   }
 
   @Override
-  public void test(List<T> t) throws ParameterException {
-    for (T e : t) {
-      for (ParameterConstraint<? super T> c : constraints) {
+  public void test(int[] t) throws ParameterException {
+    for (int e : t) {
+      for (ParameterConstraint<? super Integer> c : constraints) {
         c.test(e);
       }
     }
@@ -82,7 +82,7 @@ public class ListEachConstraint<T> implements ParameterConstraint<List<T>> {
   public String getDescription(String parameterName) {
     final String all = "all elements of " + parameterName;
     StringBuilder b = new StringBuilder();
-    for (ParameterConstraint<? super T> c : constraints) {
+    for (ParameterConstraint<? super Integer> c : constraints) {
       b.append(c.getDescription(all));
     }
     return b.toString();

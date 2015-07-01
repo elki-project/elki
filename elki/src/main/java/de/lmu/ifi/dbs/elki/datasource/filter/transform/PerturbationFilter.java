@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -56,13 +55,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * distribution (assuming a Gaussian distribution there), or to a percentage of
  * the extension in each attribute ({@code maximumValue - minimumValue}).
  *
- * This filter has a potentially wide use but has been implemented for the following publication:
+ * This filter has a potentially wide use but has been implemented for the
+ * following publication:
  * 
  * Reference:
  * <p>
- * A. Zimek, R. J. G. B. Campello, J. Sander:</br>
- * Data Perturbation for Outlier Detection Ensembles.<\br>
- * In: Proc. 26th International Conference on Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark, 2014.
+ * A. Zimek, R. J. G. B. Campello, J. Sander:</br> Data Perturbation for Outlier
+ * Detection Ensembles.<\br> In: Proc. 26th International Conference on
+ * Scientific and Statistical Database Management (SSDBM), Aalborg, Denmark,
+ * 2014.
  * </p>
  * 
  * @author Arthur Zimek
@@ -416,12 +417,12 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID);
       minimaP.setOptional(true);
       if(config.grab(minimaP)) {
-        minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
+        minima = minimaP.getValue().clone();
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID);
       maximaP.setOptional(true);
       if(config.grab(maximaP)) {
-        maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
+        maxima = maximaP.getValue().clone();
       }
 
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(minimaP, maximaP));

@@ -23,11 +23,10 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -52,11 +51,11 @@ public class RTreeLinearSplit implements SplitStrategy {
   public static final RTreeLinearSplit STATIC = new RTreeLinearSplit();
 
   @Override
-  public <E extends SpatialComparable, A> BitSet split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
+  public <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
     final int num = getter.size(entries);
     // Object assignment, and processed objects
-    BitSet assignment = new BitSet(num);
-    BitSet assigned = new BitSet(num);
+    long[] assignment = BitsUtil.zero(num);
+    long[] assigned = BitsUtil.zero(num);
     // MBRs and Areas of current assignments
     ModifiableHyperBoundingBox mbr1, mbr2;
     double area1 = 0, area2 = 0;
@@ -130,10 +129,10 @@ public class RTreeLinearSplit implements SplitStrategy {
 
       // Data to keep
       // Mark both as used
-      assigned.set(w1);
-      assigned.set(w2);
+      BitsUtil.setI(assigned, w1);
+      BitsUtil.setI(assigned, w2);
       // Assign second to second set
-      assignment.set(w2);
+      BitsUtil.setI(assignment, w2);
       // Initial mbrs and areas
       final E w1i = getter.get(entries, w1);
       final E w2i = getter.get(entries, w2);
@@ -147,7 +146,7 @@ public class RTreeLinearSplit implements SplitStrategy {
       int in1 = 1, in2 = 1;
       int remaining = num - 2;
       // Choose any element, for example the next.
-      for(int next = assigned.nextClearBit(0); remaining > 0 && next < num; next = assigned.nextClearBit(next + 1)) {
+      for(int next = BitsUtil.nextClearBit(assigned, 0); remaining > 0 && next < num; next = BitsUtil.nextClearBit(assigned, next + 1)) {
         // Shortcut when minEntries must be fulfilled
         if(in1 + remaining <= minEntries) {
           // No need to updated assigned, no changes to assignment.
@@ -156,8 +155,8 @@ public class RTreeLinearSplit implements SplitStrategy {
         if(in2 + remaining <= minEntries) {
           // Mark unassigned for second.
           // Don't bother to update assigned, though
-          for(; next < num; next = assigned.nextClearBit(next + 1)) {
-            assignment.set(next);
+          for(; next < num; next = BitsUtil.nextClearBit(assigned, next + 1)) {
+            BitsUtil.setI(assignment, next);
           }
           break;
         }
@@ -182,7 +181,7 @@ public class RTreeLinearSplit implements SplitStrategy {
           }
         }
         // Mark as used.
-        assigned.set(next);
+        BitsUtil.setI(assigned, next);
         remaining--;
         // Assign
         if(!preferSecond) {
@@ -192,7 +191,7 @@ public class RTreeLinearSplit implements SplitStrategy {
         }
         else {
           in2++;
-          assignment.set(next);
+          BitsUtil.setI(assignment, next);
           mbr2.extend(next_i);
           area2 = SpatialUtil.volume(mbr2);
         }

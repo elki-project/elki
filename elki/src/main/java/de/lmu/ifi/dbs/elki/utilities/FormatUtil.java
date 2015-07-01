@@ -27,7 +27,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.Iterator;
@@ -427,12 +426,12 @@ public final class FormatUtil {
    * @param sep the separator
    * @return a string representation of the specified bit set.
    */
-  public static String format(BitSet bitSet, int dim, String sep) {
+  public static String format(long[] bitSet, int dim, String sep) {
     StringBuilder msg = new StringBuilder();
-    msg.append(bitSet.get(0) ? '1' : '0');
+    msg.append(BitsUtil.get(bitSet, 0) ? '1' : '0');
     for(int d = 1; d < dim; d++) {
       msg.append(sep);
-      msg.append(bitSet.get(d) ? '1' : '0');
+      msg.append(BitsUtil.get(bitSet, d) ? '1' : '0');
     }
     return msg.toString();
   }
@@ -444,7 +443,7 @@ public final class FormatUtil {
    * @param bitSet the bitSet
    * @return a string representation of the specified bit set.
    */
-  public static String format(int dim, BitSet bitSet) {
+  public static String format(int dim, long[] bitSet) {
     // TODO: removed whitespace - hierarchy reading to be adapted!
     return format(bitSet, dim, ",");
   }

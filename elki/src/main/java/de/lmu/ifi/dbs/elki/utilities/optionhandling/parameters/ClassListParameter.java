@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <C> Class type
  */
 // TODO: Add missing constructors. (ObjectListParameter also!)
-public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, Class<? extends C>> {
+public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, List<Class<? extends C>>> {
   /**
    * The restriction class for the list of class names.
    */
@@ -83,12 +83,12 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
   public String getValueAsString() {
     StringBuilder buf = new StringBuilder();
     final String defPackage = restrictionClass.getPackage().getName() + ".";
-    for (Class<? extends C> c : getValue()) {
-      if (buf.length() > 0) {
+    for(Class<? extends C> c : getValue()) {
+      if(buf.length() > 0) {
         buf.append(LIST_SEP);
       }
       String name = c.getName();
-      if (name.startsWith(defPackage)) {
+      if(name.startsWith(defPackage)) {
         name = name.substring(defPackage.length());
       }
       buf.append(name);
@@ -102,40 +102,43 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
     try {
       List<?> l = List.class.cast(obj);
       // do extra validation:
-      for (Object o : l) {
-        if (!(o instanceof Class)) {
+      for(Object o : l) {
+        if(!(o instanceof Class)) {
           throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
         }
       }
       // TODO: can we use reflection to get extra checks?
       // TODO: Should we copy the list?
       return (List<Class<? extends C>>) l;
-    } catch (ClassCastException e) {
+    }
+    catch(ClassCastException e) {
       // continue with others
     }
     // Did we get a single class?
     try {
-      if (restrictionClass.isAssignableFrom((Class<?>) obj)) {
+      if(restrictionClass.isAssignableFrom((Class<?>) obj)) {
         List<Class<? extends C>> clss = new ArrayList<>(1);
         clss.add((Class<? extends C>) obj);
         return clss;
       }
-    } catch (ClassCastException e) {
+    }
+    catch(ClassCastException e) {
       // continue with others
     }
-    if (obj instanceof String) {
+    if(obj instanceof String) {
       String[] classes = SPLIT.split((String) obj);
       // TODO: allow empty lists (and list constraints) to enforce length?
-      if (classes.length == 0) {
+      if(classes.length == 0) {
         throw new WrongParameterValueException("Wrong parameter format! Given list of classes for parameter \"" + getName() + "\" is either empty or has the wrong format!");
       }
 
       List<Class<? extends C>> cls = new ArrayList<>(classes.length);
-      for (String cl : classes) {
+      for(String cl : classes) {
         Class<? extends C> clz = InspectionUtil.findImplementation(restrictionClass, cl);
-        if (clz != null) {
+        if(clz != null) {
           cls.add(clz);
-        } else {
+        }
+        else {
           throw new WrongParameterValueException(this, (String) obj, "Class '" + cl + "' not found for given value. Must be a subclass / implementation of " + restrictionClass.getName());
         }
       }
@@ -147,8 +150,8 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
 
   @Override
   protected boolean validate(List<Class<? extends C>> obj) throws ParameterException {
-    for (Class<? extends C> cls : obj) {
-      if (!restrictionClass.isAssignableFrom(cls)) {
+    for(Class<? extends C> cls : obj) {
+      if(!restrictionClass.isAssignableFrom(cls)) {
         throw new WrongParameterValueException(this, cls.getName(), "Class \"" + cls.getName() + "\" does not extend/implement restriction class " + restrictionClass + ".\n");
       }
     }
@@ -197,18 +200,19 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
   public List<C> instantiateClasses(Parameterization config) {
     config = config.descend(this);
     List<C> instances = new ArrayList<>();
-    if (getValue() == null) {
+    if(getValue() == null) {
       config.reportError(new UnusedParameterException("Value of parameter " + getName() + " has not been specified."));
       return instances; // empty list.
     }
 
-    for (Class<? extends C> cls : getValue()) {
+    for(Class<? extends C> cls : getValue()) {
       // NOTE: There is a duplication of this code in ObjectListParameter - keep
       // in sync!
       try {
         C instance = ClassGenericsUtil.tryInstantiate(restrictionClass, cls, config);
         instances.add(instance);
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         config.reportError(new WrongParameterValueException(this, cls.getName(), e));
       }
     }
@@ -225,24 +229,26 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
   public String restrictionString() {
     String prefix = restrictionClass.getPackage().getName() + ".";
     StringBuilder info = new StringBuilder();
-    if (restrictionClass.isInterface()) {
+    if(restrictionClass.isInterface()) {
       info.append("Implementing ");
-    } else {
+    }
+    else {
       info.append("Extending ");
     }
     info.append(restrictionClass.getName());
     info.append(FormatUtil.NEWLINE);
 
     List<Class<?>> known = getKnownImplementations();
-    if (!known.isEmpty()) {
+    if(!known.isEmpty()) {
       info.append("Known classes (default package " + prefix + "):");
       info.append(FormatUtil.NEWLINE);
-      for (Class<?> c : known) {
+      for(Class<?> c : known) {
         info.append("->" + FormatUtil.NONBREAKING_SPACE);
         String name = c.getName();
-        if (name.startsWith(prefix)) {
+        if(name.startsWith(prefix)) {
           info.append(name.substring(prefix.length()));
-        } else {
+        }
+        else {
           info.append(name);
         }
         info.append(FormatUtil.NEWLINE);
@@ -268,9 +274,14 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
    */
   @Override
   public String getValuesDescription() {
-    if (restrictionClass != null && restrictionClass != Object.class) {
+    if(restrictionClass != null && restrictionClass != Object.class) {
       return restrictionString();
     }
     return "";
+  }
+  
+  @Override
+  public int size() {
+    return getValue().size();
   }
 }

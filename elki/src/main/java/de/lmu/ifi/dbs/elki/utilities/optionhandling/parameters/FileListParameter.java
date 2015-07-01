@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class FileListParameter extends ListParameter<FileListParameter, File> {
+public class FileListParameter extends ListParameter<FileListParameter, List<File>> {
   /**
    * Available types of the files: {@link #INPUT_FILES} denotes input files,
    * {@link #OUTPUT_FILES} denotes output files.
@@ -136,6 +136,11 @@ public class FileListParameter extends ListParameter<FileListParameter, File> {
       }
     }
     return true;
+  }
+
+  @Override
+  public int size() {
+    return getValue().size();
   }
 
   /**

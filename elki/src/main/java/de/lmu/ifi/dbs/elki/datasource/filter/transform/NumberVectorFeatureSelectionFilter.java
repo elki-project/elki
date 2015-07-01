@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
@@ -33,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -55,14 +53,14 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
   /**
    * Keeps the selection of the subspace to project onto.
    */
-  private BitSet selectedAttributes;
+  private long[] selectedAttributes;
 
   /**
    * Constructor.
    * 
    * @param selectedAttributes Selected attributes
    */
-  public NumberVectorFeatureSelectionFilter(BitSet selectedAttributes) {
+  public NumberVectorFeatureSelectionFilter(long[] selectedAttributes) {
     super();
     this.selectedAttributes = selectedAttributes;
   }
@@ -89,25 +87,19 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
    * {@link Parameterizer#SELECTED_ATTRIBUTES_ID}.
    * </p>
    * 
-   * The index in the BitSet is expected to be shifted to the left by one, i.e.,
-   * index 0 in the BitSet relates to the first attribute.
-   * 
    * @param selectedAttributes the new selected attributes
    */
-  public void setSelectedAttributes(BitSet selectedAttributes) {
-    this.selectedAttributes.or(selectedAttributes);
+  public void setSelectedAttributes(long[] selectedAttributes) {
+    this.selectedAttributes = selectedAttributes;
   }
 
   /**
    * Provides a BitSet with the bits set to true corresponding to the selected
    * attributes in {@link Parameterizer#SELECTED_ATTRIBUTES_ID}.
    * 
-   * The index in the BitSet is shifted to the left by one, i.e., index 0 in the
-   * BitSet relates to the first attribute.
-   * 
    * @return the selected attributes
    */
-  public BitSet getSelectedAttributes() {
+  public long[] getSelectedAttributes() {
     return selectedAttributes;
   }
 
@@ -117,7 +109,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
    * @return dimensionality
    */
   public int getDimensionality() {
-    return selectedAttributes.cardinality();
+    return BitsUtil.cardinality(selectedAttributes);
   }
 
   /**
@@ -129,9 +121,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * <p>
      * Selected attributes parameter.
-     * </p>
      * <p>
      * Key: <code>-projectionfilter.selectedattributes</code>
      * </p>
@@ -141,19 +131,15 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
     /**
      * Selected attributes.
      */
-    protected BitSet selectedAttributes = null;
+    protected long[] selectedAttributes;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
+      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       if(config.grab(selectedAttributesP)) {
-        selectedAttributes = new BitSet();
-        List<Integer> dimensionList = selectedAttributesP.getValue();
-        for(int d : dimensionList) {
-          selectedAttributes.set(d);
-        }
+        selectedAttributes = selectedAttributesP.getValueAsBitSet();
       }
     }
 

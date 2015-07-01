@@ -1,22 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.geometry;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -39,6 +22,24 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
+
 /**
  * Compute the Convex Hull and/or Delaunay Triangulation, using the sweep-hull
  * approach of David Sinclair.
@@ -393,8 +394,8 @@ public class SweepHullDelaunay2D {
     // Now check for triangles that need flipping.
     if(!hullonly) {
       final int size = tris.size();
-      BitSet flippedA = new BitSet(size);
-      BitSet flippedB = new BitSet(size);
+      long[] flippedA = BitsUtil.zero(size);
+      long[] flippedB = BitsUtil.zero(size);
       // Initial flip
       int flipped = flipTriangles(null, flippedA);
       for(int iterations = 1; iterations < 2000 && flipped > 0; iterations++) {
@@ -425,10 +426,10 @@ public class SweepHullDelaunay2D {
    * @param flippedA Bit set for triangles to test
    * @param flippedB Bit set to mark triangles as done
    */
-  int flipTriangles(BitSet flippedA, BitSet flippedB) {
+  int flipTriangles(long[] flippedA, long[] flippedB) {
     final int size = tris.size();
     int numflips = 0;
-    flippedB.clear();
+    BitsUtil.zeroI(flippedB);
     if(flippedA == null) {
       for(int i = 0; i < size; i++) {
         if(flipTriangle(i, flippedB) > 0) {
@@ -437,7 +438,7 @@ public class SweepHullDelaunay2D {
       }
     }
     else {
-      for(int i = flippedA.nextSetBit(0); i > -1; i = flippedA.nextSetBit(i + 1)) {
+      for(int i = BitsUtil.nextSetBit(flippedA, 0); i > -1; i = BitsUtil.nextSetBit(flippedA, i + 1)) {
         if(flipTriangle(i, flippedB) > 0) {
           numflips += 2;
         }
@@ -453,7 +454,7 @@ public class SweepHullDelaunay2D {
    * @param flipped Bitset to modify
    * @return number of other triangle, or -1
    */
-  int flipTriangle(int i, BitSet flipped) {
+  int flipTriangle(int i, long[] flipped) {
     final Triangle cur = tris.get(i);
     // Test edge AB:
     if(cur.ab >= 0) {
@@ -498,8 +499,8 @@ public class SweepHullDelaunay2D {
         if(da >= 0) {
           tris.get(da).replaceEdge(a, d, i, ot);
         }
-        flipped.set(i);
-        flipped.set(ot);
+        BitsUtil.setI(flipped, i);
+        BitsUtil.setI(flipped, ot);
         return ot;
       }
     }
@@ -546,8 +547,8 @@ public class SweepHullDelaunay2D {
         if(da >= 0) {
           tris.get(da).replaceEdge(a, d, i, ot);
         }
-        flipped.set(i);
-        flipped.set(ot);
+        BitsUtil.setI(flipped, i);
+        BitsUtil.setI(flipped, ot);
         return ot;
       }
     }
@@ -594,8 +595,8 @@ public class SweepHullDelaunay2D {
         if(da >= 0) {
           tris.get(da).replaceEdge(a, d, i, ot);
         }
-        flipped.set(i);
-        flipped.set(ot);
+        BitsUtil.setI(flipped, i);
+        BitsUtil.setI(flipped, ot);
         return ot;
       }
     }

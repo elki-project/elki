@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -143,11 +142,11 @@ public class AddSingleScale implements Algorithm {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleListParameter minmaxP = new DoubleListParameter(MINMAX_ID);
-      minmaxP.setOptional(true);
-      minmaxP.addConstraint(new ListSizeConstraint(2));
+      DoubleListParameter minmaxP = new DoubleListParameter(MINMAX_ID) //
+      .setOptional(true) //
+      .addConstraint(new ListSizeConstraint(2));
       if(config.grab(minmaxP)) {
-        minmax = ArrayLikeUtil.toPrimitiveDoubleArray(minmaxP.getValue());
+        minmax = minmaxP.getValue().clone();
       }
     }
 

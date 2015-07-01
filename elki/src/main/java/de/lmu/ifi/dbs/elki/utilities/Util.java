@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
 import java.util.Comparator;
 import java.util.Random;
 
@@ -70,22 +69,24 @@ public final class Util {
    *        selected bit remains true
    * @return a new BitSet with randomly set bits
    */
-  public static BitSet randomBitSet(int cardinality, int capacity, Random random) {
+  public static long[] randomBitSet(int cardinality, int capacity, Random random) {
     assert (cardinality >= 0) : "Cannot set a negative number of bits!";
     assert (cardinality < capacity) : "Cannot set " + cardinality + " of " + capacity + " bits!";
-    BitSet bitset = new BitSet(capacity);
+    // FIXME: Avoid recomputing the cardinality.
     if(cardinality < capacity >>> 1) {
-      while(bitset.cardinality() < cardinality) {
-        bitset.set(random.nextInt(capacity));
+      long[] bitset = BitsUtil.zero(capacity);
+      while(BitsUtil.cardinality(bitset) < cardinality) {
+        BitsUtil.setI(bitset, random.nextInt(capacity));
       }
+      return bitset;
     }
     else {
-      bitset.flip(0, capacity);
-      while(bitset.cardinality() > cardinality) {
-        bitset.clear(random.nextInt(capacity));
+      long[] bitset = BitsUtil.ones(capacity);
+      while(BitsUtil.cardinality(bitset) > cardinality) {
+        BitsUtil.clearI(bitset, random.nextInt(capacity));
       }
+      return bitset;
     }
-    return bitset;
   }
 
   /**

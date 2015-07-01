@@ -22,10 +22,10 @@ package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -80,7 +80,7 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
 
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims) {
-    peanoSort(objs, start, end, minmax, dims, 0, new BitSet(), false);
+    peanoSort(objs, start, end, minmax, dims, 0, BitsUtil.zero(dims.length), false);
   }
 
   /**
@@ -95,7 +95,7 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
    * @param bits Bit set for inversions
    * @param desc Current ordering
    */
-  protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int[] dims, int depth, BitSet bits, boolean desc) {
+  protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int[] dims, int depth, long[] bits, boolean desc) {
     final int numdim = (dims != null) ? dims.length : (mms.length >> 1);
     final int edim = (dims != null) ? dims[depth] : depth;
     // Find the splitting points.
@@ -105,9 +105,9 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
     // Safeguard against duplicate points:
     if(max - tsecond < 1E-10 || tsecond - tfirst < 1E-10 || tfirst - min < 1E-10) {
       boolean ok = false;
-      for (int d = 0; d < numdim; d++) {
+      for(int d = 0; d < numdim; d++) {
         int d2 = ((dims != null) ? dims[d] : d) << 1;
-        if (mms[d2 + 1] - mms[d2] >= 1E-10) {
+        if(mms[d2 + 1] - mms[d2] >= 1E-10) {
           ok = true;
           break;
         }
@@ -116,7 +116,7 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
         return;
       }
     }
-    final boolean inv = bits.get(edim) ^ desc;
+    final boolean inv = BitsUtil.get(bits, edim) ^ desc;
     // Split the data set into three parts
     int fsplit, ssplit;
     if(!inv) {
@@ -135,11 +135,11 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
       peanoSort(objs, start, fsplit, mms, dims, nextdim, bits, desc);
     }
     if(fsplit < ssplit - 1) {
-      bits.flip(edim); // set (all but dim: we also flip "desc")
+      BitsUtil.flipI(bits, edim); // set (all but dim: we also flip "desc")
       mms[2 * edim] = tfirst;
       mms[2 * edim + 1] = tsecond;
       peanoSort(objs, fsplit, ssplit, mms, dims, nextdim, bits, !desc);
-      bits.flip(edim);
+      BitsUtil.flipI(bits, edim);
     }
     if(ssplit < end - 1) {
       mms[2 * edim] = !inv ? tsecond : min;

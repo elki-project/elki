@@ -28,7 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -36,6 +35,7 @@ import java.util.NoSuchElementException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -310,14 +310,14 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    * 
    * @param mask Mask to remove
    */
-  public void removeMask(BitSet mask) {
-    int dest = mask.nextSetBit(0);
+  public void removeMask(long[] mask) {
+    int dest = BitsUtil.nextSetBit(mask, 0);
     if(dest < 0) {
       return;
     }
-    int src = mask.nextClearBit(dest);
+    int src = BitsUtil.nextSetBit(mask, dest);
     while(src < numEntries) {
-      if(!mask.get(src)) {
+      if(!BitsUtil.get(mask, src)) {
         entries[dest] = entries[src];
         dest++;
       }
@@ -401,15 +401,16 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    * @param newNode Node to split to
    * @param assignment Assignment mask
    */
-  public final void splitByMask(AbstractNode<E> newNode, BitSet assignment) {
+  public final void splitByMask(AbstractNode<E> newNode, long[] assignment) {
     assert (isLeaf() == newNode.isLeaf());
-    int dest = assignment.nextSetBit(0);
+    int dest = BitsUtil.nextSetBit(assignment, 0);
     if(dest < 0) {
       throw new AbortException("No bits set in splitting mask.");
     }
+    // FIXME: use faster iteration/testing
     int pos = dest;
     while(pos < numEntries) {
-      if(assignment.get(pos)) {
+      if(BitsUtil.get(assignment, pos)) {
         // Move to new node
         newNode.addEntry(entries[pos]);
       }

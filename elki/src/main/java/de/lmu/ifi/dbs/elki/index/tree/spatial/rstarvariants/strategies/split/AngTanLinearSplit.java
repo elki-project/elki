@@ -23,13 +23,13 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -64,7 +64,7 @@ public class AngTanLinearSplit implements SplitStrategy {
   public static final AngTanLinearSplit STATIC = new AngTanLinearSplit();
 
   @Override
-  public <E extends SpatialComparable, A> BitSet split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
+  public <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
     final int num = getter.size(entries);
     // We need the overall MBR for computing edge preferences
     ModifiableHyperBoundingBox total = new ModifiableHyperBoundingBox(getter.get(entries, 0));
@@ -75,18 +75,15 @@ public class AngTanLinearSplit implements SplitStrategy {
     }
     final int dim = total.getDimensionality();
     // Prepare the axis lists (we use bitsets)
-    BitSet[] closer = new BitSet[dim];
+    long[][] closer = new long[dim][num];
     {
-      for(int d = 0; d < dim; d++) {
-        closer[d] = new BitSet();
-      }
       for(int i = 0; i < num; i++) {
         E e = getter.get(entries, i);
         for(int d = 0; d < dim; d++) {
           double low = e.getMin(d) - total.getMin(d);
           double hig = total.getMax(d) - e.getMax(d);
           if(low >= hig) {
-            closer[d].set(i);
+            BitsUtil.setI(closer[d], i);
           }
         }
       }
@@ -95,11 +92,11 @@ public class AngTanLinearSplit implements SplitStrategy {
     {
       int axis = -1;
       int bestcard = Integer.MAX_VALUE;
-      BitSet bestset = null;
+      long[] bestset = null;
       double bestover = Double.NaN;
       for(int d = 0; d < dim; d++) {
-        BitSet cand = closer[d];
-        int card = cand.cardinality();
+        long[] cand = closer[d];
+        int card = BitsUtil.cardinality(cand);
         card = Math.max(card, num - card);
         if(card == num) {
           continue;
@@ -150,11 +147,11 @@ public class AngTanLinearSplit implements SplitStrategy {
    * @param assign Assignment
    * @return Overlap amount
    */
-  protected <E extends SpatialComparable, A> double computeOverlap(A entries, ArrayAdapter<E, A> getter, BitSet assign) {
+  protected <E extends SpatialComparable, A> double computeOverlap(A entries, ArrayAdapter<E, A> getter, long[] assign) {
     ModifiableHyperBoundingBox mbr1 = null, mbr2 = null;
     for(int i = 0; i < getter.size(entries); i++) {
       E e = getter.get(entries, i);
-      if(assign.get(i)) {
+      if(BitsUtil.get(assign, i)) {
         if(mbr1 == null) {
           mbr1 = new ModifiableHyperBoundingBox(e);
         }

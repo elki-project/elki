@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -115,7 +114,6 @@ public class TextWriter {
     writers.insertHandler(String[].class, new TextWriterObjectArray<String>());
     writers.insertHandler(Double[].class, new TextWriterObjectArray<Double>());
     writers.insertHandler(Integer[].class, new TextWriterObjectArray<Integer>());
-    writers.insertHandler(BitSet.class, trivialwriter);
     writers.insertHandler(Vector.class, new TextWriterVector());
     writers.insertHandler(SimpleClassLabel.class, trivialwriter);
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);

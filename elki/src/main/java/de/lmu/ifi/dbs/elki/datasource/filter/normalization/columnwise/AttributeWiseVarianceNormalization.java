@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -256,12 +255,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
       DoubleListParameter meanP = new DoubleListParameter(MEAN_ID) //
       .setOptional(true);
       if(config.grab(meanP)) {
-        mean = ArrayLikeUtil.toPrimitiveDoubleArray(meanP.getValue());
+        mean = meanP.getValue().clone();
       }
       DoubleListParameter stddevP = new DoubleListParameter(STDDEV_ID) //
       .setOptional(true);
       if(config.grab(stddevP)) {
-        stddev = ArrayLikeUtil.toPrimitiveDoubleArray(stddevP.getValue());
+        stddev = stddevP.getValue().clone();
 
         for(double d : stddev) {
           if(d == 0.) {

@@ -27,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -51,6 +50,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -591,7 +591,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   private N split(N node) {
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
-    BitSet split = settings.nodeSplitter.split(node, NodeArrayAdapter.STATIC, minimum);
+    long[] split = settings.nodeSplitter.split(node, NodeArrayAdapter.STATIC, minimum);
 
     // New node
     final N newNode;
@@ -620,11 +620,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   public void reInsert(N node, IndexTreePath<E> path, int[] offs) {
     final int level = height - (path.getPathCount() - 1);
 
-    BitSet remove = new BitSet();
+    long[] remove = BitsUtil.zero(node.getCapacity());
     List<E> reInsertEntries = new ArrayList<>(offs.length);
     for (int i = 0; i < offs.length; i++) {
       reInsertEntries.add(node.getEntry(offs[i]));
-      remove.set(offs[i]);
+      BitsUtil.setI(remove, offs[i]);
     }
     // Remove the entries we reinsert
     node.removeMask(remove);

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.gui.util;
  */
 
 import java.util.ArrayList;
-import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -47,27 +46,27 @@ public class DynamicParameters {
   /**
    * Bit for an option that should be set
    */
-  public static final int BIT_INCOMPLETE = 0;
+  public static final int BIT_INCOMPLETE = 1;
 
   /**
    * Bit for an option with an invalid value
    */
-  public static final int BIT_INVALID = 1;
+  public static final int BIT_INVALID = 2;
 
   /**
    * Bit for an option containing an syntax error
    */
-  public static final int BIT_SYNTAX_ERROR = 2;
+  public static final int BIT_SYNTAX_ERROR = 4;
 
   /**
    * Bit for an optional value
    */
-  public static final int BIT_OPTIONAL = 3;
+  public static final int BIT_OPTIONAL = 8;
 
   /**
    * Bit for an option with a default value
    */
-  public static final int BIT_DEFAULT_VALUE = 4;
+  public static final int BIT_DEFAULT_VALUE = 16;
 
   /**
    * Pseudo-value used in dropdowns for options that have a default value
@@ -91,7 +90,7 @@ public class DynamicParameters {
 
     protected String value;
 
-    protected BitSet flags;
+    protected int flags;
 
     protected int depth;
 
@@ -103,7 +102,7 @@ public class DynamicParameters {
      * @param flags Flags
      * @param depth Depth (for tree representation)
      */
-    public Node(Parameter<?> param, String value, BitSet flags, int depth) {
+    public Node(Parameter<?> param, String value, int flags, int depth) {
       super();
       this.param = param;
       this.value = value;
@@ -141,56 +140,54 @@ public class DynamicParameters {
    */
   public synchronized void updateFromTrackParameters(TrackParameters track) {
     parameters.clear();
-    for (TrackedParameter p : track.getAllParameters()) {
+    for(TrackedParameter p : track.getAllParameters()) {
       Parameter<?> option = p.getParameter();
       String value = null;
-      if (option.isDefined()) {
-        if (option.tookDefaultValue()) {
+      if(option.isDefined()) {
+        if(option.tookDefaultValue()) {
           value = DynamicParameters.STRING_USE_DEFAULT + option.getDefaultValueAsString();
-        } else {
+        }
+        else {
           value = option.getValueAsString();
         }
       }
-      if (value == null) {
-        if (option instanceof Flag) {
-          value = Flag.NOT_SET;
-        } else {
-          value = "";
+      if(value == null) {
+        value = (option instanceof Flag) ? Flag.NOT_SET : "";
+      }
+      int bits = 0;
+      if(option.isOptional()) {
+        bits |= BIT_OPTIONAL;
+      }
+      if(option.hasDefaultValue() && option.tookDefaultValue()) {
+        bits |= BIT_DEFAULT_VALUE;
+      }
+      if(value.length() <= 0) {
+        if((bits & BIT_DEFAULT_VALUE) == 0 && (bits & BIT_OPTIONAL) == 0) {
+          bits |= BIT_INCOMPLETE;
         }
       }
-      BitSet bits = new BitSet();
-      if (option.isOptional()) {
-        bits.set(BIT_OPTIONAL);
-      }
-      if (option.hasDefaultValue() && option.tookDefaultValue()) {
-        bits.set(BIT_DEFAULT_VALUE);
-      }
-      if (value.length() <= 0) {
-        if (!bits.get(BIT_DEFAULT_VALUE) && !bits.get(BIT_OPTIONAL)) {
-          bits.set(BIT_INCOMPLETE);
-        }
-      } else {
+      else {
         try {
-          if (!option.tookDefaultValue() && !option.isValid(value)) {
-            bits.set(BIT_INVALID);
+          if(!option.tookDefaultValue() && !option.isValid(value)) {
+            bits |= BIT_INVALID;
           }
-        } catch (ParameterException e) {
-          bits.set(BIT_INVALID);
+        }
+        catch(ParameterException e) {
+          bits |= BIT_INVALID;
         }
       }
       int depth = 0;
       {
         Object pos = track.getParent(option);
-        while (pos != null) {
+        while(pos != null) {
           pos = track.getParent(pos);
           depth += 1;
-          if (depth > 10) {
+          if(depth > 10) {
             break;
           }
         }
       }
-      Node t = new Node(option, value, bits, depth);
-      parameters.add(t);
+      parameters.add(new Node(option, value, bits, depth));
     }
   }
 
@@ -202,9 +199,8 @@ public class DynamicParameters {
    * @param bits Bits
    * @param depth Depth
    */
-  public synchronized void addParameter(Parameter<?> option, String value, BitSet bits, int depth) {
-    Node t = new Node(option, value, bits, depth);
-    parameters.add(t);
+  public synchronized void addParameter(Parameter<?> option, String value, int bits, int depth) {
+    parameters.add(new Node(option, value, bits, depth));
   }
 
   /**
@@ -214,20 +210,22 @@ public class DynamicParameters {
    */
   public synchronized ArrayList<String> serializeParameters() {
     ArrayList<String> p = new ArrayList<>(2 * parameters.size());
-    for (Node t : parameters) {
-      if (t.param != null) {
-        if (t.param instanceof RemainingOptions) {
-          for (String str : t.value.split(" ")) {
-            if (str.length() > 0) {
+    for(Node t : parameters) {
+      if(t.param != null) {
+        if(t.param instanceof RemainingOptions) {
+          for(String str : t.value.split(" ")) {
+            if(str.length() > 0) {
               p.add(str);
             }
           }
-        } else if (t.param instanceof Flag) {
-          if (Flag.SET.equals(t.value)) {
+        }
+        else if(t.param instanceof Flag) {
+          if(Flag.SET.equals(t.value)) {
             p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
           }
-        } else if (t.value != null && t.value.length() > 0) {
-          if (!t.value.startsWith(STRING_USE_DEFAULT) && !STRING_OPTIONAL.equals(t.value)) {
+        }
+        else if(t.value != null && t.value.length() > 0) {
+          if(!t.value.startsWith(STRING_USE_DEFAULT) && !STRING_OPTIONAL.equals(t.value)) {
             p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
             p.add(t.value);
           }

@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * 
  * @apiviz.uses NumberVector
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization"})
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization" })
 public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
@@ -222,11 +221,11 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
       super.makeOptions(config);
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
       if(config.grab(minimaP)) {
-        minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
+        minima = minimaP.getValue().clone();
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
       if(config.grab(maximaP)) {
-        maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
+        maxima = maximaP.getValue().clone();
       }
 
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(minimaP, maximaP));

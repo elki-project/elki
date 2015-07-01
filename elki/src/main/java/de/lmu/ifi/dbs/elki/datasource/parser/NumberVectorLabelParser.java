@@ -28,7 +28,6 @@ import gnu.trove.list.array.TDoubleArrayList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,6 +41,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hash.Unique;
@@ -77,7 +77,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
   /**
    * Keeps the indices of the attributes to be treated as a string label.
    */
-  private BitSet labelIndices;
+  private long[] labelIndices;
 
   /**
    * Vector factory class.
@@ -141,7 +141,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * @param labelIndices Column indexes that are not numeric.
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(CSVReaderFormat format, BitSet labelIndices, Factory<V> factory) {
+  public NumberVectorLabelParser(CSVReaderFormat format, long[] labelIndices, Factory<V> factory) {
     super(format);
     this.labelIndices = labelIndices;
     this.factory = factory;
@@ -165,7 +165,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * @param labelIndices Column indexes that are not numeric.
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, BitSet labelIndices, NumberVector.Factory<V> factory) {
+  public NumberVectorLabelParser(Pattern colSep, String quoteChars, Pattern comment, long[] labelIndices, NumberVector.Factory<V> factory) {
     this(new CSVReaderFormat(colSep, quoteChars, comment), labelIndices, factory);
   }
 
@@ -176,7 +176,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * @return {@code true} when a label column.
    */
   protected boolean isLabelColumn(int col) {
-    return labelIndices != null && labelIndices.get(col);
+    return labelIndices != null && BitsUtil.get(labelIndices, col);
   }
 
   @Override
@@ -382,7 +382,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     /**
      * Keeps the indices of the attributes to be treated as a string label.
      */
-    protected BitSet labelIndices = null;
+    protected long[] labelIndices;
 
     /**
      * Factory object.
@@ -417,11 +417,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID, true);
 
       if(config.grab(labelIndicesP)) {
-        labelIndices = new BitSet();
-        List<Integer> labelcols = labelIndicesP.getValue();
-        for(Integer idx : labelcols) {
-          labelIndices.set(idx.intValue());
-        }
+        labelIndices =  labelIndicesP.getValueAsBitSet();
       }
     }
 

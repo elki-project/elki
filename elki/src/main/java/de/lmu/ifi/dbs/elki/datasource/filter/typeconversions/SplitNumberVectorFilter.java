@@ -174,11 +174,7 @@ public class SplitNumberVectorFilter<V extends NumberVector> implements ObjectFi
       IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID);
       selectedAttributesP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       if(config.grab(selectedAttributesP)) {
-        List<Integer> dimensionList = selectedAttributesP.getValue();
-        dims = new int[dimensionList.size()];
-        for(int i = 0; i < dimensionList.size(); i++) {
-          dims[i] = dimensionList.get(i).intValue();
-        }
+        dims = selectedAttributesP.getValue().clone();
       }
     }
 

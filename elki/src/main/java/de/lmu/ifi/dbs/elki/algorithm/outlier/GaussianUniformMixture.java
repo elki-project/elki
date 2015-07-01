@@ -1,28 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2014
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-import java.util.BitSet;
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -49,6 +48,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -65,11 +65,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * An iterative procedure then transfers objects from the ordinary set to the
  * anomalous set if the transfer increases the overall likelihood of the data.
  * 
+ * Reference:
  * <p>
- * Reference:<br>
- * Eskin, Eleazar: Anomaly detection over noisy data using learned probability
- * distributions. In Proc. of the Seventeenth International Conference on
- * Machine Learning (ICML-2000).
+ * E. Eskin<br />
+ * Anomaly detection over noisy data using learned probability distributions.<br />
+ * In Proc. of the Seventeenth International Conference on Machine Learning
+ * (ICML-2000).
  * </p>
  * 
  * @author Lisa Reichert
@@ -78,22 +79,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Gaussian-Uniform Mixture Model Outlier Detection")
 @Description("Fits a mixture model consisting of a Gaussian and a uniform distribution to the data.")
-@Reference(prefix = "Generalization using the likelihood gain as outlier score of", authors = "Eskin, Eleazar", title = "Anomaly detection over noisy data using learned probability distributions", booktitle = "Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000)")
+@Reference(prefix = "Generalization using the likelihood gain as outlier score of", //
+authors = "E. Eskin", //
+title = "Anomaly detection over noisy data using learned probability distributions", //
+booktitle = "Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000)")
 public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(GaussianUniformMixture.class);
-
-  /**
-   * Parameter to specify the fraction of expected outliers.
-   */
-  public static final OptionID L_ID = new OptionID("mmo.l", "expected fraction of outliers");
-
-  /**
-   * Parameter to specify the cutoff.
-   */
-  public static final OptionID C_ID = new OptionID("mmo.c", "cutoff");
 
   /**
    * Small value to increment diagonally of a matrix in order to avoid
@@ -139,7 +133,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     // Use an array list of object IDs for fast random access by an offset
     ArrayDBIDs objids = DBIDUtil.ensureArray(relation.getDBIDs());
     // A bit set to flag objects as anomalous, none at the beginning
-    BitSet bits = new BitSet(objids.size());
+    long[] bits = BitsUtil.zero(objids.size());
     // Positive masked collection
     DBIDs normalObjs = new MaskedDBIDs(objids, bits, true);
     // Positive masked collection
@@ -148,18 +142,18 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     WritableDoubleDataStore oscores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // compute loglikelihood
     double logLike = relation.size() * logml + loglikelihoodNormal(normalObjs, relation);
-    // logger.debugFine("normalsize   " + normalObjs.size() + " anormalsize  " +
+    // LOG.debugFine("normalsize   " + normalObjs.size() + " anormalsize  " +
     // anomalousObjs.size() + " all " + (anomalousObjs.size() +
     // normalObjs.size()));
-    // logger.debugFine(logLike + " loglike beginning" +
+    // LOG.debugFine(logLike + " loglike beginning" +
     // loglikelihoodNormal(normalObjs, database));
     DoubleMinMax minmax = new DoubleMinMax();
-    
+
     DBIDIter iter = objids.iter();
     for(int i = 0; i < objids.size(); i++, iter.advance()) {
-      // logger.debugFine("i     " + i);
+      // LOG.debugFine("i     " + i);
       // Change mask to make the current object anomalous
-      bits.set(i);
+      BitsUtil.setI(bits, i);
       // Compute new likelihoods
       double currentLogLike = normalObjs.size() * logml + loglikelihoodNormal(normalObjs, relation) + anomalousObjs.size() * logl + loglikelihoodAnomalous(anomalousObjs);
 
@@ -171,16 +165,15 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
 
       if(loglikeGain > c) {
         // flag as outlier
-        // logger.debugFine("Outlier: " + curid + " " + (currentLogLike -
+        // LOG.debugFine("Outlier: " + curid + " " + (currentLogLike -
         // logLike));
         // Update best logLike
         logLike = currentLogLike;
       }
       else {
-        // logger.debugFine("Inlier: " + curid + " " + (currentLogLike -
-        // logLike));
+        // LOG.debugFine("Inlier: " + curid + " " + (currentLogLike - logLike));
         // undo bit set
-        bits.clear(i);
+        BitsUtil.clearI(bits, i);
       }
     }
 
@@ -197,7 +190,6 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    */
   private double loglikelihoodAnomalous(DBIDs anomalousObjs) {
     int n = anomalousObjs.size();
-
     return n * Math.log(1.0 / n);
   }
 
@@ -223,7 +215,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     double fakt = 1.0 / Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(database)) * covarianceDet);
     // for each object compute probability and sum
     double prob = 0;
-    for (DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
       Vector x = database.get(iter).getColumnVector().minusEquals(mean);
       double mDist = x.transposeTimesTimes(covInv, x);
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
@@ -249,6 +241,16 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    /**
+     * Parameter to specify the fraction of expected outliers.
+     */
+    public static final OptionID L_ID = new OptionID("mmo.l", "expected fraction of outliers");
+
+    /**
+     * Parameter to specify the cutoff.
+     */
+    public static final OptionID C_ID = new OptionID("mmo.c", "cutoff");
+
     protected double l = 1E-7;
 
     protected double c = 0;

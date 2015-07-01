@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -554,26 +553,22 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter minptsP = new IntParameter(MINPTS_ID);
-        minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        final IntParameter minptsP = new IntParameter(MINPTS_ID) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(minptsP)) {
           minpts = minptsP.getValue();
         }
 
         // parameter epsilon
         // todo: constraint auf positive werte
-        List<Double> defaultEps = new ArrayList<>();
-        defaultEps.add(DEFAULT_EPSILON);
-        final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID, true);
-        epsilonP.setDefaultValue(defaultEps);
+        final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID, true) //
+        .setDefaultValue(new double[] { DEFAULT_EPSILON });
         if(config.grab(epsilonP)) {
-          List<Double> eps_list = epsilonP.getValue();
-          epsilon = new double[eps_list.size()];
+          epsilon = epsilonP.getValue().clone();
 
-          for(int d = 0; d < eps_list.size(); d++) {
-            epsilon[d] = eps_list.get(d);
+          for(int d = 0; d < epsilon.length; d++) {
             if(epsilon[d] < 0) {
-              config.reportError(new WrongParameterValueException(epsilonP, eps_list.toString()));
+              config.reportError(new WrongParameterValueException(epsilonP, epsilonP.getValueAsString()));
             }
           }
         }

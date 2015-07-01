@@ -27,7 +27,6 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
@@ -207,7 +206,7 @@ public class WeightedManhattanDistanceFunction extends WeightedLPNormDistanceFun
       super.makeOptions(config);
       DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
       if(config.grab(weightsP)) {
-        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+        weights = weightsP.getValue().clone();
       }
     }
 

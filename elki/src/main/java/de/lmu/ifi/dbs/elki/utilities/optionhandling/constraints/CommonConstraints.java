@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 /**
  * Class storing a number of very common constraints.
  * 
@@ -92,10 +90,10 @@ public final class CommonConstraints {
   /**
    * Constraint for the whole list.
    */
-  public static final ParameterConstraint<? super List<Integer>> GREATER_EQUAL_ZERO_INT_LIST = new ListEachConstraint<>(GREATER_EQUAL_ZERO_INT);
+  public static final ParameterConstraint<int[]> GREATER_EQUAL_ZERO_INT_LIST = new ListEachConstraint(GREATER_EQUAL_ZERO_INT);
 
   /**
    * List constraint: >= 1
    */
-  public static final ParameterConstraint<? super List<Integer>> GREATER_EQUAL_ONE_INT_LIST = new ListEachConstraint<>(GREATER_EQUAL_ONE_INT);
+  public static final ParameterConstraint<int[]> GREATER_EQUAL_ONE_INT_LIST = new ListEachConstraint(GREATER_EQUAL_ONE_INT);
 }

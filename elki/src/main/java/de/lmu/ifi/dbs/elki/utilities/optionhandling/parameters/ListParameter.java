@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -37,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @param <THIS> Type self-reference
  * @param <T> List type
  */
-public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> extends AbstractParameter<THIS, List<T>> {
+public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> extends AbstractParameter<THIS, T> {
   /**
    * A pattern defining a &quot,&quot.
    */
@@ -64,7 +63,7 @@ public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> exte
    * @param optionID the unique id of this parameter
    * @param defaultValue the default value of this parameter (may be null)
    */
-  public ListParameter(OptionID optionID, List<T> defaultValue) {
+  public ListParameter(OptionID optionID, T defaultValue) {
     super(optionID, defaultValue);
   }
 
@@ -88,37 +87,9 @@ public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> exte
   }
 
   /**
-   * Returns the size of this list parameter.
-   * 
-   * @return the size of this list parameter.
+   * Size of the list.
+   *
+   * @return Size
    */
-  public int getListSize() {
-    if(getValue() == null && isOptional()) {
-      return 0;
-    }
-
-    return getValue().size();
-  }
-
-  /**
-   * Returns a string representation of this list parameter. The elements of
-   * this list parameters are given in &quot;[ ]&quot;, comma separated.
-   */
-  // TODO: keep? remove?
-  protected String asString() {
-    if(getValue() == null) {
-      return "";
-    }
-    StringBuilder buffer = new StringBuilder();
-    buffer.append('[');
-
-    for(int i = 0; i < getValue().size(); i++) {
-      buffer.append(getValue().get(i).toString());
-      if(i != getValue().size() - 1) {
-        buffer.append(',');
-      }
-    }
-    buffer.append(']');
-    return buffer.toString();
-  }
+  abstract public int size();
 }

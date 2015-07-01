@@ -135,15 +135,15 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntListParameter param = new IntListParameter(BPP_ID);
-      param.addConstraint(new ListSizeConstraint(3));
-      param.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT_LIST);
+      IntListParameter param = new IntListParameter(BPP_ID) //
+      .addConstraint(new ListSizeConstraint(3)) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT_LIST);
       if(config.grab(param)) {
-        List<Integer> quant = param.getValue();
-        assert (quant.size() == 3);
-        quanth = quant.get(0);
-        quants = quant.get(1);
-        quantb = quant.get(2);
+        int[] quant = param.getValue();
+        assert (quant.length == 3);
+        quanth = quant[0];
+        quants = quant[1];
+        quantb = quant[2];
       }
     }
 

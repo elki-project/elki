@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -42,6 +41,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -198,22 +198,22 @@ public class StaticArrayDatabase extends AbstractDatabase {
   protected Relation<?>[] alignColumns(ObjectBundle pack) {
     // align representations.
     Relation<?>[] targets = new Relation<?>[pack.metaLength()];
-    BitSet used = new BitSet(relations.size());
+    long[] used = BitsUtil.zero(relations.size());
     for(int i = 0; i < targets.length; i++) {
       SimpleTypeInformation<?> meta = pack.meta(i);
       // TODO: aggressively try to match exact metas first?
       // Try to match unused representations only
-      for(int j = used.nextClearBit(0); j >= 0 && j < relations.size(); j = used.nextClearBit(j + 1)) {
+      for(int j = BitsUtil.nextClearBit(used, 0); j >= 0 && j < relations.size(); j = BitsUtil.nextClearBit(used, j + 1)) {
         Relation<?> relation = relations.get(j);
         if(relation.getDataTypeInformation().isAssignableFromType(meta)) {
           targets[i] = relation;
-          used.set(j);
+          BitsUtil.setI(used, j);
           break;
         }
       }
       if(targets[i] == null) {
         targets[i] = addNewRelation(meta);
-        used.set(relations.size() - 1);
+        BitsUtil.setI(used, relations.size() - 1);
       }
     }
     return targets;

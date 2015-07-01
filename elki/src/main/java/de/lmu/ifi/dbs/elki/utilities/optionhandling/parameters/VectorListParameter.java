@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class VectorListParameter extends ListParameter<VectorListParameter, Vector> {
+public class VectorListParameter extends ListParameter<VectorListParameter, List<Vector>> {
   /**
    * Constructs a vector list parameter with the given name and description.
    * 
@@ -169,6 +169,11 @@ public class VectorListParameter extends ListParameter<VectorListParameter, Vect
       return vecs;
     }
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of double values!");
+  }
+
+  @Override
+  public int size() {
+    return getValue().size();
   }
 
   /**

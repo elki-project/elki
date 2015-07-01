@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -396,12 +395,12 @@ public class HopkinsStatisticClusteringTendency extends AbstractPrimitiveDistanc
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID)//
       .setOptional(true);
       if(config.grab(minimaP)) {
-        minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
+        minima = minimaP.getValue().clone();
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID)//
       .setOptional(true);
       if(config.grab(maximaP)) {
-        maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
+        maxima = maximaP.getValue().clone();
       }
 
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(minimaP, maximaP));

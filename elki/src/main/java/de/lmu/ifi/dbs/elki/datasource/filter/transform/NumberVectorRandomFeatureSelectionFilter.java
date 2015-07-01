@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
@@ -55,7 +53,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
   /**
    * The selected attributes.
    */
-  protected BitSet selectedAttributes = null;
+  protected long[] selectedAttributes = null;
 
   /**
    * Holds the desired cardinality of the subset of attributes selected for

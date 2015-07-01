@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  */
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * Abstract super class for splitting a node in an M-Tree.
@@ -85,7 +85,7 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
    *         specified node
    */
   Assignments<E> balancedPartition(AbstractMTree<O, N, E, ?> tree, N node, DBID routingObject1, DBID routingObject2) {
-    BitSet assigned = new BitSet(node.getNumEntries());
+    long[] assigned = BitsUtil.zero(node.getNumEntries());
     List<DistanceEntry<E>> assigned1 = new ArrayList<>(node.getCapacity());
     List<DistanceEntry<E>> assigned2 = new ArrayList<>(node.getCapacity());
 
@@ -140,7 +140,7 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
    */
   Assignments<E> balancedPartition(AbstractMTree<O, N, E, ?> tree, N node, int routingEntNum1, int routingEntNum2, double[] distanceMatrix) {
     final int n = node.getNumEntries();
-    BitSet assigned = new BitSet(node.getNumEntries());
+    long[] assigned = BitsUtil.zero(node.getNumEntries());
     List<DistanceEntry<E>> assigned1 = new ArrayList<>(node.getCapacity());
     List<DistanceEntry<E>> assigned2 = new ArrayList<>(node.getCapacity());
 
@@ -196,14 +196,14 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
    *        false otherwise
    * @return the new covering radius
    */
-  private double assignNN(BitSet assigned, List<DistanceEntry<E>> assigned1, List<DistanceEntry<E>> list, double currentCR, boolean isLeaf) {
+  private double assignNN(long[] assigned, List<DistanceEntry<E>> assigned1, List<DistanceEntry<E>> list, double currentCR, boolean isLeaf) {
     // Remove last unassigned:
     DistanceEntry<E> distEntry = list.remove(list.size() - 1);
-    while(assigned.get(distEntry.getIndex())) {
+    while(BitsUtil.get(assigned, distEntry.getIndex())) {
       distEntry = list.remove(list.size() - 1);
     }
     assigned1.add(distEntry);
-    assigned.set(distEntry.getIndex());
+    BitsUtil.setI(assigned, distEntry.getIndex());
 
     if(isLeaf) {
       return Math.max(currentCR, distEntry.getDistance());

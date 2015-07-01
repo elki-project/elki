@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
-import java.util.BitSet;
 import java.util.Comparator;
 import java.util.Random;
 
@@ -40,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
@@ -532,11 +532,12 @@ public final class VectorUtil {
    * @param <V> Vector type
    * @return a new NumberVector as a projection on the specified attributes
    */
-  public static <V extends NumberVector> V project(V v, BitSet selectedAttributes, NumberVector.Factory<V> factory) {
+  public static <V extends NumberVector> V project(V v, long[] selectedAttributes, NumberVector.Factory<V> factory) {
+    int card = BitsUtil.cardinality(selectedAttributes);
     if(factory instanceof SparseNumberVector.Factory) {
       final SparseNumberVector.Factory<?> sfactory = (SparseNumberVector.Factory<?>) factory;
-      TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
-      for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+      TIntDoubleHashMap values = new TIntDoubleHashMap(card, 1);
+      for(int d = BitsUtil.nextSetBit(selectedAttributes, 0); d >= 0; d = BitsUtil.nextSetBit(selectedAttributes, d + 1)) {
         if(v.doubleValue(d) != 0.0) {
           values.put(d, v.doubleValue(d));
         }
@@ -544,13 +545,13 @@ public final class VectorUtil {
       // We can't avoid this cast, because Java doesn't know that V is a
       // SparseNumberVector:
       @SuppressWarnings("unchecked")
-      V projectedVector = (V) sfactory.newNumberVector(values, selectedAttributes.cardinality());
+      V projectedVector = (V) sfactory.newNumberVector(values, card);
       return projectedVector;
     }
     else {
-      double[] newAttributes = new double[selectedAttributes.cardinality()];
+      double[] newAttributes = new double[card];
       int i = 0;
-      for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+      for(int d = BitsUtil.nextSetBit(selectedAttributes, 0); d >= 0; d = BitsUtil.nextSetBit(selectedAttributes, d + 1)) {
         newAttributes[i] = v.doubleValue(d);
         i++;
       }

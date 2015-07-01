@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * </p>
  *
  * @author Steffi Wanka
- * @param <T> the type of the constraint
+ * @param <T> the type of the parameter the constraint applies to
  */
 public interface ParameterConstraint<T> {
     /**

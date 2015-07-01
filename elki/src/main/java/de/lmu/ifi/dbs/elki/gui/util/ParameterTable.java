@@ -34,7 +34,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.util.BitSet;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
@@ -237,22 +236,22 @@ public class ParameterTable extends JTable {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       if(!hasFocus) {
         if(row < parameters.size()) {
-          BitSet flags = parameters.getNode(row).flags;
+          int flags = parameters.getNode(row).flags;
           // TODO: don't hardcode black - maybe mix the other colors, too?
           c.setForeground(Color.BLACK);
-          if((flags.get(DynamicParameters.BIT_INVALID))) {
+          if((flags & DynamicParameters.BIT_INVALID) != 0) {
             c.setBackground(COLOR_SYNTAX_ERROR);
           }
-          else if((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
+          else if((flags & DynamicParameters.BIT_SYNTAX_ERROR) != 0) {
             c.setBackground(COLOR_SYNTAX_ERROR);
           }
-          else if((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
+          else if((flags & DynamicParameters.BIT_INCOMPLETE) != 0) {
             c.setBackground(COLOR_INCOMPLETE);
           }
-          else if((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
+          else if((flags & DynamicParameters.BIT_DEFAULT_VALUE) != 0) {
             c.setBackground(COLOR_DEFAULT_VALUE);
           }
-          else if((flags.get(DynamicParameters.BIT_OPTIONAL))) {
+          else if((flags & DynamicParameters.BIT_OPTIONAL) != 0) {
             c.setBackground(COLOR_OPTIONAL);
           }
           else {

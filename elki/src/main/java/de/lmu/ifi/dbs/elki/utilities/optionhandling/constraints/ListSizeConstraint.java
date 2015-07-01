@@ -34,11 +34,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
  * {@link ListParameter}) to be tested has to be equal to the specified list
  * size constraint.
  * 
+ * FIXME: Unfortunately, we cannot have good type safety anymore right now.
+ * 
  * @author Steffi Wanka
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter
+ * @apiviz.uses 
+ *              de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter
  */
-public class ListSizeConstraint implements ParameterConstraint<List<?>> {
+public class ListSizeConstraint implements ParameterConstraint<Object> {
   /**
    * The list size constraint.
    */
@@ -61,9 +64,21 @@ public class ListSizeConstraint implements ParameterConstraint<List<?>> {
    *         equal to the list size constraint specified.
    */
   @Override
-  public void test(List<?> t) throws ParameterException {
-    if(t.size() != sizeConstraint) {
-      throw new WrongParameterValueException("Parameter Constraint Error.\n" + "List parameter has not the required size. (Requested size: " + +sizeConstraint + ", current size: " + t.size() + ").\n");
+  public void test(Object t) throws ParameterException {
+    if(t instanceof List && ((List<?>) t).size() != sizeConstraint) {
+      throw new WrongParameterValueException("Parameter Constraint Error.\n" //
+          + "List parameter has not the required size. (Requested size: " + sizeConstraint //
+          + ", current size: " + ((List<?>) t).size() + ").\n");
+    }
+    if(t instanceof int[] && ((int[]) t).length != sizeConstraint) {
+      throw new WrongParameterValueException("Parameter Constraint Error.\n" //
+          + "List parameter has not the required size. (Requested size: " + sizeConstraint //
+          + ", current size: " + ((int[]) t).length + ").\n");
+    }
+    if(t instanceof double[] && ((double[]) t).length != sizeConstraint) {
+      throw new WrongParameterValueException("Parameter Constraint Error.\n" //
+          + "List parameter has not the required size. (Requested size: " + sizeConstraint //
+          + ", current size: " + ((double[]) t).length + ").\n");
     }
   }
 

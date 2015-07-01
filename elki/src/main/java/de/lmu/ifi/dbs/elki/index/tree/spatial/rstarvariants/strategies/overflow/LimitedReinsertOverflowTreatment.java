@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -33,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.ReinsertStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.NodeArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -55,7 +54,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
   /**
    * Bitset to keep track of levels a reinsert has been performed at.
    */
-  private BitSet reinsertions = new BitSet();
+  private long[] reinsertions = new long[1];
 
   /**
    * Strategy for the actual reinsertions
@@ -80,11 +79,14 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
       return false;
     }
     // Earlier reinsertions at the same level
-    if(reinsertions.get(level)) {
+    if(BitsUtil.get(reinsertions, level)) {
       return false;
     }
 
-    reinsertions.set(level);
+    if(BitsUtil.capacity(reinsertions) < level) {
+      reinsertions = BitsUtil.copy(reinsertions, level);
+    }
+    BitsUtil.setI(reinsertions, level);
     final E entry = path.getLastPathComponent().getEntry();
     assert (!entry.isLeafEntry()) : "Unexpected leaf entry";
     int[] cands = reinsertStrategy.computeReinserts(node, NodeArrayAdapter.STATIC, entry);
@@ -97,7 +99,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
 
   @Override
   public void reinitialize() {
-    reinsertions.clear();
+    BitsUtil.zeroI(reinsertions);
   }
 
   /**

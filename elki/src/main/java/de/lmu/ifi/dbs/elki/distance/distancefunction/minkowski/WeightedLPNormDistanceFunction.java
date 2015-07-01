@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
@@ -225,7 +224,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
       super.makeOptions(config);
       DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
       if(config.grab(weightsP)) {
-        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+        weights = weightsP.getValue().clone();
       }
     }
 

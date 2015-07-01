@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.outlier;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -38,7 +39,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -161,7 +161,7 @@ public class OutlierThresholdClustering implements Evaluator {
 
       DoubleListParameter thresholdP = new DoubleListParameter(THRESHOLD_ID);
       if(config.grab(thresholdP)) {
-        threshold = ArrayLikeUtil.toPrimitiveDoubleArray(thresholdP.getValue());
+        threshold = thresholdP.getValue().clone();
       }
     }
 

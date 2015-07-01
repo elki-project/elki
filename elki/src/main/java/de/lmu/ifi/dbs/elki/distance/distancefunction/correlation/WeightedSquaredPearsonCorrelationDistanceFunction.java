@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
@@ -96,10 +95,10 @@ public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractN
     if(obj == null) {
       return false;
     }
-    if (!this.getClass().equals(obj.getClass())) {
+    if(!this.getClass().equals(obj.getClass())) {
       return false;
     }
-    return Arrays.equals(this.weights, ((WeightedSquaredPearsonCorrelationDistanceFunction)obj).weights);
+    return Arrays.equals(this.weights, ((WeightedSquaredPearsonCorrelationDistanceFunction) obj).weights);
   }
 
   /**
@@ -120,7 +119,7 @@ public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractN
       super.makeOptions(config);
       DoubleListParameter weightsP = new DoubleListParameter(WEIGHTS_ID);
       if(config.grab(weightsP)) {
-        weights = ArrayLikeUtil.toPrimitiveDoubleArray(weightsP.getValue());
+        weights = weightsP.getValue().clone();
       }
     }
 

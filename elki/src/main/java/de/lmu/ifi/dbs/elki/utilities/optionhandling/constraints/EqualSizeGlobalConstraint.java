@@ -64,10 +64,10 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
     for(ListParameter<?, ?> listParam : parameters) {
       if(listParam.isDefined()) {
         if(!first) {
-          constraintSize = listParam.getListSize();
+          constraintSize = listParam.size();
           first = true;
         }
-        else if(constraintSize != listParam.getListSize()) {
+        else if(constraintSize != listParam.size()) {
           throw new WrongParameterValueException("Global constraint errror.\n" + "The list parameters " + OptionUtil.optionsNamesToString(parameters) + " must have equal list sizes.");
         }
       }

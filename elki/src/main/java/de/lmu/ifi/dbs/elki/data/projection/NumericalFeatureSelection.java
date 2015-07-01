@@ -40,8 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 /**
  * Projection class for number vectors.
  * 
- * FIXME: Use int[] instead of a BitSet, to allow reordering?
- * 
  * @author Erich Schubert
  * 
  * @apiviz.uses NumberVector
@@ -60,30 +58,41 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
   private NumberVector.Factory<V> factory;
 
   /**
-   * Output dimensionality.
-   */
-  private int dimensionality;
-
-  /**
    * Subspace.
    */
-  private BitSet bits;
+  private int[] dims;
 
   /**
    * Constructor.
    * 
-   * @param bits Dimensions
+   * @param dims Dimensions
+   */
+  public NumericalFeatureSelection(int[] dims) {
+    super();
+    this.dims = dims;
+
+    int mind = 0;
+    for(int i : dims) {
+      mind = (i > mind) ? i : mind;
+    }
+    this.mindim = mind + 1;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param bits Bitset
    */
   public NumericalFeatureSelection(BitSet bits) {
     super();
-    this.bits = bits;
-    this.dimensionality = bits.cardinality();
-
+    final int card = bits.cardinality();
+    this.dims = new int[card];
     int mind = 0;
-    for(int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
-      mind = Math.max(mind, i + 1);
+    for(int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
+      dims[j] = i;
+      mind = (i > mind) ? i : mind;
     }
-    this.mindim = mind;
+    this.mindim = mind + 1;
   }
 
   @SuppressWarnings("unchecked")
@@ -98,16 +107,16 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
 
   @Override
   public V project(V data) {
-    double[] dbl = new double[dimensionality];
-    for(int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
-      dbl[j] = data.doubleValue(i);
+    double[] dbl = new double[dims.length];
+    for(int i = 0; i < dims.length; i++) {
+      dbl[i] = data.doubleValue(dims[i]);
     }
     return factory.newNumberVector(dbl);
   }
 
   @Override
   public SimpleTypeInformation<V> getOutputDataTypeInformation() {
-    return new VectorFieldTypeInformation<>(factory, dimensionality);
+    return new VectorFieldTypeInformation<>(factory, dims.length);
   }
 
   @Override
@@ -126,19 +135,16 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
     /**
      * Dimensions to select.
      */
-    BitSet dims = new BitSet();
+    int[] dims;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntListParameter selectedAttributesP = new IntListParameter(NumberVectorFeatureSelectionFilter.Parameterizer.SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
+      IntListParameter selectedAttributesP = new IntListParameter(NumberVectorFeatureSelectionFilter.Parameterizer.SELECTED_ATTRIBUTES_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       if(config.grab(selectedAttributesP)) {
-        dims.clear();
-        for(int in : selectedAttributesP.getValue()) {
-          dims.set(in);
-        }
+        dims = selectedAttributesP.getValue();
       }
     }
 

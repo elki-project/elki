@@ -29,7 +29,6 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
@@ -102,7 +101,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
    * @param format Input format
    * @param labelIndices Indices to use as labels
    */
-  public TermFrequencyParser(boolean normalize, CSVReaderFormat format, BitSet labelIndices, SparseNumberVector.Factory<V> factory) {
+  public TermFrequencyParser(boolean normalize, CSVReaderFormat format, long[] labelIndices, SparseNumberVector.Factory<V> factory) {
     super(format, labelIndices, factory);
     this.normalize = normalize;
     this.keymap = new TObjectIntHashMap<>(1001, .5f, -1);

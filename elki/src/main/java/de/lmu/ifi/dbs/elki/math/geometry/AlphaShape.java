@@ -1,13 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.geometry;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
-
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -30,6 +22,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * Compute the alpha-Shape of a point set, using Delaunay triangulation.
@@ -67,12 +65,12 @@ public class AlphaShape {
     List<Polygon> polys = new ArrayList<>();
 
     // Working data
-    BitSet used = new BitSet(delaunay.size());
+    long[] used = BitsUtil.zero(delaunay.size());
     List<Vector> cur = new ArrayList<>();
 
-    for(int i = 0 /* = used.nextClearBit(0) */; i < delaunay.size() && i >= 0; i = used.nextClearBit(i + 1)) {
-      if(!used.get(i)) {
-        used.set(i);
+    for(int i = 0 /* = used.nextClearBit(0) */; i < delaunay.size() && i >= 0; i = BitsUtil.nextClearBit(used, i + 1)) {
+      if(!BitsUtil.get(used, i)) {
+        BitsUtil.setI(used, i);
         SweepHullDelaunay2D.Triangle tri = delaunay.get(i);
         if(tri.r2 <= alpha2) {
           // Check neighbors
@@ -90,12 +88,12 @@ public class AlphaShape {
     return polys;
   }
 
-  private void processNeighbor(List<Vector> cur, BitSet used, int i, int ab, int b) {
+  private void processNeighbor(List<Vector> cur, long[] used, int i, int ab, int b) {
     if(ab >= 0) {
-      if(used.get(ab)) {
+      if(BitsUtil.get(used, ab)) {
         return;
       }
-      used.set(ab);
+      BitsUtil.setI(used, ab);
       final SweepHullDelaunay2D.Triangle next = delaunay.get(ab);
       if(next.r2 < alpha2) {
         // Continue where we left off...

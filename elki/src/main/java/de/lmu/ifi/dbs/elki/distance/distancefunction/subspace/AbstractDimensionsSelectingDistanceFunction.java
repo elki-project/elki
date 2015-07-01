@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -103,6 +101,9 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
      */
     public static final OptionID DIMS_ID = new OptionID("distance.dims", "a comma separated array of integer values, where 0 <= d_i < the dimensionality of the feature space specifying the dimensions to be considered for distance computation. If this parameter is not set, no dimensions will be considered, i.e. the distance between two objects is always 0.");
 
+    /**
+     * Bitmask of the dimensions
+     */
     protected long[] dimensions = null;
 
     @Override
@@ -112,15 +113,7 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
       .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
       .setOptional(true);
       if(config.grab(dimsP)) {
-        final List<Integer> value = dimsP.getValue();
-        int maxd = 0;
-        for(int d : value) {
-          maxd = (d > maxd) ? d : maxd;
-        }
-        dimensions = BitsUtil.zero(maxd);
-        for(int d : value) {
-          BitsUtil.setI(dimensions, d);
-        }
+        dimensions = dimsP.getValueAsBitSet();
       }
     }
   }

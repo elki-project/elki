@@ -34,7 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -394,9 +393,7 @@ public class MiniGUI extends AbstractApplication {
       catch(ParameterException e) {
         LOG.exception(e);
       }
-      BitSet bits = new BitSet();
-      bits.set(DynamicParameters.BIT_INVALID);
-      bits.set(DynamicParameters.BIT_SYNTAX_ERROR);
+      int bits = DynamicParameters.BIT_INVALID | DynamicParameters.BIT_SYNTAX_ERROR;
       parameters.addParameter(remo, remo.getValue(), bits, 0);
     }
 

@@ -23,11 +23,10 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -52,11 +51,11 @@ public class RTreeQuadraticSplit implements SplitStrategy {
   public static final RTreeQuadraticSplit STATIC = new RTreeQuadraticSplit();
 
   @Override
-  public <E extends SpatialComparable, A> BitSet split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
+  public <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
     final int num = getter.size(entries);
     // Object assignment, and processed objects
-    BitSet assignment = new BitSet(num);
-    BitSet assigned = new BitSet(num);
+    long[] assignment = BitsUtil.zero(num);
+    long[] assigned = BitsUtil.zero(num);
     // MBRs and Areas of current assignments
     ModifiableHyperBoundingBox mbr1, mbr2;
     double area1 = 0, area2 = 0;
@@ -87,10 +86,10 @@ public class RTreeQuadraticSplit implements SplitStrategy {
       }
       // Data to keep
       // Mark both as used
-      assigned.set(w1);
-      assigned.set(w2);
+      BitsUtil.setI(assigned,w1);
+      BitsUtil.setI(assigned,w2);
       // Assign second to second set
-      assignment.set(w2);
+      BitsUtil.setI(assignment,w2);
       // Initial mbrs and areas
       area1 = areas[w1];
       area2 = areas[w2];
@@ -110,8 +109,8 @@ public class RTreeQuadraticSplit implements SplitStrategy {
         if(in2 + remaining <= minEntries) {
           // Mark unassigned for second.
           // Don't bother to update assigned, though
-          for(int pos = assigned.nextClearBit(0); pos < num; pos = assigned.nextClearBit(pos + 1)) {
-            assignment.set(pos);
+          for(int pos = BitsUtil.nextClearBit(assigned, 0); pos < num; pos = BitsUtil.nextClearBit(assigned, pos + 1)) {
+            BitsUtil.setI(assignment, pos);
           }
           break;
         }
@@ -120,7 +119,7 @@ public class RTreeQuadraticSplit implements SplitStrategy {
         int best = -1;
         E best_i = null;
         boolean preferSecond = false;
-        for(int pos = assigned.nextClearBit(0); pos < num; pos = assigned.nextClearBit(pos + 1)) {
+        for(int pos = BitsUtil.nextClearBit(assigned, 0); pos < num; pos = BitsUtil.nextClearBit(assigned, pos + 1)) {
           // Cost of putting object into both mbrs
           final E pos_i = getter.get(entries, pos);
           final double d1 = SpatialUtil.volumeUnion(mbr1, pos_i) - area1;
@@ -147,7 +146,7 @@ public class RTreeQuadraticSplit implements SplitStrategy {
           }
         }
         // Mark as used.
-        assigned.set(best);
+        BitsUtil.setI(assigned, best);
         remaining--;
         if(!preferSecond) {
           in1++;
@@ -156,7 +155,7 @@ public class RTreeQuadraticSplit implements SplitStrategy {
         }
         else {
           in2++;
-          assignment.set(best);
+          BitsUtil.setI(assignment, best);
           mbr2.extend(best_i);
           area2 = SpatialUtil.volume(mbr2);
         }

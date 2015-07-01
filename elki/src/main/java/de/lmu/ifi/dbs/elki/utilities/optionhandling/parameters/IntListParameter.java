@@ -23,10 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -37,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Elke Achtert
  * @author Erich Schubert
  */
-public class IntListParameter extends ListParameter<IntListParameter, Integer> {
+public class IntListParameter extends ListParameter<IntListParameter, int[]> {
   /**
    * Constructs an integer list parameter
    * 
@@ -56,47 +53,44 @@ public class IntListParameter extends ListParameter<IntListParameter, Integer> {
   public IntListParameter(OptionID optionID) {
     super(optionID);
   }
-  
+
   @Override
   public String getValueAsString() {
+    int[] val = getValue();
+    if(val.length == 0) {
+      return "";
+    }
     StringBuilder buf = new StringBuilder();
-    List<Integer> val = getValue();
-    Iterator<Integer> veciter = val.iterator();
-    while(veciter.hasNext()) {
-      buf.append(veciter.next().toString());
-      if (veciter.hasNext()) {
-        buf.append(LIST_SEP);
-      }
+    buf.append(val[0]);
+    for(int i = 1; i < val.length; i++) {
+      buf.append(LIST_SEP);
+      buf.append(val[i]);
     }
     return buf.toString();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  protected List<Integer> parseValue(Object obj) throws ParameterException {
-    try {
-      List<?> l = List.class.cast(obj);
-      // do extra validation:
-      for (Object o : l) {
-        if (!(o instanceof Integer)) {
-          throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
-        }
-      }
-      // TODO: can we use reflection to get extra checks?
-      // TODO: Should we copy the list?
-      return (List<Integer>)l;
-    } catch (ClassCastException e) {
-      // continue with others
+  protected int[] parseValue(Object obj) throws ParameterException {
+    if(obj instanceof int[]) {
+      return (int[]) obj;
     }
     if(obj instanceof String) {
       String[] values = SPLIT.split((String) obj);
-      ArrayList<Integer> intValue = new ArrayList<>(values.length);
-      for(String val : values) {
-        intValue.add(Integer.valueOf(val));
+      int[] intValue = new int[values.length];
+      for(int i = 0; i < values.length; i++) {
+        intValue[i] = Integer.valueOf(values[i]);
       }
       return intValue;
     }
+    if(obj instanceof Integer) {
+      return new int[] { (Integer) obj };
+    }
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Integer values!");
+  }
+
+  @Override
+  public int size() {
+    return getValue().length;
   }
 
   /**
@@ -107,5 +101,23 @@ public class IntListParameter extends ListParameter<IntListParameter, Integer> {
   @Override
   public String getSyntax() {
     return "<int_1,...,int_n>";
+  }
+
+  /**
+   * Get the values as a bitmask.
+   * 
+   * @return Bitmask
+   */
+  public long[] getValueAsBitSet() {
+    int[] value = getValue();
+    int maxd = 0;
+    for(int d : value) {
+      maxd = (d > maxd) ? d : maxd;
+    }
+    long[] dimensions = BitsUtil.zero(maxd);
+    for(int d : value) {
+      BitsUtil.setI(dimensions, d);
+    }
+    return dimensions;
   }
 }

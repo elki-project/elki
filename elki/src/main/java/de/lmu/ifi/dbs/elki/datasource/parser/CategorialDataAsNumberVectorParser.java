@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.util.BitSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,7 +87,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public CategorialDataAsNumberVectorParser(CSVReaderFormat format, BitSet labelIndices, NumberVector.Factory<V> factory) {
+  public CategorialDataAsNumberVectorParser(CSVReaderFormat format, long[] labelIndices, NumberVector.Factory<V> factory) {
     super(format, labelIndices, factory);
   }
 
