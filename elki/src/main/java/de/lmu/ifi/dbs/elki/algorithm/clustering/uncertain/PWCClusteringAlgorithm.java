@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -117,9 +118,9 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * call to the algorithms particular run method as well as the storing and
    * comparison of the resulting Clusterings.
    *
-   * @param database
-   * @param relation
-   * @return
+   * @param database Database
+   * @param relation Data relation of uncertain objects
+   * @return Clustering result
    */
   public Clustering<?> run(final Database database, final Relation<UncertainObject<?>> relation) {
     final ArrayList<Clustering<?>> clusterings = new ArrayList<>();
@@ -130,21 +131,17 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
       {
         final WritableDataStore<NumberVector> store0 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store0.put(iter, relation.get(iter).drawCenter());
+          store0.put(iter, relation.get(iter).getOriginalValues());
         }
-        clusterings.add(runClusteringAlgorithm(database, ids, store0, dim, "Raw input data"));
+        runClusteringAlgorithm(relation, ids, store0, dim, "Raw input data");
       }
       // Add the uncertain model:
-      { // FIXME: this is the same as above, currently!
-        // * final WritableDataStore<NumberVector> store1 =
-        // DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB,
-        // NumberVector.class);
-        /*
-         * for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-         * store1.put(iter, relation.get(iter).drawCenter()); }
-         */
-        // clusterings.add(runClusteringAlgorithm(database, ids, store1, dim,
-        // "Uncertain Model: Center of Mass"));
+      {
+        final WritableDataStore<NumberVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          store1.put(iter, relation.get(iter).getMean());
+        }
+        runClusteringAlgorithm(relation, ids, store1, dim, "Uncertain Model: Center of Mass");
       }
       // Add samples:
       for(int i = 0; i < this.depth; i++) {
@@ -152,11 +149,11 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           store.put(iter, relation.get(iter).drawSample());
         }
-        clusterings.add(runClusteringAlgorithm(database, ids, store, dim, "Sample " + i));
+        clusterings.add(runClusteringAlgorithm(relation, ids, store, dim, "Sample " + i));
       }
     }
 
-    // Step 2: perform the meta clustering.
+    // Step 2: perform the meta clustering (on samples only).
     DBIDRange rids = DBIDFactory.FACTORY.generateStaticDBIDRange(clusterings.size());
     final WritableDataStore<Clustering<?>> datastore = DataStoreUtil.makeStorage(rids, DataStoreFactory.HINT_DB, Clustering.class);
     Iterator<Clustering<?>> it2 = clusterings.iterator();
@@ -182,7 +179,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * @param title
    * @return
    */
-  protected Clustering<?> runClusteringAlgorithm(final Database database, final DBIDs ids, final WritableDataStore<NumberVector> store, final int dim, final String title) {
+  protected Clustering<?> runClusteringAlgorithm(final HierarchicalResult database, final DBIDs ids, final WritableDataStore<NumberVector> store, final int dim, final String title) {
     final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
     final Relation<NumberVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);

@@ -123,16 +123,17 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
 
   @Override
   public DoubleVector drawSample() {
-    return this.probabilityDensityFunction.drawValue(this.bounds, this.rand);
+    return probabilityDensityFunction.drawValue(bounds, rand);
   }
-  
+
+  @Override
   public DoubleVector getMean() {
-    return this.probabilityDensityFunction.getMean(this.bounds);
+    return probabilityDensityFunction.getMean(bounds);
   }
 
   @Override
   public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
-    return this.probabilityDensityFunction.uncertainify(vec, blur);
+    return probabilityDensityFunction.uncertainify(vec, blur);
   }
 
   /**
@@ -163,7 +164,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
 
     @Override
     protected ContinuousUncertainObject<F> makeInstance() {
-      return new ContinuousUncertainObject<F>(this.pdf);
+      return new ContinuousUncertainObject<F>(pdf);
     }
   }
 }

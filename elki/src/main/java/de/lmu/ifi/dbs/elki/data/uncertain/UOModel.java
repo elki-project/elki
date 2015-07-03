@@ -60,15 +60,15 @@ public abstract class UOModel implements SpatialComparable {
 
   public static final int PROBABILITY_SCALE = 10000;
 
-  public final static long DEFAULT_MIN_MAX_DEVIATION = 5l;
+  public final static int DEFAULT_MIN_MAX_DEVIATION = 5;
 
-  public final static long DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN = 3l;
+  public final static int DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN = 3;
 
-  public final static long DEFAULT_SAMPLE_SIZE = 10l;
+  public final static int DEFAULT_SAMPLE_SIZE = 10;
 
-  public final static long DEFAULT_STDDEV = 1l;
+  public final static int DEFAULT_STDDEV = 1;
 
-  public final static long DEFAULT_MULTIPLICITY = 1l;
+  public final static int DEFAULT_MULTIPLICITY = 1;
 
   public final static int DEFAULT_PROBABILITY_SEED = 5;
 
@@ -79,7 +79,7 @@ public abstract class UOModel implements SpatialComparable {
   public final static int DEFAULT_TRY_LIMIT = 1000;
 
   public abstract DoubleVector drawSample();
-  
+
   public abstract DoubleVector getMean();
 
   @Override

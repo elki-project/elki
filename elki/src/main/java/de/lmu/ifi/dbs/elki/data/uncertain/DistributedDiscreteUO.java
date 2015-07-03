@@ -108,11 +108,12 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
 
     return ind < this.samplePoints.size() ? this.samplePoints.get(ind).getFirst() : DistributedDiscreteUO.noObjectChosen;
   }
-  
+
+  @Override
   public DoubleVector getMean() {
     double[] meanVals = new double[this.dimensions];
     int sumWeights = 0;
-    
+
     for (Pair<DoubleVector,Integer> derp : this.samplePoints) {
       double[] vals = derp.first.getValues();
       sumWeights += derp.second;
@@ -120,11 +121,11 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
         meanVals[i] += vals[i] * derp.second;
       }
     }
-    
+
     for (int i=0; i<this.dimensions; i++) {
       meanVals[i] /= sumWeights;
     }
-    
+
     return new DoubleVector(meanVals);
   }
 

@@ -84,21 +84,22 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
     // Index := random.mod(samplePoints.size())
     return this.samplePoints.get(this.rand.nextInt(this.samplePoints.size()));
   }
-  
+
+  @Override
   public DoubleVector getMean() {
     double[] meanVals = new double[this.dimensions];
-    
+
     for (DoubleVector sp : this.samplePoints) {
       double[] vals = sp.getValues();
       for (int i=0; i<this.dimensions; i++) {
         meanVals[i] += vals[i];
       }
     }
-    
+
     for (int i=0; i<this.dimensions; i++) {
       meanVals[i] /= this.dimensions;
     }
-    
+
     return new DoubleVector(meanVals);
   }
 

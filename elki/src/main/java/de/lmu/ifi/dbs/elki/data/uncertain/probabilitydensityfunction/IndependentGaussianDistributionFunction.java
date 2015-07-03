@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
@@ -66,7 +66,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
    * @param multMax
    * @param rand
    */
-  public IndependentGaussianDistributionFunction(final double minDev, final double maxDev, final double minMin, final double maxMin, final double minMax, final double maxMax, final long multMin, final long multMax, final Random rand) {
+  public IndependentGaussianDistributionFunction(double minDev, double maxDev, double minMin, double maxMin, double minMax, double maxMax, int multMin, int multMax, Random rand) {
     this.minDev = minDev;
     this.maxDev = maxDev;
     this.minMin = minMin;
@@ -84,7 +84,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
    * @param means
    * @param variances
    */
-  public IndependentGaussianDistributionFunction(final List<DoubleVector> means, final List<DoubleVector> variances) {
+  public IndependentGaussianDistributionFunction(List<DoubleVector> means, List<DoubleVector> variances) {
     this(means, variances, null);
   }
 
@@ -95,7 +95,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
    * @param variances
    * @param weights
    */
-  public IndependentGaussianDistributionFunction(final List<DoubleVector> means, final List<DoubleVector> variances, final int[] weights) {
+  public IndependentGaussianDistributionFunction(List<DoubleVector> means, List<DoubleVector> variances, int[] weights) {
     if(means.size() != variances.size() || (weights != null && variances.size() != weights.length)) {
       throw new IllegalArgumentException("[W: ]\tSize of 'means' and 'variances' has to be the same, also Dimensionality of weights.");
     }
@@ -106,7 +106,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
     }
     if(weights == null) {
       this.weights = new int[means.size()];
-      final int c = this.weightMax / means.size();
+      final int c = weightMax / means.size();
       for(int i = 0; i < means.size(); i++) {
         this.weights[i] = c;
       }
@@ -124,20 +124,20 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
   }
 
   @Override
-  public DoubleVector drawValue(final SpatialComparable bounds, final Random rand) {
+  public DoubleVector drawValue(SpatialComparable bounds, Random rand) {
     int index = 0;
     final double[] values = new double[bounds.getDimensionality()];
 
     for(int j = 0; j < UOModel.DEFAULT_TRY_LIMIT; j++) {
-      if(this.weights.length > 1) {
-        index = UncertainUtil.drawIndexFromIntegerWeights(rand, this.weights, this.weightMax);
+      if(weights.length > 1) {
+        index = UncertainUtil.drawIndexFromIntegerWeights(rand, weights, weightMax);
       }
-      boolean inBounds = index < this.weights.length;
+      boolean inBounds = index < weights.length;
       if(!inBounds) {
         continue;
       }
       for(int i = 0; i < values.length; i++) {
-        values[i] = this.means.get(index).doubleValue(i) + rand.nextGaussian() * this.variances.get(index).doubleValue(i);
+        values[i] = means.get(index).doubleValue(i) + rand.nextGaussian() * variances.get(index).doubleValue(i);
         inBounds &= values[i] <= bounds.getMax(i) && values[i] >= bounds.getMin(i);
       }
       if(inBounds) {
@@ -147,22 +147,25 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
 
     return AbstractGaussianDistributionFunction.noSample;
   }
-  
+
+  @Override
   public DoubleVector getMean(SpatialComparable bounds) {
     double[] meanVals = new double[bounds.getDimensionality()];
     int sumWeights = 0;
-    
-    for (int i=0; i<this.means.size(); i++) {
-      for (int j=0; j<bounds.getDimensionality(); j++) {
-        meanVals[j] += this.means.get(i).getValues()[j] * this.weights[i];
-        sumWeights += this.weights[i];
+
+    for(int i = 0; i < means.size(); i++) {
+      for(int j = 0; j < bounds.getDimensionality(); j++) {
+        meanVals[j] += means.get(i).getValues()[j] * weights[i];
+        sumWeights += weights[i];
       }
     }
-    
-    for (int j=0; j<bounds.getDimensionality(); j++) {
-      meanVals[j] /= sumWeights;
+
+    if(sumWeights > 0) {
+      for(int j = 0; j < bounds.getDimensionality(); j++) {
+        meanVals[j] /= sumWeights;
+      }
     }
-    
+
     return new DoubleVector(meanVals);
   }
 
@@ -173,18 +176,18 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
 
   @Override
   public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
-    final int multiplicity = this.urand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
+    final int multiplicity = urand.nextInt((multMax - multMin) + 1) + multMin;
     final List<DoubleVector> means = new ArrayList<DoubleVector>();
     final List<DoubleVector> variances = new ArrayList<DoubleVector>();
     int[] weights;
-    weights = UncertainUtil.calculateRandomIntegerWeights(multiplicity, this.weightMax, this.urand);
+    weights = UncertainUtil.calculateRandomIntegerWeights(multiplicity, weightMax, urand);
     for(int h = 0; h < multiplicity; h++) {
       final double[] imeans = new double[vec.getDimensionality()];
       final double[] ivariances = new double[vec.getDimensionality()];
-      final double minBound = (this.urand.nextDouble() * (this.maxMin - this.minMin)) + this.minMin;
-      final double maxBound = (this.urand.nextDouble() * (this.maxMax - this.minMax)) + this.minMax;
+      final double minBound = (urand.nextDouble() * (maxMin - minMin)) + minMin;
+      final double maxBound = (urand.nextDouble() * (maxMax - minMax)) + minMax;
       for(int i = 0; i < vec.getDimensionality(); i++) {
-        ivariances[i] = (this.urand.nextDouble() * (this.maxDev - this.minDev)) + this.minDev;
+        ivariances[i] = (urand.nextDouble() * (maxDev - minDev)) + minDev;
         if(blur) {
           for(int j = 0; j < UOModel.DEFAULT_TRY_LIMIT; j++) {
             final double val = this.urand.nextGaussian() * ivariances[i] + vec.doubleValue(i);
@@ -246,12 +249,12 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
     /**
      * Field to hold parameter value.
      */
-    protected long multMin;
+    protected int multMin;
 
     /**
      * Field to hold parameter value.
      */
-    protected long multMax;
+    protected int multMax;
 
     /**
      * Field to hold RandomFactory for creation of Random.
@@ -336,11 +339,11 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
       if(config.grab(pMaxMax)) {
         this.maxMax = pMaxMax.getValue();
       }
-      final LongParameter pMultMin = new LongParameter(Parameterizer.MULT_MIN_ID, UOModel.DEFAULT_MULTIPLICITY);
+      final IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UOModel.DEFAULT_MULTIPLICITY);
       if(config.grab(pMultMin)) {
         this.multMin = pMultMin.getValue();
       }
-      final LongParameter pMultMax = new LongParameter(Parameterizer.MULT_MAX_ID, UOModel.DEFAULT_MULTIPLICITY);
+      final IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UOModel.DEFAULT_MULTIPLICITY);
       if(config.grab(pMultMax)) {
         this.multMax = pMultMax.getValue();
       }
@@ -352,7 +355,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
 
     @Override
     protected Object makeInstance() {
-      return new IndependentGaussianDistributionFunction(this.stddevMin, this.stddevMax, this.minMin, this.maxMin, this.minMax, this.maxMax, this.multMin, this.multMax, this.randFac.getRandom());
+      return new IndependentGaussianDistributionFunction(stddevMin, stddevMax, minMin, maxMin, minMax, maxMax, multMin, multMax, randFac.getRandom());
     }
   }
 }
