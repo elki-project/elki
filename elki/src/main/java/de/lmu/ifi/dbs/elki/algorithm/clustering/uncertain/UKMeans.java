@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,16 +22,16 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInit
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
@@ -50,12 +43,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
+// TODO: JavaDoc
 public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
-  
+  /**
+   * CLass logger.
+   */
+  private static final Logging LOG = Logging.getLogger(UKMeans.class);
+
   /**
    * Number of cluster centers to initialize.
    */
@@ -70,17 +67,29 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
    * Method to choose initial means.
    */
   protected KMeansInitialization<? super NumberVector> initializer;
-  
-  public UKMeans (int k, int maxiter, KMeansInitialization<? super NumberVector> initializer) {
+
+  // TODO: JavaDoc
+  public UKMeans(int k, int maxiter, KMeansInitialization<? super NumberVector> initializer) {
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
   }
-  
-  /**
-   * Initialize a Logger.
-   */
-  private static final Logging LOG = Logging.getLogger(UKMeans.class);
+
+  // TODO: JavaDoc
+  public Clustering<?> run(final Database database, final Relation<UncertainObject<?>> relation) {
+    final int dim = RelationUtil.dimensionality(relation);
+    final DBIDs ids = relation.getDBIDs();
+    final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+    for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      store.put(iter, relation.get(iter).getMean());
+    }
+
+    final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
+    final Relation<NumberVector> sample = new MaterializedRelation<>(t, ids, "means", store);
+    ProxyDatabase d = new ProxyDatabase(ids, sample);
+    KMeansLloyd<NumberVector> kmeans = new KMeansLloyd<NumberVector>(EuclideanDistanceFunction.STATIC, this.k, this.maxiter, this.initializer);
+    return kmeans.run(d);
+  }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -91,21 +100,6 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
   protected Logging getLogger() {
     return UKMeans.LOG;
   }
-  
-  public Clustering<?> run(final Database database, final Relation<UncertainObject<?>> relation) {
-    
-    final int dim = RelationUtil.dimensionality(relation);
-    final DBIDs ids = relation.getDBIDs();
-    final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
-    for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      store.put(iter, relation.get(iter).getMean());
-    }
-    
-    final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
-    final Relation<NumberVector> sample = new MaterializedRelation<>(t, ids, "means", store);
-    ProxyDatabase d = new ProxyDatabase(ids, sample);
-    KMeansLloyd<NumberVector> kmeans = new KMeansLloyd<NumberVector>(EuclideanDistanceFunction.STATIC, this.k, this.maxiter, this.initializer);
-    return kmeans.run(d);
-  }
 
+  // FIXME: add Parameterizer, to allow using this in the GUI.
 }
