@@ -93,10 +93,10 @@ public class FastMultidimensionalScalingTransform<O> implements ObjectFilter {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
 
     for(int r = 0; r < objects.metaLength(); r++) {
-      @SuppressWarnings("unchecked")
-      SimpleTypeInformation<Object> type = (SimpleTypeInformation<Object>) objects.meta(r);
+      SimpleTypeInformation<? extends Object> type = objects.meta(r);
       @SuppressWarnings("unchecked")
       final List<Object> column = (List<Object>) objects.getColumn(r);
+      // Not supported column (e.g. labels):
       if(!dist.getInputTypeRestriction().isAssignableFromType(type)) {
         bundle.appendColumn(type, column);
         continue;
@@ -120,18 +120,13 @@ public class FastMultidimensionalScalingTransform<O> implements ObjectFilter {
       }
 
       // Compute distance matrix.
-      double[][] imat = computeDistanceMatrix(castColumn, size);
+      double[][] imat = computeDistanceMatrix(castColumn);
       ClassicMultidimensionalScalingTransform.doubleCenterSymmetric(imat);
       // Find eigenvectors.
       {
         double[][] evs = new double[tdim][size];
         double[] lambda = new double[tdim];
-        findEigenVectors(imat, size, evs, lambda);
-
-        // Scaling factors.
-        for(int d = 0; d < tdim; d++) {
-          lambda[d] = Math.sqrt(lambda[d]);
-        }
+        findEigenVectors(imat, evs, lambda);
 
         // Project each data point to the new coordinates.
         double[] buf = new double[tdim];
@@ -146,99 +141,183 @@ public class FastMultidimensionalScalingTransform<O> implements ObjectFilter {
     return bundle;
   }
 
-  protected void findEigenVectors(double[][] imat, final int size, double[][] evs, double[] lambda) {
-    double[] tmp = new double[size];
-    Random rnd = new Random(); // FIXME: make parameterizable
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Learning projections.", tdim, LOG) : null;
-    for(int d = 0; d < tdim; d++) {
-      double[] cur = evs[d];
-      randomInitialization(cur, rnd);
-      double l = 0.;
-      for(int iter = 0; iter < 100; iter++) {
-        l = multiply(imat, cur, tmp);
-        double delta = updateEigenvector(tmp, cur, l);
-        if(delta < 1e-14) {
-          break;
-        }
-      }
-      lambda[d] = l;
-      if(d + 1 < tdim) {
-        for(int i = 0; i < size; i++) {
-          for(int j = 0; j < size; j++) {
-            imat[i][j] -= l * cur[i] * cur[j];
-          }
-        }
-      }
-      LOG.incrementProcessed(prog);
-    }
-    LOG.ensureCompleted(prog);
-  }
-
-  protected double[][] computeDistanceMatrix(final List<O> castColumn, final int size) {
+  /**
+   * Compute the distance matrix of a vector column.
+   * 
+   * @param col Column
+   * @return Distance matrix
+   */
+  protected double[][] computeDistanceMatrix(final List<O> col) {
+    final int size = col.size();
     double[][] imat = new double[size][size];
     boolean squared = dist instanceof SquaredEuclideanDistanceFunction;
-    FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix.", (size * (size - 1)) >>> 1, LOG) : null;
+    FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
     for(int x = 0; x < size; x++) {
-      final O ox = castColumn.get(x);
+      final O ox = col.get(x);
       for(int y = x + 1; y < size; y++) {
-        final O oy = castColumn.get(y);
+        final O oy = col.get(y);
         double distance = dist.distance(ox, oy);
-        distance *= (squared ? -.5 : -.5 * distance);
+        distance *= (squared ? -.5 : (-.5 * distance));
         imat[x][y] = distance;
         imat[y][x] = distance;
-        LOG.incrementProcessed(dprog);
+      }
+      if(dprog != null) {
+        dprog.setProcessed(dprog.getProcessed() + size - x - 1, LOG);
       }
     }
     LOG.ensureCompleted(dprog);
     return imat;
   }
 
+  /**
+   * Find the first eigenvectors and eigenvalues using power iterations.
+   * 
+   * @param imat Matrix (will be modified!)
+   * @param evs Eigenvectors output
+   * @param lambda Eigenvalues output
+   */
+  protected void findEigenVectors(double[][] imat, double[][] evs, double[] lambda) {
+    final int size = imat.length;
+    Random rnd = new Random(); // FIXME: make parameterizable
+    double[] tmp = new double[size];
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Learning projections", tdim, LOG) : null;
+    for(int d = 0; d < tdim;) {
+      final double[] cur = evs[d];
+      randomInitialization(cur, rnd);
+      double l = multiply(imat, cur, tmp);
+      for(int iter = 0; iter < 100; iter++) {
+        // This will scale "tmp" to unit length, and copy it to cur:
+        double delta = updateEigenvector(tmp, cur, l);
+        if(delta < 1e-10) {
+          break;
+        }
+        l = multiply(imat, cur, tmp);
+      }
+      l = estimateEigenvalue(imat, cur);
+      lambda[d] = l;
+      d++; // Successful
+      LOG.incrementProcessed(prog);
+      if(d == tdim) {
+        break;
+      }
+      // Update matrix
+      updateMatrix(imat, cur, l);
+    }
+    LOG.ensureCompleted(prog);
+  }
+
+  /**
+   * Choose a random vector of unit norm for power iterations.
+   * 
+   * @param out Output storage
+   * @param rnd Random source.
+   */
   protected void randomInitialization(double[] out, Random rnd) {
     double l2 = 0.;
     while(!(l2 > 0)) {
       for(int d = 0; d < out.length; d++) {
-        double val = rnd.nextDouble();
+        final double val = rnd.nextDouble();
         out[d] = val;
         l2 += val * val;
       }
     }
+    // If zero, retry. This should barely ever happen.
+    if(!(l2 > 0)) {
+      randomInitialization(out, rnd);
+      return;
+    }
     // Standardize:
-    if(l2 > 0) {
-      double s = 1. / Math.sqrt(l2);
-      for(int d = 0; d < out.length; d++) {
-        out[d] *= s;
-      }
+    final double s = 1. / Math.sqrt(l2);
+    for(int d = 0; d < out.length; d++) {
+      out[d] *= s;
     }
   }
 
-  private double multiply(double[][] mat, double[] in, double[] out) {
-    double l2 = 0.;
+  /**
+   * Compute out = A * in, and return the (signed!) length of the output vector.
+   *
+   * @param mat Matrix.
+   * @param in Input vector.
+   * @param out Output vector storage.
+   * @return Length of this vector.
+   */
+  protected double multiply(double[][] mat, double[] in, double[] out) {
+    double l = 0.;
     // Matrix multiplication:
     for(int d1 = 0; d1 < in.length; d1++) {
-      double[] row = mat[d1];
+      final double[] row = mat[d1];
       double t = 0.;
       for(int d2 = 0; d2 < in.length; d2++) {
         t += row[d2] * in[d2];
       }
       out[d1] = t;
-      l2 += t * t;
+      l += t * t;
     }
-    return Math.sqrt(l2);
+    return l > 0 ? Math.sqrt(l) : 0.;
   }
 
-  private double updateEigenvector(double[] in, double[] out, double l) {
-    final double s = l > 0 ? 1. / l : 1;
+  /**
+   * Compute the change in the eigenvector, and normalize the output vector
+   * while doing so.
+   * 
+   * @param in Input vector
+   * @param out Output vector
+   * @param l Eigenvalue
+   * @return Change
+   */
+  protected double updateEigenvector(double[] in, double[] out, double l) {
+    double s = 1. / (l > 0. ? l : l < 0. ? -l : 1.);
+    s = (in[0] > 0.) ? s : -s; // Reduce flipping vectors
     double diff = 0.;
     for(int d = 0; d < in.length; d++) {
-      // Scale to unit length
-      in[d] *= s;
+      in[d] *= s; // Scale to unit length
       // Compute change from previous iteration:
       double delta = in[d] - out[d];
       diff += delta * delta;
-      // Update.
-      out[d] = in[d];
+      out[d] = in[d]; // Update output storage
     }
     return diff;
+  }
+
+  /**
+   * Estimate the (singed!) Eigenvalue for a particular vector.
+   *
+   * @param mat Matrix.
+   * @param in Input vector.
+   * @return Estimated eigenvalue
+   */
+  protected double estimateEigenvalue(double[][] mat, double[] in) {
+    double de = 0., di = 0.;
+    // Matrix multiplication:
+    for(int d1 = 0; d1 < in.length; d1++) {
+      final double[] row = mat[d1];
+      double t = 0.;
+      for(int d2 = 0; d2 < in.length; d2++) {
+        t += row[d2] * in[d2];
+      }
+      final double s = in[d1];
+      de += t * s;
+      di += s * s;
+    }
+    return de / di;
+  }
+
+  /**
+   * Update matrix, by removing the effects of a known Eigenvector.
+   * 
+   * @param mat Matrix
+   * @param evec Known normalized Eigenvector
+   * @param eval Eigenvalue
+   */
+  protected void updateMatrix(double[][] mat, final double[] evec, double eval) {
+    final int size = mat.length;
+    for(int i = 0; i < size; i++) {
+      final double[] mati = mat[i];
+      final double eveci = evec[i];
+      for(int j = 0; j < size; j++) {
+        mati[j] -= eval * eveci * evec[j];
+      }
+    }
   }
 
   /**

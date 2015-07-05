@@ -49,9 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Rescale the data set using multidimensional scaling, MDS.
  * 
  * Note: the current implementation is rather expensive, both memory- and
- * runtime wise. Don't use for large data sets!
- * 
- * TODO: a contributed block Lanczos algorithm would be beneficial, to speed up MDS.
+ * runtime wise. Don't use for large data sets! Instead, have a look at
+ * {@link FastMultidimensionalScalingTransform} which uses power iterations
+ * instead.
  * 
  * @author Erich Schubert
  * 
@@ -91,17 +91,17 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
     final int size = objects.dataLength();
-    if (size == 0) {
+    if(size == 0) {
       return objects;
     }
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
 
-    for (int r = 0; r < objects.metaLength(); r++) {
+    for(int r = 0; r < objects.metaLength(); r++) {
       @SuppressWarnings("unchecked")
       SimpleTypeInformation<Object> type = (SimpleTypeInformation<Object>) objects.meta(r);
       @SuppressWarnings("unchecked")
       final List<Object> column = (List<Object>) objects.getColumn(r);
-      if (!dist.getInputTypeRestriction().isAssignableFromType(type)) {
+      if(!dist.getInputTypeRestriction().isAssignableFromType(type)) {
         bundle.appendColumn(type, column);
         continue;
       }
@@ -110,65 +110,36 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
       final List<O> castColumn = (List<O>) column;
       NumberVector.Factory<? extends NumberVector> factory = null;
       {
-        if (type instanceof VectorFieldTypeInformation) {
+        if(type instanceof VectorFieldTypeInformation) {
           final VectorFieldTypeInformation<?> ctype = (VectorFieldTypeInformation<?>) type;
           // Note two-step cast, to make stricter compilers happy.
           @SuppressWarnings("unchecked")
           final VectorFieldTypeInformation<? extends NumberVector> vtype = (VectorFieldTypeInformation<? extends NumberVector>) ctype;
           factory = FilterUtil.guessFactory(vtype);
-        } else {
+        }
+        else {
           factory = DoubleVector.FACTORY;
         }
         bundle.appendColumn(new VectorFieldTypeInformation<>(factory, tdim), castColumn);
       }
 
       // Compute distance matrix.
-      Matrix mat = new Matrix(size, size);
-      double[][] imat = mat.getArrayRef();
-      {
-        FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix.", (size * (size - 1)) >>> 1, LOG) : null;
-        for (int x = 0; x < size; x++) {
-          final O ox = castColumn.get(x);
-          for (int y = x + 1; y < size; y++) {
-            final O oy = castColumn.get(y);
-            double distance = Math.abs(dist.distance(ox, oy));
-            imat[x][y] = distance;
-            LOG.incrementProcessed(dprog);
-          }
-        }
-        LOG.ensureCompleted(dprog);
-      }
-      // Adjust distance matrix:
-      if (dist instanceof SquaredEuclideanDistanceFunction) {
-        // Don't square squared euclidean twice.
-        for (int x = 0; x < size; x++) {
-          for (int y = x + 1; y < size; y++) {
-            imat[x][y] *= -.5;
-          }
-        }
-      } else {
-        for (int x = 0; x < size; x++) {
-          for (int y = x + 1; y < size; y++) {
-            imat[x][y] *= -.5 * imat[x][y];
-          }
-        }
-      }
-      doubleCenterSymmetric(imat);
+      Matrix mat = new Matrix(computeDistanceMatrix(castColumn, size));
+      doubleCenterSymmetric(mat.getArrayRef());
       // Find eigenvectors.
       {
-        // TODO: implement Block-Lanczos algorithm for partial SVD.
         SingularValueDecomposition svd = new SingularValueDecomposition(mat);
         Matrix u = svd.getU();
         double[] lambda = svd.getSingularValues();
-        for (int i = 0; i < tdim; i++) {
+        for(int i = 0; i < tdim; i++) {
           lambda[i] = Math.sqrt(Math.abs(lambda[i]));
         }
 
         double[] buf = new double[tdim];
         double[][] uraw = u.getArrayRef();
-        for (int i = 0; i < size; i++) {
+        for(int i = 0; i < size; i++) {
           double[] raw = uraw[i];
-          for (int x = 0; x < buf.length; x++) {
+          for(int x = 0; x < buf.length; x++) {
             buf[x] = lambda[x] * raw[x];
           }
           column.set(i, factory.newNumberVector(buf));
@@ -176,6 +147,25 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
       }
     }
     return bundle;
+  }
+
+  protected double[][] computeDistanceMatrix(final List<O> castColumn, final int size) {
+    double[][] imat = new double[size][size];
+    boolean squared = dist instanceof SquaredEuclideanDistanceFunction;
+    FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
+    for(int x = 0; x < size; x++) {
+      final O ox = castColumn.get(x);
+      for(int y = x + 1; y < size; y++) {
+        final O oy = castColumn.get(y);
+        double distance = dist.distance(ox, oy);
+        distance *= (squared ? -.5 : -.5 * distance);
+        imat[x][y] = distance;
+        imat[y][x] = distance;
+        LOG.incrementProcessed(dprog);
+      }
+    }
+    LOG.ensureCompleted(dprog);
+    return imat;
   }
 
   /**
@@ -190,12 +180,12 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
     final int size = m.length;
     // Storage for mean values - initially all 0.
     double means[] = new double[size];
-    for (int x = 0; x < m.length; x++) {
+    for(int x = 0; x < m.length; x++) {
       final double[] rowx = m[x];
       // We already added "x" values in previous iterations.
       // Fake-add 0: mean + (0 - mean) / (x + 1)
       double rmean = means[x] - means[x] / (x + 1);
-      for (int y = x + 1; y < rowx.length; y++) {
+      for(int y = x + 1; y < rowx.length; y++) {
         final double nv = rowx[y];
         final double dx = nv - rmean, dy = nv - means[y];
         // For x < y, this is the yth entry.
@@ -207,14 +197,14 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
     }
     // Compute total mean by averaging column means.
     double mean = means[0];
-    for (int x = 1; x < size; x++) {
+    for(int x = 1; x < size; x++) {
       double dm = means[x] - mean;
       mean += dm / (x + 1);
     }
     // Row and column center; also make symmetric.
-    for (int x = 0; x < size; x++) {
+    for(int x = 0; x < size; x++) {
       m[x][x] = -2. * means[x] + mean;
-      for (int y = x + 1; y < size; y++) {
+      for(int y = x + 1; y < size; y++) {
         final double nv = m[x][y] - means[x] - means[y] + mean;
         m[x][y] = nv;
         m[y][x] = nv;
@@ -255,12 +245,12 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
       super.makeOptions(config);
 
       IntParameter dimP = new IntParameter(DIM_ID);
-      if (config.grab(dimP)) {
+      if(config.grab(dimP)) {
         tdim = dimP.intValue();
       }
 
       ObjectParameter<PrimitiveDistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
-      if (config.grab(distP)) {
+      if(config.grab(distP)) {
         dist = distP.instantiateClass(config);
       }
     }
