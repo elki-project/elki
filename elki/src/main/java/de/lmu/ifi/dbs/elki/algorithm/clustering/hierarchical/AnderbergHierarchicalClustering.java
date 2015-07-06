@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "M. R. Anderberg", //
 title = "Hierarchical Clustering Methods", //
 booktitle = "Cluster Analysis for Applications")
-public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult>implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -114,7 +114,9 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     final int size = ids.size();
 
     if(size > 0x10000) {
-      throw new AbortException("This implementation does not scale to data sets larger than " + 0x10000 + " instances (~17 GB RAM), which results in an integer overflow.");
+      throw new AbortException("This implementation does not scale to data sets larger than " + //
+      0x10000 // = 65535
+      + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
     }
     if(SingleLinkageMethod.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
@@ -170,7 +172,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     Arrays.fill(bestd, Double.POSITIVE_INFINITY);
     Arrays.fill(besti, -1);
     for(int x = 0, p = 0; x < size; x++) {
-      assert (p == AGNES.triangleSize(x));
+      assert(p == AGNES.triangleSize(x));
       double bestdx = Double.POSITIVE_INFINITY;
       int bestix = -1;
       for(int y = 0; y < x; y++, p++) {
@@ -220,7 +222,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
         y = besti[cx];
       }
     }
-    assert (x >= 0 && y >= 0);
+    assert(x >= 0 && y >= 0);
     merge(size, scratch, ix, iy, bestd, besti, pi, lambda, csize, mindist, x < y ? y : x, x < y ? x : y);
     return x;
   }
@@ -249,7 +251,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
     }
     // Perform merge in data structure: x -> y
-    assert (y < x);
+    assert(y < x);
     // Since y < x, prefer keeping y, dropping x.
     lambda.put(ix, mindist);
     pi.put(ix, iy);

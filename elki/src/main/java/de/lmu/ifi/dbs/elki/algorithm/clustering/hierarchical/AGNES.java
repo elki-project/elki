@@ -97,13 +97,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-@Reference(authors = "L. Kaufman and P. J. Rousseeuw",//
+@Reference(authors = "L. Kaufman and P. J. Rousseeuw", //
 title = "Agglomerative Nesting (Program AGNES)", //
 booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
 url = "http://dx.doi.org/10.1002/9780470316801.ch5")
 @Alias({ "HAC", "NaiveAgglomerativeHierarchicalClustering", //
 "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering" })
-public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult>implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -147,7 +147,9 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     final int size = ids.size();
 
     if(size > 0x10000) {
-      throw new AbortException("This implementation does not scale to data sets larger than " + 0x10000 + " instances (~17 GB RAM), which results in an integer overflow.");
+      throw new AbortException("This implementation does not scale to data sets larger than " + //
+      0x10000 // = 65535
+      + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
     }
     if(SingleLinkageMethod.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
@@ -238,7 +240,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       if(lambda.doubleValue(ix.seek(ox)) < Double.POSITIVE_INFINITY) {
         continue;
       }
-      assert (xbase == triangleSize(ox));
+      assert(xbase == triangleSize(ox));
       for(int oy = 0; oy < ox; oy++) {
         // Skip if object has already joined a cluster:
         if(lambda.doubleValue(iy.seek(oy)) < Double.POSITIVE_INFINITY) {
@@ -252,7 +254,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
         }
       }
     }
-    assert (x >= 0 && y >= 0);
+    assert(x >= 0 && y >= 0);
     merge(size, scratch, ix, iy, pi, lambda, csize, mindist, x, y);
     return x;
   }
@@ -279,7 +281,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
     }
     // Perform merge in data structure: x -> y
-    assert (y < x);
+    assert(y < x);
     // Since y < x, prefer keeping y, dropping x.
     lambda.put(ix, mindist);
     pi.put(ix, iy);
