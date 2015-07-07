@@ -186,8 +186,41 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
     }
   }
 
+  @Override
+  public void remove(int p) {
+    if(p >= size) {
+      throw new ArrayIndexOutOfBoundsException(p);
+    }
+    if(p < --size) {
+      System.arraycopy(dists, p + 1, dists, p, size - p);
+      System.arraycopy(ids, p + 1, ids, p, size - p);
+    }
+    // TODO: put NaN, -1?
+  }
+
+  @Override
+  public void removeSwap(int p) {
+    if(p >= size) {
+      throw new ArrayIndexOutOfBoundsException(p);
+    }
+    if(--size > 0) {
+      dists[p] = dists[size];
+      ids[p] = ids[size];
+    }
+  }
+
+  @Override
+  public void swap(int i, int j) {
+    final double tmpd = dists[i];
+    dists[i] = dists[j];
+    dists[j] = tmpd;
+    final int tmpi = ids[i];
+    ids[i] = ids[j];
+    ids[j] = tmpi;
+  }
+
   /**
-   * Truncate the list to the given size.
+   * Truncate the list to the given size, freeing the memory.
    * 
    * @param newsize New size
    */
@@ -201,19 +234,6 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
       System.arraycopy(oids, 0, ids, 0, newsize);
       size = newsize;
     }
-  }
-
-  /**
-   * Get the distance of the object at position pos.
-   * 
-   * Usually, you should be using an iterator instead. This part of the API is
-   * not stable.
-   * 
-   * @param pos Position
-   * @return Double distance.
-   */
-  public double getDoubleDistance(int pos) {
-    return dists[pos];
   }
 
   @Override

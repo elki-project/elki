@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Modifiable API for Distance-DBID results
  * 
@@ -55,5 +54,27 @@ public interface ModifiableDoubleDBIDList extends DoubleDBIDList {
   /**
    * Sort the result in ascending order
    */
-  public void sort();
+  void sort();
+
+  /**
+   * Swap to entries in the list.
+   * 
+   * @param i First entry
+   * @param j Second entry
+   */
+  void swap(int i, int j);
+  
+  /**
+   * Remove the entry at position p by shifting the remainder forward.
+   * 
+   * @param p Entry offset to remove
+   */
+  void remove(int p);
+
+  /**
+   * Remove the entry at position p by swapping with the last (not preserving the order).
+   * 
+   * @param p Entry offset to remove
+   */
+  void removeSwap(int p);
 }

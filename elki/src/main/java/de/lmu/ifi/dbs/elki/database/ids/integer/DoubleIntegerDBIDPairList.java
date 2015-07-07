@@ -151,6 +151,35 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBID
   }
 
   @Override
+  public void remove(int p) {
+    if(p >= size) {
+      throw new ArrayIndexOutOfBoundsException(p);
+    }
+    if(p < --size) {
+      System.arraycopy(data, p + 1, data, p, size - p);
+    }
+    data[size] = null;
+  }
+
+  @Override
+  public void removeSwap(int p) {
+    if(p >= size) {
+      throw new ArrayIndexOutOfBoundsException(p);
+    }
+    if(--size > 0) {
+      data[p] = data[size];
+    }
+    data[size] = null;
+  }
+
+  @Override
+  public void swap(int i, int j) {
+    final DoubleIntegerDBIDPair tmp = data[i];
+    data[i] = data[j];
+    data[j] = tmp;
+  }
+
+  @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
