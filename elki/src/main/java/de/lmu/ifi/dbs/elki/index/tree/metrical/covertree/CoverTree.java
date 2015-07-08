@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -120,7 +119,7 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
   /**
    * Stop refining the tree at this size, but build a leaf.
    */
-  int truncate = 20;
+  int truncate = 10;
 
   /**
    * Constructor.
@@ -143,17 +142,17 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
     /**
      * Objects in this node. Except for the first, which is the routing object.
      */
-    ModifiableDBIDs singletons;
+    ModifiableDoubleDBIDList singletons;
 
     /**
      * Maximum distance to descendants.
      */
-    double maxdist = 0.;
+    double maxDist = 0.;
 
     /**
      * Distance to parent.
      */
-    // double parentDist = 0.;
+    double parentDist = 0.;
 
     /**
      * Child nodes.
@@ -169,29 +168,35 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
      * Constructor.
      *
      * @param r Object.
-     * @param maxdist Maximum distance to any descendant.
+     * @param maxDist Maximum distance to any descendant.
+     * @param parentDist Distance from parent.
      */
-    public Node(DBIDRef r, double maxdist) {
-      this.singletons = DBIDUtil.newArray();
-      this.singletons.add(r);
+    public Node(DBIDRef r, double maxDist, double parentDist) {
+      this.singletons = DBIDUtil.newDistanceDBIDList();
+      this.singletons.add(0., r);
       this.children = new ArrayList<>();
-      this.maxdist = maxdist;
+      this.maxDist = maxDist;
+      this.parentDist = parentDist;
     }
 
     /**
      * Constructor for leaf node.
      *
      * @param r Object.
-     * @param maxdist Maximum distance to any descendant.
+     * @param maxDist Maximum distance to any descendant.
+     * @param parentDist Distance from parent.
      * @param singletons Singletons.
      */
-    public Node(DBIDRef r, double maxdist, DBIDs singletons) {
+    public Node(DBIDRef r, double maxDist, double parentDist, DoubleDBIDList singletons) {
       assert(!singletons.contains(r));
-      this.singletons = DBIDUtil.newArray(singletons.size() + 1);
-      this.singletons.add(r);
-      this.singletons.addDBIDs(singletons);
+      this.singletons = DBIDUtil.newDistanceDBIDList(singletons.size() + 1);
+      this.singletons.add(0., r);
+      for(DoubleDBIDListIter it = singletons.iter(); it.valid(); it.advance()) {
+        this.singletons.add(it.doubleValue(), it);
+      }
       this.children = null;
-      this.maxdist = maxdist;
+      this.maxDist = maxDist;
+      this.parentDist = parentDist;
     }
 
     /**
@@ -256,7 +261,7 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
       candidates.add(distanceQuery.distance(first, it), it);
       ++distComputations;
     }
-    root = bulkConstruct(first, Integer.MAX_VALUE, candidates);
+    root = bulkConstruct(first, Integer.MAX_VALUE, 0., candidates);
   }
 
   /**
@@ -270,7 +275,7 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
    * @param elems Candidates
    * @return Root node of subtree
    */
-  protected Node bulkConstruct(DBIDRef cur, int maxScale, ModifiableDoubleDBIDList elems) {
+  protected Node bulkConstruct(DBIDRef cur, int maxScale, double parentDist, ModifiableDoubleDBIDList elems) {
     assert(!elems.contains(cur));
     final double max = maxDistance(elems);
     final int scale = Math.min(distToScale(max) - 1, maxScale);
@@ -278,7 +283,7 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
     // Leaf node, because points coincide, we are too deep, or have too few
     // elements remaining:
     if(max <= 0 || scale <= SCALE_BOTTOM || elems.size() < truncate) {
-      return new Node(cur, max, elems);
+      return new Node(cur, max, parentDist, elems);
     }
     // Find neighbors in the cover of the current object:
     ModifiableDoubleDBIDList candidates = DBIDUtil.newDistanceDBIDList();
@@ -286,15 +291,15 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
     // If no elements were not in the cover, build a compact tree:
     if(candidates.size() == 0) {
       LOG.warning("Scale not chosen appropriately? " + max + " " + scaleToDist(scale));
-      return bulkConstruct(cur, nextScale, elems);
+      return bulkConstruct(cur, nextScale, parentDist, elems);
     }
     // We will have at least one other child, so build the parent:
-    Node node = new Node(cur, max);
+    Node node = new Node(cur, max, parentDist);
     // Routing element now is a singleton:
     final boolean curSingleton = elems.size() == 0;
     if(!curSingleton) {
       // Add node for the routing object:
-      node.children.add(bulkConstruct(cur, nextScale, elems));
+      node.children.add(bulkConstruct(cur, nextScale, 0, elems));
     }
     final double fmax = scaleToDist(nextScale);
     // Build additional cover nodes:
@@ -305,11 +310,11 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
       collectByCover(it, candidates, fmax, elems);
       assert(DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
       if(elems.size() == 0) { // Singleton
-        node.singletons.add(it);
+        node.singletons.add(it.doubleValue(), it);
       }
       else {
         // Build a full child node:
-        node.children.add(bulkConstruct(it, nextScale, elems));
+        node.children.add(bulkConstruct(it, nextScale, it.doubleValue(), elems));
       }
       candidates.removeSwap(0);
     }
@@ -320,7 +325,7 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
         node.children = null; // First in leaf is enough.
       }
       else {
-        node.singletons.add(cur); // Add as regular singleton.
+        node.singletons.add(parentDist, cur); // Add as regular singleton.
       }
     }
     // TODO: improve recycling of lists?
@@ -453,17 +458,20 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
       open.add(root);
       while(!open.isEmpty()) {
         final Node cur = open.remove(open.size() - 1); // pop()
-        final DBIDIter it = cur.singletons.iter();
+        final DoubleDBIDListIter it = cur.singletons.iter();
         final double d = distanceQuery.distance(obj, it);
         ++distComputations;
         // Covered area not in range (metric assumption!):
-        if(d > cur.maxdist + range) {
+        if(d - cur.maxDist > range) {
           continue;
         }
         if(!cur.isLeaf()) { // Inner node:
           for(Node c : cur.children) {
-            // TODO: use parentDist for pruning?
-            open.add(c);
+            // This only seems to reduce the number of distance computations
+            // marginally, unfortunately.
+            if(d - c.maxDist - c.parentDist <= range) {
+              open.add(c);
+            }
           }
         }
         else { // Leaf node
@@ -476,12 +484,13 @@ public class CoverTree<O> extends AbstractIndex<O>implements RangeIndex<O> {
         it.advance(); // Skip routing object.
         // For remaining singletons, compute the distances:
         while(it.valid()) {
-          // TODO: add metric pruning via parentDist?
-          double d2 = distanceQuery.distance(obj, it);
-          ++distComputations;
-          if(d2 <= range) {
-            assert(!ret.contains(it)) : "Duplicate singleton.";
-            ret.add(d2, it);
+          if(d - it.doubleValue() <= range) {
+            double d2 = distanceQuery.distance(obj, it);
+            ++distComputations;
+            if(d2 <= range) {
+              assert(!ret.contains(it)) : "Duplicate singleton.";
+              ret.add(d2, it);
+            }
           }
           it.advance();
         }
