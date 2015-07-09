@@ -74,13 +74,7 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
   public void adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, N, E, ?> mTree) {
     entry.setRoutingObjectID(routingObjectID);
     entry.setParentDistance(parentDistance);
-    entry.setCoveringRadius(coveringRadius(entry.getRoutingObjectID(), mTree));
-
-    for (int i = 0; i < getNumEntries(); i++) {
-      E childEntry = getEntry(i);
-      double dist = mTree.distance(routingObjectID, childEntry.getRoutingObjectID());
-      childEntry.setParentDistance(dist);
-    }
+    entry.setCoveringRadius(coveringRadius(routingObjectID, mTree));
   }
 
   /**
@@ -92,10 +86,12 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
    */
   public double coveringRadius(DBID routingObjectID, AbstractMTree<O, N, E, ?> mTree) {
     double coveringRadius = 0.;
-    for (int i = 0; i < getNumEntries(); i++) {
+    for(int i = 0; i < getNumEntries(); i++) {
       E entry = getEntry(i);
-      double distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID) + entry.getCoveringRadius();
-      coveringRadius = Math.max(coveringRadius, distance);
+      final double distance = mTree.distance(routingObjectID, entry.getRoutingObjectID());
+      entry.setParentDistance(distance);
+      final double cover = distance + entry.getCoveringRadius();
+      coveringRadius = coveringRadius < cover ? cover : coveringRadius;
     }
     return coveringRadius;
   }
@@ -109,13 +105,13 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
   @SuppressWarnings("unchecked")
   public final void integrityCheck(AbstractMTree<O, N, E, ?> mTree, E entry) {
     // leaf node
-    if (isLeaf()) {
-      for (int i = 0; i < getCapacity(); i++) {
+    if(isLeaf()) {
+      for(int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
-        if (i < getNumEntries() && e == null) {
+        if(i < getNumEntries() && e == null) {
           throw new RuntimeException("i < numEntries && entry == null");
         }
-        if (i >= getNumEntries() && e != null) {
+        if(i >= getNumEntries() && e != null) {
           throw new RuntimeException("i >= numEntries && entry != null");
         }
       }
@@ -125,29 +121,29 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
       N tmp = mTree.getNode(getEntry(0));
       boolean childIsLeaf = tmp.isLeaf();
 
-      for (int i = 0; i < getCapacity(); i++) {
+      for(int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
 
-        if (i < getNumEntries() && e == null) {
+        if(i < getNumEntries() && e == null) {
           throw new RuntimeException("i < numEntries && entry == null");
         }
 
-        if (i >= getNumEntries() && e != null) {
+        if(i >= getNumEntries() && e != null) {
           throw new RuntimeException("i >= numEntries && entry != null");
         }
 
-        if (e != null) {
+        if(e != null) {
           N node = mTree.getNode(e);
 
-          if (childIsLeaf && !node.isLeaf()) {
-            for (int k = 0; k < getNumEntries(); k++) {
+          if(childIsLeaf && !node.isLeaf()) {
+            for(int k = 0; k < getNumEntries(); k++) {
               mTree.getNode(getEntry(k));
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
           }
 
-          if (!childIsLeaf && node.isLeaf()) {
+          if(!childIsLeaf && node.isLeaf()) {
             throw new RuntimeException("Wrong Child: child id no leaf, but node is leaf!");
           }
 
@@ -157,7 +153,7 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
         }
       }
 
-      if (LoggingConfiguration.DEBUG) {
+      if(LoggingConfiguration.DEBUG) {
         Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
       }
     }
@@ -176,14 +172,14 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
     // test if parent distance is correctly set
     E entry = parent.getEntry(index);
     double parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID());
-    if (Math.abs(entry.getParentDistance() - parentDistance) > 1E-10) {
+    if(Math.abs(entry.getParentDistance() - parentDistance) > 1E-10) {
       throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + parentDistance + ",\n ist: " + entry.getParentDistance());
     }
 
     // test if covering radius is correctly set
     double mincover = parentDistance + entry.getCoveringRadius();
-    if (parentEntry.getCoveringRadius() < mincover) {
-      if (Math.abs(parentDistance - entry.getCoveringRadius()) > 1e-10) {
+    if(parentEntry.getCoveringRadius() < mincover) {
+      if(Math.abs(parentDistance - entry.getCoveringRadius()) > 1e-10) {
         String msg = "pcr < pd + cr \n" + parentEntry.getCoveringRadius() + " < " + parentDistance + " + " + entry.getCoveringRadius() + "in node " + parent.getPageID() + " at index " + index + " (child " + entry + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
         throw new RuntimeException(msg);
       }
