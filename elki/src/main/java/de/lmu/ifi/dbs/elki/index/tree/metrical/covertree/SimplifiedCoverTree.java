@@ -25,16 +25,17 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.covertree;
 
 import java.util.ArrayList;
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -88,10 +89,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
    *
    * @param relation data relation
    * @param distanceFunction distance function
+   * @param expansion Expansion rate
    * @param truncate Truncate branches with less than this number of instances.
    */
-  public SimplifiedCoverTree(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int truncate) {
-    super(relation, distanceFunction, truncate);
+  public SimplifiedCoverTree(Relation<O> relation, DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
+    super(relation, distanceFunction, expansion, truncate);
   }
 
   /**
@@ -103,7 +105,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
     /**
      * Objects in this node. Except for the first, which is the routing object.
      */
-    ModifiableDBIDs singletons;
+    ArrayModifiableDBIDs singletons;
 
     /**
      * Maximum distance to descendants.
@@ -206,7 +208,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
     final int nextScale = scale - 1;
     // Leaf node, because points coincide, we are too deep, or have too few
     // elements remaining:
-    if(max <= 0 || scale <= SCALE_BOTTOM || elems.size() < truncate) {
+    if(max <= 0 || scale <= scaleBottom || elems.size() < truncate) {
       return new Node(cur, max, elems);
     }
     // Find neighbors in the cover of the current object:
@@ -349,33 +351,33 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
       ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
       ArrayList<Node> open = new ArrayList<Node>(); // LIFO stack
       open.add(root);
+      DBIDVar r = DBIDUtil.newVar();
       while(!open.isEmpty()) {
         final Node cur = open.remove(open.size() - 1); // pop()
-        final DBIDIter it = cur.singletons.iter();
-        final double d = distance(obj, it);
+        cur.singletons.assignVar(0, r);
+        final double d = distance(obj, r);
         // Covered area not in range (metric assumption!):
         if(d - cur.maxDist > range) {
           continue;
         }
         if(!cur.isLeaf()) { // Inner node:
-          for(Node c : cur.children) {
-            open.add(c);
+          for(int i = 0, l = cur.children.size(); i < l; i++) {
+            open.add(cur.children.get(i));
           }
         }
         else { // Leaf node
           // Consider routing object, too:
           if(d <= range) {
-            ret.add(d, it); // First element is a candidate now
+            ret.add(d, r); // First element is a candidate now
           }
         }
-        it.advance(); // Skip routing object.
         // For remaining singletons, compute the distances:
-        while(it.valid()) {
-          final double d2 = distance(obj, it);
+        for(int i = 1, l = cur.singletons.size(); i < l; i++) {
+          cur.singletons.assignVar(i, r);
+          final double d2 = distance(obj, r);
           if(d2 <= range) {
-            ret.add(d2, it);
+            ret.add(d2, r);
           }
-          it.advance();
         }
       }
       ret.sort();
@@ -467,16 +469,17 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
      * Constructor.
      *
      * @param distanceFunction Distance function
+     * @param expansion Expansion rate
      * @param truncate Truncate branches with less than this number of
      *        instances.
      */
-    public Factory(DistanceFunction<? super O> distanceFunction, int truncate) {
-      super(distanceFunction, truncate);
+    public Factory(DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
+      super(distanceFunction, expansion, truncate);
     }
 
     @Override
     public SimplifiedCoverTree<O> instantiate(Relation<O> relation) {
-      return new SimplifiedCoverTree<O>(relation, distanceFunction, truncate);
+      return new SimplifiedCoverTree<O>(relation, distanceFunction, expansion, truncate);
     }
 
     /**
@@ -489,7 +492,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
     public static class Parameterizer<O> extends AbstractCoverTree.Factory.Parameterizer<O> {
       @Override
       protected SimplifiedCoverTree.Factory<O> makeInstance() {
-        return new SimplifiedCoverTree.Factory<>(distanceFunction, truncate);
+        return new SimplifiedCoverTree.Factory<>(distanceFunction, expansion, truncate);
       }
     }
   }

@@ -92,10 +92,11 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, 
    *
    * @param relation data relation
    * @param distanceFunction distance function
+   * @param expansion Expansion rate
    * @param truncate Truncate branches with less than this number of instances.
    */
-  public CoverTree(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int truncate) {
-    super(relation, distanceFunction, truncate);
+  public CoverTree(Relation<O> relation, DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
+    super(relation, distanceFunction, expansion, truncate);
   }
 
   /**
@@ -226,7 +227,7 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, 
     final int nextScale = scale - 1;
     // Leaf node, because points coincide, we are too deep, or have too few
     // elements remaining:
-    if(max <= 0 || scale <= SCALE_BOTTOM || elems.size() < truncate) {
+    if(max <= 0 || scale <= scaleBottom || elems.size() < truncate) {
       return new Node(cur, max, parentDist, elems);
     }
     // Find neighbors in the cover of the current object:
@@ -450,7 +451,6 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, 
         }
 
         final DoubleDBIDListIter it = cur.singletons.iter();
-
         if(!cur.isLeaf()) { // Inner node:
           for(Node c : cur.children) {
             // This only seems to reduce the number of distance computations
@@ -499,16 +499,17 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, 
      * Constructor.
      *
      * @param distanceFunction Distance function
+     * @param expansion Expansion rate
      * @param truncate Truncate branches with less than this number of
      *        instances.
      */
-    public Factory(DistanceFunction<? super O> distanceFunction, int truncate) {
-      super(distanceFunction, truncate);
+    public Factory(DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
+      super(distanceFunction, expansion, truncate);
     }
 
     @Override
     public CoverTree<O> instantiate(Relation<O> relation) {
-      return new CoverTree<O>(relation, distanceFunction, truncate);
+      return new CoverTree<O>(relation, distanceFunction, expansion, truncate);
     }
 
     /**
@@ -521,7 +522,7 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, 
     public static class Parameterizer<O> extends AbstractCoverTree.Factory.Parameterizer<O> {
       @Override
       protected CoverTree.Factory<O> makeInstance() {
-        return new CoverTree.Factory<>(distanceFunction, truncate);
+        return new CoverTree.Factory<>(distanceFunction, expansion, truncate);
       }
     }
   }

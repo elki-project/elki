@@ -40,26 +40,34 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
+/**
+ * Abstract base class for cover tree variants.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Object type
+ */
 public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
   /**
    * Constant expansion rate. 2 would be the intuitive value, but the original
    * version used 1.3, so we copy this. This means that in every level, the
    * cover radius shrinks by 1.3.
    */
-  final double BASE = 1.3;
+  final double expansion;
 
   /**
    * Logarithm base.
    */
-  final double INV_LOG_BASE = 1. / Math.log(BASE);
+  final double invLogExpansion;
 
   /**
    * Remaining points are likely identical. For 1.3 this yields: -2700
    */
-  protected final int SCALE_BOTTOM = (int) Math.ceil(Math.log(Double.MIN_NORMAL) * INV_LOG_BASE);
+  protected final int scaleBottom;
 
   /**
    * Holds the instance of the trees distance function.
@@ -86,13 +94,17 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    *
    * @param relation Data relation
    * @param distanceFunction Distance function
+   * @param expansion Expansion rate
    * @param truncate Truncate branches with less than this number of instances.
    */
-  public AbstractCoverTree(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int truncate) {
+  public AbstractCoverTree(Relation<O> relation, DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
     super(relation);
     this.distanceFunction = distanceFunction;
     this.distanceQuery = distanceFunction.instantiate(relation);
     this.truncate = truncate;
+    this.expansion = expansion;
+    this.invLogExpansion = 1. / Math.log(expansion);
+    this.scaleBottom = (int) Math.ceil(Math.log(Double.MIN_NORMAL) * invLogExpansion);
   }
 
   /**
@@ -102,7 +114,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    * @return Distance
    */
   protected final double scaleToDist(int s) {
-    return Math.pow(BASE, s);
+    return Math.pow(expansion, s);
   }
 
   /**
@@ -112,7 +124,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    * @return Scaling bound
    */
   protected final int distToScale(double d) {
-    return (int) Math.ceil(Math.log(d) * INV_LOG_BASE);
+    return (int) Math.ceil(Math.log(d) * invLogExpansion);
   }
 
   /**
@@ -233,6 +245,13 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
     protected DistanceFunction<? super O> distanceFunction;
 
     /**
+     * Constant expansion rate. 2 would be the intuitive value, but the original
+     * version used 1.3, so we copy this. This means that in every level, the
+     * cover radius shrinks by 1.3.
+     */
+    protected double expansion;
+
+    /**
      * Truncate tree at this height.
      */
     protected int truncate;
@@ -241,12 +260,14 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
      * Constructor.
      *
      * @param distanceFunction Distance function
+     * @param expansion Expansion rate
      * @param truncate Truncate branches with less than this number of
      *        instances.
      */
-    public Factory(DistanceFunction<? super O> distanceFunction, int truncate) {
+    public Factory(DistanceFunction<? super O> distanceFunction, double expansion, int truncate) {
       super();
       this.distanceFunction = distanceFunction;
+      this.expansion = expansion;
       this.truncate = truncate;
     }
 
@@ -282,6 +303,15 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       public static final OptionID TRUNCATE_ID = new OptionID("covertree.truncate", "Truncate tree when branches have less than this number of instances.");
 
       /**
+       * Expansion rate of the tree (going upward).
+       * <p>
+       * Key: {@code -covertree.expansionrate}<br />
+       * Default: 1.3
+       * </p>
+       */
+      public static final OptionID EXPANSION_ID = new OptionID("covertree.expansionrate", "Expansion rate of the tree (Default: 1.3).");
+
+      /**
        * Holds the instance of the trees distance function.
        */
       protected DistanceFunction<? super O> distanceFunction;
@@ -290,6 +320,11 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
        * Truncate the tree.
        */
       protected int truncate = 10;
+
+      /**
+       * Expansion rate.
+       */
+      protected double expansion = 1.3;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -305,6 +340,11 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
         .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(truncateP)) {
           truncate = truncateP.intValue();
+        }
+        DoubleParameter expansionP = new DoubleParameter(EXPANSION_ID, 1.3)//
+        .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
+        if(config.grab(expansionP)) {
+          expansion = expansionP.doubleValue();
         }
       }
     }
