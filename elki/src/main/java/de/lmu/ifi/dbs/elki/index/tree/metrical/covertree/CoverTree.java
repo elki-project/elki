@@ -32,17 +32,23 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -70,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 title = "Cover trees for nearest neighbor", //
 booktitle = "In Proc. 23rd International Conference on Machine Learning (ICML)", //
 url = "http://dx.doi.org/10.1145/1143844.1143857")
-public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O> {
+public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.
    */
@@ -316,6 +322,29 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O> {
   }
 
   @Override
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    // Query on the relation we index
+    if(distanceQuery.getRelation() != relation) {
+      return null;
+    }
+    DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
+    if(!this.distanceFunction.equals(distanceFunction)) {
+      if(LOG.isDebugging()) {
+        LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
+      }
+      return null;
+    }
+    // Bulk is not yet supported
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_BULK) {
+        return null;
+      }
+    }
+    DistanceQuery<O> dq = distanceFunction.instantiate(relation);
+    return new CoverTreeKNNQuery(dq);
+  }
+
+  @Override
   protected Logging getLogger() {
     return LOG;
   }
@@ -377,6 +406,84 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O> {
       }
       ret.sort();
       return ret;
+    }
+  }
+
+  /**
+   * KNN Query class.
+   * 
+   * @author Erich Schubert
+   */
+  public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O>implements KNNQuery<O> {
+    /**
+     * Constructor.
+     *
+     * @param distanceQuery Distance
+     */
+    public CoverTreeKNNQuery(DistanceQuery<O> distanceQuery) {
+      super(distanceQuery);
+    }
+
+    @Override
+    public KNNList getKNNForObject(O obj, int k) {
+      if(k < 1) {
+        throw new IllegalArgumentException("At least one object has to be requested!");
+      }
+
+      KNNHeap knnList = DBIDUtil.newHeap(k);
+      double d_k = Double.POSITIVE_INFINITY;
+
+      final DoubleObjectMinHeap<Node> pq = new DoubleObjectMinHeap<>();
+
+      // Push the root node
+      final double rootdist = distance(obj, root.singletons.iter());
+      pq.add(rootdist, root);
+
+      // search in tree
+      while(!pq.isEmpty()) {
+        final Node cur = pq.peekValue();
+        final double d = pq.peekKey();
+        pq.poll(); // Remove
+
+        if(knnList.size() >= k && d - cur.maxDist > d_k) {
+          continue;
+        }
+
+        final DoubleDBIDListIter it = cur.singletons.iter();
+
+        if(!cur.isLeaf()) { // Inner node:
+          for(Node c : cur.children) {
+            // This only seems to reduce the number of distance computations
+            // marginally, unfortunately.
+            if(d - c.maxDist - c.parentDist <= d_k) {
+              final DoubleDBIDListIter f = c.singletons.iter();
+              final double dist = DBIDUtil.equal(f, it) ? d : distance(obj, f);
+              if(dist - c.maxDist <= d_k) {
+                pq.add(dist, c);
+              }
+            }
+          }
+        }
+        else { // Leaf node
+          // Consider routing object, too:
+          if(d <= d_k) {
+            knnList.insert(d, it); // First element is a candidate now
+          }
+        }
+        it.advance(); // Skip routing object.
+        // For remaining singletons, compute the distances:
+        while(it.valid()) {
+          if(d - it.doubleValue() <= d_k) {
+            final double d2 = distance(obj, it);
+            if(d2 <= d_k) {
+              knnList.insert(d2, it);
+            }
+          }
+          it.advance();
+        }
+        d_k = knnList.getKNNDistance();
+      }
+      return knnList.toKNNList();
     }
   }
 

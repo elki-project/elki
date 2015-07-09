@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -296,6 +297,9 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
         ObjectParameter<DistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
         if(config.grab(distanceFunctionP)) {
           distanceFunction = distanceFunctionP.instantiateClass(config);
+          if(!distanceFunction.isMetric()) {
+            LoggingUtil.warning("CoverTree requires a metric to be exact.");
+          }
         }
         IntParameter truncateP = new IntParameter(TRUNCATE_ID, 10)//
         .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
