@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 
 /**
@@ -55,4 +56,22 @@ public interface RangeQuery<O> extends DatabaseQuery {
    * @return neighbors
    */
   public DoubleDBIDList getRangeForObject(O obj, double range);
+
+  /**
+   * Get the nearest neighbors for a particular object in a given query range
+   * 
+   * @param id query object ID
+   * @param range Query range
+   * @param result Neighbors output set
+   */
+  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result);
+
+  /**
+   * Get the nearest neighbors for a particular object in a given query range
+   * 
+   * @param obj Query object
+   * @param range Query range
+   * @param result Neighbors output set
+   */
+  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result);
 }

@@ -28,9 +28,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -165,6 +165,8 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
      * @param objectID the currently processed object
      */
     protected void expandClusterOrder(DBIDRef objectID) {
+      ModifiableDoubleDBIDList neighbors = DBIDUtil.newDistanceDBIDList();
+      DoubleDBIDListIter neighbor = neighbors.iter();
       heap.add(new OPTICSHeapEntry(DBIDUtil.deref(objectID), null, Double.POSITIVE_INFINITY));
 
       while(!heap.isEmpty()) {
@@ -172,9 +174,10 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
         clusterOrder.add(current.objectID, current.reachability, current.predecessorID);
         processedIDs.add(current.objectID);
 
-        DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(current.objectID, epsilon);
+        neighbors.clear();
+        rangeQuery.getRangeForDBID(current.objectID, epsilon, neighbors);
         if(neighbors.size() >= minpts) {
-          DoubleDBIDListIter neighbor = neighbors.iter();
+          neighbors.sort();
           final double coreDistance = neighbor.seek(minpts - 1).doubleValue();
 
           for(neighbor.seek(0); neighbor.valid(); neighbor.advance()) {

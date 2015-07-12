@@ -331,27 +331,20 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     }
 
     @Override
-    public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-      // So we have to project the query point only once:
-      return getRangeForObject(relation.get(id), range);
-    }
-
-    @Override
-    public DoubleDBIDList getRangeForObject(O obj, double range) {
+    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
       final I pobj = proj.project(obj);
-      DoubleDBIDList ilist = inner.getRangeForObject(pobj, range);
       if(norefine) {
-        return ilist;
+        inner.getRangeForObject(pobj, range, result);
+        return;
       }
-      ModifiableDoubleDBIDList olist = DBIDUtil.newDistanceDBIDList(ilist.size());
+      DoubleDBIDList ilist = inner.getRangeForObject(pobj, range);
       for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
         double dist = distanceQuery.distance(obj, iter);
         countRefinement();
         if(range <= dist) {
-          olist.add(dist, iter);
+          result.add(dist, iter);
         }
       }
-      return olist;
     }
   }
 

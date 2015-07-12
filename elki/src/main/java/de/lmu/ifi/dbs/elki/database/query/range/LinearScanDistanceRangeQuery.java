@@ -55,7 +55,7 @@ public class LinearScanDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      double currentDistance = distanceQuery.distance(id, iter);
+      final double currentDistance = distanceQuery.distance(id, iter);
       if(currentDistance <= range) {
         result.add(currentDistance, iter);
       }
@@ -68,12 +68,32 @@ public class LinearScanDistanceRangeQuery<O> extends AbstractDistanceRangeQuery<
   public DoubleDBIDList getRangeForObject(O obj, double range) {
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      double currentDistance = distanceQuery.distance(obj, iter);
+      final double currentDistance = distanceQuery.distance(obj, iter);
       if(currentDistance <= range) {
         result.add(currentDistance, iter);
       }
     }
     result.sort();
     return result;
+  }
+
+  @Override
+  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      final double currentDistance = distanceQuery.distance(id, iter);
+      if(currentDistance <= range) {
+        neighbors.add(currentDistance, iter);
+      }
+    }
+  }
+
+  @Override
+  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      final double currentDistance = distanceQuery.distance(obj, iter);
+      if(currentDistance <= range) {
+        neighbors.add(currentDistance, iter);
+      }
+    }
   }
 }

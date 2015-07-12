@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
@@ -355,11 +354,8 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     }
 
     @Override
-    public DoubleDBIDList getRangeForObject(O obj, double range) {
-      final ModifiableDoubleDBIDList res = DBIDUtil.newDistanceDBIDList();
-      kdRangeSearch(0, sorted.size(), 0, obj, res, sorted.iter(), range);
-      res.sort();
-      return res;
+    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+      kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), range);
     }
 
     /**

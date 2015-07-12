@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
@@ -390,9 +389,8 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
     }
 
     @Override
-    public DoubleDBIDList getRangeForObject(O obj, double range) {
+    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
       DoubleIntPair[] priority = rankReferencePoints(distanceQuery, obj, referencepoints);
-      ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
       for(DoubleIntPair pair : priority) {
         final ModifiableDoubleDBIDList nindex = index[pair.second];
         final double refd = pair.first;
@@ -436,8 +434,6 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
           }
         }
       }
-      result.sort();
-      return result;
     }
   }
 

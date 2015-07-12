@@ -79,16 +79,21 @@ public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID> {
   }
 
   @Override
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
+  public void getRangeForObject(DBID obj, double range, ModifiableDoubleDBIDList neighbors) {
     try {
-      Query query = mlt.like(ids.getOffset(id));
-      ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-      is.search(query, new DocumentsCollector(ids, result, range));
-      return result;
+      Query query = mlt.like(ids.getOffset(obj));
+      is.search(query, new DocumentsCollector(ids, neighbors, range));
     }
     catch(IOException e) {
       throw new AbortException("I/O error in lucene.", e);
     }
+  }
+
+  @Override
+  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
+    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
+    getRangeForDBID(id, range, result);
+    return result;
   }
 
   @Override

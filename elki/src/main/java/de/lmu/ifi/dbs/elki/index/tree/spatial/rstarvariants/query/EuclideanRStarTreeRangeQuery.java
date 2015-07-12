@@ -26,8 +26,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -72,10 +70,8 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
   }
 
   @Override
-  public DoubleDBIDList getRangeForObject(O object, double range) {
+  public void getRangeForObject(O object, double range, ModifiableDoubleDBIDList result) {
     tree.statistics.countRangeQuery();
-    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    
     final double sqepsilon = range * range;
 
     // Processing queue.
@@ -112,9 +108,5 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
         }
       }
     }
-
-    // sort the result according to the distances
-    result.sort();
-    return result;
   }
 }

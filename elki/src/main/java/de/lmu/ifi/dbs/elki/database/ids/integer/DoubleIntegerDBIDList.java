@@ -164,7 +164,6 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
   @Override
   public void clear() {
     size = 0;
-    // TODO: put NaN/-1 everywhere, or don't care?
   }
 
   @Override

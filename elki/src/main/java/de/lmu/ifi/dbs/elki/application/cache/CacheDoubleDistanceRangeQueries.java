@@ -33,8 +33,9 @@ import java.nio.channels.FileLock;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -135,8 +136,11 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
 
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing range queries", relation.size(), LOG) : null;
 
+      ModifiableDoubleDBIDList nn = DBIDUtil.newDistanceDBIDList();
+      DoubleDBIDListIter ni = nn.iter();
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        final DoubleDBIDList nn = rangeQ.getRangeForDBID(it, radius);
+        rangeQ.getRangeForDBID(it, radius, nn);
+        nn.sort();
         final int nnsize = nn.size();
 
         // Grow the buffer when needed:
@@ -152,7 +156,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
         ByteArrayUtil.writeUnsignedVarint(buffer, it.internalGetIndex());
         ByteArrayUtil.writeUnsignedVarint(buffer, nnsize);
         int c = 0;
-        for(DoubleDBIDListIter ni = nn.iter(); ni.valid(); ni.advance(), c++) {
+        for(ni.seek(0); ni.valid(); ni.advance(), c++) {
           ByteArrayUtil.writeUnsignedVarint(buffer, ni.internalGetIndex());
           buffer.putDouble(ni.doubleValue());
         }

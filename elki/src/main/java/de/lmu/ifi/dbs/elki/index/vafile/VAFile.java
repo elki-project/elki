@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
@@ -294,7 +293,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
     }
 
     @Override
-    public DoubleDBIDList getRangeForObject(V query, double eps) {
+    public void getRangeForObject(V query, double eps, ModifiableDoubleDBIDList result) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 
@@ -304,7 +303,6 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
       // Count a VA file scan
       scans += 1;
 
-      ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
       // Approximation step
       for(int i = 0; i < vectorApprox.size(); i++) {
         VectorApproximation va = vectorApprox.get(i);
@@ -323,8 +321,6 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
           result.add(dist, va.id);
         }
       }
-      result.sort();
-      return result;
     }
   }
 

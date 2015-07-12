@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
@@ -483,7 +482,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
     }
 
     @Override
-    public DoubleDBIDList getRangeForObject(V query, double range) {
+    public void getRangeForObject(V query, double range, ModifiableDoubleDBIDList result) {
       stats.incrementIssuedQueries();
       long t = System.nanoTime();
 
@@ -511,7 +510,6 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       // create candidate list (all objects) and prune candidates w.r.t.
       // mindist (i.e. remove them from the list)
       // important: this structure contains the maxDist values for refinement!
-      ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
       int candidates = 0;
       for(VectorApproximation va : vectorApprox) {
         DBID id = va.getId();
@@ -555,8 +553,6 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
         LOG.fine("query = " + query);
         LOG.fine("database: " + relation.size() + ", candidates: " + candidates + ", results: " + result.size());
       }
-
-      return result;
     }
   }
 

@@ -78,6 +78,16 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
     return result;
   }
 
+  @Override
+  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
+    linearScan(relation, relation.iterDBIDs(), relation.get(id), range, neighbors);
+  }
+
+  @Override
+  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
+    linearScan(relation, relation.iterDBIDs(), obj, range, neighbors);
+  }
+
   /**
    * Main loop for linear scan,
    * 

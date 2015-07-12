@@ -88,13 +88,28 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
 
   @Override
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    return getRangeForObject(relation.get(id), range);
+    ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
+    getRangeForObject(relation.get(id), range, result);
+    result.sort();
+    return result;
   }
 
   @Override
   public DoubleDBIDList getRangeForObject(O obj, double range) {
-    tree.statistics.countRangeQuery();
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
+    getRangeForObject(obj, range, result);
+    result.sort();
+    return result;
+  }
+
+  @Override
+  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    getRangeForObject(relation.get(id), range, result);
+  }
+
+  @Override
+  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    tree.statistics.countRangeQuery();
 
     // Processing queue.
     int[] pq = new int[101];
@@ -130,9 +145,5 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
         }
       }
     }
-
-    // sort the result according to the distances
-    result.sort();
-    return result;
   }
 }

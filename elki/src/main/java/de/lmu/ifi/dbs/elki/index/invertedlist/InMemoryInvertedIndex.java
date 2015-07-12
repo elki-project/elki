@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
@@ -379,22 +378,19 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
     }
 
     @Override
-    public DoubleDBIDList getRangeForObject(V obj, double range) {
+    public void getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
       WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       double len = naiveQuery(obj, scores, cands);
-      ModifiableDoubleDBIDList list = DBIDUtil.newDistanceDBIDList();
       // dist = 1 - sim/len <-> sim = len * (1-dist)
       double simrange = (1. - range) * len;
       for(DBIDIter n = cands.iter(); n.valid(); n.advance()) {
         double sim = scores.doubleValue(n) / length.doubleValue(n);
         if(sim >= simrange) {
-          list.add(1. - sim / len, n);
+          result.add(1. - sim / len, n);
         }
       }
-      list.sort();
-      return list;
     }
   }
 
@@ -416,22 +412,19 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
     }
 
     @Override
-    public DoubleDBIDList getRangeForObject(V obj, double range) {
+    public void getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
       WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       double len = naiveQuery(obj, scores, cands);
       // dist = acos(sim/len) <-> sim = cos(dist)*len
       double simrange = Math.cos(range) * len;
-      ModifiableDoubleDBIDList list = DBIDUtil.newDistanceDBIDList();
       for(DBIDIter n = cands.iter(); n.valid(); n.advance()) {
         double sim = scores.doubleValue(n) / length.doubleValue(n);
         if(sim >= simrange) {
-          list.add(Math.acos(sim / len), n);
+          result.add(Math.acos(sim / len), n);
         }
       }
-      list.sort();
-      return list;
     }
   }
 

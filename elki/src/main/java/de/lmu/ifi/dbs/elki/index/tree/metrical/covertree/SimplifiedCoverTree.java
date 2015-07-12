@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * 
  * @author Erich Schubert
  */
-public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, KNNIndex<O> {
+public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.
    */
@@ -138,7 +138,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
      * @param singletons Singletons.
      */
     public Node(DBIDRef r, double maxDist, DoubleDBIDList singletons) {
-      assert(!singletons.contains(r));
+      assert (!singletons.contains(r));
       this.singletons = DBIDUtil.newArray(singletons.size() + 1);
       this.singletons.add(r);
       this.singletons.addDBIDs(singletons);
@@ -179,7 +179,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
     if(ids.size() == 0) {
       return;
     }
-    assert(root == null) : "Tree already initialized.";
+    assert (root == null) : "Tree already initialized.";
     DBIDIter it = ids.iter();
     DBID first = DBIDUtil.deref(it);
     // Compute distances to all neighbors:
@@ -202,7 +202,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
    * @return Root node of subtree
    */
   protected Node bulkConstruct(DBIDRef cur, int maxScale, ModifiableDoubleDBIDList elems) {
-    assert(!elems.contains(cur));
+    assert (!elems.contains(cur));
     final double max = maxDistance(elems);
     final int scale = Math.min(distToScale(max) - 1, maxScale);
     final int nextScale = scale - 1;
@@ -230,11 +230,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
     final double fmax = scaleToDist(nextScale);
     // Build additional cover nodes:
     for(DoubleDBIDListIter it = candidates.iter(); it.valid();) {
-      assert(it.getOffset() == 0);
+      assert (it.getOffset() == 0);
       DBID t = DBIDUtil.deref(it);
       elems.clear(); // Recycle.
       collectByCover(it, candidates, fmax, elems);
-      assert(DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
+      assert (DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
       if(elems.size() == 0) { // Singleton
         node.singletons.add(it);
       }
@@ -244,7 +244,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
       }
       candidates.removeSwap(0);
     }
-    assert(candidates.size() == 0);
+    assert (candidates.size() == 0);
     // Routing object is not yet handled:
     if(curSingleton) {
       if(node.isLeaf()) {
@@ -276,7 +276,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
       for(Node chi : cur.children) {
         checkCoverTree(chi, counts, depth);
       }
-      assert(cur.children.size() > 0) : "Empty childs list.";
+      assert (cur.children.size() > 0) : "Empty childs list.";
     }
   }
 
@@ -336,7 +336,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
    *
    * @author Erich Schubert
    */
-  public class CoverTreeRangeQuery extends AbstractDistanceRangeQuery<O>implements RangeQuery<O> {
+  public class CoverTreeRangeQuery extends AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
     /**
      * Constructor.
      *
@@ -347,8 +347,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
     }
 
     @Override
-    public DoubleDBIDList getRangeForObject(O obj, double range) {
-      ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
+    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList ret) {
       ArrayList<Node> open = new ArrayList<Node>(); // LIFO stack
       open.add(root);
       DBIDVar r = DBIDUtil.newVar();
@@ -380,8 +379,6 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
           }
         }
       }
-      ret.sort();
-      return ret;
     }
   }
 
@@ -390,7 +387,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
    * 
    * @author Erich Schubert
    */
-  public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O>implements KNNQuery<O> {
+  public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
     /**
      * Constructor.
      *

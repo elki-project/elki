@@ -24,7 +24,9 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
@@ -60,9 +62,22 @@ public abstract class AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
 
   @Override
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    return getRangeForObject(relation.get(id), range);
+    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
+    getRangeForObject(relation.get(id), range, ret);
+    ret.sort();
+    return ret;
   }
 
   @Override
-  abstract public DoubleDBIDList getRangeForObject(O obj, double range);
+  public DoubleDBIDList getRangeForObject(O obj, double range) {
+    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
+    getRangeForObject(obj, range, ret);
+    ret.sort();
+    return ret;
+  }
+
+  @Override
+  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
+    getRangeForObject(relation.get(id), range, neighbors);
+  }
 }

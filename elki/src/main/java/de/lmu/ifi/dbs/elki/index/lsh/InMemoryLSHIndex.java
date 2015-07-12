@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -318,7 +317,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       }
 
       @Override
-      public DoubleDBIDList getRangeForObject(V obj, double range) {
+      public void getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
         ModifiableDBIDs candidates = DBIDUtil.newHashSet();
         final int numhash = hashtables.size();
         for(int i = 0; i < numhash; i++) {
@@ -335,7 +334,6 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         }
 
         // Refine.
-        ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
         for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
           final double dist = distanceQuery.distance(obj, iter);
           super.incRefinements(1);
@@ -343,7 +341,6 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
             result.add(dist, iter);
           }
         }
-        return result;
       }
     }
   }
