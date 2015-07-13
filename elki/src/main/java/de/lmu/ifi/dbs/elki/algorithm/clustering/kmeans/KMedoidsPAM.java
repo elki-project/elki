@@ -47,15 +47,18 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -83,7 +86,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(title = "Clustering by means of Medoids", //
 authors = "Kaufman, L. and Rousseeuw, P.J.", //
 booktitle = "Statistical Data Analysis Based on the L1-Norm and Related Methods")
-public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<MedoidModel>>implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -133,15 +136,29 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    */
   public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
-      return new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
+      return new Clustering<>("PAM Clustering", "pam-clustering");
     }
-    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
+    DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    if(distQ == null) {
+      LOG.verbose("Adding a distance matrix index to accelerate PAM.");
+      PrecomputedDistanceMatrix<V> idx = new PrecomputedDistanceMatrix<V>(relation, getDistanceFunction());
+      idx.initialize();
+      distQ = idx.getDistanceQuery(getDistanceFunction());
+    }
+    if(distQ == null) {
+      distQ = database.getDistanceQuery(relation, getDistanceFunction());
+      LOG.warning("PAM may be slow, because we do not have a precomputed distance matrix available.");
+    }
     DBIDs ids = relation.getDBIDs();
     // Choose initial medoids
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, ids, distQ));
+    if(medoids.size() != k) {
+      throw new AbortException("Initializer " + initializer.toString() + " did not return " + k + " means, but " + medoids.size());
+    }
+
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -151,7 +168,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     runPAMOptimization(distQ, ids, medoids, clusters);
 
     // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
+    Clustering<MedoidModel> result = new Clustering<>("PAM Clustering", "pam-clustering");
     for(DBIDArrayIter it = medoids.iter(); it.valid(); it.advance()) {
       MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
       result.addToplevelCluster(new Cluster<>(clusters.get(it.getOffset()), model));
@@ -256,11 +273,11 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    */
   protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore second, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V> distQ) {
     boolean changed = false;
-
     DBIDArrayIter miter = means.iter();
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double mindist = Double.POSITIVE_INFINITY, mindist2 = Double.POSITIVE_INFINITY;
-      int minIndex = 0;
+      double mindist = Double.POSITIVE_INFINITY,
+          mindist2 = Double.POSITIVE_INFINITY;
+      int minIndex = -1;
       miter.seek(0); // Reuse iterator.
       for(int i = 0; miter.valid(); miter.advance(), i++) {
         double dist = distQ.distance(iditer, miter);
