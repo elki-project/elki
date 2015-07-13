@@ -144,7 +144,7 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
         }
       }
       // Add new mean:
-      if(k == 0) {
+      if(i == 0) {
         means.clear(); // Remove temporary first element.
       }
       store.putDouble(best, Double.NaN); // So it won't be chosen twice.
@@ -152,6 +152,7 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
       means.add(best);
     }
 
+    store.destroy();
     return means;
   }
 
