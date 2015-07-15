@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.DistanceIndex;
@@ -117,7 +118,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   @Override
   public SingleObjectBundle getBundle(DBIDRef id) {
-    assert (id != null);
+    assert(id != null);
     // TODO: ensure that the ID actually exists in the database?
     try {
       // Build an object package
@@ -175,6 +176,11 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         if(q != null) {
           return q;
         }
+      }
+    }
+    for(Object o : hints) {
+      if(o == DatabaseQuery.HINT_OPTIMIZED_ONLY && !(distanceFunction instanceof DBIDDistanceFunction)) {
+        return null; // Linear scan is not desirable.
       }
     }
     return distanceFunction.instantiate(objQuery);
