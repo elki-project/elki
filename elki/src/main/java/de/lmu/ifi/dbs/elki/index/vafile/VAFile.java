@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -243,12 +242,6 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
 
   @Override
   public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        // FIXME: support bulk?
-        return null;
-      }
-    }
     DistanceFunction<? super V> df = distanceQuery.getDistanceFunction();
     if(df instanceof LPNormDistanceFunction) {
       double p = ((LPNormDistanceFunction) df).getP();

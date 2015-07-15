@@ -29,7 +29,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -51,7 +50,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @param <O> Object type
  */
-public class MkCoPTreeIndex<O> extends MkCoPTree<O> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
+public class MkCoPTreeIndex<O> extends MkCoPTree<O>implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
   /**
    * Relation indexed
    */
@@ -102,16 +101,8 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O> implements RangeIndex<O>, KN
     }
     DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
     if(!this.getDistanceFunction().equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
+      getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
-    }
-    // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
     }
     return MTreeQueryUtil.getKNNQuery(this, distanceQuery, hints);
   }
@@ -124,16 +115,8 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O> implements RangeIndex<O>, KN
     }
     DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
     if(!this.getDistanceFunction().equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
+      getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
-    }
-    // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
     }
     return MTreeQueryUtil.getRangeQuery(this, distanceQuery, hints);
   }
@@ -142,16 +125,8 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O> implements RangeIndex<O>, KN
   public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
     if(!this.getDistanceFunction().equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
-        getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
+      getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
-    }
-    // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
     }
     return new MkTreeRKNNQuery<>(this, distanceQuery);
   }
