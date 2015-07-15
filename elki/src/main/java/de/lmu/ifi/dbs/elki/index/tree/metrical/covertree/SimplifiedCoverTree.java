@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -73,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * 
  * @author Erich Schubert
  */
-public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements RangeIndex<O>, KNNIndex<O> {
+public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.
    */
@@ -138,7 +137,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
      * @param singletons Singletons.
      */
     public Node(DBIDRef r, double maxDist, DoubleDBIDList singletons) {
-      assert (!singletons.contains(r));
+      assert(!singletons.contains(r));
       this.singletons = DBIDUtil.newArray(singletons.size() + 1);
       this.singletons.add(r);
       this.singletons.addDBIDs(singletons);
@@ -179,7 +178,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
     if(ids.size() == 0) {
       return;
     }
-    assert (root == null) : "Tree already initialized.";
+    assert(root == null) : "Tree already initialized.";
     DBIDIter it = ids.iter();
     DBID first = DBIDUtil.deref(it);
     // Compute distances to all neighbors:
@@ -202,7 +201,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
    * @return Root node of subtree
    */
   protected Node bulkConstruct(DBIDRef cur, int maxScale, ModifiableDoubleDBIDList elems) {
-    assert (!elems.contains(cur));
+    assert(!elems.contains(cur));
     final double max = maxDistance(elems);
     final int scale = Math.min(distToScale(max) - 1, maxScale);
     final int nextScale = scale - 1;
@@ -230,11 +229,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
     final double fmax = scaleToDist(nextScale);
     // Build additional cover nodes:
     for(DoubleDBIDListIter it = candidates.iter(); it.valid();) {
-      assert (it.getOffset() == 0);
+      assert(it.getOffset() == 0);
       DBID t = DBIDUtil.deref(it);
       elems.clear(); // Recycle.
       collectByCover(it, candidates, fmax, elems);
-      assert (DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
+      assert(DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
       if(elems.size() == 0) { // Singleton
         node.singletons.add(it);
       }
@@ -244,7 +243,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
       }
       candidates.removeSwap(0);
     }
-    assert (candidates.size() == 0);
+    assert(candidates.size() == 0);
     // Routing object is not yet handled:
     if(curSingleton) {
       if(node.isLeaf()) {
@@ -276,7 +275,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
       for(Node chi : cur.children) {
         checkCoverTree(chi, counts, depth);
       }
-      assert (cur.children.size() > 0) : "Empty childs list.";
+      assert(cur.children.size() > 0) : "Empty childs list.";
     }
   }
 
@@ -288,16 +287,8 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
     }
     DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
-      if(LOG.isDebugging()) {
-        LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
+      LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
       return null;
-    }
-    // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
     }
     DistanceQuery<O> dq = distanceFunction.instantiate(relation);
     return new CoverTreeRangeQuery(dq);
@@ -311,16 +302,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
     }
     DistanceFunction<? super O> distanceFunction = (DistanceFunction<? super O>) distanceQuery.getDistanceFunction();
     if(!this.distanceFunction.equals(distanceFunction)) {
-      if(LOG.isDebugging()) {
-        LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
       return null;
-    }
-    // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
-        return null;
-      }
     }
     DistanceQuery<O> dq = distanceFunction.instantiate(relation);
     return new CoverTreeKNNQuery(dq);
@@ -336,7 +318,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
    *
    * @author Erich Schubert
    */
-  public class CoverTreeRangeQuery extends AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
+  public class CoverTreeRangeQuery extends AbstractDistanceRangeQuery<O>implements RangeQuery<O> {
     /**
      * Constructor.
      *
@@ -387,7 +369,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
    * 
    * @author Erich Schubert
    */
-  public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
+  public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O>implements KNNQuery<O> {
     /**
      * Constructor.
      *
@@ -410,15 +392,16 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
 
       // Push the root node
       final double rootdist = distance(obj, root.singletons.iter());
-      pq.add(rootdist, root);
+      pq.add(rootdist - root.maxDist, root);
 
       // search in tree
       while(!pq.isEmpty()) {
         final Node cur = pq.peekValue();
-        final double d = pq.peekKey();
+        final double prio = pq.peekKey(); // Minimum distance to cover
+        final double d = prio + cur.maxDist; // Restore distance to center.
         pq.poll(); // Remove
 
-        if(knnList.size() >= k && d - cur.maxDist > d_k) {
+        if(knnList.size() >= k && prio > d_k) {
           continue;
         }
 
@@ -428,15 +411,16 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
           for(Node c : cur.children) {
             final DBIDIter f = c.singletons.iter();
             final double dist = DBIDUtil.equal(f, it) ? d : distance(obj, f);
-            if(dist - c.maxDist <= d_k) {
-              pq.add(dist, c);
+            final double newprio = dist - c.maxDist; // Minimum distance
+            if(newprio <= d_k) {
+              pq.add(newprio, c);
             }
           }
         }
         else { // Leaf node
           // Consider routing object, too:
           if(d <= d_k) {
-            knnList.insert(d, it); // First element is a candidate now
+            d_k = knnList.insert(d, it); // First element is a candidate now
           }
         }
         it.advance(); // Skip routing object.
@@ -444,11 +428,10 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Rang
         while(it.valid()) {
           final double d2 = distance(obj, it);
           if(d2 <= d_k) {
-            knnList.insert(d2, it);
+            d_k = knnList.insert(d2, it);
           }
           it.advance();
         }
-        d_k = knnList.getKNNDistance();
       }
       return knnList.toKNNList();
     }
