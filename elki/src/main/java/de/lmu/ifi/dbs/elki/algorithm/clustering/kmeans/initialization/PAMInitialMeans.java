@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,14 +31,16 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -63,6 +65,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 authors = "Kaufman, L. and Rousseeuw, P.J.", //
 booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
 public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(PAMInitialMeans.class);
+
   /**
    * Constructor.
    */
@@ -90,75 +97,83 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
   @Override
   public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
     ArrayModifiableDBIDs medids = DBIDUtil.newArray(k);
+    DBIDVar bestid = DBIDUtil.newVar();
     double best = Double.POSITIVE_INFINITY;
-    Mean mean = new Mean(); // Mean is numerically more stable than sum.
     WritableDoubleDataStore mindist = null;
 
     // First mean is chosen by having the smallest distance sum to all others.
     {
-      DBID bestid = null;
-      WritableDoubleDataStore bestd = null;
+      WritableDoubleDataStore newd = null;
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial mean", ids.size(), LOG) : null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        WritableDoubleDataStore newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-        mean.reset();
+        if(newd == null) {
+          newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+        }
+        int sum = 0;
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           double d = distQ.distance(iter, iter2);
-          mean.put(d);
+          sum += d;
           newd.putDouble(iter2, d);
         }
-        if(mean.getMean() < best) {
-          best = mean.getMean();
-          bestid = DBIDUtil.deref(iter);
-          if(bestd != null) {
-            bestd.destroy();
+        if(sum < best) {
+          best = sum;
+          bestid.set(iter);
+          if(mindist != null) {
+            mindist.destroy();
           }
-          bestd = newd;
+          mindist = newd;
+          newd = null;
         }
-        else {
-          newd.destroy();
-        }
+        LOG.incrementProcessed(prog);
+      }
+      LOG.ensureCompleted(prog);
+      if(newd != null) {
+        newd.destroy();
       }
       medids.add(bestid);
-      mindist = bestd;
     }
-    assert (mindist != null);
+    assert(mindist != null);
 
     // Subsequent means optimize the full criterion.
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial centers", k, LOG) : null;
+    LOG.incrementProcessed(prog); // First one was just chosen.
     for(int i = 1; i < k; i++) {
-      DBID bestid = null;
-      WritableDoubleDataStore bestd = null;
+      WritableDoubleDataStore bestd = null, newd = null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         if(medids.contains(iter)) {
           continue;
         }
-        WritableDoubleDataStore newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-        mean.reset();
+        if(newd == null) {
+          newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+        }
+        double sum = 0.;
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          double dn = distQ.distance(iter, iter2);
-          double v = Math.min(dn, mindist.doubleValue(iter2));
-          mean.put(v);
+          double v = MathUtil.min(distQ.distance(iter, iter2), mindist.doubleValue(iter2));
+          sum += v;
           newd.put(iter2, v);
         }
-        assert (mean.getCount() == ids.size());
-        if(mean.getMean() < best) {
-          best = mean.getMean();
-          bestid = DBIDUtil.deref(iter);
+        if(sum < best) {
+          best = sum;
+          bestid.set(iter);
           if(bestd != null) {
             bestd.destroy();
           }
           bestd = newd;
-        }
-        else {
-          newd.destroy();
+          newd = null;
         }
       }
       if(bestid == null) {
         throw new AbortException("No median found that improves the criterion function?!?");
       }
       medids.add(bestid);
+      if(newd != null) {
+        newd.destroy();
+      }
       mindist.destroy();
       mindist = bestd;
+      LOG.incrementProcessed(prog);
     }
+    LOG.ensureCompleted(prog);
 
     mindist.destroy();
     return medids;
