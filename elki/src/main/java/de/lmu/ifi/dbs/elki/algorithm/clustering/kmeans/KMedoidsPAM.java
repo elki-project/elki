@@ -1,31 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
@@ -39,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -46,7 +21,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -160,18 +134,27 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     }
 
     // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet(relation.size() / k));
-    }
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    runPAMOptimization(distQ, ids, medoids, assignment);
 
-    runPAMOptimization(distQ, ids, medoids, clusters);
+    // Rewrap result
+    int[] sizes = new int[k];
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      sizes[assignment.intValue(iter)] += 1;
+    }
+    ArrayModifiableDBIDs[] clusters = new ArrayModifiableDBIDs[k];
+    for(int i = 0; i < k; i++) {
+      clusters[i] = DBIDUtil.newArray(sizes[i]);
+    }
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      clusters[assignment.intValue(iter)].add(iter);
+    }
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("PAM Clustering", "pam-clustering");
     for(DBIDArrayIter it = medoids.iter(); it.valid(); it.advance()) {
       MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
-      result.addToplevelCluster(new Cluster<>(clusters.get(it.getOffset()), model));
+      result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], model));
     }
     return result;
   }
@@ -182,77 +165,81 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * @param distQ Distance query
    * @param ids IDs to process
    * @param medoids Medoids list
-   * @param clusters Clusters
+   * @param assignment Cluster assignment
    */
-  protected void runPAMOptimization(DistanceQuery<V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, List<ModifiableDBIDs> clusters) {
+  protected void runPAMOptimization(DistanceQuery<V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+    WritableDoubleDataStore nearest = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     WritableDoubleDataStore second = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     // Initial assignment to nearest medoids
     // TODO: reuse this information, from the build phase, when possible?
-    assignToNearestCluster(medoids, ids, second, clusters, distQ);
+    assignToNearestCluster(medoids, ids, nearest, second, assignment, distQ);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
     // Swap phase
     DBIDVar bestid = DBIDUtil.newVar();
+    DBIDArrayIter m = medoids.iter(), i = medoids.iter();
     int iteration = 0;
-    for(boolean changed = true; changed; iteration++) {
+    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      changed = false;
-      // Try to swap the medoid with a better cluster member:
-      double best = 0;
+      // Try to swap a medoid with a better non-medoid member:
+      double best = Double.POSITIVE_INFINITY;
       int bestcluster = -1;
-      int i = 0;
-      for(DBIDIter miter = medoids.iter(); miter.valid(); miter.advance(), i++) {
-        for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
-          if(DBIDUtil.equal(miter, iter)) {
-            continue;
+      // Iterate over all objects, per cluster.
+      for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
+        final int pm = assignment.intValue(h);
+        m.seek(pm);
+        if(DBIDUtil.equal(m, h)) {
+          continue; // Only not-selected items
+        }
+        // h is a non-medoid currently in cluster of medoid m.
+        double cost = 0;
+        for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
+          final int pi = assignment.intValue(j);
+          i.seek(pi); // Medoid j is assigned to.
+          if(DBIDUtil.equal(i, j)) {
+            continue; // Only not-selected items
           }
-          double cost = 0;
-          DBIDIter miter2 = medoids.iter();
-          for(int j = 0; j < k; j++, miter2.advance()) {
-            for(DBIDIter iter2 = clusters.get(j).iter(); iter2.valid(); iter2.advance()) {
-              if(DBIDUtil.equal(miter2, iter2)) {
-                continue;
-              }
-              double distcur = distQ.distance(iter2, miter2);
-              double distnew = distQ.distance(iter2, iter);
-              if(j == i) {
-                // Cases 1 and 2.
-                double distsec = second.doubleValue(iter2);
-                cost += (distcur > distsec) ? //
-                // Case 1, other would switch to a third medoid
-                distsec - distcur // Always positive!
-                : // Would remain with the candidate
-                distnew - distcur; // Could be negative
-              }
-              else {
-                // Cases 3-4: objects from other clusters
-                // Case 3: is no change
-                if(distcur > distnew) {
-                  // Case 4: would switch to new medoid
-                  cost += distnew - distcur; // Always negative
-                }
-              }
+          // This is an improvement over the original PAM. We do not consider
+          // arbitrary pairs (i,h) and points j, but only those where i
+          // is the current nearest medoid of j. Since we remembered the
+          // distance to the second nearest medoid, we do not need to consider
+          // any other option.
+          double distcur = nearest.doubleValue(j); // Current assignment.
+          // = distance (j, i), because j is assigned to i
+          double dist_h = distQ.distance(j, h); // Possible reassignment.
+          if(pi == pm) { // Within the cluster of h and j
+            // Distance to second best medoid for j
+            double distsec = second.doubleValue(j);
+            cost += (dist_h < distsec) ? //
+            // Case 1b1) j is closer to h
+            dist_h - distcur
+            // Case 1b2) j would switch to a third medoid
+            : distsec - distcur;
+          }
+          else {
+            // Case 1c) j is closer to h than its current medoid
+            if(dist_h < distcur) {
+              cost += dist_h - distcur;
             }
+            // else Case 1a): j is closer to i than h and m, so no change.
           }
-          if(cost < best) {
-            best = cost;
-            bestid.set(iter);
-            bestcluster = i;
-          }
+        }
+        if(cost < best) {
+          best = cost;
+          bestid.set(h);
+          bestcluster = pm;
         }
       }
       if(LOG.isDebugging()) {
         LOG.debug("Best cost: " + best);
       }
-      if(best < 0.) {
-        changed = true;
-        medoids.set(bestcluster, bestid);
+      if(best >= 0.) {
+        break;
       }
+      medoids.set(bestcluster, bestid);
       // Reassign
-      if(changed) {
-        // TODO: can we save some of these recomputations?
-        assignToNearestCluster(medoids, ids, second, clusters, distQ);
-      }
+      // TODO: can we save some of these computations?
+      assignToNearestCluster(medoids, ids, nearest, second, assignment, distQ);
     }
     LOG.setCompleted(prog);
     if(LOG.isStatistics()) {
@@ -266,21 +253,22 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * 
    * @param means Object centroids
    * @param ids Object ids
+   * @param nearest Distance to nearest medoid
    * @param second Distance to second nearest medoid
-   * @param clusters cluster assignment
+   * @param assignment Cluster assignment
    * @param distQ distance query
    * @return true when any object was reassigned
    */
-  protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore second, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V> distQ) {
+  protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore nearest, WritableDoubleDataStore second, WritableIntegerDataStore assignment, DistanceQuery<V> distQ) {
     boolean changed = false;
+    assert(means.size() == k);
     DBIDArrayIter miter = means.iter();
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY,
           mindist2 = Double.POSITIVE_INFINITY;
       int minIndex = -1;
-      miter.seek(0); // Reuse iterator.
-      for(int i = 0; miter.valid(); miter.advance(), i++) {
-        double dist = distQ.distance(iditer, miter);
+      for(int i = 0; i < k; i++) {
+        double dist = distQ.distance(iditer, miter.seek(i));
         if(dist < mindist) {
           minIndex = i;
           mindist2 = mindist;
@@ -290,16 +278,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
           mindist2 = dist;
         }
       }
-      if(clusters.get(minIndex).add(iditer)) {
-        changed = true;
-        // Remove from previous cluster
-        // TODO: keep a list of cluster assignments to save this search?
-        for(int j = 0; j < k; j++) {
-          if(j != minIndex && clusters.get(j).remove(iditer)) {
-            break;
-          }
-        }
-      }
+      changed |= (assignment.put(iditer, minIndex) != minIndex);
+      nearest.put(iditer, mindist);
       second.put(iditer, mindist2);
     }
     return changed;

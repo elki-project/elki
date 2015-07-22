@@ -1,43 +1,19 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -68,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  *
  * @param <V> Vector type
  */
-@Reference(authors = "L. Kaufman, P. J. Rousseeuw",//
+@Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
 title = "Clustering Large Data Sets (with discussion)", //
 booktitle = "Pattern Recognition in Practice II")
 public class CLARA<V> extends KMedoidsPAM<V> {
@@ -121,7 +97,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
 
     double best = Double.POSITIVE_INFINITY;
     ArrayModifiableDBIDs bestmedoids = null;
-    List<ModifiableDBIDs> bestclusters = null;
+    WritableIntegerDataStore bestclusters = null;
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Random samples.", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
@@ -129,26 +105,36 @@ public class CLARA<V> extends KMedoidsPAM<V> {
       // Choose initial medoids
       ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
       // Setup cluster assignment store
-      List<ModifiableDBIDs> clusters = new ArrayList<>();
-      for(int i = 0; i < k; i++) {
-        clusters.add(DBIDUtil.newHashSet(relation.size() / k));
-      }
-      runPAMOptimization(distQ, rids, medoids, clusters);
-      double score = assignRemainingToNearestCluster(medoids, ids, rids, clusters, distQ);
+      WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+      runPAMOptimization(distQ, rids, medoids, assignment);
+      double score = assignRemainingToNearestCluster(medoids, ids, rids, assignment, distQ);
       if(score < best) {
         best = score;
         bestmedoids = medoids;
-        bestclusters = clusters;
+        bestclusters = assignment;
       }
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
 
+    // Rewrap result
+    int[] sizes = new int[k];
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      sizes[bestclusters.intValue(iter)] += 1;
+    }
+    ArrayModifiableDBIDs[] clusters = new ArrayModifiableDBIDs[k];
+    for(int i = 0; i < k; i++) {
+      clusters[i] = DBIDUtil.newArray(sizes[i]);
+    }
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      clusters[bestclusters.intValue(iter)].add(iter);
+    }
+
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("CLARA Clustering", "clara-clustering");
     for(DBIDArrayIter it = bestmedoids.iter(); it.valid(); it.advance()) {
       MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
-      result.addToplevelCluster(new Cluster<>(bestclusters.get(it.getOffset()), model));
+      result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], model));
     }
     return result;
   }
@@ -160,11 +146,11 @@ public class CLARA<V> extends KMedoidsPAM<V> {
    * @param means Object centroids
    * @param ids Object ids
    * @param rids Sample that was already assigned
-   * @param clusters cluster assignment
+   * @param assignment cluster assignment
    * @param distQ distance query
    * @return Sum of distances.
    */
-  protected double assignRemainingToNearestCluster(ArrayDBIDs means, DBIDs ids, DBIDs rids, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V> distQ) {
+  protected double assignRemainingToNearestCluster(ArrayDBIDs means, DBIDs ids, DBIDs rids, WritableIntegerDataStore assignment, DistanceQuery<V> distQ) {
     rids = DBIDUtil.ensureSet(rids); // Ensure we have fast contains
     double distsum = 0.;
     DBIDArrayIter miter = means.iter();
@@ -183,7 +169,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
         }
       }
       distsum += mindist;
-      clusters.get(minIndex).add(iditer);
+      assignment.put(iditer, minIndex);
     }
     return distsum;
   }
