@@ -212,7 +212,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
             nextevent = Event.NEXT_OBJECT;
             return Event.META_CHANGED;
           }
-          else if(curlbl != null && meta != null && meta.size() == 1) {
+          else if(curlbl != null && meta != null && haslabels && meta.size() == 1) {
             buildMeta();
             nextevent = Event.NEXT_OBJECT;
             return Event.META_CHANGED;
