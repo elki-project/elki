@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -113,7 +114,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       return new Clustering<>("PAM Clustering", "pam-clustering");
     }
     DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    if(distQ == null) {
+    DBIDs ids = relation.getDBIDs();
+    if(distQ == null && ids instanceof DBIDRange) {
       LOG.verbose("Adding a distance matrix index to accelerate PAM.");
       PrecomputedDistanceMatrix<V> idx = new PrecomputedDistanceMatrix<V>(relation, getDistanceFunction());
       idx.initialize();
@@ -123,7 +125,6 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
       distQ = database.getDistanceQuery(relation, getDistanceFunction());
       LOG.warning("PAM may be slow, because we do not have a precomputed distance matrix available.");
     }
-    DBIDs ids = relation.getDBIDs();
     // Choose initial medoids
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
