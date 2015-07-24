@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -107,8 +109,9 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
     DBIDs best = DBIDUtil.EMPTYDBIDS;
     double tresh = ChiSquaredDistribution.quantile(0.85, dim);
 
+    Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < iterations; i++) {
-      DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, rnd);
+      DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, random);
       CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
       Vector centroid = cv.getMeanVector();
       Matrix p = cv.destroyToSampleMatrix().inverse();
