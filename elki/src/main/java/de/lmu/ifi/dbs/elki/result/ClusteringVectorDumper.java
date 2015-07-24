@@ -58,7 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * </p>
  * 
  * This format can be read using {@link ClusteringVectorParser} for meta
- * analysis, or read as clustering using {@link ExternalClustering}.
+ * analysis, or read as clustering using
+ * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.meta.ExternalClustering}.
  * 
  * @author Erich Schubert
  */
