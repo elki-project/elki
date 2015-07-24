@@ -178,8 +178,8 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     // Swap phase
     DBIDVar bestid = DBIDUtil.newVar();
     DBIDArrayIter m = medoids.iter(), i = medoids.iter();
-    int iteration = 0;
-    for(; maxiter <= 0 || iteration < maxiter; iteration++) {
+    int iteration = 1;
+    for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       // Try to swap a medoid with a better non-medoid member:
       double best = Double.POSITIVE_INFINITY;
