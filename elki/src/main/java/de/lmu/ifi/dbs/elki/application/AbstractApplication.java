@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.application;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Properties;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
@@ -73,14 +74,38 @@ public abstract class AbstractApplication {
   private static final String NEWLINE = System.getProperty("line.separator");
 
   /**
+   * Version information.
+   */
+  public static final String VERSION;
+
+  /**
+   * Get the version number from the properties.
+   */
+  static {
+    String version = "DEVELOPMENT";
+    try {
+      Properties prop = new Properties();
+      prop.load(AbstractApplication.class.getClassLoader().getResourceAsStream("META-INF/elki.properties"));
+      version = prop.getProperty("elki.version");
+    }
+    catch(Exception e) {
+    }
+    VERSION = version;
+  }
+
+  /**
+   * Version number of the reference below.
+   */
+  private static final String REFERENCE_VERSION = "0.7.0";
+
+  /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "ELKI Version 0.6.0 (2014, January)" + NEWLINE + NEWLINE //
-      + "published in:" + NEWLINE //
-      + "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:" + NEWLINE //
-      + "Interactive Data Mining with 3D-Parallel-Coordinate-Trees." + NEWLINE //
-      + "In Proceedings of the ACM International Conference on " + NEWLINE //
-      + "Management of Data (SIGMOD), New York City, NY, 2013." + NEWLINE;
+  public static final String REFERENCE = "ELKI Release 0.7.0 (2015, August) published in:" + NEWLINE + NEWLINE //
+  + "Erich Schubert, Alexander Koos, Tobias Emrich," + NEWLINE //
+  + "Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek:" + NEWLINE //
+  + "A Framework for Clustering Uncertain Data." + NEWLINE //
+  + "In Proceedings of the VLDB Endowment, 8(12), 2015." + NEWLINE;
 
   /**
    * Constructor.
@@ -177,7 +202,10 @@ public abstract class AbstractApplication {
    */
   public static String usage(Collection<TrackedParameter> options) {
     StringBuilder usage = new StringBuilder();
-    usage.append(INFORMATION);
+    if(!REFERENCE_VERSION.equals(VERSION)) {
+      usage.append("ELKI build: " + VERSION + NEWLINE + NEWLINE);
+    }
+    usage.append(REFERENCE);
 
     // Collect options
     usage.append(NEWLINE).append("Parameters:").append(NEWLINE);
