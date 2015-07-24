@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements DistanceIndex<O> {
+public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements DistanceIndex<O> {
   /**
    * Class logger.
    */
@@ -89,7 +89,7 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
    * Size of DBID range.
    */
   private int size;
-  
+
   /**
    * Constructor.
    * 
@@ -130,7 +130,9 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
       for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
         matrix[pos] = distanceQuery.distance(ix, iy);
         pos++;
-        LOG.incrementProcessed(prog);
+      }
+      if(prog != null) {
+        prog.setProcessed(prog.getProcessed() + ix.getOffset(), LOG);
       }
     }
     LOG.ensureCompleted(prog);
