@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -108,8 +109,8 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
     ArrayList<Cluster<PrototypeModel<O>>> clusters = new ArrayList<>();
     final int size = relation.size();
 
-    if(t1 <= t2) {
-      LOG.warning(Parameterizer.T1_ID.getName() + " must be larger than " + Parameterizer.T2_ID.getName());
+    if(!(t1 >= t2)) {
+      throw new AbortException("T1 must be at least as large as T2.");
     }
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Canopy clustering", size, LOG) : null;
@@ -117,22 +118,20 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
     DBIDVar first = DBIDUtil.newVar();
     while(!ids.isEmpty()) {
       // Remove first element:
-      DBIDMIter iter = ids.iter();
-      first.set(iter);
-      iter.remove();
-      iter.advance();
+      ids.pop(first);
 
       // Start a new cluster:
       ModifiableDBIDs cids = DBIDUtil.newArray();
       cids.add(first);
 
       // Compare to remaining objects:
-      for(; iter.valid(); iter.advance()) {
+      for(DBIDMIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double dist = dq.distance(first, iter);
         // Inclusion threshold:
-        if(dist <= t1) {
-          cids.add(iter);
+        if(dist > t1) {
+          continue;
         }
+        cids.add(iter);
         // Removal threshold:
         if(dist <= t2) {
           iter.remove();
