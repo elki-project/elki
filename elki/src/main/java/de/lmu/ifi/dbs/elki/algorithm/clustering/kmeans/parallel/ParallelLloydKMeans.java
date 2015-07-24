@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -38,10 +38,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -105,18 +103,11 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
     LOG.setCompleted(prog);
 
     // Wrap result
-    List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for (int i = 0; i < k; i++) {
-      // TODO: use cluster sizes from kmm!
-      clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
-    }
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      clusters.get(assignment.intValue(iter)).add(iter);
-    }
+    ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, k);
 
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for (int i = 0; i < clusters.size(); i++) {
-      DBIDs cids = clusters.get(i);
+    for (int i = 0; i < clusters.length; i++) {
+      DBIDs cids = clusters[i];
       if (cids.size() == 0) {
         continue;
       }

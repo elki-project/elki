@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.PAMInitialMeans;
@@ -141,18 +142,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
     runPAMOptimization(distQ, ids, medoids, assignment);
 
-    // Rewrap result
-    int[] sizes = new int[k];
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      sizes[assignment.intValue(iter)] += 1;
-    }
-    ArrayModifiableDBIDs[] clusters = new ArrayModifiableDBIDs[k];
-    for(int i = 0; i < k; i++) {
-      clusters[i] = DBIDUtil.newArray(sizes[i]);
-    }
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      clusters[assignment.intValue(iter)].add(iter);
-    }
+    ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, k);
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("PAM Clustering", "pam-clustering");

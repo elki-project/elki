@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,8 +24,7 @@ import java.util.Random;
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -143,18 +143,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     }
     LOG.ensureCompleted(prog);
 
-    // Rewrap result
-    int[] sizes = new int[k];
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      sizes[bestclusters.intValue(iter)] += 1;
-    }
-    ArrayModifiableDBIDs[] clusters = new ArrayModifiableDBIDs[k];
-    for(int i = 0; i < k; i++) {
-      clusters[i] = DBIDUtil.newArray(sizes[i]);
-    }
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      clusters[bestclusters.intValue(iter)].add(iter);
-    }
+    ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, bestclusters, k);
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>("CLARA Clustering", "clara-clustering");
