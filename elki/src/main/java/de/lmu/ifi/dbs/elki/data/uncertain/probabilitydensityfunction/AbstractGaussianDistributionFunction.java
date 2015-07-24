@@ -83,7 +83,7 @@ public abstract class AbstractGaussianDistributionFunction<V> extends Probabilit
   
   protected List<DoubleVector> means;
   protected List<V> variances;
-  protected List<Integer> weights;
+  protected int[] weights;
   protected int weightMax = UOModel.PROBABILITY_SCALE; // reset by constructor
   // in case no bounded sample has been found
   protected static DoubleVector noSample = new DoubleVector(new double[] {Double.NEGATIVE_INFINITY}); 
@@ -104,16 +104,16 @@ public abstract class AbstractGaussianDistributionFunction<V> extends Probabilit
     this.means.set(position, mean);
   }
   
-  public void setWeights(final List<Integer> weights) {
+  public void setWeights(final int[] weights) {
     this.weights = weights;
   }
   
-  public List<Integer> getWeights() {
+  public int[] getWeights() {
     return this.weights;
   }
   
   public int getWeight(final int position) {
-    return this.weights.get(position);
+    return this.weights[position];
   }
   
   public void setVariances(final List<V> variances) {

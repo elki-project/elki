@@ -45,21 +45,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  *
- * ProbabilityDensityFunction class to model n-variate gaussian
- * distributions.
+ * ProbabilityDensityFunction class to model n-variate gaussian distributions.
  *
  * Used for construction of {@link UncertainObject}, filtering with
- * {@link UncertainifyFilter} and sampling with
- * {@link PWCClusteringAlgorithm}.
+ * {@link UncertainifyFilter} and sampling with {@link PWCClusteringAlgorithm}.
  *
  * @author Alexander Koos
  *
  */
 public class MultivariateGaussianDistributionFunction extends AbstractGaussianDistributionFunction<Matrix> {
-
   /**
-   * Flag specifying if covariance matrices are randomly generated
-   * during uncertainification.
+   * Flag specifying if covariance matrices are randomly generated during
+   * uncertainification.
    */
   private boolean rotate;
 
@@ -110,8 +107,8 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
    * @param variances
    * @param weights
    */
-  public MultivariateGaussianDistributionFunction(final List<DoubleVector> means, final List<Matrix> variances, final List<Integer> weights) {
-    if(means.size() != variances.size() || (weights != null && variances.size() != weights.size())) {
+  public MultivariateGaussianDistributionFunction(final List<DoubleVector> means, final List<Matrix> variances, final int[] weights) {
+    if(means.size() != variances.size() || (weights != null && variances.size() != weights.length)) {
       throw new IllegalArgumentException("[W: ]\tSize of 'means' and 'variances' has to be the same, also Dimensionality of weights.");
     }
     for(int i = 0; i < means.size(); i++) {
@@ -120,19 +117,17 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
       }
     }
     if(weights == null) {
-      this.weights = new ArrayList<Integer>();
-      if(means.size() == 1) {
-        this.weights.add(Integer.valueOf(UOModel.PROBABILITY_SCALE));
-      } else {
-        for(int i = 0; i < means.size(); i++) {
-          this.weights.add(Integer.valueOf(UOModel.PROBABILITY_SCALE / means.size()));
-        }
+      this.weights = new int[means.size()];
+      final int c = UOModel.PROBABILITY_SCALE / means.size();
+      for(int i = 0; i < means.size(); i++) {
+        this.weights[i] = c;
       }
-    } else {
+    }
+    else {
       this.weights = weights;
       this.weightMax = 0;
-      for(int i = 0; i < weights.size(); i++) {
-        this.weightMax += weights.get(i);
+      for(int i = 0; i < weights.length; i++) {
+        this.weightMax += weights[i];
       }
     }
     this.means = means;
@@ -145,10 +140,10 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
     final double[] values = new double[bounds.getDimensionality()];
 
     for(int j = 0; j < UOModel.DEFAULT_TRY_LIMIT; j++) {
-      if(this.weights.size() > 1) {
+      if(this.weights.length > 1) {
         index = UncertainUtil.drawIndexFromIntegerWeights(rand, this.weights, this.weightMax);
       }
-      boolean inBounds = index < this.weights.size();
+      boolean inBounds = index < this.weights.length;
 
       if(!inBounds) {
         continue;
@@ -156,7 +151,7 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
       for(int i = 0; i < values.length; i++) {
         values[i] = rand.nextGaussian();
       }
-      final double[] result = this.variances.get(index).getColumnDimensionality() > 1 ? (this.means.get(index).getColumnVector()).plus((new CholeskyDecomposition(this.variances.get(index))).getL().times(new Vector(values))).getArrayCopy() : this.getGaussianDrawnVector(this.means.get(index).getColumnVector(), Math.sqrt(this.variances.get(index).get(0,0)), new Vector(values));
+      final double[] result = this.variances.get(index).getColumnDimensionality() > 1 ? (this.means.get(index).getColumnVector()).plus((new CholeskyDecomposition(this.variances.get(index))).getL().times(new Vector(values))).getArrayCopy() : this.getGaussianDrawnVector(this.means.get(index).getColumnVector(), Math.sqrt(this.variances.get(index).get(0, 0)), new Vector(values));
       for(int i = 0; i < result.length; i++) {
         inBounds &= result[i] <= bounds.getMax(i) && result[i] >= bounds.getMin(i);
       }
@@ -176,15 +171,14 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
 
   /**
    *
-   * For a list of covariance matrices given look up
-   * the values from their CholeskyDecompositions diagonal
-   * and give them back as a list of vectors.
+   * For a list of covariance matrices given look up the values from their
+   * CholeskyDecompositions diagonal and give them back as a list of vectors.
    *
-   * The values of those vectors describe variances for
-   * the particular dimensions.
+   * The values of those vectors describe variances for the particular
+   * dimensions.
    *
-   * Iff the matrices are scalar (1x1) the vector will also be scalar
-   * (just 1 row).
+   * Iff the matrices are scalar (1x1) the vector will also be scalar (just 1
+   * row).
    *
    * @param variances
    * @return
@@ -194,7 +188,7 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
     for(int i = 0; i < variances.size(); i++) {
       final double[] vector = new double[variances.get(i).getColumnDimensionality()];
       for(int j = 0; j < variances.get(0).getColumnDimensionality(); j++) {
-        vector[j] = (new CholeskyDecomposition(variances.get(i))).getL().get(j,j);
+        vector[j] = (new CholeskyDecomposition(variances.get(i))).getL().get(j, j);
       }
       deviationVectors.add(new DoubleVector(vector));
     }
@@ -202,12 +196,12 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   }
 
   @Override
-  public UncertainObject<UOModel<SpatialComparable>> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
+  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
     final int multiplicity = this.urand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
     final List<DoubleVector> means = new ArrayList<DoubleVector>();
     final List<Matrix> variances = new ArrayList<Matrix>();
-    List<Integer> weights = new ArrayList<Integer>();
-    if( uncertainify ) {
+    int[] weights;
+    if(uncertainify) {
       weights = UncertainUtil.calculateRandomIntegerWeights(multiplicity, this.weightMax, this.urand);
       for(int h = 0; h < multiplicity; h++) {
         final double[] imeans = new double[vec.getDimensionality()];
@@ -216,20 +210,19 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
         for(int i = 0; i < UOModel.DEFAULT_TRY_LIMIT; i++) {
           final Matrix ivariances = this.randomDrawCovMatrix(this.rotate, vec.getDimensionality());
           for(int j = 0; j < vec.getDimensionality(); j++) {
-            imeans[j] = vec.getMax(j) + ( blur ? ( this.urand.nextInt(2) == 1 ? this.urand.nextGaussian() * minBound :
-              this.urand.nextGaussian() * maxBound ) : 0 );
+            imeans[j] = vec.getMax(j) + (blur ? (this.urand.nextInt(2) == 1 ? this.urand.nextGaussian() * minBound : this.urand.nextGaussian() * maxBound) : 0);
           }
           final double[] result = ivariances.getColumnDimensionality() > 1 ? (vec.getColumnVector()).plus((new CholeskyDecomposition(ivariances).getL()).times(new Vector(imeans))).getArrayCopy() : this.getGaussianDrawnVector(vec.getColumnVector(), Math.sqrt(ivariances.get(0, 0)), new Vector(imeans));
           boolean valid = true;
           for(int j = 0; j < vec.getDimensionality(); j++) {
-            valid &= ( result[j] >= vec.doubleValue(j) - minBound )
-                && ( result[j] <= vec.doubleValue(j) + maxBound );
+            valid &= (result[j] >= vec.doubleValue(j) - minBound) && (result[j] <= vec.doubleValue(j) + maxBound);
           }
           if(valid && i < (UOModel.DEFAULT_TRY_LIMIT - 1)) {
             means.add(new DoubleVector(result));
             variances.add(ivariances);
             break;
-          } else if(!valid && i == (UOModel.DEFAULT_TRY_LIMIT - 1)) {
+          }
+          else if(!valid && i == (UOModel.DEFAULT_TRY_LIMIT - 1)) {
             final double[] noResult = new double[vec.getDimensionality()];
             for(int k = 0; k < noResult.length; k++) {
               noResult[k] = Double.MAX_VALUE;
@@ -239,33 +232,29 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
           }
         }
       }
-    } else {
-      final int buildFac = this.rotate ? ( dims * (( dims - 1 ) + 2) + 1 ) : dims + 2 ;
-      for( int i = 0, mark = 1;
-          i < ( vec.getDimensionality() / (
-              this.rotate ? 1 + dims * ( ( dims - 1 ) + 2 )
-                  : 2 + dims )
-              );
-          i++, mark++ ) {
-        weights.add(Integer.valueOf((int) vec.doubleValue( i * buildFac )));
+    }
+    else {
+      final int buildFac = this.rotate ? (dims * ((dims - 1) + 2) + 1) : dims + 2;
+      final int s = vec.getDimensionality() / (this.rotate ? 1 + dims * ((dims - 1) + 2) : 2 + dims);
+      weights = new int[s];
+      for(int i = 0, mark = 1; i < s; i++, mark++) {
+        weights[i] = (int) vec.doubleValue(i * buildFac);
         means.add(this.getMeanVector(vec, dims, i * buildFac, mark));
-        if( this.rotate ) {
+        if(this.rotate) {
           variances.add(this.getMatrixFromData(vec, dims, i, mark + dims));
-        } else {
-          variances.add(new Matrix(new double[][] {{ vec.doubleValue( i + buildFac + 1 + mark ) }}));
+        }
+        else {
+          variances.add(new Matrix(new double[][] { { vec.doubleValue(i + buildFac + 1 + mark) } }));
         }
       }
     }
 
-    return new UncertainObject<UOModel<SpatialComparable>>(new ContinuousUncertainObject<MultivariateGaussianDistributionFunction>(
-        new MultivariateGaussianDistributionFunction(means, variances, weights),
-        vec.getDimensionality()), new DoubleVector(vec.getColumnVector()));
+    return new UncertainObject<UOModel>(new ContinuousUncertainObject<MultivariateGaussianDistributionFunction>(new MultivariateGaussianDistributionFunction(means, variances, weights), vec.getDimensionality()), new DoubleVector(vec.getColumnVector()));
   }
 
   /**
    *
-   * Extracts the vector of means from a given
-   * vector of input data.
+   * Extracts the vector of means from a given vector of input data.
    *
    * @param vec
    * @param dims
@@ -276,16 +265,15 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   private DoubleVector getMeanVector(final NumberVector vec, final int dims, final int pos, final int mark) {
     final double[] means = new double[dims];
     for(int i = 0; i < dims; i++) {
-      means[i] = vec.doubleValue( pos + mark + i);
+      means[i] = vec.doubleValue(pos + mark + i);
     }
     return new DoubleVector(means);
   }
 
   /**
    *
-   * Extracts a covariance matrix from a given
-   * vector of input data containing the matrix'
-   * serialized form.
+   * Extracts a covariance matrix from a given vector of input data containing
+   * the matrix' serialized form.
    *
    * @param vec
    * @param dims
@@ -298,7 +286,7 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
     int ind = 0;
     for(int i = 0; i < dims; i++) {
       for(int j = 0; j < i || j == 0; j++) {
-        matrix[i][j] = tmatrix[j][i] = vec.doubleValue( pos * ( dims * ( ( dims - 1 ) + 1 ) ) + mark + ind++ );
+        matrix[i][j] = tmatrix[j][i] = vec.doubleValue(pos * (dims * ((dims - 1) + 1)) + mark + ind++);
       }
     }
     return (new Matrix(matrix)).times((new Matrix(tmatrix)));
@@ -306,9 +294,9 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
 
   /**
    *
-   * Iff rotate: randomly generate covariance matrix by multiplying
-   * one lower triangular matrix with its transposed.
-   * That way drawn samples will be rotated in their space.
+   * Iff rotate: randomly generate covariance matrix by multiplying one lower
+   * triangular matrix with its transposed. That way drawn samples will be
+   * rotated in their space.
    *
    * Else: randomly generate a scalar variance.
    *
@@ -343,10 +331,10 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
     protected boolean rotate;
 
     /**
-     * Parameter to specify if randomly generated covariance
-     * matrices shall be used.
+     * Parameter to specify if randomly generated covariance matrices shall be
+     * used.
      */
-    public static final OptionID ROTATE_ID = new OptionID("uo.rotate","Create randomized covariance matrix. Else use scalar variance (1x1 CovMatrix).");
+    public static final OptionID ROTATE_ID = new OptionID("uo.rotate", "Create randomized covariance matrix. Else use scalar variance (1x1 CovMatrix).");
 
     @Override
     protected void makeOptions(final Parameterization config) {
@@ -366,19 +354,9 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
 
   @Override
   public void writeToText(final TextWriterStream out, final String label) {
-    String res = "";
-    if(label != null) {
-      for(int i = 0; i < this.means.size(); i++) {
-        res += label + "= " + "mean_" + i + ": " + this.means.get(i).toString()
-            + "\n" + "\t variance_" + i + ": " + this.variances.get(i).toString()
-            + "\n" + "\t weight_" + i + ": " + this.weights.get(i) + "\n";
-      }
-    } else {
-      for(int i = 0; i < this.means.size(); i++) {
-        res += "mean_" + i + ": " + this.means.get(i).toString()
-            + "\n" + "\t variance_" + i + ": " + this.variances.get(i).toString()
-            + "\n" + "\t weight_" + i + ": " + this.weights.get(i) + "\n";
-      }
+    String res = label + "= ";
+    for(int i = 0; i < this.means.size(); i++) {
+      res += "mean_" + i + ": " + this.means.get(i).toString() + "\n" + "\t variance_" + i + ": " + this.variances.get(i).toString() + "\n" + "\t weight_" + i + ": " + this.weights[i] + "\n";
     }
     out.inlinePrintNoQuotes(res);
   }

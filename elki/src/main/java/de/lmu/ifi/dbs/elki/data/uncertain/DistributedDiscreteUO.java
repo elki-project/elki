@@ -1,22 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -39,27 +22,36 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
-public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<Pair<DoubleVector,Integer>>> {
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
+public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<Pair<DoubleVector, Integer>>> {
 
   private int totalProbability;
-  private final static DoubleVector noObjectChosen = new DoubleVector(new double[] {Double.NEGATIVE_INFINITY});
 
-  private double minMin;
+  private final static DoubleVector noObjectChosen = new DoubleVector(new double[] { Double.NEGATIVE_INFINITY });
 
-  private double maxMin;
+  private double minMin, maxMin, minMax, maxMax;
 
-  private double minMax;
-
-  private double maxMax;
-
-  private long multMin;
-
-  private long multMax;
+  private long multMin, multMax;
 
   private Random drand;
 
-  //Constructor for uncertainifyFilter-use
+  // Constructor for uncertainifyFilter-use
   //
   // This one is basically constructing a Factory,
   // one could argue that it would be better practice
@@ -81,24 +73,27 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
   }
 
   // Constructor
-  public DistributedDiscreteUO(final List<Pair<DoubleVector,Integer>> samplePoints) {
+  public DistributedDiscreteUO(final List<Pair<DoubleVector, Integer>> samplePoints) {
     this(samplePoints, new RandomFactory(null));
   }
 
   // Constructor
-  public DistributedDiscreteUO(final List<Pair<DoubleVector,Integer>> samplePoints, final RandomFactory randomFactory) {
+  public DistributedDiscreteUO(final List<Pair<DoubleVector, Integer>> samplePoints, final RandomFactory randomFactory) {
     int check = 0;
-    for(final Pair<DoubleVector,Integer> pair: samplePoints) {
+    for(final Pair<DoubleVector, Integer> pair : samplePoints) {
       if(pair.getSecond() < 0) {
         throw new IllegalArgumentException("[W: ]\tA probability less than 0 is not possible.");
       }
       check += pair.getSecond();
     }
 
-    // User of this class should think of a way to handle possible exception at this point
+    // User of this class should think of a way to handle possible exception at
+    // this point
     // to not find their program crashing without need.
-    // To avoid misunderstanding one could compile a ".*total of 1\.$"-like pattern against
-    // raised IllegalArgumentExceptions and thereby customize his handle for this case.
+    // To avoid misunderstanding one could compile a ".*total of 1\.$"-like
+    // pattern against
+    // raised IllegalArgumentExceptions and thereby customize his handle for
+    // this case.
     if(check > UOModel.PROBABILITY_SCALE) {
       throw new IllegalArgumentException("[W: ]\tThe sum of probabilities exceeded a total of 1.");
     }
@@ -118,18 +113,17 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
 
   @Override
   public DoubleVector drawSample() {
-    final List<Integer> weights = new ArrayList<Integer>();
-
+    final int[] weights = new int[this.samplePoints.size()];
     for(int i = 0; i < this.samplePoints.size(); i++) {
-      weights.add(this.samplePoints.get(i).getSecond());
+      weights[i] = this.samplePoints.get(i).getSecond();
     }
 
     final int ind = UncertainUtil.drawIndexFromIntegerWeights(this.rand, weights, this.totalProbability);
 
-    return ind < this.samplePoints.size() ? this.samplePoints.get( ind ).getFirst() : DistributedDiscreteUO.noObjectChosen;
+    return ind < this.samplePoints.size() ? this.samplePoints.get(ind).getFirst() : DistributedDiscreteUO.noObjectChosen;
   }
 
-  public void addSamplePoint(final Pair<DoubleVector,Integer> samplePoint) {
+  public void addSamplePoint(final Pair<DoubleVector, Integer> samplePoint) {
     this.samplePoints.add(samplePoint);
     final int check = this.totalProbability;
     if(check + samplePoint.getSecond() > UOModel.PROBABILITY_SCALE) {
@@ -144,8 +138,8 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     Arrays.fill(min, Double.MAX_VALUE);
     final double max[] = new double[this.dimensions];
     Arrays.fill(max, -Double.MAX_VALUE);
-    for(final Pair<DoubleVector,Integer> samplePoint: this.samplePoints){
-      for(int d = 0; d < this.dimensions; d++){
+    for(final Pair<DoubleVector, Integer> samplePoint : this.samplePoints) {
+      for(int d = 0; d < this.dimensions; d++) {
         min[d] = Math.min(min[d], samplePoint.getFirst().doubleValue(d));
         max[d] = Math.max(max[d], samplePoint.getFirst().doubleValue(d));
       }
@@ -159,18 +153,18 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
   }
 
   @Override
-  public UncertainObject<UOModel<SpatialComparable>> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
-    final List<Pair<DoubleVector,Integer>> sampleList = new ArrayList<Pair<DoubleVector,Integer>>();
-    if( uncertainify ) {
+  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
+    final List<Pair<DoubleVector, Integer>> sampleList = new ArrayList<Pair<DoubleVector, Integer>>();
+    if(uncertainify) {
       final int genuine = this.rand.nextInt(vec.getDimensionality());
       final double difMin = this.rand.nextDouble() * (this.maxMin - this.minMin) + this.minMin;
       final double difMax = this.rand.nextDouble() * (this.maxMax - this.minMax) + this.minMax;
-      final double randDev = blur ? ( this.rand.nextInt(2) == 0 ? this.rand.nextDouble() * -difMin : this.rand.nextDouble() * difMax ) : 0;
+      final double randDev = blur ? (this.rand.nextInt(2) == 0 ? this.rand.nextDouble() * -difMin : this.rand.nextDouble() * difMax) : 0;
       final int distributionSize = this.rand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
-      final List<Integer> iweights = UncertainUtil.calculateRandomIntegerWeights(distributionSize, this.totalProbability, this.rand);
+      final int[] iweights = UncertainUtil.calculateRandomIntegerWeights(distributionSize, this.totalProbability, this.rand);
       for(int i = 0; i < distributionSize; i++) {
         if(i == genuine) {
-          sampleList.add(new Pair<DoubleVector,Integer>(new DoubleVector(vec.getColumnVector()), iweights.get(i)));
+          sampleList.add(new Pair<DoubleVector, Integer>(new DoubleVector(vec.getColumnVector()), iweights[i]));
           continue;
         }
         final double[] spair = new double[vec.getDimensionality()];
@@ -178,34 +172,28 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
           final double gtv = vec.doubleValue(j);
           spair[j] = gtv + this.rand.nextDouble() * difMax - this.rand.nextDouble() * difMin + randDev;
         }
-        sampleList.add(new Pair<DoubleVector,Integer>(new DoubleVector(spair), iweights.get(i)));
+        sampleList.add(new Pair<DoubleVector, Integer>(new DoubleVector(spair), iweights[i]));
       }
-    } else {
+    }
+    else {
       final double[] val = new double[dims];
       for(int i = 0; i < vec.getDimensionality(); i++) {
-        if(i % ( dims + 1 ) == dims) {
-          sampleList.add(new Pair<DoubleVector,Integer>(new DoubleVector(val), Integer.valueOf((int) vec.doubleValue(i))));
-        } else {
+        if(i % (dims + 1) == dims) {
+          sampleList.add(new Pair<DoubleVector, Integer>(new DoubleVector(val), Integer.valueOf((int) vec.doubleValue(i))));
+        }
+        else {
           val[i % dims] = vec.doubleValue(i);
         }
       }
     }
-    return new UncertainObject<UOModel<SpatialComparable>>(new DistributedDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), new DoubleVector(vec.getColumnVector()));
+    return new UncertainObject<UOModel>(new DistributedDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), new DoubleVector(vec.getColumnVector()));
   }
 
   public static class Parameterizer extends AbstractParameterizer {
 
-    protected double minMin;
+    protected double minMin, maxMin, minMax, maxMax;
 
-    protected double maxMin;
-
-    protected double minMax;
-
-    protected double maxMax;
-
-    protected long multMin;
-
-    protected long multMax;
+    protected long multMin, multMax;
 
     protected RandomFactory randFac;
 
@@ -213,23 +201,23 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
 
     protected double maxTotalProb;
 
-    public static final OptionID MIN_MIN_ID = new OptionID("objects.lbound.min","Minimum lower boundary.");
+    public static final OptionID MIN_MIN_ID = new OptionID("objects.lbound.min", "Minimum lower boundary.");
 
-    public static final OptionID MAX_MIN_ID = new OptionID("objects.lbound.max","Maximum lower boundary.");
+    public static final OptionID MAX_MIN_ID = new OptionID("objects.lbound.max", "Maximum lower boundary.");
 
-    public static final OptionID MIN_MAX_ID = new OptionID("objects.ubound.min","Minimum upper boundary.");
+    public static final OptionID MIN_MAX_ID = new OptionID("objects.ubound.min", "Minimum upper boundary.");
 
-    public static final OptionID MAX_MAX_ID = new OptionID("objects.ubound.max","Maximum upper boundary.");
+    public static final OptionID MAX_MAX_ID = new OptionID("objects.ubound.max", "Maximum upper boundary.");
 
-    public static final OptionID MULT_MIN_ID = new OptionID("uo.mult.min","Minimum Points per uncertain object.");
+    public static final OptionID MULT_MIN_ID = new OptionID("uo.mult.min", "Minimum Points per uncertain object.");
 
-    public static final OptionID MULT_MAX_ID = new OptionID("uo.mult.max","Maximum Points per uncertain object.");
+    public static final OptionID MULT_MAX_ID = new OptionID("uo.mult.max", "Maximum Points per uncertain object.");
 
-    public static final OptionID SEED_ID = new OptionID("uo.seed","Seed for uncertainification.");
+    public static final OptionID SEED_ID = new OptionID("uo.seed", "Seed for uncertainification.");
 
-    public static final OptionID DISTRIBUTION_SEED_ID = new OptionID("ret.uo.seed","Seed for uncertain objects private Random.");
+    public static final OptionID DISTRIBUTION_SEED_ID = new OptionID("ret.uo.seed", "Seed for uncertain objects private Random.");
 
-    public static final OptionID MAXIMUM_PROBABILITY_ID = new OptionID("uo.maxprob","Maximum total probability to draw a valid sample at all.");
+    public static final OptionID MAXIMUM_PROBABILITY_ID = new OptionID("uo.maxprob", "Maximum total probability to draw a valid sample at all.");
 
     @Override
     protected void makeOptions(final Parameterization config) {
@@ -262,7 +250,8 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
       pseed.setOptional(true);
       if(config.grab(pseed)) {
         this.randFac = new RandomFactory(pseed.getValue());
-      } else {
+      }
+      else {
         this.randFac = new RandomFactory(null);
       }
       final LongParameter dseed = new LongParameter(Parameterizer.DISTRIBUTION_SEED_ID);
@@ -286,25 +275,22 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
 
   @Override
   public void writeToText(final TextWriterStream out, final String label) {
-    String res = "";
+    StringBuilder res = new StringBuilder();
     if(label != null) {
-      for(final Pair<DoubleVector, Integer> pair : this.samplePoints) {
-        res += label + "= " + pair.getFirst().toString() + "\n"
-            + "\tprobability= " + pair.getSecond().toString() + "\n";
-      }
-    } else {
-      for(final Pair<DoubleVector, Integer> pair : this.samplePoints) {
-        res += label + "= " + pair.getFirst().toString() + "\n"
-            + "\tprobability= " + pair.getSecond().toString() + "\n";
-      }
+      res.append(label);
+      res.append("= ");
     }
-    out.inlinePrintNoQuotes(res);
+    for(final Pair<DoubleVector, Integer> pair : this.samplePoints) {
+      res.append(pair.getFirst().toString()).append(" ");
+      res.append("probability= ").append(pair.getSecond().toString());
+    }
+    out.inlinePrintNoQuotes(res.toString());
   }
 
   @Override
   public DoubleVector getAnker() {
     final double[] references = new double[this.getDimensionality()];
-    for(final Pair<DoubleVector,Integer> pair : this.samplePoints) {
+    for(final Pair<DoubleVector, Integer> pair : this.samplePoints) {
       for(int i = 0; i < this.getDimensionality(); i++) {
         references[i] += pair.getFirst().doubleValue(i);
       }

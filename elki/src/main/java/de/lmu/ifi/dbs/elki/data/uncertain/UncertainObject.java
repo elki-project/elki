@@ -30,19 +30,20 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
- * This class is a generic wrapper, that encapsulates
- * sampleModels derived from {@link UOModel}.
+ * This class is a generic wrapper, that encapsulates sampleModels derived from
+ * {@link UOModel}.
  *
  * @author Alexander Koos
  *
  * @param <U>
  */
-public class UncertainObject<U extends UOModel<SpatialComparable>> extends AbstractNumberVector implements SpatialComparable, TextWriteable {
+public class UncertainObject<U extends UOModel> extends AbstractNumberVector implements SpatialComparable, TextWriteable {
 
   protected U sampleModel;
+
   protected int id;
+
   private final double[] values;
 
   // Pretty weird Constructor

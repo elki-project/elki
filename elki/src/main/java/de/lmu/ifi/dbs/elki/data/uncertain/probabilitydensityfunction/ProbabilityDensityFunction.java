@@ -78,7 +78,7 @@ public abstract class ProbabilityDensityFunction implements TextWriteable {
    * @param uncertainify TODO
    * @param dims TODO
    */
-  public abstract UncertainObject<UOModel<SpatialComparable>> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims);
+  public abstract UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims);
 
   /**
    *

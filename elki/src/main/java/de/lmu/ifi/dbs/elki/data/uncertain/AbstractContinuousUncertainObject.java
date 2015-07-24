@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,27 +24,24 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  */
 
 /**
- * This abstract class is derived from {@link UOModel} to
- * model Uncertain-Data-Objects with continuous distributions,
- * i.e. Uncertain-Data-Objects, where the possible values
- * aren't explicitly given but are chosen from a continuous
- * space.
+ * This abstract class is derived from {@link UOModel} to model
+ * Uncertain-Data-Objects with continuous distributions, i.e.
+ * Uncertain-Data-Objects, where the possible values aren't explicitly given but
+ * are chosen from a continuous space.
  * 
- * Most likely one will use a {@link experimentalcode.students.koosa.probdensfunc.template.ProbabilityDensityFunction}
- * of some kind but I decided to implement this abstract layer
- * to give everyone the possibility to derive a custom solution
- * to this, if he likes to.
+ * Most likely one will use a
+ * {@link experimentalcode.students.koosa.probdensfunc.template.ProbabilityDensityFunction}
+ * of some kind but I decided to implement this abstract layer to give everyone
+ * the possibility to derive a custom solution to this, if he likes to.
  * 
  * @author Alexander Koos
- *
  */
-public abstract class AbstractContinuousUncertainObject extends UOModel<SpatialComparable> {
-  
+public abstract class AbstractContinuousUncertainObject extends UOModel {
+
   /**
-   * Since Continuous-Uncertain-Data-Objects don't
-   * have a specific number of values, that could
-   * be retrieved, but infinite possibilities,
-   * the getWeight method defaults to {@link Integer#MAX_VALUE}.
+   * Since Continuous-Uncertain-Data-Objects don't have a specific number of
+   * values, that could be retrieved, but infinite possibilities, the getWeight
+   * method defaults to {@link Integer#MAX_VALUE}.
    * 
    * @return int
    */

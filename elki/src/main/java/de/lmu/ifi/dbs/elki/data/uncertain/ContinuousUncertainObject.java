@@ -1,19 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.ProbabilityDensityFunction;
-import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.UniformDistributionFunction;
-import de.lmu.ifi.dbs.elki.datasource.filter.transform.UncertainifyFilter;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -36,14 +22,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.ProbabilityDensityFunction;
+import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.UniformDistributionFunction;
+import de.lmu.ifi.dbs.elki.datasource.filter.transform.UncertainifyFilter;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
-public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> extends AbstractContinuousUncertainObject {
-
+public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> extends AbstractContinuousUncertainObject{
   /**
-   * Field holding the probabilityDensityFunction this object
-   * will use for one of the following tasks:
-   * - Uncertainification in {@link UncertainifyFilter#filter(de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle)}
-   * - drawing samples in {@link PWCClusteringAlgorithm#run(de.lmu.ifi.dbs.elki.database.Database, de.lmu.ifi.dbs.elki.database.relation.Relation)}
+   * Field holding the probabilityDensityFunction this object will use for one
+   * of the following tasks: - Uncertainification in
+   * {@link UncertainifyFilter#filter(de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle)}
+   * - drawing samples in
+   * {@link PWCClusteringAlgorithm#run(de.lmu.ifi.dbs.elki.database.Database, de.lmu.ifi.dbs.elki.database.relation.Relation)}
    */
   private F probabilityDensityFunction;
 
@@ -155,13 +155,11 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
    *
    * Set a new dimensionality for this object.
    *
-   * This will most likely not be used, since dimensionality
-   * should always be clear upon the construction of an
-   * uncertain database.
+   * This will most likely not be used, since dimensionality should always be
+   * clear upon the construction of an uncertain database.
    *
-   * TODO: maybe drop every constructors and methods with
-   * the solely purpose to build uncertain objects manually -
-   * I assume they won't be to useful at all.
+   * TODO: maybe drop every constructors and methods with the solely purpose to
+   * build uncertain objects manually - I assume they won't be to useful at all.
    *
    * @param dimensions
    */
@@ -207,7 +205,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
     this.setBounds();
   }
 
-  //TODO: assert this one can be erased
+  // TODO: assert this one can be erased
   private static HyperBoundingBox getDefaultBounds(final int dimensions) {
     final double[] min = new double[dimensions];
     final double[] max = new double[dimensions];
@@ -228,7 +226,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
   }
 
   @Override
-  public UncertainObject<UOModel<SpatialComparable>> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
+  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
     return this.probabilityDensityFunction.uncertainify(vec, blur, uncertainify, dims);
   }
 
@@ -245,7 +243,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
      * Parameter to specify the {@link ProbabilityDensityFunction} to be used
      * for uncertainification.
      */
-    public static final OptionID PROBABILITY_DENSITY_FUNCTION_ID = new OptionID("cuo.pdf","This parameter is used to choose what kind of continuous probability-density-model is to be used.");
+    public static final OptionID PROBABILITY_DENSITY_FUNCTION_ID = new OptionID("cuo.pdf", "This parameter is used to choose what kind of continuous probability-density-model is to be used.");
 
     /**
      * Field to hold parameter value.
@@ -275,12 +273,12 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
       String res = "";
       if(label != null) {
         for(int i = 0; i < this.bounds.getDimensionality(); i++) {
-          res += label + "= " + "dimMin(" + i + "): " + this.bounds.getMin(i)
-              + " dimMax(" + i +"): " + this.bounds.getMax(i) + "\n";
+          res += label + "= " + "dimMin(" + i + "): " + this.bounds.getMin(i) + " dimMax(" + i + "): " + this.bounds.getMax(i) + "\n";
         }
       }
       out.inlinePrintNoQuotes(res);
-    } else {
+    }
+    else {
       this.probabilityDensityFunction.writeToText(out, label);
     }
   }

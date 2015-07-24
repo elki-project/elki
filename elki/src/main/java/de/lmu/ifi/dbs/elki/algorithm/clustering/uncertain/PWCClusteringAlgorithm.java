@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -210,7 +209,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * @return
    */
   @SuppressWarnings({ "unchecked" })
-  public Clustering<Model> run(final Database database, final Relation<UncertainObject<UOModel<SpatialComparable>>> relation) {
+  public Clustering<Model> run(final Database database, final Relation<UncertainObject<UOModel>> relation) {
     final ArrayList<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
     final ArrayList<Clustering<Model>> rclusterings = new ArrayList<Clustering<Model>>();
     final List<Relation<NumberVector>> rlist = new ArrayList<Relation<NumberVector>>();
@@ -222,7 +221,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
         final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
         final WritableDataStore<NumberVector> store0 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          UncertainObject<UOModel<SpatialComparable>> v = relation.get(iter);
+          UncertainObject<UOModel> v = relation.get(iter);
           store0.put(iter, new DoubleVector(v.getValues()));
         }
         final Relation<NumberVector> ground = new MaterializedRelation<>(database, t, ids, "Raw input data", store0);

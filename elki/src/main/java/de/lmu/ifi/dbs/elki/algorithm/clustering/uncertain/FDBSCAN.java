@@ -5,7 +5,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -52,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class FDBSCAN<O extends UncertainObject<UOModel<SpatialComparable>>> extends DBSCAN<O> {
+public class FDBSCAN<O extends UncertainObject<UOModel>> extends DBSCAN<O> {
 
   private final static Logging LOG = Logging.getLogger(FDBSCAN.class);
 
@@ -145,13 +144,13 @@ public class FDBSCAN<O extends UncertainObject<UOModel<SpatialComparable>>> exte
   @SuppressWarnings("unchecked")
   private DBIDs getEpsilonNeighbours(final DBIDRef startObjectID, final Relation<O> relation, final double epsilon) {
     final ModifiableDBIDs epsilonNeighbours = DBIDUtil.newArray();
-    final UncertainObject<UOModel<SpatialComparable>> uo = relation.get(startObjectID);
+    final UncertainObject<UOModel> uo = relation.get(startObjectID);
 
     for(final DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       if(iter.internalGetIndex() == startObjectID.internalGetIndex()) {
         continue;
       }
-      final UncertainObject<UOModel<SpatialComparable>> possibleNeighbour = relation.get(iter);
+      final UncertainObject<UOModel> possibleNeighbour = relation.get(iter);
 
       boolean inside = true, possible = true;
       for(int i = 0; i < uo.getDimensionality(); i++) {
@@ -213,7 +212,7 @@ public class FDBSCAN<O extends UncertainObject<UOModel<SpatialComparable>>> exte
     return FDBSCAN.LOG;
   }
 
-  public static class Parameterizer<O extends UncertainObject<UOModel<SpatialComparable>>> extends DBSCAN.Parameterizer<O> {
+  public static class Parameterizer<O extends UncertainObject<UOModel>> extends DBSCAN.Parameterizer<O> {
 
     protected double threshold;
 

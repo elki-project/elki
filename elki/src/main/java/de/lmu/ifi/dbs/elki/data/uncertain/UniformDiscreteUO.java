@@ -8,7 +8,6 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
@@ -132,7 +131,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   }
 
   @Override
-  public UncertainObject<UOModel<SpatialComparable>> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
+  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
     final List<DoubleVector> sampleList = new ArrayList<DoubleVector>();
     if( uncertainify ) {
       final int genuine = this.drand.nextInt(vec.getDimensionality());
@@ -161,7 +160,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
         }
       }
     }
-    return new UncertainObject<UOModel<SpatialComparable>>(new UniformDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), new DoubleVector(vec.getColumnVector()));
+    return new UncertainObject<UOModel>(new UniformDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), new DoubleVector(vec.getColumnVector()));
   }
 
   public static class Parameterizer extends DistributedDiscreteUO.Parameterizer {

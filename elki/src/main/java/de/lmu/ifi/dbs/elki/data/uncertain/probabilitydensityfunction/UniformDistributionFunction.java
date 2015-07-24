@@ -133,7 +133,7 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
   }
 
   @Override
-  public UncertainObject<UOModel<SpatialComparable>> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims) {
+  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims) {
     final double[] min = new double[uncertainify ? vec.getDimensionality() : dims];
     final double[] max = new double[uncertainify ? vec.getDimensionality() : dims];
     for(int i = 0; i < ( uncertainify ? vec.getDimensionality() : dims ); i++) {
@@ -150,7 +150,7 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
       }
     }
     
-    return new UncertainObject<UOModel<SpatialComparable>>(new ContinuousUncertainObject<UniformDistributionFunction>(min, max, new UniformDistributionFunction(), new RandomFactory(rand.nextLong())), new DoubleVector(vec.getColumnVector()));
+    return new UncertainObject<UOModel>(new ContinuousUncertainObject<UniformDistributionFunction>(min, max, new UniformDistributionFunction(), new RandomFactory(rand.nextLong())), new DoubleVector(vec.getColumnVector()));
   }
   
   /**
