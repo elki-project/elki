@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
@@ -29,6 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -172,79 +175,103 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
     WritableDoubleDataStore nearest = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     WritableDoubleDataStore second = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     // Initial assignment to nearest medoids
-    // TODO: reuse this information, from the build phase, when possible?
-    assignToNearestCluster(medoids, ids, nearest, second, assignment, distQ);
+    // TODO: reuse distance information, from the build phase, when possible?
+    double tc = assignToNearestCluster(medoids, ids, nearest, second, assignment, distQ);
+    if(LOG.isStatistics()) {
+      LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + 0 + ".cost", tc));
+    }
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
     // Swap phase
     DBIDVar bestid = DBIDUtil.newVar();
-    DBIDArrayIter m = medoids.iter(), i = medoids.iter();
+    DBIDArrayIter m = medoids.iter();
     int iteration = 1;
+    double[] cost = new double[k];
     for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      // Try to swap a medoid with a better non-medoid member:
+      // Try to swap a non-medoid with a medoid member:
       double best = Double.POSITIVE_INFINITY;
       int bestcluster = -1;
-      // Iterate over all objects, per cluster.
+      // Iterate over all non-medoids:
       for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
         final int pm = assignment.intValue(h);
         m.seek(pm);
-        if(DBIDUtil.equal(m, h)) {
-          continue; // Only not-selected items
+        double hdist = nearest.doubleValue(h); // Current assignment cost of h.
+        if(DBIDUtil.equal(m, h) || hdist <= 0.) {
+          continue; // Only consider non-selected items
         }
         // h is a non-medoid currently in cluster of medoid m.
-        double cost = 0;
+        Arrays.fill(cost, -hdist);
+        // Compute costs of reassigning other objects j:
         for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
-          final int pi = assignment.intValue(j);
-          i.seek(pi); // Medoid j is assigned to.
-          if(DBIDUtil.equal(i, j)) {
-            continue; // Only not-selected items
+          if(DBIDUtil.equal(h, j)) {
+            continue;
           }
-          // This is an improvement over the original PAM. We do not consider
-          // arbitrary pairs (i,h) and points j, but only those where i
-          // is the current nearest medoid of j. Since we remembered the
-          // distance to the second nearest medoid, we do not need to consider
-          // any other option.
-          double distcur = nearest.doubleValue(j); // Current assignment.
-          // = distance (j, i), because j is assigned to i
-          double dist_h = distQ.distance(j, h); // Possible reassignment.
-          if(pi == pm) { // Within the cluster of h and j
-            // Distance to second best medoid for j
-            double distsec = second.doubleValue(j);
-            cost += (dist_h < distsec) ? //
-            // Case 1b1) j is closer to h
-            dist_h - distcur
-            // Case 1b2) j would switch to a third medoid
-            : distsec - distcur;
-          }
-          else {
-            // Case 1c) j is closer to h than its current medoid
-            if(dist_h < distcur) {
-              cost += dist_h - distcur;
+          final int pj = assignment.intValue(j);
+          // distance(j, i) for pi == pj
+          final double distcur = nearest.doubleValue(j);
+          // second nearest, alternative reassignment
+          final double distsec = second.doubleValue(j);
+          // distance(j, h), the possible reassignment
+          final double dist_h = distQ.distance(h, j);
+          // We moved this distance computation out compared to original PAM.
+          if(dist_h < distcur) {
+            for(int pi = 0; pi < k; pi++) {
+              if(pi == pj) { // The current nearest is lost.
+                cost[pi] += ((dist_h < distsec) ? //
+                dist_h // Case 1b1) j is closer to h
+                : distsec // Case 1b2) j would switch to its second nearest
+                ) - distcur;
+              }
+              else { // Case 1c) j is closer to h than its current medoid
+                cost[pi] += dist_h - distcur;
+              } // else Case 1a): j is closer to i than h and m, so no change.
             }
-            // else Case 1a): j is closer to i than h and m, so no change.
+          }
+          else { // Only need to consider pi == pj
+            if(dist_h < distsec) {
+              // Case 1b1) j is closer to h
+              cost[pj] += dist_h - distcur;
+            }
+            else {
+              // Case 1b2) j would switch to its second nearest
+              cost[pj] += distsec - distcur;
+            }
           }
         }
-        if(cost < best) {
-          best = cost;
-          bestid.set(h);
-          bestcluster = pm;
+
+        // Consider all possible swaps:
+        for(int pi = 0; pi < k; pi++) {
+          if(cost[pi] < best) {
+            best = cost[pi];
+            bestid.set(h);
+            bestcluster = pi;
+          }
         }
-      }
-      if(LOG.isDebugging()) {
-        LOG.debug("Best cost: " + best);
       }
       if(best >= 0.) {
         break;
       }
       medoids.set(bestcluster, bestid);
       // Reassign
-      // TODO: can we save some of these computations?
-      assignToNearestCluster(medoids, ids, nearest, second, assignment, distQ);
+      double nc = assignToNearestCluster(medoids, ids, nearest, second, assignment, distQ);
+      if(LOG.isStatistics()) {
+        LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", nc));
+      }
+      if(nc > tc) {
+        if(nc - tc < 1e-7 * tc) {
+          LOG.warning("PAM failed to converge (numerical instability?)");
+          break;
+        }
+        LOG.warning("PAM failed to converge: costs increased by: " + (nc - tc) + " exepected a decrease by " + best);
+        break;
+      }
+      tc = nc;
     }
     LOG.setCompleted(prog);
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+      LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", tc));
     }
   }
 
@@ -258,32 +285,33 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
    * @param second Distance to second nearest medoid
    * @param assignment Cluster assignment
    * @param distQ distance query
-   * @return true when any object was reassigned
+   * @return Assignment cost
    */
-  protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore nearest, WritableDoubleDataStore second, WritableIntegerDataStore assignment, DistanceQuery<V> distQ) {
-    boolean changed = false;
+  protected double assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore nearest, WritableDoubleDataStore second, WritableIntegerDataStore assignment, DistanceQuery<V> distQ) {
     assert(means.size() == k);
     DBIDArrayIter miter = means.iter();
-    for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+    double cost = 0.;
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY,
           mindist2 = Double.POSITIVE_INFINITY;
       int minIndex = -1;
       for(int i = 0; i < k; i++) {
         double dist = distQ.distance(iditer, miter.seek(i));
         if(dist < mindist) {
-          minIndex = i;
           mindist2 = mindist;
           mindist = dist;
+          minIndex = i;
         }
         else if(dist < mindist2) {
           mindist2 = dist;
         }
       }
-      changed |= (assignment.put(iditer, minIndex) != minIndex);
+      assignment.put(iditer, minIndex);
       nearest.put(iditer, mindist);
       second.put(iditer, mindist2);
+      cost += mindist;
     }
-    return changed;
+    return cost;
   }
 
   @Override

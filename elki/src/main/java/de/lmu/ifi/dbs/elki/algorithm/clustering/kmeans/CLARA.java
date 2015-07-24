@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
+import java.util.Random;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -122,9 +124,10 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     ArrayModifiableDBIDs bestmedoids = null;
     WritableIntegerDataStore bestclusters = null;
 
+    Random r = random.getSingleThreadedRandom();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Random samples.", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
-      DBIDs rids = DBIDUtil.randomSample(ids, sampleSize, random);
+      DBIDs rids = DBIDUtil.randomSample(ids, sampleSize, r);
       // Choose initial medoids
       ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
       // Setup cluster assignment store

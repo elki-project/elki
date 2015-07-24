@@ -58,6 +58,8 @@ public class TestCLARA extends AbstractSimpleAlgorithmTest implements JUnit4Test
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
+    // These parameters are chosen suboptimal, for better regression testing.
+    params.addParameter(CLARA.Parameterizer.RANDOM_ID, 1);
     params.addParameter(CLARA.Parameterizer.NUMSAMPLES_ID, 2);
     params.addParameter(CLARA.Parameterizer.SAMPLESIZE_ID, 50);
     CLARA<DoubleVector> kmedians = ClassGenericsUtil.parameterizeOrAbort(CLARA.class, params);
@@ -65,7 +67,7 @@ public class TestCLARA extends AbstractSimpleAlgorithmTest implements JUnit4Test
 
     // run KMedians on database
     Clustering<MedoidModel> result = kmedians.run(db);
-    testFMeasure(db, result, 0.998005);
-    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+    testFMeasure(db, result, 0.9960200);
+    testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
   }
 }
