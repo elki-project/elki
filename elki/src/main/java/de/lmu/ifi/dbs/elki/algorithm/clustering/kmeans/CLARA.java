@@ -117,17 +117,16 @@ public class CLARA<V> extends KMedoidsPAM<V> {
       return new Clustering<>("CLARA Clustering", "clara-clustering");
     }
     DBIDs ids = relation.getDBIDs();
-    int sampleSize = (int) ((sampling < 1.) ? sampling * ids.size() : sampling);
     DistanceQuery<V> distQ = database.getDistanceQuery(relation, getDistanceFunction());
 
     double best = Double.POSITIVE_INFINITY;
     ArrayModifiableDBIDs bestmedoids = null;
     WritableIntegerDataStore bestclusters = null;
 
-    Random r = random.getSingleThreadedRandom();
+    Random rnd = random.getSingleThreadedRandom();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Random samples.", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
-      DBIDs rids = DBIDUtil.randomSample(ids, sampleSize, r);
+      DBIDs rids = DBIDUtil.randomSample(ids, sampling, rnd);
       // Choose initial medoids
       ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, rids, distQ));
       // Setup cluster assignment store

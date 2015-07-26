@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -101,10 +103,10 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int samplesize = (int) (ids.size() * share);
 
+    Random random = rnd.getSingleThreadedRandom();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNHeap kNN = DBIDUtil.newHeap(k);
-
-      DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rnd);
+      DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, random);
       for(DBIDIter iter2 = rsamp.iter(); iter2.valid(); iter2.advance()) {
         double dist = distanceQuery.distance(iter, iter2);
         kNN.insert(dist, iter2);

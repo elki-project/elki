@@ -30,23 +30,36 @@ import java.util.Random;
  * It does not provide individual random numbers, but will create a random
  * generator; either using a fixed seed or random seeded (default).
  * 
- * TODO: allow global fixing of seed, to make whole experiments reproducible,
- * without having to set every single seed.
+ * The seed can be globally predefined using {@code -Delki.seed=123}.
  * 
+ * These classes are not optimized for non-predictability, but for speed, as
+ * scientific experiments are not likely to be adversarial.
+ *
  * @author Erich Schubert
  * 
  * @apiviz.has Random
+ * @apiviz.has FastNonThreadsafeRandom
  */
 public class RandomFactory {
   /**
    * Global default factory
    */
-  public static RandomFactory DEFAULT = new RandomFactory(null);
+  public static RandomFactory DEFAULT = new RandomFactory(getGlobalSeed());
 
   /**
-   * Seed
+   * Initialize the default random.
+   * 
+   * @return seed for the random generator factory.
    */
-  private Long seed = null;
+  private static long getGlobalSeed() {
+    String sseed = System.getProperty("elki.seed");
+    return (sseed != null) ? Long.parseLong(sseed) : System.nanoTime();
+  }
+
+  /**
+   * Seed.
+   */
+  private long seed;
 
   /**
    * Factory method: Get a random factory for the given seed.
@@ -58,9 +71,7 @@ public class RandomFactory {
     if(seed == null) {
       return DEFAULT;
     }
-    else {
-      return new RandomFactory(seed);
-    }
+    return new RandomFactory(seed);
   }
 
   /**
@@ -68,7 +79,7 @@ public class RandomFactory {
    * 
    * @param seed Random seed
    */
-  public RandomFactory(Long seed) {
+  public RandomFactory(long seed) {
     super();
     this.seed = seed;
   }
@@ -79,12 +90,7 @@ public class RandomFactory {
    * @return Random generator
    */
   public Random getRandom() {
-    if(seed != null) {
-      return new Random(seed.longValue());
-    }
-    else {
-      return new Random();
-    }
+    return new Random(seed++);
   }
 
   /**
@@ -93,11 +99,6 @@ public class RandomFactory {
    * @return Random generator
    */
   public Random getSingleThreadedRandom() {
-    if(seed != null) {
-      return new FastNonThreadsafeRandom(seed.longValue());
-    }
-    else {
-      return new FastNonThreadsafeRandom();
-    }
+    return new FastNonThreadsafeRandom(seed++);
   }
 }

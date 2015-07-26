@@ -151,7 +151,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       LOG.verbose("1. Initialization phase...");
     }
     int sampleSize = Math.min(relation.size(), k_i * k);
-    DBIDs sampleSet = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, random.nextLong());
+    DBIDs sampleSet = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, random);
 
     int medoidSize = Math.min(relation.size(), m_i * k);
     ArrayDBIDs medoids = greedy(distFunc, sampleSet, medoidSize, random);

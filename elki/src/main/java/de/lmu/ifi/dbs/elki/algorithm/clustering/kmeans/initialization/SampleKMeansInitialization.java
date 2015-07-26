@@ -82,8 +82,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
 
   @Override
   public <T extends V, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<O> factory) {
-    final int samplesize = (int) Math.ceil(rate * relation.size());
-    final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), samplesize, rnd);
+    final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), rate, rnd);
 
     // Ugly cast, sorry
     @SuppressWarnings("unchecked")

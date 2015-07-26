@@ -146,18 +146,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
     DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     RangeQuery<O> rangeQuery = database.getRangeQuery(distQuery);
 
-    final DBIDs sample;
-    if(sampling <= 0) {
-      sample = relation.getDBIDs();
-    }
-    else if(sampling < 1.1) {
-      int size = (int) Math.min(sampling * relation.size(), relation.size());
-      sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
-    }
-    else {
-      int size = (int) Math.min(sampling, relation.size());
-      sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
-    }
+    final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
     FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
     int hash = 0;
     MeanVariance mv = new MeanVariance();
@@ -224,18 +213,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
     // But currently, we don't (yet) have an "integer random sample" function.
     DBIDRange sids = DBIDUtil.generateStaticDBIDRange(bundle.dataLength());
 
-    final DBIDs sample;
-    if(sampling <= 0) {
-      sample = sids;
-    }
-    else if(sampling < 1.1) {
-      int size = (int) Math.min(sampling * relation.size(), relation.size());
-      sample = DBIDUtil.randomSample(sids, size, random);
-    }
-    else {
-      int size = (int) Math.min(sampling, sids.size());
-      sample = DBIDUtil.randomSample(sids, size, random);
-    }
+    final DBIDs sample = DBIDUtil.randomSample(sids, sampling, random);
     FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
     int hash = 0;
     MeanVariance mv = new MeanVariance();

@@ -272,7 +272,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     // System.out.println("Number of samples: " + samples);
     int remaining_retries = 100;
     for(int i = 1; i <= samples; i++) {
-      DBIDs sample = DBIDUtil.randomSample(currentids, dimension + 1, r.nextLong());
+      DBIDs sample = DBIDUtil.randomSample(currentids, dimension + 1, r);
       final DBIDIter iter = sample.iter();
       // Use first as origin
       Vector originV = relation.get(iter).getColumnVector();

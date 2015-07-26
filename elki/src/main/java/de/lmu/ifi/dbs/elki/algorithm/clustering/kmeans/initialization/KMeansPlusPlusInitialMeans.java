@@ -88,7 +88,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
     }
 
     Random random = rnd.getSingleThreadedRandom();
-    DBIDRef first = DBIDUtil.randomSample(ids, 1, random).iter();
+    DBIDRef first = DBIDUtil.randomSample(ids, random);
     T firstvec = relation.get(first);
     means.add(factory.newNumberVector(firstvec));
 
@@ -138,7 +138,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     Random random = rnd.getSingleThreadedRandom();
-    DBIDRef first = DBIDUtil.randomSample(ids, 1, random).iter();
+    DBIDRef first = DBIDUtil.randomSample(ids, random);
     means.add(first);
 
     // Initialize weights

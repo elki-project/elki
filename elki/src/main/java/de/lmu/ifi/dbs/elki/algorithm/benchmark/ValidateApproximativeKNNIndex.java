@@ -159,18 +159,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
       // Relation to filter on
       Relation<String> lrel = (pattern != null) ? DatabaseUtil.guessLabelRepresentation(database) : null;
 
-      final DBIDs sample;
-      if(sampling <= 0) {
-        sample = relation.getDBIDs();
-      }
-      else if(sampling < 1.1) {
-        int size = (int) Math.min(sampling * relation.size(), relation.size());
-        sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
-      }
-      else {
-        int size = (int) Math.min(sampling, relation.size());
-        sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
-      }
+      final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance();
       MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(), mvdrerr = new MeanVariance();
@@ -235,19 +224,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAlgor
       // Random sampling is a bit of hack, sorry.
       // But currently, we don't (yet) have an "integer random sample" function.
       DBIDRange sids = DBIDUtil.generateStaticDBIDRange(bundle.dataLength());
-
-      final DBIDs sample;
-      if(sampling <= 0) {
-        sample = sids;
-      }
-      else if(sampling < 1.1) {
-        int size = (int) Math.min(sampling * relation.size(), relation.size());
-        sample = DBIDUtil.randomSample(sids, size, random);
-      }
-      else {
-        int size = (int) Math.min(sampling, sids.size());
-        sample = DBIDUtil.randomSample(sids, size, random);
-      }
+      final DBIDs sample = DBIDUtil.randomSample(sids, sampling, random);
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance();
       MeanVariance mvdist = new MeanVariance(), mvdaerr = new MeanVariance(), mvdrerr = new MeanVariance();

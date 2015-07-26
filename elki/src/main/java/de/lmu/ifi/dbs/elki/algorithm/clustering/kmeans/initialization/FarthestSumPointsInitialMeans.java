@@ -74,7 +74,7 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
     // Chose first mean
     List<V> means = new ArrayList<>(k);
 
-    DBIDRef first = DBIDUtil.randomSample(ids, 1, rnd).iter();
+    DBIDRef first = DBIDUtil.randomSample(ids, rnd);
     T prevmean = relation.get(first);
     means.add(factory.newNumberVector(prevmean));
 
@@ -120,7 +120,7 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
 
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
-    DBIDRef first = DBIDUtil.randomSample(ids, 1, rnd).iter();
+    DBIDRef first = DBIDUtil.randomSample(ids, rnd);
     means.add(first);
     DBIDVar prevmean = DBIDUtil.newVar(first);
 

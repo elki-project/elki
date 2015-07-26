@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
@@ -100,7 +101,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     // Number of neighbors to fetch
     int kk = (int) ((krate > 1.) ? krate : Math.ceil(krate * allids.size()));
 
-    DBIDs sampleids = DBIDUtil.randomSample(allids, ssize, 0L);
+    DBIDs sampleids = DBIDUtil.randomSample(allids, ssize, RandomFactory.DEFAULT);
 
     DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnq = database.getKNNQuery(dq, kk + 1);

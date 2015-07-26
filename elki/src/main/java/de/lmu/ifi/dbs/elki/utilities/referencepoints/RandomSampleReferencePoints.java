@@ -75,9 +75,9 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
       return new RelationUtil.CollectionFromRelation<>(db);
     }
 
-    ArrayList<NumberVector> result = new ArrayList<>(samplesize);
     DBIDs sample = DBIDUtil.randomSample(db.getDBIDs(), samplesize, rnd);
 
+    ArrayList<NumberVector> result = new ArrayList<>(sample.size());
     for(DBIDIter it = sample.iter(); it.valid(); it.advance()) {
       result.add(db.get(it));
     }

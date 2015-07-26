@@ -127,18 +127,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
    */
   public RetrievalPerformanceResult run(Database database, Relation<O> relation, Relation<?> lrelation) {
     final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
-
-    final DBIDs ids;
-    if(sampling < 1.) {
-      int size = Math.max(1, (int) (sampling * relation.size()));
-      ids = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
-    }
-    else if(sampling > 1.) {
-      ids = DBIDUtil.randomSample(relation.getDBIDs(), (int) sampling, random);
-    }
-    else {
-      ids = relation.getDBIDs();
-    }
+    final DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     // For storing the positive neighbors.
     ModifiableDBIDs posn = DBIDUtil.newHashSet();
@@ -289,7 +278,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
      * Static instance.
      */
     public static final KNNEvaluator STATIC = new KNNEvaluator();
-  
+
     /**
      * Evaluate by simulating kNN classification for k=1...maxk
      * 
@@ -343,7 +332,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
         }
       }
     }
-  
+
     /**
      * Counting helper for kNN classification.
      * 

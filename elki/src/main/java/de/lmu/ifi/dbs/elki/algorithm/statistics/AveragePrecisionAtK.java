@@ -120,17 +120,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
 
     MeanVarianceMinMax[] mvs = MeanVarianceMinMax.newArray(k);
 
-    final DBIDs ids;
-    if(sampling < 1.) {
-      int size = Math.max(1, (int) (sampling * relation.size()));
-      ids = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
-    }
-    else if(sampling > 1.) {
-      ids = DBIDUtil.randomSample(relation.getDBIDs(), (int) sampling, random);
-    }
-    else {
-      ids = relation.getDBIDs();
-    }
+    final DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), LOG) : null;
     // sort neighbors

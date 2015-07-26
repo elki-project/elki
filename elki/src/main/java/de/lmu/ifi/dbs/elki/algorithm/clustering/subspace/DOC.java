@@ -256,7 +256,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
 
       for(int j = 0; j < m; ++j) {
         // Choose a set of random points.
-        DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), r), random);
+        DBIDs randomSet = DBIDUtil.randomSample(S, r, random);
 
         // Initialize cluster info.
         long[] nD = BitsUtil.zero(d);
@@ -339,7 +339,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
 
       for(int j = 0; j < m; ++j) {
         // Choose a set of random points.
-        DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), r), random);
+        DBIDs randomSet = DBIDUtil.randomSample(S, r, random);
 
         // Initialize cluster info.
         long[] nD = BitsUtil.zero(d);

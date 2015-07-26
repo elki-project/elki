@@ -653,6 +653,63 @@ public final class DBIDUtil {
   }
 
   /**
+   * Produce a random sample of the given DBIDs.
+   * 
+   * @param ids Original ids
+   * @param rate Sampling rate
+   * @param random Random generator
+   * @return Sample
+   */
+  public static DBIDs randomSample(DBIDs ids, double rate, RandomFactory random) {
+    return randomSample(ids, rate, random.getSingleThreadedRandom());
+  }
+
+  /**
+   * Produce a random sample of the given DBIDs.
+   * 
+   * @param ids Original ids
+   * @param rate Sampling rate
+   * @param random Random generator
+   * @return Sample
+   */
+  public static DBIDs randomSample(DBIDs ids, double rate, Random random) {
+    if(rate <= 0) {
+      return ids;
+    }
+    if(rate < 1.1) {
+      int size = Math.min((int) (rate * ids.size()), ids.size());
+      return randomSample(ids, size, random);
+    }
+    int size = Math.min((int) rate, ids.size());
+    return randomSample(ids, size, random);
+  }
+
+  /**
+   * Draw a single random sample.
+   *
+   * @param ids IDs to draw from
+   * @param random Random value
+   * @return Random ID
+   */
+  public static DBIDVar randomSample(DBIDs ids, Random random) {
+    ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
+    DBIDVar v = DBIDUtil.newVar();
+    aids.assignVar(random.nextInt(aids.size()), v);
+    return v;
+  }
+
+  /**
+   * Draw a single random sample.
+   *
+   * @param ids IDs to draw from
+   * @param random Random value
+   * @return Random ID
+   */
+  public static DBIDVar randomSample(DBIDs ids, RandomFactory random) {
+    return randomSample(ids, random.getSingleThreadedRandom());
+  }
+
+  /**
    * Randomly split IDs into {@code p} partitions of almost-equal size.
    * 
    * @param ids Original DBIDs

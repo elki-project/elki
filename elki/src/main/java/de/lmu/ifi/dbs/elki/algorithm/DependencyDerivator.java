@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -157,7 +158,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
     DBIDs ids;
     if(this.sampleSize > 0) {
       if(randomsample) {
-        ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, 1L);
+        ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, RandomFactory.DEFAULT);
       }
       else {
         DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
