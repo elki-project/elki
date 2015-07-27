@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -40,7 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<Pair<DoubleVector, Integer>>> {
-
   private int totalProbability;
 
   private final static DoubleVector noObjectChosen = new DoubleVector(new double[] { Double.NEGATIVE_INFINITY });
@@ -270,21 +268,6 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     protected AbstractDiscreteUncertainObject makeInstance() {
       return new DistributedDiscreteUO(this.minMin, this.maxMin, this.minMax, this.maxMax, this.multMin, this.multMax, this.distributionSeed, this.maxTotalProb, this.randFac);
     }
-
-  }
-
-  @Override
-  public void writeToText(final TextWriterStream out, final String label) {
-    StringBuilder res = new StringBuilder();
-    if(label != null) {
-      res.append(label);
-      res.append("= ");
-    }
-    for(final Pair<DoubleVector, Integer> pair : this.samplePoints) {
-      res.append(pair.getFirst().toString()).append(" ");
-      res.append("probability= ").append(pair.getSecond().toString());
-    }
-    out.inlinePrintNoQuotes(res.toString());
   }
 
   @Override

@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 
 /**
  * An abstract class used to define the basic format for Uncertain-Data-Objects.
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
  * 
  * @author Alexander Koos
  */
-public abstract class UOModel implements Model, SpatialComparable, TextWriteable {
+public abstract class UOModel implements Model, SpatialComparable {
   protected Random rand;
 
   protected SpatialComparable bounds;

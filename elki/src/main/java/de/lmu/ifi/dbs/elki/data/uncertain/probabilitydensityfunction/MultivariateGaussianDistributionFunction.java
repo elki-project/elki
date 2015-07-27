@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.datasource.filter.transform.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CholeskyDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -158,7 +157,6 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
       if(inBounds) {
         return new DoubleVector(result);
       }
-
     }
 
     return AbstractGaussianDistributionFunction.noSample;
@@ -324,7 +322,6 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   }
 
   public static class Parameterizer extends IndependentGaussianDistributionFunction.Parameterizer {
-
     /**
      * Field to hold parameter value.
      */
@@ -349,16 +346,5 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
     protected Object makeInstance() {
       return new MultivariateGaussianDistributionFunction(this.stddevMin, this.stddevMax, this.minMin, this.maxMin, this.minMax, this.maxMax, this.multMin, this.multMax, this.rotate, this.randFac.getRandom());
     }
-
   }
-
-  @Override
-  public void writeToText(final TextWriterStream out, final String label) {
-    String res = label + "= ";
-    for(int i = 0; i < this.means.size(); i++) {
-      res += "mean_" + i + ": " + this.means.get(i).toString() + "\n" + "\t variance_" + i + ": " + this.variances.get(i).toString() + "\n" + "\t weight_" + i + ": " + this.weights[i] + "\n";
-    }
-    out.inlinePrintNoQuotes(res);
-  }
-
 }

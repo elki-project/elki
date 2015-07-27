@@ -4,8 +4,6 @@ import de.lmu.ifi.dbs.elki.data.AbstractNumberVector;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /*
  This file is part of ELKI:
@@ -38,8 +36,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @param <U>
  */
-public class UncertainObject<U extends UOModel> extends AbstractNumberVector implements SpatialComparable, TextWriteable {
-
+public class UncertainObject<U extends UOModel> extends AbstractNumberVector implements SpatialComparable {
   protected U sampleModel;
 
   protected int id;
@@ -114,12 +111,6 @@ public class UncertainObject<U extends UOModel> extends AbstractNumberVector imp
 
   public int getWeight() {
     return this.sampleModel.getWeight();
-  }
-
-  @Override
-  public void writeToText(final TextWriterStream out, final String label) {
-    this.sampleModel.writeToText(out, label);
-
   }
 
   @Deprecated

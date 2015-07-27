@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.transform.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -350,17 +349,4 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
       return new IndependentGaussianDistributionFunction(this.stddevMin, this.stddevMax, this.minMin, this.maxMin, this.minMax, this.maxMax, this.multMin, this.multMax, this.randFac.getRandom());
     }
   }
-
-  @Override
-  public void writeToText(final TextWriterStream out, final String label) {
-    String res = "";
-    if(label != null) {
-      res += label + "= ";
-    }
-    for(int i = 0; i < this.means.size(); i++) {
-      res += "mean_" + i + ": " + this.means.get(i).toString() + "\n" + "\t variance_" + i + ": " + this.variances.get(i).toString() + "\n" + "\t weight_" + i + ": " + this.weights[i] + "\n";
-    }
-    out.inlinePrintNoQuotes(res);
-  }
-
 }

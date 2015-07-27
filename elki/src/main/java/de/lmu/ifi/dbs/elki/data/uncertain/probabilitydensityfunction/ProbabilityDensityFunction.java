@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 
 /*
  This file is part of ELKI:
@@ -33,16 +32,13 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
  */
 
 /**
- *
  * Abstract class specifying the minimum constraints to the
  * layout for probability density functions used in uncertain
  * objects.
  *
  * @author Alexander Koos
- *
  */
-public abstract class ProbabilityDensityFunction implements TextWriteable {
-
+public abstract class ProbabilityDensityFunction {
   /**
    * Used in methods for setting bounds to initialize the
    * array used in search for extreme points.

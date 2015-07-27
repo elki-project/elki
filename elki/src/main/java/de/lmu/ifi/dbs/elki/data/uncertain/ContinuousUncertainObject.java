@@ -28,10 +28,8 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.ProbabilityDensityFunction;
-import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.UniformDistributionFunction;
 import de.lmu.ifi.dbs.elki.datasource.filter.transform.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -231,14 +229,11 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
   }
 
   /**
-   *
    * Parameterizer class.
    *
    * @author Alexander Koos
-   *
    */
   public static class Parameterizer extends AbstractParameterizer {
-
     /**
      * Parameter to specify the {@link ProbabilityDensityFunction} to be used
      * for uncertainification.
@@ -263,23 +258,6 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
     @Override
     protected Object makeInstance() {
       return new ContinuousUncertainObject<ProbabilityDensityFunction>(this.pdf);
-    }
-
-  }
-
-  @Override
-  public void writeToText(final TextWriterStream out, final String label) {
-    if(this.probabilityDensityFunction.getClass().equals(UniformDistributionFunction.class)) {
-      String res = "";
-      if(label != null) {
-        for(int i = 0; i < this.bounds.getDimensionality(); i++) {
-          res += label + "= " + "dimMin(" + i + "): " + this.bounds.getMin(i) + " dimMax(" + i + "): " + this.bounds.getMax(i) + "\n";
-        }
-      }
-      out.inlinePrintNoQuotes(res);
-    }
-    else {
-      this.probabilityDensityFunction.writeToText(out, label);
     }
   }
 

@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /*
  This file is part of ELKI:
@@ -35,17 +34,15 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  */
 
 /**
- * This class is derived from {@link AbstractDiscreteUncertainObject}
- * and models Discrete-Uncertain-Data-Objects with a uniform
- * distribution of their values probabilities, i.e. every
- * possible value has the same probability to be drawn and
- * they sum up to 1.
+ * This class is derived from {@link AbstractDiscreteUncertainObject} and models
+ * Discrete-Uncertain-Data-Objects with a uniform distribution of their values
+ * probabilities, i.e. every possible value has the same probability to be drawn
+ * and they sum up to 1.
  *
  * @author Alexander Koos
  *
  */
 public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<DoubleVector>> {
-
   private double sampleProbability;
 
   private double minMin;
@@ -88,7 +85,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   }
 
   // Constructor
-  public UniformDiscreteUO (final List<DoubleVector> samplePoints, final RandomFactory randomFactory) {
+  public UniformDiscreteUO(final List<DoubleVector> samplePoints, final RandomFactory randomFactory) {
     this.samplePoints = samplePoints;
     this.dimensions = samplePoints.get(0).getDimensionality();
     this.rand = randomFactory.getRandom();
@@ -121,8 +118,8 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
     Arrays.fill(min, Double.MAX_VALUE);
     final double max[] = new double[this.dimensions];
     Arrays.fill(max, -Double.MAX_VALUE);
-    for(final DoubleVector samplePoint: this.samplePoints){
-      for(int d = 0; d < this.dimensions; d++){
+    for(final DoubleVector samplePoint : this.samplePoints) {
+      for(int d = 0; d < this.dimensions; d++) {
         min[d] = Math.min(min[d], samplePoint.doubleValue(d));
         max[d] = Math.max(max[d], samplePoint.doubleValue(d));
       }
@@ -133,11 +130,11 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   @Override
   public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
     final List<DoubleVector> sampleList = new ArrayList<DoubleVector>();
-    if( uncertainify ) {
+    if(uncertainify) {
       final int genuine = this.drand.nextInt(vec.getDimensionality());
       final double difMin = this.drand.nextDouble() * (this.maxMin - this.minMin) + this.minMin;
       final double difMax = this.drand.nextDouble() * (this.maxMax - this.minMax) + this.minMax;
-      final double randDev = blur ? ( this.drand.nextInt(2) == 0 ? this.drand.nextDouble() * -difMin : this.drand.nextDouble() * difMax ) : 0;
+      final double randDev = blur ? (this.drand.nextInt(2) == 0 ? this.drand.nextDouble() * -difMin : this.drand.nextDouble() * difMax) : 0;
       final int distributionSize = this.drand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
       for(int i = 0; i < distributionSize; i++) {
         if(i == genuine) {
@@ -151,7 +148,8 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
         }
         sampleList.add(new DoubleVector(svec));
       }
-    } else {
+    }
+    else {
       final double[] val = new double[dims];
       for(int i = 0; i < vec.getDimensionality(); i++) {
         val[i % dims] = vec.doubleValue(i);
@@ -164,27 +162,10 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   }
 
   public static class Parameterizer extends DistributedDiscreteUO.Parameterizer {
-
     @Override
     protected UniformDiscreteUO makeInstance() {
       return new UniformDiscreteUO(this.minMin, this.maxMin, this.minMax, this.maxMax, this.multMin, this.multMax, this.distributionSeed, this.randFac);
     }
-
-  }
-
-  @Override
-  public void writeToText(final TextWriterStream out, final String label) {
-    String res = "";
-    if(label != null) {
-      for(final DoubleVector vec : this.samplePoints) {
-        res += label + "= " + vec.toString() + "\n";
-      }
-    } else {
-      for(final DoubleVector vec : this.samplePoints) {
-        res += vec.toString() + "\n";
-      }
-    }
-    out.inlinePrintNoQuotes(res);
   }
 
   @Override

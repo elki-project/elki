@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -40,16 +39,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  */
 
 /**
- * 
  * ProbabilityDensityFunction class to model uncertain objects
  * where values are randomly drawn, bounded by a {@link SpatialComparable}
  * without further constraints.
  * 
  * @author Alexander Koos
- *
  */
 public class UniformDistributionFunction extends ProbabilityDensityFunction {
-
   /**
    * Field to hold the value the randomly created maximum negative
    * deviation from the groundtruth shall have in minimum.
@@ -248,12 +244,5 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
     protected Object makeInstance() {
       return new UniformDistributionFunction(minMin, maxMin, minMax, maxMax, rand);
     }
-    
   }
-
-  @Override
-  public void writeToText(TextWriterStream out, String label) {
-    // NoOp, guarded in ContinuousUncertainObject
-  }
-
 }
