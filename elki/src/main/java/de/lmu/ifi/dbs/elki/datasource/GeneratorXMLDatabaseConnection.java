@@ -566,7 +566,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     if(axis1 <= 0 || axis1 > cluster.getDim()) {
       throw new UnableToComplyException("Invalid axis1 number given in specification file.");
     }
-    if(axis1 <= 0 || axis1 > cluster.getDim()) {
+    if(axis2 <= 0 || axis2 > cluster.getDim()) {
       throw new UnableToComplyException("Invalid axis2 number given in specification file.");
     }
     if(axis1 == axis2) {
