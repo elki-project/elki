@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 
 /**
@@ -181,25 +180,6 @@ public interface Database extends HierarchicalResult {
    */
   // TODO: add
   // MultipleObjectsBundle getBundles(DBIDs id) throws ObjectNotFoundException;
-
-  /**
-   * Add a new index to the database.
-   * 
-   * @param index Index to add
-   */
-  public void addIndex(Index index);
-
-  /**
-   * Collection of known indexes
-   */
-  public Collection<Index> getIndexes();
-
-  /**
-   * Remove a particular index
-   * 
-   * @param index Index to remove
-   */
-  public void removeIndex(Index index);
 
   /**
    * Adds a listener for the <code>DataStoreEvent</code> posted after the

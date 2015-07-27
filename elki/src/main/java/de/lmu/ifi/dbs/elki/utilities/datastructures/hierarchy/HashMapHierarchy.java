@@ -159,6 +159,16 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     return rec.iterChildren();
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Iter<O> iterChildrenReverse(O obj) {
+    Rec<O> rec = graph.get(obj);
+    if(rec == null) {
+      return (Iter<O>) EMPTY_ITERATOR;
+    }
+    return rec.iterChildrenReverse();
+  }
+
   @Override
   public Iter<O> iterDescendants(O obj) {
     return new ItrDesc(obj);
@@ -181,6 +191,16 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
       return (Iter<O>) EMPTY_ITERATOR;
     }
     return rec.iterParents();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Iter<O> iterParentsReverse(O obj) {
+    Rec<O> rec = graph.get(obj);
+    if(rec == null) {
+      return (Iter<O>) EMPTY_ITERATOR;
+    }
+    return rec.iterParentsReverse();
   }
 
   @Override
@@ -333,11 +353,37 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @return Iterator for parents.
      */
     @SuppressWarnings("unchecked")
+    public Iter<O> iterParentsReverse() {
+      if(nump == 0) {
+        return (Iter<O>) EMPTY_ITERATOR;
+      }
+      return new ItrParentsReverse();
+    }
+
+    /**
+     * Iterate over parents.
+     * 
+     * @return Iterator for parents.
+     */
+    @SuppressWarnings("unchecked")
     public Iter<O> iterChildren() {
       if(numc == 0) {
         return (Iter<O>) EMPTY_ITERATOR;
       }
       return new ItrChildren();
+    }
+
+    /**
+     * Iterate over parents.
+     * 
+     * @return Iterator for parents.
+     */
+    @SuppressWarnings("unchecked")
+    public Iter<O> iterChildrenReverse() {
+      if(numc == 0) {
+        return (Iter<O>) EMPTY_ITERATOR;
+      }
+      return new ItrChildrenReverse();
     }
 
     /**
@@ -369,6 +415,34 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     }
 
     /**
+     * Parent iterator.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    class ItrParentsReverse implements Iter<O> {
+      int pos = nump - 1;
+
+      @Override
+      public boolean valid() {
+        return pos >= 0;
+      }
+
+      @Override
+      public Iter<O> advance() {
+        pos--;
+        return this;
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public O get() {
+        return (O) parents[pos];
+      }
+    }
+
+    /**
      * Child iterator.
      * 
      * @author Erich Schubert
@@ -386,6 +460,34 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
       @Override
       public Iter<O> advance() {
         pos++;
+        return this;
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public O get() {
+        return (O) children[pos];
+      }
+    }
+
+    /**
+     * Child iterator.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    class ItrChildrenReverse implements Iter<O> {
+      int pos = numc - 1;
+
+      @Override
+      public boolean valid() {
+        return pos >= 0;
+      }
+
+      @Override
+      public Iter<O> advance() {
+        pos--;
         return this;
       }
 
@@ -432,7 +534,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     @Override
     public Iter<O> advance() {
       if(subiter == null) { // Not yet descended
-        assert (childiter.valid());
+        assert(childiter.valid());
         subiter = iterDescendants(childiter.get());
       }
       else { // Continue with subtree
@@ -450,11 +552,11 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     @Override
     public O get() {
       if(subiter != null) {
-        assert (subiter.valid());
+        assert(subiter.valid());
         return subiter.get();
       }
       else {
-        assert (childiter.valid());
+        assert(childiter.valid());
         return childiter.get();
       }
     }
@@ -495,7 +597,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     @Override
     public Iter<O> advance() {
       if(subiter == null) { // Not yet descended
-        assert (parentiter.valid());
+        assert(parentiter.valid());
         subiter = iterAncestors(parentiter.get());
       }
       else { // Continue with subtree
@@ -513,11 +615,11 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     @Override
     public O get() {
       if(subiter != null) {
-        assert (subiter.valid());
+        assert(subiter.valid());
         return subiter.get();
       }
       else {
-        assert (parentiter.valid());
+        assert(parentiter.valid());
         return parentiter.get();
       }
     }

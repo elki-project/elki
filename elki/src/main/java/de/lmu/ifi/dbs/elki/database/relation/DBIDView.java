@@ -26,24 +26,23 @@ package de.lmu.ifi.dbs.elki.database.relation;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Pseudo-representation that is the object ID itself.
  * 
  * @author Erich Schubert
  */
-public class DBIDView extends AbstractHierarchicalResult implements Relation<DBID> {
+public class DBIDView extends AbstractRelation<DBID> {
   /**
-   * The database
+   * Class logger
    */
-  private final Database database;
+  private static final Logging LOG = Logging.getLogger(DBIDView.class);
 
   /**
    * The ids object
@@ -57,34 +56,14 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
    * @param ids
    */
   public DBIDView(Database database, DBIDs ids) {
-    super();
-    this.database = database;
+    super(database);
     this.ids = DBIDUtil.makeUnmodifiable(ids);
   }
 
   @Override
-  public Database getDatabase() {
-    return database;
-  }
-
-  @Override
   public DBID get(DBIDRef id) {
-    assert (ids.contains(id));
+    assert(ids.contains(id));
     return DBIDUtil.deref(id);
-  }
-
-  @Override
-  public void set(DBIDRef id, DBID val) {
-    throw new UnsupportedOperationException("DBIDs cannot be changed.");
-  }
-
-  @Override
-  public void delete(DBIDRef id) {
-    if (database instanceof UpdatableDatabase) {
-      ((UpdatableDatabase) database).delete(id);
-    } else {
-      throw new UnsupportedOperationException("Deletions are not supported.");
-    }
   }
 
   @Override
@@ -124,5 +103,10 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   @Override
   public String getShortName() {
     return "DBID";
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

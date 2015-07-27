@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -47,9 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract base class for KNN Preprocessors.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
 public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPreprocessorIndex<O, KNNList> implements KNNIndex<O> {
@@ -70,7 +69,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation
    * @param distanceFunction Distance function
    * @param k k
@@ -84,7 +83,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
 
   /**
    * The distance query we used.
-   * 
+   *
    * @return Distance query
    */
   public DistanceQuery<O> getDistanceQuery() {
@@ -93,7 +92,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
 
   /**
    * Get the value of 'k' supported by this preprocessor.
-   * 
+   *
    * @return k
    */
   public int getK() {
@@ -107,7 +106,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
 
   /**
    * Get the k nearest neighbors.
-   * 
+   *
    * @param id Object ID
    * @return Neighbors
    */
@@ -125,28 +124,21 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
    * Create the default storage.
    */
   void createStorage() {
-    WritableDataStore<KNNList> s = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, KNNList.class);
-    storage = s;
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, KNNList.class);
   }
 
   @Override
   public void initialize() {
-    if(storage == null) {
-      if(relation.size() > 0) {
-        preprocess();
-      }
-    }
-    else {
+    if(storage != null) {
       throw new UnsupportedOperationException("Preprocessor already ran.");
+    }
+    if(relation.size() > 0) {
+      preprocess();
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public KNNQuery<O> getKNNQuery(DistanceQuery<O> distQ, Object... hints) {
-    if(!this.distanceFunction.equals(distQ.getDistanceFunction())) {
-      return null;
-    }
     // k max supported?
     for(Object hint : hints) {
       if(hint instanceof Integer) {
@@ -156,20 +148,18 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
         break;
       }
     }
-    // To make compilers happy:
-    AbstractMaterializeKNNPreprocessor<?> tmp = this;
-    return new PreprocessorKNNQuery<>(relation, (AbstractMaterializeKNNPreprocessor<O>) tmp);
+    return new PreprocessorKNNQuery<>(relation, this);
   }
 
   /**
    * The parameterizable factory.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.landmark
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractMaterializeKNNPreprocessor oneway - - «create»
-   * 
+   *
    * @param <O> The object type
    */
   public abstract static class Factory<O> implements IndexFactory<O, KNNIndex<O>> {
@@ -207,7 +197,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
 
     /**
      * Index factory.
-     * 
+     *
      * @param k k parameter
      * @param distanceFunction distance function
      */
@@ -222,7 +212,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
 
     /**
      * Get the distance function.
-     * 
+     *
      * @return Distance function
      */
     // TODO: hide this?
@@ -237,11 +227,11 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
-     * 
+     *
      * @param <O> Object type
      */
     public abstract static class Parameterizer<O> extends AbstractParameterizer {

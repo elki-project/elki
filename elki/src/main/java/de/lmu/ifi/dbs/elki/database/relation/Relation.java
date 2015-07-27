@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,10 +29,17 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 
 /**
- * An object representation from a database
+ * An object representation from a database.
  * 
  * @author Erich Schubert
  * 
@@ -49,7 +56,8 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * 
    * @return Database
    */
-  public Database getDatabase();
+  @Deprecated
+  Database getDatabase();
 
   /**
    * Get the representation of an object.
@@ -57,37 +65,23 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @param id Object ID
    * @return object instance
    */
-  public O get(DBIDRef id);
-
-  /**
-   * Set an object representation.
-   * 
-   * @param id Object ID
-   * @param val Value
-   */
-  // TODO: remove / move to a writable API?
-  public void set(DBIDRef id, O val);
-
-  /**
-   * Delete an objects values.
-   * 
-   * @param id ID to delete
-   */
-  public void delete(DBIDRef id);
+  O get(DBIDRef id);
 
   /**
    * Get the data type of this representation
    * 
    * @return Data type
    */
-  public SimpleTypeInformation<O> getDataTypeInformation();
+  SimpleTypeInformation<O> getDataTypeInformation();
 
   /**
    * Get the IDs the query is defined for.
    * 
+   * If possible, prefer {@link #iterDBIDs()}.
+   * 
    * @return IDs this is defined for
    */
-  public DBIDs getDBIDs();
+  DBIDs getDBIDs();
 
   /**
    * Get an iterator access to the DBIDs.
@@ -104,12 +98,87 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * 
    * @return iterator for the DBIDs.
    */
-  public DBIDIter iterDBIDs();
+  DBIDIter iterDBIDs();
 
   /**
    * Get the number of DBIDs.
    * 
    * @return Size
    */
-  public int size();
+  int size();
+
+  /**
+   * Get the distance query for a particular distance function.
+   * 
+   * @param distanceFunction Distance function to use
+   * @param hints Optimizer hints (optional)
+   * @return Instance to query the database with this distance
+   */
+  DistanceQuery<O> getDistanceQuery(DistanceFunction<? super O> distanceFunction, Object... hints);
+
+  /**
+   * Get the similarity query for a particular similarity function.
+   * 
+   * @param similarityFunction Similarity function to use
+   * @param hints Optimizer hints (optional)
+   * @return Instance to query the database with this similarity
+   */
+  SimilarityQuery<O> getSimilarityQuery(SimilarityFunction<? super O> similarityFunction, Object... hints);
+
+  /**
+   * Get a KNN query object for the given distance query.
+   * 
+   * When possible, this will use an index, but it may default to an expensive
+   * linear scan.
+   * 
+   * Hints include:
+   * <ul>
+   * <li>Integer: maximum value for k needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
+   * query needed</li>
+   * </ul>
+   * 
+   * @param distanceQuery Distance query
+   * @param hints Optimizer hints (optional)
+   * @return KNN Query object
+   */
+  KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
+
+  /**
+   * Get a range query object for the given distance query.
+   * 
+   * When possible, this will use an index, but it may default to an expensive
+   * linear scan.
+   * 
+   * Hints include:
+   * <ul>
+   * <li>Distance object: Maximum query range</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
+   * query needed</li>
+   * </ul>
+   * 
+   * @param distanceQuery Distance query
+   * @param hints Optimizer hints (optional)
+   * @return KNN Query object
+   */
+  RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints);
+
+  /**
+   * Get a rKNN query object for the given distance query.
+   * 
+   * When possible, this will use an index, but it may default to an expensive
+   * linear scan.
+   * 
+   * Hints include:
+   * <ul>
+   * <li>Integer: maximum value for k needed</li>
+   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
+   * query needed</li>
+   * </ul>
+   * 
+   * @param distanceQuery Distance query
+   * @param hints Optimizer hints (optional)
+   * @return KNN Query object
+   */
+  RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
 }

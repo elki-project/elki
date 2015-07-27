@@ -62,16 +62,19 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * A preprocessor for annotation of the k nearest neighbors and the reverse k
  * nearest neighbors (and their distances) to each database object.
- * 
+ *
+ * BUG: This class currently does <em>not</em> seem able to correctly keep track
+ * of the nearest neighbors!
+ *
  * @author Elke Achtert
- * 
+ *
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param the type of distance the used distance function will return
  */
 // TODO: rewrite the double optimization. Maybe use a specialized subclass?
 @Title("Materialize kNN and RkNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors and the reverse k nearest neighbors of objects of a database.")
-public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreprocessor<O> implements RKNNIndex<O> {
+public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreprocessor<O>implements RKNNIndex<O> {
   /**
    * Logger to use.
    */
@@ -84,7 +87,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to process
    * @param distanceFunction the distance function to use
    * @param k query k
@@ -103,7 +106,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   /**
    * Materializes the kNNs and RkNNs of the specified object IDs.
-   * 
+   *
    * @param ids the IDs of the objects
    */
   private void materializeKNNAndRKNNs(ArrayDBIDs ids, FiniteProgress progress) {
@@ -156,7 +159,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   /**
    * Updates the kNNs and RkNNs after insertion of the specified ids.
-   * 
+   *
    * @param ids the ids of newly inserted objects causing a change of
    *        materialized kNNs and RkNNs
    * @return the RkNNs of the specified ids, i.e. the kNNs which have been
@@ -233,6 +236,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
   protected void objectsRemoved(DBIDs ids) {
     StepProgress stepprog = getLogger().isVerbose() ? new StepProgress(3) : null;
 
+    // For debugging: valid DBIDs still in the database.
+    final DBIDs valid = DBIDUtil.ensureSet(distanceQuery.getRelation().getDBIDs());
+
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // delete the materialized (old) kNNs and RkNNs
     getLogger().beginStep(stepprog, 1, "New deletions ocurred, remove their materialized kNNs and RkNNs.");
@@ -241,8 +247,18 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     List<TreeSet<DoubleDBIDPair>> rkNNs = new ArrayList<>(ids.size());
     for(DBIDIter iter = aids.iter(); iter.valid(); iter.advance()) {
       kNNs.add(storage.get(iter));
+      for(DBIDIter it = storage.get(iter).iter(); it.valid(); it.advance()) {
+        if(!valid.contains(it) && !ids.contains(it)) {
+          LOG.warning("False kNN: " + it);
+        }
+      }
       storage.delete(iter);
       rkNNs.add(materialized_RkNN.get(iter));
+      for(DoubleDBIDPair it : materialized_RkNN.get(iter)) {
+        if(!valid.contains(it) && !ids.contains(it)) {
+          LOG.warning("False RkNN: " + it);
+        }
+      }
       materialized_RkNN.delete(iter);
     }
     // Keep only those IDs not also removed
@@ -256,13 +272,18 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
       List<? extends KNNList> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
       int i = 0;
       for(DBIDIter reknn = rkNN_ids.iter(); reknn.valid(); reknn.advance(), i++) {
+        if(kNNList.get(i) == null && !valid.contains(reknn)) {
+          LOG.warning("BUG in online kNN/RkNN maintainance: " + DBIDUtil.toString(reknn) + " no longer in database.");
+          continue;
+        }
+        assert(kNNList.get(i) != null);
         storage.put(reknn, kNNList.get(i));
         for(DoubleDBIDListIter it = kNNList.get(i).iter(); it.valid(); it.advance()) {
           materialized_RkNN.get(it).add(makePair(it, reknn));
         }
       }
     }
-    // remove objects from RkNNs of obejcts (in kNN lists)
+    // remove objects from RkNNs of objects (in kNN lists)
     {
       SetDBIDs idsSet = DBIDUtil.ensureSet(ids);
       for(DBIDIter nn = kNN_ids.iter(); nn.valid(); nn.advance()) {
@@ -284,14 +305,14 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   /**
    * Extracts and removes the DBIDs in the given collections.
-   * 
-   * @param extraxt a list of lists of DistanceResultPair to extract
+   *
+   * @param extract a list of lists of DistanceResultPair to extract
    * @param remove the ids to remove
    * @return the DBIDs in the given collection
    */
-  protected ArrayDBIDs affectedkNN(List<? extends KNNList> extraxt, DBIDs remove) {
+  protected ArrayDBIDs affectedkNN(List<? extends KNNList> extract, DBIDs remove) {
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet();
-    for(KNNList drps : extraxt) {
+    for(KNNList drps : extract) {
       for(DBIDIter iter = drps.iter(); iter.valid(); iter.advance()) {
         ids.add(iter);
       }
@@ -303,14 +324,14 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   /**
    * Extracts and removes the DBIDs in the given collections.
-   * 
-   * @param extraxt a list of lists of DistanceResultPair to extract
+   *
+   * @param extract a list of lists of DistanceResultPair to extract
    * @param remove the ids to remove
    * @return the DBIDs in the given collection
    */
-  protected ArrayDBIDs affectedRkNN(List<? extends Collection<DoubleDBIDPair>> extraxt, DBIDs remove) {
+  protected ArrayDBIDs affectedRkNN(List<? extends Collection<DoubleDBIDPair>> extract, DBIDs remove) {
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet();
-    for(Collection<DoubleDBIDPair> drps : extraxt) {
+    for(Collection<DoubleDBIDPair> drps : extract) {
       for(DoubleDBIDPair drp : drps) {
         ids.add(drp);
       }
@@ -322,7 +343,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   /**
    * Returns the materialized kNNs of the specified id.
-   * 
+   *
    * @param id the query id
    * @return the kNNs
    */
@@ -332,7 +353,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   /**
    * Returns the materialized RkNNs of the specified id.
-   * 
+   *
    * @param id the query id
    * @return the RkNNs
    */
@@ -383,16 +404,16 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
   /**
    * The parameterizable factory.
-   * 
+   *
    * @author Elke Achtert
-   * 
+   *
    * @param <O> The object type
    * @param The distance type
    */
   public static class Factory<O> extends MaterializeKNNPreprocessor.Factory<O> {
     /**
      * Constructor.
-     * 
+     *
      * @param k k
      * @param distanceFunction distance function
      */
@@ -408,9 +429,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer<O> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O> {

@@ -25,11 +25,10 @@ package de.lmu.ifi.dbs.elki.database.relation;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Representation adapter that uses toString() to produce a string
@@ -37,7 +36,12 @@ import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
  * 
  * @author Erich Schubert
  */
-public class ConvertToStringView extends AbstractHierarchicalResult implements Relation<String> {
+public class ConvertToStringView extends AbstractRelation<String> {
+  /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(ConvertToStringView.class);
+
   /**
    * The database we use
    */
@@ -49,28 +53,13 @@ public class ConvertToStringView extends AbstractHierarchicalResult implements R
    * @param existing Existing representation
    */
   public ConvertToStringView(Relation<?> existing) {
-    super();
+    super(existing.getDatabase());
     this.existing = existing;
-  }
-
-  @Override
-  public Database getDatabase() {
-    return existing.getDatabase();
   }
 
   @Override
   public String get(DBIDRef id) {
     return existing.get(id).toString();
-  }
-
-  @Override
-  public void set(DBIDRef id, String val) {
-    throw new UnsupportedOperationException("Covnersion representations are not writable!");
-  }
-
-  @Override
-  public void delete(DBIDRef id) {
-    throw new UnsupportedOperationException("Covnersion representations are not writable!");
   }
 
   @Override
@@ -101,5 +90,10 @@ public class ConvertToStringView extends AbstractHierarchicalResult implements R
   @Override
   public String getShortName() {
     return "tostring-" + existing.getShortName();
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

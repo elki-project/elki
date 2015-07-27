@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Represents a single representation. This is attached to a DBIDs object, which
@@ -44,11 +44,11 @@ import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
  * 
  * @author Erich Schubert
  */
-public class MaterializedDoubleRelation extends AbstractHierarchicalResult implements DoubleRelation {
+public class MaterializedDoubleRelation extends AbstractRelation<Double>implements DoubleRelation {
   /**
-   * Our database
+   * Class logger.
    */
-  private final Database database;
+  private static final Logging LOG = Logging.getLogger(MaterializedDoubleRelation.class);
 
   /**
    * Map to hold the objects of the database.
@@ -90,9 +90,7 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
    * @param name Name
    */
   public MaterializedDoubleRelation(Database database, DBIDs ids, String name) {
-    // We can't call this() since we'll have generics issues then.
-    super();
-    this.database = database;
+    super(database);
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
     this.content = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
@@ -107,8 +105,7 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
    * @param content Content
    */
   public MaterializedDoubleRelation(Database database, DBIDs ids, String name, DoubleDataStore content) {
-    super();
-    this.database = database;
+    super(database);
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
     this.content = content;
@@ -123,17 +120,11 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
    * @param ids IDs
    */
   public MaterializedDoubleRelation(String name, String shortname, DoubleDataStore content, DBIDs ids) {
-    super();
-    this.database = null;
+    super(null);
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
     this.shortname = shortname;
     this.content = content;
-  }
-
-  @Override
-  public Database getDatabase() {
-    return database;
   }
 
   @Deprecated
@@ -149,7 +140,7 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
 
   @Override
   public void set(DBIDRef id, double val) {
-    assert (ids.contains(id));
+    assert(ids.contains(id));
     if(content instanceof WritableDoubleDataStore) {
       ((WritableDoubleDataStore) content).putDouble(id, val);
     }
@@ -157,8 +148,8 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
 
   @Deprecated
   @Override
-  public void set(DBIDRef id, Double val) {
-    assert (ids.contains(id));
+  public void insert(DBIDRef id, Double val) {
+    assert(ids.contains(id));
     if(content instanceof WritableDoubleDataStore) {
       ((WritableDoubleDataStore) content).putDouble(id, val);
     }
@@ -171,7 +162,7 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
    */
   @Override
   public void delete(DBIDRef id) {
-    assert (!ids.contains(id));
+    assert(!ids.contains(id));
     if(content instanceof WritableDoubleDataStore) {
       ((WritableDoubleDataStore) content).delete(id);
     }
@@ -205,5 +196,10 @@ public class MaterializedDoubleRelation extends AbstractHierarchicalResult imple
   @Override
   public String getShortName() {
     return shortname;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

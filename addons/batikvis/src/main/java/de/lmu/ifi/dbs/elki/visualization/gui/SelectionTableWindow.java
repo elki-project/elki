@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.ModifiableRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 /**
  * Visualizes selected Objects in a JTable, objects can be selected, changed and
  * deleted
- * 
+ *
  * @author Heidi Kolb
  * @author Erich Schubert
  */
@@ -115,12 +115,12 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
   /**
    * Class label representation
    */
-  Relation<ClassLabel> crep;
+  ModifiableRelation<ClassLabel> crep;
 
   /**
    * Object label representation
    */
-  Relation<String> orep;
+  ModifiableRelation<String> orep;
 
   /**
    * Our context
@@ -129,7 +129,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
   /**
    * The actual visualization instance, for a single projection
-   * 
+   *
    * @param context The Context
    */
   public SelectionTableWindow(VisualizerContext context) {
@@ -141,7 +141,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     catch(Exception e) {
       // Ignore - icon not found is not fatal.
     }
-    
+
     this.context = context;
     this.database = ResultUtil.findDatabase(context.getResult());
     // FIXME: re-add labels
@@ -237,9 +237,9 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
   /**
    * View onto the database
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   class DatabaseTableModel extends AbstractTableModel {
@@ -308,12 +308,12 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
       }
       final DBIDRef id = dbids.iter().seek(rowIndex);
       if(columnIndex == 1 && aValue instanceof String) {
-        orep.set(id, (String) aValue);
+        orep.insert(id, (String) aValue);
       }
       if(columnIndex == 2 && aValue instanceof String) {
         // FIXME: better class label handling!
         SimpleClassLabel lbl = new SimpleClassLabel((String) aValue);
-        crep.set(id, lbl);
+        crep.insert(id, lbl);
       }
       if(!(aValue instanceof String)) {
         LOG.warning("Was expecting a String value from the input element, got: " + aValue.getClass());
@@ -361,7 +361,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
       dotTableModel.fireTableStructureChanged();
     }
   }
-  
+
   @Override
   public void resultAdded(Result child, Result parent) {
     // TODO Auto-generated method stub

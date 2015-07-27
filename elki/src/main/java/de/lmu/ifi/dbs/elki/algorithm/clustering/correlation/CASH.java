@@ -49,6 +49,9 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -103,10 +106,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the Hough transform.")
 @Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", //
-title = "Robust clustering in arbitraily oriented subspaces",//
-booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008",//
+title = "Robust clustering in arbitraily oriented subspaces", //
+booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", //
 url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
-public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -267,15 +270,15 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   private Relation<ParameterizationFunction> preprocess(Database db, Relation<V> vrel) {
     DBIDs ids = vrel.getDBIDs();
     SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<>(ParameterizationFunction.class);
-    MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<>(db, type, ids);
+    WritableDataStore<ParameterizationFunction> prep = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, ParameterizationFunction.class);
 
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      ParameterizationFunction f = new ParameterizationFunction(vrel.get(iter));
-      prep.set(iter, f);
+      prep.put(iter, new ParameterizationFunction(vrel.get(iter)));
     }
 
-    return prep;
+    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(db, type, ids, null, prep);
+    return prel;
   }
 
   /**
@@ -515,20 +518,20 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   private MaterializedRelation<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Relation<ParameterizationFunction> relation) {
     ProxyDatabase proxy = new ProxyDatabase(ids);
     SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<>(ParameterizationFunction.class);
-    MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<>(proxy, type, ids);
-    proxy.addRelation(prep);
+    WritableDataStore<ParameterizationFunction> prep = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, ParameterizationFunction.class);
 
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      ParameterizationFunction f = project(basis, relation.get(iter));
-      prep.set(iter, f);
+      prep.put(iter, project(basis, relation.get(iter)));
     }
 
     if(LOG.isDebugging()) {
       LOG.debugFine("db fuer dim " + (dim - 1) + ": " + ids.size());
     }
+    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(proxy, type, ids, null, prep);
+    proxy.addRelation(prel);
 
-    return prep;
+    return prel;
   }
 
   /**
@@ -748,19 +751,19 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     ProxyDatabase proxy = new ProxyDatabase(ids);
     int dim = dimensionality(relation);
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<>(proxy, type, ids);
-    proxy.addRelation(prep);
+    WritableDataStore<DoubleVector> prep = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, DoubleVector.class);
 
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DoubleVector v = new DoubleVector(relation.get(iter).getColumnVector().getArrayRef());
-      prep.set(iter, v);
+      prep.put(iter, new DoubleVector(relation.get(iter).getColumnVector().getArrayRef()));
     }
 
     if(LOG.isDebugging()) {
-      LOG.debugFine("db fuer derivator : " + prep.size());
+      LOG.debugFine("db fuer derivator : " + ids.size());
     }
 
+    MaterializedRelation<DoubleVector> prel = new MaterializedRelation<>(proxy, type, ids, null, prep);
+    proxy.addRelation(prel);
     return proxy;
   }
 
@@ -814,7 +817,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DoubleVector v = new DoubleVector(relation.get(iter).getColumnVector().getArrayRef());
-      prep.set(iter, v);
+      prep.insert(iter, v);
     }
 
     return proxy;

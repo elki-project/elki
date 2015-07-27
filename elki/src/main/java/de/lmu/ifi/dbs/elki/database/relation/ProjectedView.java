@@ -2,11 +2,10 @@ package de.lmu.ifi.dbs.elki.database.relation;
 
 import de.lmu.ifi.dbs.elki.data.projection.Projection;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /*
  This file is part of ELKI:
@@ -39,7 +38,12 @@ import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
  * @param <IN> Vector type
  * @param <OUT> Vector type
  */
-public class ProjectedView<IN, OUT> extends AbstractHierarchicalResult implements Relation<OUT> {
+public class ProjectedView<IN, OUT> extends AbstractRelation<OUT> {
+  /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(ProjectedView.class);
+
   /**
    * The wrapped representation where we get the IDs from.
    */
@@ -57,7 +61,7 @@ public class ProjectedView<IN, OUT> extends AbstractHierarchicalResult implement
    * @param projection Projection function
    */
   public ProjectedView(Relation<IN> inner, Projection<IN, OUT> projection) {
-    super();
+    super(inner.getDatabase());
     this.inner = inner;
     this.projection = projection;
     projection.initialize(inner.getDataTypeInformation());
@@ -74,23 +78,8 @@ public class ProjectedView<IN, OUT> extends AbstractHierarchicalResult implement
   }
 
   @Override
-  public Database getDatabase() {
-    return inner.getDatabase();
-  }
-
-  @Override
   public OUT get(DBIDRef id) {
     return projection.project(inner.get(id));
-  }
-
-  @Override
-  public void set(DBIDRef id, OUT val) {
-    throw new UnsupportedOperationException("Projections are read-only.");
-  }
-
-  @Override
-  public void delete(DBIDRef id) {
-    inner.delete(id);
   }
 
   @Override
@@ -111,5 +100,10 @@ public class ProjectedView<IN, OUT> extends AbstractHierarchicalResult implement
   @Override
   public int size() {
     return inner.size();
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

@@ -27,33 +27,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
-import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
-import de.lmu.ifi.dbs.elki.index.DistanceIndex;
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
-import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.index.RKNNIndex;
-import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
@@ -82,11 +72,6 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   protected final List<Relation<?>> relations = new ArrayList<>();
 
   /**
-   * Indexes.
-   */
-  protected final List<Index> indexes = new ArrayList<>();
-
-  /**
    * Index factories.
    */
   protected final Collection<IndexFactory<?, ?>> indexFactories = new ArrayList<>();
@@ -96,24 +81,6 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
    */
   public AbstractDatabase() {
     super();
-  }
-
-  @Override
-  public void addIndex(Index index) {
-    this.indexes.add(index);
-    // TODO: actually add index to the representation used?
-    this.addChildResult(index);
-  }
-
-  @Override
-  public List<Index> getIndexes() {
-    return Collections.unmodifiableList(this.indexes);
-  }
-
-  @Override
-  public void removeIndex(Index index) {
-    this.indexes.remove(index);
-    this.getHierarchy().remove(this, index);
   }
 
   @Override
@@ -160,173 +127,33 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   @Override
   public <O> DistanceQuery<O> getDistanceQuery(Relation<O> objQuery, DistanceFunction<? super O> distanceFunction, Object... hints) {
-    if(distanceFunction == null) {
-      throw new AbortException("Distance query requested for 'null' distance!");
-    }
-    ListIterator<Index> iter = indexes.listIterator(indexes.size());
-    while(iter.hasPrevious()) {
-      Index idx = iter.previous();
-      if(idx instanceof DistanceIndex) {
-        @SuppressWarnings("unchecked")
-        final DistanceIndex<O> distanceIndex = (DistanceIndex<O>) idx;
-        DistanceQuery<O> q = distanceIndex.getDistanceQuery(distanceFunction, hints);
-        if(getLogger().isDebuggingFinest()) {
-          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for distance query: " + idx);
-        }
-        if(q != null) {
-          return q;
-        }
-      }
-    }
-    for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_OPTIMIZED_ONLY && !(distanceFunction instanceof DBIDDistanceFunction)) {
-        return null; // Linear scan is not desirable.
-      }
-    }
-    return distanceFunction.instantiate(objQuery);
+    return objQuery.getDistanceQuery(distanceFunction, hints);
   }
 
   @Override
   public <O> SimilarityQuery<O> getSimilarityQuery(Relation<O> objQuery, SimilarityFunction<? super O> similarityFunction, Object... hints) {
-    if(similarityFunction == null) {
-      throw new AbortException("Similarity query requested for 'null' similarity!");
-    }
-    // TODO: add indexing support for similarities!
-    return similarityFunction.instantiate(objQuery);
+    return objQuery.getSimilarityQuery(similarityFunction, hints);
   }
 
   @Override
   public <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(distanceQuery == null) {
-      throw new AbortException("kNN query requested for 'null' distance!");
-    }
-    ListIterator<Index> iter = indexes.listIterator(indexes.size());
-    while(iter.hasPrevious()) {
-      Index idx = iter.previous();
-      if(idx instanceof KNNIndex) {
-        @SuppressWarnings("unchecked")
-        final KNNIndex<O> knnIndex = (KNNIndex<O>) idx;
-        KNNQuery<O> q = knnIndex.getKNNQuery(distanceQuery, hints);
-        if(getLogger().isDebuggingFinest()) {
-          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for kNN query: " + idx);
-        }
-        if(q != null) {
-          return q;
-        }
-      }
-    }
-
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    if(getLogger().isDebuggingFinest() && indexes.size() > 0) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
-      buf.append("Distance query: ").append(distanceQuery).append('\n');
-      if(hints.length > 0) {
-        buf.append("Hints:");
-        for(Object o : hints) {
-          buf.append(' ').append(o);
-        }
-      }
-      getLogger().debugFinest(buf.toString());
-    }
-    return QueryUtil.getLinearScanKNNQuery(distanceQuery);
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
+    return relation.getKNNQuery(distanceQuery, hints);
   }
 
   @Override
   public <O> RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(distanceQuery == null) {
-      throw new AbortException("Range query requested for 'null' distance!");
-    }
-    ListIterator<Index> iter = indexes.listIterator(indexes.size());
-    while(iter.hasPrevious()) {
-      Index idx = iter.previous();
-      if(idx instanceof RangeIndex) {
-        @SuppressWarnings("unchecked")
-        final RangeIndex<O> rangeIndex = (RangeIndex<O>) idx;
-        RangeQuery<O> q = rangeIndex.getRangeQuery(distanceQuery, hints);
-        if(getLogger().isDebuggingFinest()) {
-          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + idx);
-        }
-        if(q != null) {
-          return q;
-        }
-      }
-    }
-
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-    }
-    if(getLogger().isDebuggingFinest() && indexes.size() > 0) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
-      buf.append("Distance query: ").append(distanceQuery).append('\n');
-      if(hints.length > 0) {
-        buf.append("Hints:");
-        for(Object o : hints) {
-          buf.append(' ').append(o);
-        }
-      }
-      getLogger().debugFinest(buf.toString());
-    }
-    return QueryUtil.getLinearScanRangeQuery(distanceQuery);
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
+    return relation.getRangeQuery(distanceQuery, hints);
   }
 
   @Override
   public <O> RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(distanceQuery == null) {
-      throw new AbortException("RKNN query requested for 'null' distance!");
-    }
-    ListIterator<Index> iter = indexes.listIterator(indexes.size());
-    while(iter.hasPrevious()) {
-      Index idx = iter.previous();
-      if(idx instanceof RKNNIndex) {
-        if(getLogger().isDebuggingFinest()) {
-          getLogger().debugFinest("Considering index for RkNN Query: " + idx);
-        }
-        @SuppressWarnings("unchecked")
-        final RKNNIndex<O> rknnIndex = (RKNNIndex<O>) idx;
-        RKNNQuery<O> q = rknnIndex.getRKNNQuery(distanceQuery, hints);
-        if(getLogger().isDebuggingFinest()) {
-          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + idx);
-        }
-        if(q != null) {
-          return q;
-        }
-      }
-    }
-
-    Integer maxk = null;
-    // Default
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
-        return null;
-      }
-      if(hint instanceof Integer) {
-        maxk = (Integer) hint;
-      }
-    }
-    if(getLogger().isDebuggingFinest() && indexes.size() > 0) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
-      buf.append("Distance query: ").append(distanceQuery).append('\n');
-      if(hints.length > 0) {
-        buf.append("Hints:");
-        for(Object o : hints) {
-          buf.append(' ').append(o);
-        }
-      }
-      getLogger().debugFinest(buf.toString());
-    }
-    KNNQuery<O> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
-    return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
+    return relation.getRKNNQuery(distanceQuery, hints);
   }
 
   @Override

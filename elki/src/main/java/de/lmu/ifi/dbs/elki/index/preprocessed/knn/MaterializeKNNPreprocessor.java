@@ -52,15 +52,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
- * 
+ *
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF}.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has DistanceFunction
  * @apiviz.has KNNQuery
  * @apiviz.has KNNListener
- * 
+ *
  * @param <O> the type of database objects the preprocessor can be applied to
  */
 @Title("Materialize kNN Neighborhood preprocessor")
@@ -73,7 +73,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
   /**
    * Flag to use bulk operations.
-   * 
+   *
    * TODO: right now, bulk is not that good - so don't use
    */
   private static final boolean usebulk = false;
@@ -90,7 +90,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
   /**
    * Constructor with preprocessing step.
-   * 
+   *
    * @param relation Relation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
@@ -168,7 +168,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   /**
    * Called after new objects have been inserted, updates the materialized
    * neighborhood.
-   * 
+   *
    * @param ids the ids of the newly inserted objects
    */
   protected void objectsInserted(DBIDs ids) {
@@ -198,7 +198,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
   /**
    * Updates the kNNs of the RkNNs of the specified ids.
-   * 
+   *
    * @param ids the ids of newly inserted objects causing a change of
    *        materialized kNNs
    * @return the RkNNs of the specified ids, i.e. the kNNs which have been
@@ -232,7 +232,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
   /**
    * Updates the kNNs of the RkNNs of the specified ids.
-   * 
+   *
    * @param ids the ids of deleted objects causing a change of materialized kNNs
    * @return the RkNNs of the specified ids, i.e. the kNNs which have been
    *         updated
@@ -263,7 +263,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   /**
    * Called after objects have been removed, updates the materialized
    * neighborhood.
-   * 
+   *
    * @param ids the ids of the removed objects
    */
   protected void objectsRemoved(DBIDs ids) {
@@ -289,7 +289,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   /**
    * Informs all registered KNNListener that new kNNs have been inserted and as
    * a result some kNNs have been changed.
-   * 
+   *
    * @param insertions the ids of the newly inserted kNNs
    * @param updates the ids of kNNs which have been changed due to the
    *        insertions
@@ -308,7 +308,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   /**
    * Informs all registered KNNListener that existing kNNs have been removed and
    * as a result some kNNs have been changed.
-   * 
+   *
    * @param removals the ids of the removed kNNs
    * @param updates the ids of kNNs which have been changed due to the removals
    * @see KNNListener
@@ -326,7 +326,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   /**
    * Adds a {@link KNNListener} which will be invoked when the kNNs of objects
    * are changing.
-   * 
+   *
    * @param l the listener to add
    * @see #removeKNNListener
    * @see KNNListener
@@ -338,7 +338,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   /**
    * Removes a {@link KNNListener} previously added with {@link #addKNNListener}
    * .
-   * 
+   *
    * @param l the listener to remove
    * @see #addKNNListener
    * @see KNNListener
@@ -369,19 +369,19 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
   /**
    * The parameterizable factory.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.landmark
    * @apiviz.stereotype factory
    * @apiviz.uses MaterializeKNNPreprocessor oneway - - «create»
-   * 
+   *
    * @param <O> The object type
    */
   public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * Index factory.
-     * 
+     *
      * @param k k parameter
      * @param distanceFunction distance function
      */
@@ -397,9 +397,9 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {

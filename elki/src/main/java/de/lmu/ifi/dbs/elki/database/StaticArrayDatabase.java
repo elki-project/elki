@@ -26,8 +26,11 @@ package de.lmu.ifi.dbs.elki.database;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
@@ -36,12 +39,10 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -116,19 +117,18 @@ public class StaticArrayDatabase extends AbstractDatabase {
       if(LOG.isDebugging()) {
         LOG.debugFine("Loading data from database connection.");
       }
-      MultipleObjectsBundle objpackages = databaseConnection.loadData();
+      MultipleObjectsBundle bundle = databaseConnection.loadData();
       // Run at most once.
       databaseConnection = null;
 
       // Find DBIDs for bundle
-      int numObjects = objpackages.dataLength();
       {
-        DBIDs bids = objpackages.getDBIDs();
+        DBIDs bids = bundle.getDBIDs();
         if(bids instanceof ArrayStaticDBIDs) {
           this.ids = (ArrayStaticDBIDs) bids;
         }
         else if(bids == null) {
-          this.ids = DBIDUtil.generateStaticDBIDRange(objpackages.dataLength());
+          this.ids = DBIDUtil.generateStaticDBIDRange(bundle.dataLength());
         }
         else {
           this.ids = (ArrayStaticDBIDs) DBIDUtil.makeUnmodifiable(bids);
@@ -140,24 +140,24 @@ public class StaticArrayDatabase extends AbstractDatabase {
       relations.add(this.idrep);
       getHierarchy().add(this, idrep);
 
-      // insert into db - note: DBIDs should have been prepared before this!
-      Relation<?>[] targets = alignColumns(objpackages);
+      DBIDArrayIter it = this.ids.iter();
 
-      DBIDIter newid = ids.iter();
-      for(int j = 0; j < numObjects; j++, newid.advance()) {
-        // insert object
-        for(int i = 0; i < targets.length; i++) {
-          @SuppressWarnings("unchecked")
-          final Relation<Object> relation = (Relation<Object>) targets[i];
-          relation.set(newid, objpackages.data(j, i));
+      int numrel = bundle.metaLength();
+      for(int i = 0; i < numrel; i++) {
+        SimpleTypeInformation<?> meta = bundle.meta(i);
+        @SuppressWarnings("unchecked")
+        SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
+        WritableDataStore<Object> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, ometa.getRestrictionClass());
+        for(it.seek(0); it.valid(); it.advance()) {
+          store.put(it, bundle.data(it.getOffset(), i));
         }
-      }
+        Relation<?> relation = new MaterializedRelation<>(this, ometa, ids, null, store);
+        relations.add(relation);
+        getHierarchy().add(this, relation);
 
-      for(Relation<?> relation : relations) {
-        SimpleTypeInformation<?> meta = relation.getDataTypeInformation();
         // Try to add indexes where appropriate
         for(IndexFactory<?, ?> factory : indexFactories) {
-          if(factory.getInputTypeRestriction().isAssignableFromType(meta)) {
+          if(factory.getInputTypeRestriction().isAssignableFromType(ometa)) {
             @SuppressWarnings("unchecked")
             final IndexFactory<Object, ?> ofact = (IndexFactory<Object, ?>) factory;
             @SuppressWarnings("unchecked")
@@ -168,7 +168,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
             if(duration != null) {
               LOG.statistics(duration.end());
             }
-            addIndex(index);
+            getHierarchy().add(relation, index);
           }
         }
       }
@@ -176,62 +176,6 @@ public class StaticArrayDatabase extends AbstractDatabase {
       // fire insertion event
       eventManager.fireObjectsInserted(ids);
     }
-  }
-
-  @Override
-  public void addIndex(Index index) {
-    if(LOG.isDebuggingFiner()) {
-      LOG.debugFine("Adding index: " + index);
-    }
-    this.indexes.add(index);
-    // TODO: actually add index to the representation used?
-    this.addChildResult(index);
-  }
-
-  /**
-   * Find a mapping from package columns to database columns, eventually adding
-   * new database columns when needed.
-   * 
-   * @param pack Package to process
-   * @return Column mapping
-   */
-  protected Relation<?>[] alignColumns(ObjectBundle pack) {
-    // align representations.
-    Relation<?>[] targets = new Relation<?>[pack.metaLength()];
-    long[] used = BitsUtil.zero(relations.size());
-    for(int i = 0; i < targets.length; i++) {
-      SimpleTypeInformation<?> meta = pack.meta(i);
-      // TODO: aggressively try to match exact metas first?
-      // Try to match unused representations only
-      for(int j = BitsUtil.nextClearBit(used, 0); j >= 0 && j < relations.size(); j = BitsUtil.nextClearBit(used, j + 1)) {
-        Relation<?> relation = relations.get(j);
-        if(relation.getDataTypeInformation().isAssignableFromType(meta)) {
-          targets[i] = relation;
-          BitsUtil.setI(used, j);
-          break;
-        }
-      }
-      if(targets[i] == null) {
-        targets[i] = addNewRelation(meta);
-        BitsUtil.setI(used, relations.size() - 1);
-      }
-    }
-    return targets;
-  }
-
-  /**
-   * Add a new representation for the given meta.
-   * 
-   * @param meta meta data
-   * @return new representation
-   */
-  private Relation<?> addNewRelation(SimpleTypeInformation<?> meta) {
-    @SuppressWarnings("unchecked")
-    SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
-    Relation<?> relation = new MaterializedRelation<>(this, ometa, ids);
-    relations.add(relation);
-    getHierarchy().add(this, relation);
-    return relation;
   }
 
   @Override

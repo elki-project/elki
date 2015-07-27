@@ -59,6 +59,14 @@ public interface Hierarchy<O> {
   Iter<O> iterChildren(O self);
 
   /**
+   * Iterate over the (direct) children in reverse order.
+   * 
+   * @param self object to get children for
+   * @return iterator for children
+   */
+  Iter<O> iterChildrenReverse(O self);
+
+  /**
    * Iterate descendants (recursive children)
    * 
    * @param self object to get descendants for
@@ -81,6 +89,14 @@ public interface Hierarchy<O> {
    * @return iterator of parents
    */
   Iter<O> iterParents(O self);
+
+  /**
+   * Iterate over the (direct) parents in reverse order.
+   * 
+   * @param self object to get parents for
+   * @return iterator of parents
+   */
+  Iter<O> iterParentsReverse(O self);
 
   /**
    * Iterate ancestors (recursive parents)

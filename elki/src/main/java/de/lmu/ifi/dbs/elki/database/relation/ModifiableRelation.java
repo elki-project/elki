@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,39 +25,28 @@ package de.lmu.ifi.dbs.elki.database.relation;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
- * Interface for double-valued relations.
+ * Relations that allow modification.
+ * 
+ * Important: Relations are now responsible for maintaining their indexes after
+ * creation (i.e. notifying them of inserts and deletions).
  * 
  * @author Erich Schubert
+ *
+ * @param <O> Data type.
  */
-public interface DoubleRelation extends ModifiableRelation<Double> {
+public interface ModifiableRelation<O> extends Relation<O> {
   /**
-   * Get the representation of an object.
-   * 
-   * @param id Object ID
-   * @return object instance
-   */
-  public double doubleValue(DBIDRef id);
-
-  /**
-   * @deprecated use {@link #doubleValue} instead.
-   */
-  @Deprecated
-  @Override
-  public Double get(DBIDRef id);
-
-  /**
-   * Set an object representation.
+   * Set (or insert) an object representation.
    * 
    * @param id Object ID
    * @param val Value
    */
-  // TODO: remove / move to a writable API?
-  public void set(DBIDRef id, double val);
+  void insert(DBIDRef id, O val);
 
   /**
-   * @deprecated use {@link #set(DBIDRef, double)} instead.
+   * Delete an objects values.
+   * 
+   * @param id ID to delete
    */
-  @Deprecated
-  @Override
-  public void insert(DBIDRef id, Double val);
+  void delete(DBIDRef id);
 }

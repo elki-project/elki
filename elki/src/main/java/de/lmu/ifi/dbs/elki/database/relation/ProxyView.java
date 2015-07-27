@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * A virtual partitioning of the database. For the accepted DBIDs, access is
@@ -39,11 +39,11 @@ import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
  * 
  * @param <O> Object type
  */
-public class ProxyView<O> extends AbstractHierarchicalResult implements Relation<O> {
+public class ProxyView<O> extends AbstractRelation<O> {
   /**
-   * Our database
+   * Class logger
    */
-  private final Database database;
+  private static final Logging LOG = Logging.getLogger(ProxyView.class);
 
   /**
    * The DBIDs we contain
@@ -62,15 +62,9 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
    * @param inner Inner representation
    */
   public ProxyView(Database database, DBIDs idview, Relation<O> inner) {
-    super();
-    this.database = database;
+    super(database);
     this.idview = DBIDUtil.makeUnmodifiable(idview);
     this.inner = inner;
-  }
-
-  @Override
-  public Database getDatabase() {
-    return database;
   }
 
   /**
@@ -87,19 +81,8 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
 
   @Override
   public O get(DBIDRef id) {
-    assert (idview.contains(id)) : "Accessing object not included in view.";
+    assert(idview.contains(id)) : "Accessing object not included in view.";
     return inner.get(id);
-  }
-
-  @Override
-  public void set(DBIDRef id, O val) {
-    assert (idview.contains(id)) : "Accessing object not included in view.";
-    inner.set(id, val);
-  }
-
-  @Override
-  public void delete(DBIDRef id) {
-    throw new UnsupportedOperationException("Semantics of 'delete-from-virtual-partition' are not uniquely defined. Delete from IDs or from underlying data, please!");
   }
 
   @Override
@@ -139,5 +122,10 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
    */
   public void setDBIDs(DBIDs ids) {
     this.idview = ids;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

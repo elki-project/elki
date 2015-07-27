@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
@@ -60,9 +59,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 /**
  * Incremental version of the {@link LOF} Algorithm, supports insertions and
  * removals.
- * 
+ *
+ * BUG: this currently does not appear to work.
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has FlexibleLOF.LOFResult oneway - - updates
  */
 // TODO: related to publication?
@@ -74,7 +75,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param krefer The number of neighbors for reference
    * @param kreach The number of neighbors for reachability distance
    * @param neighborhoodDistanceFunction the neighborhood distance function
@@ -113,15 +114,16 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
   /**
    * Get the kNN and rkNN queries for the algorithm.
-   * 
+   *
    * @param relation Data
    * @param stepprog Progress logger
    * @return the kNN and rkNN queries
    */
   private Pair<Pair<KNNQuery<O>, KNNQuery<O>>, Pair<RKNNQuery<O>, RKNNQuery<O>>> getKNNAndRkNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
+    DistanceQuery<O> drefQ = database.getDistanceQuery(relation, referenceDistanceFunction);
     // Use "HEAVY" flag, since this is an online algorithm
-    KNNQuery<O> kNNRefer = QueryUtil.getKNNQuery(relation, referenceDistanceFunction, krefer, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    RKNNQuery<O> rkNNRefer = QueryUtil.getRKNNQuery(relation, referenceDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> kNNRefer = database.getKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    RKNNQuery<O> rkNNRefer = database.getRKNNQuery(drefQ, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
 
     // No optimized kNN query or RkNN query - use a preprocessor!
     if(kNNRefer == null || rkNNRefer == null) {
@@ -129,11 +131,10 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
         stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", LOG);
       }
       MaterializeKNNAndRKNNPreprocessor<O> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, referenceDistanceFunction, krefer);
-      DistanceQuery<O> ndq = database.getDistanceQuery(relation, referenceDistanceFunction);
-      kNNRefer = preproc.getKNNQuery(ndq, krefer, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNRefer = preproc.getRKNNQuery(ndq, krefer, DatabaseQuery.HINT_HEAVY_USE);
+      kNNRefer = preproc.getKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNRefer = preproc.getRKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      database.addIndex(preproc);
+      database.getHierarchy().add(relation, preproc);
     }
     else {
       if(stepprog != null) {
@@ -141,8 +142,9 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       }
     }
 
-    KNNQuery<O> kNNReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    RKNNQuery<O> rkNNReach = QueryUtil.getRKNNQuery(relation, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    DistanceQuery<O> dreachQ = database.getDistanceQuery(relation, reachabilityDistanceFunction);
+    KNNQuery<O> kNNReach = database.getKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    RKNNQuery<O> rkNNReach = database.getRKNNQuery(dreachQ, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     if(kNNReach == null || rkNNReach == null) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing neighborhood w.r.t. reachability distance function.", LOG);
@@ -151,11 +153,10 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
       config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.K_ID, kreach);
       MaterializeKNNAndRKNNPreprocessor<O> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, reachabilityDistanceFunction, kreach);
-      DistanceQuery<O> rdq = database.getDistanceQuery(relation, reachabilityDistanceFunction);
-      kNNReach = preproc.getKNNQuery(rdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNReach = preproc.getRKNNQuery(rdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
+      kNNReach = preproc.getKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE);
+      rkNNReach = preproc.getRKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      database.addIndex(preproc);
+      database.getHierarchy().add(relation, preproc);
     }
 
     Pair<KNNQuery<O>, KNNQuery<O>> kNNPair = new Pair<>(kNNRefer, kNNReach);
@@ -167,9 +168,9 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
   /**
    * Encapsulates a listener for changes of kNNs used in the online LOF
    * algorithm.
-   * 
+   *
    * @author Elke Achtert
-   * 
+   *
    * @apiviz.exclude
    */
   private class LOFKNNListener implements KNNListener {
@@ -187,7 +188,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     /**
      * Constructs a listener for the LOF algorithm.
-     * 
+     *
      * @param lofResult the result of a former run of the LOF algorithm
      */
     public LOFKNNListener(LOFResult<O> lofResult) {
@@ -225,7 +226,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
     /**
      * Invoked after the events of both preprocessors have been received, i.e.
      * until both preprocessors are up to date.
-     * 
+     *
      * @param e1 the change event of the first preprocessor
      * @param e2 the change event of the second preprocessor
      */
@@ -250,7 +251,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     /**
      * Invoked after kNNs have been inserted and updated, updates the result.
-     * 
+     *
      * @param insertions the ids of the newly inserted neighborhoods
      * @param updates1 the ids of the updated neighborhood w.r.t. the
      *        neighborhood distance function
@@ -299,7 +300,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     /**
      * Invoked after kNNs have been removed and updated, updates the result.
-     * 
+     *
      * @param deletions the ids of the removed neighborhoods
      * @param updates1 the ids of the updated neighborhood w.r.t. the
      *        neighborhood distance function
@@ -357,7 +358,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     /**
      * Merges the ids of the query result with the specified ids.
-     * 
+     *
      * @param queryResults the list of query results
      * @param ids the list of ids
      * @return a set containing the ids of the query result and the specified
@@ -376,7 +377,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     /**
      * Recomputes the lofs of the specified ids.
-     * 
+     *
      * @param ids the ids of the lofs to be recomputed
      * @param lofResult the result of the former LOF run
      */
@@ -408,9 +409,9 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends FlexibleLOF.Parameterizer<O> {

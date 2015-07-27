@@ -34,24 +34,29 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
+import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Represents a single representation. This is attached to a DBIDs object, which
  * you are supposed to manage first. I.e. put the new DBID in, then invoke
  * set(), remove the DBID, then delete().
- * 
+ *
  * TODO: is this semantic sane?
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Data type
  */
-public class MaterializedRelation<O> extends AbstractHierarchicalResult implements Relation<O> {
+public class MaterializedRelation<O> extends AbstractRelation<O>implements ModifiableRelation<O> {
   /**
-   * Our database
+   * Class logger.
    */
-  private final Database database;
+  private static final Logging LOG = Logging.getLogger(MaterializedRelation.class);
 
   /**
    * The class of objects we store.
@@ -65,7 +70,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
 
   /**
    * The DBIDs this is supposed to be defined for.
-   * 
+   *
    * Note: we only keep an unmodifiable reference.
    */
   private final StaticDBIDs ids;
@@ -82,7 +87,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
 
   /**
    * Constructor.
-   * 
+   *
    * @param database Database
    * @param type Type information
    * @param ids IDs
@@ -93,7 +98,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
 
   /**
    * Constructor.
-   * 
+   *
    * @param database Database
    * @param type Type information
    * @param ids IDs
@@ -101,8 +106,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    */
   public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name) {
     // We can't call this() since we'll have generics issues then.
-    super();
-    this.database = database;
+    super(database);
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
@@ -111,7 +115,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
 
   /**
    * Constructor.
-   * 
+   *
    * @param database Database
    * @param type Type information
    * @param ids IDs
@@ -119,8 +123,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * @param content Content
    */
   public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name, DataStore<O> content) {
-    super();
-    this.database = database;
+    super(database);
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
@@ -129,7 +132,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
 
   /**
    * Constructor.
-   * 
+   *
    * @param name Name
    * @param shortname Short name of the result
    * @param type Type information
@@ -137,8 +140,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * @param ids IDs
    */
   public MaterializedRelation(String name, String shortname, SimpleTypeInformation<O> type, DataStore<O> content, DBIDs ids) {
-    super();
-    this.database = null;
+    super(null);
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
@@ -147,34 +149,49 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   }
 
   @Override
-  public Database getDatabase() {
-    return database;
-  }
-
-  @Override
   public O get(DBIDRef id) {
     return content.get(id);
   }
 
   @Override
-  public void set(DBIDRef id, O val) {
-    assert (ids.contains(id));
-    if(content instanceof WritableDataStore) {
-      ((WritableDataStore<O>) content).put(id, val);
+  public void insert(DBIDRef id, O val) {
+    assert(ids.contains(id)) : "Object not yet in DBIDs.";
+    if(!(content instanceof WritableDataStore)) {
+      throw new AbortException("Data is stored in a non-writable data store. Modifications are not possible.");
+    }
+    ((WritableDataStore<O>) content).put(id, val);
+    for(Iter<Result> it = database.getHierarchy().iterDescendants(database); it.valid(); it.advance()) {
+      if(!(it.get() instanceof DynamicIndex)) {
+        if(it.get() instanceof Index) {
+          throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
+        }
+        continue;
+      }
+      ((DynamicIndex) it.get()).insert(id);
     }
   }
 
   /**
    * Delete an objects values.
-   * 
+   *
    * @param id ID to delete
    */
   @Override
   public void delete(DBIDRef id) {
-    assert (!ids.contains(id));
-    if(content instanceof WritableDataStore) {
-      ((WritableDataStore<O>) content).delete(id);
+    assert(!ids.contains(id)) : "Object still in DBIDs.";
+    if(!(content instanceof WritableDataStore)) {
+      throw new AbortException("Data is stored in a non-writable data store. Modifications are not possible.");
     }
+    for(Iter<Result> it = database.getHierarchy().iterDescendants(this); it.valid(); it.advance()) {
+      if(!(it.get() instanceof DynamicIndex)) {
+        if(it.get() instanceof Index) {
+          throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
+        }
+        continue;
+      }
+      ((DynamicIndex) it.get()).delete(id);
+    }
+    ((WritableDataStore<O>) content).delete(id);
   }
 
   @Override
@@ -205,5 +222,10 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   @Override
   public String getShortName() {
     return shortname;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

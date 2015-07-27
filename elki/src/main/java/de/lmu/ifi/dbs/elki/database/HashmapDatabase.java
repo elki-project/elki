@@ -37,13 +37,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.ModifiableRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
-import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -57,10 +57,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Database storing data using hashtable storage, and thus allowing additional
  * and removal of objects.
- * 
+ *
  * @author Arthur Zimek
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf HashSetModifiableDBIDs
  */
@@ -88,7 +88,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
 
   /**
    * Constructor.
-   * 
+   *
    * @param databaseConnection Database connection to get the initial data from.
    * @param indexFactories Indexes to add
    */
@@ -146,21 +146,14 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
       }
       ids.add(var);
       for(int i = 0; i < targets.length; i++) {
+        if(!(targets[i] instanceof ModifiableRelation)) {
+          throw new AbortException("Non-modifiable relations have been added to the database.");
+        }
         @SuppressWarnings("unchecked")
-        final Relation<Object> relation = (Relation<Object>) targets[i];
-        relation.set(var, objpackages.data(j, i));
+        final ModifiableRelation<Object> relation = (ModifiableRelation<Object>) targets[i];
+        relation.insert(var, objpackages.data(j, i));
       }
       newids.add(var);
-    }
-
-    // Notify indexes of insertions
-    for(Index index : indexes) {
-      if(index instanceof DynamicIndex) {
-        ((DynamicIndex) index).insertAll(newids);
-      }
-      else {
-        LOG.warning("Non-dynamic indexes have been added to the database. Updates are not possible!");
-      }
     }
 
     // fire insertion event
@@ -171,7 +164,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   /**
    * Find a mapping from package columns to database columns, eventually adding
    * new database columns when needed.
-   * 
+   *
    * @param pack Package to process
    * @return Column mapping
    */
@@ -201,7 +194,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
 
   /**
    * Add a new representation for the given meta.
-   * 
+   *
    * @param meta meta data
    * @return new representation
    */
@@ -219,8 +212,8 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
         @SuppressWarnings("unchecked")
         final Relation<Object> orep = (Relation<Object>) relation;
         Index index = ofact.instantiate(orep);
-        addIndex(index);
         index.initialize();
+        getHierarchy().add(relation, index);
       }
     }
     return relation;
@@ -230,7 +223,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
    * Removes the objects from the database (by calling
    * {@link #doDelete(DBIDRef)} for each object) and indexes and fires a
    * deletion event.
-   * 
+   *
    * {@inheritDoc}
    */
   @Override
@@ -248,16 +241,6 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       doDelete(iter);
     }
-    // Remove from indexes
-    for(Index index : indexes) {
-      if(index instanceof DynamicIndex) {
-        ((DynamicIndex) index).deleteAll(ids);
-      }
-      else {
-        LOG.warning("Non-dynamic indexes have been added to the database. Updates are not possible!");
-      }
-
-    }
     // fire deletion event
     eventManager.fireObjectsRemoved(ids);
 
@@ -267,7 +250,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   /**
    * Removes the object from the database (by calling {@link #doDelete(DBIDRef)}
    * ) and indexes and fires a deletion event.
-   * 
+   *
    * {@inheritDoc}
    */
   @Override
@@ -278,15 +261,6 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
       bundle.append(relation.getDataTypeInformation(), relation.get(id));
     }
     doDelete(id);
-    // Remove from indexes
-    for(Index index : indexes) {
-      if(index instanceof DynamicIndex) {
-        ((DynamicIndex) index).delete(id);
-      }
-      else {
-        LOG.warning("Non-dynamic indexes have been added to the database. Updates are not possible!");
-      }
-    }
     // fire deletion event
     eventManager.fireObjectRemoved(id);
 
@@ -295,7 +269,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
 
   /**
    * Removes the object with the specified id from this database.
-   * 
+   *
    * @param id id the id of the object to be removed
    */
   private void doDelete(DBIDRef id) {
@@ -304,9 +278,13 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     // Remove from all representations.
     for(Relation<?> relation : relations) {
       // ID has already been removed, and this would loop...
-      if(relation != idrep) {
-        relation.delete(id);
+      if(relation == idrep) {
+        continue;
       }
+      if(!(relation instanceof ModifiableRelation)) {
+        throw new AbortException("Non-modifiable relations have been added to the database.");
+      }
+      ((ModifiableRelation<?>) relation).delete(id);
     }
     DBIDFactory.FACTORY.deallocateSingleDBID(id);
   }
@@ -318,9 +296,9 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDatabase.Parameterizer {

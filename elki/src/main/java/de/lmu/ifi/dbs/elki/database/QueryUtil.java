@@ -110,8 +110,8 @@ public final class QueryUtil {
    */
   public static <O> KNNQuery<O> getKNNQuery(Database database, DistanceFunction<? super O> distanceFunction, Object... hints) {
     final Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction(), hints);
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
-    return database.getKNNQuery(distanceQuery, hints);
+    final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
+    return relation.getKNNQuery(distanceQuery, hints);
   }
 
   /**
@@ -135,9 +135,8 @@ public final class QueryUtil {
    * @return KNN Query object
    */
   public static <O> KNNQuery<O> getKNNQuery(Relation<O> relation, DistanceFunction<? super O> distanceFunction, Object... hints) {
-    final Database database = relation.getDatabase();
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
-    return database.getKNNQuery(distanceQuery, hints);
+    final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
+    return relation.getKNNQuery(distanceQuery, hints);
   }
 
   /**
@@ -161,8 +160,8 @@ public final class QueryUtil {
    */
   public static <O> RangeQuery<O> getRangeQuery(Database database, DistanceFunction<? super O> distanceFunction, Object... hints) {
     final Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction(), hints);
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
-    return database.getRangeQuery(distanceQuery, hints);
+    final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
+    return relation.getRangeQuery(distanceQuery, hints);
   }
 
   /**
@@ -186,9 +185,8 @@ public final class QueryUtil {
    * @return KNN Query object
    */
   public static <O> RangeQuery<O> getRangeQuery(Relation<O> relation, DistanceFunction<? super O> distanceFunction, Object... hints) {
-    final Database database = relation.getDatabase();
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
-    return database.getRangeQuery(distanceQuery, hints);
+    final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
+    return relation.getRangeQuery(distanceQuery, hints);
   }
 
   /**
@@ -212,9 +210,8 @@ public final class QueryUtil {
    * @return RKNN Query object
    */
   public static <O> RKNNQuery<O> getRKNNQuery(Relation<O> relation, DistanceFunction<? super O> distanceFunction, Object... hints) {
-    final Database database = relation.getDatabase();
-    final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distanceFunction, hints);
-    return database.getRKNNQuery(distanceQuery, hints);
+    final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction, hints);
+    return relation.getRKNNQuery(distanceQuery, hints);
   }
 
   /**
@@ -229,8 +226,8 @@ public final class QueryUtil {
     // Slight optimizations of linear scans
     if(distanceQuery instanceof PrimitiveDistanceQuery) {
       final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
-      if (EuclideanDistanceFunction.STATIC.equals(pdq.getDistanceFunction())) {
-        final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>)pdq;
+      if(EuclideanDistanceFunction.STATIC.equals(pdq.getDistanceFunction())) {
+        final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) pdq;
         return (KNNQuery<O>) new LinearScanEuclideanDistanceKNNQuery<>(ndq);
       }
       return new LinearScanPrimitiveDistanceKNNQuery<>(pdq);
@@ -250,8 +247,8 @@ public final class QueryUtil {
     // Slight optimizations of linear scans
     if(distanceQuery instanceof PrimitiveDistanceQuery) {
       final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
-      if (EuclideanDistanceFunction.STATIC.equals(pdq.getDistanceFunction())) {
-        final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>)pdq;
+      if(EuclideanDistanceFunction.STATIC.equals(pdq.getDistanceFunction())) {
+        final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) pdq;
         return (RangeQuery<O>) new LinearScanEuclideanDistanceRangeQuery<>(ndq);
       }
       return new LinearScanPrimitiveDistanceRangeQuery<>(pdq);

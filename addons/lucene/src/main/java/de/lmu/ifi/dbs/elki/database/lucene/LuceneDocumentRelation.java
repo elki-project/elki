@@ -28,30 +28,29 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.database.relation.AbstractRelation;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Relation representing the Lucene document.
- * 
+ *
  * @author Erich Schubert
  */
-public class LuceneDocumentRelation extends AbstractHierarchicalResult implements Relation<Document> {
+public class LuceneDocumentRelation extends AbstractRelation<Document> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(LuceneDocumentRelation.class);
+
   /**
    * Static type for Lucene document references.
    */
   public static final SimpleTypeInformation<Document> LUCENE_DOCUMENT_TYPE = new SimpleTypeInformation<>(Document.class);
-
-  /**
-   * Our database
-   */
-  private final LuceneDatabase database;
 
   /**
    * Lucene reader.
@@ -65,40 +64,25 @@ public class LuceneDocumentRelation extends AbstractHierarchicalResult implement
 
   /**
    * Constructor.
-   * 
+   *
    * @param database Database
    * @param ids IDs
    * @param reader index reader
    */
   protected LuceneDocumentRelation(LuceneDatabase database, DBIDRange ids, IndexReader reader) {
-    super();
-    this.database = database;
+    super(database);
     this.ids = ids;
     this.reader = reader;
-  }
-
-  @Override
-  public Database getDatabase() {
-    return database;
   }
 
   @Override
   public Document get(DBIDRef id) {
     try {
       return reader.document(ids.getOffset(id));
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new AbortException("I/O error in lucene.", e);
     }
-  }
-
-  @Override
-  public void set(DBIDRef id, Document val) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void delete(DBIDRef id) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -129,5 +113,10 @@ public class LuceneDocumentRelation extends AbstractHierarchicalResult implement
   @Override
   public String getShortName() {
     return "lucene-document";
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

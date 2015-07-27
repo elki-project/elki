@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -118,7 +119,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 title = "LOF: Identifying Density-Based Local Outliers", //
 booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000", //
 url = "http://dx.doi.org/10.1145/342009.335388")
-public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -184,8 +185,9 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    * @return the kNN queries for the algorithm
    */
   private Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
+    DistanceQuery<O> distQ = database.getDistanceQuery(relation, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE);
     // "HEAVY" flag for knnReach since it is used more than once
-    KNNQuery<O> knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> knnReach = database.getKNNQuery(distQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
     if(!(knnReach instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {

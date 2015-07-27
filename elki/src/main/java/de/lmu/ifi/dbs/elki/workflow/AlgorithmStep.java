@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -84,26 +85,40 @@ public class AlgorithmStep implements WorkflowStep {
   public HierarchicalResult runAlgorithms(Database database) {
     result = new BasicResult("Algorithm Step", "main");
     result.addChildResult(database);
-    if (LOG.isStatistics() && database.getIndexes().size() > 0) {
-      LOG.statistics("Index statistics before running algorithms:");
-      for (Index idx : database.getIndexes()) {
-        idx.logStatistics();
+    if(LOG.isStatistics()) {
+      boolean first = true;
+      for(Iter<Result> it = database.getHierarchy().iterDescendants(database); it.valid(); it.advance()) {
+        if(!(it.get() instanceof Index)) {
+          continue;
+        }
+        if(first) {
+          LOG.statistics("Index statistics before running algorithms:");
+          first = false;
+        }
+        ((Index) it.get()).logStatistics();
       }
     }
-    for (Algorithm algorithm : algorithms) {
+    for(Algorithm algorithm : algorithms) {
       Thread.currentThread().setName(algorithm.toString());
-      Duration duration = LOG.isStatistics() ? LOG.newDuration(algorithm.getClass().getName()+".runtime").begin() : null;
+      Duration duration = LOG.isStatistics() ? LOG.newDuration(algorithm.getClass().getName() + ".runtime").begin() : null;
       Result res = algorithm.run(database);
-      if (duration != null) {
+      if(duration != null) {
         LOG.statistics(duration.end());
       }
-      if (LOG.isStatistics() && database.getIndexes().size() > 0) {
-        LOG.statistics("Index statistics after running algorithms:");
-        for (Index idx : database.getIndexes()) {
-          idx.logStatistics();
+      if(LOG.isStatistics()) {
+        boolean first = true;
+        for(Iter<Result> it = database.getHierarchy().iterDescendants(database); it.valid(); it.advance()) {
+          if(!(it.get() instanceof Index)) {
+            continue;
+          }
+          if(first) {
+            LOG.statistics("Index statistics after running algorithm " + algorithm.toString() + ":");
+            first = false;
+          }
+          ((Index) it.get()).logStatistics();
         }
       }
-      if (res != null) {
+      if(res != null) {
         result.addChildResult(res);
       }
     }
@@ -158,19 +173,19 @@ public class AlgorithmStep implements WorkflowStep {
       super.makeOptions(config);
       // Time parameter
       final Flag timeF = new Flag(TIME_ID);
-      if (config.grab(timeF)) {
+      if(config.grab(timeF)) {
         time = timeF.getValue();
       }
       // parameter algorithm
       final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<>(ALGORITHM_ID, Algorithm.class);
-      if (config.grab(ALGORITHM_PARAM)) {
+      if(config.grab(ALGORITHM_PARAM)) {
         algorithms = ALGORITHM_PARAM.instantiateClasses(config);
       }
     }
 
     @Override
     protected AlgorithmStep makeInstance() {
-      if (time) {
+      if(time) {
         LoggingConfiguration.setStatistics();
       }
       return new AlgorithmStep(algorithms);

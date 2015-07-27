@@ -120,7 +120,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     RKNNQuery<DoubleVector> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
-    db.addIndex(preproc);
+    db.getHierarchy().add(rep, preproc);
     assertTrue("Preprocessor knn query class incorrect.", !(preproc_knn_query instanceof LinearScanDistanceKNNQuery));
     assertTrue("Preprocessor rknn query class incorrect.", !(preproc_rknn_query instanceof LinearScanDistanceKNNQuery));
 
