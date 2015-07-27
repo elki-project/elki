@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -110,7 +111,7 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
     }
 
     @Override
-    public NeighborSetPredicate instantiate(Relation<? extends O> relation) {
+    public NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation) {
       KNNQuery<?> knnQuery = QueryUtil.getKNNQuery(relation, distFunc);
 
       // TODO: use bulk?

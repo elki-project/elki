@@ -111,7 +111,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector> relation) {
     assert (RelationUtil.dimensionality(relation) == 1) : "TrimmedMean can only process one-dimensional data sets.";
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, nrel);
 
     WritableDoubleDataStore errors = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP);
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);

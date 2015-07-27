@@ -93,7 +93,7 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, spatial);
     DistanceQuery<O> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
 
     WritableDoubleDataStore modifiedDistance = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);

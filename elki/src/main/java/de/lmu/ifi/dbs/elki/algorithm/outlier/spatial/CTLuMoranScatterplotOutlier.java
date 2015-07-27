@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPre
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
@@ -90,12 +91,13 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
   /**
    * Main method.
    * 
+   * @param database Database
    * @param nrel Neighborhood relation
    * @param relation Data relation (1d!)
    * @return Outlier detection result
    */
-  public OutlierResult run(Relation<N> nrel, Relation<? extends NumberVector> relation) {
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
+  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector> relation) {
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, nrel);
 
     // Compute the global mean and variance
     MeanVariance globalmv = new MeanVariance();

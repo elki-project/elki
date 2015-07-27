@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPre
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -93,11 +94,19 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
     return LOG;
   }
 
-  public OutlierResult run(Relation<N> spatial, Relation<O> attributes) {
+  /**
+   * Run the algorithm
+   * 
+   * @param database Database
+   * @param spatial Spatial relation
+   * @param attributes Numerical attributes
+   * @return Outlier detection result
+   */
+  public OutlierResult run(Database database, Relation<N> spatial, Relation<O> attributes) {
     if(LOG.isDebugging()) {
       LOG.debug("Dimensionality: " + RelationUtil.dimensionality(attributes));
     }
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, spatial);
 
     CovarianceMatrix covmaker = new CovarianceMatrix(RelationUtil.dimensionality(attributes));
     WritableDataStore<Vector> deltas = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);

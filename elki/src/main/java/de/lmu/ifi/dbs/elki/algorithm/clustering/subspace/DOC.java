@@ -87,7 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 title = "A Monte Carlo algorithm for fast projective clustering", //
 booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", //
 url = "http://dx.doi.org/10.1145/564691.564739")
-public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
+public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>>implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -185,10 +185,10 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     while(S.size() > minClusterSize) {
       Cluster<SubspaceModel> C;
       if(heuristics) {
-        C = runFastDOC(relation, S, d, n, m, (int) r);
+        C = runFastDOC(database, relation, S, d, n, m, (int) r);
       }
       else {
-        C = runDOC(relation, S, d, n, m, (int) r, minClusterSize);
+        C = runDOC(database, relation, S, d, n, m, (int) r, minClusterSize);
       }
 
       if(C == null) {
@@ -218,6 +218,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
   /**
    * Performs a single run of DOC, finding a single cluster.
    * 
+   * @param database Database context
    * @param relation used to get actual values for DBIDs.
    * @param S The set of points we're working on.
    * @param d Dimensionality of the data set we're currently working on.
@@ -227,7 +228,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param minClusterSize Minimum size a cluster must have to be accepted.
    * @return a cluster, if one is found, else <code>null</code>.
    */
-  private Cluster<SubspaceModel> runDOC(Relation<V> relation, ArrayModifiableDBIDs S, final int d, int n, int m, int r, int minClusterSize) {
+  private Cluster<SubspaceModel> runDOC(Database database, Relation<V> relation, ArrayModifiableDBIDs S, final int d, int n, int m, int r, int minClusterSize) {
     // Best cluster for the current run.
     DBIDs C = null;
     // Relevant attributes for the best cluster.
@@ -241,8 +242,8 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
 
     // Weights for distance (= rectangle query)
     SubspaceMaximumDistanceFunction df = new SubspaceMaximumDistanceFunction(BitsUtil.zero(d));
-    DistanceQuery<V> dq = relation.getDatabase().getDistanceQuery(relation, df);
-    RangeQuery<V> rq = relation.getDatabase().getRangeQuery(dq);
+    DistanceQuery<V> dq = database.getDistanceQuery(relation, df);
+    RangeQuery<V> rq = database.getRangeQuery(dq);
 
     // Inform the user about the progress in the current iteration.
     FiniteProgress iprogress = LOG.isVerbose() ? new FiniteProgress("Iteration progress for current cluster", m * n, LOG) : null;
@@ -313,6 +314,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
   /**
    * Performs a single run of FastDOC, finding a single cluster.
    * 
+   * @param database Database context
    * @param relation used to get actual values for DBIDs.
    * @param S The set of points we're working on.
    * @param d Dimensionality of the data set we're currently working on.
@@ -321,7 +323,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @param n Number of outer iterations (seed points).
    * @return a cluster, if one is found, else <code>null</code>.
    */
-  private Cluster<SubspaceModel> runFastDOC(Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r) {
+  private Cluster<SubspaceModel> runFastDOC(Database database, Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r) {
     // Relevant attributes of highest cardinality.
     long[] D = null;
     // The seed point for the best dimensions.
@@ -374,8 +376,8 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
 
     // Get all points in the box.
     SubspaceMaximumDistanceFunction df = new SubspaceMaximumDistanceFunction(D);
-    DistanceQuery<V> dq = relation.getDatabase().getDistanceQuery(relation, df);
-    RangeQuery<V> rq = relation.getDatabase().getRangeQuery(dq, DatabaseQuery.HINT_SINGLE);
+    DistanceQuery<V> dq = database.getDistanceQuery(relation, df);
+    RangeQuery<V> rq = database.getRangeQuery(dq, DatabaseQuery.HINT_SINGLE);
 
     // TODO: add filtering capabilities into query API!
     DBIDs C = DBIDUtil.intersection(S, rq.getRangeForDBID(dV, w));

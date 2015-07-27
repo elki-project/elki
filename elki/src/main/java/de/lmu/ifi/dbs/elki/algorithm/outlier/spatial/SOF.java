@@ -99,7 +99,7 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<N> spatial, Relation<O> relation) {
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, spatial);
     DistanceQuery<O> distFunc = getNonSpatialDistanceFunction().instantiate(relation);
 
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);

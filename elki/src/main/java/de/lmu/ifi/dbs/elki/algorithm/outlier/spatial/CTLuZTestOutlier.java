@@ -99,7 +99,7 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector> relation) {
-    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
+    final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, nrel);
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     MeanVariance zmv = new MeanVariance();

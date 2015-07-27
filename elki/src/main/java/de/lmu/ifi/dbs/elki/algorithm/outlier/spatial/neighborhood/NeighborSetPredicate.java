@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -57,11 +58,11 @@ public interface NeighborSetPredicate extends Result {
     /**
      * Instantiation method.
      * 
+     * @param database Database
      * @param relation Relation to instantiate for.
-     * 
      * @return instance
      */
-    public NeighborSetPredicate instantiate(Relation<? extends O> relation);
+    public NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation);
 
     /**
      * Get the input type information

@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.weighted;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -58,11 +59,11 @@ public interface WeightedNeighborSetPredicate {
     /**
      * Instantiation method.
      * 
+     * @param database Database context
      * @param relation Relation to instantiate for.
-     * 
      * @return instance
      */
-    public WeightedNeighborSetPredicate instantiate(Relation<? extends O> relation);
+    public WeightedNeighborSetPredicate instantiate(Database database, Relation<? extends O> relation);
 
     /**
      * Get the input type information

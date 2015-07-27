@@ -155,7 +155,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       kNNReach = preproc.getKNNQuery(rdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
       rkNNReach = preproc.getRKNNQuery(rdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      relation.getDatabase().addIndex(preproc);
+      database.addIndex(preproc);
     }
 
     Pair<KNNQuery<O>, KNNQuery<O>> kNNPair = new Pair<>(kNNRefer, kNNReach);

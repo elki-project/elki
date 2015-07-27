@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.weighted;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -98,8 +99,8 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
     }
 
     @Override
-    public UnweightedNeighborhoodAdapter instantiate(Relation<? extends O> relation) {
-      return new UnweightedNeighborhoodAdapter(inner.instantiate(relation));
+    public UnweightedNeighborhoodAdapter instantiate(Database database, Relation<? extends O> relation) {
+      return new UnweightedNeighborhoodAdapter(inner.instantiate(database, relation));
     }
 
     @Override

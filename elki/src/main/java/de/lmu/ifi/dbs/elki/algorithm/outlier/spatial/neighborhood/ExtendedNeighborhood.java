@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -111,8 +112,8 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
     }
 
     @Override
-    public NeighborSetPredicate instantiate(Relation<? extends O> database) {
-      DataStore<DBIDs> store = extendNeighborhood(database);
+    public NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation) {
+      DataStore<DBIDs> store = extendNeighborhood(database, relation);
       ExtendedNeighborhood neighborhood = new ExtendedNeighborhood(store);
       return neighborhood;
     }
@@ -125,14 +126,14 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
     /**
      * Method to load the external neighbors.
      */
-    private DataStore<DBIDs> extendNeighborhood(Relation<? extends O> database) {
-      NeighborSetPredicate innerinst = inner.instantiate(database);
+    private DataStore<DBIDs> extendNeighborhood(Database database, Relation<? extends O> relation) {
+      NeighborSetPredicate innerinst = inner.instantiate(database, relation);
 
-      final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
+      final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
 
       // Expand multiple steps
-      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Expanding neighborhoods", database.size(), LOG) : null;
-      for(DBIDIter iter = database.iterDBIDs(); iter.valid(); iter.advance()) {
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Expanding neighborhoods", relation.size(), LOG) : null;
+      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         HashSetModifiableDBIDs res = DBIDUtil.newHashSet();
         res.add(iter);
         DBIDs todo = DBIDUtil.deref(iter);

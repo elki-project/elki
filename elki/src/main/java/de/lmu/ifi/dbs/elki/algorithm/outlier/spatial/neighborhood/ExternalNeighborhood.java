@@ -120,8 +120,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
     }
 
     @Override
-    public NeighborSetPredicate instantiate(Relation<?> relation) {
-      DataStore<DBIDs> store = loadNeighbors(relation.getDatabase(), relation);
+    public NeighborSetPredicate instantiate(Database database, Relation<?> relation) {
+      DataStore<DBIDs> store = loadNeighbors(database, relation);
       ExternalNeighborhood neighborhood = new ExternalNeighborhood(store);
       return neighborhood;
     }
