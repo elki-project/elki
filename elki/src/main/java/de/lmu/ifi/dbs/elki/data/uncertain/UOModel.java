@@ -64,9 +64,7 @@ public abstract class UOModel implements Model, SpatialComparable {
    * Explicitly sets a {@link SpatialComparable} to bound the particular
    * Uncertain-Data-Object.
    * 
-   * @param C bounds
-   * 
-   * @return void
+   * @param bounds
    */
   public void setBounds(final SpatialComparable bounds) {
     this.bounds = bounds;
@@ -76,7 +74,7 @@ public abstract class UOModel implements Model, SpatialComparable {
    * Returns the {@link SpatialComparable} bounding the particular
    * Uncertain-Data-Object.
    * 
-   * @return C
+   * @return 
    */
   public SpatialComparable getBounds() {
     return this.bounds;
@@ -86,9 +84,9 @@ public abstract class UOModel implements Model, SpatialComparable {
    * Returns the Low-Boundary of a specific dimension of the particular
    * Uncertain-Data-Object.
    * 
-   * @param int dimension
+   * @param dimension
    * 
-   * @return double
+   * @return 
    */
   @Override
   public double getMin(final int dimension) {
@@ -99,9 +97,9 @@ public abstract class UOModel implements Model, SpatialComparable {
    * Returns the High-Boundary of a specific dimension of the particular
    * Uncertain-Data-Object.
    * 
-   * @param int dimension
+   * @param dimension
    * 
-   * @return double
+   * @return 
    */
   @Override
   public double getMax(final int dimension) {
@@ -111,7 +109,7 @@ public abstract class UOModel implements Model, SpatialComparable {
   /**
    * Returns the dimensionality of the particular Uncertain-Data-Object.
    * 
-   * @return int
+   * @return 
    */
   @Override
   public int getDimensionality() {
@@ -123,12 +121,12 @@ public abstract class UOModel implements Model, SpatialComparable {
    * models in a way, they can be used as parameters to create an uncertain
    * dataset out of a given certain dataset (a groundtruth by any means).
    * 
-   * @param {@link NumberVector} vec
-   * @param boolean blur
-   * @param boolean groundtruth
-   * @param int dims
+   * @param vec
+   * @param blur
+   * @param groundtruth
+   * @param dims
    * 
-   * @return {@link UncertainObject}
+   * @return 
    */
   public abstract UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims);
 
@@ -136,7 +134,7 @@ public abstract class UOModel implements Model, SpatialComparable {
    * Creates a vector that makes it possible to visualize databases containing
    * {@link UncertainObject}
    * 
-   * @return {@link DoubleVector}
+   * @return 
    */
   public abstract DoubleVector getAnker();
 }
