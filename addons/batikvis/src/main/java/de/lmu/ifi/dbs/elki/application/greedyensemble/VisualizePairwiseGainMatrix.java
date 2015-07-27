@@ -145,7 +145,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     if(!firstlabel.matches(".*by.?label.*")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
-    relation = GreedyEnsembleExperiment.applyPrescaling(prescaling, relation, firstid);
+    relation = GreedyEnsembleExperiment.applyPrescaling(prescaling, database, relation, firstid);
 
     // Dimensionality and reference vector
     final int dim = RelationUtil.dimensionality(relation);
