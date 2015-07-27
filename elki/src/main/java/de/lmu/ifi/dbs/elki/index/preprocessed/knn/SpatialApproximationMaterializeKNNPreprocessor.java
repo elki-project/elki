@@ -56,15 +56,15 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
- * 
+ *
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF}.
- * 
+ *
  * TODO correct handling of datastore events
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses SpatialIndexTree
- * 
+ *
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
  */
@@ -78,7 +78,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
   /**
    * Constructor
-   * 
+   *
    * @param relation Relation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
@@ -89,7 +89,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
 
     Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation, SpatialIndexTree.class);
     if(indexes.size() != 1) {
@@ -176,20 +176,20 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
   /**
    * The actual preprocessor instance.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.stereotype factory
    * @apiviz.uses SpatialApproximationMaterializeKNNPreprocessor oneway - -
    *              «create»
-   * 
+   *
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
    */
   public static class Factory<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector> {
     /**
      * Constructor.
-     * 
+     *
      * @param k k
      * @param distanceFunction distance function
      */
@@ -205,9 +205,9 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<NumberVector> {

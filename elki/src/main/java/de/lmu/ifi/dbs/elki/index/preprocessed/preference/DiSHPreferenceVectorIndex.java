@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -69,9 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Preprocessor for DiSH preference vector assignment to objects of a certain
  * database.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @param <V> Vector type
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
@@ -83,7 +82,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Available strategies for determination of the preference vector.
-   * 
+   *
    * @apiviz.exclude
    */
   public enum Strategy {
@@ -114,7 +113,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to use
    * @param epsilon Epsilon value
    * @param minpts MinPts value
@@ -201,7 +200,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Determines the preference vector according to the specified neighbor ids.
-   * 
+   *
    * @param relation the database storing the objects
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
@@ -221,7 +220,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Determines the preference vector with the apriori strategy.
-   * 
+   *
    * @param relation the database storing the objects
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
@@ -279,7 +278,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Determines the preference vector with the max intersection strategy.
-   * 
+   *
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector
@@ -332,7 +331,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Returns the set with the maximum size contained in the specified map.
-   * 
+   *
    * @param candidates the map containing the sets
    * @return the set with the maximum size
    */
@@ -353,7 +352,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
   /**
    * Returns the index of the set having the maximum intersection set with the
    * specified set contained in the specified map.
-   * 
+   *
    * @param candidates the map containing the sets
    * @param set the set to intersect with
    * @param result the set to put the result in
@@ -376,18 +375,17 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
   /**
    * Initializes the dimension selecting distancefunctions to determine the
    * preference vectors.
-   * 
+   *
    * @param relation the database storing the objects
    * @param dimensionality the dimensionality of the objects
    * @return the dimension selecting distancefunctions to determine the
    *         preference vectors
    */
   private RangeQuery<V>[] initRangeQueries(Relation<V> relation, int dimensionality) {
-    Database db = relation.getDatabase();
     Class<RangeQuery<V>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
     RangeQuery<V>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {
-      rangeQueries[d] = db.getRangeQuery(new PrimitiveDistanceQuery<>(relation, new OnedimensionalDistanceFunction(d)));
+      rangeQueries[d] = relation.getRangeQuery(new PrimitiveDistanceQuery<>(relation, new OnedimensionalDistanceFunction(d)));
     }
     return rangeQueries;
   }
@@ -414,12 +412,12 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Factory class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.stereotype factory
    * @apiviz.uses DiSHPreferenceVectorIndex oneway - - «create»
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Factory<V extends NumberVector> extends AbstractPreferenceVectorIndex.Factory<V, DiSHPreferenceVectorIndex<V>> {
@@ -434,7 +432,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      * of the preference vector (default is {@link #DEFAULT_EPSILON} in each
      * dimension). If only one value is specified, this value will be used for
      * each dimension.
-     * 
+     *
      * <p>
      * Key: {@code -dish.epsilon}
      * </p>
@@ -458,7 +456,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      * Positive threshold for minimum numbers of points in the
      * epsilon-neighborhood of a point, must satisfy following
      * {@link #CONDITION}.
-     * 
+     *
      * <p>
      * Key: {@code -dish.minpts}
      * </p>
@@ -474,7 +472,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      * The strategy for determination of the preference vector, available
      * strategies are: {@link Strategy#APRIORI } and
      * {@link Strategy#MAX_INTERSECTION}.
-     * 
+     *
      * <p>
      * Key: {@code -dish.strategy}
      * </p>
@@ -501,7 +499,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
     /**
      * Constructor.
-     * 
+     *
      * @param epsilon Epsilon
      * @param minpts Minpts
      * @param strategy Strategy
@@ -520,7 +518,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
     /**
      * Return the minpts value.
-     * 
+     *
      * @return minpts
      */
     public int getMinpts() {
@@ -529,9 +527,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

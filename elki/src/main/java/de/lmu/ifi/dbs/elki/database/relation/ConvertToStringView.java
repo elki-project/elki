@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 /**
  * Representation adapter that uses toString() to produce a string
  * representation.
- * 
+ *
  * @author Erich Schubert
  */
 public class ConvertToStringView extends AbstractRelation<String> {
@@ -49,11 +49,11 @@ public class ConvertToStringView extends AbstractRelation<String> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param existing Existing representation
    */
   public ConvertToStringView(Relation<?> existing) {
-    super(existing.getDatabase());
+    super();
     this.existing = existing;
   }
 

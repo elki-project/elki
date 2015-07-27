@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Unit test for random hyperplane / cosine distance.
- * 
+ *
  * @author Evgeniy Faerman
  */
 public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
@@ -74,6 +74,6 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest im
   }
 
   private Relation<NumberVector> mockRelation(final int dimension) {
-    return new MaterializedRelation<>(null, VectorFieldTypeInformation.typeRequest(NumberVector.class, dimension, dimension), DBIDUtil.EMPTYDBIDS);
+    return new MaterializedRelation<>(VectorFieldTypeInformation.typeRequest(NumberVector.class, dimension, dimension), DBIDUtil.EMPTYDBIDS);
   }
 }

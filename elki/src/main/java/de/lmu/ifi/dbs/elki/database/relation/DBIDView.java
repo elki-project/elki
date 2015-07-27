@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.relation;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Pseudo-representation that is the object ID itself.
- * 
+ *
  * @author Erich Schubert
  */
 public class DBIDView extends AbstractRelation<DBID> {
@@ -51,12 +50,11 @@ public class DBIDView extends AbstractRelation<DBID> {
 
   /**
    * Constructor.
-   * 
-   * @param database
-   * @param ids
+   *
+   * @param ids DBIDs
    */
-  public DBIDView(Database database, DBIDs ids) {
-    super(database);
+  public DBIDView(DBIDs ids) {
+    super();
     this.ids = DBIDUtil.makeUnmodifiable(ids);
   }
 
@@ -83,7 +81,7 @@ public class DBIDView extends AbstractRelation<DBID> {
 
   /**
    * Set the DBIDs of the view.
-   * 
+   *
    * @param ids IDs to use
    */
   public void setDBIDs(DBIDs ids) {

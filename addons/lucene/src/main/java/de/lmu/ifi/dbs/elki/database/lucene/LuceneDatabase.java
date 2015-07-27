@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * Database backend using Lucene 3.
- * 
+ *
  * @author Erich Schubert
  */
 public class LuceneDatabase extends AbstractDatabase {
@@ -84,7 +84,7 @@ public class LuceneDatabase extends AbstractDatabase {
 
   /**
    * Constructor.
-   * 
+   *
    * @param directory Lucene directory.
    */
   public LuceneDatabase(Directory directory) {
@@ -99,12 +99,12 @@ public class LuceneDatabase extends AbstractDatabase {
       ids = DBIDUtil.generateStaticDBIDRange(reader.maxDoc());
 
       // ID relation:
-      idrep = new DBIDView(this, ids);
+      idrep = new DBIDView(ids);
       relations.add(idrep);
       getHierarchy().add(this, idrep);
 
       // Documents relation:
-      docrep = new LuceneDocumentRelation(this, ids, reader);
+      docrep = new LuceneDocumentRelation(ids, reader);
       relations.add(docrep);
       getHierarchy().add(this, docrep);
 
@@ -145,7 +145,7 @@ public class LuceneDatabase extends AbstractDatabase {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class Parameterizer extends AbstractParameterizer {

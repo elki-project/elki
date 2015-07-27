@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,25 +23,22 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Arrange parallel coordinates on a 2D plane, for 3D parallel coordinates.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> Object type
  */
 public interface Layouter3DPC<V> {
   /**
    * Run the layouting algorithm.
-   * 
-   * @param database Database to use
+   *
    * @param rel Relation to use
-   * 
+   *
    * @return Layout, nodes indexed by dimension.
    */
-  Layout layout(Database database, Relation<? extends V> rel);
+  Layout layout(Relation<? extends V> rel);
 }

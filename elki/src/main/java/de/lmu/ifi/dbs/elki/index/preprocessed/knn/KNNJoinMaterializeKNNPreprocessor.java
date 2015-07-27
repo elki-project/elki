@@ -32,9 +32,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * Class to materialize the kNN using a spatial join on an R-tree.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> vector type
  */
 public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor<V> {
@@ -45,7 +45,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index
    * @param distanceFunction Distance function
    * @param k k
@@ -58,7 +58,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
   protected void preprocess() {
     // Run KNNJoin
     KNNJoin<V, ?, ?> knnjoin = new KNNJoin<V, RStarTreeNode, SpatialEntry>(distanceFunction, k);
-    storage = knnjoin.run(relation.getDatabase(), relation);
+    storage = knnjoin.run(relation);
   }
 
   @Override
@@ -83,19 +83,19 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
 
   /**
    * The parameterizable factory.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.landmark
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractMaterializeKNNPreprocessor oneway - - «create»
-   * 
+   *
    * @param <O> The object type
    */
   public static class Factory<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * Constructor.
-     * 
+     *
      * @param k K
      * @param distanceFunction distance function
      */
@@ -110,11 +110,11 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
 
     /**
      * Parameterization class
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
-     * 
+     *
      * @param <O> Object type
      */
     public static class Parameterizer<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {

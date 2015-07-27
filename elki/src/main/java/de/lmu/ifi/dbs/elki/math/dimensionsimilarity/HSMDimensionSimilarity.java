@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Compute the similarity of dimensions by using a hough transformation.
- * 
+ *
  * Reference: <br>
  * <p>
  * A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, and
@@ -44,10 +43,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Dimensional Data. <br/>
  * IEEEVisualization and Computer Graphics, 2011.
  * </p>
- * 
+ *
  * FIXME: This needs serious TESTING before release. Large parts have been
  * rewritten, but could not be tested at the time of rewriting.
- * 
+ *
  * @author Erich Schubert
  * @author Robert Rödler
  */
@@ -63,7 +62,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Angular resolution. Best if divisible by 4: smaller tables.
-   * 
+   *
    * The original publication used 50.
    */
   private final static int STEPS = 48; // 64;
@@ -81,7 +80,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     final int resolution = 512;
     boolean[][][][] pics = new boolean[dim][dim][][]; // [resolution][resolution];
@@ -134,7 +133,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Compute the sum of a matrix.
-   * 
+   *
    * @param mat Matrix
    * @return Sum of all elements
    */
@@ -151,7 +150,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Count the number of cells above the threshold.
-   * 
+   *
    * @param mat Matrix
    * @param threshold Threshold
    * @return Number of elements above the threshold.
@@ -171,7 +170,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Perform a hough transformation on the binary image in "mat".
-   * 
+   *
    * @param mat Binary image
    * @return Hough transformation of image.
    */
@@ -198,7 +197,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Draw a line onto the array, using the classic Bresenham algorithm.
-   * 
+   *
    * @param x0 Start X
    * @param y0 Start Y
    * @param x1 End X
@@ -238,9 +237,9 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

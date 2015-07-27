@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * GLS-Backward Search is a statistical approach to detecting spatial outliers.
- * 
+ *
  * <p>
  * F. Chen and C.-T. Lu and A. P. Boedihardjo: <br>
  * GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier
@@ -71,15 +71,15 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * In Proc. 16th ACM SIGKDD international conference on Knowledge discovery and
  * data mining, 2010
  * </p>
- * 
+ *
  * Implementation note: this is just the most basic version of this algorithm.
  * The spatial relation must be two dimensional, the set of spatial basis
  * functions is hard-coded (but trivial to enhance) to {1,x,y,x*x,y*y,x*y}, and
  * we assume the neighborhood is large enough for the simpler formulas to work
  * that make the optimization problem convex.
- * 
+ *
  * @author Ahmed Hettab
- * 
+ *
  * @param <V> Vector type to use for distances
  */
 @Title("GLS-Backward Search")
@@ -102,7 +102,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k number of nearest neighbors to use
    * @param alpha Significance niveau
@@ -115,7 +115,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param database Database to process
    * @param relationx Spatial relation
    * @param relationy Attribute relation
@@ -128,7 +128,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     // Outlier detection loop
     {
       ModifiableDBIDs idview = DBIDUtil.newHashSet(relationx.getDBIDs());
-      ProxyView<V> proxy = new ProxyView<>(database, idview, relationx);
+      ProxyView<V> proxy = new ProxyView<>(idview, relationx);
 
       double phialpha = NormalDistribution.standardNormalQuantile(1.0 - alpha *.5);
       // Detect outliers while significant.
@@ -157,7 +157,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
   /**
    * Run a single iteration of the GLS-SOD modeling step
-   * 
+   *
    * @param relationx Geo relation
    * @param relationy Attribute relation
    * @return Top outlier and associated score
@@ -265,11 +265,11 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Input vector type
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
@@ -307,7 +307,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
     /**
      * Get the alpha parameter
-     * 
+     *
      * @param config Parameterization
      */
     protected void getParameterAlpha(Parameterization config) {
@@ -319,7 +319,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
     /**
      * Get the k parameter
-     * 
+     *
      * @param config Parameterization
      */
     protected void getParameterK(Parameterization config) {

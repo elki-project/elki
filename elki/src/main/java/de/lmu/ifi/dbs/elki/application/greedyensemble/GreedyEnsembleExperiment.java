@@ -79,15 +79,15 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * strategy. Starting with the best candidate only as initial ensemble, the most
  * diverse candidate is investigated at each step. If it improves towards the
  * (estimated) target vector, it is added, otherwise it is discarded.
- * 
+ *
  * This approach is naive, and it may be surprising that it can improve results.
  * The reason is probably that diversity will result in a comparable ensemble,
  * while the reduced ensemble size is actually responsible for the improvements,
  * by being more decisive and less noisy due to dropping "unhelpful" members.
- * 
+ *
  * This still leaves quite a bit of room for improvement. If you build upon this
  * basic approach, please acknowledge our proof of concept work.
- * 
+ *
  * Reference:
  * <p>
  * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
@@ -95,7 +95,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * In Proceedings of the 12th SIAM International Conference on Data Mining
  * (SDM), Anaheim, CA, 2012.
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", //
@@ -145,7 +145,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
   /**
    * Distance modes.
-   * 
+   *
    * @apiviz.exclude
    */
   public static enum Distance {
@@ -162,7 +162,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inputstep Input step
    * @param voting Ensemble voting
    * @param distance Distance function
@@ -491,7 +491,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
   /**
    * Build a single-element "ensemble".
-   * 
+   *
    * @param ensemble
    * @param vec
    */
@@ -510,7 +510,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   /**
    * Prescale each vector (except when in {@code skip}) with the given scaling
    * function.
-   * 
+   *
    * @param scaling Scaling function
    * @param database Database context
    * @param relation Relation to read
@@ -532,7 +532,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       }
       contents.put(iter, factory.newNumberVector(raw, ArrayLikeUtil.DOUBLEARRAYADAPTER));
     }
-    return new MaterializedRelation<>(database, relation.getDataTypeInformation(), ids, "rescaled", contents);
+    return new MaterializedRelation<>(relation.getDataTypeInformation(), ids, "rescaled", contents);
   }
 
   private static void applyScaling(double[] raw, ScalingFunction scaling) {
@@ -586,7 +586,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
   /**
    * Compute the gain coefficient.
-   * 
+   *
    * @param score New score
    * @param ref Reference score
    * @param optimal Maximum score possible
@@ -598,9 +598,9 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
@@ -701,7 +701,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
   /**
    * Main method.
-   * 
+   *
    * @param args Command line parameters.
    */
   public static void main(String[] args) {

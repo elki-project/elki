@@ -30,7 +30,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -65,14 +64,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Joins in a given spatial database to each object its k-nearest neighbors.
  * This algorithm only supports spatial databases based on a spatial index
  * structure.
- * 
+ *
  * Since this method compares the MBR of every single leaf with every other
  * leaf, it is essentially quadratic in the number of leaves, which may not be
  * appropriate for large trees.
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
- * 
+ *
  * @param <V> the type of FeatureVector handled by this Algorithm
  * @param <N> the type of node used in the spatial index structure
  * @param <E> the type of entry used in the spatial node
@@ -92,7 +91,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k k parameter
    */
@@ -103,17 +102,17 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
   /**
    * Joins in the given spatial database to each object its k-nearest neighbors.
-   * 
+   *
    * @param database Database to process
    * @param relation Relation to process
    * @return result
    */
   @SuppressWarnings("unchecked")
-  public WritableDataStore<KNNList> run(Database database, Relation<V> relation) {
+  public WritableDataStore<KNNList> run(Relation<V> relation) {
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
-    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(database, SpatialIndexTree.class);
+    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation, SpatialIndexTree.class);
     if(indexes.size() != 1) {
       throw new AbortException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
@@ -217,7 +216,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
   /**
    * Initialize the heaps.
-   * 
+   *
    * @param distFunction Distance function
    * @param pr Node to initialize for
    * @return List of heaps
@@ -237,7 +236,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
   /**
    * Processes the two data pages pr and ps and determines the k-nearest
    * neighbors of pr in ps.
-   * 
+   *
    * @param df the distance function to use
    * @param pr the first data page
    * @param ps the second data page
@@ -262,7 +261,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
   /**
    * Compute the maximum stop distance.
-   * 
+   *
    * @param heaps Heaps list
    * @return the k-nearest neighbor distance of pr in ps
    */
@@ -292,9 +291,9 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
   /**
    * Task in the processing queue.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Task implements Comparable<Task> {
@@ -315,7 +314,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
     /**
      * Constructor.
-     * 
+     *
      * @param mindist Minimum distance
      * @param i First offset
      * @param j Second offset
@@ -335,9 +334,9 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V> {

@@ -52,10 +52,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * This database class uses array-based storage and thus does not allow for
  * dynamic insert, delete and update operations. However, array access is
  * expected to be faster and use less memory.
- * 
+ *
  * @author Arthur Zimek
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf ArrayDBIDs
  * @apiviz.uses DatabaseConnection
@@ -84,7 +84,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
 
   /**
    * Constructor.
-   * 
+   *
    * @param databaseConnection Database connection to get the initial data from.
    * @param indexFactories Indexes to add
    */
@@ -136,7 +136,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
       }
       // Replace id representation (it would be nicer if we would not need
       // DBIDView at all)
-      this.idrep = new DBIDView(this, this.ids);
+      this.idrep = new DBIDView(this.ids);
       relations.add(this.idrep);
       getHierarchy().add(this, idrep);
 
@@ -151,7 +151,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
         for(it.seek(0); it.valid(); it.advance()) {
           store.put(it, bundle.data(it.getOffset(), i));
         }
-        Relation<?> relation = new MaterializedRelation<>(this, ometa, ids, null, store);
+        Relation<?> relation = new MaterializedRelation<>(ometa, ids, null, store);
         relations.add(relation);
         getHierarchy().add(this, relation);
 
@@ -185,9 +185,9 @@ public class StaticArrayDatabase extends AbstractDatabase {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDatabase.Parameterizer {

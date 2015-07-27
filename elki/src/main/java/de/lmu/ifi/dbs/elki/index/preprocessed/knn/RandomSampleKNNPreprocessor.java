@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Class that computed the kNN only on a random sample.
- * 
+ *
  * Used in:
  * <p>
  * Subsampling for Efficient and Effective Unsupervised Outlier Detection
@@ -57,9 +57,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * In: Proc. 19th ACM SIGKDD International Conference on Knowledge Discovery and
  * Data Mining, KDD '13
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
 @Reference(title = "Subsampling for Efficient and Effective Unsupervised Outlier Detection Ensembles", authors = "A. Zimek and M. Gaudet and R. J. G. B. Campello and J. Sander", booktitle = "Proc. 19th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, KDD '13")
@@ -81,7 +81,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index
    * @param distanceFunction distance function
    * @param k k
@@ -96,7 +96,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing random-sample k nearest neighbors (k=" + k + ")", relation.size(), getLogger()) : null;
 
@@ -141,13 +141,13 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
 
   /**
    * The parameterizable factory.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.landmark
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractMaterializeKNNPreprocessor oneway - - «create»
-   * 
+   *
    * @param <O> The object type
    */
   public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
@@ -163,7 +163,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
 
     /**
      * Constructor.
-     * 
+     *
      * @param k K
      * @param distanceFunction distance function
      * @param share Sample size (relative)
@@ -182,18 +182,18 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
 
     /**
      * Parameterization class
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
-     * 
+     *
      * @param <O> Object type
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
       /**
        * Parameter to specify how many objects to consider for computing the
        * kNN.
-       * 
+       *
        * <p>
        * Key: {@code -randomknn.share}
        * </p>
@@ -202,7 +202,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
 
       /**
        * Random number generator seed.
-       * 
+       *
        * <p>
        * Key: {@code -randomknn.seed}
        * </p>

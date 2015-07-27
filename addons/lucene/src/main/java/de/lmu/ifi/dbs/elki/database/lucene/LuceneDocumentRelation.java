@@ -65,12 +65,11 @@ public class LuceneDocumentRelation extends AbstractRelation<Document> {
   /**
    * Constructor.
    *
-   * @param database Database
    * @param ids IDs
    * @param reader index reader
    */
-  protected LuceneDocumentRelation(LuceneDatabase database, DBIDRange ids, IndexReader reader) {
-    super(database);
+  protected LuceneDocumentRelation(DBIDRange ids, IndexReader reader) {
+    super();
     this.ids = ids;
     this.reader = reader;
   }

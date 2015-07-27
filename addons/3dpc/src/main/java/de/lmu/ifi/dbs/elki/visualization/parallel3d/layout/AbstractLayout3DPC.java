@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.CovarianceDimensionSimilarity;
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout.Edge;
 
 /**
  * Abstract class for dimension similarity based layouters.
- * 
+ *
  * @author Erich Schubert
  */
 public abstract class AbstractLayout3DPC<N extends Layout.Node> implements SimilarityBasedLayouter3DPC<NumberVector> {
@@ -53,7 +52,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
   /**
    * Constructor.
-   * 
+   *
    * @param sim Similarity measure
    */
   public AbstractLayout3DPC(DimensionSimilarity<? super NumberVector> sim) {
@@ -67,10 +66,10 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   }
 
   @Override
-  public Layout layout(Database database, Relation<? extends NumberVector> rel) {
+  public Layout layout(Relation<? extends NumberVector> rel) {
     int dim = RelationUtil.dimensionality(rel);
     DimensionSimilarityMatrix mat = DimensionSimilarityMatrix.make(dim);
-    sim.computeDimensionSimilarites(database, rel, rel.getDBIDs(), mat);
+    sim.computeDimensionSimilarites(rel, rel.getDBIDs(), mat);
     return layout(dim, mat);
   }
 
@@ -79,26 +78,26 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
   /**
    * Build the minimum spanning tree.
-   * 
+   *
    * @param mat Similarity matrix
    * @param layout Layout to write to
    * @return Root node id
    */
   protected N buildSpanningTree(DimensionSimilarityMatrix mat, Layout layout) {
-    assert (layout.edges == null || layout.edges.size() == 0);
+    assert(layout.edges == null || layout.edges.size() == 0);
     int[] iedges = PrimsMinimumSpanningTree.processDense(mat, DimensionSimilarityMatrix.PRIM_ADAPTER);
     int root = findOptimalRoot(iedges);
 
     // Convert edges:
     ArrayList<Edge> edges = new ArrayList<>(iedges.length >> 1);
-    for (int i = 0; i < iedges.length; i += 2) {
+    for(int i = 0; i < iedges.length; i += 2) {
       edges.add(new Edge(iedges[i], iedges[i + 1]));
     }
     layout.edges = edges;
 
     // Prefill nodes array with nulls.
     ArrayList<N> nodes = new ArrayList<>(mat.size());
-    for (int i = 0; i < mat.size(); i++) {
+    for(int i = 0; i < mat.size(); i++) {
       nodes.add(null);
     }
     layout.nodes = nodes;
@@ -111,7 +110,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
   /**
    * Recursive tree build method.
-   * 
+   *
    * @param msg Minimum spanning graph
    * @param cur Current node
    * @param parent Parent node
@@ -121,32 +120,33 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   protected N buildTree(int[] msg, int cur, int parent, ArrayList<N> nodes) {
     // Count the number of children:
     int c = 0;
-    for (int i = 0; i < msg.length; i += 2) {
-      if (msg[i] == cur && msg[i + 1] != parent) {
+    for(int i = 0; i < msg.length; i += 2) {
+      if(msg[i] == cur && msg[i + 1] != parent) {
         c++;
       }
-      if (msg[i + 1] == cur && msg[i] != parent) {
+      if(msg[i + 1] == cur && msg[i] != parent) {
         c++;
       }
     }
     // Build children:
     List<N> children;
-    if (c > 0) {
+    if(c > 0) {
       children = new ArrayList<>(c);
-    } else {
+    }
+    else {
       children = Collections.emptyList();
     }
-    for (int i = 0; i < msg.length; i += 2) {
-      if (msg[i] == cur && msg[i + 1] != parent) {
+    for(int i = 0; i < msg.length; i += 2) {
+      if(msg[i] == cur && msg[i + 1] != parent) {
         c--;
         children.add(buildTree(msg, msg[i + 1], cur, nodes));
       }
-      if (msg[i + 1] == cur && msg[i] != parent) {
+      if(msg[i + 1] == cur && msg[i] != parent) {
         c--;
         children.add(buildTree(msg, msg[i], cur, nodes));
       }
     }
-    assert (c == 0);
+    assert(c == 0);
     N node = makeNode(cur, children);
     nodes.set(cur, node);
     return node;
@@ -154,13 +154,13 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
   /**
    * Compute the depth of the graph.
-   * 
+   *
    * @param node Current node
    * @return Depth
    */
   protected int maxDepth(Layout.Node node) {
     int depth = 0;
-    for (int i = 0; i < node.numChildren(); i++) {
+    for(int i = 0; i < node.numChildren(); i++) {
       Layout.Node child = node.getChild(i);
       depth = Math.max(depth, maxDepth(child));
     }
@@ -169,9 +169,9 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
   /**
    * Abstract node implementation.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <N> Final node type
    */
   public static class AbstractNode<N extends AbstractNode<N>> implements Layout.Node {
@@ -192,7 +192,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
     /**
      * Constructor.
-     * 
+     *
      * @param dim Dimension number
      * @param children Children
      */
@@ -230,11 +230,11 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   /**
    * Find the "optimal" root of a spanning tree. Optimal in the sense of: one of
    * the most central nodes.
-   * 
+   *
    * This uses a simple message passing approach. Every node that has only one
    * unset neighbor will emit a message to this neighbor. The node last to emit
    * wins.
-   * 
+   *
    * @param msg Minimum spanning graph.
    * @return
    */
@@ -246,24 +246,24 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
     // We shouldn't need more iterations in any case ever.
     int root = -1;
-    for (int i = 1; i < size; i++) {
+    for(int i = 1; i < size; i++) {
       boolean active = false;
-      for (int e = 0; e < msg.length; e += 2) {
-        if (depth[msg[e]] == 0) {
+      for(int e = 0; e < msg.length; e += 2) {
+        if(depth[msg[e]] == 0) {
           missing[msg[e + 1]]++;
         }
-        if (depth[msg[e + 1]] == 0) {
+        if(depth[msg[e + 1]] == 0) {
           missing[msg[e]]++;
         }
       }
-      for (int n = 0; n < size; n++) {
-        if (depth[n] == 0 && missing[n] <= 1) {
+      for(int n = 0; n < size; n++) {
+        if(depth[n] == 0 && missing[n] <= 1) {
           depth[n] = i;
           root = n;
           active = true;
         }
       }
-      if (!active) {
+      if(!active) {
         break;
       }
       Arrays.fill(missing, 0); // Clean up.
@@ -273,9 +273,9 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
@@ -288,7 +288,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<DimensionSimilarity<NumberVector>> simP = new ObjectParameter<>(SIM_ID, DimensionSimilarity.class, CovarianceDimensionSimilarity.class);
-      if (config.grab(simP)) {
+      if(config.grab(simP)) {
         sim = simP.instantiateClass(config);
       }
     }

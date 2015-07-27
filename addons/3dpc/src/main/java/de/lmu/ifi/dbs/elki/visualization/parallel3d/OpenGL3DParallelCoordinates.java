@@ -88,7 +88,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 
 /**
  * Simple JOGL2 based parallel coordinates visualization.
- * 
+ *
  * Reference:
  * <p>
  * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
@@ -96,15 +96,15 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
  * Proceedings of the 2013 ACM International Conference on Management of Data
  * (SIGMOD), New York City, NY, 2013.
  * </p>
- * 
+ *
  * TODO: Improve generics of Layout3DPC.
- * 
+ *
  * TODO: Generalize to multiple relations and non-numeric feature vectors.
- * 
+ *
  * FIXME: proper depth-sorting of edges. It's not that simple, unfortunately.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
 @Alias({ "3dpc", "3DPC" })
@@ -122,7 +122,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
   /**
    * Constructor.
-   * 
+   *
    * @param layout Layout
    */
   public OpenGL3DParallelCoordinates(Layouter3DPC<? super O> layout) {
@@ -152,7 +152,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
   /**
    * Hack: Get/Create the style result.
-   * 
+   *
    * @return Style result
    */
   public StyleResult getStyleResult(HierarchicalResult result) {
@@ -175,9 +175,9 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
   /**
    * Class keeping the visualizer settings.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <O> Object type
    */
   public static class Settings<O> {
@@ -214,9 +214,9 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
   /**
    * Visualizer instance.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <O> Object type
    */
   public static class Instance<O extends NumberVector> implements GLEventListener {
@@ -272,9 +272,9 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
     /**
      * States of the UI.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     protected static enum State { //
@@ -285,9 +285,9 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
     /**
      * Shared data for visualization modules.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @param <O> Relation data type
      */
     protected static class Shared<O> {
@@ -346,7 +346,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
     /**
      * Constructor.
-     * 
+     *
      * @param rel Relation
      * @param proj Projection
      * @param settings Settings
@@ -483,14 +483,14 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
             if (shared.mat == null) {
               messageOverlay.setMessage("Recomputing similarity matrix.");
               shared.mat = DimensionSimilarityMatrix.make(shared.dim);
-              shared.settings.sim.computeDimensionSimilarites(shared.rel.getDatabase(), shared.rel, shared.rel.getDBIDs(), shared.mat);
+              shared.settings.sim.computeDimensionSimilarites(shared.rel, shared.rel.getDBIDs(), shared.mat);
             }
             messageOverlay.setMessage("Recomputing layout using similarity matrix.");
             final Layout newlayout = layouter.layout(shared.dim, shared.mat);
             setLayout(newlayout);
           } else {
             messageOverlay.setMessage("Recomputing layout.");
-            final Layout newlayout = shared.settings.layout.layout(shared.rel.getDatabase(), shared.rel);
+            final Layout newlayout = shared.settings.layout.layout(shared.rel);
             setLayout(newlayout);
           }
         }
@@ -545,7 +545,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
     /**
      * Switch the current state.
-     * 
+     *
      * @param newstate State to switch to.
      */
     void switchState(State newstate) {
@@ -621,7 +621,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
     /**
      * Callback from layouting thread.
-     * 
+     *
      * @param newlayout New layout.
      */
     protected void setLayout(final Layout newlayout) {
@@ -645,11 +645,11 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {

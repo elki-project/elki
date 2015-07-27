@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * A proxy database to use e.g. for projections and partitions.
- * 
+ *
  * @author Erich Schubert
  */
 public class ProxyDatabase extends AbstractDatabase {
@@ -49,29 +49,29 @@ public class ProxyDatabase extends AbstractDatabase {
 
   /**
    * Constructor.
-   * 
+   *
    * @param ids DBIDs to use
    */
   public ProxyDatabase(DBIDs ids) {
     super();
-    this.idrep = new DBIDView(this, ids);
+    this.idrep = new DBIDView(ids);
     this.relations.add(idrep);
     this.addChildResult(idrep);
   }
 
   /**
    * Constructor.
-   * 
+   *
    * @param ids DBIDs to use
    * @param relations Relations to contain
    */
   public ProxyDatabase(DBIDs ids, Iterable<Relation<?>> relations) {
     super();
-    this.idrep = new DBIDView(this, ids);
+    this.idrep = new DBIDView(ids);
     this.relations.add(idrep);
     this.addChildResult(idrep);
     for (Relation<?> orel : relations) {
-      Relation<?> relation = ProxyView.wrap(this, ids, orel);
+      Relation<?> relation = new ProxyView<>(ids, orel);
       this.relations.add(relation);
       this.addChildResult(relation);
     }
@@ -79,7 +79,7 @@ public class ProxyDatabase extends AbstractDatabase {
 
   /**
    * Constructor.
-   * 
+   *
    * @param ids DBIDs to use
    * @param relations Relations to contain
    */
@@ -89,7 +89,7 @@ public class ProxyDatabase extends AbstractDatabase {
 
   /**
    * Constructor, proxying all relations of an existing database.
-   * 
+   *
    * @param ids ids to proxy
    * @param database Database to wrap
    */
@@ -104,7 +104,7 @@ public class ProxyDatabase extends AbstractDatabase {
 
   /**
    * Add a new representation.
-   * 
+   *
    * @param relation Representation to add.
    */
   public void addRelation(Relation<?> relation) {
@@ -118,7 +118,7 @@ public class ProxyDatabase extends AbstractDatabase {
 
   /**
    * Set the DBIDs to use.
-   * 
+   *
    * @param ids DBIDs to use
    */
   public void setDBIDs(DBIDs ids) {

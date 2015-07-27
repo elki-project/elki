@@ -51,11 +51,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
- * 
+ *
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF}.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> the type of database objects the preprocessor can be applied to
  */
 @Title("Partitioning Approximate kNN Preprocessor")
@@ -78,7 +78,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
 
   /**
    * Constructor
-   * 
+   *
    * @param relation Relation to process
    * @param distanceFunction the distance function to use
    * @param k query k
@@ -93,7 +93,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     MeanVariance ksize = new MeanVariance();
     if(LOG.isVerbose()) {
@@ -164,13 +164,13 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
 
   /**
    * The parameterizable factory.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.stereotype factory
    * @apiviz.uses PartitionApproximationMaterializeKNNPreprocessor oneway - -
    *              «create»
-   * 
+   *
    * @param <O> The object type
    */
   public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
@@ -186,7 +186,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
 
     /**
      * Constructor.
-     * 
+     *
      * @param k k
      * @param distanceFunction distance function
      * @param partitions number of partitions
@@ -206,9 +206,9 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {

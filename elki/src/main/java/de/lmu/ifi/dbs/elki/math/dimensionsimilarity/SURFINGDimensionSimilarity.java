@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,10 +24,8 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
@@ -39,11 +37,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Compute the similarity of dimensions using the SURFING score. The parameter k
  * for the k nearest neighbors is currently hard-coded to 10% of the set size.
- * 
+ *
  * Note that the complexity is roughly O(n n k) * O(d^2), so this is a rather
  * slow method without index support, and with k at 10% of n, is actually cubic.
  * So try to use an appropriate index!
- * 
+ *
  * Reference:
  * <p>
  * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
@@ -51,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Proceedings of the 2013 ACM International Conference on Management of Data
  * (SIGMOD), New York City, NY, 2013.
  * </p>
- * 
+ *
  * Based on:
  * <p>
  * Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and
@@ -59,12 +57,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Subspace Selection for Clustering High-Dimensional Data<br />
  * In IEEE International Conference on Data Mining, 2004.
  * </p>
- * 
+ *
  * TODO: make the subspace distance function and k parameterizable.
- * 
+ *
  * @author Robert Rödler
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses SubspaceEuclideanDistanceFunction
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", booktitle = "Proc. of the 2013 ACM International Conference on Management of Data (SIGMOD)", url = "http://dx.doi.org/10.1145/2463676.2463696")
@@ -86,7 +84,7 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
   booktitle = "IEEE International Conference on Data Mining, 2004", //
   url = "http://dx.doi.org/10.1109/ICDM.2004.10112")
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     Mean kdistmean = new Mean();
     final int k = Math.max(1, subset.size() / 10);
@@ -101,8 +99,8 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
         long[] dims = BitsUtil.zero(dim);
         BitsUtil.setI(dims, i);
         BitsUtil.setI(dims, j);
-        DistanceQuery<? extends NumberVector> dq = database.getDistanceQuery(relation, new SubspaceEuclideanDistanceFunction(dims));
-        KNNQuery<? extends NumberVector> knnq = database.getKNNQuery(dq, k);
+        final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dims);
+        KNNQuery<? extends NumberVector> knnq = relation.getKNNQuery(df, k);
 
         kdistmean.reset();
         int knn = 0;
@@ -128,9 +126,9 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

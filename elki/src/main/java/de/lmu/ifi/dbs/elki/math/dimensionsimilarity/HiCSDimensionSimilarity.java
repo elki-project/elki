@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -53,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Use the statistical tests as used by HiCS to arrange dimensions.
- * 
+ *
  * Reference:
  * <p>
  * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
@@ -61,14 +60,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Proceedings of the 2013 ACM International Conference on Management of Data
  * (SIGMOD), New York City, NY, 2013.
  * </p>
- * 
+ *
  * Based on:
  * <p>
  * F. Keller, E. Müller, and K. Böhm.<br />
  * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking. <br />
  * In ICDE, pages 1037–1048, 2012.
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @author Robert Rödler
  */
@@ -99,7 +98,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
 
   /**
    * Constructor.
-   * 
+   *
    * @param statTest Test function
    * @param m Number of monte-carlo iterations
    * @param alpha Alpha threshold
@@ -114,7 +113,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final Random random = rnd.getSingleThreadedRandom();
     final int dim = matrix.size();
 
@@ -135,7 +134,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
    * Calculates "index structures" for every attribute, i.e. sorts a
    * ModifiableArray of every DBID in the database for every dimension and
    * stores them in a list
-   * 
+   *
    * @param relation Relation to index
    * @param ids IDs to use
    * @param matrix Matrix (for dimension subset)
@@ -158,7 +157,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
 
   /**
    * Calculates the actual contrast of a given subspace
-   * 
+   *
    * @param relation Data relation
    * @param subset Subset to process
    * @param subspaceIndex1 Index of first subspace
@@ -224,9 +223,9 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

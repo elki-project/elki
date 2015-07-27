@@ -97,7 +97,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
    */
   public MaterializeKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k) {
     super(relation, distanceFunction, k);
-    this.knnQuery = relation.getDatabase().getKNNQuery(distanceQuery, k, DatabaseQuery.HINT_BULK, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_NO_CACHE);
+    this.knnQuery = relation.getKNNQuery(distanceQuery, k, DatabaseQuery.HINT_BULK, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_NO_CACHE);
   }
 
   /**

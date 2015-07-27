@@ -1,5 +1,29 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.Node;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,42 +50,18 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 import gnu.trove.impl.Constants;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.Node;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
- * 
+ *
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF}.
- * 
+ *
  * TODO correct handling of datastore events
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses MetricalIndexTree
- * 
+ *
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param <N> the type of spatial nodes in the spatial index
  * @param <E> the type of spatial entries in the spatial index
@@ -76,7 +76,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
   /**
    * Constructor
-   * 
+   *
    * @param relation Relation to preprocess
    * @param distanceFunction the distance function to use
    * @param k query k
@@ -87,7 +87,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
+    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
 
     MetricalIndexTree<O, N, E> index = getMetricalIndex(relation);
 
@@ -151,14 +151,14 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   /**
    * Do some (limited) type checking, then cast the database into a spatial
    * database.
-   * 
+   *
    * @param relation Database
    * @return Metrical index
    * @throws IllegalStateException when the cast fails.
    */
   private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
     Class<MetricalIndexTree<O, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndexTree.class);
-    ArrayList<MetricalIndexTree<O, N, E>> indexes = ResultUtil.filterResults(relation.getDatabase(), mcls);
+    ArrayList<MetricalIndexTree<O, N, E>> indexes = ResultUtil.filterResults(relation, mcls);
     // FIXME: check we got the right the representation
     if(indexes.size() == 1) {
       return indexes.get(0);
@@ -191,13 +191,13 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
   /**
    * The parameterizable factory.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.stereotype factory
    * @apiviz.uses MetricalIndexApproximationMaterializeKNNPreprocessor oneway -
    *              - «create»
-   * 
+   *
    * @param <O> the type of database objects the preprocessor can be applied to
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
@@ -205,7 +205,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   public static class Factory<O extends NumberVector, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * Constructor.
-     * 
+     *
      * @param k k
      * @param distanceFunction distance function
      */
@@ -221,9 +221,9 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer<O extends NumberVector, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {

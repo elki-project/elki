@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining
  * (PAKDD 2006), Singapore, 2006.
  * </p>
- * 
+ *
  * @author Elke Achtert
  * @param <NV> the type of NumberVector handled by this Algorithm
  */
@@ -110,7 +110,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param minpts MinPts
    */
@@ -138,7 +138,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
     if(LOG.isVerbose()) {
       LOG.verbose("knnJoin...");
     }
-    DataStore<KNNList> knns = knnJoin.run(database, relation);
+    DataStore<KNNList> knns = knnJoin.run(relation);
     DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
@@ -193,7 +193,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
   /**
    * Expands the spatial nodes of the specified pair.
-   * 
+   *
    * @param index the index storing the objects
    * @param distFunction the spatial distance function of this algorithm
    * @param nodePair the pair of nodes to be expanded
@@ -215,7 +215,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
   /**
    * Expands the specified directory nodes.
-   * 
+   *
    * @param distFunction the spatial distance function of this algorithm
    * @param node1 the first node
    * @param node2 the second node
@@ -250,7 +250,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
   /**
    * Expands the specified leaf nodes.
-   * 
+   *
    * @param distFunction the spatial distance function of this algorithm
    * @param node1 the first node
    * @param node2 the second node
@@ -286,7 +286,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
   /**
    * Reinserts the objects of the already expanded nodes.
-   * 
+   *
    * @param distFunction the spatial distance function of this algorithm
    * @param index the index storing the objects
    * @param path the path of the object inserted last
@@ -350,7 +350,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
   /**
    * Encapsulates an entry in the cluster order.
-   * 
+   *
    * @apiviz.exclude
    */
   public class SpatialObjectPair implements Comparable<SpatialObjectPair> {
@@ -376,7 +376,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
     /**
      * Creates a new entry with the specified parameters.
-     * 
+     *
      * @param entry1 the first entry of this pair
      * @param entry2 the second entry of this pair
      * @param isExpandable if true, this pair is expandable (a pair of nodes),
@@ -394,7 +394,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
      * negative integer, zero, or a positive integer as this object is less
      * than, equal to, or greater than the specified object.
      * <p/>
-     * 
+     *
      * @param other the Object to be compared.
      * @return a negative integer, zero, or a positive integer as this object is
      *         less than, equal to, or greater than the specified object.
@@ -417,7 +417,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
     /**
      * Returns a string representation of the object.
-     * 
+     *
      * @return a string representation of the object.
      */
     @Override
@@ -460,9 +460,9 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<NV extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NV> {

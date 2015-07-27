@@ -29,7 +29,6 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -43,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Compute dimension similarity by using a nested means discretization.
- * 
+ *
  * Reference:
  * <p>
  * D. Guo<br />
@@ -51,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * selection and multivariate clustering<br />
  * Information Visualization, 2(4), 2003.
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "D. Guo", //
@@ -66,7 +65,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Desired size: 35 observations.
-   * 
+   *
    * While this could trivially be made parameterizable, it is a reasonable rule
    * of thumb and not expected to have a major effect.
    */
@@ -80,7 +79,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
 
     // Find a number of bins as recommended by Cheng et al.
@@ -119,7 +118,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
    * Calculates "index structures" for every attribute, i.e. sorts a
    * ModifiableArray of every DBID in the database for every dimension and
    * stores them in a list.
-   * 
+   *
    * @param relation Relation to index
    * @param ids IDs to use
    * @param matrix Matrix for dimension information
@@ -131,7 +130,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
     double[] tmp = new double[ids.size()];
     Mean mean = new Mean();
-  
+
     for(int i = 0; i < dim; i++) {
       final int d = matrix.dim(i);
       // Index for a single dimension:
@@ -150,13 +149,13 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
       assert (idx.size() == (1 << depth));
       subspaceIndex.add(idx);
     }
-  
+
     return subspaceIndex;
   }
 
   /**
    * Recursive call to further subdivide the array.
-   * 
+   *
    * @param it Iterator (will be reset!)
    * @param data 1D data, sorted
    * @param idx Output index
@@ -221,7 +220,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Intersect the two 1d grid decompositions, to obtain a 2d matrix.
-   * 
+   *
    * @param res Output matrix to fill
    * @param partsx Partitions in first component
    * @param partsy Partitions in second component.
@@ -239,7 +238,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Compute the MCE entropy value.
-   * 
+   *
    * @param mat Partition size matrix
    * @param psizesx Partition sizes on X
    * @param psizesy Partition sizes on Y
@@ -284,9 +283,9 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

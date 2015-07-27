@@ -54,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * A simple outlier detection algorithm that computes the standard deviation of
  * the kNN distances.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
 public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
@@ -72,7 +72,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to use
    * @param k Number of neighbors to use
    */
@@ -83,7 +83,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   /**
    * Run the outlier detection algorithm
-   * 
+   *
    * @param database Database to use
    * @param relation Relation to analyze
    * @return Outlier score result
@@ -115,7 +115,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
     // Wrap the result in the standard containers
     // Actual min-max, theoretical min-max!
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
-    DoubleRelation rel = new MaterializedDoubleRelation(database, relation.getDBIDs(), "stddev-outlier", scores);
+    DoubleRelation rel = new MaterializedDoubleRelation(relation.getDBIDs(), "stddev-outlier", scores);
     return new OutlierResult(meta, rel);
   }
 
@@ -131,11 +131,11 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

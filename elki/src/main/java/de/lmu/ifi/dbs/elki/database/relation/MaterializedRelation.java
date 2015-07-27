@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.relation;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -88,25 +87,23 @@ public class MaterializedRelation<O> extends AbstractRelation<O>implements Modif
   /**
    * Constructor.
    *
-   * @param database Database
    * @param type Type information
    * @param ids IDs
    */
-  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids) {
-    this(database, type, ids, null);
+  public MaterializedRelation(SimpleTypeInformation<O> type, DBIDs ids) {
+    this(type, ids, null);
   }
 
   /**
    * Constructor.
    *
-   * @param database Database
    * @param type Type information
    * @param ids IDs
    * @param name Name
    */
-  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name) {
+  public MaterializedRelation(SimpleTypeInformation<O> type, DBIDs ids, String name) {
     // We can't call this() since we'll have generics issues then.
-    super(database);
+    super();
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
@@ -116,14 +113,13 @@ public class MaterializedRelation<O> extends AbstractRelation<O>implements Modif
   /**
    * Constructor.
    *
-   * @param database Database
    * @param type Type information
    * @param ids IDs
    * @param name Name
    * @param content Content
    */
-  public MaterializedRelation(Database database, SimpleTypeInformation<O> type, DBIDs ids, String name, DataStore<O> content) {
-    super(database);
+  public MaterializedRelation(SimpleTypeInformation<O> type, DBIDs ids, String name, DataStore<O> content) {
+    super();
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
@@ -140,7 +136,7 @@ public class MaterializedRelation<O> extends AbstractRelation<O>implements Modif
    * @param ids IDs
    */
   public MaterializedRelation(String name, String shortname, SimpleTypeInformation<O> type, DataStore<O> content, DBIDs ids) {
-    super(null);
+    super();
     this.type = type;
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
@@ -160,7 +156,7 @@ public class MaterializedRelation<O> extends AbstractRelation<O>implements Modif
       throw new AbortException("Data is stored in a non-writable data store. Modifications are not possible.");
     }
     ((WritableDataStore<O>) content).put(id, val);
-    for(Iter<Result> it = database.getHierarchy().iterDescendants(database); it.valid(); it.advance()) {
+    for(Iter<Result> it = this.getHierarchy().iterDescendants(this); it.valid(); it.advance()) {
       if(!(it.get() instanceof DynamicIndex)) {
         if(it.get() instanceof Index) {
           throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
@@ -182,7 +178,7 @@ public class MaterializedRelation<O> extends AbstractRelation<O>implements Modif
     if(!(content instanceof WritableDataStore)) {
       throw new AbortException("Data is stored in a non-writable data store. Modifications are not possible.");
     }
-    for(Iter<Result> it = database.getHierarchy().iterDescendants(this); it.valid(); it.advance()) {
+    for(Iter<Result> it = this.getHierarchy().iterDescendants(this); it.valid(); it.advance()) {
       if(!(it.get() instanceof DynamicIndex)) {
         if(it.get() instanceof Index) {
           throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");

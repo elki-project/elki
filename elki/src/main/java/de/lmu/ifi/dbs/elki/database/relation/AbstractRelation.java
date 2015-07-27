@@ -1,28 +1,28 @@
 package de.lmu.ifi.dbs.elki.database.relation;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
+Copyright (C) 2015
+Ludwig-Maximilians-Universität München
+Lehr- und Forschungseinheit für Datenbanksysteme
+ELKI Development Team
 
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-import de.lmu.ifi.dbs.elki.database.Database;
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -47,30 +47,17 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract base class for relations.
- * 
+ *
  * @author Erich Schubert
  *
  * @param <O> Data type
  */
 public abstract class AbstractRelation<O> extends AbstractHierarchicalResult implements Relation<O> {
   /**
-   * Our database
-   */
-  protected final Database database;
-
-  /**
    * Constructor.
-   *
-   * @param database Database context (TODO: remove)
    */
-  public AbstractRelation(Database database) {
+  public AbstractRelation() {
     super();
-    this.database = database;
-  }
-
-  @Override
-  public Database getDatabase() {
-    return database;
   }
 
   @Override
@@ -154,6 +141,12 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
   }
 
   @Override
+  public KNNQuery<O> getKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
+    return getKNNQuery(distanceQuery, hints);
+  }
+
+  @Override
   public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
@@ -192,6 +185,12 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
       getLogger().debugFinest(buf.toString());
     }
     return QueryUtil.getLinearScanRangeQuery(distanceQuery);
+  }
+
+  @Override
+  public RangeQuery<O> getRangeQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
+    return getRangeQuery(distanceQuery, hints);
   }
 
   @Override
@@ -240,9 +239,15 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
   }
 
+  @Override
+  public RKNNQuery<O> getRKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
+    return getRKNNQuery(distanceQuery, hints);
+  }
+
   /**
    * Get the class logger.
-   * 
+   *
    * @return Logger
    */
   abstract protected Logging getLogger();

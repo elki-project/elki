@@ -51,9 +51,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Initialize k-means by running k-means on a sample of the data set only.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> Vector type
  */
 public class SampleKMeansInitialization<V extends NumberVector> extends AbstractKMeansInitialization<V> {
@@ -69,7 +69,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
 
   /**
    * Constructor.
-   * 
+   *
    * @param rnd Random generator.
    * @param innerkMeans Inner k-means algorithm.
    * @param rate Sampling rate.
@@ -93,7 +93,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
     }
     @SuppressWarnings("unchecked")
     PrimitiveDistanceFunction<? super NumberVector> pdf = (PrimitiveDistanceFunction<? super NumberVector>) distanceFunction;
-    ProxyView<V> proxyv = new ProxyView<>(database, sample, rel);
+    ProxyView<V> proxyv = new ProxyView<>(sample, rel);
     ProxyDatabase proxydb = new ProxyDatabase(sample, proxyv);
 
     innerkMeans.setK(k);
@@ -110,11 +110,11 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeansInitialization.Parameterizer {

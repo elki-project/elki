@@ -96,7 +96,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     super();
     this.databaseConnection = databaseConnection;
     this.ids = DBIDUtil.newHashSet();
-    this.idrep = new DBIDView(this, this.ids);
+    this.idrep = new DBIDView(this.ids);
     this.relations.add(idrep);
     this.addChildResult(idrep);
 
@@ -201,7 +201,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   private Relation<?> addNewRelation(SimpleTypeInformation<?> meta) {
     @SuppressWarnings("unchecked")
     SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
-    Relation<?> relation = new MaterializedRelation<>(this, ometa, ids);
+    Relation<?> relation = new MaterializedRelation<>(ometa, ids);
     relations.add(relation);
     getHierarchy().add(this, relation);
     // Try to add indexes where appropriate

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.relation;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -34,9 +33,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 /**
  * A virtual partitioning of the database. For the accepted DBIDs, access is
  * passed on to the wrapped representation.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
 public class ProxyView<O> extends AbstractRelation<O> {
@@ -57,26 +56,14 @@ public class ProxyView<O> extends AbstractRelation<O> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param idview Ids to expose
    * @param inner Inner representation
    */
-  public ProxyView(Database database, DBIDs idview, Relation<O> inner) {
-    super(database);
+  public ProxyView(DBIDs idview, Relation<O> inner) {
+    super();
     this.idview = DBIDUtil.makeUnmodifiable(idview);
     this.inner = inner;
-  }
-
-  /**
-   * Constructor-like static method.
-   * 
-   * @param <O> Object type
-   * @param idview Ids to expose
-   * @param inner Inner representation
-   * @return Instance
-   */
-  public static <O> ProxyView<O> wrap(Database database, DBIDs idview, Relation<O> inner) {
-    return new ProxyView<>(database, idview, inner);
   }
 
   @Override
@@ -117,7 +104,7 @@ public class ProxyView<O> extends AbstractRelation<O> {
 
   /**
    * Set the DBIDs to use.
-   * 
+   *
    * @param ids DBIDs
    */
   public void setDBIDs(DBIDs ids) {

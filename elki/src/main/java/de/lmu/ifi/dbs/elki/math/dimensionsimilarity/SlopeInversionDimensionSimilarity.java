@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Arrange dimensions based on the entropy of the slope spectrum. In contrast to
  * {@link SlopeDimensionSimilarity}, we also take the option of inverting an
  * axis into account.
- * 
+ *
  * Reference:
  * <p>
  * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
@@ -44,9 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Proceedings of the 2013 ACM International Conference on Management of Data
  * (SIGMOD), New York City, NY, 2013.
  * </p>
- * 
+ *
  * TODO: shouldn't this be normalized by the single-dimension entropies or so?
- * 
+ *
  * @author Erich Schubert
  * @author Robert Rödler
  */
@@ -68,7 +67,7 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
   }
 
   @Override
-  public void computeDimensionSimilarites(Database database, Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+  public void computeDimensionSimilarites(Relation<? extends NumberVector> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
     final int size = subset.size();
 
@@ -157,9 +156,9 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

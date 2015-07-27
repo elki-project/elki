@@ -86,20 +86,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * The CASH algorithm is a subspace clustering algorithm based on the Hough
  * transform.
- * 
+ *
  * Reference:
  * <p>
  * E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek:<br />
  * Robust clustering in arbitrarily oriented subspaces. <br>
  * In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008
  * </p>
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has CASHInterval
  * @apiviz.has ParameterizationFunction
  * @apiviz.has LinearEquationModel
- * 
+ *
  * @param <V> Vector type
  */
 // todo elke hierarchy (later)
@@ -205,7 +205,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
   /**
    * Constructor.
-   * 
+   *
    * @param minPts MinPts parameter
    * @param maxLevel Maximum level
    * @param minDim Minimum dimensionality
@@ -223,7 +223,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
   /**
    * Run CASH on the relation.
-   * 
+   *
    * @param database Database
    * @param vrel Relation
    * @return Clustering result
@@ -262,7 +262,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
   /**
    * Preprocess the dataset, precomputing the parameterization functions.
-   * 
+   *
    * @param db Database
    * @param vrel Vector relation
    * @return Preprocessed relation
@@ -277,14 +277,14 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       prep.put(iter, new ParameterizationFunction(vrel.get(iter)));
     }
 
-    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(db, type, ids, null, prep);
+    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(type, ids, null, prep);
     return prel;
   }
 
   /**
    * Runs the CASH algorithm on the specified database, this method is
    * recursively called until only noise is left.
-   * 
+   *
    * @param relation the Relation to run the CASH algorithm on
    * @param progress the progress object for verbose messages
    * @return a mapping of subspace dimensionalities to clusters
@@ -422,7 +422,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
   /**
    * Get the dimensionality of a vector field.
-   * 
+   *
    * @param relation Relation
    * @return Dimensionality
    */
@@ -432,7 +432,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
   /**
    * Initializes the heap with the root intervals.
-   * 
+   *
    * @param heap the heap to be initialized
    * @param relation the database storing the parameterization functions
    * @param dim the dimensionality of the database
@@ -507,7 +507,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Builds a dim-1 dimensional database where the objects are projected into
    * the specified subspace.
-   * 
+   *
    * @param dim the dimensionality of the database
    * @param basis the basis defining the subspace
    * @param ids the ids for the new database
@@ -528,7 +528,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     if(LOG.isDebugging()) {
       LOG.debugFine("db fuer dim " + (dim - 1) + ": " + ids.size());
     }
-    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(proxy, type, ids, null, prep);
+    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(type, ids, null, prep);
     proxy.addRelation(prel);
 
     return prel;
@@ -537,7 +537,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Projects the specified parameterization function into the subspace
    * described by the given basis.
-   * 
+   *
    * @param basis the basis defining he subspace
    * @param f the parameterization function to be projected
    * @return the projected parameterization function
@@ -553,7 +553,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Determines a basis defining a subspace described by the specified alpha
    * values.
-   * 
+   *
    * @param alpha the alpha values
    * @return a basis defining a subspace described by the specified alpha values
    */
@@ -570,7 +570,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Computes the product of all sinus values of the specified angles from start
    * to end index.
-   * 
+   *
    * @param start the index to start
    * @param end the index to end
    * @param alpha the array of angles
@@ -588,7 +588,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Determines the next ''best'' interval at maximum level, i.e. the next
    * interval containing the most unprocessed objects.
-   * 
+   *
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
@@ -608,7 +608,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Recursive helper method to determine the next ''best'' interval at maximum
    * level, i.e. the next interval containing the most unprocessed objects
-   * 
+   *
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
@@ -667,7 +667,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Determines the minimum and maximum function value of all parameterization
    * functions stored in the specified database.
-   * 
+   *
    * @param relation the database containing the parameterization functions.
    * @param dimensionality the dimensionality of the database
    * @return an array containing the minimum and maximum function value of all
@@ -697,7 +697,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * Runs the derivator on the specified interval and assigns all points having
    * a distance less then the standard deviation of the derivator model to the
    * model to this model.
-   * 
+   *
    * @param relation the database containing the parameterization functions
    * @param interval the interval to build the model
    * @param dim the dimensionality of the database
@@ -740,7 +740,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Builds a database for the derivator consisting of the ids in the specified
    * interval.
-   * 
+   *
    * @param relation the database storing the parameterization functions
    * @param interval the interval to build the database from
    * @return a database for the derivator consisting of the ids in the specified
@@ -762,7 +762,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       LOG.debugFine("db fuer derivator : " + ids.size());
     }
 
-    MaterializedRelation<DoubleVector> prel = new MaterializedRelation<>(proxy, type, ids, null, prep);
+    MaterializedRelation<DoubleVector> prel = new MaterializedRelation<>(type, ids, null, prep);
     proxy.addRelation(prel);
     return proxy;
   }
@@ -771,7 +771,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * Runs the derivator on the specified interval and assigns all points having
    * a distance less then the standard deviation of the derivator model to the
    * model to this model.
-   * 
+   *
    * @param relation the database containing the parameterization functions
    * @param ids the ids to build the model
    * @param dimensionality the dimensionality of the subspace
@@ -801,7 +801,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   /**
    * Builds a database for the derivator consisting of the ids in the specified
    * interval.
-   * 
+   *
    * @param relation the database storing the parameterization functions
    * @param ids the ids to build the database from
    * @return a database for the derivator consisting of the ids in the specified
@@ -811,7 +811,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     ProxyDatabase proxy = new ProxyDatabase(ids);
     int dim = dimensionality(relation);
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<>(proxy, type, ids);
+    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<>(type, ids);
     proxy.addRelation(prep);
 
     // Project
@@ -835,9 +835,9 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

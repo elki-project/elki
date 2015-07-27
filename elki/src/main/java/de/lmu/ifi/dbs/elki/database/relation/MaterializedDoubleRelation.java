@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.relation;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Represents a single representation. This is attached to a DBIDs object, which
  * you are supposed to manage first. I.e. put the new DBID in, then invoke
  * set(), remove the DBID, then delete().
- * 
+ *
  * @author Erich Schubert
  */
 public class MaterializedDoubleRelation extends AbstractRelation<Double>implements DoubleRelation {
@@ -57,7 +56,7 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
 
   /**
    * The DBIDs this is supposed to be defined for.
-   * 
+   *
    * Note: we only keep an unmodifiable reference.
    */
   private final StaticDBIDs ids;
@@ -74,38 +73,32 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
 
   /**
    * Constructor.
-   * 
-   * @param database Database
+   *
    * @param ids IDs
    */
-  public MaterializedDoubleRelation(Database database, DBIDs ids) {
-    this(database, ids, null);
+  public MaterializedDoubleRelation(DBIDs ids) {
+    this(ids, null);
   }
 
   /**
    * Constructor.
-   * 
-   * @param database Database
+   *
    * @param ids IDs
    * @param name Name
    */
-  public MaterializedDoubleRelation(Database database, DBIDs ids, String name) {
-    super(database);
-    this.ids = DBIDUtil.makeUnmodifiable(ids);
-    this.name = name;
-    this.content = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
+  public MaterializedDoubleRelation(DBIDs ids, String name) {
+    this(ids, name, DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB));
   }
 
   /**
    * Constructor.
-   * 
-   * @param database Database
+   *
    * @param ids IDs
    * @param name Name
    * @param content Content
    */
-  public MaterializedDoubleRelation(Database database, DBIDs ids, String name, DoubleDataStore content) {
-    super(database);
+  public MaterializedDoubleRelation(DBIDs ids, String name, DoubleDataStore content) {
+    super();
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
     this.content = content;
@@ -113,14 +106,14 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
 
   /**
    * Constructor.
-   * 
+   *
    * @param name Name
    * @param shortname Short name of the result
    * @param content Content
    * @param ids IDs
    */
   public MaterializedDoubleRelation(String name, String shortname, DoubleDataStore content, DBIDs ids) {
-    super(null);
+    super();
     this.ids = DBIDUtil.makeUnmodifiable(ids);
     this.name = name;
     this.shortname = shortname;
@@ -157,7 +150,7 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
 
   /**
    * Delete an objects values.
-   * 
+   *
    * @param id ID to delete
    */
   @Override

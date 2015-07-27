@@ -72,12 +72,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * k-nn distance is stored in each entry of a node.
  * <p/>
  * TODO: noch nicht fertig!!!
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has RdKNNNode
  * @apiviz.has RdKNNTreeHeader
- * 
+ *
  * @param <O> Object type
  */
 // FIXME: currently does not yet return RKNNQuery objects!
@@ -104,7 +104,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index
    * @param pagefile Data storage
    * @param settings Tree settings
@@ -113,12 +113,12 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     super(pagefile, settings);
     this.relation = relation;
     this.distanceQuery = settings.distanceFunction.instantiate(relation);
-    this.knnQuery = relation.getDatabase().getKNNQuery(distanceQuery);
+    this.knnQuery = relation.getKNNQuery(distanceQuery);
   }
 
   /**
    * Performs necessary operations before inserting the specified entry.
-   * 
+   *
    * @param entry the entry to be inserted
    */
   @Override
@@ -314,7 +314,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   /**
    * Sorts the entries of the specified node according to their minimum distance
    * to the specified object.
-   * 
+   *
    * @param node the node
    * @param q the query object
    * @param distanceFunction the distance function for computing the distances
@@ -336,7 +336,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Adapts the knn distances before insertion of entry q.
-   * 
+   *
    * @param q the entry to be inserted
    * @param nodeEntry the entry representing the root of the current subtree
    * @param knns_q the knns of q
@@ -399,7 +399,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Performs a reverse knn query in the specified subtree.
-   * 
+   *
    * @param node the root node of the current subtree
    * @param oid the id of the object for which the rknn query is performed
    * @param result the list containing the query results
@@ -428,7 +428,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Performs a bulk reverse knn query in the specified subtree.
-   * 
+   *
    * @param node the root node of the current subtree
    * @param ids the object ids for which the rknn query is performed
    * @param result the map containing the query results for each object
@@ -467,7 +467,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Adjusts the knn distance in the subtree of the specified root entry.
-   * 
+   *
    * @param entry the root entry of the current subtree
    * @param ids <em>Sorted</em> list of IDs
    * @param knnLists a map of knn lists for each leaf entry
@@ -498,7 +498,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Creates a new leaf node with the specified capacity.
-   * 
+   *
    * @return a new leaf node
    */
   @Override
@@ -508,7 +508,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Creates a new directory node with the specified capacity.
-   * 
+   *
    * @return a new directory node
    */
   @Override
@@ -518,7 +518,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Creates a new directory entry representing the specified node.
-   * 
+   *
    * @param node the node to be represented by the new entry
    */
   @Override
@@ -528,7 +528,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Creates an entry representing the root node.
-   * 
+   *
    * @return an entry representing the root node
    */
   @Override
@@ -539,7 +539,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   /**
    * Throws an IllegalArgumentException if the specified distance function is
    * not an instance of the distance function used by this index.
-   * 
+   *
    * @throws IllegalArgumentException
    * @param distanceFunction the distance function to be checked
    */
@@ -561,7 +561,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Inserts the specified real vector object into this index.
-   * 
+   *
    * @param id the object id that was inserted
    */
   @Override
@@ -572,7 +572,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   /**
    * Inserts the specified objects into this index. If a bulk load mode is
    * implemented, the objects are inserted in one bulk.
-   * 
+   *
    * @param ids the objects to be inserted
    */
   @Override
@@ -600,7 +600,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
   /**
    * Deletes the specified object from this index.
-   * 
+   *
    * @return true if this index did contain the object with the specified id,
    *         false otherwise
    */

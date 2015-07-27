@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,28 +22,26 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Interface for computing pairwise dimension similarities, used for arranging
  * dimensions in parallel coordinate plots.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses DimensionSimilarityMatrix - - «writes»
- * 
+ *
  * @param <V> Object type
  */
 public interface DimensionSimilarity<V> {
   /**
    * Compute the dimension similarity matrix
-   * 
-   * @param database Database context
+   *
    * @param relation Relation
    * @param subset DBID subset (for sampling / selection)
    * @param matrix Matrix to fill
    */
-  public void computeDimensionSimilarites(Database database, Relation<? extends V> relation, DBIDs subset, DimensionSimilarityMatrix matrix);
+  public void computeDimensionSimilarites(Relation<? extends V> relation, DBIDs subset, DimensionSimilarityMatrix matrix);
 }
