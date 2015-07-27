@@ -71,11 +71,11 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * Class to load an outlier detection summary file, as produced by
  * {@link ComputeKNNOutlierScores}, and compute a matrix with the pairwise
  * gains. It will have one column / row obtained for each combination.
- * 
+ *
  * The gain is always computed in relation to the better of the two input
  * methods. Green colors indicate the result has improved, red indicate it
  * became worse.
- * 
+ *
  * Reference:
  * <p>
  * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
@@ -83,9 +83,9 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * In Proceedings of the 12th SIAM International Conference on Data Mining
  * (SDM), Anaheim, CA, 2012.
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.composedOf SimilarityMatrixVisualizer
  */
@@ -121,7 +121,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inputstep Input step
    * @param prescaling Scaling function for input scores.
    * @param voting Voting function
@@ -145,7 +145,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     if(!firstlabel.matches(".*by.?label.*")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
-    relation = GreedyEnsembleExperiment.applyPrescaling(prescaling, database, relation, firstid);
+    relation = GreedyEnsembleExperiment.applyPrescaling(prescaling, relation, firstid);
 
     // Dimensionality and reference vector
     final int dim = RelationUtil.dimensionality(relation);
@@ -264,7 +264,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
   /**
    * Show a single visualization.
-   * 
+   *
    * @param context Visualization context
    * @param factory Visualizer factory
    * @param task Visualization task
@@ -283,9 +283,9 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
@@ -338,7 +338,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
   /**
    * Main method.
-   * 
+   *
    * @param args Command line parameters.
    */
   public static void main(String[] args) {

@@ -192,7 +192,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     if(!firstlabel.matches("bylabel")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
-    relation = applyPrescaling(prescaling, database, relation, firstid);
+    relation = applyPrescaling(prescaling, relation, firstid);
     final int numcand = relation.size() - 1;
 
     // Dimensionality and reference vector
@@ -512,12 +512,11 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    * function.
    *
    * @param scaling Scaling function
-   * @param database Database context
    * @param relation Relation to read
    * @param skip DBIDs to pass unmodified
    * @return New relation
    */
-  public static Relation<NumberVector> applyPrescaling(ScalingFunction scaling, Database database, Relation<NumberVector> relation, DBIDs skip) {
+  public static Relation<NumberVector> applyPrescaling(ScalingFunction scaling, Relation<NumberVector> relation, DBIDs skip) {
     if(scaling == null) {
       return relation;
     }
